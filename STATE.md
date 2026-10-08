@@ -16,7 +16,7 @@ Next, in order:
 4. **M4 hardware:** USB speaker and microphone (Dylan buys), MAXN thermal test, offline cold start, eight-hour run.
 5. **Tuning phase (after M3):** fresh larger held-out set with other people's voices; turn merge for long pauses; detector labels for sight; told-statement prompting; latency to 1.2 s.
 
-Running jobs: none. caffeinate runs on the Mac.
+Running jobs: two builders in parallel (D44): M2.2c live-track stability (robot/detect.py, bench/clip_sightings.py, sighting bound) and M3.2 people memory (robot/people.py, robot/faces.py). The lead wires both into robot/main.py after review. Jetson runs serialize on shared/gpu.lock.
 
 ## Known gaps (carried, D40)
 
