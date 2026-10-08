@@ -42,6 +42,18 @@
   "license": "Apache-2.0"
  },
  {
+  "path": "gguf/q35-Qwen3.5-4B-Q4_K_M.gguf",
+  "url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/Qwen3.5-4B-Q4_K_M.gguf",
+  "sha256": "2cd86508d00a978e0d69bb0f7cf42979fdd72e94952820db9c4ee9a23c1326c3",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/q35-4b-mmproj-F16.gguf",
+  "url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/mmproj-F16.gguf",
+  "sha256": "cd88edcf8d031894960bb0c9c5b9b7e1fea6ebee02b9f7ce925a00d12891f864",
+  "license": "Apache-2.0"
+ },
+ {
   "path": "gguf/Qwen3VL-4B-Instruct-Q4_K_M.gguf",
   "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct-GGUF/resolve/1cd86afb9a95c410a6038ab3b40d8b578c892266/Qwen3VL-4B-Instruct-Q4_K_M.gguf",
   "sha256": "66358cb18bb6b3b1b6675aa412c7a88ef01d228f481184d13668e5201c730a0a",
@@ -112,5 +124,53 @@
   "url": "https://raw.githubusercontent.com/snakers4/silero-vad/1e261b036686cd0017d500ee96acd1c4ba572a9d/src/silero_vad/data/silero_vad.onnx",
   "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
   "license": "MIT"
+ },
+ {
+  "path": "gguf/g3-gemma-3-4b-it-Q4_K_M.gguf",
+  "url": "https://huggingface.co/ggml-org/gemma-3-4b-it-GGUF/resolve/d09762237476/gemma-3-4b-it-Q4_K_M.gguf",
+  "sha256": "882e8d2db44dc554fb0ea5077cb7e4bc49e7342a1f0da57901c0802ea21a0863",
+  "license": "Gemma"
+ },
+ {
+  "path": "gguf/g3-mmproj-model-f16.gguf",
+  "url": "https://huggingface.co/ggml-org/gemma-3-4b-it-GGUF/resolve/d09762237476/mmproj-model-f16.gguf",
+  "sha256": "8c0fb064b019a6972856aaae2c7e4792858af3ca4561be2dbf649123ba6c40cb",
+  "license": "Gemma"
+ },
+ {
+  "path": "gguf/mcpm4-ggml-model-Q4_K_M.gguf",
+  "url": "https://huggingface.co/openbmb/MiniCPM-V-4-gguf/resolve/c548a86e7664/ggml-model-Q4_K_M.gguf",
+  "sha256": "b0ff610e9c92b30389ff1e0dd40fffed3c1f02a9d34a735fd5fba6a5ad25672b",
+  "license": "MiniCPM Model License"
+ },
+ {
+  "path": "gguf/mcpm4-mmproj-model-f16.gguf",
+  "url": "https://huggingface.co/openbmb/MiniCPM-V-4-gguf/resolve/c548a86e7664/mmproj-model-f16.gguf",
+  "sha256": "f0faa9ae63532300999c86a196f140c716cd0fbb08bbbd81850f1f9a631f7761",
+  "license": "MiniCPM Model License"
+ },
+ {
+  "path": "gguf/q25vl-Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "url": "https://huggingface.co/ggml-org/Qwen2.5-VL-3B-Instruct-GGUF/resolve/5037fcf163dd/Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "sha256": "d02fe9b69ad8cadbbd228e387667af66612c44bed29ffc8eb1e7caf9ac486c12",
+  "license": "Qwen Research License"
+ },
+ {
+  "path": "gguf/q25vl-mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf",
+  "url": "https://huggingface.co/ggml-org/Qwen2.5-VL-3B-Instruct-GGUF/resolve/5037fcf163dd/mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf",
+  "sha256": "980c9b2f78c04e6cff93d277ada09e768394f112d75db3b4e9dea8a69f9fb904",
+  "license": "Qwen Research License"
+ },
+ {
+  "path": "gguf/lfm2-LFM2-VL-3B-Q4_K_M.gguf",
+  "url": "https://huggingface.co/LiquidAI/LFM2-VL-3B-GGUF/resolve/da5c839b488c/LFM2-VL-3B-Q4_K_M.gguf",
+  "sha256": "07b435d85daec5dec0e2be6644f36201d1a0dff8904d83e41175ba2d3b6f3ffe",
+  "license": "LFM Open License v1.0"
+ },
+ {
+  "path": "gguf/lfm2-mmproj-LFM2-VL-3B-Q8_0.gguf",
+  "url": "https://huggingface.co/LiquidAI/LFM2-VL-3B-GGUF/resolve/da5c839b488c/mmproj-LFM2-VL-3B-Q8_0.gguf",
+  "sha256": "135dd0ee2a0ceb597fac0d8640dae6c86f28c7ca2cd5b88eb309c32fe8f8dde9",
+  "license": "LFM Open License v1.0"
  }
 ]

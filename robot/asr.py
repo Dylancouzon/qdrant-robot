@@ -26,7 +26,8 @@ BUFFER_S = 30
 THREADS = 4                  # Parakeet's share of the six cores
 # Names the acoustic model spells by sound. Visitors say "quadrant".
 _QDRANT = r"(?:quadrant|q ?drant|cue ?drant|kudrant)"
-_FIXES = [(re.compile(rf"\b{_QDRANT}(?:age|ed?ge)\b", re.I), "Qdrant Edge"),  # "quadrantage"
+_FIXES = [(re.compile(rf"\b(?:{_QDRANT}|quadr[aeiou]n\w*?)(?:age|ed?ge)\b", re.I),
+           "Qdrant Edge"),  # "quadrantage", "quadrundage"
           (re.compile(rf"\b{_QDRANT}s?\b", re.I), "Qdrant")]
 
 
@@ -42,6 +43,8 @@ class Scribe:
     def __init__(self):
         opts = ort.SessionOptions()
         opts.intra_op_num_threads = THREADS
+        opts.enable_cpu_mem_arena = False  # each input length would otherwise grow the arena
+        opts.add_session_config_entry("session.disable_prepacking", "1")  # one copy of weights
         self.model = onnx_asr.load_model("nemo-parakeet-tdt-0.6b-v2", MODELS / "parakeet-v2",
                                          quantization="int8", providers=["CPUExecutionProvider"],
                                          sess_options=opts)
@@ -132,6 +135,7 @@ if __name__ == "__main__":
     assert normalize("What is quadrant edge?") == "What is Qdrant edge?"
     assert normalize("a quadrangle") == "a quadrangle"
     assert normalize("What is quadrantage?") == "What is Qdrant Edge?"
+    assert normalize("What is quadrundage?") == "What is Qdrant Edge?"
     assert normalize("quadrant edge") == "Qdrant edge"
     ears = object.__new__(Ears)  # only the buffer and line logic, without loading a model
     ears.fed, ears.buffer = 0, np.zeros(4, np.float32)

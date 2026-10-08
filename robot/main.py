@@ -1,24 +1,26 @@
 """The robot: hears a line, looks, recalls, answers aloud. One process; the LLM runs in a
 supervised llama-server child. Every turn logs its stage times and saves its answer audio.
 
-    python -m robot.main            live: camera, camera microphone, speaker if any
+    python -m robot.main                       camera, camera microphone, no speaker
+    python -m robot.main --speaker plughw:1,0  ... and an ALSA speaker
+    python -m robot.main --listen 7070         microphone and speaker of a Mac client
 """
+import argparse
 import json
 import queue
 import threading
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-import cv2
 import numpy as np
 
 from robot import audio, brain
 from robot.asr import Ears, Scribe
 from robot.config import SHARED
-from robot.knowledge import Knowledge
-from robot.memory import Seen
+from robot.knowledge import VERBATIM, Knowledge
+from robot.memory import Memory, about_now, about_past, is_question, thumb
 from robot.text_embed import TextEmbedder
 from robot.tts import RATE, Speaker, phrases
 
@@ -28,9 +30,7 @@ SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
 
 
 def scene_change(a: np.ndarray, b: np.ndarray) -> float:
-    def thumb(f: np.ndarray) -> np.ndarray:
-        return cv2.resize(cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), (64, 36)).astype(np.float32)
-    return float(np.abs(thumb(a) - thumb(b)).mean())
+    return float(np.abs(thumb(a).astype(np.float32) - thumb(b)).mean())
 
 
 @dataclass
@@ -40,6 +40,8 @@ class Look:
     taken: float                  # capture time: the evidence time of what the brain saw
     image: dict
     exchanges: int
+    changed: bool                 # the view differs from the previous turn's
+    history: list[dict]           # the conversation as prefilled with this frame
 
 
 @dataclass
@@ -49,6 +51,9 @@ class Turn:
     answer: str = ""
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
+    verbatim: bool = False        # answered with a stored fact, no LLM
+    told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
+    prompt: list = field(default_factory=list)  # the brain's messages, images left out
     frame_id: int = 0             # the frame this turn saw, stored as a memory
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
@@ -65,16 +70,17 @@ class Turn:
 
 class Robot:
     def __init__(self, camera, out: Path, memory: Path = SHARED / "memory",
-                 speaker_device: str | None = None, model: str = brain.MODEL):
+                 play: Callable[[np.ndarray], None] | None = None, model: str = brain.MODEL):
         self.camera, self.out = camera, out
         out.mkdir(parents=True, exist_ok=True)
-        self.knowledge, self.seen, self.embed = Knowledge(), Seen(memory), TextEmbedder()
+        self.knowledge, self.memory, self.embed = Knowledge(), Memory(memory), TextEmbedder()
         self.scribe = Scribe()
         self.voice = Speaker()
-        self.speaker = audio.Mouth(RATE, speaker_device)
+        self.speaker = audio.Mouth(play)
         self.brain = brain.Brain(model)
         self.history: list[dict] = []
         self.exchanges = 0                      # counts every exchange; history is capped
+        self.last_frame: np.ndarray | None = None  # the frame of the previous turn
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
         self.lines: queue.Queue = queue.Queue()  # finished lines for the final transcript
         self.turns: queue.Queue[Turn] = queue.Queue()  # finished turns, for replay and logs
@@ -93,8 +99,9 @@ class Robot:
     def reset(self, memory: Path) -> None:
         """Start over with an empty memory and conversation (scripted sessions)."""
         self.jobs.join()
-        self.seen.shard.close()
-        self.seen, self.history, self.exchanges, self.ready = Seen(memory), [], 0, None
+        self.memory.shard.close()
+        self.memory, self.history, self.exchanges, self.ready = Memory(memory), [], 0, None
+        self.last_frame = None
 
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
@@ -140,12 +147,17 @@ class Robot:
             elif (caption := self.brain.caption(job[2], lambda: self.speaking)) is None:
                 self.uncaptioned.append(job[1:])  # a visitor spoke: retry after their turn
             else:
-                self.seen.caption(job[1], caption)
+                self.memory.caption(job[1], caption)
             self.jobs.task_done()
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
-        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges)
-        self.brain.prefill(brain.messages(self.history, look.image))
+        changed = self.last_frame is not None and scene_change(
+            self.last_frame, shot[0]) > SCENE_CHANGE
+        # After the view changes, the brain's earlier answers describe a scene that is gone: keep
+        # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
+        history = [m for m in self.history if m["role"] == "user"] if changed else self.history
+        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
+        self.brain.prefill(brain.messages(history, look.image))
         self.ready = look
 
     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
@@ -155,15 +167,31 @@ class Robot:
             self._look(shot)
         if (look := self.ready) is None:
             return  # no camera frame yet: nothing to answer about
-        turn.facts = [fact for _, fact in self.knowledge.search(self.embed([turn.question])[0])]
-        recalled = self.seen.recent(before=turn.speech_start)
+        question = self.embed([turn.question])[0]
+        found = self.knowledge.search(question)
+        turn.facts = [fact for _, fact in found]
+        turn.verbatim = bool(found) and found[0][0] >= VERBATIM
+        past = about_past(turn.question)
+        # Memories of the scene in view now are the present, not something shown before.
+        recalled = [m for m in self.memory.recent(before=turn.speech_start)
+                    if np.abs(m["thumb"] - thumb(look.frame).astype(np.float32)).mean()
+                    > SCENE_CHANGE] if past else []
         turn.memories = [m["id"] for m in recalled]
-        memories = [f"{brain.age(turn.speech_start - m['ts'])}: {m['caption']}"
-                    for m in recalled]
+        memories = [f"{k}. {brain.age(turn.speech_start - m['ts'])}: {m['caption']}"
+                    for k, m in enumerate(reversed(recalled), 1)]  # oldest first
+        statements = self.memory.told(question, before=turn.speech_start)
+        turn.told = [m["said"] for m in statements]
+        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
         turn.retrieved = time.time()
-        prefix = brain.messages(self.history, look.image)
-        msgs = brain.messages(self.history, look.image, memories, turn.facts, turn.question)
-        audio_parts = list(self._speak(phrases(self._tokens(msgs, turn)), turn))
+        prefix = brain.messages(look.history, look.image)
+        self.last_frame = look.frame
+        image = None if past and not about_now(turn.question) else look.image
+        msgs = brain.messages(look.history, image, memories, turn.facts,
+                              turn.question, look.changed, past, told)
+        turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
+                       if isinstance(m["content"], list) else m for m in msgs]
+        tokens = self._said(turn.facts[0], turn) if turn.verbatim else self._tokens(msgs, turn)
+        audio_parts = list(self._speak(phrases(tokens), turn))
         turn.done = time.time()
         turn.wav = f"{int(turn.line * 1000)}.wav"
         spoken = np.concatenate(audio_parts or [np.zeros(1)])
@@ -173,13 +201,18 @@ class Robot:
                                         {"role": "assistant", "content": turn.answer}]
                         )[-2 * HISTORY_TURNS:]
         self.exchanges += 1
-        pid = turn.frame_id = self.seen.add(look.frame, turn.question, ts=look.taken)
+        statement = None if is_question(turn.question) else question  # findable later
+        pid = turn.frame_id = self.memory.add(look.frame, turn.question, statement, look.taken)
         for job in [*self.uncaptioned, (pid, prefix)]:
             self.jobs.put(("caption", *job))
         self.uncaptioned = []
         with (self.out / "turns.jsonl").open("a") as f:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
+
+    def _said(self, fact: str, turn: Turn) -> Iterator[str]:
+        turn.first_token, turn.answer = time.time(), fact
+        yield fact
 
     def _tokens(self, msgs: list[dict], turn: Turn) -> Iterator[str]:
         for delta in self.brain.answer(msgs):
@@ -198,17 +231,27 @@ class Robot:
 
     def close(self) -> None:
         self.jobs.join()
-        self.seen.shard.close()
+        self.speaker.q.join()  # let the last phrase finish playing
+        self.memory.shard.close()
         self.knowledge.shard.close()
         self.brain.close()
 
 
 def main() -> None:
     from robot.camera import Camera
-    robot = Robot(Camera(), SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"))
+    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument("--speaker", help="ALSA playback device")
+    p.add_argument("--listen", type=int, help="TCP port for a Mac client (tools/talk.py)")
+    a = p.parse_args()
+    chunks, play = audio.mic(), audio.aplay(a.speaker, RATE) if a.speaker else None
+    if a.listen:
+        print(f"waiting for a client on port {a.listen}", flush=True)
+        chunks, play = audio.serve(a.listen)
+    robot = Robot(Camera(), SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
     print("listening", flush=True)
-    for chunk in audio.mic():
+    for chunk in chunks:
         robot.hear(chunk)
+    robot.close()
 
 
 if __name__ == "__main__":

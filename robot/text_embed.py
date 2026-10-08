@@ -18,8 +18,9 @@ class TextEmbedder:
         self.tok = Tokenizer.from_file(str(d / "tokenizer.json"))
         self.tok.enable_truncation(MAX_TOKENS)
         self.tok.enable_padding()
-        providers = [p for p in ("CUDAExecutionProvider", "CPUExecutionProvider")
-                     if p in ort.get_available_providers()]
+        cuda = "CUDAExecutionProvider" in ort.get_available_providers()
+        providers = ([("CUDAExecutionProvider", {"arena_extend_strategy": "kSameAsRequested"})]
+                     if cuda else ["CPUExecutionProvider"])
         self.sess = ort.InferenceSession(str(d / "model.onnx"), providers=providers)
 
     def __call__(self, texts: list[str]) -> np.ndarray:

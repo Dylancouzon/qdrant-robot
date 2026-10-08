@@ -4,14 +4,15 @@ Last updated: 2026-10-08 01:10, by the lead (overnight session). Rewrite, do not
 
 ## Active task
 
-**M1.3 Decision run** is next. M1.2 vertical slice is done (review PASS `reviews/20261008-020746-59698-review.md`).
+**M1.3 Decision run**: not yet met (review `reviews/20261008-042932-76113-review.md`: 35/39 is 89.7%, under 90%). Final configuration is being measured over three runs; then M1.4 held-out acceptance.
 
-- Reviews: design `reviews/20261008-004127-86650-design.md` and `reviews/20261008-014824-42570-design.md` (GO WITH CHANGES, applied); task review rounds `reviews/20261008-0142*`, `-0147*`, `-0152*` (FIX, fixed or rejected in D25).
-- Pipeline: Silero VAD and Parakeet TDT 0.6B v2 int8 on the CPU (D24, provisional until real voices, D26); Qwen3-VL-2B on llama-server with a kept-warm frame prefix; retrieval in code (knowledge shard, captioned frame memory in Edge); Kokoro on ORT CUDA with early first phrases.
-- Latest replay (`bench/results/2026-10-08-replay-1791439664.jsonl`, 12 spoken turns): 10/12, recall evidence 2/2; p50 from end of speech: line 0.39 s, transcript 0.66 s, first token 0.81 s, first phrase 1.17 s, first synthesized audio 1.72 s (max 1.97 s).
-- Failures: 2B trusts its own previous answer over the frame (scene change) and skips a greeting; Qwen3-VL-4B passes both but is about 1 s slower at 15W. Keyword scoring is weak: build a larger judged dev set before choosing (D26).
-- Next: M1.3 decision run with an expanded, judged dev set (2B against 4B), Kokoro TensorRT (needs ONNX shape inference), and a Mac live client.
-- Next command: write `eval/dev/sessions.jsonl` additions (20 or more mixed turns) and a judge, then `scratchpad replay` for 2B and 4B.
+- Acceptance command (Mac): `python3 eval/run.py [cases] [--model m]`: deploy, replay on the Jetson, collect, judge (`eval/judge.py`, gpt-6-sol). Exit 0 only when keywords, evidence, and the judge all pass.
+- Recent dev runs (39 turns): 36/39, 35/39 judged; first synthesized audio 1.63 to 1.67 s p50.
+- Changes since the M1.2 commit (uncommitted): conversation memory (visitor statements with a bge `said` vector on each Edge point, recalled by vector search), context gating (memories only for past questions, no image unless the question also points at the present, memories of the current scene skipped), verbatim facts at 0.93, one-sentence answers, memory limits (D28), two-part captions ("Main object: ..."), Mac client `tools/talk.py`, per-run tegrastats.
+- Reviews open: M1.3 task review FIX (fixes applied: talk.py reads and mute, playback drain, judge in acceptance; quality rerun pending). Design `reviews/20261008-053055-21159-design.md` GO WITH CHANGES: applied question detection by opening word and image for here-and-past questions; false-recollection tests are in the held-out set.
+- Held-out set frozen 2026-10-08 05:40: `eval/heldout/sessions.jsonl` (26 turns, unused voices, new images). Do not tune on it.
+- Running: two acceptance runs (scratchpad `runs.txt`); robot units `qr-replay`.
+- Next command: `python3 eval/run.py` (dev, three times), then `python3 eval/run.py eval/heldout/sessions.jsonl`.
 
 ## Robot access
 
@@ -40,7 +41,7 @@ Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/D
 
 ## Unmet targets
 
-All CLAUDE.md targets unmeasured at acceptance scale. Interim (dev, 12 turns, no speaker): first synthesized audio 1.72 s p50 against the 1.2 s final target; decode 22 tok/s against 30 tok/s (15W caps the GPU at 625 MHz).
+All CLAUDE.md targets unmeasured at acceptance scale. Interim (dev, 39 turns, no speaker): first synthesized audio 1.77 s p50 against the 1.2 s final target; decode 22 tok/s against 30 tok/s (15W caps the GPU at 625 MHz).
 
 ## Milestones and acceptance
 
@@ -58,7 +59,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 - [x] **M1.1 Stack qualification.** Done 2026-10-08 except Super mode (needs Dylan).
 - [x] **M1.2 Vertical slice.** Done 2026-10-08 (C3).
-- [ ] **M1.3 Decision run.** 20 mixed turns on the Jetson; pass: 18 or more correct, no swap, 1 GB headroom.
+- [ ] **M1.3 Decision run.** In review: dev 35/39 judged, no swap, 1,886 MB headroom (D27, D28).
 - [ ] **M1.4 It talks.** Knowledge shard and current-camera questions to M1 acceptance, with dev fixtures and scored replays. Knowledge shard is built (`knowledge/build.py`, Qdrant v1.19.0 server snapshot restored into Edge 0.8.0).
 - [ ] **M1.5 Milestone gate.**
 

@@ -9,6 +9,7 @@ dependencies = [
     "opencv-python-headless==5.0.0.93",
     "qdrant-edge-py==0.8.0",
     "kokoro-onnx==0.6.1",
+    "sounddevice==0.5.6; sys_platform == 'darwin'",
     "tokenizers==0.23.2",
     "onnxruntime==1.30.0; sys_platform == 'darwin'",
     # PyPI's aarch64 GPU build has no sm_87 kernels; the Jetson AI Lab build does (research/stack.md).

@@ -13,6 +13,9 @@ SNAPSHOT = ROOT / "knowledge/knowledge.snapshot"
 # Below this cosine the best phrasing is not the visitor's question. Provisional: calibrate on
 # eval/dev knowledge and off-topic questions (M1.4).
 MIN_SCORE = 0.75
+# At or above this, the question is one of the fact's phrasings in other words: the robot says
+# the fact itself, with no LLM. Dev questions: correct matches 0.95 to 1.0, others 0.86 or less.
+VERBATIM = 0.93
 
 
 class Knowledge:

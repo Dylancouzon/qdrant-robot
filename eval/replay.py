@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Replay scripted sessions through the whole robot on the Jetson and score them: each session
 starts with an empty memory, shows fixture frames, and speaks fixture WAVs at real-time pace.
-Exits non-zero when any step fails.
+Exits non-zero when a keyword or evidence check fails. Acceptance also needs the judge: run
+both through `eval/run.py` on the Mac.
 
     python -m eval.replay [--model qwen3vl-4b] [eval/dev/sessions.jsonl]
 """
@@ -29,7 +30,7 @@ REACT_S = 1.0    # a visitor waits for the answer to finish, then this long, bef
 
 def ok(step: dict, answer: str) -> bool:
     a = answer.lower().replace("\u2019", "'")
-    return any(w in a for w in step["expect_any"]) and not any(
+    return any(w in a for w in step["expect_any"] or [""]) and not any(
         w in a for w in step.get("expect_none", []))
 
 
@@ -58,6 +59,7 @@ def main(path: Path, model: str) -> int:
             row = {"id": step["id"], "ok": ok(step, turn.answer), "heard": turn.question,
                    "evidence_ok": all(f in turn.memories for f in want) if want else None,
                    "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
+                   "verbatim": turn.verbatim, "told": turn.told, "prompt": turn.prompt,
                    "line_s": turn.line - turn.speech_end,
                    "asr_s": turn.transcribed - turn.speech_end,
                    "first_token_s": turn.first_token - turn.speech_end,
@@ -81,6 +83,7 @@ def main(path: Path, model: str) -> int:
                "asr_p50_s": statistics.median(r["asr_s"] for r in rows),
                "first_token_p50_s": statistics.median(r["first_token_s"] for r in rows),
                "first_phrase_p50_s": statistics.median(r["first_phrase_s"] for r in rows),
+               "audio_dir": str(out),
                "note": "first_audio = first phrase synthesized and queued; no speaker yet"}
     results = SHARED / "results" / f"{stamp}-replay-{int(time.time())}.jsonl"
     results.write_text("".join(json.dumps(r) + "\n" for r in [*rows, summary]))

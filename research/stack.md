@@ -16,6 +16,21 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 
 - 15 minutes of continuous llama-bench (Qwen3-VL-2B, pp512 plus tg128 in a loop, GPU busy 74% mean): junction temperature peaked at 59.9 °C, prefill and decode stayed within 0.3% from first to last run, VDD_IN 10.9 W mean and 14.3 W peak, no new over-current events (`oc3_event_cnt` stayed at 14,949, counted earlier since boot, probably during the six-core build). Evidence: `bench/results/thermal-15w.tegrastats`. (J)
 
+## Memory budget (bench/memory_budget.py, MemAvailable drop per component, J)
+
+| Component | Before limits | After limits |
+| --- | --- | --- |
+| bge-small, ORT CUDA (includes the process's CUDA context) | 370 MB | 442 MB |
+| Kokoro, ORT CUDA | 608 MB, +576 MB after 39 phrase lengths | 441 MB, +211 MB |
+| Parakeet int8 plus Silero, CPU | 1,218 MB | 880 MB |
+| llama-server, Qwen3-VL-2B Q4_K_M | 2,511 MB | 2,067 MB |
+| Available with everything loaded and exercised | 460 MB | 2,016 MB |
+
+- llama-server keeps a host-RAM prompt cache, 8 GiB by default (`--cache-ram`): long replays pushed the robot 1.4 GB into swap. Now `--cache-ram 0`, `-c 2048`, `-ub 256`.
+- ORT's CUDA arena keeps a block per input shape. `kSameAsRequested` alone made Kokoro grow more (+1,340 MB); arena shrinkage after each run (`memory.enable_memory_arena_shrinkage`) bounds it with no speed loss (RTF 0.13).
+- Parakeet int8 on the CPU: no memory arena and no weight prepacking (one copy of the weights).
+- Qwen3.5-4B Q4_K_M was killed by the OOM killer at load (4.6 GB anonymous RSS).
+
 ## Speech timings
 
 | Model | Runtime | Result | Label |
@@ -24,6 +39,8 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 | Kokoro v1.0 fp32 ONNX | ORT CPU | 2,242 ms for 3.18 s (RTF 0.71) | J |
 | Kokoro v1.0 int8 ONNX | ORT CPU and CUDA | RTF 2.4 to 4.6: int8 ops fall back badly | J |
 | Kokoro v1.0 fp16 ONNX | kokoro-onnx 0.6.1 | fails ("zero-size array") | J |
+| Kokoro v1.0 fp32 ONNX | ORT 1.24 CUDA EP, `cudnn_conv_algo_search=HEURISTIC`, alone | 0.16 s for a two-word phrase, 0.23 s for six words, RTF 0.13 | J |
+| Kokoro v1.0 fp32 ONNX | ORT TensorRT EP | blocked: `SplitToSequence` output has no shape, and ORT's symbolic shape inference fails on the model | J |
 
 ## llama.cpp (commit 9c2e0e4, CUDA 13.2, sm_87, 15W, `-fa 1`)
 

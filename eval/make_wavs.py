@@ -3,20 +3,24 @@
 
     eval/make_wavs.py eval/dev/brain.jsonl     writes eval/dev/audio/<id>.wav, skips existing
     eval/make_wavs.py eval/dev/sessions.jsonl  the same for every "say" step of each session
+    eval/make_wavs.py eval/heldout/sessions.jsonl --voices heldout   voices the dev set never uses
 """
+import argparse
 import json
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
 # Several synthetic voices, rotated per case; real recorded voices join them later.
-VOICES = ["Samantha", "Daniel", "Karen", "Moira", "Rishi"]
+VOICES = {"dev": ["Samantha", "Daniel", "Karen", "Moira", "Rishi", "Fred", "Kathy", "Ralph",
+                  "Grandpa (English (US))"],
+          "heldout": ["Eddy (English (US))", "Flo (English (UK))", "Reed (English (US))",
+                      "Sandy (English (UK))", "Rocko (English (US))", "Shelley (English (US))"]}
 # How people say it; `say` mispronounces the written name.
 SPOKEN = {"Qdrant": "quadrant"}
 
 
-def main(cases: Path) -> None:
+def main(cases: Path, voices: list[str]) -> None:
     out = cases.parent / "audio"
     out.mkdir(exist_ok=True)
     records = [json.loads(line) for line in cases.read_text().splitlines()]
@@ -30,11 +34,15 @@ def main(cases: Path) -> None:
             text = case["say"]
             for written, spoken in SPOKEN.items():
                 text = text.replace(written, spoken)
-            subprocess.run(["say", "-v", VOICES[k % len(VOICES)], "-o", aiff, text], check=True)
+            subprocess.run(["say", "-v", voices[k % len(voices)], "-o", aiff, text], check=True)
             subprocess.run(["afconvert", "-f", "WAVE", "-d", "LEI16@16000", "-c", "1",
                             aiff, wav], check=True)
         print(wav)
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument("cases", type=Path)
+    p.add_argument("--voices", choices=VOICES, default="dev")
+    a = p.parse_args()
+    main(a.cases, VOICES[a.voices])

@@ -76,7 +76,7 @@ def run(name: str, cmd: list[str], wait: bool) -> int:
         raise SystemExit(f"job name must be lowercase letters, digits, and dashes: {name!r}")
     unit = f"qr-{name}"
     job = shlex.join(cmd)
-    log = f"{BASE}/shared/results/{name}.tegrastats"
+    log = f"{BASE}/shared/results/{name}-$(date +%Y%m%d-%H%M%S).tegrastats"  # one per run
     body = (f"tegrastats --interval 1000 --logfile {log} & t=$!; "
             f".venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
     flags = "--wait --pipe" if wait else "--no-block"

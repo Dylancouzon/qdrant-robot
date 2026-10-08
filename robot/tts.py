@@ -11,6 +11,8 @@ from kokoro_onnx import Kokoro
 from robot.config import MODELS
 
 VOICE = "af_heart"
+# Spoken as people say them; Kokoro reads "Qdrant" as "Cube-rant" (heard in a transcribed answer).
+SAY_AS = {"qdrant-edge-py": "quadrant edge pie", "Qdrant": "quadrant"}
 RATE = 24000
 FIRST_WORDS = 2   # the first phrase may end at a comma after this many words
 MAX_WORDS = 18    # never hold more than this before speaking
@@ -50,18 +52,37 @@ def phrases(deltas: Iterable[str]) -> Iterator[str]:
         yield buf.strip()
 
 
+class _Shrinking:
+    """An ORT session whose GPU arena gives memory back after every run: each phrase length is
+    a new shape, and the arena would otherwise keep a block per shape (+1.3 GB measured)."""
+
+    def __init__(self, sess: ort.InferenceSession):
+        self.sess, self.opts = sess, ort.RunOptions()
+        self.opts.add_run_config_entry("memory.enable_memory_arena_shrinkage", "gpu:0")
+
+    def run(self, outputs, feeds, *_):  # the caller's run options are replaced by ours
+        return self.sess.run(outputs, feeds, self.opts)
+
+    def __getattr__(self, name: str):
+        return getattr(self.sess, name)
+
+
 class Speaker:
     def __init__(self):
         d = MODELS / "kokoro"
         # Every phrase has a new input length: an exhaustive cuDNN search would rerun each time.
         cuda = "CUDAExecutionProvider" in ort.get_available_providers()
-        providers = ([("CUDAExecutionProvider", {"cudnn_conv_algo_search": "HEURISTIC"})]
+        providers = ([("CUDAExecutionProvider", {"cudnn_conv_algo_search": "HEURISTIC",
+                                                "arena_extend_strategy": "kSameAsRequested"})]
                      if cuda else ["CPUExecutionProvider"])
         sess = ort.InferenceSession(str(d / "kokoro-v1.0.onnx"), providers=providers)
-        self.kokoro = Kokoro.from_session(sess, str(d / "voices-v1.0.bin"))
+        self.kokoro = Kokoro.from_session(_Shrinking(sess) if cuda else sess,
+                                          str(d / "voices-v1.0.bin"))
         self.say("Ready.")  # warm every kernel before the first visitor
 
     def say(self, text: str) -> np.ndarray:
+        for written, spoken in SAY_AS.items():
+            text = text.replace(written, spoken)
         audio, rate = self.kokoro.create(text, voice=VOICE, lang="en-us")
         assert rate == RATE
         return audio
