@@ -9,16 +9,20 @@ Last updated: 2026-10-07, by the setup session. Rewrite this file at every hando
 - Changed paths: the harness itself (all files in the repo), uncommitted. It is checkpoint C0.
 - Unresolved findings: none.
 - Running jobs: none.
-- Next command: `ssh -o BatchMode=yes robot true` (works once `Host robot` exists in `~/.ssh/config`). Then: `ssh robot 'cat /etc/nv_tegra_release; sudo nvpmodel -q; free -m; df -h; arecord -l; aplay -l; v4l2-ctl --list-devices'`
+- Next command: `ssh robot 'sudo systemctl disable --now l6-robot.service memory-robot-clock.service; sudo nvpmodel -q --verbose | grep -i -E "MAXN|POWER_MODEL"'`, then switch to MAXN_SUPER.
 
 ## Robot access
 
-- Hostname `qdrant-robot`, Ubuntu 24.04.4 LTS (so likely JetPack 7). On 2026-10-07 it did not answer on the LAN (no SSH on 192.168.1.0/24, no 192.168.55.1 USB network). The serial console works from the Mac at `/dev/cu.usbmodem17905260463333`, 115200 baud (debug USB-C port).
-- SSH target: TBD. Diagnose the LAN link over serial first, then add `Host robot` to `~/.ssh/config`.
-- User: TBD. Sudo: passwordless expected; fallback password in `.env` (`ROBOT_SUDO_PASSWORD`).
-- Network: same LAN as the Mac (192.168.1.0/24). Internet on the Jetson: expected through that LAN; confirm in M0.1.
-- JetPack, CUDA, TensorRT, Python, power mode, audio devices, camera modes: unknown until M0.1.
-- Deployed release and services: none of ours yet. The course robot's `memory-robot.service` may still be installed; stop and disable it before M0.3.
+- `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Fallback: the serial console at `/dev/cu.usbmodem17905260463333`, 115200 baud, user `qdrant`, password in `.env`.
+- Network: Wi-Fi on the home LAN ("FBI surveillance van #4", autoconnect, 192.168.1.238 by DHCP). The course robot's `l6-hotspot` is set to not autoconnect. Ethernet has link but no DHCP lease. Never re-enable the hotspot over SSH.
+
+## Robot facts (quick inventory, 2026-10-07)
+
+- L4T R39.2.0, Ubuntu 24.04.4, Python 3.12.3, headless (`multi-user.target`), Docker installed, `uv` at `~/.local/bin/uv`. `nvcc` is not on PATH; find CUDA and TensorRT versions in M0.1.
+- **Power mode is 15W, not MAXN_SUPER.** Switch it in M0.1 before any benchmark.
+- RAM 7,485 MB total; 4,441 MB available while `l6-robot.service` runs. 8 GB swap file on NVMe. NVMe 233 GB, 162 GB free.
+- Audio in: the camera has a microphone (`Arducam 1080P Low Light`, ALSA card 0). Audio out: HDMI and I2S only, so play answers on the Mac until a USB speaker is attached.
+- Old services still running: `l6-robot.service` (the course robot, from `~/Documents/github/l6-robot`) and `memory-robot-clock.service`. Stop and disable both before benchmarks. Old memory backups in `~` (`edge-data.bak-20260812`, `edge-data-backup-2026-08-20.tgz`): keep them.
 
 ## Git
 
@@ -54,7 +58,7 @@ All targets in CLAUDE.md are unmeasured.
 
 ## Facts from Dylan (2026-10-07)
 
-- No microphone or speaker on the Jetson yet. Use the Mac's microphone and speaker. The USB camera may or may not have a microphone; check in M0.1.
+- No speaker on the Jetson yet; the camera's microphone is on the Jetson. The Mac's microphone and speaker are also available.
 - Gemma license accepted on Hugging Face; the token is on the Mac (`~/.cache/huggingface/token`).
 - Persona and voice: free choice.
 - Dylan is near the robot on 2026-10-08 for human tests.
