@@ -11,7 +11,7 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 Next, in order (D55):
 
 1. Done (D56): M2.2c, D51 retention, M3.3 people wiring committed. M3 dev 32/33, zero false identities. Dylan's rulings pending: the no-face answer (intro-3, m2-restart-name-2 fail until then) and told names held in RAM.
-2. One integrated visitor script on the Jetson: objects, naming, removal, conversation eviction, replacement visitor, consent, forget, restart; record correctness, false identities, latency, fps, RAM, swap, disk.
+2. Done (D58): integrated visitor baseline, oracle 17/21, audio 14/21, faces 9/9 with zero false identities, 1,260 MB headroom, 1.61 s first audio p50 with audio.
 3. M2.2b naming, forgetting, ignoring objects; M2.3 conversation beyond the window and labels on a video view; M2 and M3 gates.
 4. M4: speaker (ordered), offline cold start, eight-hour run.
 5. Tuning phase (after M3): fresh held-out with other voices, turn merge, sight labels, latency, robot-camera face threshold.
@@ -22,6 +22,7 @@ Running jobs: none.
 
 ## Known gaps (carried, D40)
 
+- Audio in the integrated visit (D58): "Qdrant hatch" for "Qdrant Edge"; a short opener ("Okay, so...") splits a question.
 - Privacy (D54): a turn frame showing a visitor who was not identified in it survives "forget me" until 12 h retention evicts it.
 - Live camera (D47): tracks fragment and labels flicker on real frames (52 tracks, 11 relabeled, in a 90 s clip); sightings are unbounded (185 in a 30-minute soak). Next M2 work: majority label per track, merge short tracks, bound stored sightings.
 - M2 answers: the 2B ignores sighting lines; the detector misses objects outside its 50-word vocabulary or at low score (D43). Decode 28.2 tok/s with the detector at 15 fps (target 30).
