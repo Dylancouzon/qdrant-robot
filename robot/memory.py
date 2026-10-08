@@ -56,14 +56,17 @@ _ASKS = re.compile(r"^(what|where|who|whom|whose|when|why|how|which|is|are|was|w
 _SHOWN = re.compile(r"\b(show|showed|shown|hold|holding|held|in my hands?|bring|brought)\b",
                     re.I)
 _FIRST = re.compile(r"\bfirst\b", re.I)
-_COMPARE = re.compile(r"\b(same|different|like|similar|compare)\b", re.I)
+# Anything that narrows which memory is meant (a time, a place, a comparison) goes to the
+# brain with the memories instead: the code path only knows "newest" and "first".
+_NARROWED = re.compile(r"\b(same|different|like|similar|compare|yesterday|today|morning|"
+                       r"hour|hours|minutes?|ago|week|left|right|center|middle)\b", re.I)
 _MAIN = re.compile(r"Main object:\s*([^.\n]+)")
 
 
 def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
     """The answer to "what did I show you" from memories (newest first), or None when the
     question is another kind or no memory names a main object."""
-    if not (about_past(question) and _SHOWN.search(question)) or _COMPARE.search(question):
+    if not (about_past(question) and _SHOWN.search(question)) or _NARROWED.search(question):
         return None
     named = [(m, x.group(1).strip()) for m in memories if (x := _MAIN.search(m["caption"]))]
     if not named:
@@ -180,5 +183,7 @@ if __name__ == "__main__":
         "You showed me green apples")
     assert shown("Is this the same thing I showed you?", mems, ago) is None
     assert shown("What did we talk about?", mems, ago) is None
+    assert shown("What did I show you yesterday?", mems, ago) is None
+    assert shown("What did I show you on the left?", mems, ago) is None
     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
     print("selftest ok")

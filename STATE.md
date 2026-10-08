@@ -4,15 +4,15 @@ Last updated: 2026-10-08 01:10, by the lead (overnight session). Rewrite, do not
 
 ## Active task
 
-**M1.3 Decision run**: not yet met (review `reviews/20261008-042932-76113-review.md`: 35/39 is 89.7%, under 90%). Final configuration is being measured over three runs; then M1.4 held-out acceptance.
+**M1.3 Decision run**: not met. Dev plateau at 40/47 judged (85%) across context strategies; held-out baseline 15/26 (D29). Work is on branch `spike/m1-3-quality` (HEAD 00ecb19 plus uncommitted routing and counsel fixes); `main` is at the M1.2 commit.
 
-- Acceptance command (Mac): `python3 eval/run.py [cases] [--model m]`: deploy, replay on the Jetson, collect, judge (`eval/judge.py`, gpt-6-sol). Exit 0 only when keywords, evidence, and the judge all pass.
-- Recent dev runs (39 turns): 36/39, 35/39 judged; first synthesized audio 1.63 to 1.67 s p50.
-- Changes since the M1.2 commit (uncommitted): conversation memory (visitor statements with a bge `said` vector on each Edge point, recalled by vector search), context gating (memories only for past questions, no image unless the question also points at the present, memories of the current scene skipped), verbatim facts at 0.93, one-sentence answers, memory limits (D28), two-part captions ("Main object: ..."), Mac client `tools/talk.py`, per-run tegrastats.
-- Reviews open: M1.3 task review FIX (fixes applied: talk.py reads and mute, playback drain, judge in acceptance; quality rerun pending). Design `reviews/20261008-053055-21159-design.md` GO WITH CHANGES: applied question detection by opening word and image for here-and-past questions; false-recollection tests are in the held-out set.
-- Held-out set frozen 2026-10-08 05:40: `eval/heldout/sessions.jsonl` (26 turns, unused voices, new images). Do not tune on it.
-- Running: two acceptance runs (scratchpad `runs.txt`); robot units `qr-replay`.
-- Next command: `python3 eval/run.py` (dev, three times), then `python3 eval/run.py eval/heldout/sessions.jsonl`.
+- Acceptance: `python3 eval/run.py [cases] [--model m]` (deploy, replay, collect, judge with gpt-6-sol, transcribe speech on the Mac).
+- Brain: Qwen3-VL-2B remains best of nine tried (D27, D29, D30). First synthesized audio 1.56 to 1.63 s p50; 1.9 GB headroom; no swap.
+- Counsel 07:26 (D30) applied: frame-only captions, narrowed code-path recall, strict sentence cap, router (`robot/route.py`). Next per counsel: audit judge strictness (held-out "snow", "stir fry" rubrics need human adjudication), then a cached few-shot prefix or a LoRA fine-tune (MLX-VLM on the Mac) if context work stays flat.
+- Builder running in a worktree on `spike/detector`: YOLO26n vs onnxruntime vs YOLOE prompt-free, fps and label quality on the Jetson, holding `shared/gpu.lock`. Its report comes back to the lead; integration (object memory, regions, grounding hints) is the lead's.
+- Dylan (2026-10-08 morning): license fine for the detector; light on; idea: detector and retrieval labels instead of VLM captions (adopted, D30).
+- Running jobs: none of the lead's. The builder may hold `shared/gpu.lock`.
+- Next command: wait for the builder report; then `python3 eval/run.py` after integrating detections.
 
 ## Robot access
 

@@ -21,6 +21,7 @@ from robot.asr import Ears, Scribe
 from robot.config import SHARED
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import Memory, about_now, about_past, is_question, shown, thumb
+from robot.route import Router
 from robot.text_embed import TextEmbedder
 from robot.tts import RATE, Speaker, phrases
 
@@ -51,6 +52,7 @@ class Turn:
     answer: str = ""
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
+    kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages, images left out
@@ -75,6 +77,7 @@ class Robot:
         out.mkdir(parents=True, exist_ok=True)
         self.knowledge, self.memory, self.embed = Knowledge(), Memory(memory), TextEmbedder()
         self.scribe = Scribe()
+        self.route = Router(self.embed)
         self.voice = Speaker()
         self.speaker = audio.Mouth(play)
         self.brain = brain.Brain(model)
@@ -88,7 +91,7 @@ class Robot:
         self.speaking = False                   # a visitor is mid-line: background work yields
         self.speech_start = 0.0
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
-        self.uncaptioned: list[tuple[int, list[dict]]] = []  # (frame id, prompt prefix)
+        self.uncaptioned: list[tuple[int, dict]] = []  # (frame id, encoded frame)
         for target in (self._work, self._transcribe, self._watch):
             threading.Thread(target=target, name=target.__name__, daemon=True).start()
         self.ears = Ears(self._heard_start, self._heard_line)
@@ -185,9 +188,12 @@ class Robot:
         recalled_answer = shown(turn.question, recalled,
                                 lambda m: brain.age(turn.speech_start - m["ts"]))
         turn.retrieved = time.time()
-        prefix = brain.messages(look.history, look.image)
         self.last_frame = look.frame
-        image = None if past and not about_now(turn.question) else look.image
+        # Each kind of turn gets only its evidence: the image for sight, or whenever the question
+        # points at the present; never for small talk or knowledge (it pulled answers to the room).
+        turn.kind = self.route(question)
+        sees = about_now(turn.question) or (turn.kind == "sight" and not past)
+        image = look.image if sees else None
         msgs = brain.messages(look.history, image, memories, turn.facts,
                               turn.question, look.changed, past, told)
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
@@ -211,7 +217,7 @@ class Robot:
         self.exchanges += 1
         statement = None if is_question(turn.question) else question  # findable later
         pid = turn.frame_id = self.memory.add(look.frame, turn.question, statement, look.taken)
-        for job in [*self.uncaptioned, (pid, prefix)]:
+        for job in [*self.uncaptioned, (pid, look.image)]:
             self.jobs.put(("caption", *job))
         self.uncaptioned = []
         with (self.out / "turns.jsonl").open("a") as f:

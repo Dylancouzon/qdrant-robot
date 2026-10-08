@@ -90,11 +90,9 @@ def jpeg(frame: np.ndarray) -> dict:
 
 
 def sentences(text: str) -> int:
-    """Finished sentences of at least MIN_WORDS words. A first sentence that is a question (a
-    joke's setup) or an exclamation ("Nice to meet you!") does not count, so an answer can
-    follow it."""
-    found = [m.strip() for m in _SENTENCE.findall(text) if len(m.split()) >= MIN_WORDS]
-    return len(found) - bool(found and found[0].endswith(("?", "!")))
+    """Finished sentences of at least MIN_WORDS words; shorter ones ("Of course!", a joke's
+    "Why don't scientists trust atoms?") do not count, so an answer can follow them."""
+    return sum(len(m.split()) >= MIN_WORDS for m in _SENTENCE.findall(text))
 
 
 def age(seconds: float) -> str:
@@ -167,11 +165,10 @@ class Brain:
                             if sentences(text) >= MAX_SENTENCES:
                                 return
 
-    def caption(self, prefix: list[dict], stop: Callable[[], bool]) -> str | None:
-        """One-sentence description of the frame in a turn's prompt prefix (its KV cache is
-        reused), or None if `stop` interrupts it."""
-        *head, user = prefix
-        msgs = [*head, {**user, "content": [*user["content"], {"type": "text", "text": CAPTION}]}]
+    def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
+        """Describe one frame from the frame alone (no persona, no conversation), so a memory
+        is evidence of what was seen; None if `stop` interrupts it."""
+        msgs = [{"role": "user", "content": [image, {"type": "text", "text": CAPTION}]}]
         text = ""
         for delta in self.answer(msgs, max_tokens=48):
             if stop():
@@ -191,7 +188,7 @@ if __name__ == "__main__":
     assert age(30) == "30 seconds ago" and age(600) == "10 minutes ago"
     assert sentences("Of course! Why don't scientists trust atoms?") == 0
     hello = "Hello there, it is so nice to meet you! I see clothes hanging on a rack."
-    assert sentences(hello) == 1
+    assert sentences(hello) == 2
     two = "Because atoms make up everything you see. Two cats sleep on a blanket. And"
     assert sentences(two) == 2
     now = jpeg(np.zeros((720, 1280, 3), np.uint8))
