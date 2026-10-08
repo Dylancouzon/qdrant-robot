@@ -17,14 +17,14 @@ def test_sightings() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         robot.memory, robot.tracker, robot.points = Memory(Path(tmp)), Tracker(), {}
         robot.away, robot.detecting, robot.detect_failed = set(), threading.Lock(), None
-        robot.visitors = {}
+        robot.visitors, robot.named, robot.ignored, robot.mine = {}, set(), set(), {}
         frame = np.zeros((720, 1280, 3), np.uint8)
         clock = Detection("clock", 0.9, (1000, 100, 1200, 300))
         bottle = Detection("bottle", 0.9, (100, 100, 200, 300))
 
         def step(dets: list[Detection], now: float) -> None:
             if found := robot.tracker.update(dets, 1280, now):
-                robot._sight(found)
+                robot._sight(found, None)
 
         for k in range(CONFIRM):
             step([clock, bottle], 10.0 + k)
@@ -67,13 +67,13 @@ def test_return_and_turnover(monkeypatch) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         robot.memory, robot.tracker, robot.points = Memory(Path(tmp)), Tracker(), {}
         robot.away, robot.detecting, robot.detect_failed = set(), threading.Lock(), None
-        robot.visitors = {}
+        robot.visitors, robot.named, robot.ignored, robot.mine = {}, set(), set(), {}
         robot.vocab, robot.history = {"cup"}, []
         clock = iter(range(10_000))
 
         def step(dets: list[Detection]) -> None:
             if found := robot.tracker.update(dets, 1280, float(next(clock))):
-                robot._sight(found)
+                robot._sight(found, None)
             assert robot.memory.shard.count(memory.CountRequest()) <= memory.MAX_POINTS
 
         cup = Detection("cup", 0.9, (100, 100, 200, 200))

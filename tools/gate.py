@@ -26,7 +26,8 @@ PASSING = {"design": "GO", "review": "PASS", "milestone": "MILESTONE MET"}
 TIMEOUT_S = 900
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
-SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.detect", "robot.memory", "robot.tts"]
+SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.detect", "robot.memory",
+             "robot.things", "robot.tts"]
 
 def git(*args: str, env: dict | None = None) -> str:
     """git in ROOT. A hook's GIT_DIR and GIT_INDEX_FILE are dropped: in a linked worktree they

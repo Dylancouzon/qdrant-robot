@@ -25,32 +25,32 @@ As of 2026-10-08. Builds on the M1 loop (`research/m1-slice-design.md`, D21 to D
 4. **Recall query.** Label, region, and time resolved in code with payload filters; recency ranks within the asked time window (D37). RRF over vectors only after filtering misses on distractor fixtures.
 5. **Conversation beyond the window.** Statements already have vectors. Add the robot's answers as text points so "What did we talk about?" searches both sides.
 
-## M2.2b: name, forget, and ignore objects (brief for the design gate, 2026-10-08)
+## M2.2b: name, forget, and ignore objects (2026-10-08)
 
-**Embedder bake-off.** One embedder ships; the loser goes to `DECISIONS.md`.
+Design gate GO WITH CHANGES (reviews/20261008-174532-2635-design.md); its changes are applied below.
 
-- (A) SigLIP 2 base (`google/siglip2-base-patch16-224`), pooled image vector, 768-d. It fills the existing `image` slot size and could later serve text-to-crop search. About 86 M vision parameters (U); ViT-B/16 224 on TensorRT FP16 took 19.9 ms (J, `research/models.md`).
-- (B) DINOv2-small (`facebook/dinov2-small`), CLS vector, 384-d, Apache-2.0. About 21 M parameters (U), so about four times less compute (U). Self-supervised features usually separate instances better than CLIP-family features (E, ILIAS and PeKit at large sizes, `research/models.md`); small sizes are unmeasured.
-- Floor (no model): an HSV color histogram of the crop, 10 lines. If it meets the bar, no model ships.
-- Label only fails by construction: every same-class distractor is a false match.
+**Bake-off result** (`bench/reid.py`, `bench/results/2026-10-08-reid-1791502259.jsonl`, CPU FP32 on the Mac; the scores do not depend on the machine). Views: 24 COCO phones and 24 COCO teddy bears pasted into other rooms, sides, sizes, and light (the change the fixtures show), and 8 Objectron cup and 8 camera videos (a real viewpoint change). Every crop is our detector's box. Each instance enrolls 3 crops and scores MaxSim against every other instance of any class, because the robot matches across detector labels. The threshold is the top other-instance score on the even instances, then tested on the odd ones.
 
-**How it is measured (Jetson, `bench/reid.py`, time box 90 minutes).** The dev composites paste one identical cutout at several scales, so they cannot measure re-identification. Use real multi-view footage instead: Objectron videos (cup, laptop, bottle, camera, book; C-UDA license; 15 MB per video, URLs checked), 10 instances per class.
+| Arm | Threshold | Phones | Teddy bears | Cups | Cameras | False matches (same class, other class) |
+| --- | --- | --- | --- | --- | --- | --- |
+| HSV histogram (no model) | 0.964 | 7/22 | 5/35 | 0/12 | 2/6 | 0/625, 0/1,400 |
+| SigLIP 2 base, pooled | 0.947 | 5/22 | 6/35 | 0/12 | 3/6 | 0/625, 0/1,400 |
+| DINOv2-small, CLS | 0.831 | 12/22 | 8/35 | 5/12 | 2/6 | 0/625, 0/1,400 |
+| **DINOv2-small, CLS and mean patch** | 0.822 | 15/22 | 15/35 | 5/12 | 2/6 | 0/625, 0/1,400 |
 
-- Crops come from our own detector box (`robot/detect.py`), as at runtime: 12 frames per video.
-- Enroll each instance from 3 consecutive crops at the start (a held object turning a little). Positives: crops from the second half of the same video (other viewpoints). Negatives: every query crop of the other 9 instances of that class.
-- Score: MaxSim, the best cosine over the enrolled crops, as Edge computes it.
-- Split instances 5 and 5 per class. Set the threshold on the first half at the highest negative score (zero false matches). On the second half, report: true matches at that threshold, false matches, and rank-1 accuracy with two named instances of one class.
-- Cost: TensorRT FP16 engine per arm (trtexec, reused `detect._TensorRT` runner), ms per crop p50 and p99 alone and while llama-server decodes, RSS and GPU memory added, decode tok/s change.
-- Rule: zero false matches on the second half is required; then the most true matches wins; within 5 points, the cheaper arm wins. Results go to `bench/results/`. Crops stay in `shared/`, not in git.
+- The HSV floor fails: look-alike bears and black phones need a threshold that rejects most true matches. DINOv2-small ships; SigLIP 2 base is rejected (fewer true matches, about four times the compute).
+- With two named objects of one kind, the right one scores higher in 621 of 625 pairs. Most misses are safe: the robot says it does not know or does not see it.
+- Jetson cost (J, `bench/crop_cost.py`, `bench/results/2026-10-08-crop-cost-*.jsonl`): onnxruntime CUDA, FP32, 15.3 ms p50 and 17.2 ms p99 per crop, 262 MB RSS added to a process that already holds CUDA. Back-to-back crops cut llama-server decode from 34.8 to 18.4 tok/s. The robot embeds on its worker thread, which runs turns too, so a crop never overlaps a turn's decode. An FP16 model or a TensorRT engine would cut the RAM; neither is needed yet.
 
-**Design after the gate (code, no LLM tool calls).**
+**Built (code, no LLM tool calls).**
 
-- Store: named points live in the memory shard, with a `crops` multivector (MaxSim, created with `UpdateOperation.create_dense_vector`, verified in the 0.8.0 stubs) and payload `name`, `label`. The unused `image` slot is deleted (`delete_vector_name`). Ignore rules are vectorless points with payload `ignore: <label>`. Neither has `ts` or `last_seen`, so retention never evicts them (D51).
-- Naming ("this is my X", "remember this X as my X"): candidates are confirmed tracks in view whose label matches X (any non-person track when X is outside the vocabulary). One candidate binds. Two or more: the robot asks "the one on my left or on my right?", and the next turn answers with a side. Crops: the detector thread keeps the last four crops per in-view track, at least 0.5 s apart.
-- Matching: a new track is embedded only when a named point of its kind exists (so normal booth traffic costs nothing). A match above the threshold tags the track's sighting `named: <id>`.
-- Recall: "where is my X", "have you seen my X", "is this my X" are answered from tracks in view and tagged sightings. Anything else says it does not know or has not seen it. A same-class track below the threshold is never called the visitor's.
-- "Forget my X": delete the named point and clear `named` from its sightings. "Ignore the chair": add a rule; `_sight` skips sightings of that label, and an answer about chairs says it is ignoring them. "Stop ignoring chairs" deletes the rule. Both survive restart because they live in Edge.
-- Acceptance (frozen): `eval/dev/m2.jsonl` naming, forget, and ignore cases; a fresh one-time probe set in `eval/probes/m2d.jsonl` written before the code; no regression on other dev M2 cases; Jetson ms and RAM per new-track crop embedding.
+- Store: `robot/things.py`, its own Edge shard `things` (as `robot/people.py`), so the memory shard's schema is unchanged. One point per name with a `crops` multivector (MaxSim) and payload `name`, `labels`, and `turns`. Ignore rules are vectorless points with payload `ignore: <label>`. Retention never touches this shard.
+- Track and crop stay bound: `Sighting` carries its box, the sight job carries the frame it came from, and the robot keeps the last view (frame plus `Tracker.view()`) and three views 0.33 s apart.
+- Naming ("this is my X", "this X is mine", "remember this X as my X") is an action, in code. It binds only the one candidate in view: the one confirmed track of X's kind, else the one object in view, whose own label joins the named labels (the detector calls the dev gold phone a bag). Otherwise the robot asks for it alone (no sides: the robot cannot turn). The crops come from the recent views of that track. The turn first waits, at most 0.5 s, for tracks confirmed after its speech start.
+- Matching runs across detector labels (labels are hints, D61): once any object is named, every new non-person track is embedded, and at MATCH (0.822) or above its sighting is tagged `named`. The bound track is tagged even when its sighting is still queued.
+- Questions about the object go to retrieval (Dylan, 2026-10-08: questions feed the brain, actions stay in code). `Robot.named_evidence` returns evidence lines (its caption from the naming turn, when it was named, each object in view with its score, the latest matched sightings), the matching track (None below MATCH), and the evidence ids. Until the lead routes these lines to the brain, `_mine` gives a minimal code answer from them: "Yes, your phone is here now", "I see a phone, but I am not sure it is yours", "I last saw your phone 20 seconds ago", and "Is this my phone?" scores the object nearest the center.
+- "Forget my X" deletes the named point, the turns that named it (frame and statement), the tag on its sightings, and any pending tag for a queued sighting; the forget turn itself is not stored. "Ignore the chair" stores a rule: new tracks of that label are not stored, sighting recall skips the label, stored turn captions lose the clauses that name it, statements about it are not recalled, and "did you notice any chairs?" says it is ignoring them. "Stop ignoring chairs" deletes the rule. Both survive a restart.
+- Checks: `robot/test_things.py` (naming, "which one?", same-kind distractor, restart, forget, ignore), `python -m robot.things`.
 
 ## Memory budget
 

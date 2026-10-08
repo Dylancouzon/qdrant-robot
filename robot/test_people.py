@@ -108,6 +108,7 @@ def test_robot_identity(monkeypatch) -> None:
     from robot.memory import Memory
     from robot.people import DECLINED, NO_FACE_SEEN, NOT_SURE, _id
     from robot.text_embed import DIM as TEXT_DIM
+    from robot.things import Things
 
     steps = []
 
@@ -123,8 +124,9 @@ def test_robot_identity(monkeypatch) -> None:
     def make(root: Path) -> Robot:
         robot = Robot.__new__(Robot)  # every part a turn uses, with stub models
         robot.people = People(root)
-        robot.memory = Memory(root)
+        robot.memory, robot.things = Memory(root), Things(root)
         robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
+        robot.named, robot.ignored, robot.mine = set(), set(), {}
         robot.asking, robot.hiding, robot.detecting = None, None, threading.Lock()
         robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
         robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
@@ -147,7 +149,7 @@ def test_robot_identity(monkeypatch) -> None:
             for _ in range(n):  # the robot's detection loop, without the detector
                 dets = [Detection("person", 0.9, box)] if k else []
                 if found := robot.tracker.update(dets, 1280, float(next(clock))):
-                    robot._sight(found)
+                    robot._sight(found, None)
             return frame
 
         def ask(text: str, frame: np.ndarray) -> str | None:
@@ -238,6 +240,7 @@ def test_robot_identity(monkeypatch) -> None:
             "a new face on a forgotten track is stored"
         robot.memory.shard.close()
         robot.people.shard.close()
+        robot.things.shard.close()
         robot = make(root)  # a restart: nothing of Ana is left to recognize or hide
         assert robot.people.identify(np.eye(DIM)[1]) is None and robot.people.identify(
             np.eye(DIM)[2]) is None, "after a reopen of both shards"

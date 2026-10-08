@@ -57,3 +57,29 @@ Written by `eval/make_scenes.py`. Composites paste COCO val2017 objects cut out 
 - `m2c-dog.jpg`: the dog, center. Objects: dog 3419 (center).
   - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
   - COCO 579321: http://farm5.staticflickr.com/4114/4737904204_465fa5d55b_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2d-bg.jpg`: the empty M2.2b probe scene: a bright kitchen.
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2d-phone-a.jpg`: a black smartphone, held up. Objects: cell phone 325126 (center).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 53909: http://farm8.staticflickr.com/7402/8714966583_f0853928b4_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2d-phone-b.jpg`: a black flip phone, held up; same class and color. Objects: cell phone 326697 (center).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 345356: http://farm1.staticflickr.com/58/195983274_6fb2676229_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2d-phones.jpg`: flip phone left, smartphone right. Objects: cell phone 326697 (left), cell phone 325126 (right).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 345356: http://farm1.staticflickr.com/58/195983274_6fb2676229_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 53909: http://farm8.staticflickr.com/7402/8714966583_f0853928b4_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2d-teddy-a.jpg`: a golden teddy bear with a striped scarf. Objects: teddy bear 1160097 (center).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 411938: http://farm6.staticflickr.com/5301/5694283812_1ba30885f9_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2d-teddies.jpg`: a shaggy golden bear left, the scarf bear right. Objects: teddy bear 1163127 (left), teddy bear 1160097 (right).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 113403: http://farm3.staticflickr.com/2613/3713015524_bac439d1e6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 411938: http://farm6.staticflickr.com/5301/5694283812_1ba30885f9_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2d-cup.jpg`: a paper coffee cup with a sleeve. Objects: cup 670357 (center).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 157601: http://farm9.staticflickr.com/8478/8239498722_1b6cb129fd_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2d-bottle-cup.jpg`: a Coca-Cola bottle left, the coffee cup right. Objects: bottle 79620 (left), cup 670357 (right).
+  - COCO 445846: http://farm7.staticflickr.com/6238/6282443910_5477113bf6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 194724: http://farm7.staticflickr.com/6155/6165978029_81ac06fbe3_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 157601: http://farm9.staticflickr.com/8478/8239498722_1b6cb129fd_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)

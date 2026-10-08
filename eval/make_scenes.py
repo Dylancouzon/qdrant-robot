@@ -22,6 +22,7 @@ HO_BG = 68286  # a hotel bedroom, cropped to 16:9; held-out never uses a dev bac
 PROBE_BG = 552883  # an empty green kitchen; the probes use nothing dev or held-out shows
 PROBE_BG_B = 58029  # an empty bathroom, for the M2.2a probes
 PROBE_BG_C = 343466  # an empty kitchen with a stove, for the M2.2a review probes
+PROBE_BG_D = 445846  # an empty bright kitchen, for the M2.2b probes
 
 # name: (background, [(annotation id, region, height px)], why it fits). An int background is a
 # COCO image; a scene with no objects is that image as is (a real photo).
@@ -108,6 +109,19 @@ SCENES = {
         "m2c-clock-right": (PROBE_BG_C, [(334068, "right", 220)], "the same clock, right"),
         "m2c-dog-right": (PROBE_BG_C, [(13412, "right", 240)], "a dog, right; the clock is gone"),
         "m2c-dog": (PROBE_BG_C, [(3419, "center", 280)], "the dog, center"),
+        "m2d-bg": (PROBE_BG_D, [], "the empty M2.2b probe scene: a bright kitchen"),
+        "m2d-phone-a": (PROBE_BG_D, [(325126, "center", 300)], "a black smartphone, held up"),
+        "m2d-phone-b": (PROBE_BG_D, [(326697, "center", 300)],
+                        "a black flip phone, held up; same class and color"),
+        "m2d-phones": (PROBE_BG_D, [(326697, "left", 220), (325126, "right", 220)],
+                       "flip phone left, smartphone right"),
+        "m2d-teddy-a": (PROBE_BG_D, [(1160097, "center", 320)],
+                        "a golden teddy bear with a striped scarf"),
+        "m2d-teddies": (PROBE_BG_D, [(1163127, "left", 260), (1160097, "right", 260)],
+                        "a shaggy golden bear left, the scarf bear right"),
+        "m2d-cup": (PROBE_BG_D, [(670357, "center", 260)], "a paper coffee cup with a sleeve"),
+        "m2d-bottle-cup": (PROBE_BG_D, [(79620, "left", 280), (670357, "right", 220)],
+                           "a Coca-Cola bottle left, the coffee cup right"),
     },
 }
 

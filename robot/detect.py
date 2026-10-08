@@ -41,6 +41,7 @@ class Sighting:
     label: str
     region: str
     seen: float  # when the track last matched a detection
+    box: tuple[int, int, int, int] = (0, 0, 0, 0)  # its box in the frame the sighting comes from
     gone: bool = False  # out of view for MAX_MISSED frames; a new track may still continue it
     ended: bool = False  # lost for LOST frames: no new track continues it any more
 
@@ -257,15 +258,14 @@ class Tracker:
         """Ids of the tracks the last frame matched."""
         return {t.id for t in self.tracks if t.missed == 0}
 
-    def boxes(self, label: str) -> dict[int, tuple[int, int, int, int]]:
-        """The boxes of the confirmed tracks of majority `label` the last frame matched."""
-        return {t.id: t.det.box for t in self.tracks
-                if t.missed == 0 and t.reported and t.label == label}
+    def view(self) -> dict[int, tuple[str, tuple[int, int, int, int]]]:
+        """Track id -> (majority label, box) of the confirmed tracks the last frame matched."""
+        return {t.id: (t.label, t.det.box) for t in self.tracks if t.missed == 0 and t.reported}
 
     @staticmethod
     def _report(t: _Track) -> Sighting:
         t.reported = t.region, t.label
-        return Sighting(t.id, t.label, t.region, t.seen)
+        return Sighting(t.id, t.label, t.region, t.seen, t.det.box)
 
 
 def _vote_selftest(w: int) -> None:

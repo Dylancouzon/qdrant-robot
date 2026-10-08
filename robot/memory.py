@@ -75,12 +75,17 @@ _NARROWED = re.compile(r"\b(same|different|like|similar|compare|yesterday|today|
 _MAIN = re.compile(r"Main object:\s*([^.\n]+)")
 
 
+def main_object(caption: str) -> str | None:
+    """The main object a stored frame's caption names ("a gold keypad phone"), or None."""
+    return x.group(1).strip() if (x := _MAIN.search(caption)) else None
+
+
 def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
     """The answer to "what did I show you" from memories (newest first), or None when the
     question is another kind or no memory names a main object."""
     if not (about_past(question) and _SHOWN.search(question)) or _NARROWED.search(question):
         return None
-    named = [(m, x.group(1).strip()) for m in memories if (x := _MAIN.search(m["caption"]))]
+    named = [(m, x) for m in memories if (x := main_object(m["caption"]))]
     if not named:
         return None
     m, thing = named[-1] if _FIRST.search(question) else named[0]
@@ -141,7 +146,7 @@ def sighting_query(question: str, context: list[str], vocab: Collection[str]
     where, still, gone = (bool(x.search(question)) for x in (_WHERE, _STILL, _GONE))
     if not labels and _IT.search(question) and (where or still):
         labels = next((k for k in (kinds(c, vocab) for c in context) if k), set())
-        labels = labels if len(set(map(_kind, labels))) == 1 else set()
+        labels = labels if len(set(map(kind_of, labels))) == 1 else set()
     now = not about_past(question) or still or bool(_NOW_TOO.search(question))
     past = about_past(question) or bool(_PERFECT.search(question))
     if labels and (where or gone or (past or still) and (regions or _SEES.search(question))):
@@ -154,11 +159,11 @@ def sighting_query(question: str, context: list[str], vocab: Collection[str]
     return ("seen", match, now) if past and (regions or _SEES.search(question)) else None
 
 
-def _a(label: str) -> str:
+def article(label: str) -> str:
     return label if label.endswith("s") else f"{'an' if label[0] in 'aeiou' else 'a'} {label}"
 
 
-def _kind(label: str) -> str:
+def kind_of(label: str) -> str:
     return next((g.split("|")[0] for g in KINDS if label in g.split("|")), label)
 
 
@@ -171,7 +176,7 @@ def sighting_answer(mode: str, match: dict[str, set[str]], now_too: bool, past: 
     because the detector cannot tell whether they are the same object."""
     visible: dict[str, list[str]] = {}  # kind -> regions in view, over the whole frame
     for s in now:
-        visible.setdefault(_kind(s["label"]), []).append(s["region"])
+        visible.setdefault(kind_of(s["label"]), []).append(s["region"])
     now = [s for s in now if all(s[k] in v for k, v in match.items())]
     groups: dict[tuple[str, str], list[dict]] = {}
     for s in (now if now_too and mode != "gone" else []) + past:
@@ -180,12 +185,12 @@ def sighting_answer(mode: str, match: dict[str, set[str]], now_too: bool, past: 
     if not named:
         return None
     ids = {s["id"] for s in now}
-    return (" ".join(_described(g, ids, visible.get(_kind(g[0]["label"]), []), ago)
+    return (" ".join(_described(g, ids, visible.get(kind_of(g[0]["label"]), []), ago)
                      for g in named), [s["id"] for g in named for s in g])
 
 
 def _key(s: dict) -> tuple[str, str]:
-    return _kind(s["label"]), s["region"]
+    return kind_of(s["label"]), s["region"]
 
 
 def _side(region: str) -> str:
@@ -198,7 +203,7 @@ def _described(group: list[dict], now: set[int], visible: list[str],
     """One kind in one region: in view now (the first track), or last seen, then where the
     same kind is in view now, anywhere in the frame (a moved object is a new track)."""
     s, unsure = group[0], "; I cannot tell if it is the same one."
-    thing, where = _a(s["label"]), _side(s["region"])
+    thing, where = article(s["label"]), _side(s["region"])
     if s["id"] in now:
         earlier = [x for x in group if x["id"] not in now]
         return f"I see {thing} {where} now." + (
@@ -284,11 +289,13 @@ class Memory:
         self.shard.flush()
         return pid
 
-    def sighting(self, label: str, region: str, seen: float) -> int:
-        """Store a new track: `label` in the `region` third of the frame."""
+    def sighting(self, label: str, region: str, seen: float, named: str | None = None) -> int:
+        """Store a new track: `label` in the `region` third of the frame, and the name of the
+        visitor's object it matched (robot/things.py)."""
         pid = self._id()
         self.shard.update(UpdateOperation.upsert_points([Point(pid, {}, {
-            "label": label, "region": region, "first_seen": seen, "last_seen": seen})]))
+            "label": label, "region": region, "first_seen": seen, "last_seen": seen,
+            **({"named": named} if named else {})})]))
         self.shard.flush()
         return pid
 
@@ -365,17 +372,26 @@ class Memory:
         return [self._row(h) for h in hits]
 
     def sightings(self, before: float, n: int = 4, hide: Collection[int] = (),
-                  **match: Collection[str]) -> list[dict]:
+                  skip: Collection[str] = (), **match: Collection[str]) -> list[dict]:
         """Payloads (id, label, region, first_seen, last_seen) of the sightings last
-        seen before `before`, newest first, except the points in `hide`; `match` keeps those
-        whose field has one of the given values (label=["cup", "mug"])."""
+        seen before `before`, newest first, except the points in `hide` and the labels in
+        `skip` (ignored kinds); `match` keeps those whose field has one of the given values
+        (label=["cup", "mug"])."""
         hits = self.shard.query(QueryRequest(
             limit=n, query=OrderBy("last_seen", Direction.Desc), with_payload=True,
             filter=Filter(must=[FieldCondition(key="last_seen", range=RangeFloat(lt=before)),
                                 *(FieldCondition(key=k, match=MatchAny(list(v)))
                                   for k, v in match.items())],
-                          must_not=[HasIdCondition(set(hide))] if hide else None)))
+                          must_not=[HasIdCondition(set(hide))] * bool(hide) + [
+                              FieldCondition(key="label", match=MatchAny(list(skip)))
+                          ] * bool(skip) or None)))
         return [{"id": h.id, **h.payload} for h in hits]
+
+    def untag(self, name: str) -> None:
+        """Remove the visitor's object `name` from every sighting that matched it."""
+        self.shard.update(UpdateOperation.delete_payload_by_filter(
+            Filter(must=[FieldCondition(key="named", match=MatchValue(name))]), ["named"]))
+        self.shard.flush()
 
     def points(self, ids: Collection[int]) -> list[dict]:
         """Payloads of the points `ids` (the sightings in view now)."""
@@ -490,6 +506,12 @@ if __name__ == "__main__":
         seen.sighting("bag", "right", 340.0)
         assert [s["label"] for s in seen.sightings(before=400.0)] == ["bag", "cup"]
         assert seen.sightings(before=335.0)[0]["region"] == "center", "the update moved it"
+        mine = seen.sighting("cup", "right", 336.0, named="cup")
+        assert [s["id"] for s in seen.sightings(400.0, named=["cup"])] == [mine]
+        assert [s["label"] for s in seen.sightings(400.0, skip=["cup"])] == ["bag"]
+        seen.untag("cup")
+        assert seen.sightings(400.0, named=["cup"]) == [] and seen.points([mine])
+        seen.forget([mine])
         assert [s["label"] for s in seen.sightings(before=400.0, n=1, hide={
             seen.sightings(before=400.0)[0]["id"]})] == ["cup"], "hidden points leave room"
         assert len(seen.recent(before=400.0, n=9)) == 3 and seen.told(v, before=400.0)[0][
