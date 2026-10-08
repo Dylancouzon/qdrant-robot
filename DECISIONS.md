@@ -217,3 +217,6 @@ Design gate GO WITH CHANGES (reviews/20261008-174532-2635-design.md): bake-off H
 
 ## D58 2026-10-08: Integrated visitor baseline (one continuous dev session)
 eval/dev/visitor.jsonl, 21 steps, no reset, one restart (review PASS reviews/20261008-175613-19815-review.md). Oracle 17/21, audio 14/21 (bench/results/2026-10-08-replay-{1791496173,1791496489}): faces 9/9 with zero false identities in both; sight, objects, and knowledge carry the misses; audio adds "Qdrant hatch" for "Qdrant Edge" and splits after a short opener. First audio p50/p95 1.61/2.74 s with audio; tracking 14.9 fps; minimum headroom 1,260 MB with every component active; memory folder about 4 MB per visit. Frozen as the integration baseline; two rubric and scene limits carried, not fixed after the results.
+
+## D59 2026-10-08: Video view is MJPEG from the robot process, token-protected, labels only
+Design gate GO WITH CHANGES (reviews/20261008-175709-21402-design.md): robot/view.py serves a capped MJPEG stream (stdlib http.server) of the newest frame with the boxes and labels of tracks in view on that frame; a token is required and it binds to localhost by default (live visitor video must not be open to the booth network); no person names in the first version; it never writes frames. Rejected for now: a separate viewer process over shared memory, WebRTC.

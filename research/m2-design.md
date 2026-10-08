@@ -61,3 +61,11 @@ Detector 195 MB (J). SigLIP 2 base on ORT CUDA about 400 MB (U); DINOv2-small ab
 - "This is my phone" ... later "Where is my phone?": named-object recall with a multivector point (MaxSim) in Qdrant Edge, on the board.
 - Labels on the video view come from the detector plus the named-object memory.
 - Restart and "forget my phone" on stage: memories persist across a power cycle, and deletion is real (points and crops).
+
+## M2.3a: labels on a video view
+
+Goal (Dylan, STATE M2): a booth screen shows the robot's camera view with labels on tracked objects (and names of recognized, consenting visitors only while their face matches now). Alternatives, measured on the Jetson by added CPU and GPU time per frame, detection fps and decode with the view open, and end-to-end view lag:
+- (A) MJPEG over HTTP from the robot process (stdlib `http.server` in a thread): draw the newest frame's track boxes and labels with OpenCV, encode JPEG at a capped rate (for example 10 fps, 960 px), serve `multipart/x-mixed-replace` to any browser on the booth LAN or a local screen. One new module `robot/view.py` reading the camera's newest frame and a snapshot of tracks.
+- (B) A separate viewer process reading frames and track state from shared memory: isolates the robot process but adds IPC.
+- (C) WebRTC: lower lag, far more code and dependencies.
+The view never stores frames (no privacy impact on memory) and only draws names that the identity path already says aloud.
