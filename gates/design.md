@@ -7,4 +7,5 @@ Judge the proposed approach, not only its details. Answer, in this order:
 2. What is the simplest version that meets this task's acceptance criteria and keeps a credible path to the final targets in CLAUDE.md?
 3. What in the proposal is over-engineered, speculative, or duplicated? What can be deleted?
 4. What would we measure on the Jetson to settle any doubt?
+5. Proportion and scope (D40, breadth first): is the proposal sized to the problem and to the current milestone, or does it polish one capability while other features are missing? Prefer deleting the source of a problem over a new mechanism; a residual risk may be carried as a known gap.
 Under 500 words. Do not edit files. End with exactly one last line: `VERDICT: GO`, `VERDICT: GO WITH CHANGES` (list the changes above it), or `VERDICT: RETHINK` (say what instead above it).

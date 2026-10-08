@@ -8,13 +8,15 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 **M2.2a done** (D48): sighting questions answered in code; one-time probes 7/8. **Next active: M2.2c live-track stability** (D47): majority label per track, merge a short track into a neighbor with the same label and side, bound stored sightings; measure on `shared/clips/live-items-1.avi` (needs a clip source in the replay) and the 64-window question.
 
-Next, in order:
+Next, in order (D55):
 
-1. **M2.2b Naming, forgetting, ignoring** (D37): "this is my phone" binds a name to a confirmed track (or the robot asks), several crops as one multivector point (MaxSim); "forget my phone" deletes the point, crops, and pending writes; "ignore the chair" is a class rule; both survive restart. Parsed in code.
-2. **M2.3** Conversation beyond the window (answers as text points); labels on a video view; M2 gate.
-3. **M3 Faces:** design gated (D41, D42: EdgeFace-S vs insightface w600k_r50, claim score bake-off, full deletion). Waiting on colleagues' photos in `eval/faces/` for held-out; dev uses public face sets.
-4. **M4 hardware:** USB speaker and microphone (Dylan buys), MAXN thermal test, offline cold start, eight-hour run.
-5. **Tuning phase (after M3):** fresh larger held-out set with other people's voices; turn merge for long pauses; detector labels for sight; told-statement prompting; latency to 1.2 s.
+1. Finish M3.3 (builder: D54 sighting frames removed, audit cuts), review, commit with M2.2c. M3 dev oracle 32/33, zero false identities (bench/results/2026-10-08-replay-1791492853).
+2. One integrated visitor script on the Jetson: objects, naming, removal, conversation eviction, replacement visitor, consent, forget, restart; record correctness, false identities, latency, fps, RAM, swap, disk.
+3. M2.2b naming, forgetting, ignoring objects; M2.3 conversation beyond the window and labels on a video view; M2 and M3 gates.
+4. M4: speaker (ordered), offline cold start, eight-hour run.
+5. Tuning phase (after M3): fresh held-out with other voices, turn merge, sight labels, latency, robot-camera face threshold.
+
+Stop (D55): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks.
 
 Running jobs: two builders (D44). M3.3 integration (robot/main.py, robot/memory.py: M2.2c track stability and D51 retention reviewed except people wiring, plus people wiring, face step, identity answers, protection on every deletion path). M3.0 face replay fixtures (eval/dev/m3.jsonl, eval/heldout/m3.jsonl; face scenes in gitignored eval/faces/scenes, to copy to the Jetson shared folder for replays). Jetson runs serialize on shared/gpu.lock.
 
