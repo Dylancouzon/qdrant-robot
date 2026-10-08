@@ -8,14 +8,15 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 **M2.2a done** (D48): sighting questions answered in code; one-time probes 7/8. **Next active: M2.2c live-track stability** (D47): majority label per track, merge a short track into a neighbor with the same label and side, bound stored sightings; measure on `shared/clips/live-items-1.avi` (needs a clip source in the replay) and the 64-window question.
 
-Next, in order (D55, D61):
+Next, in order (D55, D61, D62):
 
-1. M2.2b (builder running): object naming actions, DINOv2 matching, forget, ignore; recall exposed as retrieval, not code answers.
+1. M2.2b (builder running): object naming actions, DINOv2 matching, forget, ignore; recall as retrieval.
 2. D60 identity rulings and the video view hook (D59) in robot/main.py.
-3. Assistant v1 (D61): teach the focus object with confirmation (video view labels "Smartphone?" or "???" or the learned name); retrieval lines into the brain with calibrated per-shard minimum scores; bge action router; answers toward 200 tokens; compare with today's code answers on the integrated visit and one-time paraphrases, then delete the code answer paths; drop left and right logic and fixtures.
-4. M2.3 conversation beyond the window (part of 3: conversation shard in retrieval); M2 and M3 gates.
-5. M4: speaker (ordered), offline cold start, eight-hour run.
-6. Tuning (after v1 headroom): bigger brain or tool calls, training, held-out with other voices, robot-camera face threshold.
+3. Latency: the TTS first phrase takes 0.53 s (Kokoro should be about 0.1 s): measure alone vs during decode, fix.
+4. RAM budget per component with everything active, what can be freed, and whether Qwen3-VL-4B fits (D62: squeeze the bigger model).
+5. Assistant v1 (D61, D62): always retrieve with calibrated per-shard minimum scores; retrieval lines into the brain; actions by rules, then a Qdrant intents shard (replaces route.py), then confirmation; teach the focus object with confirmation (view labels "Smartphone?" or "???" or the name); time-decay Formula and Rrf of statements and sightings; memory panel on the view; answers toward 200 tokens with context and barge-in checked; 2B vs 4B evidence use; compare with today's code answers, then delete them; drop left and right.
+6. M2 and M3 gates; live test day (human checklist); then decide optimizations and training from the biggest measured gaps.
+7. M4: speaker (ordered), offline cold start, eight-hour run.
 
 Stop (D55): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks.
 
