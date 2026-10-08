@@ -13,7 +13,7 @@ Last updated: 2026-10-07, by the setup session. Rewrite this file at every hando
 
 ## Robot access
 
-- `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Fallback: the serial console at `/dev/cu.usbmodem17905260463333`, 115200 baud, user `qdrant`, password in `.env`.
+- `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Fallback, only when Dylan plugs in the debug USB-C cable: the serial console at `/dev/cu.usbmodem*`, 115200 baud, user `qdrant`, password in `.env`. The cable is unplugged as of 2026-10-07; SSH, sudo, and internet were verified without it.
 - Network: Wi-Fi on the home LAN ("FBI surveillance van #4", autoconnect, 192.168.1.238 by DHCP). The course robot's `l6-hotspot` is set to not autoconnect. Ethernet has link but no DHCP lease. Never re-enable the hotspot over SSH.
 
 ## Robot facts (quick inventory, 2026-10-07)
@@ -26,7 +26,7 @@ Last updated: 2026-10-07, by the setup session. Rewrite this file at every hando
 
 ## Git
 
-Standing approval to commit and push (see CLAUDE.md). No remote exists yet; ask Dylan which GitHub repo to create before the first push.
+Standing approval to commit and push (see CLAUDE.md). Remote: `origin` = github.com/Dylancouzon/qdrant-robot (private), branch `main`.
 
 ## Checkpoints
 
