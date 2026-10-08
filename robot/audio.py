@@ -87,18 +87,24 @@ class Mouth:
 
     def __init__(self, play: Callable[[np.ndarray], None] | None):
         self.sink = play
-        self.q: queue.Queue[np.ndarray] = queue.Queue()
-        threading.Thread(target=self._run, name="mouth", daemon=True).start()
+        self.q: queue.Queue[np.ndarray | None] = queue.Queue()
+        self.thread = threading.Thread(target=self._run, name="mouth", daemon=True)
+        self.thread.start()
 
     def _run(self) -> None:
-        while True:
-            audio = self.q.get()
+        while (audio := self.q.get()) is not None:  # None: close() stops the thread
             if self.sink:
                 self.sink(audio)
             self.q.task_done()
+        self.q.task_done()
 
     def play(self, audio: np.ndarray) -> None:
         self.q.put(audio)
+
+    def close(self) -> None:
+        """Play what is queued, then stop."""
+        self.q.put(None)
+        self.thread.join()
 
 
 if __name__ == "__main__":

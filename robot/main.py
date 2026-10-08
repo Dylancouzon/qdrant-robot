@@ -93,8 +93,11 @@ class Robot:
         self.speech_start = 0.0
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
         self.uncaptioned: list[tuple[int, dict]] = []  # (frame id, encoded frame)
-        for target in (self._work, self._transcribe, self._watch):
-            threading.Thread(target=target, name=target.__name__, daemon=True).start()
+        self.closing = threading.Event()
+        self.threads = [threading.Thread(target=t, name=t.__name__, daemon=True)
+                        for t in (self._watch, self._transcribe, self._work)]
+        for t in self.threads:
+            t.start()
         self.ears = Ears(self._heard_start, self._heard_line)
 
     def hear(self, chunk: np.ndarray) -> None:
@@ -128,8 +131,8 @@ class Robot:
 
     def _transcribe(self) -> None:
         # Its own thread: the final transcript overlaps a prefill instead of queuing behind it.
-        while True:
-            speech, t_line, speech_end, speech_start, shot = self.lines.get()
+        while (line := self.lines.get()) is not None:  # None: close() stops the thread
+            speech, t_line, speech_end, speech_start, shot = line
             if text := self.scribe(speech):  # empty: noise the VAD took for speech
                 self.asked += 1
                 self.jobs.put(("turn", Turn(question=text, line=t_line,
@@ -139,8 +142,7 @@ class Robot:
 
     def _watch(self) -> None:
         # Keep a recent frame prefilled while nobody speaks, so a turn rarely waits for one.
-        while True:
-            time.sleep(WATCH_S)
+        while not self.closing.wait(WATCH_S):
             shot = self.camera.latest()
             if not self.speaking and self.jobs.empty() and self._stale(shot[0]):
                 self.jobs.put(("look", shot))
@@ -152,8 +154,7 @@ class Robot:
 
     def _work(self) -> None:
         # One worker: llama-server jobs run in order, and a turn reuses the last look.
-        while True:
-            job = self.jobs.get()
+        while (job := self.jobs.get()) is not None:  # None: close() stops the thread
             if job[0] == "look":
                 self._look(job[1])
             elif job[0] == "turn":
@@ -257,8 +258,17 @@ class Robot:
             yield pcm
 
     def close(self) -> None:
-        self.jobs.join()
-        self.speaker.q.join()  # let the last phrase finish playing
+        """Finish the queued work, stop the threads, and release the shards and llama-server,
+        so a new Robot can open the same memory folder (a restart)."""
+        watch, transcribe, work = self.threads
+        self.closing.set()
+        watch.join()               # no more looks
+        self.lines.put(None)
+        transcribe.join()          # no more turns
+        self.jobs.join()           # the last turns and the captions they queue
+        self.jobs.put(None)
+        work.join()
+        self.speaker.close()  # let the last phrase finish playing
         self.memory.shard.close()
         self.knowledge.shard.close()
         self.brain.close()

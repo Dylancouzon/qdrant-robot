@@ -28,3 +28,6 @@ onnxruntime-gpu = { index = "jetson" }
 name = "jetson"
 url = "https://pypi.jetson-ai-lab.io/sbsa/cu130/+simple/"
 explicit = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
