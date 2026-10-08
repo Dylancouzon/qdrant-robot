@@ -163,3 +163,7 @@ Rejected: insightface and Hugging Face EdgeFace weights (non-commercial, researc
 
 ## D42 2026-10-08: Face model licenses are not a constraint (Dylan); embedder bake-off on accuracy and cost
 Dylan: an internal demo, nothing distributed, any model may be used. The M3 embedder bake-off becomes EdgeFace-S (IJB-C TAR@1e-4 95.63, 306M FLOPs) vs insightface w600k_r50 (97.12, R50), with SFace as the light fallback; SCRFD may replace YuNet if it detects small faces better. The rest of D41 stands (calibrated claim score, full deletion, identity in code). Held-out faces: colleagues' photos and video frames (consent given for video content), kept in eval/faces/ outside git.
+
+## D43 2026-10-08: M2.1 detector sightings land; answers from sightings carried (0/8 unseen probes)
+YOLOE-26n booth vocabulary in the robot process at 14.7 fps; one Edge point per track (label, region, first and last seen, frame); gone sightings in Memories for past questions; detector failures reload three times then stop the robot. Review PASS reviews/20261008-121043-71318-review.md. Dev M2 32/74, evidence 19/21 (bench/results/2026-10-08-replay-1791475673); unseen probes 0/8, evidence 3/5 (1791474901): the detector misses objects outside its vocabulary or at low score (orange 0.10, flower pot, books), and the 2B ignores correct sighting lines. Decode 28.2 vs 30.4 tok/s with the detector (carried, D40).
+Next: answer sighting questions in code (D37), then naming, forgetting, ignoring. Rejected: prompt wording for sighting lines (the 2B ignores them; rule 6).

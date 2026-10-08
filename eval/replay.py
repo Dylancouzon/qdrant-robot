@@ -29,7 +29,8 @@ from robot.memory import is_question
 
 SILENCE_S = 1.5  # after each question, so the VAD can end the line
 REACT_S = 1.0    # a visitor waits for the answer to finish, then this long, before speaking
-STAGES = ("line_s", "asr_s", "first_token_s", "first_phrase_s", "first_audio_s", "speech_s")
+STAGES = ("line_s", "asr_s", "first_token_s", "first_phrase_s", "first_audio_s", "speech_s",
+          "detect_fps")
 
 
 def ok(step: dict, answer: str) -> bool:
@@ -67,17 +68,18 @@ def idle(robot: Robot, seconds: float, oracle: bool) -> None:
 def score(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> dict:
     """The step's row: a split step is BAD, and its last turn (the question's end) is scored.
     Evidence: a named step's statement must be among the recalled statements (the robot stores
-    statements, robot/main.py); a named question step's frame among the recalled frames."""
+    statements, robot/main.py); a named question step's frame, or one of a named wait step's
+    sightings, among the recalled memories."""
     if not turns:  # the VAD or the transcript dropped the question
         return {"id": step["id"], "ok": False, "split": 0, "heard": "", "answer": "",
                 "evidence_ok": None, **dict.fromkeys(STAGES)}
     turn = turns[-1]
-    frames[step["id"]] = (turn.frame_id, None if is_question(turn.question) else turn.question)
-    want = [frames.get(k, (None, None)) for k in step.get("evidence", [])]
+    frames[step["id"]] = ({turn.frame_id}, None if is_question(turn.question) else turn.question)
+    want = [frames.get(k, (set(), None)) for k in step.get("evidence", [])]
     row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
            "heard": " | ".join(t.question for t in turns), "split": len(turns),
-           "evidence_ok": all(said in turn.told if said else f in turn.memories
-                               for f, said in want)
+           "evidence_ok": all(said in turn.told if said else bool(ids & set(turn.memories))
+                               for ids, said in want)
                            if want else None,
            "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
            "kind": turn.kind, "verbatim": turn.verbatim, "told": turn.told,
@@ -87,7 +89,8 @@ def score(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> di
            "first_token_s": turn.first_token - turn.speech_end,
            "first_phrase_s": turn.first_phrase - turn.speech_end,
            "first_audio_s": turn.first_audio - turn.speech_end,
-           "speech_s": turn.speech_end - turn.speech_start, "wav": turn.wav}
+           "speech_s": turn.speech_end - turn.speech_start, "wav": turn.wav,
+           "detect_fps": turn.detect_fps}
     if oracle:  # no audio: speech, line, and transcript stages were not measured
         for k in ("line_s", "asr_s", "speech_s"):
             row[k] = None
@@ -103,6 +106,16 @@ def reported(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) ->
     return row
 
 
+def sighted(sightings: list[dict], shown: tuple[float, float], step: dict,
+            in_view: set[int]) -> set[int]:
+    """Ids of the sightings of a named wait step's object: seen while the frame was `shown`
+    (from, to), with one of its `labels`, and in its `region` when the step names one. A point
+    whose track is still `in_view` is being seen now: its stored last_seen is not its end."""
+    return {s["id"] for s in sightings if s["first_seen"] <= shown[1]
+            and (s["id"] in in_view or s["last_seen"] >= shown[0])
+            and s["label"] in step["labels"] and step.get("region", s["region"]) == s["region"]}
+
+
 def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracle: bool,
         audio: str) -> list[dict]:
     """Play each session from an empty memory and return the scored rows. A restart closes the
@@ -114,12 +127,21 @@ def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracl
             robot = start(memory)
         else:
             robot.reset(memory)
-        frames: dict[str, tuple] = {}  # step id -> (frame stored there, statement or None)
+        frames: dict[str, tuple] = {}  # step id -> (memory ids stored there, statement or None)
+        shown = time.time()  # when the frame in view was shown
         for step in s["steps"]:
             if "show" in step:
                 robot.camera.show(cases.parent / step["show"])
+                shown = time.time()
             elif "wait" in step:  # the frame stays in view
                 idle(robot, step["wait"], oracle)
+                if "id" in step:
+                    robot.jobs.join()  # the sightings queued while it waited are stored
+                    found = robot.memory.sightings(before=time.time(), n=50)
+                    with robot.detecting:
+                        in_view = {robot.points.get(t) for t in robot.tracker.in_view()}
+                    frames[step["id"]] = (sighted(found, (shown, time.time()), step, in_view),
+                                          None)
             elif "restart" in step:
                 t = time.time()
                 robot.close()
@@ -132,6 +154,8 @@ def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracl
             else:
                 wav = None if oracle else cases.parent / audio / f"{step['id']}.wav"
                 rows.append(reported(step, converse(robot, step, wav), frames, oracle))
+            if robot.detect_failed:  # answers without sightings would score a different robot
+                raise RuntimeError("detection stopped") from robot.detect_failed
     robot.close()
     return rows
 
@@ -163,6 +187,9 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
                "asr_p50_s": p50(rows, "asr_s"),
                "first_token_p50_s": p50(rows, "first_token_s"),
                "first_phrase_p50_s": p50(rows, "first_phrase_s"),
+               "detect_fps_p50": p50(rows, "detect_fps"),
+               "detect_fps_min": min((r["detect_fps"] for r in rows if r["detect_fps"] is not None),
+                                     default=None),
                "audio_dir": str(out),
                "note": ("oracle: latencies start when the text is submitted (text to audio)"
                         if oracle else

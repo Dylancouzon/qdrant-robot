@@ -6,20 +6,24 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 **Breadth first (D40):** every feature end to end on the Jetson, known gaps carried here, tuning after M3. M1 works end to end (talks, sees, recalls, knows Qdrant); its accuracy and latency targets stay unmet below.
 
-**M2.1 Detector sightings in memory** (builder running, Mac plus Jetson): YOLOE-26n booth vocabulary from `spike/detector` in a detection thread at camera rate; one Edge point per track (label, region, first and last seen, frame id); sightings in the Memories block for past questions; sighting evidence ids in the replay. Acceptance: oracle replay of `eval/dev/m2.jsonl` per capability, no regression on `eval/dev/sessions.jsonl` oracle (40/47, `bench/results/2026-10-08-replay-1791471099`), detection fps and decode while talking, RAM headroom. The lead reads the diff (note: it edits `eval/dev/m2.jsonl` and `tools/gate.py`; check against rule 6) before the review gate.
+**M2.2a Sighting answers in code** (next builder): "what was on your left?", "what is gone?", "is the X still there?" resolved in code from sightings and the in-view snapshot, spoken without the LLM (like `shown()`), with the brain as fallback. Acceptance: dev M2 removed and left-right capabilities, a fresh one-time probe set (the M2.1 probes are spent), no regression on `eval/dev/sessions.jsonl` oracle (39/47 with the detector).
+
+M2.1 done (D43): sightings stored and retrieved (dev evidence 19/21), answers carried (unseen probes 0/8).
 
 Next, in order:
 
-1. **M2.2 Naming, forgetting, ignoring** (D37): "this is my phone" binds a name to a confirmed track (or the robot asks), several crops as one multivector point (MaxSim); "forget my phone" deletes the point, crops, and pending writes; "ignore the chair" is a class rule; both survive restart. Parsed in code.
+1. **M2.2b Naming, forgetting, ignoring** (D37): "this is my phone" binds a name to a confirmed track (or the robot asks), several crops as one multivector point (MaxSim); "forget my phone" deletes the point, crops, and pending writes; "ignore the chair" is a class rule; both survive restart. Parsed in code.
 2. **M2.3** Conversation beyond the window (answers as text points); labels on a video view; M2 gate.
-3. **M3 Faces:** design brief with two alternatives (YuNet plus EdgeFace or MobileFaceNet), consent, a face multivector per person, "forget me", zero false identities on strangers; design gate first.
+3. **M3 Faces:** design gated (D41, D42: EdgeFace-S vs insightface w600k_r50, claim score bake-off, full deletion). Waiting on colleagues' photos in `eval/faces/` for held-out; dev uses public face sets.
 4. **M4 hardware:** USB speaker and microphone (Dylan buys), MAXN thermal test, offline cold start, eight-hour run.
 5. **Tuning phase (after M3):** fresh larger held-out set with other people's voices; turn merge for long pauses; detector labels for sight; told-statement prompting; latency to 1.2 s.
 
-Running jobs: the M2.1 builder (it runs `eval/run.py` replays on the Jetson; check `pgrep -f eval/run.py` before any Jetson job). caffeinate runs on the Mac.
+Running jobs: none. caffeinate runs on the Mac.
 
 ## Known gaps (carried, D40)
 
+- M2 answers: the 2B ignores sighting lines; the detector misses objects outside its 50-word vocabulary or at low score (D43). Decode 28.2 tok/s with the detector at 15 fps (target 30).
+- Swap grows at in-process replay restarts (44 to 756 MB), with or without the detector; a real restart is a new process.
 - Answers: real-voice dev 42/47 (89%), held-out real voices 18/26 (69%, use 2 of D29) against 90%. Sight naming in clutter is the main miss (D39: more image tokens did not help).
 - Latency: first synthesized audio 1.45 s p50 dev, 1.58 s held-out, against 1.2 s; no speaker yet.
 - A pause over 0.35 s after a short fragment splits the question (knowledge-more-2, 1.34 s).

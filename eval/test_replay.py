@@ -1,6 +1,7 @@
 """Step dispatch of eval/replay.py without models: a fake robot that remembers every turn in its
 memory folder, so a restart that kept the folder still finds the turns from before it."""
 import queue
+import threading
 import time
 from pathlib import Path
 
@@ -13,7 +14,7 @@ STORED: dict[Path, list[int]] = {}  # memory folder -> frame ids, survives a res
 class FakeRobot:
     def __init__(self, memory: Path, log: list):
         self.memory, self.log, self.asked, self.turns = memory, log, 0, queue.Queue()
-        self.camera = self
+        self.camera, self.detect_failed = self, None
         log.append(("start", memory))
 
     def show(self, path: Path) -> None:
@@ -63,3 +64,34 @@ def test_statement_evidence() -> None:
     shown = {"id": "c", "expect_any": [""], "evidence": ["b"]}  # a question step: its frame
     recall = Turn(question="What did I ask?", answer="Your name.", frame_id=3, memories=[2])
     assert replay.score(shown, [recall], frames, oracle=True)["evidence_ok"] is True
+
+
+def test_wait_evidence(monkeypatch) -> None:
+    """A named wait step's evidence is the sightings stored while it waited."""
+    monkeypatch.setattr(replay, "REACT_S", 0)
+    monkeypatch.setattr(replay, "sighted", lambda found, shown, step, in_view: {1})
+    ask = {"say": "what was here?", "expect_any": [""], "evidence": ["w"]}
+    steps = [{"show": "a.jpg"}, {"id": "w", "wait": 0}, {"id": "q1", **ask}, {"id": "q2", **ask}]
+    robot = FakeRobot(Path(), [])
+    robot.jobs, robot.memory = queue.Queue(), robot  # FakeRobot.sightings stands in for Edge
+    robot.sightings = lambda before, n: []
+    robot.detecting, robot.points = threading.Lock(), {}
+    robot.tracker = type("Tracker", (), {"in_view": lambda self: []})()
+    rows = replay.run([{"steps": steps}], lambda m: robot, Path("eval/dev/x"),
+                      oracle=True, audio="audio")
+    assert [r["evidence_ok"] for r in rows] == [False, True]  # q2 recalls memory 1, q1 none
+
+
+def test_sighted() -> None:
+    row = {"id": 1, "first_seen": 10.0, "last_seen": 10.0, "label": "laptop", "region": "center"}
+    chair = {**row, "id": 2, "label": "chair"}
+    before = {**row, "id": 3, "first_seen": 5.0, "last_seen": 8.9}  # gone before the show
+    left = {**row, "id": 4, "region": "left"}
+    early = {**row, "id": 5, "first_seen": 9.5}  # confirmed after the show, before the wait
+    shown, step = (9.0, 13.0), {"labels": ["laptop", "computer"], "region": "center"}
+    assert replay.sighted([row, chair, before, left, early], shown, step, set()) == {1, 5}
+    assert replay.sighted([row, left], shown, {"labels": ["laptop"]}, set()) == {1, 4}
+    # Seen since before an earlier show and still in view: its stored last_seen is stale.
+    kept = {**row, "id": 6, "first_seen": 1.0, "last_seen": 1.0}
+    assert replay.sighted([kept], shown, step, set()) == set()
+    assert replay.sighted([kept], shown, step, {6}) == {6}

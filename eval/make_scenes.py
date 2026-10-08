@@ -2,7 +2,7 @@
 """Compose the M2 fixture scenes: COCO val2017 objects cut out along their masks and pasted at a
 fixed region of a background, plus plain COCO copies; writes eval/<set>/images and SOURCES.md.
 
-    eval/make_scenes.py instances_val2017.json   (from COCO annotations_trainval2017.zip)
+    eval/make_scenes.py instances_val2017.json [probes]  (annotations_trainval2017.zip)
 """
 import argparse
 import json
@@ -19,6 +19,7 @@ X = {"left": 0.17, "center": 0.5, "right": 0.83}  # object centers; left means i
 MAX_W = {"left": 290, "center": 600, "right": 290}  # a side object stays inside its third
 DEV_BG = "live/closet-night.jpg"
 HO_BG = 68286  # a hotel bedroom, cropped to 16:9; held-out never uses a dev background
+PROBE_BG = 552883  # an empty green kitchen; the probes use nothing dev or held-out shows
 
 # name: (background, [(annotation id, region, height px)], why it fits). An int background is a
 # COCO image; a scene with no objects is that image as is (a real photo).
@@ -81,6 +82,16 @@ SCENES = {
         "coco-000000319935": (319935, [], "a bedroom: armchair, sofa, bed, coffee table"),
         "coco-000000277197": (277197, [], "a living room: carved chairs, sofa, flowers"),
     },
+    "probes": {  # one-time M2 probes (eval/probes/README.md)
+        "m2p-bg": (PROBE_BG, [], "the empty probe scene: a green kitchen counter"),
+        "m2p-backpack": (PROBE_BG, [(1164885, "center", 300)], "a red and black backpack"),
+        "m2p-orange": (PROBE_BG, [(1051839, "center", 220)], "an orange, center"),
+        "m2p-orange-plant": (PROBE_BG, [(1051839, "left", 180), (1609432, "right", 300)],
+                             "an orange left, pink flowers in a green pot right"),
+        "m2p-plant-book": (PROBE_BG, [(1609432, "left", 300), (1139039, "right", 160)],
+                           "the flower pot left, a stack of books right"),
+        "m2p-book": (PROBE_BG, [(1139039, "center", 200)], "the stack of books, center"),
+    },
 }
 
 
@@ -116,13 +127,14 @@ def paste(frame: np.ndarray, ann: dict, region: str, height: int) -> None:
     roi[:] = (alpha * obj + (1 - alpha) * roi).astype(np.uint8)
 
 
-def main(annotations: Path) -> None:
+def main(annotations: Path, sets: list[str]) -> None:
     d = json.loads(annotations.read_text())
     anns = {a["id"]: a for a in d["annotations"]}
     images = {i["id"]: i for i in d["images"]}
     licenses = {lic["id"]: lic for lic in d["licenses"]}
     cats = {c["id"]: c["name"] for c in d["categories"]}
-    for name, scenes in SCENES.items():
+    for name in sets:
+        scenes = SCENES[name]
         root = EVAL / name
         lines = ["# M2 fixture images", "", "Written by `eval/make_scenes.py`. Composites paste "
                  "COCO val2017 objects cut out along their masks; plain `coco-*` files are the "
@@ -153,4 +165,6 @@ def main(annotations: Path) -> None:
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("annotations", type=Path)
-    main(p.parse_args().annotations)
+    p.add_argument("sets", nargs="*", default=list(SCENES), help=f"of {list(SCENES)}")
+    a = p.parse_args()
+    main(a.annotations, a.sets)

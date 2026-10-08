@@ -1,11 +1,11 @@
 """The robot's memory, one Qdrant Edge shard: one point per turn, holding the frame it saw (JPEG
 on disk as evidence, capture time, a caption the VLM wrote from that frame in idle time) and
-what the visitor said. Statements carry a bge vector, so later questions find them by vector
-search ("What drink do I like?" finds "I really love espresso"). M2 adds SigLIP 2 image vectors.
-"""
+what the visitor said, and one point per detector track (a sighting: label, region of the frame,
+first and last seen times, and its source frame). Statements carry a bge vector, so later
+questions find them by vector search ("What drink do I like?" finds "I really love espresso")."""
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from pathlib import Path
 
 import cv2
@@ -18,6 +18,7 @@ from qdrant_edge import (
     EdgeVectorParams,
     FieldCondition,
     Filter,
+    HasIdCondition,
     OrderBy,
     PayloadSchemaType,
     Point,
@@ -99,8 +100,20 @@ class Memory:
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={
                 "image": EdgeVectorParams(size=IMAGE_DIM, distance=Distance.Cosine),
                 "said": EdgeVectorParams(size=TEXT_DIM, distance=Distance.Cosine)}))
-            self.shard.update(UpdateOperation.create_field_index("ts", PayloadSchemaType.Float))
+        for field in ("ts", "last_seen"):  # a no-op when the index exists
+            self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
         self.last_id = 0
+
+    def _id(self) -> int:
+        """A new point or frame id, unique across restarts (microseconds since the epoch)."""
+        self.last_id = max(self.last_id + 1, time.time_ns() // 1000)
+        return self.last_id
+
+    def save(self, frame: np.ndarray) -> str:
+        """Store a frame as evidence; returns its file name."""
+        jpg = f"{self._id()}.jpg"
+        cv2.imwrite(str(self.frames / jpg), frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        return jpg
 
     def add(self, frame: np.ndarray, said: str, said_vec: np.ndarray | None = None,
             ts: float | None = None) -> int:
@@ -108,18 +121,25 @@ class Memory:
         view, with `said_vec` when it is a statement worth finding later. Each turn gets its
         own id, even for the same captured frame."""
         ts = ts or time.time()
-        pid = self.last_id = max(self.last_id + 1, time.time_ns() // 1000)
-        jpg = self.frames / f"{pid}.jpg"
-        cv2.imwrite(str(jpg), frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        jpg, pid = self.save(frame), self._id()
         vectors = {} if said_vec is None else {"said": said_vec.tolist()}
         self.shard.update(UpdateOperation.upsert_points([Point(pid, vectors, {
-            "ts": ts, "frame": jpg.name, "said": said,
-            "thumb": thumb(frame).tobytes().hex()})]))
+            "ts": ts, "frame": jpg, "said": said, "thumb": thumb(frame).tobytes().hex()})]))
         self.shard.flush()
         return pid
 
-    def caption(self, pid: int, text: str) -> None:
-        self.shard.update(UpdateOperation.set_payload([pid], {"caption": text}))
+    def sighting(self, label: str, region: str, seen: float, frame: str) -> int:
+        """Store a new track: `label` in the `region` third of `frame` (a saved frame)."""
+        pid = self._id()
+        self.shard.update(UpdateOperation.upsert_points([Point(pid, {}, {
+            "label": label, "region": region, "first_seen": seen, "last_seen": seen,
+            "frame": frame})]))
+        self.shard.flush()
+        return pid
+
+    def set(self, pid: int, **fields) -> None:
+        """Update payload fields of a point: a caption, or a sighting's region and times."""
+        self.shard.update(UpdateOperation.set_payload([pid], fields))
         self.shard.flush()
 
     @staticmethod
@@ -146,6 +166,15 @@ class Memory:
                                 FieldCondition(key="caption", is_empty=False)])))
         return [self._row(h) for h in hits]
 
+    def sightings(self, before: float, n: int = 4, hide: Collection[int] = ()) -> list[dict]:
+        """Payloads (id, label, region, first_seen, last_seen, frame) of the sightings last
+        seen before `before`, newest first, except the points in `hide`."""
+        hits = self.shard.query(QueryRequest(
+            limit=n, query=OrderBy("last_seen", Direction.Desc), with_payload=True,
+            filter=Filter(must=[FieldCondition(key="last_seen", range=RangeFloat(lt=before))],
+                          must_not=[HasIdCondition(set(hide))] if hide else None)))
+        return [{"id": h.id, **h.payload} for h in hits]
+
 
 if __name__ == "__main__":
     import tempfile
@@ -155,7 +184,7 @@ if __name__ == "__main__":
         a = seen.add(img, "what is this?", ts=100.0)
         seen.add(img, "and this?", ts=200.0)
         assert seen.recent(before=300.0) == [], "uncaptioned frames are not memories yet"
-        seen.caption(a, "a red mug in the center")
+        seen.set(a, caption="a red mug in the center")
         assert [m["caption"] for m in seen.recent(before=300.0)] == ["a red mug in the center"]
         assert seen.recent(before=50.0) == []
         b, c = seen.add(img, "first turn", ts=300.0), seen.add(img, "second turn", ts=300.0)
@@ -164,13 +193,26 @@ if __name__ == "__main__":
         seen.add(img, "I love espresso.", v, ts=310.0)
         assert [m["said"] for m in seen.told(v, before=400.0)] == ["I love espresso."]
         assert seen.told(v, before=305.0) == [], "only statements made before the question"
-        seen.caption(b, "a desk")
-        seen.caption(c, "a desk")
+        seen.set(b, caption="a desk")
+        seen.set(c, caption="a desk")
         assert b != c and [m["said"] for m in seen.recent(before=400.0, n=2)] in (
             ["first turn", "second turn"], ["second turn", "first turn"]), "one frame, two turns"
+        cup = seen.sighting("cup", "left", 320.0, seen.save(img))
+        seen.set(cup, region="center", last_seen=330.0)
+        seen.sighting("bag", "right", 340.0, seen.save(img))
+        assert [s["label"] for s in seen.sightings(before=400.0)] == ["bag", "cup"]
+        assert seen.sightings(before=335.0)[0]["region"] == "center", "the update moved it"
+        assert [s["label"] for s in seen.sightings(before=400.0, n=1, hide={
+            seen.sightings(before=400.0)[0]["id"]})] == ["cup"], "hidden points leave room"
+        assert len(seen.recent(before=400.0, n=9)) == 3 and seen.told(v, before=400.0)[0][
+            "said"] == "I love espresso.", "sightings are neither captioned frames nor statements"
         seen.shard.close()
-        m = Memory(Path(tmp)).recent(before=300.0)[0]
+        again = Memory(Path(tmp))
+        m = again.recent(before=300.0)[0]
         assert (Path(tmp) / "frames" / m["frame"]).exists(), "must survive a restart"
+        s = again.sightings(before=400.0)[1]
+        assert (s["label"], s["first_seen"], s["last_seen"]) == ("cup", 320.0, 330.0)
+        assert (Path(tmp) / "frames" / s["frame"]).exists()
     assert about_past("What did I just show you?") and about_past("Do you remember me?")
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")

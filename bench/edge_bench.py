@@ -49,7 +49,7 @@ def main(points: int) -> None:
         memory = Memory(Path(tmp))
         for k in range(points):  # every other turn is a statement with a vector
             pid = memory.add(frame, f"turn {k}", vecs[k] if k % 2 else None, ts=1000.0 + k)
-            memory.caption(pid, f"Main object: thing {k}. Around it: a table.")
+            memory.set(pid, caption=f"Main object: thing {k}. Around it: a table.")
         now = 1000.0 + points
         picks = rng.integers(0, points, QUERIES)
         rows = [{"query": "memory.recent", "points": points,

@@ -1,15 +1,18 @@
-"""The robot: hears a line, looks, recalls, answers aloud. One process; the LLM runs in a
-supervised llama-server child. Every turn logs its stage times and saves its answer audio.
+"""The robot: hears a line, looks, recalls, answers aloud, and remembers what its detector
+tracks. One process; the LLM runs in a supervised llama-server child. Every turn logs its stage
+times and saves its answer audio.
 
     python -m robot.main                       camera, camera microphone, no speaker
     python -m robot.main --speaker plughw:1,0  ... and an ALSA speaker
     python -m robot.main --listen 7070         microphone and speaker of a Mac client
 """
 import argparse
+import contextlib
 import json
 import queue
 import threading
 import time
+import traceback
 from collections.abc import Callable, Iterator
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -19,6 +22,7 @@ import numpy as np
 from robot import audio, brain
 from robot.asr import Ears, Scribe
 from robot.config import SHARED
+from robot.detect import Detector, Sighting, Tracker
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import Memory, about_now, about_past, is_question, shown, thumb
 from robot.route import Router
@@ -28,6 +32,10 @@ from robot.tts import RATE, Speaker, phrases
 HISTORY_TURNS = 4  # the conversation window, in exchanges
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
 SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
+# Camera rate: unthrottled detection halved LLM decode (research/detector.md).
+DETECT_FPS = 15
+DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
+WHERE = {"left": "on your left", "center": "in the center", "right": "on your right"}
 
 
 def scene_change(a: np.ndarray, b: np.ndarray) -> float:
@@ -68,6 +76,7 @@ class Turn:
     done: float = 0.0
     wav: str = ""
     audio_s: float = 0.0          # length of the spoken answer
+    detect_fps: float = 0.0       # detection and tracking rate while this turn ran
 
 
 class Robot:
@@ -81,6 +90,10 @@ class Robot:
         self.voice = Speaker()
         self.speaker = audio.Mouth(play)
         self.brain = brain.Brain(model)
+        self.detect, self.tracker = Detector(), Tracker()
+        self.points: dict[int, int] = {}  # track id -> its sighting point, while it is tracked
+        self.detections = 0                     # frames detected so far
+        self.detect_failed: Exception | None = None  # set when detection stopped for good
         self.history: list[dict] = []
         self.exchanges = 0                      # counts every exchange; history is capped
         self.last_frame: np.ndarray | None = None  # the frame of the previous turn
@@ -94,8 +107,9 @@ class Robot:
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
         self.uncaptioned: list[tuple[int, dict]] = []  # (frame id, encoded frame)
         self.closing = threading.Event()
+        self.detecting = threading.Lock()       # held while a frame is detected and tracked
         self.threads = [threading.Thread(target=t, name=t.__name__, daemon=True)
-                        for t in (self._watch, self._transcribe, self._work)]
+                        for t in (self._watch, self._detect, self._transcribe, self._work)]
         for t in self.threads:
             t.start()
         self.ears = Ears(self._heard_start, self._heard_line)
@@ -113,11 +127,15 @@ class Robot:
                                     speech_start=self.speech_start), self.start_frame))
 
     def reset(self, memory: Path) -> None:
-        """Start over with an empty memory and conversation (scripted sessions)."""
-        self.jobs.join()
-        self.memory.shard.close()
-        self.memory, self.history, self.exchanges, self.ready = Memory(memory), [], 0, None
-        self.last_frame = None
+        """Start over with an empty memory and conversation (scripted sessions). Detection
+        pauses so no sighting of the old session reaches the new memory, and the tracker starts
+        over so objects still in view are sighted again."""
+        self.jobs.join()  # the turns first: a turn's recall takes self.detecting
+        with self.detecting:
+            self.jobs.join()  # sightings queued since
+            self.memory.shard.close()
+            self.memory, self.history, self.exchanges, self.ready = Memory(memory), [], 0, None
+            self.last_frame, self.points, self.tracker = None, {}, Tracker()
 
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
@@ -147,6 +165,50 @@ class Robot:
             if not self.speaking and self.jobs.empty() and self._stale(shot[0]):
                 self.jobs.put(("look", shot))
 
+    def _detect(self) -> None:
+        # Detection and tracking at camera rate on the newest frame; sightings are written by
+        # the worker after the turns queued before them, never during a turn.
+        due, failures = time.time(), 0
+        while not self.closing.wait(max(0.0, due - time.time())):
+            due = max(due + 1 / DETECT_FPS, time.time())
+            frame, _ = self.camera.latest()
+            if frame is None:
+                continue
+            try:
+                self.detect = self.detect or Detector()
+                with self.detecting:
+                    found = self.tracker.update(self.detect(frame), frame.shape[1], time.time())
+            except Exception as e:
+                failures += 1
+                print(f"detection failed ({failures} of {DETECT_RESTARTS + 1}):", flush=True)
+                traceback.print_exc()
+                with contextlib.suppress(Exception):
+                    self.detect.close()
+                self.detect = None  # reloaded on the next frame
+                if failures > DETECT_RESTARTS:
+                    self.detect_failed = e
+                    return
+                continue
+            self.detections += 1
+            if found:
+                self.jobs.put(("sight", found, frame))
+
+    def _sight(self, found: list[Sighting], frame: np.ndarray) -> None:
+        """One point per track: stored when confirmed, updated when it moves region (with the
+        new source frame) and when it leaves."""
+        jpg = None
+        for s in found:
+            pid = self.points.pop(s.track, None) if s.gone else self.points.get(s.track)
+            if s.gone:
+                if pid:
+                    self.memory.set(pid, last_seen=s.seen)
+                continue
+            jpg = jpg or self.memory.save(frame)
+            if pid:
+                self.memory.set(pid, region=s.region, last_seen=s.seen, frame=jpg)
+            else:
+                self.points[s.track] = self.memory.sighting(s.label, s.region, s.seen, jpg)
+
     def _stale(self, frame: np.ndarray | None) -> bool:
         """The prefilled look no longer matches `frame` or the conversation."""
         return frame is not None and (self.ready is None or self.ready.exchanges != self.exchanges
@@ -159,10 +221,12 @@ class Robot:
                 self._look(job[1])
             elif job[0] == "turn":
                 self._turn(*job[1:])
+            elif job[0] == "sight":
+                self._sight(*job[1:])
             elif (caption := self.brain.caption(job[2], lambda: self.speaking)) is None:
                 self.uncaptioned.append(job[1:])  # a visitor spoke: retry after their turn
             else:
-                self.memory.caption(job[1], caption)
+                self.memory.set(job[1], caption=caption)
             self.jobs.task_done()
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
@@ -182,18 +246,13 @@ class Robot:
             self._look(shot)
         if (look := self.ready) is None:
             return  # no camera frame yet: nothing to answer about
+        started, detections = time.time(), self.detections
         question = self.embed([turn.question])[0]
         found = self.knowledge.search(question)
         turn.facts = [fact for _, fact in found]
         turn.verbatim = bool(found) and found[0][0] >= VERBATIM
         past = about_past(turn.question)
-        # Memories of the scene in view now are the present, not something shown before.
-        recalled = [m for m in self.memory.recent(before=turn.speech_start)
-                    if np.abs(m["thumb"] - thumb(look.frame).astype(np.float32)).mean()
-                    > SCENE_CHANGE] if past else []
-        turn.memories = [m["id"] for m in recalled]
-        memories = [f"{k}. {brain.age(turn.speech_start - m['ts'])}: {m['caption']}"
-                    for k, m in enumerate(reversed(recalled), 1)]  # oldest first
+        recalled, memories = self._recall(turn, look.frame) if past else ([], [])
         statements = self.memory.told(question, before=turn.speech_start)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
@@ -221,6 +280,7 @@ class Robot:
             tokens = self._tokens(msgs, turn)
         audio_parts = list(self._speak(phrases(tokens), turn))
         turn.done = time.time()
+        turn.detect_fps = (self.detections - detections) / (turn.done - started)
         turn.wav = f"{int(turn.line * 1000)}.wav"
         spoken = np.concatenate(audio_parts or [np.zeros(1)])
         turn.audio_s = len(spoken) / RATE
@@ -237,6 +297,21 @@ class Robot:
         with (self.out / "turns.jsonl").open("a") as f:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
+
+    def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
+        """Captioned frames (newest first) and the Memories lines, oldest first: captions and
+        sightings. What is in view now is the present, not something seen before."""
+        recalled = [m for m in self.memory.recent(before=turn.speech_start)
+                    if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
+        with self.detecting:  # a consistent snapshot of the tracks
+            in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+        sights = self.memory.sightings(before=turn.speech_start, hide=in_view)
+        turn.memories = [m["id"] for m in recalled + sights]
+        ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
+        lines = sorted([(m["ts"], f"{ago(m['ts'])}: {m['caption']}") for m in recalled[::-1]] + [
+            (s["last_seen"], f"{ago(s['last_seen'])}: {s['label']} {WHERE[s['region']]}")
+            for s in sights], key=lambda x: x[0])
+        return recalled, [f"{k}. {line}" for k, (_, line) in enumerate(lines, 1)]
 
     def _said(self, fact: str, turn: Turn) -> Iterator[str]:
         turn.first_token, turn.answer = time.time(), fact
@@ -260,9 +335,12 @@ class Robot:
     def close(self) -> None:
         """Finish the queued work, stop the threads, and release the shards and llama-server,
         so a new Robot can open the same memory folder (a restart)."""
-        watch, transcribe, work = self.threads
+        watch, detect, transcribe, work = self.threads
         self.closing.set()
         watch.join()               # no more looks
+        detect.join()              # no more sightings
+        if self.detect:
+            self.detect.close()
         self.lines.put(None)
         transcribe.join()          # no more turns
         self.jobs.join()           # the last turns and the captions they queue
@@ -288,6 +366,8 @@ def main() -> None:
     print("listening", flush=True)
     for chunk in chunks:
         robot.hear(chunk)
+        if robot.detect_failed:
+            raise RuntimeError("detection stopped") from robot.detect_failed
     robot.close()
 
 

@@ -28,6 +28,9 @@ def check_session(path: Path, session: dict) -> None:
             missing = set(step.get("evidence", [])) - seen
             assert not missing, f"{step['id']}: evidence {missing} is not an earlier step"
             assert step["rubric"], f"{step['id']}: empty rubric"
+        if "wait" in step and "id" in step:  # its evidence: sightings of the named object
+            assert step["labels"], f"{step['id']}: a named wait step needs the object's labels"
+        if "id" in step:
             seen.add(step["id"])
 
 
