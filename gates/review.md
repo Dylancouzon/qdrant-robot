@@ -1,4 +1,5 @@
 You are the task review gate for this repo. Read CLAUDE.md and STATE.md first. Review the uncommitted changes (`git diff HEAD` and new files from `git status`) and the files named below.
+Read the tracked harness and product code plus the evidence cited below; read refs/ only when relevant; skip model files and bulk logs. Judge the code at the current commit plus uncommitted changes. Separate blocking findings from optional improvements.
 
 Check, in this order:
 1. Correctness: bugs, races, resource leaks, wrong numbers, broken edge cases.

@@ -10,3 +10,12 @@ __pycache__/
 .DS_Store
 .env
 cert/
+.env.*
+!.env.example
+.firecrawl/
+.pytest_cache/
+build/
+dist/
+*.safetensors
+*.pt
+*.pth

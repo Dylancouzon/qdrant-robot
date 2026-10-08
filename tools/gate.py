@@ -2,9 +2,12 @@
 """Run a Codex gate read-only on this repo, save its verdict in reviews/, and
 exit 0 only when the verdict passes (3 = act on findings, 124 = timeout).
 
-    tools/gate.py <design|review|milestone> "<what to judge, with paths>"
+    tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths>"
     tools/gate.py selftest
+
+--model overrides the gate's default model (counsel: design --model gpt-6-astra).
 """
+import argparse
 import os
 import signal
 import subprocess
@@ -26,12 +29,16 @@ def verdict(response: str) -> str:
     return lines[-1].split(":", 1)[1].strip().upper()
 
 
-def run(gate: str, what: str) -> int:
+def interrupted(signum, frame):
+    raise KeyboardInterrupt  # so SIGTERM also runs the cleanup in run()
+
+
+def run(gate: str, what: str, model: str) -> int:
     reviews = ROOT / "reviews"
     reviews.mkdir(exist_ok=True)
     out = reviews / f"{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}-{gate}.md"
     prompt = (ROOT / "gates" / f"{gate}.md").read_text() + f"\nWhat to judge: {what}\n"
-    cmd = ["codex", "exec", "--model", MODEL[gate], "-s", "read-only",
+    cmd = ["codex", "exec", "--model", model, "-s", "read-only",
            "--skip-git-repo-check", "-C", str(ROOT), "-o", str(out), prompt]
     with open(f"{out}.log", "w") as log:
         # stdin closed: codex exec otherwise waits for input forever.
@@ -44,9 +51,12 @@ def run(gate: str, what: str) -> int:
             return 124
         finally:
             # Covers timeout and Ctrl-C: never leave a Codex process group behind.
-            if proc.poll() is None:
+            # The launcher may have exited while its children still run.
+            try:
                 os.killpg(proc.pid, signal.SIGKILL)
-                proc.wait()
+            except ProcessLookupError:
+                pass
+            proc.wait()
     if proc.returncode or not out.exists():
         print(f"codex failed ({proc.returncode}); log: {out}.log", file=sys.stderr)
         return proc.returncode or 1
@@ -70,6 +80,10 @@ if __name__ == "__main__":
     if sys.argv[1:] == ["selftest"]:
         selftest()
         sys.exit(0)
-    if len(sys.argv) != 3 or sys.argv[1] not in MODEL:
-        sys.exit(__doc__)
-    sys.exit(run(sys.argv[1], sys.argv[2]))
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("gate", choices=MODEL)
+    parser.add_argument("what", help="what to judge, with paths and evidence")
+    parser.add_argument("--model", help="override the gate's default model")
+    args = parser.parse_args()
+    signal.signal(signal.SIGTERM, interrupted)
+    sys.exit(run(args.gate, args.what, args.model or MODEL[args.gate]))

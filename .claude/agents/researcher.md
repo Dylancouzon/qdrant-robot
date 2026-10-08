@@ -10,4 +10,4 @@ You research one question for the Qdrant Edge robot (Jetson Orin Nano Super 8 GB
 - Open the pages you cite; a search snippet is not a source.
 - Label every number: measured on an Orin Nano, measured elsewhere, or unverified.
 - Report in 300 words or fewer unless the brief asks for more: findings first, then a table if it helps, then URLs.
-- Do not edit files. The lead updates research/.
+- Do not edit files. The lead updates research/, STATE.md, and DECISIONS.md.

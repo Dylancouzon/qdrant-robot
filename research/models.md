@@ -11,6 +11,9 @@ As of 2026-10-07. Labels: **J** measured on an Orin Nano 8 GB, **E** measured el
 
 ## Language and vision-language models
 
+TensorRT Edge-LLM 0.11.0 ships aarch64 Python 3.12 wheels with an Orin (SM87) configuration. Its Orin support matrix lists JetPack 7.2, CUDA 13.2, and TensorRT 10, which likely matches this robot's L4T R39.2. Qwen3-VL-2B and Cosmos-Reason2-2B are in its supported model list. Sources: https://nvidia.github.io/TensorRT-Edge-LLM/latest/user_guide/getting_started/installation.html, https://nvidia.github.io/TensorRT-Edge-LLM/latest/user_guide/getting_started/supported-models.html
+
+
 | Model | Speed and memory | Runtime | Label |
 | --- | --- | --- | --- |
 | Qwen3-VL-2B INT4 | 36 tok/s decode, 1,750 tok/s prefill, 4,486 MB GPU memory | TensorRT Edge-LLM 0.10.0, JetPack 7.2, short prompts | J |
@@ -54,7 +57,7 @@ Instance retrieval (ILIAS, mAP@1k, 5M distractors, **E**): CLIP-L 12.1, DINOv2-B
 
 ## Closest existing stack (not proof that ours fits)
 
-The Jetson AI Lab tutorial "reachy-mini-jetson-assistant" runs, on an Orin Nano 8 GB: Cosmos-Reason2-2B Q4_K_M (about 2.2 GB, llama.cpp in Docker), faster-whisper (CTranslate2 built with CUDA arch 8.7), Kokoro ONNX, Silero VAD, YuNet face tracking at about 15 Hz. It needs headless mode and an 8 GB NVMe swap file, leaves almost no headroom, and has no memory shards or retrieval encoders. Its Python 3.10 and CUDA 12.6 advice may not match current TensorRT Edge-LLM requirements; check the support matrix. Gotchas from it: pip CTranslate2 is CPU-only; install onnxruntime-gpu from the Jetson index (jp6/cu126); pin numpy 1.26.4 on Python 3.10.
+The Jetson AI Lab tutorial "reachy-mini-jetson-assistant" runs, on an Orin Nano 8 GB: Cosmos-Reason2-2B Q4_K_M (about 2.2 GB, llama.cpp in Docker), faster-whisper (CTranslate2 built with CUDA arch 8.7), Kokoro ONNX, Silero VAD, YuNet face tracking at about 15 Hz. It needs headless mode and an 8 GB NVMe swap file, leaves almost no headroom, and has no memory shards or retrieval encoders. Its jp6/cu126 wheels and Python 3.10 pins do not apply to this robot (Python 3.12, L4T R39.2). Qualify every wheel here: Python ABI, architecture, CUDA libraries, execution provider, and an actual GPU run. If GPU speech fails qualification, start with CPU Moonshine and CPU Kokoro ONNX and measure their contention with the LLM. Gotchas from it: pip CTranslate2 is CPU-only; install onnxruntime-gpu from the Jetson index (jp6/cu126); pin numpy 1.26.4 on Python 3.10.
 
 ## Sources
 

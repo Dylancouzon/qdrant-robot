@@ -40,3 +40,14 @@ Why: the build runs without a human in the loop.
 
 ## D10 2026-10-07: Test by scripted sessions from the Mac; the Mac is the mic and speaker for now
 Why: no human at the robot most of the time and no audio hardware on the Jetson. Synthetic speech plus recorded real voices; fixture images for sight.
+
+## D11 2026-10-07: Second Codex gpt-6.1-sol harness review applied
+Added: lead-only authority over STATE and DECISIONS, Mac-to-Jetson workflow, recovery rules, scored replay loop, dev vs final audio, counsel via `gate.py design --model gpt-6-astra`, argparse and SIGTERM-safe cleanup in gate.py. Skipped: process-level tests for gate.py (timeout and interruption paths), add if a gate ever hangs.
+Correction to D10: the Jetson has a microphone (the camera's); only a speaker is missing.
+
+## D12 2026-10-07: Qualify the stack before choosing models; TensorRT Edge-LLM first
+Why: L4T R39.2 is new (rewritten kernel, past compatibility issues) and has no system CUDA or TensorRT. TensorRT Edge-LLM 0.11.0 ships aarch64 Python 3.12 wheels for Orin, JetPack 7.2, CUDA 13.2.
+Rejected: a broad model sweep first; assuming jp6/cu126 wheels work here.
+
+## D13 2026-10-07: Measure power and thermals before choosing a power mode
+Why: only 15W and 7W profiles exist on this release; Super mode may need better cooling in the closed enclosure.

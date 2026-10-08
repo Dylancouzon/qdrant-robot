@@ -2,6 +2,10 @@
 
 This is an autonomous, AI-led project. **The rules in this file supersede Dylan's global CLAUDE.md** wherever they differ (Git, sub-agents, review gates, writing gates).
 
+The lead may choose architectures, models, training approaches, cleanup, deployments, commits, and pushes within this product scope without asking. After a task, continue to the next unmet milestone. Ask Dylan only for physical intervention (cables, reflashing, hardware), new spending, credentials, or recovery beyond available access. Keep unmet targets visible.
+
+Session-start reconciliation and edits to `STATE.md` and `DECISIONS.md` belong to the lead. Builders, researchers, and reviewers report discrepancies to the lead and never edit those two files.
+
 A desktop robot that sees, listens, talks, and remembers, with every model and every memory on one Jetson Orin Nano Super 8 GB. Its memory is Qdrant Edge, the embedded Qdrant engine, inside the robot's own process. It is a conference-booth showcase: the reaction we want is "how does this run on a $249 board?"
 
 ## Session start (and after every compaction)
@@ -65,7 +69,8 @@ Provisional. M0 measures baselines. Change a target only through an evidence-bac
 | Builder | `builder` subagent (Opus) | One scoped task from a written brief. One builder at a time |
 | Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per substantive approach, before building it |
 | Task review | Codex `gpt-6-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
-| Milestone review and counsel | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone; also after two failed approaches to the same problem |
+| Milestone review | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone |
+| Counsel | Codex `gpt-6-astra`, `tools/gate.py design --model gpt-6-astra` | After two failed approaches to the same problem, or an architecture-level doubt |
 
 Subagents do not spawn subagents. The lead reads every builder diff before the review gate.
 
@@ -73,7 +78,7 @@ Brief a builder with: the task ID, the linked decisions, allowed paths, interfac
 
 ## Gates
 
-`tools/gate.py <design|review|milestone> "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
+`tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
 
 - **Design gate** asks: Is this the best solution? Is this the best way to build what we are trying to build? What would a strong edge-ML engineer do instead? What is the simplest version that meets the target? What can be deleted?
 - **Review gate** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job.
@@ -112,10 +117,26 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 - `research/` holds one file per topic: summary first, sources last. Replace an outdated finding; do not stack corrections. Label numbers J (measured on an Orin Nano), E (measured elsewhere), or U (unverified).
 - `reviews/` keeps gate verdicts (logs are ignored). Record the outcome in `DECISIONS.md` when it changes a decision.
 
-## Deployment on the Jetson
+## Mac-to-Jetson workflow
 
-- Deploy each build to its own release directory. Before switching, keep the working release, an environment manifest, the service configuration, and a backup of each closed shard. If health or acceptance checks fail, switch back.
-- Check a remote job's status before restarting it.
+- Build one deploy, run, and collect workflow in M0, and use only it afterwards.
+- A release is identified by a hash of its source, including untracked files. Copy source and fixtures from the Mac to `/home/qdrant/qdrant-robot/releases/<hash>`. Models, memories, and logs live in `/home/qdrant/qdrant-robot/shared`.
+- Create the venv on the Jetson with its system Python 3.12. Pin dependencies and save the full environment (`pip freeze`, CUDA, TensorRT, model revisions and checksums) with the release.
+- Download models before offline tests. Record revision, checksum, preprocessing, and license per model.
+- Run long jobs as named systemd units with bounded logs. Record unit, command, release, start time, and log path in `STATE.md`. Collect results to the Mac before review.
+- Keep the previous release and a closed-shard backup until the new release passes acceptance. If health or acceptance fails, switch back.
+
+## Recovery
+
+- After reconnecting or a reboot, inspect boot ID, services, the deployed release, logs, and unfinished results before restarting anything. Mark interrupted runs as interrupted, never as complete. systemd restarts are bounded (for example `StartLimitBurst=3`).
+- On OOM or throttling: keep the kernel log and `tegrastats`, then reduce concurrency or memory before retrying.
+- On low disk: stop downloads and builds; delete only reproducible caches. Never delete memories, backups, or benchmark evidence.
+- Lost SSH: retry with backoff for 15 minutes, keep doing Mac-side work, then record the blocker and ask Dylan.
+- Before long work, record its timeout, disk estimate, and progress signal. Drop an approach after 90 minutes with no new evidence. Retry an infrastructure failure once, after diagnosis.
+
+## Launch checklist (each autonomous session)
+
+Verify Claude and Codex authentication, model selection, and remaining usage. Keep the Mac awake (`caffeinate -dimsu` in the background). Reconcile any still-running subagents before starting new ones.
 
 ## Tools and gotchas
 
@@ -139,5 +160,9 @@ Most of the time no one is near the robot. Every capability must be testable fro
 - **Speech in.** Generate question WAVs on the Mac (`say -o q.aiff "..."`, then convert to 16 kHz mono WAV), and record real voices when Dylan is around. Keep both in `eval/`; synthetic voices alone overstate ASR quality.
 - **Speech out.** Save every TTS answer as a WAV with timestamps. Score it by transcribing it on the Mac and comparing it with the expected answer and with the LLM's text.
 - **Sight.** The robot's camera cannot be aimed by an agent. Use fixture images and recorded clips through the file source. Use the live camera only to check that capture, orientation, and fps work. The room lights may be off at night: check mean frame brightness first, and when the frame is dark, run fixture-based work and leave live-camera checks for when it is lit.
-- **Live interaction.** Until a microphone and speaker are attached to the Jetson, the Mac is the robot's microphone and speaker: a small client streams Mac mic audio to the Jetson and plays the answers. This is also how Dylan tests by voice.
+- **Live interaction during development.** Use the camera's microphone (on the Jetson) or a Mac client that streams Mac mic audio in and plays answers. Every model still runs on the Jetson. Report file-generation latency and Mac-transport latency separately.
+- **Final acceptance (M4).** A Jetson-connected speaker and microphone, the Mac disconnected, offline cold start, full spoken interaction. Measure physical audible latency with an acoustic recording or an audio loopback.
+- **Scoring.** Each replay command exits non-zero when any required step fails. It records ASR text, tool arguments, retrieved evidence IDs, answer text, output audio, and stage timestamps. Score retrieval and answers separately against the fixture. Transcribe output audio independently on the Mac; empty, truncated, or wrong speech fails.
+- **Coverage.** Current and remembered left and right regions, similar objects, conversation eviction, absent memories, identity uncertainty, a new visitor replacing the last one, consent, restart, and deletion (verify after restart, including images and pending writes). Calibrate thresholds on development fixtures; freeze held-out fixtures before tuning.
+- **Provenance.** Store generated captions and replies with their source evidence. A generated statement alone never counts as an observed fact.
 - **Human test days.** When Dylan is at the robot, prepare a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.

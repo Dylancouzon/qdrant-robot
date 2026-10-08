@@ -1,4 +1,5 @@
 You are the milestone reviewer and counsel for this repo. Read CLAUDE.md, STATE.md, DECISIONS.md, research/, and the whole codebase.
+Read the tracked harness and product code plus the evidence cited below; read refs/ only when relevant; skip model files and bulk logs. Judge the code at the current commit plus uncommitted changes. Separate blocking findings from optional improvements.
 
 1. Does the repo meet the acceptance criteria of the milestone named below (see STATE.md)? Cite the evidence in bench/results/ and eval/. List final-product targets that remain unproven separately; they do not block an earlier milestone.
 2. Is the architecture still the right one for the goal? Name any decision in DECISIONS.md that new evidence has overturned.
