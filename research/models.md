@@ -9,6 +9,35 @@ As of 2026-10-07. Labels: **J** measured on an Orin Nano 8 GB, **E** measured el
 - Small LLMs handle one tool call well and multi-turn tool use badly. Qwen3-1.7B: about 83 to 87% on BFCL simple, 17% multi-turn (**E**). Design for one-shot tool calls; resolve times and dates in code, not in the model.
 - The CLIP ViT-B/32 used in the course robot is weak for "this exact object". DINOv2, SigLIP 2, and PE separate instances far better.
 
+## JetPack 7 (L4T R39) on Orin: what is known (2026-10-07)
+
+- Ultralytics lists Orin Nano on JetPack 7: install torch and torchvision from the `cu130` index (pip wheels fail), `onnxruntime-gpu` 1.24.0 works on Python 3.12, use native TensorRT 10.x (the `latest-nvidia-arm64` image ships TensorRT 11.2, which JetPack does not support). Rebuild engines on the board. https://docs.ultralytics.com/guides/nvidia-jetson
+- A June 2026 NVIDIA forum guide for JetPack 7.2 on the Orin Nano Super: CUDA 12.6 containers and wheels fail or return NaN; TensorRT 10.16.2 works out of the box. https://forums.developer.nvidia.com/t/setting-up-the-nvidia-jetson-orin-nano-super-dev-kit-on-jetpack-7-2-a-practical-guide-june-2026/372490
+- The Jetson AI Lab Gemma 4 page lists JetPack 6 for Orin and JetPack 7 for Thor; Gemma 4 on Orin with JetPack 7 is unconfirmed (U). https://www.jetson-ai-lab.com/tutorials/gemma4-on-jetson/
+
+## Omni and ASR candidates
+
+| Model | Finding | Label |
+| --- | --- | --- |
+| Gemma 4 E2B | Audio, image, and text input listed by TensorRT Edge-LLM (README), vLLM, LiteRT-LM, llama.cpp (an Orin audio issue is reported). LiteRT-LM text only: 24.2 tok/s GPU decode, 0.9 s TTFT for a 1,024-token prefill, 2.7 GB. Audio path unmeasured on Orin. FLEURS English WER 8.0% (secondhand) | J (text), U (audio) |
+| Gemma 4 E4B | llama.cpp ran out of CUDA memory on an 8 GB Orin Nano and fell back to CPU | J |
+| Gemma 3n E2B | Over five billion parameters under standard execution; the small footprint needs special caching and skipping | E |
+| Qwen2.5-Omni-3B | llama.cpp audio and vision; research-only license | U |
+| Moonshine Small Streaming | 7.84% average WER, 527 ms latency on a Raspberry Pi 5 | E |
+| Qwen3-ASR, Nemotron-3.5-ASR | Listed by TensorRT Edge-LLM as dedicated ASR models | U |
+
+## Detector and faces
+
+| Model | Finding | Label |
+| --- | --- | --- |
+| YOLO26n 640, TensorRT | FP16 4.57 ms, INT8 3.80 ms (mAP 0.480 against 0.449), excluding pre and post processing; AGPL-3.0 | J |
+| RF-DETR Base | 14.83 ms FP16; Nano to Medium are Apache 2.0 | J |
+| YOLOE | Face detection unconfirmed; prompted classes need a 254 MB text encoder at export | E |
+| YuNet | WIDER val AP 0.834 / 0.824 / 0.708 (easy, medium, hard); MIT; 5 landmarks | E |
+| EdgeFace-XS | 1.77M parameters, LFW 99.73, IJB-C 94.85; CC BY-NC-SA | E |
+| MobileFaceNet (insightface) | 13 MB, LFW 99.70, IJB-C 95.02; non-commercial | E |
+| ByteTrack, OC-SORT | Well under 1 ms per frame at 10 fps on one CPU core (desktop) | E |
+
 ## Language and vision-language models
 
 TensorRT Edge-LLM 0.11.0 ships aarch64 Python 3.12 wheels with an Orin (SM87) configuration. Its Orin support matrix lists JetPack 7.2, CUDA 13.2, and TensorRT 10, which likely matches this robot's L4T R39.2. Qwen3-VL-2B and Cosmos-Reason2-2B are in its supported model list. Sources: https://nvidia.github.io/TensorRT-Edge-LLM/latest/user_guide/getting_started/installation.html, https://nvidia.github.io/TensorRT-Edge-LLM/latest/user_guide/getting_started/supported-models.html

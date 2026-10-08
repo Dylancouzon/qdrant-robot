@@ -51,3 +51,18 @@ Rejected: a broad model sweep first; assuming jp6/cu126 wheels work here.
 
 ## D13 2026-10-07: Measure power and thermals before choosing a power mode
 Why: only 15W and 7W profiles exist on this release; Super mode may need better cooling in the closed enclosure.
+
+## D14 2026-10-07: Architecture rethink: one omni brain, event-driven perception, results-first harness
+Why: Dylan rejected the testing-phase plan ("it will not fit"). Gemma 4 E2B omni first, Moonshine plus Qwen3-VL-2B fallback; YOLO26n plus ByteTrack; YuNet plus a small face embedder; pooled SigLIP 2 and bge-small; bounded scheduling. A hypothesis the build may replace.
+Rejected: eight separate models with their own runtimes; a 15 fps continuous pipeline; patch multivectors before a measured need. Evidence: Astra counsel and two researchers (research/models.md).
+
+## D15 2026-10-07: Gates are enforced by a commit hook, not by instructions (superseded by D17)
+Why: Dylan asked how gates are enforced; instructions alone can be skipped. The hook binds a PASS review to the exact code tree and runs deterministic checks; `spike/*` branches stay free for exploration; design briefs need two alternatives.
+
+## D16 2026-10-07: Milestones are working robots with results targets
+M1 It talks, M2 It remembers, M3 It knows you, M4 Booth-ready, M5 Wikipedia add-on. Interim numbers from Astra counsel. M1 starts with a vertical slice and a 20-turn decision run, not a benchmark phase.
+
+## D17 2026-10-07: Light safety net replaces strict enforcement (supersedes D15)
+Dylan: "Don't go overboard enforcing. Most agents do okay at calling gates, so just an extra layer." The pre-commit hook blocks only failing deterministic checks and reminds about missing reviews.
+Rejected: review-to-tree binding that blocks commits, a Claude command guard, a CI audit (each slowed work; the guard also blocked harmless commands).
+Owner decision: replaces design verdict reviews/20261007-225624-88242-design.md (RETHINK). Accepted gap: checks read the working tree, so stage everything you commit.

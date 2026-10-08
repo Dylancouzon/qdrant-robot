@@ -35,7 +35,7 @@ Priority order when goals conflict: good answers, then fast answers, then camera
 
 ## Targets
 
-Provisional. M0 measures baselines. Change a target only through an evidence-backed `DECISIONS.md` entry; an unmet target stays visible in `STATE.md` until then.
+Final targets for M4. Each milestone in `STATE.md` has its own interim numbers. M1 measures the first baselines. Change a target only through an evidence-backed `DECISIONS.md` entry; an unmet target stays visible in `STATE.md` until then.
 
 | Metric | Target |
 | --- | --- |
@@ -55,10 +55,33 @@ Provisional. M0 measures baselines. Change a target only through an evidence-bac
 ## Approach
 
 - Off-the-shelf models first. Fine-tune, distill, or train our own (for example a YOLO model) only when a benchmark shows the off-the-shelf option misses a target.
-- Build a thin working loop early, then measure and replace parts. Do not run a broad model sweep before something works end to end.
+- Build a thin working loop early, then measure and replace parts. Do not run a broad model sweep before something works end to end. There is no separate testing phase: every milestone ships a robot a visitor can use.
 - Pin `qdrant-edge-py` (0.8.0 at the start), model revisions, runtime versions, and preprocessing. Verify every Edge capability against the installed package's `.pyi` stubs, not against a skill or blog. The `qdrant:qdrant-edge` plugin skill is wrong about fusion: Edge fuses prefetches with `Fusion.Rrf` and `Fusion.Dbsf`.
 - 0.8.0 has no `query_batch` and no `Memory` placement setting; both are on Qdrant `master` only. Building Edge from source is allowed if a benchmark justifies it.
-- Architecture starting point (a design gate may overturn it): one Python process with native inference bindings and bounded queues; one owner thread for Edge operations; camera capture keeps only the newest frame; detection runs continuously; embeddings run on change or request; speech work preempts background embedding; the LLM streams short phrases into TTS; tool handlers validate arguments and resolve dates and times in code; memory stores observed evidence, never generated recollections.
+
+## Fixed outcomes and open choices
+
+Fixed (change only with Dylan): every model runs on the Jetson; memory lives in Qdrant Edge in-process; answers cite stored evidence; faces need explicit consent; "forget me" deletes for real; releases can roll back; runs are reproducible; unmet targets stay visible; answer quality comes first.
+
+Open (the build decides by measurement): model family, runtime, process count, CPU or GPU placement, precision, detector cadence, training, and every item of the starting architecture below.
+
+## Starting architecture (a hypothesis, not a rule)
+
+Validated by research and Astra counsel on 2026-10-07 (D14). Replace any part that a measurement beats.
+
+- **Brain:** one resident multimodal model takes the visitor's audio, the current frame, and retrieved memories, and streams text with tool calls. First candidate: Gemma 4 E2B at INT4 (NVIDIA lists audio, image, and text input). Fallback, swapping only this path: a streaming ASR (Moonshine) in front of Qwen3-VL-2B.
+- **Perception:** YOLO26n on TensorRT FP16 with ByteTrack, about 10 fps, event-driven (embed only new or changed tracks and explicit "remember this" requests). Faces: YuNet for detection and landmarks, a small aligned-face embedder (EdgeFace or MobileFaceNet) on new faces or identity requests. A combined detector is a later training project, only if YuNet measurably misses.
+- **Embeddings:** pooled SigLIP 2 vectors for object crops, frames, and text queries; bge-small for conversation and knowledge. Patch multivectors are deferred until a measured miss on similar objects.
+- **Voice:** Silero VAD; streaming TTS (Kokoro) that emits short clauses with a maximum wait, faster than playback; interruption cancels the turn.
+- **Scheduling:** bounded GPU tasks with speech first, detection deadlines, and deferred embedding writes. Capture runs independently and drops stale frames. Start CPU sessions at one thread and allocate by measured contention across the six cores.
+- **Generation limits to start:** one active generation, 2,048-token context, bounded image tokens, 64 output tokens. Preallocate buffers and warm every path at boot.
+- **Memory:** points carry timestamps, boxes, track IDs, and robot-relative regions. Tools run in code against Edge, validate arguments, and resolve times in code. Memory stores observed evidence, never generated recollections. Retention is bounded.
+
+## Exploring without tunnel vision
+
+- A design brief names at least two real alternatives and how each would be measured. A brief with one option gets RETHINK.
+- A choice that moves a target is settled by a time-boxed bake-off: prototype the candidates on `spike/*` branches, measure them on the Jetson, merge the winner, record the loser in `DECISIONS.md`.
+- Drop an approach after 90 minutes with no new evidence. After two failed approaches to one problem, run Astra counsel before a third.
 
 ## Roles
 
@@ -67,7 +90,7 @@ Provisional. M0 measures baselines. Change a target only through an evidence-bac
 | Lead | The main session (Opus) | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
 | Researcher | `researcher` subagent (Sonnet) | One question needed for the next decision. Never edits code. Two at most at once |
 | Builder | `builder` subagent (Opus) | One scoped task from a written brief. One builder at a time |
-| Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per substantive approach, before building it |
+| Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per architectural decision (model, runtime, process layout, data schema, new module), before building it. Not for reversible small steps |
 | Task review | Codex `gpt-6-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
 | Milestone review | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone |
 | Counsel | Codex `gpt-6-astra`, `tools/gate.py design --model gpt-6-astra` | After two failed approaches to the same problem, or an architecture-level doubt |
@@ -83,6 +106,14 @@ Brief a builder with: the task ID, the linked decisions, allowed paths, interfac
 - **Design gate** asks: Is this the best solution? Is this the best way to build what we are trying to build? What would a strong edge-ML engineer do instead? What is the simplest version that meets the target? What can be deleted?
 - **Review gate** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job.
 - **Milestone gate** judges the milestone's own acceptance criteria, lists unproven final targets separately, and gives counsel on direction.
+
+### Safety net (light by design)
+
+Gates are mainly a habit, not a lock. One extra layer helps:
+
+- `tools/githooks/pre-commit` (enable once per clone: `git config core.hooksPath tools/githooks`) runs `tools/gate.py checks`: ruff with a complexity limit of 10 (`ruff.toml`), vulture for dead code, and our tests. It blocks only when those fail, and prints the size delta.
+- The same hook prints a reminder when no PASS review matches the staged code. It never blocks on that.
+- `spike/*` branches are for free exploration; bring the winner to `main` with a review.
 
 Resolve every blocking finding. To reject a finding, record the evidence in `DECISIONS.md`. Rerun a gate only after a material change, never to ask again about unchanged work. A better approach wins over sunk cost when evidence supports it, not on a reviewer's preference alone.
 
@@ -106,7 +137,7 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 - Define acceptance fixtures before choosing models. Keep development fixtures separate from held-out acceptance fixtures in `eval/`.
 - Fixtures cover current sight, past frames (including left and right, and similar objects), conversation eviction and recall, people (including unknown people), knowledge, absent memories, restart, and deletion. Each case stores the expected evidence IDs and acceptable answers. Score retrieval and answer correctness separately.
 - Each benchmark run writes `bench/results/YYYY-MM-DD-<what>-<run id>.jsonl` with: code revision or diff hash, machine, software and model versions, precision, context and image-token limits, dataset size, the command, sample counts, and percentiles.
-- Separate cold start from warm turns. Per turn, record endpointing, ASR done, retrieval, first token, first audible output, and answer done. Use at least 100 representative turns and 1,000 queries per shard.
+- Separate cold start from warm turns. Per turn, record endpointing, ASR done, retrieval, first token, first audible output, and answer done. Milestone acceptance uses at least 100 representative turns and 1,000 queries per shard; smaller checks are fine while building.
 - Log memory, swap, temperatures, and clocks (`tegrastats`) during every Jetson run. Peak headroom is measured with every component active.
 - M4 needs held-out acceptance, all targets, offline cold start, restart persistence, deletion checks, and an eight-hour active run with no restart.
 
@@ -119,7 +150,7 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 
 ## Mac-to-Jetson workflow
 
-- Build one deploy, run, and collect workflow in M0, and use only it afterwards.
+- Build one deploy, run, and collect workflow in the first task, and use only it afterwards.
 - A release is identified by a hash of its source, including untracked files. Copy source and fixtures from the Mac to `/home/qdrant/qdrant-robot/releases/<hash>`. Models, memories, and logs live in `/home/qdrant/qdrant-robot/shared`.
 - Create the venv on the Jetson with its system Python 3.12. Pin dependencies and save the full environment (`pip freeze`, CUDA, TensorRT, model revisions and checksums) with the release.
 - Download models before offline tests. Record revision, checksum, preprocessing, and license per model.
@@ -136,7 +167,7 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 
 ## Launch checklist (each autonomous session)
 
-Verify Claude and Codex authentication, model selection, and remaining usage. Keep the Mac awake (`caffeinate -dimsu` in the background). Reconcile any still-running subagents before starting new ones.
+Verify Claude and Codex authentication, model selection, and remaining usage, and that `git config core.hooksPath` prints `tools/githooks`. Keep the Mac awake (`caffeinate -dimsu` in the background). Reconcile any still-running subagents before starting new ones.
 
 ## Tools and gotchas
 

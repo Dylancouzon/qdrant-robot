@@ -4,10 +4,10 @@ Last updated: 2026-10-07, by the setup session. The lead rewrites this file at e
 
 ## Active task
 
-**M0.1 Inventory and stack qualification.** Not started. No product code exists.
+**M1.1 Stack qualification.** Not started. No product code exists.
 
-- Changed paths: none beyond the committed harness.
-- Unresolved findings: none open. The harness passed two Codex gpt-6.1-sol reviews (D8, D11); the second review's fixes are applied.
+- Changed paths: none beyond the committed harness (architecture rethink D14, milestones D16, light safety net D17).
+- Unresolved findings: none open. Harness reviews in `reviews/`; owner decisions recorded in D17.
 - Running jobs (last observed 2026-10-07): `l6-robot.service` and `memory-robot-clock.service`, the course robot. Refresh their status before changing them.
 - Next command: `ssh robot 'systemctl status --no-pager l6-robot.service memory-robot-clock.service; sudo nvpmodel -q --verbose; df -h /; free -m'`
 
@@ -33,6 +33,7 @@ Standing approval to commit and push (see CLAUDE.md). Remote: `origin` = github.
 ## Checkpoints
 
 - C0: the harness, committed and pushed.
+- C1: architecture rethink and light safety net, committed and pushed.
 
 ## Unmet targets
 
@@ -40,28 +41,31 @@ All targets in CLAUDE.md are unmeasured.
 
 ## Milestones and acceptance
 
-| ID | Milestone | Acceptance |
+Each milestone ends with a robot a visitor can use. Interim numbers are proposed targets (D16); the final targets are in CLAUDE.md.
+
+| ID | Milestone | Visitor experience and acceptance |
 | --- | --- | --- |
-| M0 | Feasibility | Stack qualified on this L4T release; one integrated loop (speech in, camera, VLM, TTS, one Edge shard) replays a scripted session and runs 30 minutes on the Jetson; memory budget with evidence; Astra gate passed |
-| M1 | Talk about now | Spoken questions get spoken answers on the Jetson; "What do you see?" uses the current frame; basic Qdrant knowledge shard answers "What is Qdrant Edge?"; latency per stage logged |
-| M2 | Remember | Conversation moves to the memory shard and returns through `remember`; frames stored on change with image and text vectors; "What did I show you?" and "What was on your left?" pass dev fixtures; restart keeps memory |
-| M3 | People | "Do you remember me?" works; a face is stored only after explicit consent, as a multivector with MaxSim; "forget me" deletes and shows the count; zero false identity claims on stranger fixtures |
-| M4 | Booth-ready | Held-out `eval/` at target; all CLAUDE.md targets met; Jetson-connected speaker and microphone pass spoken interaction with the Mac disconnected; offline cold start; deletion checks; 8-hour active run with no restart |
+| M1 | It talks | Answers questions about the current camera view and about Qdrant aloud, on the Jetson alone. 90% correct or more; audio latency 2 s median, 4 s p95 or better; 30 minutes without restart |
+| M2 | It remembers | Recalls removed objects, left and right observations, and evicted conversation through `remember`, including after a restart. 90% per capability; Edge search 10 ms p99; M1 speech targets held |
+| M3 | It knows you | Enrolls a face with consent, recognizes returning visitors (face multivector, MaxSim), handles a new visitor replacing the last, forgets on request. 90% known-person recognition; zero false identities on held-out strangers |
+| M4 | Booth-ready | Every capability offline with Jetson-connected audio for eight hours. Final CLAUDE.md targets: 1.2 s p50 and 2 s p95 audible latency, 15 fps tracking while talking, 500 MB headroom with no swap, held-out eval at target |
 | M5 | Add-on | Offline Wikipedia knowledge shard, only if every M4 target still holds |
 
-## M0 tasks
+## M1 tasks
 
-- [ ] **M0.1 Inventory and stack qualification.**
-    1. Preserve the course robot first: copy its unit files, environment, and code revision into `shared/legacy/`, then stop and disable `l6-robot.service` and `memory-robot-clock.service`.
-    2. Record the GPU, driver, and which CUDA, cuDNN, and TensorRT are reachable (system packages, pip wheels, or NVIDIA L4T containers). Decide the stack path: pip wheels, JetPack apt components, or containers. A reflash to an older JetPack needs Dylan and an x86 Ubuntu host; propose it only with evidence.
-    3. Power: find whether a 25W or MAXN_SUPER profile exists for this release. Run a 15-minute GPU load in the closed enclosure at each available mode, log `tegrastats` temperatures and clocks, and record throttling. If a faster mode throttles, propose cooling (a Jetson-driven fan is allowed).
-    4. Draft the `eval/` fixture plan and the scripted-session format.
-    5. Build the deploy, run, and collect workflow (CLAUDE.md, "Mac-to-Jetson workflow").
-- [ ] **M0.2 Edge checks.** `qdrant-edge-py` 0.8.0 on the Jetson: fusion, multivector MaxSim, persistence across restart, calls from two threads, query latency. Save them as runnable checks.
-- [ ] **M0.3 Runtime qualification and first VLM.** Test the TensorRT Edge-LLM 0.11.0 aarch64 Python 3.12 wheel first: native loading, image inference from Python, token streaming, one validated tool call. If it fails, use a pinned llama.cpp CUDA build for SM87 and check its multimodal Python interface. Start with Qwen3-VL-2B-Instruct INT4. Compare Cosmos-Reason2-2B, Gemma 4 E2B, or larger models only after a measured quality, latency, or memory miss. Reserve memory for detection, retrieval encoders, faces, and all shards.
-- [ ] **M0.4 Thin loop.** One process: VAD and ASR, current frame, VLM, streaming TTS, one Edge shard. Qualify each speech wheel on this stack with a real GPU run; fall back to CPU Moonshine and CPU Kokoro ONNX if needed. Replay one scripted session end to end and score it.
-- [ ] **M0.5 Soak.** Run the loop for 30 minutes with `tegrastats`. Bound context, image tokens, output tokens, and memory growth.
-- [ ] **M0.6 Decide.** Write the stack and memory budget to `DECISIONS.md`, then run `tools/gate.py milestone "M0"`.
+- [ ] **M1.1 Stack qualification.**
+    1. Preserve the course robot: copy its unit files, environment, and code revision into `shared/legacy/`, then stop and disable `l6-robot.service` and `memory-robot-clock.service`.
+    2. Record the GPU, driver, and reachable CUDA, cuDNN, and TensorRT. Known for JetPack 7 (see `research/models.md`): torch from the `cu130` index, `onnxruntime-gpu` 1.24, native TensorRT 10.16 works; CUDA 12.6 builds fail or give NaN; the Ultralytics container ships TensorRT 11.2, which JetPack does not support.
+    3. Power: check for a 25W or MAXN_SUPER profile on this release; run a 15-minute GPU load in the closed enclosure at each mode with `tegrastats`; record throttling; propose cooling if a faster mode throttles.
+    4. Build the deploy, run, and collect workflow.
+- [ ] **M1.2 Vertical slice.** Design gate first (two alternatives: Gemma 4 E2B omni, and Moonshine plus Qwen3-VL-2B). Build the thinnest robot that does one real thing: a visitor asks about an object, hears the answer, removes the object, and asks what they showed. One process, one real Edge lookup, streaming TTS. Reserve memory for the components not yet built (detector, face models, embedders) so the budget stays honest.
+- [ ] **M1.3 Decision run.** 20 mixed turns on the Jetson: direct sight, one tool round trip, long speech, and repeated turns near the context limit. Pass: 18 or more correct, no swap, 1 GB headroom. Record correctness, end of speech to first playable audio, peak available RAM, swap, and detection gaps. If the brain fails, swap only its path to the fallback and keep everything else.
+- [ ] **M1.4 It talks.** Knowledge shard (snapshot) and current-camera questions to M1 acceptance, with `eval/` dev fixtures and scored replays.
+- [ ] **M1.5 Milestone gate.** `tools/gate.py milestone "M1"`.
+
+## Human checklist for 2026-10-08 (Dylan at the robot)
+
+Prepare before he arrives: record 20 real spoken questions per fixture set, show five personal objects to the camera with their names, confirm the camera microphone level, and note where a USB speaker and a fan could mount.
 
 ## Facts from Dylan (2026-10-07)
 

@@ -1,0 +1,8 @@
+line-length = 100
+extend-exclude = ["refs"]
+
+[lint]
+select = ["E", "F", "W", "B", "SIM", "C90"]
+
+[lint.mccabe]
+max-complexity = 10
