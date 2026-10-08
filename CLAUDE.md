@@ -1,0 +1,143 @@
+# Qdrant Edge Robot
+
+This is an autonomous, AI-led project. **The rules in this file supersede Dylan's global CLAUDE.md** wherever they differ (Git, sub-agents, review gates, writing gates).
+
+A desktop robot that sees, listens, talks, and remembers, with every model and every memory on one Jetson Orin Nano Super 8 GB. Its memory is Qdrant Edge, the embedded Qdrant engine, inside the robot's own process. It is a conference-booth showcase: the reaction we want is "how does this run on a $249 board?"
+
+## Session start (and after every compaction)
+
+1. Read this file, then `STATE.md`, then the `DECISIONS.md` entries that the active task links.
+2. Reconcile `STATE.md` with reality: `git status`, and on the Jetson the running jobs and the deployed release. Fix `STATE.md` first if it is wrong.
+3. Read `research/` only for the topic of the active task.
+4. Finish and review the active task before you start another. Commit only if the Git section of `STATE.md` allows it. Otherwise, leave the diff and evidence as a verified checkpoint and record it in `STATE.md`.
+
+## Goal
+
+Reach the capabilities of `refs/reachy-edge-memory` with no laptop: same idea, our own architecture. That demo stores memory on the robot but runs every model on a laptop over HTTP. We run all of it on the Jetson. Expect architecture changes: for example one process, GPU inference, one resident VLM, and no HTTP between components.
+
+Capabilities to reach (from the reference README, "What to ask it"):
+
+| Visitor says | Answered from |
+| --- | --- |
+| "What do you see?" | The camera, now |
+| "What was on your left?", "What did I show you?" | Stored frames (image vector plus text vector on one point) |
+| "What did we talk about?" | The conversation window, then the conversation memory shard through a `remember` tool |
+| "Do you remember me?" | Face match against people (one point per person, several face shots as a multivector, MaxSim) |
+| "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with several question phrasings as a multivector) |
+
+The robot has no motors. "Left" and "right" mean the left and right parts of the wide-angle frame.
+
+Priority order when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. A Wikipedia knowledge shard is an add-on after M4, never at the cost of the core loop.
+
+## Targets
+
+Provisional. M0 measures baselines. Change a target only through an evidence-backed `DECISIONS.md` entry; an unmet target stays visible in `STATE.md` until then.
+
+| Metric | Target |
+| --- | --- |
+| Physical end of speech to first audible output (includes endpointing) | 1.2 s p50, 2.0 s p95 |
+| Answer correctness on held-out `eval/` fixtures | 90% or more per capability; zero false identity claims on strangers |
+| LLM decode (secondary to answer quality) | 30 tok/s or more |
+| Detection and tracking while talking (not camera capture rate) | 15 fps or more, sustained |
+| Qdrant Edge query | 10 ms p99 per shard |
+| Peak RAM headroom with every component active | 500 MB minimum, aim for 1 GB; no swap during a turn |
+
+## Hardware and machines
+
+- **Robot:** Jetson Orin Nano Super 8 GB, headless, NVMe, USB camera (Arducam IMX291, about 100°), reachable over the network. Access details are in `STATE.md`. Keep SSH access working: never run the course robot's hotspot setup over the active Wi-Fi link.
+- **Allowed additions:** anything the Jetson drives directly over USB, I2C, SPI, or GPIO: speaker, microphones, sensors, LEDs, displays, a thermal printer. No servos, no arms.
+- **Mac (Apple silicon):** development, unit tests, dataset preparation, index builds, and training runs that need headroom. Build Jetson-specific engines on the Jetson, and measure every acceptance number on the Jetson. The product runs on the Jetson only.
+
+## Approach
+
+- Off-the-shelf models first. Fine-tune, distill, or train our own (for example a YOLO model) only when a benchmark shows the off-the-shelf option misses a target.
+- Build a thin working loop early, then measure and replace parts. Do not run a broad model sweep before something works end to end.
+- Pin `qdrant-edge-py` (0.8.0 at the start), model revisions, runtime versions, and preprocessing. Verify every Edge capability against the installed package's `.pyi` stubs, not against a skill or blog. The `qdrant:qdrant-edge` plugin skill is wrong about fusion: Edge fuses prefetches with `Fusion.Rrf` and `Fusion.Dbsf`.
+- 0.8.0 has no `query_batch` and no `Memory` placement setting; both are on Qdrant `master` only. Building Edge from source is allowed if a benchmark justifies it.
+- Architecture starting point (a design gate may overturn it): one Python process with native inference bindings and bounded queues; one owner thread for Edge operations; camera capture keeps only the newest frame; detection runs continuously; embeddings run on change or request; speech work preempts background embedding; the LLM streams short phrases into TTS; tool handlers validate arguments and resolve dates and times in code; memory stores observed evidence, never generated recollections.
+
+## Roles
+
+| Role | Who | When |
+| --- | --- | --- |
+| Lead | The main session (Opus) | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
+| Researcher | `researcher` subagent (Sonnet) | One question needed for the next decision. Never edits code. Two at most at once |
+| Builder | `builder` subagent (Opus) | One scoped task from a written brief. One builder at a time |
+| Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per substantive approach, before building it |
+| Task review | Codex `gpt-6-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
+| Milestone review and counsel | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone; also after two failed approaches to the same problem |
+
+Subagents do not spawn subagents. The lead reads every builder diff before the review gate.
+
+Brief a builder with: the task ID, the linked decisions, allowed paths, interfaces it must keep, acceptance checks, the machine it runs on (Mac or Jetson), and when to stop and report instead of building around a problem.
+
+## Gates
+
+`tools/gate.py <design|review|milestone> "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
+
+- **Design gate** asks: Is this the best solution? Is this the best way to build what we are trying to build? What would a strong edge-ML engineer do instead? What is the simplest version that meets the target? What can be deleted?
+- **Review gate** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job.
+- **Milestone gate** judges the milestone's own acceptance criteria, lists unproven final targets separately, and gives counsel on direction.
+
+Resolve every blocking finding. To reject a finding, record the evidence in `DECISIONS.md`. Rerun a gate only after a material change, never to ask again about unchanged work. A better approach wins over sunk cost when evidence supports it, not on a reviewer's preference alone.
+
+## Definition of done
+
+A task is done when its acceptance checks pass, blocking findings are resolved, the code it replaces is deleted, the review gate passed, and `STATE.md` reflects reality.
+
+## Keeping the repo clean
+
+The repo must stay the cleanest, most optimized version of itself. Every task leaves the code smaller or clearer where it can.
+
+- One way to do each thing. Delete the old path in the same change.
+- No dead code, no compatibility shims, no commented-out code, no "for later" scaffolding.
+- No abstraction that adds neither isolation nor testability. No config option for a value that never changes.
+- Each module starts with one or two lines on what it is for.
+- Non-trivial logic leaves one runnable check (a small `test_*.py` or an `assert`-based self-check).
+- Everything in `refs/` is read-only reference. Copy an idea, not a file.
+
+## Benchmarks and evaluation
+
+- Define acceptance fixtures before choosing models. Keep development fixtures separate from held-out acceptance fixtures in `eval/`.
+- Fixtures cover current sight, past frames (including left and right, and similar objects), conversation eviction and recall, people (including unknown people), knowledge, absent memories, restart, and deletion. Each case stores the expected evidence IDs and acceptable answers. Score retrieval and answer correctness separately.
+- Each benchmark run writes `bench/results/YYYY-MM-DD-<what>-<run id>.jsonl` with: code revision or diff hash, machine, software and model versions, precision, context and image-token limits, dataset size, the command, sample counts, and percentiles.
+- Separate cold start from warm turns. Per turn, record endpointing, ASR done, retrieval, first token, first audible output, and answer done. Use at least 100 representative turns and 1,000 queries per shard.
+- Log memory, swap, temperatures, and clocks (`tegrastats`) during every Jetson run. Peak headroom is measured with every component active.
+- M4 needs held-out acceptance, all targets, offline cold start, restart persistence, deletion checks, and an eight-hour active run with no restart.
+
+## Context hygiene
+
+- `STATE.md` is the only status file. Rewrite it, do not append. Keep it under 120 lines. Before any delegation, remote change, compaction, or session end, it records: the active task and its acceptance checks, changed paths, unresolved findings, evidence paths, running jobs (host, directory, PID or service, command, log path), and the exact next command.
+- `DECISIONS.md` is append-only. Each entry is five lines or fewer: date, decision, why, rejected alternatives, evidence path.
+- `research/` holds one file per topic: summary first, sources last. Replace an outdated finding; do not stack corrections. Label numbers J (measured on an Orin Nano), E (measured elsewhere), or U (unverified).
+- `reviews/` keeps gate verdicts (logs are ignored). Record the outcome in `DECISIONS.md` when it changes a decision.
+
+## Deployment on the Jetson
+
+- Deploy each build to its own release directory. Before switching, keep the working release, an environment manifest, the service configuration, and a backup of each closed shard. If health or acceptance checks fail, switch back.
+- Check a remote job's status before restarting it.
+
+## Tools and gotchas
+
+- `codex exec` waits on stdin unless stdin is closed. `tools/gate.py` handles it; close stdin in any direct call.
+- This workspace cannot read folders outside the repo (macOS sandbox). Keep references inside `refs/` (gitignored); their revisions are in `DECISIONS.md`.
+- Writing style for docs and commit messages: plain, short sentences; "vector search engine", never "vector database".
+
+## Git
+
+Dylan gave standing approval (2026-10-07) to commit and push for this entire project. Commit each task after its review gate passes. Push when a remote exists. Commit messages: imperative subject, 5 to 10 words, with the `Co-Authored-By` footer.
+
+## Secrets
+
+The robot's sudo password is in `.env` as `ROBOT_SUDO_PASSWORD` (gitignored). Never write it into a tracked file, a log, or a commit. If passwordless sudo works, prefer it.
+
+## Testing without a human
+
+Most of the time no one is near the robot. Every capability must be testable from this Mac without a person:
+
+- **Scripted sessions.** The runtime reads audio and frames from a source: live devices, or files. `eval/` sessions are scripts of steps (show this image, say this WAV, wait) with expected answers and evidence IDs. Replay them on the Jetson and score them.
+- **Speech in.** Generate question WAVs on the Mac (`say -o q.aiff "..."`, then convert to 16 kHz mono WAV), and record real voices when Dylan is around. Keep both in `eval/`; synthetic voices alone overstate ASR quality.
+- **Speech out.** Save every TTS answer as a WAV with timestamps. Score it by transcribing it on the Mac and comparing it with the expected answer and with the LLM's text.
+- **Sight.** The robot's camera cannot be aimed by an agent. Use fixture images and recorded clips through the file source. Use the live camera only to check that capture, orientation, and fps work. The room lights may be off at night: check mean frame brightness first, and when the frame is dark, run fixture-based work and leave live-camera checks for when it is lit.
+- **Live interaction.** Until a microphone and speaker are attached to the Jetson, the Mac is the robot's microphone and speaker: a small client streams Mac mic audio to the Jetson and plays the answers. This is also how Dylan tests by voice.
+- **Human test days.** When Dylan is at the robot, prepare a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.

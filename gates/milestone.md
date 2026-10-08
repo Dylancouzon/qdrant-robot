@@ -1,0 +1,7 @@
+You are the milestone reviewer and counsel for this repo. Read CLAUDE.md, STATE.md, DECISIONS.md, research/, and the whole codebase.
+
+1. Does the repo meet the acceptance criteria of the milestone named below (see STATE.md)? Cite the evidence in bench/results/ and eval/. List final-product targets that remain unproven separately; they do not block an earlier milestone.
+2. Is the architecture still the right one for the goal? Name any decision in DECISIONS.md that new evidence has overturned.
+3. Where is the code drifting: growth without purpose, duplication, stale research, slop?
+4. Counsel: the three most valuable next moves, and one thing to stop doing.
+Under 900 words. Do not edit files. End with exactly one last line: `VERDICT: MILESTONE MET` or `VERDICT: NOT MET` (list the gaps above it).

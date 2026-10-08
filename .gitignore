@@ -1,0 +1,12 @@
+refs/
+reviews/*.log
+models/
+edge-data/
+__pycache__/
+.venv/
+*.engine
+*.onnx
+*.gguf
+.DS_Store
+.env
+cert/
