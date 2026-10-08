@@ -86,6 +86,14 @@ Live test day (two people): 10 teaches each, five with two objects in view, five
 
 Wake word, LED, echo cancellation and barge-in, a Kalman tracker, the brain deciding focus or binding, view decay, a memory editor page, patch-level multivectors, greetings on sight, spoken confirmation for a single candidate.
 
+## Foreground, not background (Dylan, 2026-10-08)
+
+- Scenery: a track still for about 60 s (furniture, shelf items, the rack) is marked scenery; it never takes the focus, is never offered for teaching, and is not re-stored as new sightings; it becomes a candidate again when it moves or disappears and returns.
+- Focus salience adds interaction cues: appeared or moved in the last few seconds, overlaps a person or a "hand" box (YOLOE vocabulary), large, central.
+- A teaching zone: only objects in the central near-field part of the frame take the focus (a mat or table area in front of the robot at a booth).
+- Option after the live test, if needed: a USB depth camera (for example OAK-D Lite or Orbbec, about $100 to $200; new spending, Dylan's call) for a "closer than 1 m" gate.
+- Measure on the live clip: background objects taking the focus (target 0 per minute), time for a held-up item to take it.
+
 ## Dylan's changes (D63, 2026-10-08)
 
 - The focus box is for teaching: only unrecognized objects take the focus; a guess ("Dylan's phone?") never holds it; a visitor can always teach the object they hold even when it is labeled or guessed ("no, this is my wallet" creates a new object and a negative point for the old guess).
