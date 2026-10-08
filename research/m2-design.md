@@ -1,6 +1,6 @@
 # M2 "It remembers": design brief
 
-As of 2026-10-08. Builds on the M1 loop (`research/m1-slice-design.md`, D21 to D29) and the detector spike (`spike/detector`, `research/detector.md` there). Not yet gated.
+As of 2026-10-08. Builds on the M1 loop (`research/m1-slice-design.md`, D21 to D29) and the detector spike (`spike/detector`, `research/detector.md` there). Gated: GO WITH CHANGES (reviews/20261008-100431-34165-design.md, D37). Changes applied below.
 
 ## Summary
 
@@ -21,12 +21,10 @@ As of 2026-10-08. Builds on the M1 loop (`research/m1-slice-design.md`, D21 to D
    - (B) Scene-change frames only, captioned in idle time (no detector).
    - Measure on recorded clips and fixture sequences: removed-object and left/right recall correctness, points per hour, GPU ms per hour, first-audio latency while the detector runs.
 2. **Crop vectors (identity of "my phone" against another phone, and text-to-image).**
-   - (A) SigLIP 2 base pooled vector: one model for crop-to-crop and text-to-crop.
-   - (B) DINOv2-small for crop-to-crop identity (stronger on instances, U), plus bge on labels and captions for text.
-   - (C) Patch multivectors (deferred until a measured miss).
+   - Deferred (D37): no crop embedder until label, region, and time filtering miss on same-class fixtures. Then (A) SigLIP 2 base pooled vector for crop-to-crop and text-to-crop, or (B) DINOv2-small for instance identity plus bge for text; never both at once. Patch multivectors only after a measured miss.
    - Measure: recall@1 for named-object re-identification with a same-class distractor (two phones, two mugs), text-to-crop recall@1, ms per crop, RAM.
-3. **Naming, forgetting, ignoring.** "This is my phone": the crops of the track nearest the frame center (or the one the visitor holds) are stored as one named point, several crops as a multivector; later sightings MaxSim-match against named points and the label on the video view becomes the name. "Forget my phone": delete the point and its crops. "Ignore the chair": a named point flagged `ignore`; matching tracks are never stored. Parsing runs in code on the transcript (as `shown` and `about_past` do today), not as LLM tool calls. Alternative: LLM tool calls; measure intent accuracy on dev phrasings and added first-token latency.
-4. **Recall query.** (A) For past questions, fuse prefetches with RRF in one Edge query: label or caption text vector, crop vector (text tower if A in 2), and recency (Formula with time decay), with the region as a payload filter for left or right. (B) Recency only (today). Measure evidence-ID accuracy on dev memory fixtures with distractors.
+3. **Naming, forgetting, ignoring.** "This is my phone": the crops of the track nearest the frame center (or the one the visitor holds) are stored as one named point, several crops as a multivector; later sightings MaxSim-match against named points and the label on the video view becomes the name. "Forget my phone": delete the point and its crops. "Ignore the chair": a persistent class rule (separate from named instances), so matching tracks are never stored; both kinds of rule survive restart. A name binds to a confirmed track, or the robot asks which one. Parsing runs in code on the transcript (as `shown` and `about_past` do today), not as LLM tool calls. Alternative: LLM tool calls; measure intent accuracy on dev phrasings and added first-token latency.
+4. **Recall query.** Label, region, and time resolved in code with payload filters; recency ranks within the asked time window (D37). RRF over vectors only after filtering misses on distractor fixtures.
 5. **Conversation beyond the window.** Statements already have vectors. Add the robot's answers as text points so "What did we talk about?" searches both sides.
 
 ## Memory budget

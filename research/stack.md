@@ -9,8 +9,7 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 - `onnxruntime-gpu` 1.24.0 from `https://pypi.jetson-ai-lab.io/sbsa/cu130/+simple/` works on the Orin GPU and lists TensorRT, CUDA, and CPU providers. Install with `--index-strategy unsafe-best-match`. (J)
 - The Jetson AI Lab index has no `jp7` Orin channel; JetPack 7 Orin uses the `sbsa/cu130` channel. (J)
 - The course robot's torch 2.13.0+cu130 has no sm_87 build: it warns and runs without the GPU. (J, from its journal)
-- Power: BPMP caps EMC at 2,133 MHz and the GPU at 624.75 MHz. The Super profile file (`nvpmodel_p3767_0003_super.conf`: 25W and MAXN_SUPER, EMC 3,199 MHz) and Super DTBs exist, but the board was flashed with the non-Super config (TNSPEC `jetson-orin-nano-devkit`). Super mode needs new boot firmware in QSPI. (J)
-- Super options, from a researcher (2026-10-07): (a) NVIDIA's documented path, a QSPI-only `l4t_initrd_flash.sh` with `jetson-orin-nano-devkit-super` from an x86 Ubuntu host in recovery mode (E); (b) on-device UEFI capsule update: `nvidia-l4t-bootloader` 39.2.0 ships `/opt/ota_package/t23x/TEGRA_BL_3767_super.Cap` on this robot (J). NVIDIA staff said in 2025 that a capsule alone does not enable Super; a community script also rewrites TNSPEC and COMPATIBLE_SPEC (U on R39). Expected gain: GPU 625 to 1,020 MHz, EMC 2,133 to 3,199 MHz; NVIDIA reports Llama 3.2 3B from 27.7 to 43.1 tok/s (E). The 25W mode (EMC 3,199, GPU 918) likely captures most of the decode gain (U).
+- Power: MAXN_SUPER since 2026-10-08 (D31, D32): GPU 1,020 MHz, EMC 3,199 MHz, CPU 1,728 MHz, applied by the on-device UEFI capsule `TEGRA_BL_3767_super.Cap` after setting TNSPEC and COMPATIBLE_SPEC to `jetson-orin-nano-devkit-super-` (the QSPI flash from an x86 host was not needed). Before it, BPMP capped EMC at 2,133 MHz and the GPU at 624.75 MHz. (J)
 
 ## Thermals (15W, closed enclosure, stock fan)
 
@@ -52,7 +51,7 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 | Qwen3-VL-2B Q8_0 (1.70 GiB) | | 18.9 tok/s | J |
 
 - `jetson_clocks` adds about 3%. Disabling CUDA graphs costs 7%.
-- Decode is overhead-bound, not bandwidth-bound: 65% more weight bytes cost only 19% more time, so about 27 of 43 ms per token is fixed per-kernel cost at 625 MHz. Speculative decoding and kernel fusion (TensorRT Edge-LLM) attack that cost; so would Super clocks.
+- Decode is overhead-bound, not bandwidth-bound: 65% more weight bytes cost only 19% more time, so about 27 of 43 ms per token is fixed per-kernel cost at 625 MHz. Speculative decoding and kernel fusion (TensorRT Edge-LLM) attack that cost; Super clocks took Qwen3-VL-2B decode to 36.0 tok/s (D32).
 - The default build aborts in `cuMemAddressReserve` (CUDA VMM pool) on the first image: build with `-DGGML_CUDA_NO_VMM=ON`. (J)
 - Gemma 4 E2B with its audio mmproj loads and accepts audio ("experimental" warning). Server RSS with 4,096 context: about 3.5 GB. (J)
 
