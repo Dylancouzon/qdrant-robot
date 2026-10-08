@@ -85,12 +85,17 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 - [x] **M1.4 It talks.** End to end with gaps (D40): knowledge shard calibrated on dev (M1.4a, verbatim facts, unseen paraphrases 0.85 to 0.98), current-camera questions scored; sight naming in clutter carried (D39).
 - [x] **M1.5 Milestone gate.** MILESTONE MET under D40 (`reviews/20261008-111211-5165-milestone.md`). Carried: 30 minutes without restart not yet run; research drift (stack.md Super mode, m2-design.md fusion and ignore) to clean in M2.
 
-## Human checklist (when Dylan is at the robot)
+## Human checklist (live test day, when Dylan is at the robot)
 
-1. Audio: the camera microphone is the input (in use). Speaker ordered 2026-10-08 (Waveshare USB sound card with 8 ohm 5 W speaker): when plugged into the Jetson, find the ALSA card, run with `--speaker`, measure audible latency, check echo into the camera microphone (mute the microphone while speaking first), and compare the card's microphone if it has one. Test the camera microphone at about 1 m with background noise before buying another microphone.
-2. Calibrate `SCENE_CHANGE` on a lit, static scene.
-3. Camera: watch for the USB port fault (D32).
-4. The 3080 box: hold (see Next, item 6).
+Fixtures so far are photos and recorded audio fed as files; the live camera was checked only for capture and fps. Dylan (2026-10-08): get as far as possible first, then a live testing phase.
+
+1. Audio: the camera microphone is the input. Speaker ordered (Waveshare USB card, 8 ohm 5 W): plug into the Jetson, run with `--speaker`, measure audible latency, check echo into the camera microphone, compare the card's microphone if any. Test the camera microphone at about 1 m with background noise before buying another microphone.
+2. Faces (M3.2): Dylan, then colleagues if present, at 0.5, 1, and 2 m, frontal and turned: record clips to recalibrate the face threshold on robot-camera frames (D45: dev margin 0.011).
+3. Objects (M2): show, name, remove, and move real objects (phone, mug, bag) left and right; record the session as fixtures.
+4. Spoken session end to end with the speaker: every capability, interruptions, a long pause mid-question.
+5. Calibrate `SCENE_CHANGE` on a lit, static scene; watch for the camera USB port fault (D32).
+
+Without a human (Lead, when the Jetson is free and the room is lit): a live soak run (camera on, no speech, 30 minutes then hours: detection on real frames, memory growth, temperatures, leaks; closes the M1 30-minute check), and camera-domain fixtures recorded from the live camera.
 
 ## Facts from Dylan
 
