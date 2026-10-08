@@ -19,16 +19,18 @@ CONTEXT = 64
 START_P, END_P = 0.5, 0.35   # speech starts above START_P, ends below END_P (hysteresis)
 START_FRAMES = 2             # voiced frames in a row before a line starts (64 ms)
 HANGOVER_S = 0.35            # silence that ends a line; mid-sentence pauses are shorter
+LONG_S, LONG_HANGOVER_S = 4.0, 0.7  # long questions pause longer (0.58 s in dev, D37)
 MIN_SPEECH_S = 0.25          # shorter lines are noise
-MAX_LINE_S = 15.0
+MAX_LINE_S = 25.0            # under BUFFER_S; a 16 s fixture question split at 15 s
 PAD_S = 0.2                  # audio kept before and after a line, so edge words are whole
 BUFFER_S = 30
 THREADS = 4                  # Parakeet's share of the six cores
 # Names the acoustic model spells by sound. Visitors say "quadrant".
-_QDRANT = r"(?:quadrant|q ?drant|cue ?drant|kudrant)"
+_QDRANT = r"(?:quadranth?|q ?drant|cue ?drant|kudrant)"
 _FIXES = [(re.compile(rf"\b(?:{_QDRANT}|quadr[aeiou]n\w*?)(?:age|ed?ge)\b", re.I),
            "Qdrant Edge"),  # "quadrantage", "quadrundage"
-          (re.compile(rf"\b{_QDRANT}s?\b", re.I), "Qdrant")]
+          (re.compile(rf"\b{_QDRANT}s?\b", re.I), "Qdrant"),
+          (re.compile(r"\bmulti[ -]vector", re.I), "multivector")]  # the knowledge phrasing
 
 
 def normalize(text: str) -> str:
@@ -106,7 +108,8 @@ class Ears:
             return
         self.silence = self.silence + FRAME if p < END_P else 0
         speech_end = end - self.silence
-        if self.silence >= HANGOVER_S * RATE or end - self.start >= MAX_LINE_S * RATE:
+        hangover = LONG_HANGOVER_S if speech_end - self.start > LONG_S * RATE else HANGOVER_S
+        if self.silence >= hangover * RATE or end - self.start >= MAX_LINE_S * RATE:
             start, self.start, self.voiced = self.start, None, 0
             if speech_end - start >= MIN_SPEECH_S * RATE:
                 pad = int(PAD_S * RATE)
@@ -137,6 +140,8 @@ if __name__ == "__main__":
     assert normalize("What is quadrantage?") == "What is Qdrant Edge?"
     assert normalize("What is quadrundage?") == "What is Qdrant Edge?"
     assert normalize("quadrant edge") == "Qdrant edge"
+    assert normalize("What is Quadranth Edge?") == "What is Qdrant Edge?"
+    assert normalize("What is a multi vector?") == "What is a multivector?"
     ears = object.__new__(Ears)  # only the buffer and line logic, without loading a model
     ears.fed, ears.buffer = 0, np.zeros(4, np.float32)
     ears.keep(np.array([1, 2, 3], np.float32))
@@ -151,4 +156,10 @@ if __name__ == "__main__":
         ears.step(p, k * FRAME)
     assert events[0] == "start" and len(events) == 2, events
     assert abs(events[1] - (100.0 - (RATE * 4 - 20 * FRAME) / RATE)) < 1e-6, "speech end time"
+    for voiced, pause in ((130, 18), (520, 0)):  # a 0.58 s pause after 4 s; a 16.6 s line
+        events.clear()
+        ps = [0.9] * voiced + [0.1] * pause + [0.9] * 5 + [0.1] * 22
+        for k, p in enumerate(ps, 1):
+            ears.step(p, k * FRAME)
+        assert events[0] == "start" and len(events) == 2, (voiced, events)
     print("selftest ok")

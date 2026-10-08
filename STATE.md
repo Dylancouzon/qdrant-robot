@@ -1,32 +1,33 @@
 # State
 
-Last updated: 2026-10-08 09:50, by the lead (handoff after a repo review). Rewrite, do not append.
+Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 ## Active task
 
-**M1.3 Decision run**: not met. All work is on `main` (the reviewed robot was merged; `spike/*` is for bake-offs only).
+**M1.3 Decision run**: not met (dev 42/47 = 89% against 90%). Harness, endpointing, and generalization rule done (D38, review PASS `reviews/20261008-103501-66240-review.md`).
 
-- Dev, synthetic voices, MAXN_SUPER, Qwen3-VL-2B: 41/47 judged (87%), speech 46/47; p50 from end of speech: transcript 0.73 s, first token 0.82 s, first phrase 1.04 s, first synthesized audio 1.47 s (`bench/results/2026-10-08-replay-1791463902.judged.jsonl`). Qwen3-VL-4B re-run on the same pipeline: 37/47, 1.91 s; the 2B stays (D35).
-- Dev, real voices (first run): 29/47 judged, but 16 turns heard the previous step's question. The recordings are right; a pause inside a question splits the line at the VAD, and `eval/replay.py` then shifts every later step by one (D36). Held-out stays at 15/26 synthetic (17/26 under D33); real-voice held-out is not run yet (one use spent so far, D29).
-- Qdrant Edge query target met: p99 under 0.5 ms at 1,000 points (D36, `bench/edge_bench.py`).
+- Real-voice dev: 42/47 judged, 1 split (knowledge-more-2: 1.34 s pause after "Where is"), first synthesized audio p50 1.45 s (`bench/results/2026-10-08-replay-1791468888.judged.jsonl`). Synthetic dev 42/47, 0 splits, 1.47 s (`...-1791469392`).
+- Held-out real voices (use 2 of D29): 18/26 judged, 0 splits, 1.58 s p50 (`...-1791470020`). Failures: sight (mug, banana, skateboard, weather), one knowledge, one told. Not tuned on.
+- Probes (`eval/probes`, one-time, never tuned on): 22/23 (`...-1791469690`).
+- Dev failures left: hand-teddy-3, same-apples-1/2 (sight and "same as before"), desk-1, joke-1 (fix landed after that run; probes 5/5). The 2B ignores "The visitor told you" lines when the question is not marked past (intro-3 synthetic).
+- Review rule 6 (Dylan): every behavior fix needs evidence beyond the dev steps it flips (unseen probes or a counted held-out run).
 
 Next session, in order:
 
-1. **Harness:** after each step, `eval/replay.py` drains every turn the step produced; a step that produced more than one turn is BAD with `split: n`. Check: the real-voice dev replay reports splits instead of shifted questions. Run `python3 eval/run.py --audio audio-real`.
-2. **Endpointing for real voices (D26):** candidates to measure on the real-voice dev set: a longer VAD hangover (0.35 s to about 0.6 s), or a minimum line (a fragment under about 1 s waits for more speech). Metric: split steps and first-audio p50; accept the one that removes splits for the least latency. Then add "Quadranth" to `normalize` in `robot/asr.py` (knowledge-1).
-3. Real-voice held-out run (use 2, count it in DECISIONS), then M1.4 (knowledge and sight to acceptance) and M1.5 (milestone gate).
-4. MAXN thermal test (15 minutes of load in the enclosure; the detector run peaked at 66.3 °C).
-5. M2: design gate on `research/m2-design.md` with the detector numbers (`spike/detector`, rebased on `main` 2026-10-08, builder report in `research/detector.md` there), then object memory.
-6. The 3080 box LoRA (brief B1 written, `boxes/3080/README.md`): **not started, and not needed yet.** No measured brain miss justifies training (D5): the open failures are endpointing, ASR of "Qdrant", and the harness. Revisit after M1.5.
+1. **Sight (M1.4):** held-out failures are mostly naming objects. Candidate: detector labels from `spike/detector` (YOLOE booth vocabulary) in the sight prompt, against the current image-only prompt; measure on dev sight steps plus new probe images, never held-out.
+2. **Turn merge** for pauses longer than the hangover (design verdict `reviews/20261008-100527-35955-design.md`: track playback apart from turn completion, never commit a cancelled turn; or Smart Turn v3.2 on the fragment, `research/endpointing.md`).
+3. MAXN thermal test (15 minutes of load in the enclosure; the detector run peaked at 66.3 °C).
+4. **M2** (design GO WITH CHANGES, D37): fixtures are written (`eval/dev/m2.jsonl`, `eval/heldout/m2.jsonl`, 38 images, `eval/make_scenes.py`, `eval/test_fixtures.py`). Next: replay step types `wait` and `restart`, then detector sightings with label, region, and times.
+5. The 3080 box LoRA: not started, not needed (D5). Revisit after M1.5.
 
-Running jobs: none. caffeinate runs on the Mac.
+Running jobs: none. caffeinate runs on the Mac. Deployed release: `5fd5253828fa`.
 
 ## Robot access
 
 - `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Internet works.
 - Serial fallback only when Dylan plugs in the debug USB-C cable (unplugged now): `/dev/cu.usbmodem*`, 115200 baud, user `qdrant`, password in `.env`.
 - Network: Wi-Fi on the home LAN (192.168.1.238 by DHCP). The course robot's `l6-hotspot` does not autoconnect. Never re-enable the hotspot over SSH.
-- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. Deployed: `154ba4924a5c`. Models: `python -m tools.models` verifies `models.json`.
+- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. Deployed: `5fd5253828fa` (the held-out run; the timeout revert after it touches only eval/replay.py). Models: `python -m tools.models` verifies `models.json`.
 - Acceptance run from the Mac: `python3 eval/run.py [--model M] [--oracle | --audio audio-real] [cases]` deploys, replays, collects, judges, and checks speech. Real-voice fixtures: `tools/record.py <cases> [--check]`.
 
 ## Finding your way in the evidence
@@ -49,11 +50,12 @@ Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/D
 
 ## Checkpoints
 
+- C6: replay split scoring, length-scaled hangover, overfitting rule, M2 fixtures (D37, D38).
 - C0, C1: harness and architecture rethink. C2: M1.1 (`reviews/20261008-010719-8012-review.md`). C3: M1.2 (`reviews/20261008-020746-59698-review.md`). C4: M1.3 quality work (`reviews/20261008-084259-59432-review.md`). C5: repo hygiene, Edge benchmark, 4B re-run, recorder check (D34 to D36).
 
 ## Unmet targets
 
-All CLAUDE.md targets unmeasured at acceptance scale except Edge query (met, D36). Interim (dev, 47 turns, no speaker, MAXN): first synthesized audio 1.47 s p50 against 1.2 s; decode 36.0 tok/s meets 30. Held-out answers 15/26 synthetic; real voices split at pauses (D36).
+All CLAUDE.md targets unmeasured at acceptance scale except Edge query (met, D36). Interim (no speaker, MAXN): first synthesized audio 1.45 s p50 dev, 1.58 s held-out, against 1.2 s; decode 36.0 tok/s meets 30. Held-out answers 18/26 real voices (69% against 90%).
 
 ## Milestones and acceptance
 
@@ -71,7 +73,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 - [x] **M1.1 Stack qualification.** Done 2026-10-08.
 - [x] **M1.2 Vertical slice.** Done 2026-10-08 (C3).
-- [ ] **M1.3 Decision run.** Synthetic dev 41/47, no swap, 1,886 MB headroom (D27, D28, D35). Real voices: harness and endpointing first (D36).
+- [ ] **M1.3 Decision run.** Real-voice dev 42/47, held-out 18/26, endpointing done (D38); 1,886 MB headroom (D28).
 - [ ] **M1.4 It talks.** Knowledge shard and current-camera questions to M1 acceptance, with dev fixtures and scored replays. Knowledge shard is built (`knowledge/build.py`, Qdrant v1.19.0 server snapshot restored into Edge 0.8.0).
 - [ ] **M1.5 Milestone gate.**
 

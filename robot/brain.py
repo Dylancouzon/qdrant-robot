@@ -65,7 +65,8 @@ SYSTEM = (
     "about the past, say you do not remember."
 )
 CHANGED = "The view has changed since your last answer.\n"
-PAST = "The visitor asks about the past: answer from your memories.\n"
+# "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
+PAST = "The visitor asks about the past: answer from the lines above.\n"
 # Main object first: recall answers with the first thing a caption names (prompt probes, D29).
 CAPTION = ("Answer in this form: 'Main object: <the most prominent object>. Around it: "
            "<other things, with left, center, or right>.'")
@@ -90,9 +91,10 @@ def jpeg(frame: np.ndarray) -> dict:
 
 
 def sentences(text: str) -> int:
-    """Finished sentences of at least MIN_WORDS words; shorter ones ("Of course!", a joke's
-    "Why don't scientists trust atoms?") do not count, so an answer can follow them."""
-    return sum(len(m.split()) >= MIN_WORDS for m in _SENTENCE.findall(text))
+    """Finished statements of at least MIN_WORDS words; shorter ones ("Of course!") and
+    questions (a joke's setup) do not count, so an answer can follow them."""
+    return sum(len(m.split()) >= MIN_WORDS and not m.endswith("?")
+               for m in _SENTENCE.findall(text))
 
 
 def age(seconds: float) -> str:
@@ -187,6 +189,7 @@ if __name__ == "__main__":
         os.execv(args[0], args)
     assert age(30) == "30 seconds ago" and age(600) == "10 minutes ago"
     assert sentences("Of course! Why don't scientists trust atoms?") == 0
+    assert sentences("Sure! Here's one: Why don't scientists trust calculators?") == 0
     hello = "Hello there, it is so nice to meet you! I see clothes hanging on a rack."
     assert sentences(hello) == 2
     two = "Because atoms make up everything you see. Two cats sleep on a blanket. And"

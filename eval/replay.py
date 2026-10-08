@@ -26,12 +26,65 @@ from robot.main import Robot
 
 SILENCE_S = 1.5  # after each question, so the VAD can end the line
 REACT_S = 1.0    # a visitor waits for the answer to finish, then this long, before speaking
+STAGES = ("line_s", "asr_s", "first_token_s", "first_phrase_s", "first_audio_s", "speech_s")
 
 
 def ok(step: dict, answer: str) -> bool:
     a = answer.lower().replace("\u2019", "'")
     return any(w in a for w in step["expect_any"] or [""]) and not any(
         w in a for w in step.get("expect_none", []))
+
+
+def converse(robot: Robot, step: dict, wav: Path | None) -> list:
+    """Say the step (its WAV at real-time pace, or its text when `wav` is None) and return
+    every turn it produced, then wait while the answer plays and the visitor reacts."""
+    asked = robot.asked
+    if wav is None:  # oracle: the fixture text as the transcript, brain quality without ASR
+        robot.ask(step["say"])
+    else:
+        for chunk in paced(read_wav(wav), SILENCE_S):
+            robot.hear(chunk)
+        robot.lines.join()  # every line of this step is transcribed
+    # A pause inside a question can split it into several lines, each answered.
+    turns = [robot.turns.get(timeout=60) for _ in range(robot.asked - asked)]
+    wait = (turns[-1].audio_s if turns else 0) + REACT_S
+    if wav is None:
+        time.sleep(wait)
+    else:  # the microphone keeps running while the answer plays and the visitor reacts
+        for chunk in paced(np.zeros(0, np.float32), wait):
+            robot.hear(chunk)
+    return turns
+
+
+def score(step: dict, turns: list, frames: dict[str, int], oracle: bool) -> dict:
+    """The step's row: a split step is BAD, and its last turn (the question's end) is scored."""
+    if not turns:  # the VAD or the transcript dropped the question
+        return {"id": step["id"], "ok": False, "split": 0, "heard": "", "answer": "",
+                "evidence_ok": None, **dict.fromkeys(STAGES)}
+    turn = turns[-1]
+    frames[step["id"]] = turn.frame_id
+    want = [frames.get(k) for k in step.get("evidence", [])]
+    row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
+           "heard": " | ".join(t.question for t in turns), "split": len(turns),
+           "evidence_ok": all(f in turn.memories for f in want) if want else None,
+           "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
+           "kind": turn.kind, "verbatim": turn.verbatim, "told": turn.told,
+           "prompt": turn.prompt,
+           "line_s": turn.line - turn.speech_end,
+           "asr_s": turn.transcribed - turn.speech_end,
+           "first_token_s": turn.first_token - turn.speech_end,
+           "first_phrase_s": turn.first_phrase - turn.speech_end,
+           "first_audio_s": turn.first_audio - turn.speech_end,
+           "speech_s": turn.speech_end - turn.speech_start, "wav": turn.wav}
+    if oracle:  # no audio: speech, line, and transcript stages were not measured
+        for k in ("line_s", "asr_s", "speech_s"):
+            row[k] = None
+    return row
+
+
+def p50(rows: list[dict], k: str) -> float | None:
+    v = [r[k] for r in rows if r[k] is not None]
+    return statistics.median(v) if v else None
 
 
 def main(path: Path, model: str, oracle: bool, audio: str) -> int:
@@ -48,53 +101,29 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
             if "show" in step:
                 camera.show(path.parent / step["show"])
                 continue
-            if oracle:  # the fixture text as the transcript: brain quality without ASR
-                robot.ask(step["say"])
-                turn = robot.turns.get(timeout=60)
-                time.sleep(turn.audio_s + REACT_S)
-            else:
-                for chunk in paced(read_wav(path.parent / audio / f"{step['id']}.wav"),
-                                   SILENCE_S):
-                    robot.hear(chunk)
-                turn = robot.turns.get(timeout=60)
-                # The microphone keeps running while the answer plays and the visitor reacts.
-                for chunk in paced(np.zeros(0, np.float32), turn.audio_s + REACT_S):
-                    robot.hear(chunk)
-            frames[step["id"]] = turn.frame_id
-            want = [frames[k] for k in step.get("evidence", [])]
-            row = {"id": step["id"], "ok": ok(step, turn.answer), "heard": turn.question,
-                   "evidence_ok": all(f in turn.memories for f in want) if want else None,
-                   "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
-                   "kind": turn.kind, "verbatim": turn.verbatim, "told": turn.told,
-                   "prompt": turn.prompt,
-                   "line_s": turn.line - turn.speech_end,
-                   "asr_s": turn.transcribed - turn.speech_end,
-                   "first_token_s": turn.first_token - turn.speech_end,
-                   "first_phrase_s": turn.first_phrase - turn.speech_end,
-                   "first_audio_s": turn.first_audio - turn.speech_end,
-                   "speech_s": turn.speech_end - turn.speech_start, "wav": turn.wav}
-            if oracle:  # no audio: speech, line, and transcript stages were not measured
-                for k in ("line_s", "asr_s", "speech_s"):
-                    row[k] = None
+            wav = None if oracle else path.parent / audio / f"{step['id']}.wav"
+            row = score(step, turns := converse(robot, step, wav), frames, oracle)
             rows.append(row)
             mark = {True: " +ev", False: " -EV", None: ""}[row["evidence_ok"]]
-            print(f"{'ok ' if row['ok'] else 'BAD'} {row['first_audio_s']:.2f}s "
-                  f"{step['id']}{mark}: [{turn.question}] {turn.answer}", flush=True)
+            mark += f" split: {len(turns)}" if len(turns) > 1 else ""
+            print(f"{'ok ' if row['ok'] else 'BAD'} {row['first_audio_s'] or 0:.2f}s "
+                  f"{step['id']}{mark}: [{row['heard']}] {row['answer']}", flush=True)
     robot.close()
-    firsts = sorted(r["first_audio_s"] for r in rows)
+    firsts = sorted(r["first_audio_s"] for r in rows if r["first_audio_s"] is not None)
     summary = {"summary": "replay", "model": model, "oracle": oracle, "audio": audio,
                "cases": str(path), "system": SYSTEM,  # the prompt rows leave it out
                "tegrastats": os.environ.get("ROBOT_TEGRASTATS"),
                "machine": platform.node(),
                "release": os.environ.get("ROBOT_RELEASE"), "n": len(rows),
                "correct": sum(r["ok"] for r in rows),
+               "split": sum(r["split"] > 1 for r in rows),
                "evidence": f"{sum(r['evidence_ok'] is True for r in rows)}/"
                            f"{sum(r['evidence_ok'] is not None for r in rows)}",
-               "first_audio_p50_s": statistics.median(firsts),
-               "first_audio_max_s": firsts[-1],
-               "asr_p50_s": None if oracle else statistics.median(r["asr_s"] for r in rows),
-               "first_token_p50_s": statistics.median(r["first_token_s"] for r in rows),
-               "first_phrase_p50_s": statistics.median(r["first_phrase_s"] for r in rows),
+               "first_audio_p50_s": p50(rows, "first_audio_s"),
+               "first_audio_max_s": firsts[-1] if firsts else None,
+               "asr_p50_s": p50(rows, "asr_s"),
+               "first_token_p50_s": p50(rows, "first_token_s"),
+               "first_phrase_p50_s": p50(rows, "first_phrase_s"),
                "audio_dir": str(out),
                "note": ("oracle: latencies start when the text is submitted (text to audio)"
                         if oracle else

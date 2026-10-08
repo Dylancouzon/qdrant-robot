@@ -1,0 +1,57 @@
+# M2 fixture images
+
+Written by `eval/make_scenes.py`. Composites paste COCO val2017 objects cut out along their masks; plain `coco-*` files are the original photos. Each image keeps its sources' licenses; one with a CC BY-SA source is CC BY-SA.
+
+- `m2-bg.jpg`: the empty held-out scene: a hotel bed with two lamps.
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-scissors.jpg`: scissors, held up. Objects: scissors 1157541 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 550322: http://farm3.staticflickr.com/2487/4195477568_0ba3208eb3_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-vase-remote.jpg`: a glass vase with stems left, a TV remote right. Objects: vase 1154625 (left), remote 1111918 (right).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 249025: http://farm1.staticflickr.com/37/83075908_0f36b4f984_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 222735: http://farm4.staticflickr.com/3212/2749561795_4c25c5a576_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-remote-right.jpg`: the remote right; vase gone. Objects: remote 1111918 (right).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 222735: http://farm4.staticflickr.com/3212/2749561795_4c25c5a576_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-remote.jpg`: the TV remote, held up. Objects: remote 1111918 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 222735: http://farm4.staticflickr.com/3212/2749561795_4c25c5a576_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-apples.jpg`: two red apples, center. Objects: apple 1049781 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 189078: http://farm5.staticflickr.com/4026/4430551771_58c190b055_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-bag-umbrella.jpg`: a black leather handbag left, a black lace umbrella right. Objects: handbag 1177695 (left), umbrella 279676 (right).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 250137: http://farm5.staticflickr.com/4084/5028973928_910bfd2613_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 339823: http://farm6.staticflickr.com/5023/5596623597_042b2c2ded_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-clock-left.jpg`: an orange wall clock, left third. Objects: clock 333904 (left).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 191013: http://farm9.staticflickr.com/8057/8193281147_81461e9773_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-teddy-white.jpg`: a white fluffy teddy bear. Objects: teddy bear 1163344 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 113403: http://farm3.staticflickr.com/2613/3713015524_bac439d1e6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-teddy-gold.jpg`: a golden-brown teddy bear with a yellow button tag. Objects: teddy bear 1162789 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 335081: http://farm9.staticflickr.com/8342/8234160647_246bcdcd27_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-bottle-dragon.jpg`: a brown beer bottle with a red Dragon Stout label. Objects: bottle 83672 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 79651: http://farm4.staticflickr.com/3720/9659844494_a70f5d61c0_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-bottle-pink.jpg`: a dark bottle with a pink label; same class as the stout. Objects: bottle 86514 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 146489: http://farm4.staticflickr.com/3581/5841328823_0f891d5429_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-phone-flip.jpg`: a silver Samsung flip phone. Objects: cell phone 328787 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 42528: http://farm4.staticflickr.com/3205/2849230650_402d291378_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-phone-slider.jpg`: a silver slider phone with a green screen; same class. Objects: cell phone 321838 (center).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 446207: http://farm4.staticflickr.com/3121/3160251864_87bc5a4273_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-phones.jpg`: slider phone left, flip phone right. Objects: cell phone 321838 (left), cell phone 328787 (right).
+  - COCO 68286: http://farm4.staticflickr.com/3772/9124536029_b9eaf76c3e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 446207: http://farm4.staticflickr.com/3121/3160251864_87bc5a4273_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 42528: http://farm4.staticflickr.com/3205/2849230650_402d291378_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `coco-000000578500.jpg`: a living room: blue wing chair, sofas, lamps.
+  - COCO 578500: http://farm5.staticflickr.com/4042/4376919410_eff5f487aa_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `coco-000000319935.jpg`: a bedroom: armchair, sofa, bed, coffee table.
+  - COCO 319935: http://farm4.staticflickr.com/3352/3542980344_a845a4cb2c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `coco-000000277197.jpg`: a living room: carved chairs, sofa, flowers.
+  - COCO 277197: http://farm5.staticflickr.com/4110/5016175615_cc6c050115_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)

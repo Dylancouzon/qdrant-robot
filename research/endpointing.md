@@ -1,8 +1,11 @@
 # Endpointing: detecting the end of a visitor's turn
 
-As of 2026-10-07. Labels: J measured on an Orin Nano, E measured elsewhere, U unverified. Nothing here is measured on our robot yet.
+As of 2026-10-08. Labels: J measured on an Orin Nano, E measured elsewhere, U unverified.
 
 ## Summary
+
+- Measured (2026-10-08, D38): Silero VAD with a 0.35 s hangover, raised to 0.7 s after 4 s of speech, line limit 25 s. Dylan's 47 dev recordings: one split left (a 1.34 s pause after "Where is"), first audio p50 1.45 s, unchanged from a flat 0.35 s (J). Only two dev recordings have an inner pause over 0.06 s, so these values rest on little data: held-out real voices are the test.
+- Open: a pause longer than the hangover after an unfinished fragment. Candidates: Smart Turn v3.2 on the fragment (below), or cancel the unfinished turn and merge the lines when speech resumes (design verdict reviews/20261008-100527-35955-design.md: track playback separately, never commit a cancelled turn).
 
 - Plan: Silero VAD with a short hangover (about 200 ms), then Pipecat Smart Turn v3.2 on the last 8 s of audio to decide "turn complete". Start the LLM speculatively on that decision and cancel it if speech resumes. Force "complete" after about 3 s of silence.
 - Smart Turn v3.2: 8 MB int8, audio input, BSD-2. English accuracy 94.3%, 2.6% cut-offs, 3.1% waits too long (E). CPU time 15 to 95 ms on cloud ARM and x86 (E); expect 60 to 150 ms on our A78AE cores (U).

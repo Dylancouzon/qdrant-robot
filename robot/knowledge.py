@@ -10,11 +10,13 @@ from qdrant_edge import EdgeShard, Query, QueryRequest
 from robot.config import ROOT, SHARED
 
 SNAPSHOT = ROOT / "knowledge/knowledge.snapshot"
-# Below this cosine the best phrasing is not the visitor's question. Provisional: calibrate on
-# eval/dev knowledge and off-topic questions (M1.4).
+# Below this cosine the best phrasing is not the visitor's question. eval/dev (M1.4a): scene,
+# recall, and small-talk questions 0.74 or less; knowledge questions 0.81 or more (badly misheard
+# ones, 0.71: they reach the brain without a fact).
 MIN_SCORE = 0.75
 # At or above this, the question is one of the fact's phrasings in other words: the robot says
-# the fact itself, with no LLM. Dev questions: correct matches 0.95 to 1.0, others 0.86 or less.
+# the fact itself, with no LLM. eval/dev: knowledge questions heard right 0.97 to 1.0; misheard
+# ones 0.89 or less, which the brain answers with the fact.
 VERBATIM = 0.93
 
 
@@ -42,10 +44,13 @@ if __name__ == "__main__":
     embed = TextEmbedder()
     with tempfile.TemporaryDirectory() as tmp:
         k = Knowledge(Path(tmp) / "knowledge")
-        q = embed(["what exactly is qdrant edge", "how is the weather today"])
+        q = embed(["what exactly is qdrant edge", "how is the weather today",
+                   "Is a server required for Qdrant Edge?"])  # not a dev phrasing
         t = time.perf_counter()
         hit = k.search(q[0])
         ms = (time.perf_counter() - t) * 1000
         assert hit and "embedded" in hit[0][1], hit
         assert not k.search(q[1]), "off-topic questions must find nothing"
+        server = k.search(q[2])
+        assert server[0][0] >= VERBATIM and "needs no server" in server[0][1], server
         print(f"selftest ok: {hit[0][0]:.3f} {hit[0][1][:50]}... ({ms:.2f} ms)")

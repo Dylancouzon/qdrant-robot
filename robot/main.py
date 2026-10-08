@@ -86,6 +86,7 @@ class Robot:
         self.last_frame: np.ndarray | None = None  # the frame of the previous turn
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
         self.lines: queue.Queue = queue.Queue()  # finished lines for the final transcript
+        self.asked = 0                          # turns queued so far (one per heard line)
         self.turns: queue.Queue[Turn] = queue.Queue()  # finished turns, for replay and logs
         self.ready: Look | None = None          # the frame whose prompt prefix is prefilled
         self.speaking = False                   # a visitor is mid-line: background work yields
@@ -104,6 +105,7 @@ class Robot:
         self._heard_start()
         t = time.time()
         self.speaking = False
+        self.asked += 1
         self.jobs.put(("turn", Turn(question=text, line=t, transcribed=t, speech_end=t,
                                     speech_start=self.speech_start), self.start_frame))
 
@@ -128,11 +130,12 @@ class Robot:
         # Its own thread: the final transcript overlaps a prefill instead of queuing behind it.
         while True:
             speech, t_line, speech_end, speech_start, shot = self.lines.get()
-            if not (text := self.scribe(speech)):
-                continue  # noise the VAD took for speech
-            self.jobs.put(("turn", Turn(question=text, line=t_line,
-                                        transcribed=time.time(), speech_end=speech_end,
-                                        speech_start=speech_start), shot))
+            if text := self.scribe(speech):  # empty: noise the VAD took for speech
+                self.asked += 1
+                self.jobs.put(("turn", Turn(question=text, line=t_line,
+                                            transcribed=time.time(), speech_end=speech_end,
+                                            speech_start=speech_start), shot))
+            self.lines.task_done()
 
     def _watch(self) -> None:
         # Keep a recent frame prefilled while nobody speaks, so a turn rarely waits for one.

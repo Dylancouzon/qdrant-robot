@@ -1,0 +1,48 @@
+# M2 fixture images
+
+Written by `eval/make_scenes.py`. Composites paste COCO val2017 objects cut out along their masks; plain `coco-*` files are the original photos. Each image keeps its sources' licenses; one with a CC BY-SA source is CC BY-SA.
+
+- `m2-clock.jpg`: a station clock, center. Objects: clock 335955 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 67896: http://farm9.staticflickr.com/8442/7997145503_9c5e040b00_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-clock-right.jpg`: the station clock, right third. Objects: clock 335955 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 67896: http://farm9.staticflickr.com/8442/7997145503_9c5e040b00_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-laptop.jpg`: a black laptop, center. Objects: laptop 1097715 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 340894: http://farm1.staticflickr.com/63/198876231_494acc23d1_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-laptop-silver.jpg`: a silver laptop, center. Objects: laptop 1102546 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 363840: http://farm3.staticflickr.com/2797/4256603007_6fbbea22de_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-snack.jpg`: a banana left, a pink-frosted donut right. Objects: banana 1041806 (left), donut 1078906 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 79651: http://farm4.staticflickr.com/3720/9659844494_a70f5d61c0_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 109798: http://farm5.staticflickr.com/4050/4281720883_039e354b4d_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-banana.jpg`: the banana left; the donut is gone. Objects: banana 1041806 (left). Background: `live/closet-night.jpg` (our camera).
+  - COCO 79651: http://farm4.staticflickr.com/3720/9659844494_a70f5d61c0_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-pepsi.jpg`: a blue Pepsi paper cup, center. Objects: cup 670367 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 311303: http://farm4.staticflickr.com/3372/3178812639_f6e31bec0b_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-umbrella-bag.jpg`: a rainbow-striped umbrella left, a red handbag right. Objects: umbrella 282291 (left), handbag 1178519 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 360137: http://farm8.staticflickr.com/7020/6479798749_fb83fd63db_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 329041: http://farm4.staticflickr.com/3169/2887451891_ec68bd2df3_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-bag-umbrella.jpg`: the same two, swapped: red handbag left, umbrella right. Objects: handbag 1178519 (left), umbrella 282291 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 329041: http://farm4.staticflickr.com/3169/2887451891_ec68bd2df3_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 360137: http://farm8.staticflickr.com/7020/6479798749_fb83fd63db_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-umbrella.jpg`: the striped umbrella, held up. Objects: umbrella 282291 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 360137: http://farm8.staticflickr.com/7020/6479798749_fb83fd63db_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-teddy-white.jpg`: a white teddy bear with a red scarf and red hat, center. Objects: teddy bear 1163282 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 50844: http://farm3.staticflickr.com/2674/3904379072_e7e9125836_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-teddy-brown.jpg`: a brown teddy bear with a green hat, center. Objects: teddy bear 1161771 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 50844: http://farm3.staticflickr.com/2674/3904379072_e7e9125836_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-teddies.jpg`: white bear left, brown bear right. Objects: teddy bear 1163282 (left), teddy bear 1161771 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 50844: http://farm3.staticflickr.com/2674/3904379072_e7e9125836_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2-phone-gold.jpg`: a gold keypad phone (Nokia), held up. Objects: cell phone 1638183 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 288391: http://farm5.staticflickr.com/4148/5202601512_b2b9399204_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-phone-black.jpg`: a black slider phone, held up; same class as the gold one. Objects: cell phone 323016 (center). Background: `live/closet-night.jpg` (our camera).
+  - COCO 561366: http://farm1.staticflickr.com/198/459435907_bb6c8c82c9_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-phones.jpg`: black phone left, gold phone right. Objects: cell phone 323016 (left), cell phone 1638183 (right). Background: `live/closet-night.jpg` (our camera).
+  - COCO 561366: http://farm1.staticflickr.com/198/459435907_bb6c8c82c9_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 288391: http://farm5.staticflickr.com/4148/5202601512_b2b9399204_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2-phone-gold-left.jpg`: the gold phone, left third. Objects: cell phone 1638183 (left). Background: `live/closet-night.jpg` (our camera).
+  - COCO 288391: http://farm5.staticflickr.com/4148/5202601512_b2b9399204_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `coco-000000081061.jpg`: a wooden chair, a couch, a suitcase by a curb.
+  - COCO 81061: http://farm7.staticflickr.com/6114/6343957302_e2b3590013_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `coco-000000513688.jpg`: a desk chair at a desk with a laptop and phone.
+  - COCO 513688: http://farm8.staticflickr.com/7144/6810570399_3007351596_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `coco-000000366141.jpg`: a living room: armchairs, sofa, cat, TV.
+  - COCO 366141: http://farm3.staticflickr.com/2585/3704586407_21804c6219_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
