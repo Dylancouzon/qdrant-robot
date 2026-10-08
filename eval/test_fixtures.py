@@ -6,6 +6,9 @@ from pathlib import Path
 
 EVAL = Path(__file__).parent
 KINDS = {"show", "say", "wait", "restart"}  # one per step; eval/replay.py must run each
+# Team photos and the face scenes built from them (eval/make_faces.py): gitignored, so absent on
+# machines without them; sessions showing a missing face scene there are not checked for it.
+SCENES = (EVAL / "faces" / "scenes").resolve()  # eval/faces is a symlink on the Jetson
 
 
 def records(path: Path) -> list[dict]:
@@ -22,7 +25,9 @@ def check_session(path: Path, session: dict) -> None:
         kinds = KINDS & step.keys()
         assert len(kinds) == 1, f"{path.name} {session['id']}: step needs one of {KINDS}: {step}"
         if "show" in step:
-            assert (path.parent / step["show"]).is_file(), f"{path.name}: no {step['show']}"
+            shown = (path.parent / step["show"]).resolve()
+            assert shown.is_file() or not SCENES.parent.exists() and shown.is_relative_to(
+                SCENES), f"{path.name}: no {step['show']} (face scenes: python -m eval.make_faces)"
         if "say" in step:
             assert (path.parent / "audio" / f"{step['id']}.wav").is_file(), f"no WAV {step['id']}"
             missing = set(step.get("evidence", [])) - seen
@@ -44,11 +49,15 @@ def test_sessions() -> None:
 
 
 def test_heldout_shows_no_dev_image() -> None:
-    dev = {digest(p) for p in (EVAL / "dev").rglob("*.jpg")}
-    # ponytail: m2.jsonl only; heldout/sessions.jsonl shows ../dev/live/closet-night.jpg (M1).
-    for session in records(EVAL / "heldout" / "m2.jsonl"):
-        for step in session["steps"]:
-            if "show" in step:
-                shown = (EVAL / "heldout" / step["show"]).resolve()
+    dev = {digest(p) for p in [*(EVAL / "dev").rglob("*.jpg"), *SCENES.glob("dev-*.jpg")]}
+    # ponytail: m2 and m3 only; heldout/sessions.jsonl shows ../dev/live/closet-night.jpg (M1).
+    for name in ("m2.jsonl", "m3.jsonl"):
+        for step in (st for s in records(EVAL / "heldout" / name) for st in s["steps"]):
+            if "show" not in step:
+                continue
+            shown = (EVAL / "heldout" / step["show"]).resolve()
+            if shown.is_relative_to(SCENES):
+                assert shown.name.startswith("heldout-"), f"held-out shows {shown.name}"
+            else:
                 assert shown.is_relative_to(EVAL / "heldout"), f"held-out shows {shown}"
-                assert digest(shown) not in dev, f"held-out {step['show']} is a dev image"
+            assert not shown.exists() or digest(shown) not in dev, f"{step['show']} is a dev image"

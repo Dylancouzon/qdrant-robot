@@ -19,6 +19,7 @@ HOST = "robot"
 BASE = "/home/qdrant/qdrant-robot"
 GPU_LOCK = f"{BASE}/shared/gpu.lock"  # every job that loads models holds it (tools/jetson.py run)
 # Lead bookkeeping and reference material never ship to the robot.
+FACES = ROOT / "eval/faces/scenes"  # team-photo scenes for M3 replays, never in git
 NOT_SHIPPED = ("STATE.md", "DECISIONS.md", "CLAUDE.md", "research/", "reviews/", "gates/",
                "bench/results/", "refs/", ".claude/")
 
@@ -47,13 +48,25 @@ def digest(files: list[str], root: Path = ROOT) -> str:
     return h.hexdigest()[:12]
 
 
+def release_id(source: str, scenes: str) -> str:
+    """The source digest alone, or with the face-scene digest folded in when scenes ship."""
+    return hashlib.sha256((source + scenes).encode()).hexdigest()[:12] if scenes else source
+
+
 def deploy() -> None:
     files = shipped()
-    release = digest(files)
+    # Private face scenes (gitignored, D42): one set per content hash in shared/, never
+    # overwritten; the release ID covers them, so a rolled-back release replays its own set.
+    scenes = digest(sorted(str(f.relative_to(ROOT)) for f in FACES.rglob("*") if f.is_file())
+                    ) if FACES.is_dir() else ""
+    release = release_id(digest(files), scenes)
     lock = digest(["pyproject.toml", "uv.lock"])
     rel = f"{BASE}/releases/{release}"
     sh("ssh", HOST, f"mkdir -p {rel}")
     sh("rsync", "-a", "--files-from=-", ".", f"{HOST}:{rel}/", input="\n".join(files))
+    if scenes:
+        sh("ssh", HOST, f"mkdir -p {BASE}/shared/faces/{scenes}/scenes")
+        sh("rsync", "-a", f"{FACES}/", f"{HOST}:{BASE}/shared/faces/{scenes}/scenes/")
     # One venv per dependency set; system site-packages expose the apt TensorRT bindings.
     remote(f"""set -euo pipefail
 export PATH=$HOME/.local/bin:/usr/local/cuda/bin:$PATH
@@ -62,6 +75,7 @@ venv={BASE}/shared/venvs/{lock}
 [ -x $venv/bin/python ] || uv venv -q --python /usr/bin/python3.12 --system-site-packages $venv
 UV_PROJECT_ENVIRONMENT=$venv uv sync -q --frozen --no-install-project
 ln -sfn $venv .venv
+[ -n "{scenes}" ] && ln -sfn {BASE}/shared/faces/{scenes} eval/faces
 {{ echo "release {release}"; cat /etc/nv_tegra_release | head -1; uname -r
    nvcc --version | tail -2; dpkg-query -W 'tensorrt' 'libcudnn9-cuda-13' 'cuda-toolkit-13-2'
    uv pip freeze --python $venv/bin/python; }} > ENV.txt 2>&1
@@ -111,6 +125,9 @@ def selftest(tmp: Path) -> None:
     first = digest(["a"], tmp)
     (tmp / "a").write_text("2")
     assert digest(["a"], tmp) != first, "content change must change the release ID"
+    assert release_id(first, "") == first, "without scenes the ID is the source digest"
+    assert len({release_id(first, ""), release_id(first, "s1"), release_id(first, "s2")}) == 3, \
+        "changed scenes change the release ID"
     assert not any(f.startswith(NOT_SHIPPED) for f in shipped())
     print("selftest ok")
 
