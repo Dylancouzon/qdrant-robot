@@ -4,14 +4,14 @@ Last updated: 2026-10-08 01:10, by the lead (overnight session). Rewrite, do not
 
 ## Active task
 
-**M1.2 Vertical slice**, built and running end to end on the Jetson; quality and latency work in progress.
+**M1.3 Decision run** is next. M1.2 vertical slice is done (review PASS `reviews/20261008-020746-59698-review.md`).
 
-- Design verdict: `reviews/20261008-004127-86650-design.md` (GO WITH CHANGES). Changes applied: recall uses the stored frame as evidence (captioned from the frame, not from the answer); dependency check done (Jetson venv has only onnxruntime-gpu 1.24.0). Still open from it: measure the prefix cache with a new live frame while ASR runs (replay now does this: first token 0.64 s p50 after end of speech).
-- Code (uncommitted, M1.2): `robot/{asr,audio,brain,camera,knowledge,main,memory,text_embed,tts}.py`, `knowledge/{facts.jsonl,build.py,knowledge.snapshot}`, `eval/{replay.py,make_wavs.py,dev/}`, `bench/{brain_bakeoff,asr_bench,prefix_cache}.py`.
-- Latest replay (`eval/dev/sessions.jsonl`, 12 spoken turns, release f3a352ff849e): 9/12 correct; p50 from end of speech: ASR 0.46 s, first token 0.64 s, first phrase 1.09 s, first synthesized audio 1.78 s. Failures: the 2B model trusts history over the frame (scene change), skips a greeting, and ASR errors ("His Qdrant written in rest") break retrieval.
-- Experiments next, in order: (1) Qwen3-VL-4B for answer quality, (2) Parakeet TDT 0.6B v2 on the GPU as the final-pass ASR, (3) Kokoro on the TensorRT provider (TTS takes about 0.7 s for the first phrase under GPU contention). Downloads running on the robot: `/tmp/dl.log` (`gguf/Qwen3VL-4B-*`, `parakeet-v2/`).
-- Acceptance (M1.2): the show, remove, and recall session passes on the Jetson with stage timings recorded; review gate PASS.
-- Next command: `python3 tools/jetson.py deploy && python3 tools/jetson.py run replay --wait -- -m eval.replay`
+- Reviews: design `reviews/20261008-004127-86650-design.md` and `reviews/20261008-014824-42570-design.md` (GO WITH CHANGES, applied); task review rounds `reviews/20261008-0142*`, `-0147*`, `-0152*` (FIX, fixed or rejected in D25).
+- Pipeline: Silero VAD and Parakeet TDT 0.6B v2 int8 on the CPU (D24, provisional until real voices, D26); Qwen3-VL-2B on llama-server with a kept-warm frame prefix; retrieval in code (knowledge shard, captioned frame memory in Edge); Kokoro on ORT CUDA with early first phrases.
+- Latest replay (`bench/results/2026-10-08-replay-1791439664.jsonl`, 12 spoken turns): 10/12, recall evidence 2/2; p50 from end of speech: line 0.39 s, transcript 0.66 s, first token 0.81 s, first phrase 1.17 s, first synthesized audio 1.72 s (max 1.97 s).
+- Failures: 2B trusts its own previous answer over the frame (scene change) and skips a greeting; Qwen3-VL-4B passes both but is about 1 s slower at 15W. Keyword scoring is weak: build a larger judged dev set before choosing (D26).
+- Next: M1.3 decision run with an expanded, judged dev set (2B against 4B), Kokoro TensorRT (needs ONNX shape inference), and a Mac live client.
+- Next command: write `eval/dev/sessions.jsonl` additions (20 or more mixed turns) and a judge, then `scratchpad replay` for 2B and 4B.
 
 ## Robot access
 
@@ -36,10 +36,11 @@ Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/D
 
 - C0, C1: harness and architecture rethink.
 - C2: M1.1 stack qualification (review PASS `reviews/20261008-010719-8012-review.md`).
+- C3: M1.2 vertical slice (review PASS `reviews/20261008-020746-59698-review.md`).
 
 ## Unmet targets
 
-All CLAUDE.md targets unmeasured at acceptance scale. Interim (dev, 12 turns, no speaker): first synthesized audio 1.78 s p50 against the 1.2 s final target; decode 22 tok/s against 30 tok/s (15W caps the GPU at 625 MHz).
+All CLAUDE.md targets unmeasured at acceptance scale. Interim (dev, 12 turns, no speaker): first synthesized audio 1.72 s p50 against the 1.2 s final target; decode 22 tok/s against 30 tok/s (15W caps the GPU at 625 MHz).
 
 ## Milestones and acceptance
 
@@ -56,7 +57,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 ## M1 tasks
 
 - [x] **M1.1 Stack qualification.** Done 2026-10-08 except Super mode (needs Dylan).
-- [ ] **M1.2 Vertical slice.** In progress (see Active task).
+- [x] **M1.2 Vertical slice.** Done 2026-10-08 (C3).
 - [ ] **M1.3 Decision run.** 20 mixed turns on the Jetson; pass: 18 or more correct, no swap, 1 GB headroom.
 - [ ] **M1.4 It talks.** Knowledge shard and current-camera questions to M1 acceptance, with dev fixtures and scored replays. Knowledge shard is built (`knowledge/build.py`, Qdrant v1.19.0 server snapshot restored into Edge 0.8.0).
 - [ ] **M1.5 Milestone gate.**
@@ -67,6 +68,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 2. **Audio hardware (spending).** A USB speaker and a close-talk USB microphone for the booth. The Jetson has no analog audio out.
 3. Record 20 real spoken questions (the `eval/dev/brain.jsonl` texts) on the camera mic and on the Mac.
 4. Show five personal objects to the camera with their names.
+5. Calibrate the scene-change threshold (`SCENE_CHANGE` in `robot/main.py`) on a lit, static scene; tonight's frames were dark.
 
 ## Facts from Dylan
 
