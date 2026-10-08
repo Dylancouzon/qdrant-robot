@@ -1,6 +1,6 @@
 # Booth UX: focus, labels, memory hygiene, turn-taking
 
-As of 2026-10-08. A Fable design pass on Dylan's request, with the repo and both reference robots as context. Proposed; open points for Dylan at the end. Labels: J measured on an Orin Nano, E measured elsewhere, U unverified.
+As of 2026-10-08. A Fable design pass on Dylan's request, with the repo and both reference robots as context. Adopted with Dylan's changes (D63, end of file). Labels: J measured on an Orin Nano, E measured elsewhere, U unverified.
 
 ## Summary
 
@@ -86,7 +86,10 @@ Live test day (two people): 10 teaches each, five with two objects in view, five
 
 Wake word, LED, echo cancellation and barge-in, a Kalman tracker, the brain deciding focus or binding, view decay, a memory editor page, patch-level multivectors, greetings on sight, spoken confirmation for a single candidate.
 
-## Open for Dylan
+## Dylan's changes (D63, 2026-10-08)
 
-- Answer length: Fable 60 tokens default (200 on request); Dylan said 64 is too limiting; lead suggests about 120 tokens default.
-- No spoken confirmation for a single candidate (undo instead), which departs from the D61 gate's confirmation; lead agrees with the undo.
+- The focus box is for teaching: only unrecognized objects take the focus; a guess ("Dylan's phone?") never holds it; a visitor can always teach the object they hold even when it is labeled or guessed ("no, this is my wallet" creates a new object and a negative point for the old guess).
+- One unprompted line: a greeting when a new person faces the robot, once per visitor, never over speech; by name only after an enrolled face match.
+- A wake word: the robot answers only after its name, then keeps a conversation window (about 20 s, renewed by each turn) for follow-ups; lines outside the window are ignored. Method chosen by measurement (a small keyword model such as openWakeWord vs spotting the name in the transcript), design gate first. This replaces the "no wake word" item and the facing gate as the main turn gate.
+- Answer length: 64 tokens for v1; revisit after the live test (the robot will not only be at booths and should sound smart).
+- No spoken confirmation for a single candidate; "that's not it" undoes (agreed).
