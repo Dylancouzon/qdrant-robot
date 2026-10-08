@@ -22,6 +22,7 @@ Running jobs: none. caffeinate runs on the Mac.
 
 ## Known gaps (carried, D40)
 
+- Live camera (D47): tracks fragment and labels flicker on real frames (52 tracks, 11 relabeled, in a 90 s clip); sightings are unbounded (185 in a 30-minute soak). Next M2 work: majority label per track, merge short tracks, bound stored sightings.
 - M2 answers: the 2B ignores sighting lines; the detector misses objects outside its 50-word vocabulary or at low score (D43). Decode 28.2 tok/s with the detector at 15 fps (target 30).
 - Swap grows at in-process replay restarts (44 to 756 MB), with or without the detector; a real restart is a new process.
 - Answers: real-voice dev 42/47 (89%), held-out real voices 18/26 (69%, use 2 of D29) against 90%. Sight naming in clutter is the main miss (D39: more image tokens did not help).
@@ -95,7 +96,7 @@ Fixtures so far are photos and recorded audio fed as files; the live camera was 
 4. Spoken session end to end with the speaker: every capability, interruptions, a long pause mid-question.
 5. Calibrate `SCENE_CHANGE` on a lit, static scene; watch for the camera USB port fault (D32).
 
-Without a human (Lead, when the Jetson is free and the room is lit): a live soak run (camera on, no speech, 30 minutes then hours: detection on real frames, memory growth, temperatures, leaks; closes the M1 30-minute check), and camera-domain fixtures recorded from the live camera.
+Without a human: 30-minute live soak done (D47: stable; closes the M1 30-minute check without speech); hours-long soak next. Clips: `shared/clips/live-items-1.avi` (90 s, Dylan handling items, unscripted). Live sessions: snapshot with thirds first, timed cues to the end, record only after Dylan says ready.
 
 ## Facts from Dylan
 
