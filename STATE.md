@@ -20,6 +20,7 @@ Running jobs: two builders (D44). M3.3 integration (robot/main.py, robot/memory.
 
 ## Known gaps (carried, D40)
 
+- Privacy (D54): a turn frame showing a visitor who was not identified in it survives "forget me" until 12 h retention evicts it.
 - Live camera (D47): tracks fragment and labels flicker on real frames (52 tracks, 11 relabeled, in a 90 s clip); sightings are unbounded (185 in a 30-minute soak). Next M2 work: majority label per track, merge short tracks, bound stored sightings.
 - M2 answers: the 2B ignores sighting lines; the detector misses objects outside its 50-word vocabulary or at low score (D43). Decode 28.2 tok/s with the detector at 15 fps (target 30).
 - Swap grows at in-process replay restarts (44 to 756 MB), with or without the detector; a real restart is a new process.
