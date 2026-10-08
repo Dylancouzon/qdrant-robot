@@ -170,3 +170,7 @@ Next: answer sighting questions in code (D37), then naming, forgetting, ignoring
 
 ## D44 2026-10-08: Two builders at once when files and the Jetson are disjoint (Dylan)
 Dylan approved an M3 builder in parallel with the M2.2a builder, "maybe not for concurrent load". Rule: parallel builders own disjoint paths; only one uses the Jetson at a time (M3.1 is Mac-only: face accuracy does not depend on the board; its Jetson latency check waits for M2.2a). Supersedes "one builder at a time" in CLAUDE.md for this case.
+
+## D45 2026-10-08: Face embedder insightface w600k_r50 with two-shot support (M3.1)
+Bake-off on team photos (11 people, gitignored eval/faces) and LFW strangers, Mac: w600k_r50 with a claim needing two enrolled shots at 0.328 is the only pair with zero false matches at 20 and 50 identities for full, 80, and 40 px faces; held-out (use 2, after a rule bug in use 1) 15/15 recognized, 0 false identities on 4,113 strangers, highest impostor 0.257 (bench/results/2026-10-08-faces-*-17914{79900,80133,80344,80453}.jsonl; reviews/20261008-132825-68060-review.md).
+Carried: the dev margin is 0.011 (impostor 0.317 at 40 px, 50 identities), strangers are press photos, and only 5 held-out probes are from a different session than enrollment: recalibrate the threshold on robot-camera frames before runtime use (M3.2). Rejected: EdgeFace-S (5 false matches at 40 px, 50 identities with two-shot), SFace (false matches at 40 px), MaxSim alone and mean vectors (false matches as the gallery grows).

@@ -184,5 +184,29 @@
   "url": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yoloe-26n-seg.pt",
   "sha256": "1741c1f8da3cea47e2c01829c334a50dc0b9bbd05e685b90a3ce84fae32c8c1b",
   "license": "AGPL-3.0"
+ },
+ {
+  "path": "faces/yunet_2023mar.onnx",
+  "url": "https://huggingface.co/opencv/face_detection_yunet/resolve/3cc26e7f1014a5ee5d74a42acee58bafc9d0a310/face_detection_yunet_2023mar.onnx",
+  "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+  "license": "MIT"
+ },
+ {
+  "path": "faces/w600k_r50.onnx",
+  "url": "https://huggingface.co/public-data/insightface/resolve/33c1063c49c785b7652d3fd529f86fa4f149392b/models/buffalo_l/w600k_r50.onnx",
+  "sha256": "4c06341c33c2ca1f86781dab0e829f88ad5b64be9fba56e56bc9ebdefc619e43",
+  "license": "insightface non-commercial research (D42)"
+ },
+ {
+  "path": "faces/sface_2021dec.onnx",
+  "url": "https://huggingface.co/opencv/face_recognition_sface/resolve/3d7082438a6e4551e840c9b2bb60b71e8da4b524/face_recognition_sface_2021dec.onnx",
+  "sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "faces/edgeface_s_gamma_05.pt",
+  "url": "https://huggingface.co/Idiap/EdgeFace-S-GAMMA/resolve/a1c171036159e94bd4c766088370a37d0899d31f/edgeface_s_gamma_05.pt",
+  "sha256": "dc59abda2e8580399fd115a1eeb07e1f21156196db604b884407bcf0f17efb07",
+  "license": "CC-BY-NC-SA-4.0 (D42)"
  }
 ]
