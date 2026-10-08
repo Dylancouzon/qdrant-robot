@@ -6,9 +6,7 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 **Breadth first (D40):** every feature end to end on the Jetson, known gaps carried here, tuning after M3. M1 works end to end (talks, sees, recalls, knows Qdrant); its accuracy and latency targets stay unmet below.
 
-**M2.2a Sighting answers in code** (next builder): "what was on your left?", "what is gone?", "is the X still there?" resolved in code from sightings and the in-view snapshot, spoken without the LLM (like `shown()`), with the brain as fallback. Acceptance: dev M2 removed and left-right capabilities, a fresh one-time probe set (the M2.1 probes are spent), no regression on `eval/dev/sessions.jsonl` oracle (39/47 with the detector).
-
-M2.1 done (D43): sightings stored and retrieved (dev evidence 19/21), answers carried (unseen probes 0/8).
+**M2.2a done** (D48): sighting questions answered in code; one-time probes 7/8. **Next active: M2.2c live-track stability** (D47): majority label per track, merge a short track into a neighbor with the same label and side, bound stored sightings; measure on `shared/clips/live-items-1.avi` (needs a clip source in the replay) and the 64-window question.
 
 Next, in order:
 

@@ -24,7 +24,16 @@ from robot.asr import Ears, Scribe
 from robot.config import SHARED
 from robot.detect import Detector, Sighting, Tracker
 from robot.knowledge import VERBATIM, Knowledge
-from robot.memory import Memory, about_now, about_past, is_question, shown, thumb
+from robot.memory import (
+    Memory,
+    about_now,
+    about_past,
+    is_question,
+    shown,
+    sighting_answer,
+    sighting_query,
+    thumb,
+)
 from robot.route import Router
 from robot.text_embed import TextEmbedder
 from robot.tts import RATE, Speaker, phrases
@@ -35,6 +44,7 @@ SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
 # Camera rate: unthrottled detection halved LLM decode (research/detector.md).
 DETECT_FPS = 15
 DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
+SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
 WHERE = {"left": "on your left", "center": "in the center", "right": "on your right"}
 
 
@@ -91,6 +101,7 @@ class Robot:
         self.speaker = audio.Mouth(play)
         self.brain = brain.Brain(model)
         self.detect, self.tracker = Detector(), Tracker()
+        self.vocab = set(self.detect.names.values())  # the labels the detector can give
         self.points: dict[int, int] = {}  # track id -> its sighting point, while it is tracked
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
@@ -257,7 +268,8 @@ class Robot:
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
         recalled_answer = shown(turn.question, recalled,
-                                lambda m: brain.age(turn.speech_start - m["ts"]))
+                                lambda m: brain.age(turn.speech_start - m["ts"])
+                                ) or self._sighted(turn)
         turn.retrieved = time.time()
         self.last_frame = look.frame
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
@@ -312,6 +324,26 @@ class Robot:
             (s["last_seen"], f"{ago(s['last_seen'])}: {s['label']} {WHERE[s['region']]}")
             for s in sights], key=lambda x: x[0])
         return recalled, [f"{k}. {line}" for k, (_, line) in enumerate(lines, 1)]
+
+    def _sighted(self, turn: Turn) -> str | None:
+        """The answer to a sighting question from the sightings and the tracks in view now, or
+        None for another question or when no sighting matches (the brain answers then, with
+        captions). The sightings it names become the turn's evidence."""
+        if self.detect_failed:  # the tracks in view are stale: claim nothing about now
+            return None
+        context = [m["content"] for m in self.history[:-3:-1]]  # the last answer first
+        if (query := sighting_query(turn.question, context, self.vocab)) is None:
+            return None
+        with self.detecting:
+            here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+        # Enough tracks to group by kind and region before the answer limit (ponytail: a
+        # window, not a group-by; Edge 0.8 has none. Facet on label if one kind floods it).
+        past = self.memory.sightings(turn.speech_start, SIGHTINGS, here, **query[1])
+        if found := sighting_answer(*query, past, self.memory.points(here),
+                                    lambda ts: brain.age(turn.speech_start - ts)):
+            answer, turn.memories = found
+            return answer
+        return None
 
     def _said(self, fact: str, turn: Turn) -> Iterator[str]:
         turn.first_token, turn.answer = time.time(), fact

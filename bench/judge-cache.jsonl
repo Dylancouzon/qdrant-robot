@@ -1,0 +1,127 @@
+{"key": "d20ece751b98ff73", "pass": true, "why": "Identifies the clock in front.", "votes": [true, true, true]}
+{"key": "ff313d70a4bcf269", "pass": true, "why": "Says the central clock is gone.", "votes": [true, true, true]}
+{"key": "cca52dc82f5b78d7", "pass": true, "why": "Says the clock is no longer visible.", "votes": [true, true, true]}
+{"key": "49c169f41e2200a8", "pass": false, "why": "Adds a missing monitor unsupported by the rubric.", "votes": [true, false, false]}
+{"key": "2e38b96f338b686b", "pass": false, "why": "Invents a second donut and omits the required positions.", "votes": [false, false, false]}
+{"key": "f46a5ac510c390a5", "pass": false, "why": "Places the removed donut on the wrong side.", "votes": [false, false, false]}
+{"key": "a763fc6a84ec2cf9", "pass": true, "why": "Says the central cup was there and is gone.", "votes": [true, true, true]}
+{"key": "b4a1813f87fcc322", "pass": true, "why": "Places the striped umbrella on its left.", "votes": [true, true, true]}
+{"key": "f6eb849c8862c53b", "pass": true, "why": "Places the red bag on its right earlier.", "votes": [true, true, true]}
+{"key": "8da399a79ef1a8b2", "pass": true, "why": "Places the striped umbrella on its right.", "votes": [true, true, true]}
+{"key": "1ea558265fccc2ba", "pass": false, "why": "Does not say the red bag was on its left.", "votes": [false, false, false]}
+{"key": "a1dbce3edce9ba81", "pass": true, "why": "Recalls the clock on its right.", "votes": [true, true, true]}
+{"key": "5683b33a611f0525", "pass": true, "why": "Identifies a teddy bear.", "votes": [true, true, false]}
+{"key": "3824ffef3b37e372", "pass": true, "why": "Identifies another teddy bear with a green hat.", "votes": [true, true, false]}
+{"key": "fae84bd19ad1e5c3", "pass": false, "why": "Does not distinguish the first bear from the second.", "votes": [false, false, false]}
+{"key": "4dcff4b920a3bb05", "pass": false, "why": "Does not answer green hat.", "votes": [false, false, false]}
+{"key": "16bd6f96c86f0714", "pass": true, "why": "Identifies a laptop in front of the closet.", "votes": [true, true, true]}
+{"key": "aff57aea1190ae47", "pass": false, "why": "Incorrectly says the two laptops are the same.", "votes": [false, false, false]}
+{"key": "e9c64f980bd1a936", "pass": false, "why": "Does not recall that the first laptop was black.", "votes": [false, false, false]}
+{"key": "5e5f4ec48f3fcfdb", "pass": true, "why": "Identifies the gold phone.", "votes": [true, true, true]}
+{"key": "bd3e5c7b763313f4", "pass": false, "why": "Does not identify the black phone.", "votes": [false, false, false]}
+{"key": "89a73a4b768cfe20", "pass": true, "why": "Says the gold phone came first.", "votes": [true, true, true]}
+{"key": "4c58547c57835b49", "pass": false, "why": "Acknowledges ownership but does not say it will remember.", "votes": [false, false, false]}
+{"key": "afb39dccda0132b8", "pass": false, "why": "Does not say the phone is no longer visible.", "votes": [false, false, false]}
+{"key": "924003f5a07995f4", "pass": false, "why": "Does not place the visitor's gold phone on its right.", "votes": [false, false, false]}
+{"key": "8e636514e138927c", "pass": false, "why": "Incorrectly claims the black phone belongs to the visitor.", "votes": [false, false, false]}
+{"key": "2cff4f899da9684c", "pass": false, "why": "Does not acknowledge ownership or promise to remember.", "votes": [false, false, false]}
+{"key": "57cdba577e59f6b6", "pass": false, "why": "Does not identify which bear belongs to the visitor.", "votes": [false, false, false]}
+{"key": "720dffa09786f874", "pass": true, "why": "Acknowledges the gold phone as the visitor's.", "votes": [true, true, true]}
+{"key": "0c13d39b1c84ffac", "pass": false, "why": "Describes disappearance instead of confirming deletion.", "votes": [false, false, false]}
+{"key": "af06b066eb0059c7", "pass": true, "why": "Says it does not remember the phone.", "votes": [true, true, true]}
+{"key": "768089fcb24fa33b", "pass": false, "why": "Incorrectly identifies the forgotten phone as the visitor's.", "votes": [false, false, false]}
+{"key": "402a74f14d6b2ea4", "pass": false, "why": "Claims to know the forgotten phone's location.", "votes": [false, false, false]}
+{"key": "2f558325882f251f", "pass": false, "why": "Does not acknowledge the bear as the visitor's.", "votes": [false, false, false]}
+{"key": "726c3d99ba820861", "pass": false, "why": "Does not acknowledge the laptop as the visitor's.", "votes": [false, false, false]}
+{"key": "544f52e3454189f3", "pass": false, "why": "Describes disappearance instead of confirming deletion.", "votes": [false, false, false]}
+{"key": "147067edf07e9d72", "pass": false, "why": "Does not identify the brown bear with the green hat.", "votes": [false, false, false]}
+{"key": "dee508e67d1f01c2", "pass": false, "why": "Does not say it forgot the visitor's laptop.", "votes": [false, false, false]}
+{"key": "e59cbf5e06ec8433", "pass": false, "why": "Does not confirm it will ignore chairs.", "votes": [false, false, false]}
+{"key": "19b7d000ce9fd76c", "pass": false, "why": "Mentions a chair and misses the required scenes.", "votes": [false, false, false]}
+{"key": "d67edec9fa717811", "pass": false, "why": "Describes remembered chairs despite the ignore rule.", "votes": [false, false, false]}
+{"key": "035f57b6e76e093d", "pass": false, "why": "Does not describe the living room.", "votes": [false, false, false]}
+{"key": "8d5b95ce64128f86", "pass": false, "why": "Does not confirm the ignore rule still holds.", "votes": [false, false, false]}
+{"key": "757866077da45578", "pass": true, "why": "Responds to the visitor liking green.", "votes": [true, true, true]}
+{"key": "f7f3218b49784277", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "a8e930c3c298f5a5", "pass": false, "why": "Does not say eight.", "votes": [false, false, false]}
+{"key": "a85c26c4c8ede813", "pass": true, "why": "Says five.", "votes": [true, true, true]}
+{"key": "e7d868b044b49753", "pass": true, "why": "Describes the chair, microphone, and clothes.", "votes": [true, true, true]}
+{"key": "2cd5f44e6922b001", "pass": true, "why": "Recalls green.", "votes": [true, true, true]}
+{"key": "f6a3974c4f3b199f", "pass": true, "why": "Responds to the train trip from Berlin.", "votes": [true, true, true]}
+{"key": "549e2826329baebe", "pass": true, "why": "Says Qdrant is written in Rust.", "votes": [true, true, true]}
+{"key": "a1e7ed8e12fc58f0", "pass": true, "why": "Says Tokyo.", "votes": [true, true, true]}
+{"key": "f8183569de74a902", "pass": false, "why": "Does not count from one to five.", "votes": [false, false, false]}
+{"key": "7dc26875eb17e8d5", "pass": true, "why": "Says two.", "votes": [true, true, true]}
+{"key": "d32808dd9323c939", "pass": true, "why": "Recalls Berlin.", "votes": [true, true, true]}
+{"key": "5941ad4419895c34", "pass": true, "why": "Recalls travel by train.", "votes": [true, true, false]}
+{"key": "fde415e626994b15", "pass": true, "why": "Responds to the talk at four o'clock.", "votes": [true, true, true]}
+{"key": "8b3a3f3119f93091", "pass": true, "why": "Says cold.", "votes": [true, true, true]}
+{"key": "239f23a948d2cb37", "pass": false, "why": "Does not say cow.", "votes": [false, false, false]}
+{"key": "be0a1016c8828e4b", "pass": true, "why": "Says yellow.", "votes": [true, true, true]}
+{"key": "6699c9a2b9af268d", "pass": true, "why": "Says sixty.", "votes": [true, true, true]}
+{"key": "6bcbb88103617277", "pass": true, "why": "Says ice.", "votes": [true, true, true]}
+{"key": "68fd713fdeb033d8", "pass": false, "why": "Invents that the talk is happening now.", "votes": [false, false, false]}
+{"key": "2a1d38b3a8caa263", "pass": false, "why": "Invents that the talk is happening now.", "votes": [false, true, false]}
+{"key": "2a0d2cbee58760b9", "pass": false, "why": "Does not identify the umbrella.", "votes": [false, false, false]}
+{"key": "98c5af7a2b7268b5", "pass": true, "why": "Recalls the umbrella from before the restart.", "votes": [true, true, true]}
+{"key": "e2285567fb94d5b7", "pass": true, "why": "Greets Priya and responds to her building drones.", "votes": [true, true, true]}
+{"key": "8d21efdb610c53e5", "pass": true, "why": "Recalls Priya's name.", "votes": [true, true, true]}
+{"key": "01a22bde411e1bc1", "pass": true, "why": "Recalls drones.", "votes": [true, true, true]}
+{"key": "44369b9e9cd8fc8f", "pass": true, "why": "Recognizes the visitor's phone on its left.", "votes": [true, true, false]}
+{"key": "8d74c0b317ff412d", "pass": false, "why": "Speculates that someone took or moved the keys.", "votes": [true, false, false]}
+{"key": "7d8c5b9aa4a15b3a", "pass": false, "why": "Invents a previous discussion about Qdrant.", "votes": [false, false, false]}
+{"key": "2c0a649405cfddc7", "pass": false, "why": "Claims it can see something shown before.", "votes": [false, false, false]}
+{"key": "7d3e31b712c0ab89", "pass": true, "why": "Identifies the stop sign.", "votes": [true, true, true]}
+{"key": "8c98a647e7128c4c", "pass": true, "why": "Recalls the stop sign.", "votes": [true, true, true]}
+{"key": "ed766952d5adc9c7", "pass": true, "why": "Identifies the motorcycle.", "votes": [true, true, true]}
+{"key": "badfe02a87db9cdb", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "a796ca5b73891208", "pass": true, "why": "Identifies the cat.", "votes": [true, true, true]}
+{"key": "d6fbed0864d1f8ab", "pass": true, "why": "Describes the room without claiming the cat remains.", "votes": [true, true, true]}
+{"key": "ce0a442f68cb53be", "pass": true, "why": "Explains embedded vector search without a server.", "votes": [true, true, true]}
+{"key": "2723b7f815c61454", "pass": true, "why": "Does not invent a memory.", "votes": [true, true, true]}
+{"key": "51c2c3b9b0a99ba3", "pass": true, "why": "Places the stop sign on the left.", "votes": [true, true, true]}
+{"key": "3a282869a2390947", "pass": true, "why": "Greets Dylan and responds to espresso.", "votes": [true, true, true]}
+{"key": "d466379320459534", "pass": true, "why": "Recalls espresso.", "votes": [true, true, true]}
+{"key": "a36642dc07fbe176", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "c701eaea2331e9b1", "pass": true, "why": "Reads route 15.", "votes": [true, true, true]}
+{"key": "3e48a8447c7629ee", "pass": true, "why": "Reads Metrocentre as the destination.", "votes": [true, true, true]}
+{"key": "0ea89734aea4ee2e", "pass": true, "why": "Names places on the signs.", "votes": [true, true, true]}
+{"key": "37ca3e3c6ebae4ef", "pass": true, "why": "Counts two planes.", "votes": [true, true, true]}
+{"key": "87346c597bc7c7e5", "pass": true, "why": "Identifies Sydney through its Harbour Bridge.", "votes": [true, true, true]}
+{"key": "49311b105d154176", "pass": true, "why": "Identifies green apples.", "votes": [true, true, true]}
+{"key": "bdbe0601fa429705", "pass": true, "why": "Identifies a red double-decker bus.", "votes": [true, true, true]}
+{"key": "6407ad986991c13f", "pass": true, "why": "Recalls apples first.", "votes": [true, true, true]}
+{"key": "bc72adad2732b9e7", "pass": true, "why": "Recalls the bus second.", "votes": [true, true, true]}
+{"key": "8b2a5049fbaeeebb", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "e9f84a3c32caf2ea", "pass": true, "why": "Identifies a zebra.", "votes": [true, true, true]}
+{"key": "939168470f1abce5", "pass": true, "why": "Describes stand-up paddleboarding.", "votes": [true, true, true]}
+{"key": "626a918ac398e754", "pass": true, "why": "Identifies the phone.", "votes": [true, true, true]}
+{"key": "966246748ca7d64e", "pass": true, "why": "Reads Hello Kitty.", "votes": [true, true, true]}
+{"key": "c168eea457e60317", "pass": true, "why": "Identifies an Apple computer.", "votes": [true, true, true]}
+{"key": "cd11cb6020e3b42b", "pass": true, "why": "Places a berry cake on the left.", "votes": [true, true, true]}
+{"key": "abc58ded1a2784b5", "pass": true, "why": "Confirms the bookshelf.", "votes": [true, true, true]}
+{"key": "021d195f901c86c5", "pass": true, "why": "Says Edge runs in-process without requiring a server.", "votes": [true, true, true]}
+{"key": "c7e4aaa944e6ae56", "pass": true, "why": "Places memory in local Qdrant Edge shards.", "votes": [true, true, true]}
+{"key": "b9a269f6ded30a70", "pass": true, "why": "Says everything runs on the Jetson.", "votes": [true, true, true]}
+{"key": "997364437c2d107e", "pass": true, "why": "Explains multiple vectors and MaxSim.", "votes": [true, true, true]}
+{"key": "f642a182daa7b8b6", "pass": true, "why": "Responds naturally to the visitor.", "votes": [true, true, true]}
+{"key": "80500e8b9d96c430", "pass": true, "why": "Answers Paris.", "votes": [true, true, true]}
+{"key": "5e8143d88a1821fc", "pass": true, "why": "Recalls Berlin.", "votes": [true, true, true]}
+{"key": "99354d76dc24d9aa", "pass": false, "why": "The punchline is a contradiction, not a coherent joke.", "votes": [false, false, false]}
+{"key": "81463ff3f3e904a2", "pass": false, "why": "Does not say he appears to be having fun.", "votes": [false, false, false]}
+{"key": "67acfeddc8a950e6", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "fd2ccc2935a1fb47", "pass": true, "why": "Recalls stuffed animals.", "votes": [true, true, true]}
+{"key": "1256876df59ebdae", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
+{"key": "ccaa60497401ea5b", "pass": false, "why": "Identifies apples but invents a shared batch.", "votes": [true, false, false]}
+{"key": "17ad07a3f364ba01", "pass": false, "why": "Does not identify teddy bears or contrast them with apples.", "votes": [false, false, false]}
+{"key": "36ec82b9774561c3", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}
+{"key": "a6591ad96c95cb9c", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "a0ea779a59a04aab", "pass": false, "why": "Fails to recall Ana's name.", "votes": [false, false, false]}
+{"key": "8af9c8262d10b70e", "pass": true, "why": "Identifies the earlier bear without claiming it is the same one.", "votes": [true, true, true]}
+{"key": "118442c87aaabcce", "pass": true, "why": "Says it is a different bear, as the rubric permits.", "votes": [true, true, true]}
+{"key": "3b0bdfcc373a6382", "pass": false, "why": "Fails to identify the earlier clock.", "votes": [false, false, false]}
+{"key": "448171666c45e7f4", "pass": true, "why": "Identifies the dog on its right now.", "votes": [true, true, true]}
+{"key": "a7fd16d9751d8f58", "pass": true, "why": "Identifies the earlier clock on its left.", "votes": [true, true, true]}
+{"key": "26b94960240910d3", "pass": true, "why": "Places the clock on its right now.", "votes": [true, true, true]}
+{"key": "4b0acbf5d61960d8", "pass": true, "why": "Identifies a dog.", "votes": [true, true, true]}
+{"key": "2f2a63fdbd49aa54", "pass": true, "why": "Says it does not see the dog now.", "votes": [true, true, true]}

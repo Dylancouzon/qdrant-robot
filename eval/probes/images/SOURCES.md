@@ -21,3 +21,39 @@ Written by `eval/make_scenes.py`. Composites paste COCO val2017 objects cut out 
 - `m2p-book.jpg`: the stack of books, center. Objects: book 1139039 (center).
   - COCO 552883: http://farm9.staticflickr.com/8221/8338626140_9b8937a193_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
   - COCO 309938: http://farm3.staticflickr.com/2460/3742502573_02458ab759_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2b-bg.jpg`: the empty M2.2a probe scene: a bathroom.
+  - COCO 58029: http://farm6.staticflickr.com/5143/5589997131_22f51b308c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2b-mug-dog.jpg`: a white pirate mug left, a dog right. Objects: cup 678926 (left), dog 6247 (right).
+  - COCO 58029: http://farm6.staticflickr.com/5143/5589997131_22f51b308c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 2592: http://farm4.staticflickr.com/3271/2864950455_3f5b5086da_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 546829: http://farm4.staticflickr.com/3321/3602461508_d8fd434a9e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2b-dog.jpg`: the dog right; the mug is gone. Objects: dog 6247 (right).
+  - COCO 58029: http://farm6.staticflickr.com/5143/5589997131_22f51b308c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 546829: http://farm4.staticflickr.com/3321/3602461508_d8fd434a9e_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2b-cat-backpack.jpg`: a cat left, a backpack right. Objects: cat 50694 (left), backpack 1167659 (right).
+  - COCO 58029: http://farm6.staticflickr.com/5143/5589997131_22f51b308c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 119828: http://farm3.staticflickr.com/2646/4171324648_411cccdac6_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+  - COCO 306139: http://farm5.staticflickr.com/4092/5003303411_fd1d0e52ec_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2b-cat.jpg`: the cat, center. Objects: cat 50694 (center).
+  - COCO 58029: http://farm6.staticflickr.com/5143/5589997131_22f51b308c_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 119828: http://farm3.staticflickr.com/2646/4171324648_411cccdac6_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2c-bg.jpg`: the empty M2.2a review probe scene: a kitchen.
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2c-teddy-a-left.jpg`: a teddy bear, left. Objects: teddy bear 1159358 (left).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 563758: http://farm4.staticflickr.com/3661/3622627604_41de1289a6_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2c-teddy-b-left.jpg`: a different teddy bear, left. Objects: teddy bear 1160237 (left).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 446703: http://farm1.staticflickr.com/144/334302892_86ce0431c0_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2c-clock-left.jpg`: a clock, left. Objects: clock 334068 (left).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 372260: http://farm6.staticflickr.com/5350/9918453144_050959b8b5_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2c-clock-right.jpg`: the same clock, right. Objects: clock 334068 (right).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 372260: http://farm6.staticflickr.com/5350/9918453144_050959b8b5_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)
+- `m2c-dog-right.jpg`: a dog, right; the clock is gone. Objects: dog 13412 (right).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 253386: http://farm4.staticflickr.com/3196/3037448990_28822471dd_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+- `m2c-dog.jpg`: the dog, center. Objects: dog 3419 (center).
+  - COCO 343466: http://farm9.staticflickr.com/8421/7831368930_5c1244e182_z.jpg, Attribution License (http://creativecommons.org/licenses/by/2.0/)
+  - COCO 579321: http://farm5.staticflickr.com/4114/4737904204_465fa5d55b_z.jpg, Attribution-ShareAlike License (http://creativecommons.org/licenses/by-sa/2.0/)

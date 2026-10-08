@@ -20,6 +20,8 @@ MAX_W = {"left": 290, "center": 600, "right": 290}  # a side object stays inside
 DEV_BG = "live/closet-night.jpg"
 HO_BG = 68286  # a hotel bedroom, cropped to 16:9; held-out never uses a dev background
 PROBE_BG = 552883  # an empty green kitchen; the probes use nothing dev or held-out shows
+PROBE_BG_B = 58029  # an empty bathroom, for the M2.2a probes
+PROBE_BG_C = 343466  # an empty kitchen with a stove, for the M2.2a review probes
 
 # name: (background, [(annotation id, region, height px)], why it fits). An int background is a
 # COCO image; a scene with no objects is that image as is (a real photo).
@@ -91,6 +93,21 @@ SCENES = {
         "m2p-plant-book": (PROBE_BG, [(1609432, "left", 300), (1139039, "right", 160)],
                            "the flower pot left, a stack of books right"),
         "m2p-book": (PROBE_BG, [(1139039, "center", 200)], "the stack of books, center"),
+        "m2b-bg": (PROBE_BG_B, [], "the empty M2.2a probe scene: a bathroom"),
+        "m2b-mug-dog": (PROBE_BG_B, [(678926, "left", 200), (6247, "right", 240)],
+                        "a white pirate mug left, a dog right"),
+        "m2b-dog": (PROBE_BG_B, [(6247, "right", 240)], "the dog right; the mug is gone"),
+        "m2b-cat-backpack": (PROBE_BG_B, [(50694, "left", 220), (1167659, "right", 260)],
+                             "a cat left, a backpack right"),
+        "m2b-cat": (PROBE_BG_B, [(50694, "center", 260)], "the cat, center"),
+        "m2c-bg": (PROBE_BG_C, [], "the empty M2.2a review probe scene: a kitchen"),
+        "m2c-teddy-a-left": (PROBE_BG_C, [(1159358, "left", 240)], "a teddy bear, left"),
+        "m2c-teddy-b-left": (PROBE_BG_C, [(1160237, "left", 240)],
+                             "a different teddy bear, left"),
+        "m2c-clock-left": (PROBE_BG_C, [(334068, "left", 220)], "a clock, left"),
+        "m2c-clock-right": (PROBE_BG_C, [(334068, "right", 220)], "the same clock, right"),
+        "m2c-dog-right": (PROBE_BG_C, [(13412, "right", 240)], "a dog, right; the clock is gone"),
+        "m2c-dog": (PROBE_BG_C, [(3419, "center", 280)], "the dog, center"),
     },
 }
 

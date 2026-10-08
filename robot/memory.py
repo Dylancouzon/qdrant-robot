@@ -19,6 +19,7 @@ from qdrant_edge import (
     FieldCondition,
     Filter,
     HasIdCondition,
+    MatchAny,
     OrderBy,
     PayloadSchemaType,
     Point,
@@ -74,6 +75,129 @@ def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> st
         return None
     m, thing = named[-1] if _FIRST.search(question) else named[0]
     return f"You showed me {thing}, {age(m)}."
+
+
+# Sighting questions ("what was on your left?", "is the cup still there?", "what is gone?"),
+# answered in code from the detector's sightings and what it tracks now: the 2B brain ignored
+# sighting lines in its prompt (D43). Each group is one kind of thing for a visitor: detector
+# labels that flicker on one object, and the words people use for them.
+KINDS = ["cup|mug", "teddy bear|plush toy|toy|teddy|plush|stuffed animal",
+         "bag|backpack|handbag|purse|rucksack|suitcase", "phone|mobile|cellphone|smartphone",
+         "laptop|computer", "monitor|screen|display|tv|television",
+         "computer mouse|mouse", "remote control|remote", "potted plant|plant|flower",
+         "glasses|sunglasses|spectacles", "headphones|headset|earphones", "t-shirt|shirt",
+         "bicycle|bike", "motorcycle|motorbike", "keys|key", "dog|puppy", "cat|kitten",
+         "person|man|woman|someone|somebody|people|visitor", "photo|picture|photograph"]
+SAID = 3  # sightings named in one answer at most
+_SIDE = re.compile(r"\b(?:your|my|the)\s+(left|right)\b|\b(left|right)[\s-](?:side|hand|corner)\b|"
+                   r"\b(center|centre|middle)\b", re.I)
+_GONE = re.compile(r"\b(gone|missing|disappear\w*|vanish\w*|took|taken|take away|removed?|"
+                   r"chang\w*|no longer|not (?:there|here)|isn't (?:there|here))\b", re.I)
+_STILL = re.compile(r"\b(still|anymore|any more|no longer)\b", re.I)
+_SEES = re.compile(r"\b(see|sees|seen|saw|spot\w*|notic\w*|make out|find|found|there|here|around|"
+                   r"anywhere|in view|in front)\b", re.I)
+_PERFECT = re.compile(r"\b(have|has|ever)\b", re.I)  # "have you seen", "has anyone left"
+_NOW_TOO = re.compile(r"\b(now|have|has|ever)\b", re.I)  # a past question that reaches now
+_WHERE = re.compile(r"\bwhere\b", re.I)
+_IT = re.compile(r"\b(it|them|they|that one)\b", re.I)
+_WHAT = re.compile(r"\b(what|which|anything|something)\b", re.I)
+
+
+def _groups(vocab: Collection[str]) -> list[list[str]]:
+    return [g.split("|") for g in KINDS] + [[label] for label in vocab]
+
+
+def kinds(text: str, vocab: Collection[str]) -> set[str]:
+    """The detector labels a text names, with their kind's other labels ("mugs" names cup and
+    mug). Plurals count; words of no label in `vocab` do not."""
+    groups = _groups(vocab)
+    known = {w for g in groups for w in g}
+    words = [w if w in known else w[:-2] if w.endswith("es") and w[:-2] in known
+             else w[:-1] if w.endswith("s") and w[:-1] in known else w
+             for w in re.findall(r"[a-z]+(?:-[a-z]+)?", text.lower())]
+    text = f" {' '.join(words)} "
+    return {w for g in groups if any(f" {x} " in text for x in g) for w in g if w in vocab}
+
+
+def sighting_query(question: str, context: list[str], vocab: Collection[str]
+                   ) -> tuple[str, dict[str, set[str]], bool] | None:
+    """What a sighting question asks, or None for any other question: ("kind", {"label": ...})
+    for where a named thing is or was; ("gone", match) for what left the view; ("seen", match)
+    for what was seen, optionally {"region": ...}; and whether it asks about now too. "it" is
+    the one object the newest text of `context` (the last exchange, newest first) names."""
+    labels, regions = kinds(question, vocab), {
+        "center" if g in ("centre", "middle") else g.lower()
+        for m in _SIDE.finditer(question) for g in m.groups() if g}
+    where, still, gone = (bool(x.search(question)) for x in (_WHERE, _STILL, _GONE))
+    if not labels and _IT.search(question) and (where or still):
+        labels = next((k for k in (kinds(c, vocab) for c in context) if k), set())
+        labels = labels if len(set(map(_kind, labels))) == 1 else set()
+    now = not about_past(question) or still or bool(_NOW_TOO.search(question))
+    past = about_past(question) or bool(_PERFECT.search(question))
+    if labels and (where or gone or (past or still) and (regions or _SEES.search(question))):
+        return "kind", {"label": labels}, now
+    match = {"region": regions} if regions else {}
+    if labels or not _WHAT.search(question):
+        return None
+    if gone:
+        return "gone", match, False
+    return ("seen", match, now) if past and (regions or _SEES.search(question)) else None
+
+
+def _a(label: str) -> str:
+    return label if label.endswith("s") else f"{'an' if label[0] in 'aeiou' else 'a'} {label}"
+
+
+def _kind(label: str) -> str:
+    return next((g.split("|")[0] for g in KINDS if label in g.split("|")), label)
+
+
+def sighting_answer(mode: str, match: dict[str, set[str]], now_too: bool, past: list[dict],
+                    now: list[dict], ago: Callable[[float], str]) -> tuple[str, list[int]] | None:
+    """The spoken answer to a sighting_query and the ids of the sightings it names, or None
+    when no sighting matches: captions then answer, as they cover objects the detector cannot
+    name. `past`: sightings out of view, newest first (already matched); `now`: every sighting
+    in view. Each sighting is one track; tracks of one kind in one region are named together,
+    because the detector cannot tell whether they are the same object."""
+    visible: dict[str, list[str]] = {}  # kind -> regions in view, over the whole frame
+    for s in now:
+        visible.setdefault(_kind(s["label"]), []).append(s["region"])
+    now = [s for s in now if all(s[k] in v for k, v in match.items())]
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for s in (now if now_too and mode != "gone" else []) + past:
+        groups.setdefault(_key(s), []).append(s)
+    named = list(groups.values())[:SAID]
+    if not named:
+        return None
+    ids = {s["id"] for s in now}
+    return (" ".join(_described(g, ids, visible.get(_kind(g[0]["label"]), []), ago)
+                     for g in named), [s["id"] for g in named for s in g])
+
+
+def _key(s: dict) -> tuple[str, str]:
+    return _kind(s["label"]), s["region"]
+
+
+def _side(region: str) -> str:
+    # Spoken to the visitor: the robot's own left and right (image left is the robot's left).
+    return "in the center" if region == "center" else f"on my {region}"
+
+
+def _described(group: list[dict], now: set[int], visible: list[str],
+               ago: Callable[[float], str]) -> str:
+    """One kind in one region: in view now (the first track), or last seen, then where the
+    same kind is in view now, anywhere in the frame (a moved object is a new track)."""
+    s, unsure = group[0], "; I cannot tell if it is the same one."
+    thing, where = _a(s["label"]), _side(s["region"])
+    if s["id"] in now:
+        earlier = [x for x in group if x["id"] not in now]
+        return f"I see {thing} {where} now." + (
+            f" I also saw {thing} there {ago(earlier[0]['last_seen'])}{unsure}" if earlier else "")
+    saw = f"I saw {thing} {where}, {ago(s['last_seen'])}"
+    if visible:
+        there = "there" if s["region"] in visible else " and ".join(map(_side, sorted(visible)))
+        return f"{saw}. I see {thing} {there} now{unsure}"
+    return f"{saw}; I do not see {'them' if s['label'].endswith('s') else 'it'} now."
 
 
 def about_past(question: str) -> bool:
@@ -166,15 +290,73 @@ class Memory:
                                 FieldCondition(key="caption", is_empty=False)])))
         return [self._row(h) for h in hits]
 
-    def sightings(self, before: float, n: int = 4, hide: Collection[int] = ()) -> list[dict]:
+    def sightings(self, before: float, n: int = 4, hide: Collection[int] = (),
+                  **match: Collection[str]) -> list[dict]:
         """Payloads (id, label, region, first_seen, last_seen, frame) of the sightings last
-        seen before `before`, newest first, except the points in `hide`."""
+        seen before `before`, newest first, except the points in `hide`; `match` keeps those
+        whose field has one of the given values (label=["cup", "mug"])."""
         hits = self.shard.query(QueryRequest(
             limit=n, query=OrderBy("last_seen", Direction.Desc), with_payload=True,
-            filter=Filter(must=[FieldCondition(key="last_seen", range=RangeFloat(lt=before))],
+            filter=Filter(must=[FieldCondition(key="last_seen", range=RangeFloat(lt=before)),
+                                *(FieldCondition(key=k, match=MatchAny(list(v)))
+                                  for k, v in match.items())],
                           must_not=[HasIdCondition(set(hide))] if hide else None)))
         return [{"id": h.id, **h.payload} for h in hits]
 
+    def points(self, ids: Collection[int]) -> list[dict]:
+        """Payloads of the points `ids` (the sightings in view now)."""
+        return [{"id": r.id, **r.payload}
+                for r in self.shard.retrieve(list(ids), True, False)] if ids else []
+
+def _sighting_selftest() -> None:
+    vocab = {"cup", "mug", "bag", "backpack", "keys", "umbrella", "potted plant", "lamp", "clock"}
+    q = lambda text, *context: sighting_query(text, list(context), vocab)  # noqa: E731
+    assert kinds("Did you spot any mugs or backpacks?", vocab) == {"cup", "mug", "bag", "backpack"}
+    assert kinds("the flowers", vocab) == {"potted plant"} and kinds("a giraffe", vocab) == set()
+    assert q("Where did my umbrella end up?") == ("kind", {"label": {"umbrella"}}, False)
+    assert q("Can you still make out the plant?") == ("kind", {"label": {"potted plant"}}, True)
+    assert q("Has anyone left their keys around here?") == ("kind", {"label": {"keys"}}, True)
+    assert q("Was the clock in the middle or on the right side?")[::2] == ("kind", False)
+    assert q("Could you tell if it is still there?", "I see a lamp on my right now.") == (
+        "kind", {"label": {"lamp"}}, True), "'it' is the one thing the last exchange named"
+    assert q("Is it still there?", "A lamp and a clock.", "the lamp?") is None, "ambiguous 'it'"
+    assert q("Hmm, which thing vanished from the middle?") == ("gone", {"region": {"center"}},
+                                                               False)
+    assert q("Anything changed since then?") == ("gone", {}, False)
+    assert q("Tell me what sat to the left-hand side a minute ago, what was it?") == (
+        "seen", {"region": {"left"}}, False)
+    assert q("So what did you notice during my break?") == ("seen", {}, False)
+    for other in ("What's on your right?", "Is this the same bag as before?", "What color "
+                  "was the umbrella?", "Do you still remember my mug?", "What do you see "
+                  "right now?", "What did we chat about earlier?", "Is it heavy?"):
+        assert q(other) is None, other
+    ago = lambda ts: f"{100 - ts:.0f} seconds ago"  # noqa: E731
+    lamp = {"id": 1, "label": "lamp", "region": "right", "last_seen": 10.0}
+    mug = {"id": 2, "label": "mug", "region": "left", "last_seen": 80.0}
+    cup = {"id": 3, "label": "cup", "region": "left", "last_seen": 60.0}  # maybe the same mug
+    clock = {"id": 4, "label": "clock", "region": "right", "last_seen": 50.0}
+    new_mug = {"id": 5, "label": "mug", "region": "left", "last_seen": 90.0}
+    assert sighting_answer("gone", {}, False, [mug, cup, clock], [lamp], ago) == (
+        "I saw a mug on my left, 20 seconds ago; I do not see it now. I saw a clock on my "
+        "right, 50 seconds ago; I do not see it now.", [2, 3, 4]), "one kind and side, together"
+    assert sighting_answer("gone", {}, False, [mug], [new_mug], ago)[0] == (
+        "I saw a mug on my left, 20 seconds ago. I see a mug there now; I cannot tell if it is "
+        "the same one."), "a new mug on the same side does not hide the earlier one"
+    assert sighting_answer("seen", {"region": {"right"}}, False, [clock], [lamp], ago) == (
+        "I saw a clock on my right, 50 seconds ago; I do not see it now.", [4]), \
+        "a past question leaves out what is in view now"
+    assert sighting_answer("kind", {"label": {"mug", "cup"}}, True, [mug], [new_mug], ago)[0] \
+        == ("I see a mug on my left now. I also saw a mug there 20 seconds ago; I cannot tell "
+            "if it is the same one.")
+    many = [{**cup, "id": 10 + k, "last_seen": 70.0 - k} for k in range(9)]
+    assert sighting_answer("seen", {}, False, many + [clock], [], ago)[1][-1] == 4, \
+        "repeated sightings of one kind leave room for others"
+    moved = {"id": 6, "label": "clock", "region": "left", "last_seen": 95.0}  # a new track
+    assert sighting_answer("seen", {"region": {"right"}}, False, [clock], [moved, lamp], ago)[
+        0] == ("I saw a clock on my right, 50 seconds ago. I see a clock on my left now; I "
+               "cannot tell if it is the same one."), "no 'not seen' claim when it moved sides"
+    assert sighting_answer("kind", {"label": {"keys"}}, True, [], [lamp], ago) is None
+    assert sighting_answer("seen", {"region": {"center"}}, True, [], [lamp], ago) is None
 
 if __name__ == "__main__":
     import tempfile
@@ -228,4 +410,6 @@ if __name__ == "__main__":
     assert shown("What did I show you yesterday?", mems, ago) is None
     assert shown("What did I show you on the left?", mems, ago) is None
     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
+    _sighting_selftest()
     print("selftest ok")
+
