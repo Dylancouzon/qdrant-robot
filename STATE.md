@@ -4,23 +4,27 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 ## Active task
 
-**M1.3 Decision run**: not met (dev 42/47 = 89% against 90%). Harness, endpointing, and generalization rule done (D38, review PASS `reviews/20261008-103501-66240-review.md`).
+**Breadth first (D40):** every feature end to end on the Jetson, known gaps carried here, tuning after M3. M1 works end to end (talks, sees, recalls, knows Qdrant); its accuracy and latency targets stay unmet below.
 
-- Real-voice dev: 42/47 judged, 1 split (knowledge-more-2: 1.34 s pause after "Where is"), first synthesized audio p50 1.45 s (`bench/results/2026-10-08-replay-1791468888.judged.jsonl`). Synthetic dev 42/47, 0 splits, 1.47 s (`...-1791469392`).
-- Held-out real voices (use 2 of D29): 18/26 judged, 0 splits, 1.58 s p50 (`...-1791470020`). Failures: sight (mug, banana, skateboard, weather), one knowledge, one told. Not tuned on.
-- Probes (`eval/probes`, one-time, never tuned on): 22/23 (`...-1791469690`).
-- Dev failures left: hand-teddy-3, same-apples-1/2 (sight and "same as before"), desk-1, joke-1 (fix landed after that run; probes 5/5). The 2B ignores "The visitor told you" lines when the question is not marked past (intro-3 synthetic).
-- Review rule 6 (Dylan): every behavior fix needs evidence beyond the dev steps it flips (unseen probes or a counted held-out run).
+**M2.1 Detector sightings in memory** (builder running, Mac plus Jetson): YOLOE-26n booth vocabulary from `spike/detector` in a detection thread at camera rate; one Edge point per track (label, region, first and last seen, frame id); sightings in the Memories block for past questions; sighting evidence ids in the replay. Acceptance: oracle replay of `eval/dev/m2.jsonl` per capability, no regression on `eval/dev/sessions.jsonl` oracle (40/47, `bench/results/2026-10-08-replay-1791471099`), detection fps and decode while talking, RAM headroom. The lead reads the diff (note: it edits `eval/dev/m2.jsonl` and `tools/gate.py`; check against rule 6) before the review gate.
 
-Next session, in order:
+Next, in order:
 
-1. **Sight (M1.4):** held-out failures are mostly naming objects. Candidate: detector labels from `spike/detector` (YOLOE booth vocabulary) in the sight prompt, against the current image-only prompt; measure on dev sight steps plus new probe images, never held-out.
-2. **Turn merge** for pauses longer than the hangover (design verdict `reviews/20261008-100527-35955-design.md`: track playback apart from turn completion, never commit a cancelled turn; or Smart Turn v3.2 on the fragment, `research/endpointing.md`).
-3. MAXN thermal test (15 minutes of load in the enclosure; the detector run peaked at 66.3 °C).
-4. **M2** (design GO WITH CHANGES, D37): fixtures are written (`eval/dev/m2.jsonl`, `eval/heldout/m2.jsonl`, 38 images, `eval/make_scenes.py`, `eval/test_fixtures.py`). Next: replay step types `wait` and `restart`, then detector sightings with label, region, and times.
-5. The 3080 box LoRA: not started, not needed (D5). Revisit after M1.5.
+1. **M2.2 Naming, forgetting, ignoring** (D37): "this is my phone" binds a name to a confirmed track (or the robot asks), several crops as one multivector point (MaxSim); "forget my phone" deletes the point, crops, and pending writes; "ignore the chair" is a class rule; both survive restart. Parsed in code.
+2. **M2.3** Conversation beyond the window (answers as text points); labels on a video view; M2 gate.
+3. **M3 Faces:** design brief with two alternatives (YuNet plus EdgeFace or MobileFaceNet), consent, a face multivector per person, "forget me", zero false identities on strangers; design gate first.
+4. **M4 hardware:** USB speaker and microphone (Dylan buys), MAXN thermal test, offline cold start, eight-hour run.
+5. **Tuning phase (after M3):** fresh larger held-out set with other people's voices; turn merge for long pauses; detector labels for sight; told-statement prompting; latency to 1.2 s.
 
-Running jobs: none. caffeinate runs on the Mac. Deployed release: `5fd5253828fa`.
+Running jobs: the M2.1 builder (it runs `eval/run.py` replays on the Jetson; check `pgrep -f eval/run.py` before any Jetson job). caffeinate runs on the Mac.
+
+## Known gaps (carried, D40)
+
+- Answers: real-voice dev 42/47 (89%), held-out real voices 18/26 (69%, use 2 of D29) against 90%. Sight naming in clutter is the main miss (D39: more image tokens did not help).
+- Latency: first synthesized audio 1.45 s p50 dev, 1.58 s held-out, against 1.2 s; no speaker yet.
+- A pause over 0.35 s after a short fragment splits the question (knowledge-more-2, 1.34 s).
+- The 2B sometimes ignores "The visitor told you" lines (intro-3, small-talk-3 in oracle).
+- Held-out leaks: M1 held-out reuses dev frame `live/closet-night.jpg`; `bench/results` holds held-out transcripts.
 
 ## Robot access
 
@@ -73,8 +77,8 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 - [x] **M1.1 Stack qualification.** Done 2026-10-08.
 - [x] **M1.2 Vertical slice.** Done 2026-10-08 (C3).
-- [ ] **M1.3 Decision run.** Real-voice dev 42/47, held-out 18/26, endpointing done (D38); 1,886 MB headroom (D28).
-- [ ] **M1.4 It talks.** Knowledge shard and current-camera questions to M1 acceptance, with dev fixtures and scored replays. Knowledge shard is built (`knowledge/build.py`, Qdrant v1.19.0 server snapshot restored into Edge 0.8.0).
+- [x] **M1.3 Decision run.** End to end with gaps (D40): real-voice dev 42/47, held-out 18/26, endpointing done (D38); 1,886 MB headroom (D28).
+- [x] **M1.4 It talks.** End to end with gaps (D40): knowledge shard calibrated on dev (M1.4a, verbatim facts, unseen paraphrases 0.85 to 0.98), current-camera questions scored; sight naming in clutter carried (D39).
 - [ ] **M1.5 Milestone gate.**
 
 ## Human checklist (when Dylan is at the robot)
