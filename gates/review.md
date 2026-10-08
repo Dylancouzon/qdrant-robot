@@ -6,5 +6,5 @@ Check, in this order:
 2. Performance on a Jetson Orin Nano 8 GB: memory, latency, wasted work.
 3. Cleanliness: dead code, duplication, an abstraction with one implementation, a config value that never changes, a missing runnable check for non-trivial logic.
 4. Is this the smallest change that does the job? Is there a better approach the author missed?
-5. Process: if the change adds a module, a dependency, or a model, or changes an approach, a design verdict in reviews/ (GO, or GO WITH CHANGES with the changes applied) must cover it; otherwise FIX. A claim that something is faster needs a result in bench/results/; otherwise FIX. Every finding cites file:line.
+5. Process: if the change adds a runtime module under robot/, a dependency, or a model, or changes an approach (a benchmark or tool script needs no design verdict), a design verdict in reviews/ (GO, or GO WITH CHANGES with the changes applied) must cover it; otherwise FIX. A claim that something is faster needs a result in bench/results/; otherwise FIX. Every finding cites file:line.
 List findings most severe first, each with file:line and a concrete fix. Under 600 words. Do not edit files. End with exactly one last line: `VERDICT: PASS` or `VERDICT: FIX`.

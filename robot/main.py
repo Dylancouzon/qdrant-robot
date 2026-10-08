@@ -55,7 +55,7 @@ class Turn:
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
-    prompt: list = field(default_factory=list)  # the brain's messages, images left out
+    prompt: list = field(default_factory=list)  # the brain's messages without images or system
     frame_id: int = 0             # the frame this turn saw, stored as a memory
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
@@ -204,8 +204,10 @@ class Robot:
         image = look.image if sees else None
         msgs = brain.messages(look.history, image, memories, turn.facts,
                               turn.question, look.changed, past, told)
+        # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
-                       if isinstance(m["content"], list) else m for m in msgs]
+                       if isinstance(m["content"], list) else m
+                       for m in msgs if m["role"] != "system"]
         if recalled_answer:
             turn.verbatim = True
             tokens = self._said(recalled_answer, turn)

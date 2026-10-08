@@ -77,10 +77,12 @@ def run(name: str, cmd: list[str], wait: bool) -> int:
         raise SystemExit(f"job name must be lowercase letters, digits, and dashes: {name!r}")
     unit = f"qr-{name}"
     job = shlex.join(cmd)
-    log = f"{BASE}/shared/results/{name}-$(date +%Y%m%d-%H%M%S).tegrastats"  # one per run
-    # One heavy job at a time: two model stacks at once exhaust the 8 GB (GPU_LOCK).
-    body = (f"tegrastats --interval 1000 --logfile {log} & t=$!; "
-            f"flock {GPU_LOCK} .venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
+    # One tegrastats log per run; a result file records its name (ROBOT_TEGRASTATS) so the
+    # two pair up. One heavy job at a time: two model stacks exhaust the 8 GB (GPU_LOCK).
+    # The logger starts inside the lock, so it never records another job's wait or load.
+    locked = (f"tegrastats --interval 1000 --logfile $ROBOT_SHARED/results/$ROBOT_TEGRASTATS "
+              f"& t=$!; .venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
+    body = f"flock {GPU_LOCK} bash -c {shlex.quote(locked)}"
     flags = "--wait --pipe" if wait else "--no-block"
     return remote(f"""set -eu
 mkdir -p {BASE}/shared/results {BASE}/shared/models
@@ -90,6 +92,7 @@ sudo systemd-run --unit={unit} {flags} --collect --uid=qdrant --gid=qdrant \\
   --working-directory="$rel" --setenv=HOME=/home/qdrant \\
   --setenv=ROBOT_SHARED={BASE}/shared --setenv=PYTHONUNBUFFERED=1 \\
   --setenv=ROBOT_RELEASE="$(basename "$rel")" \\
+  --setenv=ROBOT_TEGRASTATS={name}-$(date +%Y%m%d-%H%M%S).tegrastats \\
   -p StartLimitBurst=3 bash -c {shlex.quote(body)}
 {'' if wait else f'echo "started {unit}; logs: journalctl -u {unit}"'}""", check=False)
 

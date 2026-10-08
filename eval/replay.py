@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 
 from robot.audio import paced, read_wav
-from robot.brain import MODEL, MODELS
+from robot.brain import MODEL, MODELS, SYSTEM
 from robot.camera import FileCamera
 from robot.config import SHARED
 from robot.main import Robot
@@ -83,7 +83,8 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
     robot.close()
     firsts = sorted(r["first_audio_s"] for r in rows)
     summary = {"summary": "replay", "model": model, "oracle": oracle, "audio": audio,
-               "cases": str(path),
+               "cases": str(path), "system": SYSTEM,  # the prompt rows leave it out
+               "tegrastats": os.environ.get("ROBOT_TEGRASTATS"),
                "machine": platform.node(),
                "release": os.environ.get("ROBOT_RELEASE"), "n": len(rows),
                "correct": sum(r["ok"] for r in rows),

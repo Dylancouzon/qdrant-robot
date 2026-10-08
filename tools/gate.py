@@ -3,7 +3,7 @@
 exit 0 only when the verdict passes (3 = act on findings, 124 = timeout).
 
     tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths>"
-    tools/gate.py checks      deterministic checks: lint, complexity, dead code, tests
+    tools/gate.py checks      deterministic checks: lint, complexity, dead code, tests, self-checks
     tools/gate.py precommit   git pre-commit hook (git config core.hooksPath tools/githooks)
     tools/gate.py selftest
 
@@ -26,6 +26,7 @@ PASSING = {"design": "GO", "review": "PASS", "milestone": "MILESTONE MET"}
 TIMEOUT_S = 900
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
+SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.memory", "robot.tts"]
 
 def git(*args: str, env: dict | None = None) -> str:
     """git in ROOT. A hook's GIT_DIR and GIT_INDEX_FILE are dropped: in a linked worktree they
@@ -68,6 +69,10 @@ def checks() -> int:
     tests = [f for f in py if Path(f).name.startswith("test_")]
     if tests:
         steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
+    # Module self-checks that run without models or devices (the Mac venv has the packages).
+    steps += [[str(ROOT / ".venv/bin/python"), "-m", m] for m in SELFTESTS]
+    steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",
+                                                                    "tools/gate.py")]
     for cmd in steps:
         r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         if r.returncode:
