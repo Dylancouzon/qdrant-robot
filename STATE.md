@@ -10,7 +10,7 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 Next, in order (D55):
 
-1. Done (D56): M2.2c, D51 retention, M3.3 people wiring committed. M3 dev 32/33, zero false identities. Dylan's rulings pending: the no-face answer (intro-3, m2-restart-name-2 fail until then) and told names held in RAM.
+1. Done (D56): M2.2c, D51 retention, M3.3 people wiring committed. M3 dev 32/33, zero false identities. Dylan ruled (D60): no 'can't see your face'; told names answer within the live conversation, dropped when a different face appears; implement after M2.2b.
 2. Done (D58): integrated visitor baseline, oracle 17/21, audio 14/21, faces 9/9 with zero false identities, 1,260 MB headroom, 1.61 s first audio p50 with audio.
 3. M2.2b naming, forgetting, ignoring objects; M2.3 conversation beyond the window and labels on a video view; M2 and M3 gates.
 4. M4: speaker (ordered), offline cold start, eight-hour run.
