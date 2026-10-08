@@ -4,15 +4,17 @@ Last updated: 2026-10-08 01:10, by the lead (overnight session). Rewrite, do not
 
 ## Active task
 
-**M1.3 Decision run**: not met. Dev plateau at 40/47 judged (85%) across context strategies; held-out baseline 15/26 (D29). Work is on branch `spike/m1-3-quality` (HEAD 00ecb19 plus uncommitted routing and counsel fixes); `main` is at the M1.2 commit.
+**M1.3 Decision run**: not met. Branch `spike/m1-3-quality` (pushed, review PASS `reviews/20261008-084259-59432-review.md`); `main` still at the M1.2 commit d998162. Merge to `main` after M1.3 passes.
 
-- Acceptance: `python3 eval/run.py [cases] [--model m]` (deploy, replay, collect, judge with gpt-6-sol, transcribe speech on the Mac).
-- Brain: Qwen3-VL-2B remains best of nine tried (D27, D29, D30). First synthesized audio 1.56 to 1.63 s p50; 1.9 GB headroom; no swap.
-- Counsel 07:26 (D30) applied: frame-only captions, narrowed code-path recall, strict sentence cap, router (`robot/route.py`). Next per counsel: audit judge strictness (held-out "snow", "stir fry" rubrics need human adjudication), then a cached few-shot prefix or a LoRA fine-tune (MLX-VLM on the Mac) if context work stays flat.
-- Builder running in a worktree on `spike/detector`: YOLO26n vs onnxruntime vs YOLOE prompt-free, fps and label quality on the Jetson, holding `shared/gpu.lock`. Its report comes back to the lead; integration (object memory, regions, grounding hints) is the lead's.
-- Dylan (2026-10-08 morning): license fine for the detector; light on; idea: detector and retrieval labels instead of VLM captions (adopted, D30).
-- Running jobs: none of the lead's. The builder may hold `shared/gpu.lock`.
-- Next command: wait for the builder report; then `python3 eval/run.py` after integrating detections.
+- Latest dev run in MAXN_SUPER (`bench/results/2026-10-08-replay-1791463902.judged.jsonl`, synthetic voices): 41/47 judged (87%), speech 46/47; p50 from end of speech: transcript 0.73 s, first token 0.82 s, first phrase 1.04 s, first synthesized audio 1.47 s. Oracle (exact text) 41/47: the brain, not ASR, limits quality. Held-out baseline 15/26 at 15W (D29).
+- Real voices recorded by Dylan 2026-10-08: `eval/dev/audio-real/` (47) and `eval/heldout/audio-real/` (26), fifine USB mic on the Mac.
+- Next, in order:
+  1. Real-voice runs: `python3 eval/run.py --audio audio-real`, then `python3 eval/run.py eval/heldout/sessions.jsonl --audio audio-real` (held-out use 2: count it in DECISIONS).
+  2. MAXN thermal test (15 minutes of load in the enclosure, like the 15W one; the detector run peaked at 66.3 °C).
+  3. Integrate the detector: branch `spike/detector` (4b6032e, builder report in `research/detector.md` there): YOLOE-26n booth vocabulary on raw TensorRT FP16, 15 fps with LLM decoding at 31.7 tok/s. Design gate first (`research/m2-design.md` needs the detector numbers and Dylan's naming and forgetting features), then object memory with exact regions, detections as grounding lines for the VLM, crops for SigLIP 2 later. Review the builder's diff before merging (the lead read `robot/detect.py`; it looked sound).
+  4. LoRA fine-tune of Qwen3-VL-2B (counsel and researcher: text-only LoRA, merge, convert with llama.cpp, Q4_K_M, keep the mmproj) on Dylan's 3080 machine (32 GB RAM): needs its OS and SSH access from Dylan. The same machine enables TensorRT Edge-LLM INT4 builds and is a recovery host for the Jetson.
+- Open for Dylan: three judge rulings (see Human checklist); audio hardware purchase (approved).
+- Running jobs: none. caffeinate runs on the Mac.
 
 ## Robot access
 
@@ -67,10 +69,11 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 1. Super mode: done (D31).
 2. Audio hardware: approved. Get a directional dynamic USB microphone for the booth and any small USB speaker; meanwhile use the Mac through `tools/talk.py`.
-3. Recording real voices: commands in the scratchpad file `record-commands.md` (`tools/record.py eval/dev/sessions.jsonl`, then `eval/heldout/sessions.jsonl`).
+3. Real voices: recorded (47 dev, 26 held-out).
 4. Judge rulings pending: held-out "sunny, no snow", "chicken, rice, vegetables, not stir fry", dev "stuffed animals for teddy bears".
 5. The 3080 machine (32 GB): OS and SSH access needed for LoRA training and TensorRT Edge-LLM INT4 builds.
 6. Calibrate `SCENE_CHANGE` on a lit, static scene.
+7. Camera: the USB hub disabled its port once after the Super reboot ("EMI?"); Dylan moved it to another port, capture works (16.2 fps). Watch for recurrence (D32).
 
 ## Facts from Dylan
 
