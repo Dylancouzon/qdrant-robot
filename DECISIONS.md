@@ -125,3 +125,6 @@ Rejected: the QSPI-only flash from an x86 host (no host was available; now Dylan
 ## D32 2026-10-08: MAXN_SUPER evidence, and a camera fault on the USB hub
 Evidence for D31: bench/results/2026-10-08-llama-bench-maxn-super.jsonl (Qwen3-VL-2B 36.0 tok/s decode, 1,492 tok/s prefill; 4B 17.5 and 658), each row records the power mode. The detector builder measured 66.3 °C peak with detection at 15 fps and LLM decoding (spike/detector research/detector.md).
 About 7 minutes after the Super reboot the hub disabled the camera's port ("usb 1-2-port2: disabled by hub (EMI?)"); the camera re-enumerated and now fails VIDIOC_STREAMON (protocol error) even after a software port reset. Asked Dylan to replug it; if it recurs only in MAXN_SUPER, test the 25W mode.
+
+## D33 2026-10-08: Dylan's rulings on three judged answers (human adjudication, not tuning)
+Held-out "sunny with clear blue skies" (no snow): correct, less precise. Held-out "chicken, rice, and vegetables" (not "stir fry"): correct. Dev "stuffed animals" for teddy bears: acceptable but imprecise; a follow-up question would help. The three rubrics now say so (eval/heldout and eval/dev sessions); held-out baseline 15/26 becomes 17/26 under the rulings (D29). Precision of object names should come from detector labels (spike/detector).
