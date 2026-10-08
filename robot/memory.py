@@ -5,6 +5,7 @@ search ("What drink do I like?" finds "I really love espresso"). M2 adds SigLIP 
 """
 import re
 import time
+from collections.abc import Callable
 from pathlib import Path
 
 import cv2
@@ -48,6 +49,27 @@ _NOW = re.compile(r"\b(this|these|that one|now|here|right now)\b", re.I)
 # ASR ends some questions with a period ("is Qdrant written in Rust."): the opening word decides.
 _ASKS = re.compile(r"^(what|where|who|whom|whose|when|why|how|which|is|are|was|were|do|does|did|"
                    r"can|could|will|would|should|have|has|tell me)\b", re.I)
+
+
+# "What did I show you?" and its variants: the demo's key memory question, answered in code
+# from the newest memory's main object, because the 2B brain often ignored a present memory.
+_SHOWN = re.compile(r"\b(show|showed|shown|hold|holding|held|in my hands?|bring|brought)\b",
+                    re.I)
+_FIRST = re.compile(r"\bfirst\b", re.I)
+_COMPARE = re.compile(r"\b(same|different|like|similar|compare)\b", re.I)
+_MAIN = re.compile(r"Main object:\s*([^.\n]+)")
+
+
+def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
+    """The answer to "what did I show you" from memories (newest first), or None when the
+    question is another kind or no memory names a main object."""
+    if not (about_past(question) and _SHOWN.search(question)) or _COMPARE.search(question):
+        return None
+    named = [(m, x.group(1).strip()) for m in memories if (x := _MAIN.search(m["caption"]))]
+    if not named:
+        return None
+    m, thing = named[-1] if _FIRST.search(question) else named[0]
+    return f"You showed me {thing}, {age(m)}."
 
 
 def about_past(question: str) -> bool:
@@ -150,5 +172,13 @@ if __name__ == "__main__":
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
     assert is_question("is Qdrant written in Rust.") and is_question("Where am I from?")
+    mems = [{"caption": "Main object: a bus. Around it: a street."},
+            {"caption": "Main object: green apples\nAround it: a bowl."}]
+    ago = lambda m: "just now"  # noqa: E731
+    assert shown("What did I just show you?", mems, ago) == "You showed me a bus, just now."
+    assert shown("What was the first thing I showed you?", mems, ago).startswith(
+        "You showed me green apples")
+    assert shown("Is this the same thing I showed you?", mems, ago) is None
+    assert shown("What did we talk about?", mems, ago) is None
     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
     print("selftest ok")

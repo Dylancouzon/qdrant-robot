@@ -20,7 +20,7 @@ from robot import audio, brain
 from robot.asr import Ears, Scribe
 from robot.config import SHARED
 from robot.knowledge import VERBATIM, Knowledge
-from robot.memory import Memory, about_now, about_past, is_question, thumb
+from robot.memory import Memory, about_now, about_past, is_question, shown, thumb
 from robot.text_embed import TextEmbedder
 from robot.tts import RATE, Speaker, phrases
 
@@ -51,7 +51,7 @@ class Turn:
     answer: str = ""
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
-    verbatim: bool = False        # answered with a stored fact, no LLM
+    verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages, images left out
     frame_id: int = 0             # the frame this turn saw, stored as a memory
@@ -182,6 +182,8 @@ class Robot:
         statements = self.memory.told(question, before=turn.speech_start)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
+        recalled_answer = shown(turn.question, recalled,
+                                lambda m: brain.age(turn.speech_start - m["ts"]))
         turn.retrieved = time.time()
         prefix = brain.messages(look.history, look.image)
         self.last_frame = look.frame
@@ -190,7 +192,13 @@ class Robot:
                               turn.question, look.changed, past, told)
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
                        if isinstance(m["content"], list) else m for m in msgs]
-        tokens = self._said(turn.facts[0], turn) if turn.verbatim else self._tokens(msgs, turn)
+        if recalled_answer:
+            turn.verbatim = True
+            tokens = self._said(recalled_answer, turn)
+        elif turn.verbatim:
+            tokens = self._said(turn.facts[0], turn)
+        else:
+            tokens = self._tokens(msgs, turn)
         audio_parts = list(self._speak(phrases(tokens), turn))
         turn.done = time.time()
         turn.wav = f"{int(turn.line * 1000)}.wav"

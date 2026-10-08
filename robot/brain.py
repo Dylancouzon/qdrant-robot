@@ -22,6 +22,7 @@ from robot.config import SHARED
 URL = "http://127.0.0.1:8080"
 SERVER = SHARED / "src/llama.cpp/build/bin/llama-server"
 GGUF = SHARED / "models/gguf"
+LOG = SHARED / "logs/llama-server.log"
 MODELS = {  # D27: qwen3vl-2b; the others stay for bake-offs. (weights, projector, extra args)
     "qwen3vl-2b": ("Qwen3VL-2B-Instruct-Q4_K_M.gguf", "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf", []),
     "qwen3vl-4b": ("Qwen3VL-4B-Instruct-Q4_K_M.gguf", "mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf", []),
@@ -124,11 +125,12 @@ def messages(history: list[dict], now: dict | None, memories: list[str] = (), fa
 
 class Brain:
     def __init__(self, model: str = MODEL):
-        self.proc = subprocess.Popen(server_args(model), stdout=subprocess.DEVNULL,
-                                     stderr=subprocess.DEVNULL)
+        LOG.parent.mkdir(parents=True, exist_ok=True)
+        with LOG.open("w") as log:  # one server run per file: why it failed stays readable
+            self.proc = subprocess.Popen(server_args(model), stdout=log, stderr=log)
         for _ in range(600):
             if self.proc.poll() is not None:
-                raise RuntimeError(f"llama-server exited with {self.proc.returncode}")
+                raise RuntimeError(f"llama-server exited with {self.proc.returncode}; see {LOG}")
             try:
                 urllib.request.urlopen(f"{URL}/health", timeout=1).read()
                 break

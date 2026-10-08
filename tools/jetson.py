@@ -17,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HOST = "robot"
 BASE = "/home/qdrant/qdrant-robot"
+GPU_LOCK = f"{BASE}/shared/gpu.lock"  # every job that loads models holds it (tools/jetson.py run)
 # Lead bookkeeping and reference material never ship to the robot.
 NOT_SHIPPED = ("STATE.md", "DECISIONS.md", "CLAUDE.md", "research/", "reviews/", "gates/",
                "bench/results/", "refs/", ".claude/")
@@ -77,8 +78,9 @@ def run(name: str, cmd: list[str], wait: bool) -> int:
     unit = f"qr-{name}"
     job = shlex.join(cmd)
     log = f"{BASE}/shared/results/{name}-$(date +%Y%m%d-%H%M%S).tegrastats"  # one per run
+    # One heavy job at a time: two model stacks at once exhaust the 8 GB (GPU_LOCK).
     body = (f"tegrastats --interval 1000 --logfile {log} & t=$!; "
-            f".venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
+            f"flock {GPU_LOCK} .venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
     flags = "--wait --pipe" if wait else "--no-block"
     return remote(f"""set -eu
 mkdir -p {BASE}/shared/results {BASE}/shared/models
