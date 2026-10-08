@@ -79,7 +79,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 - [x] **M1.2 Vertical slice.** Done 2026-10-08 (C3).
 - [x] **M1.3 Decision run.** End to end with gaps (D40): real-voice dev 42/47, held-out 18/26, endpointing done (D38); 1,886 MB headroom (D28).
 - [x] **M1.4 It talks.** End to end with gaps (D40): knowledge shard calibrated on dev (M1.4a, verbatim facts, unseen paraphrases 0.85 to 0.98), current-camera questions scored; sight naming in clutter carried (D39).
-- [ ] **M1.5 Milestone gate.**
+- [x] **M1.5 Milestone gate.** MILESTONE MET under D40 (`reviews/20261008-111211-5165-milestone.md`). Carried: 30 minutes without restart not yet run; research drift (stack.md Super mode, m2-design.md fusion and ignore) to clean in M2.
 
 ## Human checklist (when Dylan is at the robot)
 
