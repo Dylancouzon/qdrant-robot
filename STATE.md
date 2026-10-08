@@ -16,7 +16,7 @@ Next, in order:
 4. **M4 hardware:** USB speaker and microphone (Dylan buys), MAXN thermal test, offline cold start, eight-hour run.
 5. **Tuning phase (after M3):** fresh larger held-out set with other people's voices; turn merge for long pauses; detector labels for sight; told-statement prompting; latency to 1.2 s.
 
-Running jobs: two builders in parallel (D44): M2.2c live-track stability (robot/detect.py, bench/clip_sightings.py, sighting bound) and M3.2 people memory (robot/people.py, robot/faces.py). The lead wires both into robot/main.py after review. Jetson runs serialize on shared/gpu.lock.
+Running jobs: two builders (D44). M3.3 integration (robot/main.py, robot/memory.py: M2.2c track stability and D51 retention reviewed except people wiring, plus people wiring, face step, identity answers, protection on every deletion path). M3.0 face replay fixtures (eval/dev/m3.jsonl, eval/heldout/m3.jsonl; face scenes in gitignored eval/faces/scenes, to copy to the Jetson shared folder for replays). Jetson runs serialize on shared/gpu.lock.
 
 ## Known gaps (carried, D40)
 
