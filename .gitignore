@@ -21,3 +21,4 @@ dist/
 *.pth
 .claude/worktrees/
 backups/
+eval/faces/
