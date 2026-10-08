@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import platform
+import subprocess
 import sys
 import threading
 import time
@@ -103,6 +104,8 @@ def main() -> None:
     import tensorrt
     row = {"command": " ".join(sys.argv), "machine": platform.node(),
            "l4t": Path("/etc/nv_tegra_release").read_text().split(",")[0],
+           "power": subprocess.run(["nvpmodel", "-q"], capture_output=True,
+                                   text=True).stdout.split("\n")[0],  # "NV Power Mode: 15W"
            "code": hashlib.sha256(b"".join(
                (ROOT / f).read_bytes() for f in ("robot/detect.py", "bench/detect_bench.py")
            )).hexdigest()[:12],
