@@ -4,6 +4,8 @@ As of 2026-10-08 (researcher). Labels: J measured on an Orin Nano, E measured el
 
 ## Summary
 
+- Decision (D65): "Hey Edgy" at the start of a line; arm A (transcript) first, arm B (openWakeWord) as the fallback.
+
 - Recommendation: spot the robot's name in the Parakeet transcript of each VAD line first (no new model; Parakeet already runs at 0.22 s p50 per line, J, D24; fuzzy or phonetic aliases for mishearings); train an openWakeWord model only if that arm misses or false-triggers on booth babble.
 - "Edgy" is a weak wake word at a Qdrant Edge booth: staff say "edge" all day, "edgy" is an ordinary word, and it has about three phonemes (U; Picovoice advises at least six). Candidates: "Kodiak" (6 phonemes, U), "Juniper" (6 to 7, U), "Hey Edgy" (5, U, still collides with "edge").
 - openWakeWord: custom models from synthetic Piper TTS in under an hour (E); a classifier about 0.42 MB (E); 15 to 20 models in real time on one Raspberry Pi 3 core (E), under 5% of one Orin core expected (U); aim under 5% false rejects and 0.5 false accepts per hour on far-field party audio (E); Apache 2.0 code; our own trained model avoids the CC BY-NC-SA pretrained weights.
