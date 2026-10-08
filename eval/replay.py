@@ -90,7 +90,7 @@ def score(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> di
            "first_phrase_s": turn.first_phrase - turn.speech_end,
            "first_audio_s": turn.first_audio - turn.speech_end,
            "speech_s": turn.speech_end - turn.speech_start, "wav": turn.wav,
-           "detect_fps": turn.detect_fps}
+           "detect_fps": turn.detect_fps, "identity": turn.identity}
     if oracle:  # no audio: speech, line, and transcript stages were not measured
         for k in ("line_s", "asr_s", "speech_s"):
             row[k] = None

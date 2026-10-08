@@ -125,3 +125,106 @@
 {"key": "26b94960240910d3", "pass": true, "why": "Places the clock on its right now.", "votes": [true, true, true]}
 {"key": "4b0acbf5d61960d8", "pass": true, "why": "Identifies a dog.", "votes": [true, true, true]}
 {"key": "2f2a63fdbd49aa54", "pass": true, "why": "Says it does not see the dog now.", "votes": [true, true, true]}
+{"key": "a7885c2569fe9e95", "pass": true, "why": "Identifies the center clock and says it is gone.", "votes": [true, true, true]}
+{"key": "483082dff8896973", "pass": false, "why": "Omits that the laptop was black.", "votes": [false, false, false]}
+{"key": "e7ab016e622deada", "pass": false, "why": "Omits the blue Pepsi paper cup details.", "votes": [false, false, false]}
+{"key": "95ba4ed5c53ddcb0", "pass": false, "why": "Does not say the bag was on its left.", "votes": [false, false, false]}
+{"key": "84e02fd20e0bacca", "pass": true, "why": "Identifies the clock on its right a moment ago.", "votes": [true, true, true]}
+{"key": "b4356199623bd75d", "pass": false, "why": "Does not identify the green hat.", "votes": [false, false, false]}
+{"key": "c92e49c4bd6ebc67", "pass": false, "why": "Omits that the laptop was black.", "votes": [false, false, false]}
+{"key": "3b36deedfc2d5e18", "pass": false, "why": "Falsely says the two laptops were the same.", "votes": [false, false, false]}
+{"key": "de6595a47984d3d3", "pass": true, "why": "Identifies the gold keypad phone.", "votes": [true, true, true]}
+{"key": "e0d8a56231fb1bc0", "pass": false, "why": "Does not say the gold phone came first.", "votes": [false, false, false]}
+{"key": "cee056bbacd3cccd", "pass": true, "why": "Says it does not remember the phone.", "votes": [true, true, true]}
+{"key": "f0cb268fc6df4a64", "pass": false, "why": "Omits the umbrella's rainbow stripes.", "votes": [false, false, false]}
+{"key": "ec2f076a5f1aa6a5", "pass": false, "why": "Omits that the umbrella was striped.", "votes": [false, false, false]}
+{"key": "9c4f8af45774e96d", "pass": true, "why": "Correctly says Priya.", "votes": [true, true, true]}
+{"key": "2801654b5ffd526d", "pass": true, "why": "Correctly says drones.", "votes": [true, true, true]}
+{"key": "96395463d2345f51", "pass": false, "why": "Implies the visitor showed it an image.", "votes": [false, false, false]}
+{"key": "80069e8e6a02563b", "pass": true, "why": "Places the striped umbrella on its left.", "votes": [true, true, true]}
+{"key": "2ac2b8c8c19426c7", "pass": true, "why": "Recalls the red bag on its right.", "votes": [true, true, true]}
+{"key": "6e52f88c1bde7f3e", "pass": false, "why": "Omits the gold phone and that it is no longer visible.", "votes": [false, false, false]}
+{"key": "ec0ad94422db7bbc", "pass": false, "why": "Incorrectly claims the black phone belongs to the visitor.", "votes": [false, false, false]}
+{"key": "7fdc2ae8a3bbd1c1", "pass": true, "why": "Responds to the visitor's train trip.", "votes": [true, true, true]}
+{"key": "62d3cb5256ab1359", "pass": true, "why": "Says Tokyo.", "votes": [true, true, true]}
+{"key": "62ba7031ea3208de", "pass": true, "why": "Counts from one to five.", "votes": [true, true, true]}
+{"key": "ecb035042c195f64", "pass": false, "why": "Does not say two wheels.", "votes": [false, false, false]}
+{"key": "00186394e30a7b44", "pass": false, "why": "Says Berlin but invents a previously mentioned destination.", "votes": [true, false, false]}
+{"key": "fc56c1c9b4288bd9", "pass": false, "why": "Recalls the train but invents a journey duration.", "votes": [false, false, false]}
+{"key": "51500aedcd118753", "pass": false, "why": "Recalls the talk but invents the current time.", "votes": [false, false, false]}
+{"key": "33a4a8c7bf6550cf", "pass": false, "why": "Misses the sofa, cat, and TV.", "votes": [false, false, false]}
+{"key": "f5156e42a2a5206f", "pass": false, "why": "Does not confirm the rule still holds.", "votes": [false, false, false]}
+{"key": "cd76b8310dd35974", "pass": false, "why": "Correct color, but falsely claims to see it now.", "votes": [false, false, false]}
+{"key": "9fe02d30eb205152", "pass": false, "why": "It does not say Berlin.", "votes": [false, false, false]}
+{"key": "756fedc31667b09c", "pass": false, "why": "Omits the white bear's red scarf and hat.", "votes": [false, false, false]}
+{"key": "8897b4061a211ff3", "pass": false, "why": "Does not identify which bear came first.", "votes": [false, false, false]}
+{"key": "2a675e0533f33da0", "pass": false, "why": "Does not confirm the phone was forgotten.", "votes": [false, false, false]}
+{"key": "e306f7cc3dd08273", "pass": false, "why": "Recalls the gold phone after forgetting it.", "votes": [false, false, false]}
+{"key": "91b8ed35851a4feb", "pass": true, "why": "Says the talk is at four o'clock.", "votes": [true, true, true]}
+{"key": "e891b9c8065f7806", "pass": true, "why": "Recalls the visitor's talk at four o'clock.", "votes": [true, true, true]}
+{"key": "afae54c2798b8feb", "pass": false, "why": "Does not identify the striped umbrella.", "votes": [false, false, false]}
+{"key": "89002b6f3d0c53af", "pass": false, "why": "Does not say the phone is on its left.", "votes": [false, false, false]}
+{"key": "920d37f20a33225b", "pass": false, "why": "Invents objects the visitor never showed.", "votes": [false, false, false]}
+{"key": "30b4059762b90118", "pass": true, "why": "Asks for consent without claiming recognition.", "votes": [true, true, true]}
+{"key": "ce177a36a7b578ee", "pass": true, "why": "Confirms it will remember Maya's face.", "votes": [true, true, true]}
+{"key": "7eb1e10180738cc7", "pass": false, "why": "Calls a stranger Maya.", "votes": [false, false, false]}
+{"key": "7b19a67a4ad69ad8", "pass": true, "why": "Recognizes Maya by name.", "votes": [true, true, true]}
+{"key": "b6bc282588d42614", "pass": true, "why": "Says Maya.", "votes": [true, true, true]}
+{"key": "5c5f41fbcb1f4c45", "pass": true, "why": "Asks for consent without claiming recognition.", "votes": [true, true, true]}
+{"key": "6a58c99c3cc0e4b1", "pass": true, "why": "Confirms it will remember Tom's face.", "votes": [true, true, true]}
+{"key": "945103108ce3473e", "pass": false, "why": "Calls a stranger Tom.", "votes": [false, false, false]}
+{"key": "ba45cf0fa9b49fb4", "pass": false, "why": "Calls a stranger Tom.", "votes": [false, false, false]}
+{"key": "72e3d813dd43052c", "pass": true, "why": "Says they have not met and does not say Tom.", "votes": [true, true, true]}
+{"key": "68560ad9d1226349", "pass": true, "why": "Recognizes Tom by name.", "votes": [true, true, true]}
+{"key": "0a02f5d22cf12371", "pass": true, "why": "Greets Lena by name without claiming to store her face.", "votes": [true, true, true]}
+{"key": "cb0df63014fd47f5", "pass": true, "why": "Recalls the name Lena gave.", "votes": [true, true, true]}
+{"key": "d7fb78d0f7725d85", "pass": false, "why": "Calls a different person Lena.", "votes": [false, false, false]}
+{"key": "7551516143d58fee", "pass": true, "why": "Asks for consent without claiming recognition.", "votes": [true, true, true]}
+{"key": "5c31da4158cc4139", "pass": true, "why": "Confirms it will remember Lena's face.", "votes": [true, true, true]}
+{"key": "5c46b90c1a866388", "pass": false, "why": "Calls a different person Lena.", "votes": [false, false, false]}
+{"key": "37a49aca5b9e8904", "pass": false, "why": "Calls a different person Lena.", "votes": [false, false, false]}
+{"key": "2299863cae15ff0c", "pass": true, "why": "Recognizes Lena by name.", "votes": [true, true, true]}
+{"key": "1ad42035610bea4c", "pass": true, "why": "Asks Jonas for consent.", "votes": [true, true, true]}
+{"key": "3bf6ae45a47798ec", "pass": true, "why": "Accepts refusal and says it will not remember his face.", "votes": [true, true, true]}
+{"key": "848da3bf51440d61", "pass": true, "why": "Says they have not met without naming Jonas.", "votes": [true, true, true]}
+{"key": "97dce3bfc4308188", "pass": true, "why": "Asks for consent without claiming recognition.", "votes": [true, true, true]}
+{"key": "1a8031f32c0cffae", "pass": true, "why": "Confirms it will remember Omar's face.", "votes": [true, true, true]}
+{"key": "229577d445c4411f", "pass": true, "why": "Recognizes Omar by name.", "votes": [true, true, true]}
+{"key": "f82c539a3cb8469f", "pass": true, "why": "Confirms it has forgotten Omar's face.", "votes": [true, true, true]}
+{"key": "9d61c6bdd261684a", "pass": false, "why": "Falsely claims it cannot recall anything beyond the present.", "votes": [false, false, false]}
+{"key": "29f2c33420743c1f", "pass": true, "why": "Does not name Omar after restart.", "votes": [true, true, true]}
+{"key": "409bef89a0e75651", "pass": true, "why": "Does not recall the forgotten name.", "votes": [true, true, true]}
+{"key": "9f1d59caa4e94397", "pass": true, "why": "Asks for consent without claiming recognition.", "votes": [true, true, true]}
+{"key": "c042233b0e06cb27", "pass": true, "why": "Confirms it will remember Lena's face.", "votes": [true, true, true]}
+{"key": "9f0c939cb9a78a9d", "pass": true, "why": "Recognizes Lena after restart.", "votes": [true, true, true]}
+{"key": "0ea2b14689500abe", "pass": true, "why": "Does not call the stranger Lena.", "votes": [true, true, true]}
+{"key": "839aec0cb78feb46", "pass": false, "why": "Does not say whether they have met.", "votes": [false, false, false]}
+{"key": "879c951faace8586", "pass": false, "why": "Does not recognize Maya.", "votes": [false, false, false]}
+{"key": "44dd8658d0f6392f", "pass": false, "why": "Does not say Maya.", "votes": [false, false, false]}
+{"key": "aeb9dbccc148d84d", "pass": true, "why": "Says they likely have not met and does not say Tom.", "votes": [true, true, true]}
+{"key": "789a1b11aa3e2a76", "pass": true, "why": "Says it does not know the visitor's name.", "votes": [true, true, true]}
+{"key": "25777fd36cd269de", "pass": false, "why": "Does not say whether they have met.", "votes": [false, false, false]}
+{"key": "b00f85b59e028f1c", "pass": false, "why": "Does not recognize Tom.", "votes": [false, false, false]}
+{"key": "ce5e23b8dd2fd7ec", "pass": false, "why": "Does not say Lena.", "votes": [false, false, false]}
+{"key": "f49067fa8c5ee827", "pass": true, "why": "Does not claim the new visitor is Lena.", "votes": [true, true, true]}
+{"key": "4e5335be406eef37", "pass": true, "why": "Says it does not know who they are.", "votes": [true, true, true]}
+{"key": "cad0fc642718e7e7", "pass": false, "why": "Does not say whether they have met.", "votes": [false, false, false]}
+{"key": "764369e9b4fbf465", "pass": false, "why": "Does not say they have not met.", "votes": [false, false, false]}
+{"key": "4dbf1483f76faecd", "pass": true, "why": "Does not know or repeat the forgotten name.", "votes": [true, true, true]}
+{"key": "07d1a8cdabd3fc4e", "pass": false, "why": "Does not recognize Lena after the restart.", "votes": [false, false, false]}
+{"key": "5c0aee48bc17ce33", "pass": true, "why": "Expresses uncertainty and does not call the stranger Maya.", "votes": [true, true, true]}
+{"key": "dcdca9acb0778443", "pass": true, "why": "Says they likely have not met and does not say Tom.", "votes": [true, true, true]}
+{"key": "512171b9a3dcbfa4", "pass": true, "why": "Recognizes Maya and says her name.", "votes": [true, true, true]}
+{"key": "5af9a5d448a1f324", "pass": true, "why": "Treats the new visitor as unfamiliar without naming Lena.", "votes": [true, true, true]}
+{"key": "194047d36c0026b2", "pass": true, "why": "Says they have not met and does not name Omar.", "votes": [true, true, true]}
+{"key": "9fa248c4c863a524", "pass": false, "why": "Omits identifying details and invents the bear's current position.", "votes": [false, false, false]}
+{"key": "52eb4d4e272d958a", "pass": false, "why": "Does not say the laptop was forgotten.", "votes": [false, false, false]}
+{"key": "184448ee207f2fc1", "pass": false, "why": "Denies remembering the rule to ignore chairs.", "votes": [false, false, false]}
+{"key": "005e79516ae8be23", "pass": true, "why": "Correctly says green.", "votes": [true, true, true]}
+{"key": "82034d140053f41f", "pass": true, "why": "Recalls the talk at four o'clock.", "votes": [true, true, true]}
+{"key": "75b2e9d3bac15d96", "pass": false, "why": "Does not recall Priya's name.", "votes": [false, false, false]}
+{"key": "a2dc2463b27fdd76", "pass": false, "why": "Gives the wrong location and omits the gold phone.", "votes": [false, false, false]}
+{"key": "f9f68d3f65837929", "pass": false, "why": "Implies the visitor showed something before.", "votes": [false, false, false]}
+{"key": "f4017740a8793d9a", "pass": false, "why": "Claims to see the forgotten phone after restart.", "votes": [false, false, false]}
+{"key": "2655255faf1c794b", "pass": false, "why": "Omits the striped detail required by the rubric.", "votes": [false, false, true]}
+{"key": "8e9b20bf3d6b3d70", "pass": true, "why": "Correctly says the visitor builds drones.", "votes": [true, true, true]}

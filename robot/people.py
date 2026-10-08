@@ -33,7 +33,7 @@ SHOTS = 5  # enrolled shots kept per person
 THRESHOLD = 0.328
 CANDIDATES = 10  # people whose best shot passes THRESHOLD, checked for a second shot
 MIN_FACE = 40  # px, face box width: the smallest size the bake-off measured (about 2 m away)
-UPPER = 0.5  # share of a person box, from the top, searched for the face
+SIMILAR = 0.8  # faces at least this share of the largest one's width: the most central wins
 
 
 class People:
@@ -47,18 +47,17 @@ class People:
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
 
-    def enroll(self, name: str, shots: dict[str, np.ndarray], consent: float | None) -> bool:
-        """Store a person from face vectors keyed by the frame each came from (the first
-        SHOTS); `consent` is when they said yes. One point per name: enrolling a known name
+    def enroll(self, name: str, shots: list[np.ndarray], consent: float | None) -> bool:
+        """Store a person from face vectors of different frames (the first SHOTS; no image is
+        kept); `consent` is when they said yes. One point per name: enrolling a known name
         replaces its shots and keeps its links. Refused (False) without consent or with fewer
         than two frames, since an identity claim needs two shots."""
         if not consent or len(shots) < 2:
             return False
-        frames = list(shots)[:SHOTS]
         self.shard.update(UpdateOperation.upsert_points([Point(
-            _id(name), {"shots": [shots[f].tolist() for f in frames]},
-            {"name": name, "consent": consent, "shots": len(frames),
-             "linked": self._linked(name, frames)})]))
+            _id(name), {"shots": [s.tolist() for s in shots[:SHOTS]]},
+            {"name": name, "consent": consent, "shots": min(len(shots), SHOTS),
+             "linked": self._linked(name, [])})]))
         self.shard.flush()
         return True
 
@@ -70,27 +69,32 @@ class People:
         return list(dict.fromkeys(old + ids))
 
     def link(self, name: str, ids: list) -> None:
-        """Record evidence ids (frames, sighting points, captioned turns) seen with `name`, so
-        forget() returns them; a no-op for an unknown name."""
+        """Record evidence ids (turn points and their frames) seen with `name`, so forget()
+        returns them; a no-op for an unknown name."""
         if self.shard.retrieve([_id(name)], False, False):
             self.shard.update(UpdateOperation.set_payload(
                 [_id(name)], {"linked": self._linked(name, ids)}))
             self.shard.flush()
 
-    def identify(self, face: np.ndarray) -> tuple[str, float] | None:
-        """(name, score) of the person whose second-best shot is closest to `face` (a unit
-        vector), at THRESHOLD or above; None for anyone else. Edge MaxSim finds candidates by
-        their best shot; the second-best is computed here."""
+    def scores(self, face: np.ndarray) -> list[tuple[str, float, float]]:
+        """(name, best shot, second-best shot) of the enrolled people nearest `face` (a unit
+        vector), highest second-best first: the two-shot rule's value. Edge MaxSim finds the
+        candidates by their best shot; the second-best is computed here."""
         hits = self.shard.query(QueryRequest(
             limit=CANDIDATES, query=Query.Nearest([face.tolist()], using="shots"),
-            score_threshold=THRESHOLD, with_payload=["name"], with_vector=True))
-        scored = [(h.payload["name"], float(np.sort(np.array(h.vector["shots"]) @ face)[-2]))
-                  for h in hits]
-        return max((s for s in scored if s[1] >= THRESHOLD), key=lambda s: s[1], default=None)
+            with_payload=["name"], with_vector=True))
+        shots = [(h.payload["name"], np.sort(np.array(h.vector["shots"]) @ face)) for h in hits]
+        return sorted(((n, float(s[-1]), float(s[-2])) for n, s in shots), key=lambda x: -x[2])
+
+    def identify(self, face: np.ndarray) -> tuple[str, float] | None:
+        """(name, score) of the person whose second-best shot is closest to `face`, at
+        THRESHOLD or above; None for anyone else."""
+        best = self.scores(face)[:1]
+        return (best[0][0], best[0][2]) if best and best[0][2] >= THRESHOLD else None
 
     def forget(self, name: str) -> list:
-        """Delete every point called `name`; returns the ids linked to them (shot frames
-        included), for the caller to delete that evidence."""
+        """Delete every point called `name`; returns the ids linked to them, for the caller to
+        delete that evidence."""
         linked: list = []
         while found := self.shard.scroll(ScrollRequest(
                 limit=100, with_payload=["linked"],
@@ -105,15 +109,16 @@ def _id(name: str) -> str:
     return str(uuid.uuid5(uuid.NAMESPACE_URL, f"person:{name}"))
 
 
-def face(faces: Faces, frame: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarray | None:
-    """The face vector of the person in `box` (x1, y1, x2, y2), from the largest face in the
-    box's upper part, or None when there is none at least MIN_FACE wide."""
-    x1, y1, x2, y2 = (max(0, v) for v in box)
-    top = frame[y1:y1 + int((y2 - y1) * UPPER), x1:x2]
-    found = faces.detect(top) if top.size else []
+def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
+    """The face vector of the visitor in `frame` and its width in pixels: the largest face,
+    or among faces nearly as large (SIMILAR), the one nearest the center. None when no face
+    is MIN_FACE wide."""
+    found = faces.detect(frame)
     if not len(found) or found[0, 2] < MIN_FACE:
         return None
-    return faces.embed([align(top, found[0, 4:14].reshape(5, 2))])[0]
+    big = found[found[:, 2] >= SIMILAR * found[0, 2]]
+    f = big[np.argmin(np.abs(big[:, 0] + big[:, 2] / 2 - frame.shape[1] / 2))]
+    return faces.embed([align(frame, f[4:14].reshape(5, 2))])[0], int(f[2])
 
 
 # Identity requests. A name given with "remember me" makes it an enrollment request.
@@ -139,6 +144,8 @@ _YES = re.compile(r"\b(yes|yeah|yep|yup|sure|ok(ay)?|of course|go ahead|please d
 
 DECLINED = "All right, I won't remember your face."
 NO_FACE = "I can't see your face well enough. Please look at me and ask again."
+NO_FACE_SEEN = "I can't see your face right now."
+NOT_SURE = "I'm not sure who you are."
 
 
 def name_in(text: str) -> str | None:

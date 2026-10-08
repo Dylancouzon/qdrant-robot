@@ -10,7 +10,7 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 Next, in order (D55):
 
-1. Finish M3.3 (builder: D54 sighting frames removed, audit cuts), review, commit with M2.2c. M3 dev oracle 32/33, zero false identities (bench/results/2026-10-08-replay-1791492853).
+1. Done (D56): M2.2c, D51 retention, M3.3 people wiring committed. M3 dev 32/33, zero false identities. Dylan's rulings pending: the no-face answer (intro-3, m2-restart-name-2 fail until then) and told names held in RAM.
 2. One integrated visitor script on the Jetson: objects, naming, removal, conversation eviction, replacement visitor, consent, forget, restart; record correctness, false identities, latency, fps, RAM, swap, disk.
 3. M2.2b naming, forgetting, ignoring objects; M2.3 conversation beyond the window and labels on a video view; M2 and M3 gates.
 4. M4: speaker (ordered), offline cold start, eight-hour run.
@@ -18,7 +18,7 @@ Next, in order (D55):
 
 Stop (D55): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks.
 
-Running jobs: two builders (D44). M3.3 integration (robot/main.py, robot/memory.py: M2.2c track stability and D51 retention reviewed except people wiring, plus people wiring, face step, identity answers, protection on every deletion path). M3.0 face replay fixtures (eval/dev/m3.jsonl, eval/heldout/m3.jsonl; face scenes in gitignored eval/faces/scenes, to copy to the Jetson shared folder for replays). Jetson runs serialize on shared/gpu.lock.
+Running jobs: none.
 
 ## Known gaps (carried, D40)
 

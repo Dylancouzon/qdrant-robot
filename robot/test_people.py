@@ -22,33 +22,32 @@ def test_people() -> None:
     near = lambda n: unit(base[n] + 0.05 * rng.normal(size=DIM))  # noqa: E731 another photo
     with tempfile.TemporaryDirectory() as tmp:
         people = People(Path(tmp))
-        assert not people.enroll("Ana", {"f1": near("Ana"), "f2": near("Ana")}, None), "consent"
-        assert not people.enroll("Ana", {"f1": near("Ana")}, 1.0), "one frame is one shot"
-        assert people.enroll("Ana", {f"a{k}": near("Ana") for k in range(7)}, 1.0)
-        assert people.enroll("Ben", {"b1": near("Ben"), "b2": near("Ben")}, 2.0)
-        assert people.enroll("Cy", {"c1": near("Cy"), "c2": near("Cy")}, 2.0)
+        assert not people.enroll("Ana", [near("Ana"), near("Ana")], None), "consent"
+        assert not people.enroll("Ana", [near("Ana")], 1.0), "one frame is one shot"
+        assert people.enroll("Ana", [near("Ana") for _ in range(7)], 1.0)
+        assert people.enroll("Ben", [near("Ben"), near("Ben")], 2.0)
+        assert people.enroll("Cy", [near("Cy"), near("Cy")], 2.0)
         assert people.identify(near("Ana"))[0] == "Ana"
         assert people.identify(near("Ben"))[0] == "Ben"
         assert people.identify(unit(rng.normal(size=DIM))) is None, "a stranger"
-        people.link("Ana", ["a1", 17, "t9.jpg"])
+        people.link("Ana", [16, 17])
         people.link("Ana", [17, 18])
         people.link("Nobody", [99])
-        assert people.enroll("Ana", {"a9": near("Ana"), "a8": near("Ana")}, 3.0), "re-enroll"
+        assert people.enroll("Ana", [near("Ana"), near("Ana")], 3.0), "re-enroll"
         assert people.identify(near("Ana"))[0] == "Ana"
-        assert people.forget("Ana") == [f"a{k}" for k in range(5)] + [17, "t9.jpg", 18, "a9",
-                                                                      "a8"], "every linked id"
+        assert people.forget("Ana") == [16, 17, 18], "every linked id, once"
         assert people.forget("Nobody") == []
         people.shard.update(UpdateOperation.upsert_points([  # past one scroll page
             Point(k, {"shots": [near("Ben").tolist()] * 2}, {"name": "Ben", "linked": [k]})
             for k in range(150)]))
-        assert len(people.forget("Ben")) == 152, "the enrolled point and all 150 extra"
+        assert len(people.forget("Ben")) == 150, "linked ids of all 150 extra points"
         people.shard.close()
         again = People(Path(tmp))
         assert again.identify(near("Ana")) is None, "forgotten after a reopen"
         assert again.identify(near("Ben")) is None
         assert again.identify(near("Cy"))[0] == "Cy", "others stay"
         again.link("Cy", list(range(2500)))  # more evidence than any cap would keep
-        assert len(again.forget("Cy")) == 2502, "every linked id, plus the two shot frames"
+        assert len(again.forget("Cy")) == 2500, "every linked id"
         again.shard.close()
         assert People(Path(tmp)).identify(near("Cy")) is None, "gone after a reopen"
 
@@ -85,7 +84,162 @@ def test_face_step() -> None:
     faces = Faces()
     im = [cv2.imread(str(LFW / f"Colin_Powell/Colin_Powell_{k:04d}.jpg")) for k in (1, 2)]
     # LFW centers a 250 px photo on the face: a box twice as tall puts it in the upper half.
-    a, b = (face(faces, x, (0, 0, 250, 500)) for x in im)
+    (a, _), (b, _) = (face(faces, x) for x in im)
     assert a @ b > 0.4, "the same person"
     small = cv2.resize(im[0], None, fx=0.25, fy=0.25)
-    assert face(faces, small, (0, 0, 63, 126)) is None, "a face under MIN_FACE"
+    assert face(faces, small) is None, "a face under MIN_FACE"
+
+
+def test_robot_identity(monkeypatch) -> None:
+    """The robot's identity turns through Robot._turn on real Edge shards, with a fake face
+    step (a person's face vector is the pixel value of their frame; 99: the face is hidden)
+    and stub brain, voice, and embedder. Identity comes from the face in the frame at speech
+    start, never a track or the cached look: a visitor who replaces another in the same place
+    (the look stays valid), or whose new track merges into another's lost track, inherits no
+    name, consent, or evidence; after "forget me" nothing of that face is stored."""
+    import queue
+    import threading
+    import time
+    from types import SimpleNamespace as Stub
+
+    from robot import main, memory
+    from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
+    from robot.main import Robot, Turn
+    from robot.memory import Memory
+    from robot.people import DECLINED, NO_FACE_SEEN, NOT_SURE, _id
+    from robot.text_embed import DIM as TEXT_DIM
+
+    steps = []
+
+    def fake_face(faces, frame):
+        steps.append(1)
+        k = int(frame[0, 0, 0])
+        return None if k == 99 else (np.eye(DIM, dtype=np.float32)[k], 120)
+
+    monkeypatch.setattr(main, "face", fake_face)
+    here, near = (400, 100, 800, 700), (450, 100, 850, 700)
+    clock = iter(range(int(time.time()), int(time.time()) + 10_000))  # wall clock, as turns
+
+    def make(root: Path) -> Robot:
+        robot = Robot.__new__(Robot)  # every part a turn uses, with stub models
+        robot.people = People(root)
+        robot.memory = Memory(root)
+        robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
+        robot.asking, robot.hiding, robot.detecting = None, None, threading.Lock()
+        robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
+        robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
+        robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
+        robot.out = root / "out"
+        robot.out.mkdir(exist_ok=True)
+        robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
+        robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "social"
+        robot.brain = Stub(prefill=lambda m: None, answer=lambda m: iter(["Okay."]))
+        robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
+        robot.speaker = Stub(play=lambda pcm: None)
+        return robot
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root, turns = Path(tmp), []
+        robot = make(root)
+
+        def frames(k: int | None, n: int, box: tuple = here) -> np.ndarray:
+            frame = np.full((720, 1280, 3), k or 0, np.uint8)
+            for _ in range(n):  # the robot's detection loop, without the detector
+                dets = [Detection("person", 0.9, box)] if k else []
+                if found := robot.tracker.update(dets, 1280, float(next(clock))):
+                    robot._sight(found)
+            return frame
+
+        def ask(text: str, frame: np.ndarray) -> str | None:
+            """The code answer to `text` said in front of `frame`, or None (the brain's)."""
+            t = float(next(clock))
+            turns.append(turn := Turn(question=text, speech_start=t, line=t, speech_end=t))
+            robot._turn(turn, (frame, t))
+            return turn.answer if turn.verbatim else None
+
+        def linked(name: str) -> list[int]:
+            found = robot.people.shard.retrieve([_id(name)], ["linked"], False)
+            return found[0].payload["linked"] if found else []
+
+        def said() -> list[str]:
+            return [r.payload.get("said", "") for r in robot.memory.shard.scroll(
+                memory.ScrollRequest(limit=999, with_payload=True))[0]]
+
+        ana = frames(1, 60)
+        assert steps == [], "no face step without a turn"
+        assert ask("What's my name?", ana) == NOT_SURE
+        assert ask("Nice to meet you, I'm Ana.", ana) is None, "the conversation answers"
+        assert ask("What's my name?", ana) == NOT_SURE, "a told name is not held (ruling due)"
+        assert ask("Remember me, I'm Ana.", ana).startswith("May I remember your face, Ana?")
+        assert ask("Hmm, what?", ana).startswith("Sorry, may I"), "unclear: asked once more"
+        assert ask("What's the weather?", ana) is None, "then the conversation goes on"
+        assert ask("Yes.", ana) is None and robot.people.identify(np.eye(DIM)[1]) is None
+        assert ask("Remember me, I'm Ana.", ana).startswith("May I")
+        assert ask("No thanks.", ana) == DECLINED and robot.people.identify(np.eye(DIM)[1]) is None
+        assert ask("Remember me, I'm Ana.", ana).startswith("May I")
+        assert ask("Yes, sure.", ana) == done("enroll", "Ana", True)
+        assert ask("Do you remember me?", ana) == "You're Ana. I remember your face."
+        assert turns[-1].identity["claimed"] == "Ana" and turns[-1].identity["face_px"] == 120
+        assert turns[-1].identity["scores"][0][::2] == ["Ana", 1.0], "the two-shot value logged"
+        track, ana_links = robot._visitor(), linked("Ana")
+        robot._look((ana, float(next(clock))))  # idle time prefills Ana's frame (_watch)
+        ben = frames(2, 3)  # Ben steps into Ana's place: the track goes on
+        assert robot._visitor() == track and not robot._stale(ben), \
+            "and the prefilled look of Ana stays valid for his turn"
+        assert ask("Do you remember me?", ben).startswith("I don't think we've met")
+        assert linked("Ana") == ana_links, "his turn is not linked to her"
+        assert ask("Who am I?", ben) == NOT_SURE and linked("Ana") == ana_links, \
+            "Ben inherits neither Ana's name nor her evidence"
+        assert ask("Remember me, I'm Ben.", ben).startswith("May I")
+        assert ask("Yes.", frames(1, 1)) == done("enroll", "Ben", False), "not the face that asked"
+        assert ask("Remember me, I'm Ben.", ben).startswith("May I")
+        assert ask("Yes.", ben) == done("enroll", "Ben", True)
+        assert ask("Great, thanks, robot.", ben) is None
+        hidden = frames(99, 1)
+        assert ask("What's my name?", hidden) == NO_FACE_SEEN, "no face: a code answer"
+        frames(2, 3)
+        frames(None, MAX_MISSED + 2)  # Ben leaves; Ana steps in nearby before his track ends
+        ana = frames(1, CONFIRM + 1, near)
+        assert robot._visitor() == track, "her new track continued his lost one"
+        assert ask("What's my name?", ana) == "You're Ana. I remember your face."
+        assert ask("Thanks!", ana) is None
+        assert "Remember me, I'm Ben." in said() and "Nice to meet you, I'm Ana." in said()
+        hers = robot.memory.points(linked("Ana"))
+        held = {r.payload["frame"] for r in robot.memory.shard.scroll(memory.ScrollRequest(
+            limit=999, with_payload=["frame"]))[0] if "frame" in r.payload}
+        assert hers and {f.name for f in (root / "frames").iterdir()} == held, \
+            "the frames on disk are the turns' own: enrollment keeps no image"
+        assert ask("Please forget me.", ana) == done("forget", "Ana", True)
+        assert robot.people.identify(np.eye(DIM)[1]) is None
+        assert robot.people.identify(np.eye(DIM)[2])[0] == "Ben", "only the face that asked"
+        assert not robot.memory.points([p["id"] for p in hers])
+        assert not any((root / "frames" / p["frame"]).exists() for p in hers), "and frames"
+        assert "Thanks!" not in said() and "Great, thanks, robot." in said(), \
+            "her linked turns go, Ben's stay"
+        frames(None, LOST + 2)  # the detector loses her: no person track at all
+        assert ask("Hello again, I'm still here.", ana) is None
+        assert ask("Can you hear me?", frames(99, 1)) is None
+        assert not any(t in said() for t in ("Please forget me.", "Hello again, I'm still here.",
+                                             "Can you hear me?")), "nothing of her is stored"
+        assert ask("Hi, I'm next in line.", frames(2, 1)) is None
+        assert "Hi, I'm next in line." in said(), "another face ends the hiding"
+        monkeypatch.setattr(memory, "MAX_POINTS", 1)
+        robot._retain(float(next(clock)))
+        assert robot.memory.shard.count(memory.CountRequest()) <= 1 and linked("Ben"), \
+            "linked turns expire like other evidence: the cap holds"
+        monkeypatch.setattr(memory, "MAX_POINTS", 20_000)
+        ben = frames(2, CONFIRM + 1)
+        track = robot._visitor()
+        assert ask("Forget me too.", ben) == done("forget", "Ben", True)
+        assert ask("Still me.", ben) is None and "Still me." not in said()
+        cy = frames(3, 3)  # Cy steps into Ben's place: the same track id
+        assert robot._visitor() == track
+        assert ask("Hello, I'm new here.", cy) is None and "Hello, I'm new here." in said(), \
+            "a new face on a forgotten track is stored"
+        robot.memory.shard.close()
+        robot.people.shard.close()
+        robot = make(root)  # a restart: nothing of Ana is left to recognize or hide
+        assert robot.people.identify(np.eye(DIM)[1]) is None and robot.people.identify(
+            np.eye(DIM)[2]) is None, "after a reopen of both shards"
+        assert ask("Do you remember me?", frames(1, CONFIRM + 1)).startswith(
+            "I don't think we've met"), "only a new consent could enroll her again"

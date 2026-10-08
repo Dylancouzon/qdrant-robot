@@ -23,6 +23,7 @@ from robot import audio, brain
 from robot.asr import Ears, Scribe
 from robot.config import SHARED
 from robot.detect import Detector, Sighting, Tracker
+from robot.faces import Faces
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     Memory,
@@ -33,6 +34,18 @@ from robot.memory import (
     sighting_answer,
     sighting_query,
     thumb,
+)
+from robot.people import (
+    DECLINED,
+    NO_FACE_SEEN,
+    NOT_SURE,
+    THRESHOLD,
+    People,
+    consent,
+    done,
+    face,
+    reply,
+    request,
 )
 from robot.route import Router
 from robot.text_embed import TextEmbedder
@@ -46,6 +59,11 @@ DETECT_FPS = 15
 DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
 SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
 WHERE = {"left": "on your left", "center": "in the center", "right": "on your right"}
+# Identity is the face in the current frame, never a track (design
+# reviews/20261008-161702-78890-design.md): a visitor replacing another keeps the track id.
+# A face step runs only on an identity question and after a turn is spoken (to link it).
+# No usable face: NO_FACE_SEEN; a name told but never enrolled: NOT_SURE (no face is held).
+CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 
 
 def scene_change(a: np.ndarray, b: np.ndarray) -> float:
@@ -61,6 +79,12 @@ class Look:
     exchanges: int
     changed: bool                 # the view differs from the previous turn's
     history: list[dict]           # the conversation as prefilled with this frame
+
+
+@dataclass
+class Visitor:
+    """What a person track carries for its life only (D49)."""
+    forgotten: bool = False   # "forget me": nothing more of this track is written
 
 
 @dataclass
@@ -87,6 +111,7 @@ class Turn:
     wav: str = ""
     audio_s: float = 0.0          # length of the spoken answer
     detect_fps: float = 0.0       # detection and tracking rate while this turn ran
+    identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
 
 
 class Robot:
@@ -94,7 +119,9 @@ class Robot:
                  play: Callable[[np.ndarray], None] | None = None, model: str = brain.MODEL):
         self.camera, self.out = camera, out
         out.mkdir(parents=True, exist_ok=True)
-        self.knowledge, self.memory, self.embed = Knowledge(), Memory(memory), TextEmbedder()
+        self.knowledge, self.embed, self.faces = Knowledge(), TextEmbedder(), Faces()
+        self.people = People(memory)
+        self.memory = Memory(memory)
         self.scribe = Scribe()
         self.route = Router(self.embed)
         self.voice = Speaker()
@@ -103,6 +130,15 @@ class Robot:
         self.detect, self.tracker = Detector(), Tracker()
         self.vocab = set(self.detect.names.values())  # the labels the detector can give
         self.points: dict[int, int] = {}  # track id -> its sighting point, while it is tracked
+        self.away: set[int] = set()  # tracked ids reported gone: their points may be evicted
+        self.visitors: dict[int, Visitor] = {}  # person track id -> what is known of them
+        # (name, times asked, [face] of the request): consent asked, the face held only until
+        # the answer
+        self.asking: tuple[str, int, list] | None = None
+        # (face, last seen) of a visitor who asked to be forgotten. It serves the deletion, not
+        # identification: RAM only, never written, dropped when another face or no face for
+        # CLEAR_S follows (or at a restart). Until then no turn showing that face is stored.
+        self.hiding: tuple[np.ndarray, float] | None = None
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
         self.history: list[dict] = []
@@ -145,8 +181,12 @@ class Robot:
         with self.detecting:
             self.jobs.join()  # sightings queued since
             self.memory.shard.close()
-            self.memory, self.history, self.exchanges, self.ready = Memory(memory), [], 0, None
+            self.people.shard.close()
+            self.people = People(memory)
+            self.memory = Memory(memory)
+            self.history, self.exchanges, self.ready = [], 0, None
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
+            self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
 
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
@@ -202,23 +242,56 @@ class Robot:
                 continue
             self.detections += 1
             if found:
-                self.jobs.put(("sight", found, frame))
+                self.jobs.put(("sight", found))
 
-    def _sight(self, found: list[Sighting], frame: np.ndarray) -> None:
-        """One point per track: stored when confirmed, updated when it moves region (with the
-        new source frame) and when it leaves."""
-        jpg = None
+    def _sight(self, found: list[Sighting]) -> None:
+        """One point per track (label, region, times; no frame: answers use labels, and a
+        stored frame could hold a visitor's face): stored when confirmed, updated when its
+        region or majority label changes and when it leaves; each write bounds the evidence
+        to the retention window and caps (Memory.retain), never evicting a track that is not
+        gone (in view, or missed for less than MAX_MISSED frames)."""
         for s in found:
-            pid = self.points.pop(s.track, None) if s.gone else self.points.get(s.track)
-            if s.gone:
+            pid = self.points.get(s.track)
+            if s.ended:
+                self._end(s.track)
+            elif s.gone:
+                self.away.add(s.track)
                 if pid:
-                    self.memory.set(pid, last_seen=s.seen)
-                continue
-            jpg = jpg or self.memory.save(frame)
-            if pid:
-                self.memory.set(pid, region=s.region, last_seen=s.seen, frame=jpg)
+                    self.memory.set(pid, label=s.label, last_seen=s.seen)
             else:
-                self.points[s.track] = self.memory.sighting(s.label, s.region, s.seen, jpg)
+                self.away.discard(s.track)
+                if pid:
+                    self.memory.set(pid, label=s.label, region=s.region, last_seen=s.seen)
+                else:
+                    self.points[s.track] = self.memory.sighting(s.label, s.region, s.seen)
+        self._retain(max(s.seen for s in found))
+
+    def _end(self, track: int) -> None:
+        """A track no new track can continue: forget its id."""
+        self.points.pop(track, None)  # its last_seen was written when it went out of view
+        self.away.discard(track)
+        self.visitors.pop(track, None)
+
+    def _whois(self, frame: np.ndarray, turn: Turn | None = None
+               ) -> tuple[np.ndarray, str | None] | None:
+        """The visitor's face in the whole `frame` (people.face) and the enrolled person it
+        matches by the two-shot rule, or None without a usable face. An identity turn logs
+        the face width, the step time, and the two best people's scores, never the face."""
+        started, found = time.time(), face(self.faces, frame)
+        scores = self.people.scores(found[0])[:2] if found else []
+        name = scores[0][0] if scores and scores[0][2] >= THRESHOLD else None
+        if turn is not None:
+            turn.identity = {"face_px": found[1] if found else 0, "claimed": None,
+                             "face_ms": round(1000 * (time.time() - started), 1),
+                             "scores": [[n, round(b, 3), round(s, 3)] for n, b, s in scores]}
+        return (found[0], name) if found else None
+
+    def _retain(self, now: float) -> None:
+        """Bound memory to the retention window and caps (Memory.retain) after each write,
+        never evicting the point of a track that is not gone."""
+        evicted = set(self.memory.retain(now, {
+            p for t, p in self.points.items() if t not in self.away}))
+        self.points = {t: p for t, p in self.points.items() if p not in evicted}
 
     def _stale(self, frame: np.ndarray | None) -> bool:
         """The prefilled look no longer matches `frame` or the conversation."""
@@ -267,9 +340,12 @@ class Robot:
         statements = self.memory.told(question, before=turn.speech_start)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
-        recalled_answer = shown(turn.question, recalled,
-                                lambda m: brain.age(turn.speech_start - m["ts"])
-                                ) or self._sighted(turn)
+        track = self._visitor()
+        # The frame at speech start: the cached look may show an earlier visitor.
+        now, taken = (look.frame, look.taken) if shot[0] is None else shot
+        recalled_answer = self._identity(turn, now, track) or shown(
+            turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
+        ) or self._sighted(turn)
         turn.retrieved = time.time()
         self.last_frame = look.frame
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
@@ -302,13 +378,111 @@ class Robot:
                         )[-2 * HISTORY_TURNS:]
         self.exchanges += 1
         statement = None if is_question(turn.question) else question  # findable later
-        pid = turn.frame_id = self.memory.add(look.frame, turn.question, statement, look.taken)
-        for job in [*self.uncaptioned, (pid, look.image)]:
-            self.jobs.put(("caption", *job))
-        self.uncaptioned = []
+        self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
+                    statement, track)
         with (self.out / "turns.jsonl").open("a") as f:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
+
+    def _store(self, turn: Turn, shot: tuple[np.ndarray, float, dict],
+               statement: np.ndarray | None, track: int | None) -> None:
+        """Remember the turn after its answer was spoken: `shot` (the frame at speech start,
+        its capture time, its image for the caption), what was said, a caption later, linked
+        to the enrolled person whose face it shows. Nothing while a forgotten visitor may be
+        in view (`hiding`), or for a person track that asked to be forgotten."""
+        frame, taken, image = shot
+        seen = self._whois(frame)
+        if self._hidden(seen, track):
+            return
+        pid = turn.frame_id = self.memory.add(frame, turn.question, statement, taken)
+        if seen and seen[1]:
+            self.people.link(seen[1], [pid])  # "forget me" deletes it if still kept
+        self._retain(time.time())
+        for job in [*self.uncaptioned, (pid, image)]:
+            self.jobs.put(("caption", *job))
+        self.uncaptioned = []
+
+    def _hidden(self, seen: tuple[np.ndarray, str | None] | None, track: int | None) -> bool:
+        """Whether a turn with face `seen` must not be stored after a "forget me": the same
+        face, or no face on the forgotten track or before CLEAR_S has passed. Another face (a
+        new visitor, even on the same track) ends the hiding and the track's forgotten state."""
+        face_, last = self.hiding or (None, 0.0)
+        if seen and face_ is not None and float(seen[0] @ face_) >= THRESHOLD:
+            self.hiding = face_, time.time()
+            return True
+        v = self.visitors.get(track, Visitor())
+        if seen:
+            self.hiding, v.forgotten = None, False
+            return False
+        if face_ is not None and time.time() - last > CLEAR_S:
+            self.hiding = None
+        return self.hiding is not None or v.forgotten
+
+    def _visitor(self) -> int | None:
+        """The person track in view with the largest box (at a booth, the one speaking)."""
+        with self.detecting:
+            boxes = self.tracker.boxes("person")
+        return max(boxes, key=lambda t: (boxes[t][2] - boxes[t][0]) * (boxes[t][3] - boxes[t][1]),
+                   default=None)
+
+    def _identity(self, turn: Turn, frame: np.ndarray, track: int | None) -> str | None:
+        """Identity requests answered in code (robot/people.py) from the face in the current
+        frame, never from a track: consent, enrollment, "forget me", "do you remember me",
+        "what's my name". None for any other turn."""
+        asked, self.asking = self.asking, None
+        if asked and (answer := self._consent(turn, asked, frame)) is not None:
+            return answer
+        if request(turn.question) is None:
+            return None
+        if (seen := self._whois(frame, turn)) is None:
+            return NO_FACE_SEEN
+        vec, name = seen
+        turn.identity["claimed"] = name
+        said = reply(turn.question, (name, 1.0) if name else None, True)
+        if said is None:  # a name no enrolled face gives
+            return NOT_SURE
+        answer, action = said
+        if action and action[0] == "forget":
+            return done("forget", action[1], self._forget(track, action[1], vec))
+        if action:
+            self.asking = action[1], 1, [vec]
+        return answer
+
+    def _consent(self, turn: Turn, asked: tuple[str, int, list], frame: np.ndarray
+                 ) -> str | None:
+        """The answer to "May I remember your face?": enroll on yes, decline on no, ask once
+        more when unclear, then None (the conversation goes on)."""
+        name, times, shots = asked
+        if (yes := consent(turn.question)) is None:
+            if times < 2:
+                self.asking = name, times + 1, shots
+                return f"Sorry, may I remember your face, {name}? Please say yes or no."
+            return None
+        return done("enroll", name, self._enroll(name, shots, frame, turn)) if yes else DECLINED
+
+    def _enroll(self, name: str, shots: list[np.ndarray], frame: np.ndarray, turn: Turn) -> bool:
+        """Enroll `name` after consent from the face that asked and the face that said yes
+        (two frames, one person): face vectors in the people shard, no image."""
+        if (seen := self._whois(frame, turn)) is None or any(
+                float(seen[0] @ s) < THRESHOLD for s in shots):
+            return False  # no face now, or not the face that asked
+        return self.people.enroll(name, [*shots, seen[0]], time.time())
+
+    def _forget(self, track: int | None, name: str, face_: np.ndarray) -> bool:
+        """"Forget me" from the face matched now: the person point, every linked turn still
+        kept (its frame, caption, and statement), and nothing more written for the person track
+        in view; pending caption writes to a deleted point are dropped by Memory.set."""
+        # Carried gap: a turn frame where this person appears unidentified (before enrollment,
+        # or behind another visitor) is not linked, so it stays until retention (RETAIN_S, 12 h).
+        try:
+            self.memory.forget(self.people.forget(name))
+        except Exception:
+            traceback.print_exc()
+            return False
+        if track is not None:
+            self.visitors[track] = Visitor(forgotten=True)
+        self.hiding = face_, time.time()
+        return True
 
     def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
         """Captioned frames (newest first) and the Memories lines, oldest first: captions and
@@ -380,6 +554,7 @@ class Robot:
         work.join()
         self.speaker.close()  # let the last phrase finish playing
         self.memory.shard.close()
+        self.people.shard.close()
         self.knowledge.shard.close()
         self.brain.close()
 

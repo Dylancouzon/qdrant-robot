@@ -1,7 +1,7 @@
 """The robot's memory, one Qdrant Edge shard: one point per turn, holding the frame it saw (JPEG
 on disk as evidence, capture time, a caption the VLM wrote from that frame in idle time) and
 what the visitor said, and one point per detector track (a sighting: label, region of the frame,
-first and last seen times, and its source frame). Statements carry a bge vector, so later
+first and last seen times; no frame). Statements carry a bge vector, so later
 questions find them by vector search ("What drink do I like?" finds "I really love espresso")."""
 import re
 import time
@@ -11,6 +11,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 from qdrant_edge import (
+    CountRequest,
     Direction,
     Distance,
     EdgeConfig,
@@ -20,12 +21,14 @@ from qdrant_edge import (
     Filter,
     HasIdCondition,
     MatchAny,
+    MatchValue,
     OrderBy,
     PayloadSchemaType,
     Point,
     Query,
     QueryRequest,
     RangeFloat,
+    ScrollRequest,
     UpdateOperation,
 )
 
@@ -34,6 +37,13 @@ from robot.text_embed import DIM as TEXT_DIM
 
 IMAGE_DIM = 768  # the SigLIP 2 vector slot M2 fills
 THUMB = (64, 36)  # width, height
+# Retention (reviews/20261008-151809-4769-design.md): ordinary evidence (sightings, turn frames,
+# captions, statements) lasts the booth day. The caps are a safety net: a 30-minute soak stored
+# 185 sightings, so a booth day is about 4,500 points; 20,000 is four times that. A frame is
+# about 130 KB (J), so 20,000 frames take about 2.6 GB; 4 GB of the 109 GB free disk holds them.
+RETAIN_S = 12 * 3600
+MAX_POINTS = 20_000
+MAX_FRAME_BYTES = 4 << 30
 TOLD_MIN = 0.5   # bge cosine: relevant statements scored 0.53 to 0.72, unrelated 0.45 to 0.53
 # Questions about the past get recent memories; questions about now do not, because a stale
 # caption in the prompt pulls a 2B brain away from the image (D27).
@@ -226,7 +236,28 @@ class Memory:
                 "said": EdgeVectorParams(size=TEXT_DIM, distance=Distance.Cosine)}))
         for field in ("ts", "last_seen"):  # a no-op when the index exists
             self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
+        self.shard.update(UpdateOperation.create_field_index("frame", PayloadSchemaType.Keyword))
         self.last_id = 0
+        self.frame_bytes = self._sweep()  # the bytes MAX_FRAME_BYTES limits
+
+    def _held(self, jpg: str) -> bool:
+        return bool(self.shard.count(CountRequest(filter=Filter(must=[
+            FieldCondition(key="frame", match=MatchValue(jpg))]))))
+
+    def _sweep(self) -> int:
+        """Delete every frame file that no point holds (crash leftovers: with the shard just
+        opened, no write is pending); returns the bytes of the rest, the bytes MAX_FRAME_BYTES
+        limits."""
+        held, offset = set(), None
+        while True:  # one pass over the frame names, not a query per file
+            page, offset = self.shard.scroll(ScrollRequest(
+                offset=offset, limit=1000, with_payload=["frame"]))
+            held |= {r.payload["frame"] for r in page if "frame" in r.payload}
+            if offset is None:
+                break
+        for f in [f for f in self.frames.glob("*.jpg") if f.name not in held]:
+            f.unlink()
+        return sum(f.stat().st_size for f in self.frames.glob("*.jpg"))
 
     def _id(self) -> int:
         """A new point or frame id, unique across restarts (microseconds since the epoch)."""
@@ -237,6 +268,7 @@ class Memory:
         """Store a frame as evidence; returns its file name."""
         jpg = f"{self._id()}.jpg"
         cv2.imwrite(str(self.frames / jpg), frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        self.frame_bytes += (self.frames / jpg).stat().st_size
         return jpg
 
     def add(self, frame: np.ndarray, said: str, said_vec: np.ndarray | None = None,
@@ -252,19 +284,61 @@ class Memory:
         self.shard.flush()
         return pid
 
-    def sighting(self, label: str, region: str, seen: float, frame: str) -> int:
-        """Store a new track: `label` in the `region` third of `frame` (a saved frame)."""
+    def sighting(self, label: str, region: str, seen: float) -> int:
+        """Store a new track: `label` in the `region` third of the frame."""
         pid = self._id()
         self.shard.update(UpdateOperation.upsert_points([Point(pid, {}, {
-            "label": label, "region": region, "first_seen": seen, "last_seen": seen,
-            "frame": frame})]))
+            "label": label, "region": region, "first_seen": seen, "last_seen": seen})]))
         self.shard.flush()
         return pid
 
-    def set(self, pid: int, **fields) -> None:
-        """Update payload fields of a point: a caption, or a sighting's region and times."""
+    def set(self, pid: int, **fields) -> bool:
+        """Update payload fields of a point: a caption, or a sighting's label, region, and
+        times. False, and nothing written, when the point is gone (evicted or forgotten before
+        a pending write)."""
+        if not self.points([pid]):
+            return False
         self.shard.update(UpdateOperation.set_payload([pid], fields))
         self.shard.flush()
+        return True
+
+    def forget(self, ids: Collection[int]) -> None:
+        """Delete the points still kept of `ids`, and their frames unless another point holds
+        the same frame."""
+        found = self.points(ids)
+        self.shard.update(UpdateOperation.delete_points([p["id"] for p in found]))
+        self.shard.flush()
+        for jpg in {p["frame"] for p in found if "frame" in p}:
+            if not self._held(jpg) and (path := self.frames / jpg).exists():
+                self.frame_bytes -= path.stat().st_size
+                path.unlink()
+
+    def _oldest(self, n: int, before: float, keep: Collection[int]) -> list[int]:
+        """Up to `n` ids of the oldest points last seen before `before` (turns by capture time,
+        sightings by last seen), oldest first, except the point ids in `keep`."""
+        hide, found = [HasIdCondition(keep)] if keep else None, []
+        for field in ("ts", "last_seen"):
+            found += [(h.payload[field], h.id) for h in self.shard.query(QueryRequest(
+                limit=n, query=OrderBy(field, Direction.Asc), with_payload=[field],
+                filter=Filter(must=[FieldCondition(key=field, range=RangeFloat(lt=before))],
+                              must_not=hide)))]
+        return [i for _, i in sorted(found)[:n]]
+
+    def retain(self, now: float, active: Collection[int]) -> list[int]:
+        """Evict the evidence older than RETAIN_S, then the oldest points until the shard and
+        its frame files are under the caps, never the `active` points (tracks still in view).
+        Returns the evicted point ids."""
+        keep, evicted = set(active), []
+        while old := self._oldest(256, now - RETAIN_S, keep):
+            self.forget(old)
+            evicted += old
+        while (over := self.shard.count(CountRequest()) - MAX_POINTS) > 0 or (
+                self.frame_bytes > MAX_FRAME_BYTES):
+            if not (old := self._oldest(over if over > 0 else 1, float("inf"), keep)):
+                break  # everything left is in view
+            self.forget(old)
+            evicted += old
+        return evicted
 
     @staticmethod
     def _row(hit) -> dict:
@@ -292,7 +366,7 @@ class Memory:
 
     def sightings(self, before: float, n: int = 4, hide: Collection[int] = (),
                   **match: Collection[str]) -> list[dict]:
-        """Payloads (id, label, region, first_seen, last_seen, frame) of the sightings last
+        """Payloads (id, label, region, first_seen, last_seen) of the sightings last
         seen before `before`, newest first, except the points in `hide`; `match` keeps those
         whose field has one of the given values (label=["cup", "mug"])."""
         hits = self.shard.query(QueryRequest(
@@ -358,6 +432,38 @@ def _sighting_selftest() -> None:
     assert sighting_answer("kind", {"label": {"keys"}}, True, [], [lamp], ago) is None
     assert sighting_answer("seen", {"region": {"center"}}, True, [], [lamp], ago) is None
 
+def _retain_selftest(seen: Memory, frames: Path, img: np.ndarray) -> None:
+    global MAX_POINTS, MAX_FRAME_BYTES
+    hour, day = 3600.0, 1000.0 + RETAIN_S  # the selftest's clock: the shard's oldest is ts 100
+    old_turns = [m["frame"] for m in seen.recent(before=1e9, n=99)]
+    cups = [seen.sighting("cup", "left", day - hour + k) for k in range(4)]
+    assert seen.retain(day, ()) and len(seen.sightings(1e9, 99, label=["cup"])) == 4, \
+        "an hour-old cup outlives three newer cup tracks"
+    assert seen.recent(before=1e9, n=99) == [] and seen.told(np.eye(TEXT_DIM)[0], 1e9) == [], \
+        "turns, captions, and statements past the window are evicted"
+    assert old_turns and not any((frames / f).exists() for f in old_turns), "and their frames"
+    assert seen.sightings(1e9, 99, label=["bag"]) == [], "a sighting past the window too"
+    MAX_POINTS, MAX_FRAME_BYTES = 3, 1 << 40
+    named = seen.add(img, "this is my phone", ts=day - 1)  # a linked turn: it expires too
+    kept = seen.points([named])[0]["frame"]
+    for k in range(10):  # turnover: one cup stays in view, others come and go
+        seen.sighting("cup", "right", day + k)
+        seen.retain(day + k, {cups[0]})
+        assert seen.shard.count(CountRequest()) == MAX_POINTS, "the cap holds exactly"
+    assert seen.points([cups[0]]) and not seen.points([named]), "the oldest out of view go"
+    assert not (frames / kept).exists(), "with its frame"
+    assert not seen.set(named, caption="x"), "a pending write to an evicted point is dropped"
+    seen.forget([named, cups[0]])
+    assert not seen.points([cups[0]]), "forget skips the ids already gone"
+    MAX_POINTS = 20_000
+    for k in range(3):
+        seen.add(img, f"turn {k}", ts=day + 20 + k)
+    MAX_FRAME_BYTES = seen.frame_bytes - 1
+    seen.retain(day + 30, {cups[0]})
+    assert seen.frame_bytes <= MAX_FRAME_BYTES, "the disk cap evicts the oldest out of view"
+    MAX_FRAME_BYTES = 4 << 30
+
+
 if __name__ == "__main__":
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
@@ -379,9 +485,9 @@ if __name__ == "__main__":
         seen.set(c, caption="a desk")
         assert b != c and [m["said"] for m in seen.recent(before=400.0, n=2)] in (
             ["first turn", "second turn"], ["second turn", "first turn"]), "one frame, two turns"
-        cup = seen.sighting("cup", "left", 320.0, seen.save(img))
+        cup = seen.sighting("cup", "left", 320.0)
         seen.set(cup, region="center", last_seen=330.0)
-        seen.sighting("bag", "right", 340.0, seen.save(img))
+        seen.sighting("bag", "right", 340.0)
         assert [s["label"] for s in seen.sightings(before=400.0)] == ["bag", "cup"]
         assert seen.sightings(before=335.0)[0]["region"] == "center", "the update moved it"
         assert [s["label"] for s in seen.sightings(before=400.0, n=1, hide={
@@ -389,12 +495,20 @@ if __name__ == "__main__":
         assert len(seen.recent(before=400.0, n=9)) == 3 and seen.told(v, before=400.0)[0][
             "said"] == "I love espresso.", "sightings are neither captioned frames nor statements"
         seen.shard.close()
+        frames = Path(tmp) / "frames"
+        orphans = ("1.jpg", "2.jpg", f"{seen.last_id + 10**9}.jpg")  # crash leftovers
+        for orphan in orphans:
+            (frames / orphan).write_bytes(b"x" * 10)
         again = Memory(Path(tmp))
+        assert not any((frames / f).exists() for f in orphans), "orphans are deleted at open"
+        assert again.frame_bytes == sum(f.stat().st_size for f in frames.iterdir()), \
+            "the disk cap counts the frames left: the held ones"
         m = again.recent(before=300.0)[0]
         assert (Path(tmp) / "frames" / m["frame"]).exists(), "must survive a restart"
         s = again.sightings(before=400.0)[1]
         assert (s["label"], s["first_seen"], s["last_seen"]) == ("cup", 320.0, 330.0)
-        assert (Path(tmp) / "frames" / s["frame"]).exists()
+        assert "frame" not in s, "a sighting stores no frame"
+        _retain_selftest(again, Path(tmp) / "frames", img)
     assert about_past("What did I just show you?") and about_past("Do you remember me?")
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
