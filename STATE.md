@@ -87,7 +87,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 ## Human checklist (when Dylan is at the robot)
 
-1. Audio hardware: approved; get a directional dynamic USB microphone and any small USB speaker. Meanwhile the Mac is the microphone and speaker (`tools/talk.py`).
+1. Audio: the camera microphone is the input (in use). Buy only a small USB speaker now. Test the camera microphone at about 1 m with background noise (ASR against Dylan's clean recordings); buy a directional microphone only if that test shows a real drop.
 2. Calibrate `SCENE_CHANGE` on a lit, static scene.
 3. Camera: watch for the USB port fault (D32).
 4. The 3080 box: hold (see Next, item 6).
