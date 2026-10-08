@@ -87,7 +87,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 
 ## Human checklist (when Dylan is at the robot)
 
-1. Audio: the camera microphone is the input (in use). Buy only a small USB speaker now. Test the camera microphone at about 1 m with background noise (ASR against Dylan's clean recordings); buy a directional microphone only if that test shows a real drop.
+1. Audio: the camera microphone is the input (in use). Speaker ordered 2026-10-08 (Waveshare USB sound card with 8 ohm 5 W speaker): when plugged into the Jetson, find the ALSA card, run with `--speaker`, measure audible latency, check echo into the camera microphone (mute the microphone while speaking first), and compare the card's microphone if it has one. Test the camera microphone at about 1 m with background noise before buying another microphone.
 2. Calibrate `SCENE_CHANGE` on a lit, static scene.
 3. Camera: watch for the USB port fault (D32).
 4. The 3080 box: hold (see Next, item 6).
