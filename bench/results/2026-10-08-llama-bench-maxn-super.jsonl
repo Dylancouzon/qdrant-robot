@@ -1,0 +1,4 @@
+{"model_filename": "models/gguf/Qwen3VL-2B-Instruct-Q4_K_M.gguf", "n_prompt": 512, "n_gen": 0, "avg_ts": 1492.482652, "stddev_ts": 61.689105, "build_commit": "9c2e0e4", "power": "NV Power Mode: MAXN_SUPER"}
+{"model_filename": "models/gguf/Qwen3VL-2B-Instruct-Q4_K_M.gguf", "n_prompt": 0, "n_gen": 64, "avg_ts": 35.971262, "stddev_ts": 0.241428, "build_commit": "9c2e0e4", "power": "NV Power Mode: MAXN_SUPER"}
+{"model_filename": "models/gguf/Qwen3VL-4B-Instruct-Q4_K_M.gguf", "n_prompt": 512, "n_gen": 0, "avg_ts": 658.325276, "stddev_ts": 10.827197, "build_commit": "9c2e0e4", "power": "NV Power Mode: MAXN_SUPER"}
+{"model_filename": "models/gguf/Qwen3VL-4B-Instruct-Q4_K_M.gguf", "n_prompt": 0, "n_gen": 64, "avg_ts": 17.527277, "stddev_ts": 0.072091, "build_commit": "9c2e0e4", "power": "NV Power Mode: MAXN_SUPER"}

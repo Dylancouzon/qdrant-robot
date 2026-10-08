@@ -27,8 +27,11 @@ TIMEOUT_S = 900
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
 
-def git(*args: str, env=None) -> str:
-    return subprocess.run(["git", *args], cwd=ROOT, env=env, check=True,
+def git(*args: str, env: dict | None = None) -> str:
+    """git in ROOT. A hook's GIT_DIR and GIT_INDEX_FILE are dropped: in a linked worktree they
+    pointed these commands at another index; `env` adds what a call needs."""
+    clean = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    return subprocess.run(["git", *args], cwd=ROOT, env={**clean, **(env or {})}, check=True,
                           capture_output=True, text=True).stdout.strip()
 
 
@@ -36,7 +39,7 @@ def code_tree(source: str) -> str:
     """Tree hash of the code in "worktree", "index", or a revision, minus bookkeeping."""
     with tempfile.TemporaryDirectory() as tmp:
         index = Path(tmp) / "index"
-        env = {**os.environ, "GIT_INDEX_FILE": str(index)}
+        env = {"GIT_INDEX_FILE": str(index)}
         if source == "index":
             shutil.copy(git("rev-parse", "--path-format=absolute", "--git-path", "index"), index)
         else:

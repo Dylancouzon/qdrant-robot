@@ -1,4 +1,5 @@
 """Enforcement checks for tools/gate.py, run against a throwaway git repository."""
+import os
 import subprocess
 from pathlib import Path
 
@@ -7,9 +8,13 @@ import pytest
 import gate
 
 
+# Like gate.git: a hook's GIT_* variables must not reach these test commands.
+CLEAN_ENV = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+
+
 def sh(repo: Path, *args: str) -> str:
-    return subprocess.run(args, cwd=repo, check=True, capture_output=True,
-                          text=True).stdout.strip()
+    return subprocess.run(args, cwd=repo, check=True, capture_output=True, text=True,
+                          env=CLEAN_ENV).stdout.strip()
 
 
 @pytest.fixture

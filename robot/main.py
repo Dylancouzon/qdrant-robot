@@ -99,6 +99,14 @@ class Robot:
     def hear(self, chunk: np.ndarray) -> None:
         self.ears.feed(chunk)
 
+    def ask(self, text: str) -> None:
+        """A typed line, entering where a transcript would (oracle replays, debugging)."""
+        self._heard_start()
+        t = time.time()
+        self.speaking = False
+        self.jobs.put(("turn", Turn(question=text, line=t, transcribed=t, speech_end=t,
+                                    speech_start=self.speech_start), self.start_frame))
+
     def reset(self, memory: Path) -> None:
         """Start over with an empty memory and conversation (scripted sessions)."""
         self.jobs.join()
