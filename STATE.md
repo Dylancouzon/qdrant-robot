@@ -8,13 +8,14 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 **M2.2a done** (D48): sighting questions answered in code; one-time probes 7/8. **Next active: M2.2c live-track stability** (D47): majority label per track, merge a short track into a neighbor with the same label and side, bound stored sightings; measure on `shared/clips/live-items-1.avi` (needs a clip source in the replay) and the 64-window question.
 
-Next, in order (D55):
+Next, in order (D55, D61):
 
-1. Done (D56): M2.2c, D51 retention, M3.3 people wiring committed. M3 dev 32/33, zero false identities. Dylan ruled (D60): no 'can't see your face'; told names answer within the live conversation, dropped when a different face appears; implement after M2.2b.
-2. Done (D58): integrated visitor baseline, oracle 17/21, audio 14/21, faces 9/9 with zero false identities, 1,260 MB headroom, 1.61 s first audio p50 with audio.
-3. M2.2b naming, forgetting, ignoring objects; M2.3 conversation beyond the window and labels on a video view; M2 and M3 gates.
-4. M4: speaker (ordered), offline cold start, eight-hour run.
-5. Tuning phase (after M3): fresh held-out with other voices, turn merge, sight labels, latency, robot-camera face threshold.
+1. M2.2b (builder running): object naming actions, DINOv2 matching, forget, ignore; recall exposed as retrieval, not code answers.
+2. D60 identity rulings and the video view hook (D59) in robot/main.py.
+3. Assistant v1 (D61): teach the focus object with confirmation (video view labels "Smartphone?" or "???" or the learned name); retrieval lines into the brain with calibrated per-shard minimum scores; bge action router; answers toward 200 tokens; compare with today's code answers on the integrated visit and one-time paraphrases, then delete the code answer paths; drop left and right logic and fixtures.
+4. M2.3 conversation beyond the window (part of 3: conversation shard in retrieval); M2 and M3 gates.
+5. M4: speaker (ordered), offline cold start, eight-hour run.
+6. Tuning (after v1 headroom): bigger brain or tool calls, training, held-out with other voices, robot-camera face threshold.
 
 Stop (D55): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks.
 
