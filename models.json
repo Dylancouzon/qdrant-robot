@@ -178,5 +178,11 @@
   "url": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt",
   "sha256": "9b09cc8bf347f0fc8a5f7657480587f25db09b34bf33b0652110fb03a8ad4fef",
   "license": "AGPL-3.0"
+ },
+ {
+  "path": "detector/yoloe-26n-seg.pt",
+  "url": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yoloe-26n-seg.pt",
+  "sha256": "1741c1f8da3cea47e2c01829c334a50dc0b9bbd05e685b90a3ce84fae32c8c1b",
+  "license": "AGPL-3.0"
  }
 ]

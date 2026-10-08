@@ -1,5 +1,5 @@
-"""Object detection and tracking: an end-to-end YOLO ONNX model (no NMS) on TensorRT or onnxruntime,
-and an IoU tracker that reports new and changed tracks with label, region, and crop.
+"""Object detection and tracking: YOLOE-26n with a fixed booth vocabulary (end-to-end, no NMS) on
+TensorRT, and an IoU tracker that reports new and changed tracks with label, region, and crop.
 
     python -m robot.detect     self-check (the tracker; the detector too when its model exists)
 """
@@ -14,7 +14,7 @@ import numpy as np
 
 from robot.config import MODELS, ROOT
 
-MODEL = MODELS / "detector/yolo26n-384x640.onnx"
+MODEL = MODELS / "detector/yoloe-26n-booth-384x640.onnx"  # recipe: research/detector.md
 INPUT = (384, 640)  # height, width: the 16:9 camera frame letterboxed with little padding
 LOW, HIGH = 0.1, 0.25  # every detection above LOW continues a track; only HIGH starts one
 MATCH_IOU = 0.3
@@ -101,36 +101,19 @@ class _TensorRT:
         return self.host["output0"]
 
 
-class _Onnx:
-    """onnxruntime with the TensorRT provider (FP16, cached engine), else CUDA, else the CPU."""
-
-    def __init__(self, model: Path, tensorrt: bool = True):
-        import onnxruntime as ort
-        trt = ("TensorrtExecutionProvider", {
-            "trt_fp16_enable": True, "trt_engine_cache_enable": True,
-            "trt_engine_cache_path": str(model.parent / "ort-trt-cache")})
-        wanted = [trt] * tensorrt + [("CUDAExecutionProvider",
-                                      {"cudnn_conv_algo_search": "HEURISTIC"}),
-                                     "CPUExecutionProvider"]
-        have = ort.get_available_providers()
-        providers = [p for p in wanted if (p if isinstance(p, str) else p[0]) in have]
-        self.sess = ort.InferenceSession(str(model), providers=providers)
-
-    def __call__(self, blob: np.ndarray) -> np.ndarray:
-        return self.sess.run(["output0"], {"images": blob})[0]
-
-
 class Detector:
-    """`backend`: "tensorrt" (an engine built by trtexec next to the ONNX, `.fp16.engine`),
-    "ort-trt", or "ort-cuda" (onnxruntime; both fall back to the CPU on the Mac)."""
+    """TensorRT when an engine built by trtexec sits next to the ONNX (`<name>.fp16.engine`,
+    recipe in research/detector.md); else onnxruntime on CUDA, or on the CPU on the Mac."""
 
-    def __init__(self, model: Path = MODEL, backend: str = "tensorrt"):
+    def __init__(self, model: Path = MODEL):
         import onnxruntime as ort
-        meta = ort.InferenceSession(str(model), providers=["CPUExecutionProvider"])
-        self.names = ast.literal_eval(meta.get_modelmeta().custom_metadata_map["names"])
-        del meta
-        self.run = (_TensorRT(model.with_suffix(".fp16.engine")) if backend == "tensorrt"
-                    else _Onnx(model, tensorrt=backend == "ort-trt"))
+        engine = model.with_suffix(".fp16.engine")
+        wanted = ["CUDAExecutionProvider"] * (not engine.exists()) + ["CPUExecutionProvider"]
+        sess = ort.InferenceSession(str(model), providers=[
+            p for p in wanted if p in ort.get_available_providers()])
+        self.names = ast.literal_eval(sess.get_modelmeta().custom_metadata_map["names"])
+        self.run = _TensorRT(engine) if engine.exists() else (
+            lambda blob: sess.run(["output0"], {"images": blob})[0])
 
     def __call__(self, frame: np.ndarray) -> list[Detection]:
         blob, scale, left, top = letterbox(frame)
@@ -240,11 +223,12 @@ def _selftest() -> None:
     blob, scale, left, top = letterbox(frame)
     assert blob.shape == (1, 3, *INPUT) and (scale, left, top) == (0.5, 0, 12)
     if MODEL.exists():  # the Mac has no model unless it was exported there
-        backend = "tensorrt" if MODEL.with_suffix(".fp16.engine").exists() else "ort-cuda"
-        dets = Detector(backend=backend)(cv2.imread(str(
-            ROOT / "eval/dev/live/closet-stopsign-center.jpg")))
+        detect = Detector()
+        dets = detect(cv2.imread(str(ROOT / "eval/dev/live/closet-stopsign-center.jpg")))
         assert any(d.label == "stop sign" and d.conf > 0.5 for d in dets), dets
-        print(f"detector ok ({backend}): {[(d.label, round(d.conf, 2)) for d in dets[:5]]}")
+        backend = "tensorrt" if isinstance(detect.run, _TensorRT) else "onnxruntime"
+        print(f"detector ok ({backend}): "
+              f"{[(d.label, round(d.conf, 2)) for d in dets[:5]]}")
     print("selftest ok")
 
 
