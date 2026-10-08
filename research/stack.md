@@ -1,0 +1,46 @@
+# Jetson software stack: what works on this robot
+
+As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12, 15W mode). Labels: J measured here, E elsewhere, U unverified.
+
+## Summary
+
+- CUDA 13.2.2, cuDNN 9.20, and TensorRT 10.16.2 install from NVIDIA's JetPack apt repo (`r39.2`): `cuda-toolkit-13-2 libcudnn9-cuda-13 libcudnn9-dev-cuda-13 tensorrt python3-libnvinfer python3-libnvinfer-dev`. About 27 GB of disk. Driver 595.78. (J)
+- PyPI `onnxruntime-gpu` 1.30.0 (aarch64) has no sm_87 kernels: `cudaErrorNoKernelImageForDevice`. (J)
+- `onnxruntime-gpu` 1.24.0 from `https://pypi.jetson-ai-lab.io/sbsa/cu130/+simple/` works on the Orin GPU and lists TensorRT, CUDA, and CPU providers. Install with `--index-strategy unsafe-best-match`. (J)
+- The Jetson AI Lab index has no `jp7` Orin channel; JetPack 7 Orin uses the `sbsa/cu130` channel. (J)
+- The course robot's torch 2.13.0+cu130 has no sm_87 build: it warns and runs without the GPU. (J, from its journal)
+- Power: BPMP caps EMC at 2,133 MHz and the GPU at 624.75 MHz. The Super profile file (`nvpmodel_p3767_0003_super.conf`: 25W and MAXN_SUPER, EMC 3,199 MHz) and Super DTBs exist, but the board was flashed with the non-Super config (TNSPEC `jetson-orin-nano-devkit`). Super mode needs new boot firmware in QSPI. (J)
+- Super options, from a researcher (2026-10-07): (a) NVIDIA's documented path, a QSPI-only `l4t_initrd_flash.sh` with `jetson-orin-nano-devkit-super` from an x86 Ubuntu host in recovery mode (E); (b) on-device UEFI capsule update: `nvidia-l4t-bootloader` 39.2.0 ships `/opt/ota_package/t23x/TEGRA_BL_3767_super.Cap` on this robot (J). NVIDIA staff said in 2025 that a capsule alone does not enable Super; a community script also rewrites TNSPEC and COMPATIBLE_SPEC (U on R39). Expected gain: GPU 625 to 1,020 MHz, EMC 2,133 to 3,199 MHz; NVIDIA reports Llama 3.2 3B from 27.7 to 43.1 tok/s (E). The 25W mode (EMC 3,199, GPU 918) likely captures most of the decode gain (U).
+
+## Thermals (15W, closed enclosure, stock fan)
+
+- 15 minutes of continuous llama-bench (Qwen3-VL-2B, pp512 plus tg128 in a loop, GPU busy 74% mean): junction temperature peaked at 59.9 °C, prefill and decode stayed within 0.3% from first to last run, VDD_IN 10.9 W mean and 14.3 W peak, no new over-current events (`oc3_event_cnt` stayed at 14,949, counted earlier since boot, probably during the six-core build). Evidence: `bench/results/thermal-15w.tegrastats`. (J)
+
+## Speech timings
+
+| Model | Runtime | Result | Label |
+| --- | --- | --- | --- |
+| Kokoro v1.0 fp32 ONNX | ORT 1.24 CUDA EP | 489 ms for 3.18 s of audio (RTF 0.15), CPU busy with a build | J |
+| Kokoro v1.0 fp32 ONNX | ORT CPU | 2,242 ms for 3.18 s (RTF 0.71) | J |
+| Kokoro v1.0 int8 ONNX | ORT CPU and CUDA | RTF 2.4 to 4.6: int8 ops fall back badly | J |
+| Kokoro v1.0 fp16 ONNX | kokoro-onnx 0.6.1 | fails ("zero-size array") | J |
+
+## llama.cpp (commit 9c2e0e4, CUDA 13.2, sm_87, 15W, `-fa 1`)
+
+| Model | Prefill pp512 | Decode tg64 | Label |
+| --- | --- | --- | --- |
+| Gemma 4 E2B Q4_0 (2.63 GiB) | 758 tok/s | 19.5 tok/s | J |
+| Qwen3-VL-2B Q4_K_M (1.03 GiB) | 941 tok/s | 22.9 tok/s | J |
+| Qwen3.5-2B Q4_K_M (1.18 GiB) | 723 tok/s | 21.2 tok/s | J |
+| Qwen3-VL-2B Q8_0 (1.70 GiB) | | 18.9 tok/s | J |
+
+- `jetson_clocks` adds about 3%. Disabling CUDA graphs costs 7%.
+- Decode is overhead-bound, not bandwidth-bound: 65% more weight bytes cost only 19% more time, so about 27 of 43 ms per token is fixed per-kernel cost at 625 MHz. Speculative decoding and kernel fusion (TensorRT Edge-LLM) attack that cost; so would Super clocks.
+- The default build aborts in `cuMemAddressReserve` (CUDA VMM pool) on the first image: build with `-DGGML_CUDA_NO_VMM=ON`. (J)
+- Gemma 4 E2B with its audio mmproj loads and accepts audio ("experimental" warning). Server RSS with 4,096 context: about 3.5 GB. (J)
+
+## Sources
+
+- https://repo.download.nvidia.com/jetson/common r39.2
+- https://pypi.jetson-ai-lab.io/sbsa/cu130/+simple/onnxruntime-gpu/
+- https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1

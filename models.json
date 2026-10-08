@@ -1,0 +1,68 @@
+[
+ {
+  "path": "gguf/gemma-4-E2B-it-Q4_0.gguf",
+  "url": "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/b4243c156154b6dca9324415f8c7ccc098b4aed1/gemma-4-E2B-it-Q4_0.gguf",
+  "sha256": "8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52",
+  "license": "Gemma"
+ },
+ {
+  "path": "gguf/mmproj-gemma-4-E2B-it-Q8_0.gguf",
+  "url": "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/b4243c156154b6dca9324415f8c7ccc098b4aed1/mmproj-gemma-4-E2B-it-Q8_0.gguf",
+  "sha256": "9406f99c16d68cda4f1f0552192dcc99021ea1fc6d2fd50b1dc3ccf30d04b292",
+  "license": "Gemma"
+ },
+ {
+  "path": "gguf/mtp-gemma-4-E2B-it-Q4_0.gguf",
+  "url": "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/b4243c156154b6dca9324415f8c7ccc098b4aed1/mtp-gemma-4-E2B-it-Q4_0.gguf",
+  "sha256": "718d3a44057924d5840c65a0aeedf7929366adeeda92a2006955ccabaf645ef4",
+  "license": "Gemma"
+ },
+ {
+  "path": "gguf/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+  "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+  "sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+  "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+  "sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/q35-Qwen3.5-2B-Q4_K_M.gguf",
+  "url": "https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/f6d5376be1edb4d416d56da11e5397a961aca8ae/Qwen3.5-2B-Q4_K_M.gguf",
+  "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/q35-mmproj-F16.gguf",
+  "url": "https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/f6d5376be1edb4d416d56da11e5397a961aca8ae/mmproj-F16.gguf",
+  "sha256": "7035e9cb8d7c6a9681d07eef9a364783e86ea4cd73faab2eabb4f43a101830c7",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "kokoro/kokoro-v1.0.onnx",
+  "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.0.onnx",
+  "sha256": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "kokoro/voices-v1.0.bin",
+  "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/voices-v1.0.bin",
+  "sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "bge-small/model.onnx",
+  "url": "https://huggingface.co/BAAI/bge-small-en-v1.5/resolve/5c38ec7c405ec4b44b94cc5a9bb96e735b38267a/onnx/model.onnx",
+  "sha256": "828e1496d7fabb79cfa4dcd84fa38625c0d3d21da474a00f08db0f559940cf35",
+  "license": "MIT"
+ },
+ {
+  "path": "bge-small/tokenizer.json",
+  "url": "https://huggingface.co/BAAI/bge-small-en-v1.5/resolve/5c38ec7c405ec4b44b94cc5a9bb96e735b38267a/tokenizer.json",
+  "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+  "license": "MIT"
+ }
+]

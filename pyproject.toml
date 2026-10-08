@@ -1,0 +1,29 @@
+[project]
+name = "qdrant-robot"
+version = "0.1.0"
+description = "A desktop robot whose models and memory (Qdrant Edge) all run on one Jetson Orin Nano."
+requires-python = "==3.12.*"
+dependencies = [
+    "numpy==2.3.3",
+    "opencv-python-headless==5.0.0.93",
+    "moonshine-voice==0.1.5",
+    "qdrant-edge-py==0.8.0",
+    "kokoro-onnx==0.6.1",
+    "tokenizers==0.23.2",
+    "onnxruntime==1.30.0; sys_platform == 'darwin'",
+    # PyPI's aarch64 GPU build has no sm_87 kernels; the Jetson AI Lab build does (research/stack.md).
+    "onnxruntime-gpu==1.24.0; sys_platform == 'linux'",
+]
+
+[tool.uv]
+# kokoro-onnx asks for the CPU onnxruntime, which would overwrite the GPU build on the Jetson.
+override-dependencies = ["onnxruntime==1.30.0; sys_platform == 'darwin'"]
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux' and platform_machine == 'aarch64'"]
+
+[tool.uv.sources]
+onnxruntime-gpu = { index = "jetson" }
+
+[[tool.uv.index]]
+name = "jetson"
+url = "https://pypi.jetson-ai-lab.io/sbsa/cu130/+simple/"
+explicit = true
