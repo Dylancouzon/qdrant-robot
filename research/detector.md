@@ -1,14 +1,14 @@
 # Detector and tracker (M2.D spike)
 
-As of 2026-10-08, on our robot (15W, TensorRT 10.16.2, onnxruntime-gpu 1.24.0). Labels: J measured here, E measured elsewhere, U unverified. Raw results: `bench/results/2026-10-08-detect-*.jsonl` and `detect-*.tegrastats`.
+As of 2026-10-08, on our robot (MAXN_SUPER where marked, otherwise 15W; TensorRT 10.16.2, onnxruntime-gpu 1.24.0). Labels: J measured here, E measured elsewhere, U unverified. Raw results: `bench/results/2026-10-08-detect-*.jsonl` and `detect-*.tegrastats`.
 
 ## Summary
 
 - Recommendation: YOLOE-26n with a fixed 50-word booth vocabulary, exported end-to-end (no NMS) at 384x640, run as a TensorRT FP16 engine through the TensorRT Python API (`robot/detect.py`). It finds the booth objects that COCO-80 lacks (plush toy, badge, sticker, phone, mug are in the vocabulary) at nearly the cost of YOLO26n. (J)
 - Backend: raw TensorRT (A) over onnxruntime with the TensorRT provider (B). Same speed, 340 MB less RAM, and no six-minute engine build inside the robot process. (J)
-- At 15 fps with llama-server decoding, the detector keeps 15.0 fps and LLM decode drops from 23.2 to 20.6 tok/s (11%). Unthrottled, decode halves (23.3 to 11.9 tok/s). Run detection at camera rate, never flat out. (J)
+- MAXN_SUPER: at 15 fps with llama-server decoding, the detector keeps 15.0 fps and LLM decode drops from 34.6 to 31.7 tok/s (8%), above the 30 tok/s target. At 15W the drop was 23.2 to 20.6 (11%). Unthrottled at 15W, decode halved (23.3 to 11.9). Run detection at camera rate, never flat out. (J)
 - YOLOE prompt-free (4,585 built-in tags) is rejected: scene tags ("laundry room", "biology laboratory") outrank the objects, it misses the teddy bears and apples in our closet frames, and it costs 18.6 ms of GPU per frame. (J)
-- Live camera: capture 15.2 fps, detection and tracking 15.0 fps (every frame), 8.5 ms p50 per frame, 29 sightings in 30 s of a static lit scene. (J)
+- Live camera (15W): capture 15.2 fps, detection and tracking 15.0 fps (every frame), 8.5 ms p50 per frame, 29 sightings in 30 s of a static lit scene. (J) After the MAXN_SUPER reboot, OpenCV cannot open `/dev/video0` ("can't be used to capture by name"), while `v4l2-ctl` streams 1280x720 MJPG at 26.7 fps: no live run in MAXN_SUPER yet.
 
 ## Backends (YOLO26n 384x640, 9 camera frames 1280x720 cycled, 30 s, alone on the GPU)
 
@@ -28,6 +28,10 @@ trtexec GPU compute per frame: YOLO26n 4.33 ms, YOLOE-26n booth 5.07 ms, YOLOE-2
 | YOLO26n (COCO-80) | 128.6 | 7.15 ms | 13.0 ms, 20.9 (from 23.2) | J |
 | YOLOE-26n booth vocabulary | 114.2 | 7.92 ms | 13.9 ms, 20.6 (from 23.2) | J |
 | YOLOE-26n prompt-free | 13.1 (tracker-bound) | 23.2 ms | not run | J |
+| YOLO26n, MAXN_SUPER | 146.4 | 6.09 ms | 12.2 ms, 32.2 (from 34.5) | J |
+| YOLOE-26n booth vocabulary, MAXN_SUPER | 130.8 | 6.74 ms | 12.8 ms, 31.7 (from 34.6) | J |
+
+Rows without a mode are 15W. MAXN_SUPER runs: peak tj 66.3 °C, RAM peak 3,233 MB, no swap growth (`detect-super.tegrastats`).
 
 The tracker takes 0.6 to 0.8 ms p50. With prompt-free, 300 detections a frame push it to 52 ms. Tracking adds no GPU work.
 
