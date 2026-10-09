@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-10-09T18:01:51-04:00",
+  "host": "dylan@192.168.1.74",
+  "readonly_reconciliation_exit": 0,
+  "completed_export": false,
+  "status": "ACTIVE_CHECKPOINT_PENDING",
+  "files": [
+    {
+      "path": "bench/results/2026-10-09-p2-trt-sharing-reconcile/receipt.txt",
+      "bytes": 2933,
+      "sha256": "df88e9ceef966155ef97cf2de8afc0253d599df2e6bf47e25868e717d907da4d"
+    }
+  ]
+}

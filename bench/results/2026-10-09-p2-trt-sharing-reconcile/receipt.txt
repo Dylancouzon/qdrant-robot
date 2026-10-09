@@ -1,0 +1,26 @@
+2026-10-09T18:01:51-04:00
+5f4af7d6-879e-48eb-979a-45e715f1d626
+ActiveState=active
+SubState=running
+InvocationID=b9ec1e261ba04407938c9be35eec3f1d
+MainPID=128539
+ExecMainStartTimestamp=Fri 2026-10-09 16:46:49 EDT
+ExecMainExitTimestamp=
+ExecMainCode=0
+ExecMainStatus=0
+MemoryCurrent=8546189312
+MemoryPeak=13116727296
+MemorySwapCurrent=0
+memory.used [MiB], memory.total [MiB], utilization.gpu [%]
+10007 MiB, 10240 MiB, 100 %
+pid, process_name, used_gpu_memory [MiB]
+128544, [Not Found], [N/A]
+               total        used        free      shared  buff/cache   available
+Mem:            25Gi       9.2Gi       3.9Gi       233Mi        13Gi        16Gi
+Swap:          7.0Gi       6.2Gi       869Mi
+ 5.02s/it]Calibrating (multimodal):  85%|████████▌ | 109/128 [10:40<01:36,  5.07s/it]Calibrating (multimodal):  86%|████████▌ | 110/128 [10:45<01:31,  5.08s/it]Calibrating (multimodal):  87%|████████▋ | 111/128 [10:50<01:27,  5.16s/it]Calibrating (multimodal):  88%|████████▊ | 112/128 [10:56<01:23,  5.21s/it]Calibrating (multimodal):  88%|████████▊ | 113/128 [11:00<01:14,  5.00s/it]Calibrating (multimodal):  89%|████████▉ | 114/128 [11:05<01:09,  4.95s/it]Calibrating (multimodal):  90%|████████▉ | 115/128 [11:10<01:03,  4.90s/it]Calibrating (multimodal):  91%|█████████ | 116/128 [11:15<01:00,  5.02s/it]Calibrating (multimodal):  91%|█████████▏| 117/128 [11:21<00:56,  5.12s/it]Calibrating (multimodal):  92%|█████████▏| 118/128 [11:26<00:51,  5.14s/it]Calibrating (multimodal):  93%|█████████▎| 119/128 [11:31<00:46,  5.19s/it]Calibrating (multimodal):  94%|█████████▍| 120/128 [11:36<00:40,  5.01s/it]Calibrating (multimodal):  95%|█████████▍| 121/128 [11:41<00:35,  5.08s/it]Calibrating (multimodal):  95%|█████████▌| 122/128 [11:45<00:29,  4.93s/it]Calibrating (multimodal):  96%|█████████▌| 123/128 [11:50<00:23,  4.79s/it]Calibrating (multimodal):  97%|█████████▋| 124/128 [11:55<00:19,  4.93s/it]Calibrating (multimodal):  98%|█████████▊| 125/128 [12:00<00:15,  5.00s/it]Calibrating (multimodal):  98%|█████████▊| 126/128 [12:06<00:10,  5.13s/it]Calibrating (multimodal):  99%|█████████▉| 127/128 [12:11<00:05,  5.17s/it]Calibrating (multimodal): 100%|██████████| 128/128 [12:16<00:00,  4.97s/it]Calibrating (multimodal): 100%|██████████| 128/128 [12:16<00:00,  5.75s/it]
+awq_lite: Searching parameters...
+Calibrating (multimodal):   0%|          | 0/128 [00:00<?, ?it/s]Loading extension modelopt_cuda_ext...
+Loaded extension modelopt_cuda_ext in 0.3 seconds
+
+Checkpoint output directory absent.

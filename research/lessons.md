@@ -133,6 +133,8 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 
 - Mac scoring uses `.venv/bin/python eval/judge.py` (Python 3.12), not system `python3` (3.9). The latter can launch the models, then fail at `zip(..., strict=True)` before saving votes. The project pins Python 3.12; use its interpreter for model scoring and eval entrypoints.
 
+- Shared WSL use requires resource coordination as well as separate directories. Read-only reconciliation at 18:01:51 EDT (E) confirms the same named quantizer, completed 128/128 activation collection, active AWQ search, and no checkpoint. GPU 10007/10240 MiB at 100% leaves no practical concurrent GPU capacity. Other projects can use light CPU work and isolated environments; GPU jobs must wait or acquire /home/dylan/qdrant-robot-box/gpu.lock. The lock only coordinates participants that use it. Preserve other-project services and the running quantizer. Receipt: bench/results/2026-10-09-p2-trt-sharing-reconcile/manifest.json.
+
 - Overnight 2026-10-09 starts on spike/overnight-2026-10-09 from main eb746fe. Keep command watchdogs separate from healthy experiment duration (D83). Reconcile boot IDs, release, service ownership, and progress before restarting jobs. SSH checks use a 10 s connection limit, keepalives, and a 45 s outer watchdog. The WSL disney-demo-qdrant container belongs to another project; leave it running. Authentication commands do not expose remaining usage.
 
 - Robot: `ssh robot` (qdrant-robot.local, user qdrant). See STATE.md, Robot access.
