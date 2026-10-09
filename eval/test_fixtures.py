@@ -1,5 +1,6 @@
 """Fixture integrity: every scripted session parses, every spoken step has its WAV, evidence points
 to an earlier step, shown images exist, and held-out never shows a dev image."""
+
 import hashlib
 import json
 from pathlib import Path
@@ -26,8 +27,9 @@ def check_session(path: Path, session: dict) -> None:
         assert len(kinds) == 1, f"{path.name} {session['id']}: step needs one of {KINDS}: {step}"
         if "show" in step:
             shown = (path.parent / step["show"]).resolve()
-            assert shown.is_file() or not SCENES.parent.exists() and shown.is_relative_to(
-                SCENES), f"{path.name}: no {step['show']} (face scenes: python -m eval.make_faces)"
+            assert shown.is_file() or not SCENES.parent.exists() and shown.is_relative_to(SCENES), (
+                f"{path.name}: no {step['show']} (face scenes: python -m eval.make_faces)"
+            )
         if "say" in step:
             assert (path.parent / "audio" / f"{step['id']}.wav").is_file(), f"no WAV {step['id']}"
             missing = set(step.get("evidence", [])) - seen
@@ -44,6 +46,13 @@ def test_sessions() -> None:
         sessions = [r for r in records(path) if "steps" in r]  # brain.jsonl holds single cases
         ids = [s["id"] for r in sessions for s in r["steps"] if "say" in s]
         assert len(ids) == len(set(ids)), f"{path.name}: duplicate step ids"
+        if sessions and "start_at_s" in sessions[0]:
+            # Timed data has separate reviewer rubrics; its audio harness is a later task.
+            from eval.prepare_challenge import check_manifest
+
+            assert path.name == "visits.jsonl" and all("start_at_s" in s for s in sessions)
+            check_manifest(path.parent)
+            continue
         for session in sessions:
             check_session(path, session)
 

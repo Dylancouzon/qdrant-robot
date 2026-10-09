@@ -1,0 +1,31 @@
+# Independent F0c challenge
+
+This folder freezes evaluation data before baseline scoring or retrieval changes. It contains 48 scored questions in three 600-second visits. All schedules use absolute seconds from one process start. The Robot process stays unchanged for the full 1,800 seconds. The separate continuous harness remains unimplemented and requires its own design gate.
+
+`visits.jsonl` contains visitor utterances and show events. `rubrics.jsonl` contains reviewer-only expected facts and rubrics. `dialogue-sources.jsonl` preserves the original fictional statements as source authority. Source IDs identify dataset captures or scheduled utterances. They never identify runtime-generated Qdrant Edge points. Rubrics use the existing fixture convention, with `rubric`, `expect_any`, and `expect_none`; keyword lists remain empty because meaning determines the verdict.
+
+Start each AVI at its absolute show time. Keep its final frame until the next show event. The six show times are 0, 180, 600, 780, 1,200, and 1,380 seconds. Use one unchanged Robot process; replace the camera source through the later harness's reviewed interface. Do not restart Robot between visits. `FileCamera` supplies final-frame hold. The clips contain only actual source motion, with no encoded repeated frames. Question times allow more than 20 seconds after each source change. Failure or lateness must be logged by the future harness; silently shifting the schedule invalidates the fixed comparison.
+
+The clips contain books and bottles. They contain no visitor face or demonstrated focus enrollment. This dataset validates current and older visual observations, shared fictional dialogue, corrections, missing facts, and ordinary chat. It cannot validate ownership, identity, named-object enrollment, or physical audio latency. Older dialogue facts describe fictional third-party events. They never attribute a long-gap fact to the anonymous speaker. Names Noor, Soren, and Inez identify fictional characters, not people in the footage.
+
+The evaluator visually inspected each whole-video contact sheet and the first and final derived frames. Source facts come from those frames and literal scheduled utterances. No model or teacher generated or scored the expected facts. Book covers, bottle appearances, and backgrounds distinguish the six visible instances. Capture IDs are distinct from all recorded prior Objectron cup and camera IDs. Objectron exposes no stable participant or cross-video physical-instance identifier here. Verified participant disjointness and worldwide physical-instance disjointness remain unavailable. All Objectron sources therefore remain excluded from future training, including unselected captures. All prior COCO and existing evaluation sources also remain excluded.
+
+`sources.json` records primary URLs, original bytes and SHA256 hashes, complete raw frame timestamps, exact commands, codec, orientation, and sample mapping. Output frame `k` samples original frame `2*k`. The original timestamp comes from the corresponding saved raw PTS, rather than nominal frame rate. Explicit clockwise rotation produces upright 480 by 640 stored pixels. The AVI uses MJPG at 15 frames per second. The original videos have nominal 30 frames per second and variable timestamp details. All source motion is retained apart from alternate-frame resampling.
+
+`frame-evidence.jsonl` and `decode-check.json` preserve separate original-derived and fixture-decoded frame hashes. Resizing and lossy compression change pixels. Mean pixel error records raw-to-fixture similarity and does not establish exact equality. Reverse-order indexed fixture decoding matches independent sequential fixture decoding for every output frame. `contact-sheet.jpg` and `keyframes/` support visual review. The later integrated harness must still qualify its source-switching behavior and actual delivery timing on the Jetson.
+
+`training-exclusions.json` is the contract supplied to future builders and trainers. Its training allowlist starts empty. A later worker may use only explicitly approved new source IDs outside every excluded family. Builders must not read this folder's answers, source facts, schedule wording, or future baseline failures. The evaluator and reviewer retain this folder. Used challenge results become development evidence and require a fresh source freeze for another acceptance comparison.
+
+Source: Google Research Objectron, by Adel Ahmadyan, Liangkai Zhang, Artsiom Ablavatski, Jianing Wei, and Matthias Grundmann, 2021. Primary repository: https://github.com/google-research-datasets/Objectron. Objectron data uses C-UDA-1.0. Computational use and modification are permitted under its terms. Redistribution requires the received attribution and binds every downstream recipient to C-UDA. Anyone receiving these fixture videos and source-derived frames must follow the included `LICENSE-C-UDA-1.0.txt` and retain this attribution and obligation. This private fixture package is for computational evaluation. Do not use its source images for promotional publication without checking separate rights.
+
+Preparation runs on the Mac without models or remote jobs:
+
+```sh
+.venv/bin/python eval/prepare_challenge.py acquire
+.venv/bin/python eval/prepare_challenge.py prepare
+.venv/bin/python eval/prepare_challenge.py verify
+```
+
+Each acquisition and conversion command has a 300-second process-group watchdog. Curl has 10-second connection and 120-second total limits. Source-size checks protect the 300 MB cache. Every ffprobe/version subprocess also has a finite timeout. Run the complete native preparation or verification command under an outer 300-second process-group watchdog, as recorded in `operations.json`. Partial outputs retain `.incomplete`. Diagnose failures before one infrastructure retry. Existing `sources.json` pins original hashes, and preparation refuses changed raw inputs.
+
+The earlier H264 long-hold preparation was interrupted after the lead chose short MJPG sources. Its intermediate files and log remain in the ignored cache. It was a preparation change, not a capability experiment. No model scores, integrated latency, memory, or paging results exist for this challenge.

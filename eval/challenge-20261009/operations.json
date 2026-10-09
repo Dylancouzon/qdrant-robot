@@ -1,0 +1,73 @@
+{
+  "baseline_revision": "6474e65dfd1d5b771294d97fdd3fade57ab4332e",
+  "machine": "Mac, local data preparation only",
+  "date": "2026-10-09",
+  "running_jobs": [],
+  "network": {
+    "firecrawl_status": "Authenticated; -1/1000 credits. No paid request issued. Official web/HTTPS retrieval used.",
+    "source_head": "HEAD checked all six original MOV sizes before fetch. Index HEAD checked bottle index size7158.",
+    "download_command_template": [
+      "curl",
+      "--fail",
+      "--connect-timeout",
+      "10",
+      "--max-time",
+      "120",
+      "--progress-bar",
+      "PRIMARY_URL",
+      "-o",
+      "CACHE_PATH.incomplete"
+    ],
+    "download_watchdog_s": 300,
+    "complete_raw_MOV_bytes": 108057253,
+    "progress": "curl progress per file, followed by completed byte count",
+    "retry_count": 0
+  },
+  "conversion": {
+    "command_record": "sources.json per-source conversion_command",
+    "individual_watchdog_s": 300,
+    "native_outer_watchdog_s": 300,
+    "outer_command": "Python subprocess.Popen([\".venv/bin/python\", \"eval/prepare_challenge.py\", ACTION], start_new_session=True); wait(timeout=300); on timeout killpg(pid, SIGKILL), wait, and fail.",
+    "log": "build/f0c-sources/reproduce.log",
+    "result": "Completed; all six AVI SHA256 hashes match regeneration byte-for-byte.",
+    "interrupted_attempt": {
+      "kind": "H264 encoded long-hold movie preparation",
+      "reason": "Lead selected six short full-motion MJPG clips and existing FileCamera final-frame holds.",
+      "stopped_process_groups": [
+        21391,
+        21487
+      ],
+      "log": "build/f0c-sources/prepare.log",
+      "retained_intermediates": [
+        "build/f0c-sources/bottle-batch-3-14.mp4.incomplete",
+        "build/f0c-sources/book-batch-20-35.mp4"
+      ],
+      "classification": "Interrupted data preparation, no capability score."
+    }
+  },
+  "checks": {
+    "ruff": "uvx ruff check eval/prepare_challenge.py passed",
+    "vulture": "uvx vulture --min-confidence80 eval/prepare_challenge.py passed",
+    "schema": "48 unique questions;16 per visit; absolute sorted schedule; source/frame evidence links; pinned source and fixture hashes.",
+    "wording": "48 unique scored utterances, no exact development utterance reuse. Only development wording inspected.",
+    "indexed_identity": "710/710 indexed fixture frames matched separately sequential-decoded pixel hashes, including reverse seeks.",
+    "reproduction": "All six MJPG AVI files reproduced byte-identically.",
+    "visual": "Evaluator inspected whole-source contact sheets and exact final derived frames. Lead inspected all six scenes and confirmed all 48 expected facts before freeze.",
+    "models": "No model loaded; no teacher agreement; no baseline outputs; no remote jobs.",
+    "full_repo": "tools/gate.py checks passed, 78 tests; 12.35 s, clean exit. Timed data uses separate rubrics; legacy audio checks remain unchanged.",
+    "fixture_compatibility": "Show paths relative to visits.jsonl. Timed schema checks prior sources and request/absence authority without requiring unprepared audio. Two validator failures diagnosed and corrected before freeze."
+  },
+  "raw_cache_bytes": 113071560,
+  "limits": {
+    "raw_cache_bytes_max": 300000000,
+    "final_folder_bytes_max": 60000000,
+    "each_video_bytes_max_exclusive": 15000000
+  },
+  "unfinished": [
+    "Lead task review and checksum audit.",
+    "Separate design gate for continuous source-switching harness and source event contract.",
+    "Integrated Jetson source switching/timing qualification, continuous baseline, and later selected-candidate comparison.",
+    "Verified participant and cross-capture physical grouping unavailable; all Objectron excluded from training."
+  ],
+  "next_command": ".venv/bin/python eval/prepare_challenge.py verify"
+}

@@ -1,0 +1,16 @@
+{
+  "scored": 48,
+  "per_visit": 16,
+  "visits": 3,
+  "duration_s": 1800,
+  "category_counts": {
+    "visual_detail": 12,
+    "plain_chat": 6,
+    "older_observation": 9,
+    "absent_evidence": 6,
+    "topic_reference": 9,
+    "correction": 6
+  },
+  "auxiliary_statements": 15,
+  "show_events": 6
+}

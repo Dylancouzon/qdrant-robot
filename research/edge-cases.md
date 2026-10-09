@@ -33,3 +33,5 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 ## File source decode errors (F0b review, 2026-10-09)
 
 A later video decoding or seeking error raises from FileCamera.latest(). The detector loop can exit without setting detect_failed, so a replay may continue with stopped detection. Carry under D71; before relying on failure propagation in a continuous challenge, set detect_failed on source errors and make the evaluator fail. F0b source qualification completed without a decoding error. Evidence: reviews/20261009-030935-4181-review.md, robot/main.py _detect().
+
+- F0c verification regeneration (D91): `eval/prepare_challenge.py verify` rewrites decoded images and metadata. A changed OpenCV environment could change frozen artifacts while verification succeeds. Current hashes match. Before using a different environment, check every freeze hash; move generation to prepare and make verify read-only if this helper is extended. Review: reviews/20261009-034031-43247-review.md.

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "training_source_allowlist": [],
+  "allowlist_policy": "Closed by default. Training requires explicit new approved source IDs, outside every excluded family. No challenge-derived text, images, answers, or failures.",
+  "excluded_families": [
+    "Objectron, all captures/classes/participants/physical instances",
+    "COCO, all images/annotations/composites",
+    "existing eval fixtures and all their source material",
+    "shared/clips/live-items-1.avi and all derived frames"
+  ],
+  "challenge_source_ids": [
+    "book/batch-20/35",
+    "bottle/batch-3/14",
+    "book/batch-6/16",
+    "bottle/batch-40/29",
+    "book/batch-31/44",
+    "bottle/batch-7/24"
+  ],
+  "excluded_paths": [
+    "eval/**",
+    "build/f0c-sources/**",
+    "bench/results/*challenge*"
+  ],
+  "reviewer_only_material": [
+    "rubrics.jsonl",
+    "dialogue-sources.jsonl",
+    "sources.json",
+    "frame-evidence.jsonl",
+    "decode-check.json",
+    "visits.jsonl",
+    "keyframes/",
+    "future baseline failures"
+  ],
+  "group_policy": "Whole captures only. Stable participant and cross-capture physical IDs unavailable; exclude the entire ambiguous Objectron family from training.",
+  "enforcement": "Lead must give builders this exclusion contract rather than evaluator answers. Future source allowlists require reviewer approval.",
+  "baseline_revision": "6474e65dfd1d5b771294d97fdd3fade57ab4332e"
+}
