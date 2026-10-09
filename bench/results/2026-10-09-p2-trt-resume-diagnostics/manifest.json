@@ -1,0 +1,39 @@
+{
+  "status": "ACTIVE_SEARCH_CHECKPOINT_PENDING",
+  "remote_access_restored": true,
+  "quantizer_restarted": false,
+  "diagnosed_search_failure": false,
+  "model_inference": false,
+  "files": [
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-resume-resource.txt",
+      "bytes": 794,
+      "sha256": "af12b43baa09c48cd507cce9ec814ab4f2efdd05e85475b1f79c65d60b630a57"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-resume-stack-1.txt",
+      "bytes": 3757,
+      "sha256": "2dfb8605fad87970480b20ac34b6f02d35643b0650ba370cb027a5a1a4687ad5"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-resume-stack-native.txt",
+      "bytes": 15966,
+      "sha256": "9c0a8cd7e262747cadbed57d8fc328baf3c4f80dbe79095eeffbe29c04e79776"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-resume-stack-native-2.txt",
+      "bytes": 30329,
+      "sha256": "f46c089f4c79f78914e34330b226f56d10527298b0e45f9981bdbaa3ac6b0d88"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-resume-kernel.txt",
+      "bytes": 1108,
+      "sha256": "282142844d43463da8b5720feb2767580e361bd61d2a20257fc2b3b3d146fa4a"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-resume-diagnostics/trt-assistant-stage.log",
+      "bytes": 422,
+      "sha256": "2f632da5efa300746c38910fbea99c5085bea5a4054be2df4f62f5164ae29b5b"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "observed_at_utc": "2026-10-09T22:27:34.206372+00:00",
+  "action": "read-only session-start reconciliation",
+  "remote_state_verified": false,
+  "remote_mutation": false,
+  "wsl": {
+    "host": "dylan@192.168.1.74",
+    "native_exit": 255,
+    "error": "ssh: connect to host 192.168.1.74 port 22: Operation not permitted"
+  },
+  "jetson": {
+    "host": "robot",
+    "native_exit": 255,
+    "error": "ssh: Could not resolve hostname qdrant-robot.local: nodename nor servname provided, or not known"
+  },
+  "session_permissions": {
+    "filesystem": "workspace-write; .git read-only",
+    "network": "restricted",
+    "approval_policy": "never"
+  }
+}

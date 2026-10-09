@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-10-09T18:31:46.238984-04:00",
+  "host": "Jetson Orin Nano Super",
+  "status": "ASSISTANT_AND_BASE_METADATA_STAGED",
+  "artifact_sha256": "9da354befc24230d158db2d2687e376265a42687d091c1dc7754605a3a64bd35",
+  "source_files_verified": 15,
+  "base_weights_present": false,
+  "model_inference": false,
+  "engine_build": false,
+  "location": "/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge"
+}
