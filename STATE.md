@@ -20,7 +20,7 @@ Next, in order (D55, D61, D62):
 
 Stop (D55): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks.
 
-Running jobs: none.
+Running jobs: three builders (D44): V1-A1 (robot/main.py, robot/brain.py: TTS pause at the first phrase, D60 identity rulings, view hook, answer length), V1-C (new robot/focus.py, robot/view.py: focus object, labels, status strip, memory panel), V1-D (robot/tts.py, robot/asr.py memory: free RAM for the 4B). Jetson runs serialize on shared/gpu.lock. Next after A1: retrieval into the brain with calibrated thresholds and the intents shard; then the Hey Edgy wake word (D65).
 
 ## Known gaps (carried, D40)
 
