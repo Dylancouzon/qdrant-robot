@@ -1,0 +1,38 @@
+/home/qdrant/qdrant-robot/shared/sessions/20261009-192932
+/home/qdrant/qdrant-robot/shared/sessions/replay-1791567027
+2026-10-09T19:29:08-04:00 qdrant-robot systemd[1]: Started qr-live-mac-transport-192903.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.main --listen 7070; rc=\$?; kill \$t; exit \$rc'".
+2026-10-09T19:29:08-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:08.713410687 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"
+2026-10-09T19:29:08-04:00 qdrant-robot bash[306031]: waiting for a client on port 7070
+2026-10-09T19:29:33-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:33.491353247 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+2026-10-09T19:29:33-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:33.491405854 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+2026-10-09T19:29:33-04:00 qdrant-robot bash[306031]: [ WARN:0@25.055] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+2026-10-09T19:29:34-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:34.680519318 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+2026-10-09T19:29:34-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:34.680584628 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+2026-10-09T19:29:40-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:40.787860932 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.
+2026-10-09T19:29:40-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:40.789314980 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.
+2026-10-09T19:29:40-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:40.824240647 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+2026-10-09T19:29:40-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:40.824294054 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.549852023 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.553891070 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.557343315 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.561281980 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.570207897 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.570554481 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:41-04:00 qdrant-robot bash[306031]: 2026-10-09 19:29:41.570606256 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+2026-10-09T19:29:48-04:00 qdrant-robot bash[306031]: [10/09/2026-19:29:48] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+2026-10-09T19:29:48-04:00 qdrant-robot bash[306031]: listening
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]: Exception in thread mouth:
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]: Traceback (most recent call last):
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:   File "/usr/lib/python3.12/threading.py", line 1073, in _bootstrap_inner
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:     self.run()
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:   File "/usr/lib/python3.12/threading.py", line 1010, in run
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:     self._target(*self._args, **self._kwargs)
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:   File "/home/qdrant/qdrant-robot/releases/cd60be65ee79/robot/audio.py", line 97, in _run
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:     self.sink(audio)
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:   File "/home/qdrant/qdrant-robot/releases/cd60be65ee79/robot/audio.py", line 81, in send
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]:     conn.sendall(struct.pack("<I", len(pcm)) + pcm)
+2026-10-09T19:29:53-04:00 qdrant-robot bash[306031]: BrokenPipeError: [Errno 32] Broken pipe
+2026-10-09T19:29:53-04:00 qdrant-robot systemd[1]: Stopping qr-live-mac-transport-192903.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.main --listen 7070; rc=\$?; kill \$t; exit \$rc'"...
+2026-10-09T19:29:53-04:00 qdrant-robot systemd[1]: qr-live-mac-transport-192903.service: Deactivated successfully.
+2026-10-09T19:29:53-04:00 qdrant-robot systemd[1]: Stopped qr-live-mac-transport-192903.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.main --listen 7070; rc=\$?; kill \$t; exit \$rc'".
+2026-10-09T19:29:53-04:00 qdrant-robot systemd[1]: qr-live-mac-transport-192903.service: Consumed 23.544s CPU time.

@@ -1,0 +1,86 @@
+"""One recorded speech check through the existing Jetson TCP audio protocol."""
+import hashlib
+import importlib.util
+import json
+import socket
+import subprocess
+import threading
+import time
+import wave
+from pathlib import Path
+
+root = Path.cwd()
+source = Path("/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface/tools/talk.py")
+spec = importlib.util.spec_from_file_location("talk", source)
+talk = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(talk)
+unit = "qr-live-mac-transport-192903.service"
+prefix = root / "bench/results/2026-10-09-mac-audio-transport"
+ssh = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "robot"]
+def remote(script):
+    return subprocess.run([*ssh,script],capture_output=True,text=True,timeout=30,check=True).stdout
+
+tunnel = subprocess.Popen(["ssh","-o","BatchMode=yes","-o","ExitOnForwardFailure=yes",
+                           "-N","-L","127.0.0.1:17070:127.0.0.1:7070","robot"])
+conn = None
+stop = threading.Event()
+receipt = dict(machine="qdrant-robot", release="cd60be65ee79", unit=unit,
+               input_mode="recorded_tcp", fixture="eval/dev/audio/wake-3.wav",
+               source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+               fixture_sha256=hashlib.sha256(Path("eval/dev/audio/wake-3.wav").read_bytes()).hexdigest(),
+               command="tools/jetson.py run live-mac-transport-192903 -- -m robot.main --listen 7070",
+               physical_latency_claim=False, human_listening="pending")
+try:
+    deadline = time.monotonic()+60
+    while time.monotonic()<deadline:
+        report = remote(f"systemctl is-active {unit}; journalctl -u {unit} -o cat --no-pager -n 30")
+        if "waiting for a client on port 7070" in report.splitlines():
+            conn=socket.create_connection(("127.0.0.1",17070),timeout=5)
+            conn.settimeout(60)
+            break
+        time.sleep(.5)
+    if conn is None:
+        raise RuntimeError("No Jetson listener within command watchdog")
+    deadline=time.monotonic()+180
+    while time.monotonic()<deadline:
+        report=remote(f"systemctl is-active {unit}; journalctl -u {unit} -o cat --no-pager -n 60")
+        if "listening" in report.splitlines():
+            receipt["readiness"]="exact listening line"
+            break
+        if report.splitlines()[0]!="active":
+            raise RuntimeError(report)
+        time.sleep(.5)
+    else:
+        raise RuntimeError("Warmup exceeded command watchdog")
+    with wave.open("eval/dev/audio/wake-3.wav") as w:
+        speech=w.readframes(w.getnframes())
+    speech+=bytes((-len(speech))%2560)
+    start=time.monotonic()
+    last=start+len(speech)/32000
+    def send():
+        cursor=0
+        while not stop.is_set():
+            block=speech[cursor:cursor+2560] if cursor<len(speech) else bytes(2560)
+            conn.sendall(block)
+            cursor+=2560
+            stop.wait(max(0,start+cursor/32000-time.monotonic()))
+    sender=threading.Thread(target=send,daemon=True)
+    sender.start()
+    pcm=talk.frame(conn)
+    received=time.monotonic()
+    with wave.open(str(prefix.with_suffix(".wav")),"wb") as w:
+        w.setnchannels(1);w.setsampwidth(2);w.setframerate(24000);w.writeframes(pcm.tobytes())
+    receipt.update(returned_samples=len(pcm),returned_duration_s=len(pcm)/24000,
+                   recorded_input_end_to_frame_s=received-last,native_exit=0,
+                   mac_transport_measurement="paced input end to complete first PCM phrase; excludes acoustic playback")
+    print(json.dumps(receipt),flush=True)
+finally:
+    stop.set()
+    if conn:
+        conn.shutdown(socket.SHUT_RDWR);conn.close()
+    tunnel.terminate();tunnel.wait(timeout=10)
+    receipt["journal"]=str(prefix.with_suffix(".journal.txt").relative_to(root))
+    prefix.with_suffix(".journal.txt").write_text(remote(f"sudo journalctl -u {unit} -o short-iso --no-pager"))
+    remote(f"sudo systemctl stop {unit}")
+    receipt["after_stop"]=remote("sudo systemctl list-units 'qr-*' --no-legend --plain; readlink -f /home/qdrant/qdrant-robot/current; flock -n /home/qdrant/qdrant-robot/shared/gpu.lock true && echo gpu-lock-free")
+    prefix.with_suffix(".json").write_text(json.dumps(receipt,indent=2)+"\n")

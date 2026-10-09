@@ -538,3 +538,15 @@ Evidence: reviews/20261009-165443-67521-review.md; bench/results/2026-10-09-p2-t
 ## D121 2026-10-09: Correct the recorded search timestamp
 The archived ad37 journal records Searching parameters at16:44:54, not16:44:58 stated in D119. Nativeextension load remains16:45:00. This correction changes no outcome: activation completed, search started, and the operator prematurely interrupted before a checkpoint.
 Evidence: bench/results/2026-10-09-p2-trt-interrupted-native/quantize-native.log; pause/handoff review20261009-170053-79168 PASS141.38s/native0 verifies21 receipt hashes, bundle16members/licensecards, and47/47 speech bindings. Superseded research wording is replaced; append-only decisions remain intact.
+
+## D122 2026-10-09: Build a reusable Mac audio control interface
+Dylan requests MacBook microphone/speaker interaction now and later, with Sol6.1/high builder. Select a loopback page over existing native sounddevice/TCP audio and SSH; all models/Edge stay on current qualified Jetson cd60. Start/Mute/Stop, explicit built-in devices, status/errors/levels; page load starts no capture.
+Sol design192324 GO WITH CHANGES81.43s/native3 requires local Host/Origin/token controls, listening-marker readiness, fresh owned unit per Start, device qualification, bounded frames, monotonic paced mute/tail, and complete cleanup. Resolve during scoped build, no further planning gate. Native old-client cleanup is unqualified.
+Reject browser PCM/WebSocket for added resampling/transport machinery and new dependencies. Preserve product/model/memory behavior, WSL quantizer, and existing workflow. Local lifecycle checks plus actual Jetson audio turn and opened page qualify the interface; human listening remains pending, no quality/physical-latency claim.
+Evidence: research/mac-audio-interface.md; reviews/20261009-192324-33657-design.md; tools/talk.py/robot/audio.py/robot/main.py. Builder owns isolated spike/mac-audio-interface; lead owns review, deployment, and shared status.
+
+## D123 2026-10-09: Qualify the reusable Mac audio interface
+Sol 6.1 high replaces the old CLI audio loop with loopback controls and one owned native audio child. Exact MacBook devices, readiness, bounded framing, muted silence, and owned cleanup pass; all robot models and memory stay on cd60. WSL and main stay unchanged.
+Twenty focused checks pass in 5.07s; full checks pass in 33.46s; Sol52230 review PASS135.83s. Actual acoustic recorded question, returned playback, Mute/Unmute, Stop, fresh Start, and warmup Stop pass. The page remains open and idle; human listening and all final acceptance targets remain pending.
+Recorded TCP returns75,759 samples/3.156625s, independently transcribed as the embedded-Qdrant answer;1.205s input-end to complete phrase excludes physical playback. Reject browser audio machinery and further optional polishing. Carry launcher-timeout/mute-close races under D71.
+Evidence: research/mac-audio-interface.md; bench/results/2026-10-09-mac-audio-{interface,transport}.json and paired journals/WAV/tegrastats; reviews/20261009-193528-52230-review.md; research/edge-cases.md. Current and previous remain cd60; all owned model jobs stop.

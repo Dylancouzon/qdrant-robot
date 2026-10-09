@@ -1,0 +1,158 @@
+{
+  "url": "http://127.0.0.1:8765",
+  "server_pid": 46797,
+  "release": "cd60be65ee79",
+  "human_listening": "pending",
+  "events": [
+    {
+      "at": 1791588747.589141,
+      "status": {
+        "phase": "Warming up Jetson; microphone off",
+        "active": true,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0,
+        "output_level": 0
+      }
+    },
+    {
+      "at": 1791588759.598739,
+      "status": {
+        "phase": "Listening",
+        "active": true,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0.062652587890625,
+        "output_level": 0,
+        "suppressed": false
+      }
+    },
+    {
+      "at": 1791588774.535038,
+      "status": {
+        "phase": "Listening",
+        "active": true,
+        "muted": true,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0.003326416015625,
+        "output_level": 0,
+        "suppressed": true
+      }
+    },
+    {
+      "at": 1791588794.11309,
+      "status": {
+        "phase": "Listening",
+        "active": true,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0.002899169921875,
+        "output_level": 0.465179443359375,
+        "suppressed": true,
+        "playing": true
+      }
+    },
+    {
+      "at": 1791588822.12545,
+      "status": {
+        "phase": "Idle",
+        "active": false,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0,
+        "output_level": 0,
+        "suppressed": false,
+        "playing": false
+      }
+    },
+    {
+      "at": 1791588839.6333911,
+      "status": {
+        "phase": "Warming up Jetson; microphone off",
+        "active": true,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0,
+        "output_level": 0,
+        "suppressed": false,
+        "playing": false
+      }
+    },
+    {
+      "at": 1791588857.3722858,
+      "status": {
+        "phase": "Idle",
+        "active": false,
+        "muted": false,
+        "error": "",
+        "input": "MacBook Pro Microphone",
+        "output": "MacBook Pro Speakers",
+        "input_level": 0,
+        "output_level": 0,
+        "suppressed": false,
+        "playing": false
+      }
+    }
+  ],
+  "native_streams_opened": true,
+  "explicit_devices": [
+    "MacBook Pro Microphone",
+    "MacBook Pro Speakers"
+  ],
+  "acoustic_fixture_started": 1791588790.207631,
+  "acoustic_fixture": "eval/dev/audio/wake-3.wav played on explicit MacBook speakers; native UI microphone captures it; no Mac recording.",
+  "acoustic_returned_playback_observed": true,
+  "unit": "qr-live-mac-a5c78f83ca5f.service",
+  "full_checks": {
+    "elapsed_s": 33.46,
+    "native_exit": 0,
+    "log": "build/p2/logs/interface-full-checks.log"
+  },
+  "after_stop_remote": "/home/qdrant/qdrant-robot/releases/cd60be65ee79\ngpu-lock-free\n308969 bash -c sudo systemctl list-units 'qr-*' --no-legend --plain; readlink -f /home/qdrant/qdrant-robot/current; flock -n /home/qdrant/qdrant-robot/shared/gpu.lock true && echo gpu-lock-free; pgrep -af 'robot.main|llama-server|tegrastats' || true\n",
+  "after_stop_local": "46797 /Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python tools/talk.py",
+  "source_sha256": {
+    "tools/talk.py": "8fcedef1637136a7a8a8bce32d87c69389917a58612c4e1320c0c4bec2bf3260",
+    "tools/talk.html": "492209df24b31a7588c7b28150ea4fb74cb15af6bd65ee3a4aa1ff6708a41157",
+    "tools/test_talk.py": "f7d28b3e9c950ba7a12602ff2f24530d58fb256b1d0ed4bd988aaa5db6343716"
+  },
+  "second_start_remote": "qr-live-mac-89074fb2cb3d.service loaded active running /usr/bin/bash -c \"flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \\$ROBOT_SHARED/results/\\$ROBOT_TEGRASTATS & t=\\$!; .venv/bin/python -u -m robot.main --listen 7070; rc=\\$?; kill \\$t; exit \\$rc'\"\n",
+  "second_unit": "qr-live-mac-89074fb2cb3d.service",
+  "warmup_stop_pass": true,
+  "after_second_stop_remote": "/home/qdrant/qdrant-robot/releases/cd60be65ee79\ngpu-lock-free\n",
+  "browser": "Chrome tab1202942040; Start, Mute, Unmute, Stop, second Start, warmup Stop, final Idle verified by CUA.",
+  "interface_journal": "bench/results/2026-10-09-mac-audio-interface.journal.txt",
+  "tegrastats": "bench/results/live-mac-a5c78f83ca5f-20261009-193222.tegrastats",
+  "second_journal": "bench/results/2026-10-09-mac-audio-interface-warmup-stop.journal.txt",
+  "second_tegrastats": "bench/results/live-mac-89074fb2cb3d-20261009-193355.tegrastats",
+  "owned_local_audio_or_tunnels_after_stop": [],
+  "focused_checks": {
+    "count": 20,
+    "elapsed_s": 5.07,
+    "native_exit": 0,
+    "command": "uv run --no-project --with pytest pytest -q tools/test_talk.py"
+  },
+  "acoustic_turn": {
+    "question": "what is Qdrant edge?",
+    "answer": "Qdrant Edge is the embedded version of Qdrant. It runs inside the application's own process, with no server. Think of it as SQLite, but for vector search.",
+    "wav": "1791588792984.wav",
+    "kind": "knowledge",
+    "speech_end": 1791588792.5883403,
+    "transcribed": 1791588793.4328241,
+    "first_audio": 1791588793.9372978,
+    "done": 1791588794.8830545
+  },
+  "private_raw_turns_sha256": "4b2e10456c24afd1e624d4802b2f29d620f5da99f45bbab5e868c9b7c653e916",
+  "private_raw_turns": "Original on Jetson shared/sessions/20261009-193224/turns.jsonl and ignored Mac build/p2/logs/interface-private/turns.jsonl. Background transcripts excluded from publication."
+}
