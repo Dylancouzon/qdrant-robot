@@ -1,0 +1,56 @@
+Oct 09 16:19:29 qdrant-robot systemd[1]: Started qr-p2-trt-runtime-setup.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -c '\"'\"'from pathlib import Path\nimport hashlib,json,subprocess,urllib.request\nbase=Path('\"'\"'\"'\"'\"'\"'\"'\"'/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge'\"'\"'\"'\"'\"'\"'\"'\"')\nbase.mkdir(parents=True,exist_ok=True)\nvenv=base/'\"'\"'\"'\"'\"'\"'\"'\"'venv'\"'\"'\"'\"'\"'\"'\"'\"'\nsubprocess.run(['\"'\"'\"'\"'\"'\"'\"'\"'/home/qdrant/.local/bin/uv'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'venv'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'--python'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'/usr/bin/python3.12'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'--system-site-packages'\"'\"'\"'\"'\"'\"'\"'\"',str(venv)],check=True)\nurl='\"'\"'\"'\"'\"'\"'\"'\"'https://files.pythonhosted.org/packages/c2/07/32efeb227b4b4c952b051ab9b990b21146756296b5ee65450de827cc5072/tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl'\"'\"'\"'\"'\"'\"'\"'\"'\nwheel=base/'\"'\"'\"'\"'\"'\"'\"'\"'tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl'\"'\"'\"'\"'\"'\"'\"'\"'\nexpected='\"'\"'\"'\"'\"'\"'\"'\"'9e6722a5a250d0ba18665911a908aecfc9684722b9d56d944efe31fe6c889d9b'\"'\"'\"'\"'\"'\"'\"'\"'\nif not wheel.exists():\n part=wheel.with_suffix('\"'\"'\"'\"'\"'\"'\"'\"'.part'\"'\"'\"'\"'\"'\"'\"'\"')\n urllib.request.urlretrieve(url,part)\n assert hashlib.file_digest(part.open('\"'\"'\"'\"'\"'\"'\"'\"'rb'\"'\"'\"'\"'\"'\"'\"'\"'),'\"'\"'\"'\"'\"'\"'\"'\"'sha256'\"'\"'\"'\"'\"'\"'\"'\"').hexdigest()==expected\n part.rename(wheel)\nassert wheel.stat().st_size==447070745 and hashlib.file_digest(wheel.open('\"'\"'\"'\"'\"'\"'\"'\"'rb'\"'\"'\"'\"'\"'\"'\"'\"'),'\"'\"'\"'\"'\"'\"'\"'\"'sha256'\"'\"'\"'\"'\"'\"'\"'\"').hexdigest()==expected\nprint('\"'\"'\"'\"'\"'\"'\"'\"'verified officialwheel'\"'\"'\"'\"'\"'\"'\"'\"',wheel.name,expected,flush=True)\nsubprocess.run(['\"'\"'\"'\"'\"'\"'\"'\"'/home/qdrant/.local/bin/uv'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'pip'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'install'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'--python'\"'\"'\"'\"'\"'\"'\"'\"',str(venv/'\"'\"'\"'\"'\"'\"'\"'\"'bin/python'\"'\"'\"'\"'\"'\"'\"'\"'),str(wheel)+'\"'\"'\"'\"'\"'\"'\"'\"'[server]'\"'\"'\"'\"'\"'\"'\"'\"'],check=True)\nwith (base/'\"'\"'\"'\"'\"'\"'\"'\"'environment.txt'\"'\"'\"'\"'\"'\"'\"'\"').open('\"'\"'\"'\"'\"'\"'\"'\"'w'\"'\"'\"'\"'\"'\"'\"'\"') as f:\n subprocess.run(['\"'\"'\"'\"'\"'\"'\"'\"'/home/qdrant/.local/bin/uv'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'pip'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'freeze'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'--python'\"'\"'\"'\"'\"'\"'\"'\"',str(venv/'\"'\"'\"'\"'\"'\"'\"'\"'bin/python'\"'\"'\"'\"'\"'\"'\"'\"')],stdout=f,check=True)\nsubprocess.run([str(venv/'\"'\"'\"'\"'\"'\"'\"'\"'bin/python'\"'\"'\"'\"'\"'\"'\"'\"'),'\"'\"'\"'\"'\"'\"'\"'\"'-c'\"'\"'\"'\"'\"'\"'\"'\"','\"'\"'\"'\"'\"'\"'\"'\"'import tensorrt; from tensorrt_edgellm import runtime; print(tensorrt.__version__, flush=True); print(runtime.load(), flush=True)'\"'\"'\"'\"'\"'\"'\"'\"'],cwd=base,check=True,timeout=120)\nprint('\"'\"'\"'\"'\"'\"'\"'\"'officialruntime loaded on target'\"'\"'\"'\"'\"'\"'\"'\"',flush=True)\n'\"'\"'; rc=\$?; kill \$t; exit \$rc'".
+Oct 09 16:19:29 qdrant-robot bash[300188]: Using CPython 3.12.3 interpreter at: /usr/bin/python3.12
+Oct 09 16:19:29 qdrant-robot bash[300188]: Creating virtual environment at: /home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/venv
+Oct 09 16:19:29 qdrant-robot bash[300188]: Activate with: source /home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/venv/bin/activate
+Oct 09 16:19:44 qdrant-robot bash[300186]: verified officialwheel tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl 9e6722a5a250d0ba18665911a908aecfc9684722b9d56d944efe31fe6c889d9b
+Oct 09 16:19:45 qdrant-robot bash[300197]: Using Python 3.12.3 environment at: /home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/venv
+Oct 09 16:19:45 qdrant-robot bash[300197]: Resolved 31 packages in 555ms
+Oct 09 16:19:45 qdrant-robot bash[300197]: Downloading pydantic-core (2.0MiB)
+Oct 09 16:19:45 qdrant-robot bash[300197]: Downloading av (31.7MiB)
+Oct 09 16:19:45 qdrant-robot bash[300197]: Downloading cuda-core (5.9MiB)
+Oct 09 16:19:45 qdrant-robot bash[300197]: Downloading numpy (13.4MiB)
+Oct 09 16:19:45 qdrant-robot bash[300197]: Downloading cuda-bindings (6.2MiB)
+Oct 09 16:19:46 qdrant-robot bash[300197]:  Downloaded pydantic-core
+Oct 09 16:19:46 qdrant-robot bash[300197]:  Downloaded cuda-bindings
+Oct 09 16:19:46 qdrant-robot bash[300197]:  Downloaded cuda-core
+Oct 09 16:19:47 qdrant-robot bash[300197]:  Downloaded av
+Oct 09 16:19:47 qdrant-robot bash[300197]:  Downloaded numpy
+Oct 09 16:19:47 qdrant-robot bash[300197]: Prepared 17 packages in 1.77s
+Oct 09 16:19:47 qdrant-robot bash[300197]: Installed 31 packages in 29ms
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + annotated-doc==0.0.5
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + annotated-types==0.8.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + anyio==4.15.1
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + av==17.1.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + certifi==2026.7.22
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + click==8.5.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + cuda-bindings==13.4.3
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + cuda-core==1.2.1
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + cuda-pathfinder==1.8.3
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + cuda-python==13.4.1
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + fastapi==0.139.2
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + filelock==4.1.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + fsspec==2026.9.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + h11==0.16.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + hf-xet==1.7.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + httpcore==1.0.9
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + httpx==0.28.1
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + huggingface-hub==1.33.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + idna==3.20
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + numpy==2.2.6
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + packaging==26.3
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + pydantic==2.14.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + pydantic-core==2.50.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + python-multipart==0.0.32
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + pyyaml==6.0.3
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + starlette==1.7.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + tensorrt-edgellm==0.11.0 (from file:///home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl)
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + tqdm==4.70.1
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + typing-extensions==4.16.0
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + typing-inspection==0.4.4
+Oct 09 16:19:47 qdrant-robot bash[300197]:  + uvicorn==0.51.0
+Oct 09 16:19:47 qdrant-robot bash[300226]: Using Python 3.12.3 environment at: /home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/venv
+Oct 09 16:19:48 qdrant-robot bash[300229]: 10.16.2.10
+Oct 09 16:19:48 qdrant-robot bash[300229]: <module 'tensorrt_edgellm._edgellm_runtime' from '/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/venv/lib/python3.12/site-packages/tensorrt_edgellm/_native/payloads/jetson-orin-jp72-cu13-sm87/_edgellm_runtime.cpython-312-aarch64-linux-gnu.so'>
+Oct 09 16:19:48 qdrant-robot bash[300186]: officialruntime loaded on target
+Oct 09 16:19:48 qdrant-robot systemd[1]: qr-p2-trt-runtime-setup.service: Deactivated successfully.
+Oct 09 16:19:48 qdrant-robot systemd[1]: qr-p2-trt-runtime-setup.service: Consumed 13.288s CPU time.

@@ -2483,3 +2483,43 @@
 {"key": "f55bce4fe2e4ffb7", "pass": false, "why": "Says person instead of bus.", "votes": [false, false, false]}
 {"key": "ae5a35ca185580db", "pass": false, "why": "Does not recall the teddy bears.", "votes": [false, false, false]}
 {"key": "1f2f2fbbce07690f", "pass": false, "why": "Incorrectly says the teddy bears and apples are the same.", "votes": [false, false, false]}
+{"key": "8691458e168aa9dd", "pass": false, "why": "Says book instead of stop sign.", "votes": [false, false, false]}
+{"key": "678fa96746922673", "pass": true, "why": "Recalls the stop sign.", "votes": [true, true, true]}
+{"key": "7739776afd1f91e3", "pass": false, "why": "Says bicycle instead of motorcycle.", "votes": [false, false, false]}
+{"key": "77023a75493086e4", "pass": false, "why": "Recalls a bicycle instead of a motorcycle.", "votes": [false, false, false]}
+{"key": "1fb02e53d1f87002", "pass": false, "why": "Invents a chair and says the cat belongs to a friend.", "votes": [false, false, false]}
+{"key": "a4cae378eff2985d", "pass": false, "why": "Claims the cat is still there.", "votes": [false, false, false]}
+{"key": "df1504ce728eaf75", "pass": true, "why": "Says it has no memory from yesterday.", "votes": [true, true, true]}
+{"key": "43bcba534db2a394", "pass": false, "why": "Misses the stop sign on the left.", "votes": [false, false, false]}
+{"key": "7472b7889d1d1711", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "746f8774c99ec636", "pass": true, "why": "Recalls espresso.", "votes": [true, true, true]}
+{"key": "bbd72e3b766c4520", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "2b49cb2e168b00ec", "pass": false, "why": "Does not read route 15.", "votes": [false, false, false]}
+{"key": "0323e3a44d156a5e", "pass": false, "why": "Confuses the destination with other text on the bus.", "votes": [false, false, false]}
+{"key": "261945ff2c3a9a0b", "pass": true, "why": "Names Ventura, Hollywood Boulevard, and Sunset Boulevard.", "votes": [true, true, true]}
+{"key": "a97366066e097c7b", "pass": true, "why": "Counts two planes.", "votes": [true, true, true]}
+{"key": "4a8c5884fee4ec80", "pass": true, "why": "Names Sydney.", "votes": [true, true, true]}
+{"key": "d81bfd7f51de61a3", "pass": true, "why": "Identifies the fruit as an apple.", "votes": [true, true, true]}
+{"key": "93a42834ecf0d90e", "pass": false, "why": "Calls the bus an apple.", "votes": [false, false, false]}
+{"key": "2c73bb04e1bb098c", "pass": true, "why": "Recalls the apples came first.", "votes": [true, true, true]}
+{"key": "ebda30dbba59e358", "pass": false, "why": "Says apple instead of bus.", "votes": [false, false, false]}
+{"key": "6a14f01fc8aaf748", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "d5bc1aa212f5a5be", "pass": true, "why": "Identifies a zebra.", "votes": [true, true, true]}
+{"key": "43eacc7cdf183e12", "pass": true, "why": "Identifies paddleboarding.", "votes": [true, true, true]}
+{"key": "94985de90980aaae", "pass": false, "why": "Says paddleboard instead of phone.", "votes": [false, false, false]}
+{"key": "61af0a69124092c6", "pass": false, "why": "Does not identify Hello Kitty.", "votes": [false, false, false]}
+{"key": "b70886c04f6876ba", "pass": false, "why": "Says Jetson board instead of Apple computer.", "votes": [false, false, false]}
+{"key": "3c824e7abd570535", "pass": false, "why": "Misses the cake with berries.", "votes": [false, false, false]}
+{"key": "ab50cc9c0b82946e", "pass": false, "why": "Denies the visible bookshelf.", "votes": [false, false, false]}
+{"key": "a8924b86008765c6", "pass": false, "why": "Invents a San Francisco location and ignores Berlin.", "votes": [false, false, false]}
+{"key": "ed6737143c6a3108", "pass": true, "why": "Names Paris.", "votes": [true, true, true]}
+{"key": "82f31bc995192a35", "pass": true, "why": "Recalls Berlin.", "votes": [true, true, true]}
+{"key": "2a9878b8f39c7c50", "pass": true, "why": "Tells a short, coherent joke.", "votes": [true, true, true]}
+{"key": "90c952d71ace69fa", "pass": false, "why": "Invents an old memory and calls the activity surfing.", "votes": [false, true, false]}
+{"key": "6903d00264318982", "pass": false, "why": "Does not mention the teddy bears.", "votes": [false, false, false]}
+{"key": "64083dea491b690a", "pass": true, "why": "Recalls the teddy bears.", "votes": [false, true, true]}
+{"key": "7d6bc9f08b95a315", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
+{"key": "c2de5124b033c1e4", "pass": false, "why": "Fails to see the green apples.", "votes": [false, false, false]}
+{"key": "bd67969fcaced4eb", "pass": false, "why": "Calls teddy bears the same as apples.", "votes": [false, false, false]}
+{"key": "4da9ab041e247d95", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}
+{"key": "a4a7de807eb294ed", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}

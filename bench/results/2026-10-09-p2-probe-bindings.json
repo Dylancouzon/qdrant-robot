@@ -1,0 +1,18 @@
+{
+  "release": "8a578811803e",
+  "source_commit": "9141a7b",
+  "runtime": "llama.cpp9c2e0e491a822adae1f0b1c831adb4160057d24f CUDA sm87 NO_VMM",
+  "machine": "Jetson Orin Nano Super",
+  "model": "Granite4.0-H-Micro3B Q4_K_M",
+  "model_sha256": "bcc78b9b25450101d1ad90d4b9a264e1bac892f534dfb76066f4eec792fdf023",
+  "unit": "qr-p2-granite-dialogue-debug",
+  "server_command": "-m robot.brain serve granite4-h-micro",
+  "context_tokens": 4096,
+  "output_tokens": 128,
+  "source_sha256": {
+    "bench/results/2026-10-09-p2-hybrid-m1-fullturns.jsonl": "24192d783a95efbb61b1b5834b034fa6a55e2e059d2721486f000412f8a5fb89",
+    "bench/results/2026-10-09-p2-granite-dialogue-probe.jsonl": "fcc024e9978403fbecc6bf7ef54b830c92e977593c4898460f7c5502e3f5fc8f",
+    "bench/results/2026-10-09-p2-granite-tools-probe.jsonl": "7206bfe3beec23460feb63614e1658d33f2cbd3001178657f5f00e86d8807ff8"
+  },
+  "limits": "Recorded-prompt diagnostics; selected four failures and two no-history protocol probes. No held-out, live-tool, integrated performance, or acceptance result."
+}

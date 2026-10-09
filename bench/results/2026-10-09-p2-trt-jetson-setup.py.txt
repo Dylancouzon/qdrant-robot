@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,subprocess,urllib.request
+base=Path('/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge')
+base.mkdir(parents=True,exist_ok=True)
+venv=base/'venv'
+subprocess.run(['/home/qdrant/.local/bin/uv','venv','--python','/usr/bin/python3.12','--system-site-packages',str(venv)],check=True)
+url='https://files.pythonhosted.org/packages/c2/07/32efeb227b4b4c952b051ab9b990b21146756296b5ee65450de827cc5072/tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl'
+wheel=base/'tensorrt_edgellm-0.11.0-cp312-cp312-manylinux_2_39_aarch64.whl'
+expected='9e6722a5a250d0ba18665911a908aecfc9684722b9d56d944efe31fe6c889d9b'
+if not wheel.exists():
+ part=wheel.with_suffix('.part')
+ urllib.request.urlretrieve(url,part)
+ assert hashlib.file_digest(part.open('rb'),'sha256').hexdigest()==expected
+ part.rename(wheel)
+assert wheel.stat().st_size==447070745 and hashlib.file_digest(wheel.open('rb'),'sha256').hexdigest()==expected
+print('verified officialwheel',wheel.name,expected,flush=True)
+subprocess.run(['/home/qdrant/.local/bin/uv','pip','install','--python',str(venv/'bin/python'),str(wheel)+'[server]'],check=True)
+with (base/'environment.txt').open('w') as f:
+ subprocess.run(['/home/qdrant/.local/bin/uv','pip','freeze','--python',str(venv/'bin/python')],stdout=f,check=True)
+subprocess.run([str(venv/'bin/python'),'-c','import tensorrt; from tensorrt_edgellm import runtime; print(tensorrt.__version__, flush=True); print(runtime.load(), flush=True)'],cwd=base,check=True,timeout=120)
+print('officialruntime loaded on target',flush=True)

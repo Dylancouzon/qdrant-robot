@@ -1,0 +1,98 @@
+Oct 09 13:30:26 qdrant-robot systemd[1]: Started qr-p2-hybrid-m1-fp32.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m eval.replay --oracle eval/dev/sessions.jsonl; rc=\$?; kill \$t; exit \$rc'".
+Oct 09 13:30:26 qdrant-robot bash[295431]: 2026-10-09 13:30:26.902153247 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"
+Oct 09 13:30:27 qdrant-robot bash[295431]: 2026-10-09 13:30:27.827586533 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+Oct 09 13:30:27 qdrant-robot bash[295431]: 2026-10-09 13:30:27.827641458 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+Oct 09 13:30:27 qdrant-robot bash[295431]: [ WARN:0@1.174] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+Oct 09 13:30:28 qdrant-robot bash[295431]: 2026-10-09 13:30:28.913616175 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+Oct 09 13:30:28 qdrant-robot bash[295431]: 2026-10-09 13:30:28.913675996 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+Oct 09 13:30:34 qdrant-robot bash[295431]: 2026-10-09 13:30:34.406493892 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.
+Oct 09 13:30:34 qdrant-robot bash[295431]: 2026-10-09 13:30:34.407370665 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.
+Oct 09 13:30:34 qdrant-robot bash[295431]: 2026-10-09 13:30:34.441796672 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.
+Oct 09 13:30:34 qdrant-robot bash[295431]: 2026-10-09 13:30:34.441871889 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.105771835 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.111344166 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.116965533 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.120892725 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.131449096 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.131829150 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:35 qdrant-robot bash[295431]: 2026-10-09 13:30:35.131881034 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.
+Oct 09 13:30:43 qdrant-robot bash[295431]: [10/09/2026-13:30:43] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+Oct 09 13:30:59 qdrant-robot bash[295431]: BAD 4.80s recall-stop-1: [What am I holding up?] You're holding up a book titled "The Hitchhiker's Guide to the Galaxy." It's a classic science fiction novel by Douglas Adams. Enjoy your reading!
+Oct 09 13:31:07 qdrant-robot bash[295431]: ok  1.49s recall-stop-2 +ev: [What did I just show you?] You showed me a red stop sign. It's there, as seen moments ago.
+Oct 09 13:31:15 qdrant-robot bash[295431]: BAD 2.42s recall-moto-1: [Do you know what this is?] Yes, it's a common mode of transportation called a bicycle.
+Oct 09 13:31:22 qdrant-robot bash[295431]: BAD 1.58s recall-moto-2 +ev: [Can you remember what I showed you?] Yes, earlier we discussed a bicycle with clothes hung nearby.
+Oct 09 13:31:31 qdrant-robot bash[295431]: ok  2.04s scene-change-1: [What is this?] This is your friend's cat resting peacefully on a pretty pink chair right here in front of us.
+Oct 09 13:31:43 qdrant-robot bash[295431]: BAD 2.17s scene-change-2: [And what do you see now?] I can see the cat from earlier still resting peacefully in front of that pink chair. The rest of the room looks unchanged too.
+Oct 09 13:31:56 qdrant-robot bash[295431]: ok  0.82s knowledge-1: [What is Qdrant Edge?] Qdrant Edge is the embedded version of Qdrant. It runs inside the application's own process, with no server. Think of it as SQLite, but for vector search.
+Oct 09 13:32:03 qdrant-robot bash[295431]: ok  0.44s knowledge-2: [Is Qdrant written in Rust?] Qdrant is written in Rust, which keeps it fast and memory-safe under heavy load.
+Oct 09 13:32:15 qdrant-robot bash[295431]: ok  1.82s absent-1: [What did I show you yesterday?] I don't have any memories of showing you anything yesterday. My memory only goes back to today's interactions with visitors at my booth.
+Oct 09 13:32:23 qdrant-robot bash[295431]: BAD 1.71s left-1: [What is on your left?] On my left, I see another booth setup for Qdrant Edge.
+Oct 09 13:32:34 qdrant-robot bash[295431]: ok  1.40s conversation-1: [Hi! My name is Dylan and I really love espresso.] Nice to meet you, Dylan! Espresso sounds deliciously tempting. Do tell me more about your favorite coffee?
+Oct 09 13:32:51 qdrant-robot bash[295431]: ok  1.11s conversation-2: [What drink do I like?] You enjoy espresso. It's a richly flavorful coffee beverage that many people appreciate for its bold taste. Do you have any favorite ways to prepare it or go-to spots where you get your fix?
+Oct 09 13:32:59 qdrant-robot bash[295431]: ok  1.92s bus-red-1: [What color is that bus?] The bus appears to be red based on what I see in the current image.
+Oct 09 13:33:07 qdrant-robot bash[295431]: BAD 2.02s bus-red-2: [Can you read its route number?] I'm unable to read license plates or extract text from images directly.
+Oct 09 13:33:13 qdrant-robot bash[295431]: BAD 2.08s bus-purple-1: [Where is this bus going?] This bus is headed for Bens 96.
+Oct 09 13:33:39 qdrant-robot bash[295431]: ok  1.84s signs-1: [Which places do those road signs mention?] You're in Los Angeles! Ventura is a coastal city north of LA, known for its beaches and outdoor activities. Hollywood Boulevard and Sunset Boulevard are famous streets in the heart of Hollywood, where you'll find iconic landmarks like Grauman's Chinese Theatre and TCL Chinese Theatre.
+Oct 09 13:33:44 qdrant-robot bash[295431]: ok  2.04s sydney-1: [How many planes can you see?] Two planes in front of me right now.
+Oct 09 13:33:50 qdrant-robot bash[295431]: ok  1.56s sydney-2: [Which city do you think this is?] Sydney, Australia based on the view and time.
+Oct 09 13:33:54 qdrant-robot bash[295431]: ok  1.37s fruit-then-bus-1: [What fruit is this?] apple
+Oct 09 13:33:58 qdrant-robot bash[295431]: BAD 1.44s fruit-then-bus-2: [And what about this one?] It's an apple.
+Oct 09 13:34:01 qdrant-robot bash[295431]: ok  1.13s fruit-then-bus-3 +ev: [What was the first thing I showed you?] the apples
+Oct 09 13:34:04 qdrant-robot bash[295431]: BAD 1.30s fruit-then-bus-4 +ev: [And what did I show you after that?] you showed me an apple
+Oct 09 13:34:16 qdrant-robot bash[295431]: ok  1.82s objects-1: [What are these?] Teddy bears! They're cute stuffed animals loved by kids and adults alike. Do you have a favorite bear?
+Oct 09 13:34:26 qdrant-robot bash[295431]: ok  1.30s objects-2: [Which animal is this?] Zebra! It's a striped equine with a distinctive appearance. Quite fascinating creatures, aren't they?
+Oct 09 13:34:39 qdrant-robot bash[295431]: ok  2.09s objects-3: [What is that person doing?] The person is enjoying an activity called paddleboarding, gliding across the water's surface. It looks like fun! Have you ever tried it?
+Oct 09 13:34:49 qdrant-robot bash[295431]: BAD 2.07s objects-4: [What is she holding?] She's holding a paddleboard, ready for some water adventure! It looks like fun in the sun.
+Oct 09 13:35:04 qdrant-robot bash[295431]: BAD 2.31s objects-5: [What is printed on her phone case?] The visitor's phone case has a playful design featuring characters from popular culture! It adds a fun touch to their device. Do you have any interesting accessories yourself?
+Oct 09 13:35:11 qdrant-robot bash[295431]: BAD 2.34s desk-1: [What kind of computer is on that desk?] It's a Jetson board running Qdrant Edge.
+Oct 09 13:35:16 qdrant-robot bash[295431]: BAD 1.76s desk-2: [What is on the left side of the table?] There's a pair of glasses there.
+Oct 09 13:35:21 qdrant-robot bash[295431]: ok  1.82s desk-3: [Is there a bookshelf in this room?] I don't see any bookshelf here right now.
+Oct 09 13:35:34 qdrant-robot bash[295431]: ok  0.70s knowledge-more-1: [Does Qdrant Edge need a server?] Qdrant Edge needs no server: it runs inside the application's own process. A Qdrant server is optional, and Edge can restore its snapshots and stay in sync with it.
+Oct 09 13:35:44 qdrant-robot bash[295431]: ok  0.45s knowledge-more-2: [Where is your memory stored?] My memory is Qdrant Edge, running inside my own process. What I see and hear becomes vectors in Edge shards on my disk.
+Oct 09 13:35:58 qdrant-robot bash[295431]: ok  0.43s knowledge-more-3: [Do you use the cloud?] Everything I do runs on one Jetson Orin Nano board inside me: listening, seeing, thinking, speaking, and remembering. Nothing goes to a laptop or the cloud.
+Oct 09 13:36:09 qdrant-robot bash[295431]: ok  0.55s knowledge-more-4: [What is a multivector?] One Qdrant point can hold several vectors, including multivectors, where many vectors describe one item and are compared with MaxSim.
+Oct 09 13:36:19 qdrant-robot bash[295431]: ok  1.24s small-talk-1: [I'm visiting from Berlin.] Nice to meet you! Welcome to our booth in San Francisco. How can we assist with your visit?
+Oct 09 13:36:23 qdrant-robot bash[295431]: ok  1.24s small-talk-2: [What's the capital of France?] Paris is the capital of France.
+Oct 09 13:36:30 qdrant-robot bash[295431]: ok  1.27s small-talk-3: [Do you remember where I'm from?] Yes, you're from Berlin. How was your trip so far?
+Oct 09 13:36:38 qdrant-robot bash[295431]: ok  1.01s joke-1: [Can you tell me a short joke?] Sure! Why don't scientists trust atoms? Because they make up everything!
+Oct 09 13:37:15 qdrant-robot bash[295431]: ok  1.78s long-question-1: [Okay so I have been standing at this booth for a while and my friend sent me this photo from the beach, and I honestly cannot tell what is going on in it, is he drowning or having fun, what do you think?] Memories:
+Oct 09 13:37:15 qdrant-robot bash[295431]: - 1791567398.748223 seconds ago: The person seems to be surfing with his arms up.
+Oct 09 13:37:15 qdrant-robot bash[295431]: The visitor appears to be enjoying a sunny day at the beach while engaging in water sports like surfing. Based on their posture and facial expression, it looks like they're having fun rather than being in danger of drowning.
+Oct 09 13:37:21 qdrant-robot bash[295431]: BAD 1.62s hand-teddy-1: [Look at this.] Sure thing! What did you bring?
+Oct 09 13:37:29 qdrant-robot bash[295431]: ok  0.41s hand-teddy-2 +ev: [What did I have in my hand earlier?] You showed me two teddy bears on a chair, around them is a black background, 6 seconds ago.
+Oct 09 13:37:35 qdrant-robot bash[295431]: BAD 1.57s hand-teddy-3: [Are they still there?] Yes, teddy bears are still on that chair!
+Oct 09 13:37:45 qdrant-robot bash[295431]: BAD 1.80s same-apples-1: [Do you like these?] I don't see any items in front of me to comment on. What would you like my opinion about?
+Oct 09 13:37:54 qdrant-robot bash[295431]: BAD 1.94s same-apples-2: [Is this the same as what I just showed you?] Yes, that's exactly what we saw earlier with the apple display and clothing hung up.
+Oct 09 13:38:01 qdrant-robot bash[295431]: ok  1.40s intro-1: [Nice to meet you, I'm Ana.] Nice to meet you too, Ana! How are you doing today?
+Oct 09 13:38:08 qdrant-robot bash[295431]: ok  1.26s intro-2: [How's your day going?] My day is going well so far! Thanks for asking.
+Oct 09 13:38:11 qdrant-robot bash[295431]: ok  0.44s intro-3: [Do you know my name?] You told me you're Ana.
+Oct 09 13:38:12 qdrant-robot bash[295431]: {
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "summary": "replay",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "model": "granite4-h-micro",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "oracle": true,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "audio": "audio",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "cases": "eval/dev/sessions.jsonl",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "tegrastats": "p2-hybrid-m1-fp32-20261009-133026.tegrastats",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "machine": "qdrant-robot",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "release": "78094c49f711",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "n": 47,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "n_expected": 47,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "score_type": "keyword_and_split; answer correctness is in .judged.jsonl",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "correct": 30,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "split": 0,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "evidence": "5/5",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "first_audio_p50_s": 1.5690436363220215,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "first_audio_max_s": 4.804888486862183,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "asr_p50_s": null,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "first_token_p50_s": 0.704838752746582,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "first_phrase_p50_s": 1.1869781017303467,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "detect_fps_p50": 14.981243971988386,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "detect_fps_min": 9.18949899186931,
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "audio_dir": "/home/qdrant/qdrant-robot/shared/sessions/replay-1791567027",
+Oct 09 13:38:12 qdrant-robot bash[295431]:  "note": "oracle: latencies start when the text is submitted (text to audio)"
+Oct 09 13:38:12 qdrant-robot bash[295431]: }
+Oct 09 13:38:14 qdrant-robot systemd[1]: qr-p2-hybrid-m1-fp32.service: Main process exited, code=exited, status=1/FAILURE
+Oct 09 13:38:14 qdrant-robot systemd[1]: qr-p2-hybrid-m1-fp32.service: Failed with result 'exit-code'.
+Oct 09 13:38:14 qdrant-robot systemd[1]: qr-p2-hybrid-m1-fp32.service: Consumed 4min 20.885s CPU time, 6.0G memory peak, 1.0G memory swap peak.
+297831 bash -c journalctl -u qr-p2-hybrid-m1-fp32 --no-pager; pgrep -af "llama-server|eval.replay" || true; readlink ~/qdrant-robot/current
+releases/cd60be65ee79

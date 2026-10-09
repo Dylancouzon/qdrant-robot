@@ -1,5 +1,7 @@
 # Plan to raise the robot's capability ceiling
 
+P2 supersedes the execution sequence below after Dylan's architecture-level correction. Its testing-first architecture-comparison draft is superseded before dispatch. Read STATE.md for the selected architecture/build task. F1j implementation is paused. The following P1 plan preserves its historical alternatives and evidence.
+
 Planning date: 2026-10-09. Baseline: main at fcfd32a. This session produces the plan; the next session executes it. J means measured on this Jetson, E means measured elsewhere, and U means unverified. All proposed gains and resource budgets below are U. D79 records Dylan's scope and worker choice; D83 removes execution deadlines and preserves the review gates.
 
 ## Recommendation

@@ -1,0 +1,1004 @@
+Oct 09 13:50:57 qdrant-robot systemd[1]: Started qr-p2-granite-dialogue-debug.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.brain serve granite4-h-micro; rc=\$?; kill \$t; exit \$rc'".
+Oct 09 13:50:57 qdrant-robot bash[298239]: 0.00.092.752 I srv  llama_server: initializing ...
+Oct 09 13:50:57 qdrant-robot bash[298239]: 0.00.092.791 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+Oct 09 13:50:57 qdrant-robot bash[298239]: 0.00.094.484 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+Oct 09 13:50:57 qdrant-robot bash[298239]: 0.00.097.242 I srv    load_model: loading model '/home/qdrant/qdrant-robot/shared/models/gguf/granite-4.0-h-micro-Q4_K_M.gguf'
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.521.695 I cmn          init: llama threadpool init, n_threads = 6
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.782.330 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 4096, kv_unified = 'false'
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.782.509 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.808.780 I srv  llama_server: model loaded
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.808.804 I srv  llama_server: listening on http://127.0.0.1:8080
+Oct 09 13:51:01 qdrant-robot bash[298239]: 0.03.808.806 W srv  llama_server: notice: server default port will be changed to :9931 in a future release (ref: https://github.com/ggml-org/llama.cpp/pull/26508)
+Oct 09 13:52:04 qdrant-robot bash[298239]: 1.06.962.907 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+Oct 09 13:52:04 qdrant-robot bash[298239]: 1.06.963.005 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.723.542 I slot print_timing: id  0 | task 0 | prompt eval time =    1123.66 ms /   353 tokens (    3.18 ms per token,   314.15 tokens per second)
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.723.559 I slot print_timing: id  0 | task 0 |        eval time =    1636.81 ms /    34 tokens (   49.60 ms per token,    20.16 tokens per second)
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.723.562 I slot print_timing: id  0 | task 0 |       total time =    2760.47 ms /   387 tokens
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.723.577 I slot print_timing: id  0 | task 0 |    graphs reused =         33
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.723.742 I slot      release: id  0 | task 0 | stop processing: n_tokens = 386, truncated = 0
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.744.314 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.915
+Oct 09 13:52:07 qdrant-robot bash[298239]: 1.09.744.468 I slot launch_slot_: id  0 | task 38 | processing task, is_child = 0
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.962.389 I slot print_timing: id  0 | task 38 | prompt eval time =     825.69 ms /   353 tokens (    2.34 ms per token,   427.52 tokens per second)
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.962.404 I slot print_timing: id  0 | task 38 |        eval time =     392.19 ms /     9 tokens (   49.02 ms per token,    20.40 tokens per second)
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.962.407 I slot print_timing: id  0 | task 38 |       total time =    1217.87 ms /   362 tokens
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.962.412 I slot print_timing: id  0 | task 38 |    graphs reused =         40
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.962.541 I slot      release: id  0 | task 38 | stop processing: n_tokens = 361, truncated = 0
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.981.148 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105415095960
+Oct 09 13:52:08 qdrant-robot bash[298239]: 1.10.981.281 I slot launch_slot_: id  0 | task 51 | processing task, is_child = 0
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.961.403 I slot print_timing: id  0 | task 51 | prompt eval time =     472.86 ms /   156 tokens (    3.03 ms per token,   329.90 tokens per second)
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.961.422 I slot print_timing: id  0 | task 51 |        eval time =     507.21 ms /    11 tokens (   50.72 ms per token,    19.72 tokens per second)
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.961.427 I slot print_timing: id  0 | task 51 |       total time =     980.07 ms /   167 tokens
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.961.435 I slot print_timing: id  0 | task 51 |    graphs reused =         49
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.961.520 I slot      release: id  0 | task 51 | stop processing: n_tokens = 166, truncated = 0
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.989.225 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105416094935
+Oct 09 13:52:09 qdrant-robot bash[298239]: 1.11.989.382 I slot launch_slot_: id  0 | task 65 | processing task, is_child = 0
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.723.266 I slot print_timing: id  0 | task 65 | prompt eval time =     733.82 ms /   313 tokens (    2.34 ms per token,   426.54 tokens per second)
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.723.282 I slot print_timing: id  0 | task 65 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.723.284 I slot print_timing: id  0 | task 65 |       total time =     733.82 ms /   314 tokens
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.723.287 I slot print_timing: id  0 | task 65 |    graphs reused =         49
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.723.424 I slot      release: id  0 | task 65 | stop processing: n_tokens = 313, truncated = 0
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.751.905 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.873 (> 0.100 thold), f_keep = 0.984
+Oct 09 13:52:10 qdrant-robot bash[298239]: 1.12.752.043 I slot launch_slot_: id  0 | task 70 | processing task, is_child = 0
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.676.703 I slot print_timing: id  0 | task 70 | prompt eval time =     271.27 ms /    48 tokens (    5.65 ms per token,   176.94 tokens per second)
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.676.719 I slot print_timing: id  0 | task 70 |        eval time =    1653.34 ms /    34 tokens (   50.10 ms per token,    19.96 tokens per second)
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.676.722 I slot print_timing: id  0 | task 70 |       total time =    1924.61 ms /    82 tokens
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.676.725 I slot print_timing: id  0 | task 70 |    graphs reused =         81
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.676.856 I slot      release: id  0 | task 70 | stop processing: n_tokens = 386, truncated = 0
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.706.811 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.790 (> 0.100 thold), f_keep = 0.798
+Oct 09 13:52:12 qdrant-robot bash[298239]: 1.14.706.967 I slot launch_slot_: id  0 | task 106 | processing task, is_child = 0
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.642.159 I slot print_timing: id  0 | task 106 | prompt eval time =    1002.20 ms /   390 tokens (    2.57 ms per token,   389.15 tokens per second)
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.642.176 I slot print_timing: id  0 | task 106 |        eval time =     932.95 ms /    20 tokens (   49.10 ms per token,    20.37 tokens per second)
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.642.179 I slot print_timing: id  0 | task 106 |       total time =    1935.14 ms /   410 tokens
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.642.182 I slot print_timing: id  0 | task 106 |    graphs reused =         99
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.642.318 I slot      release: id  0 | task 106 | stop processing: n_tokens = 409, truncated = 0
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.672.043 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.954
+Oct 09 13:52:14 qdrant-robot bash[298239]: 1.16.672.197 I slot launch_slot_: id  0 | task 131 | processing task, is_child = 0
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.339.431 I slot print_timing: id  0 | task 131 | prompt eval time =     997.00 ms /   390 tokens (    2.56 ms per token,   391.17 tokens per second)
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.339.446 I slot print_timing: id  0 | task 131 |        eval time =     670.19 ms /    15 tokens (   47.87 ms per token,    20.89 tokens per second)
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.339.449 I slot print_timing: id  0 | task 131 |       total time =    1667.19 ms /   405 tokens
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.339.452 I slot print_timing: id  0 | task 131 |    graphs reused =        112
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.339.586 I slot      release: id  0 | task 131 | stop processing: n_tokens = 404, truncated = 0
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.368.086 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105422473007
+Oct 09 13:52:16 qdrant-robot bash[298239]: 1.18.368.221 I slot launch_slot_: id  0 | task 151 | processing task, is_child = 0
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.673.240 I slot print_timing: id  0 | task 151 | prompt eval time =     588.81 ms /   193 tokens (    3.05 ms per token,   327.78 tokens per second)
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.673.256 I slot print_timing: id  0 | task 151 |        eval time =    1716.16 ms /    36 tokens (   49.03 ms per token,    20.39 tokens per second)
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.673.259 I slot print_timing: id  0 | task 151 |       total time =    2304.97 ms /   229 tokens
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.673.262 I slot print_timing: id  0 | task 151 |    graphs reused =        146
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.673.358 I slot      release: id  0 | task 151 | stop processing: n_tokens = 228, truncated = 0
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.705.797 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105424806781
+Oct 09 13:52:18 qdrant-robot bash[298239]: 1.20.705.954 I slot launch_slot_: id  0 | task 191 | processing task, is_child = 0
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.588.839 I slot print_timing: id  0 | task 191 | prompt eval time =     882.82 ms /   347 tokens (    2.54 ms per token,   393.06 tokens per second)
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.588.856 I slot print_timing: id  0 | task 191 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.588.858 I slot print_timing: id  0 | task 191 |       total time =     882.82 ms /   348 tokens
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.588.861 I slot print_timing: id  0 | task 191 |    graphs reused =        146
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.588.987 I slot      release: id  0 | task 191 | stop processing: n_tokens = 347, truncated = 0
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.618.624 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.877 (> 0.100 thold), f_keep = 0.986
+Oct 09 13:52:19 qdrant-robot bash[298239]: 1.21.618.768 I slot launch_slot_: id  0 | task 197 | processing task, is_child = 0
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.171.319 I slot print_timing: id  0 | task 197 | prompt eval time =     271.09 ms /    51 tokens (    5.32 ms per token,   188.13 tokens per second)
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.171.334 I slot print_timing: id  0 | task 197 |        eval time =    1281.41 ms /    27 tokens (   49.29 ms per token,    20.29 tokens per second)
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.171.338 I slot print_timing: id  0 | task 197 |       total time =    1552.50 ms /    78 tokens
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.171.341 I slot print_timing: id  0 | task 197 |    graphs reused =        171
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.171.481 I slot      release: id  0 | task 197 | stop processing: n_tokens = 416, truncated = 0
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.201.328 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.835 (> 0.100 thold), f_keep = 0.743
+Oct 09 13:52:20 qdrant-robot bash[298239]: 1.23.201.485 I slot launch_slot_: id  0 | task 226 | processing task, is_child = 0
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.390.696 I slot print_timing: id  0 | task 226 | prompt eval time =     928.10 ms /   370 tokens (    2.51 ms per token,   398.67 tokens per second)
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.390.712 I slot print_timing: id  0 | task 226 |        eval time =     261.06 ms /     6 tokens (   52.21 ms per token,    19.15 tokens per second)
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.390.715 I slot print_timing: id  0 | task 226 |       total time =    1189.16 ms /   376 tokens
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.390.719 I slot print_timing: id  0 | task 226 |    graphs reused =        175
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.390.854 I slot      release: id  0 | task 226 | stop processing: n_tokens = 375, truncated = 0
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.420.215 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.987
+Oct 09 13:52:22 qdrant-robot bash[298239]: 1.24.420.363 I slot launch_slot_: id  0 | task 237 | processing task, is_child = 0
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.400.246 I slot print_timing: id  0 | task 237 | prompt eval time =     925.50 ms /   370 tokens (    2.50 ms per token,   399.78 tokens per second)
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.400.263 I slot print_timing: id  0 | task 237 |        eval time =      54.32 ms /     2 tokens (   54.32 ms per token,    18.41 tokens per second)
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.400.266 I slot print_timing: id  0 | task 237 |       total time =     979.83 ms /   372 tokens
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.400.269 I slot print_timing: id  0 | task 237 |    graphs reused =        175
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.400.410 I slot      release: id  0 | task 237 | stop processing: n_tokens = 371, truncated = 0
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.428.881 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105429533829
+Oct 09 13:52:23 qdrant-robot bash[298239]: 1.25.429.026 I slot launch_slot_: id  0 | task 244 | processing task, is_child = 0
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.749.116 I slot print_timing: id  0 | task 244 | prompt eval time =     549.79 ms /   173 tokens (    3.18 ms per token,   314.67 tokens per second)
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.749.133 I slot print_timing: id  0 | task 244 |        eval time =    1770.25 ms /    37 tokens (   49.17 ms per token,    20.34 tokens per second)
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.749.141 I slot print_timing: id  0 | task 244 |       total time =    2320.04 ms /   210 tokens
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.749.146 I slot print_timing: id  0 | task 244 |    graphs reused =        210
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.749.238 I slot      release: id  0 | task 244 | stop processing: n_tokens = 209, truncated = 0
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.778.545 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105431882657
+Oct 09 13:52:25 qdrant-robot bash[298239]: 1.27.778.735 I slot launch_slot_: id  0 | task 285 | processing task, is_child = 0
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.622.327 I slot print_timing: id  0 | task 285 | prompt eval time =     843.53 ms /   329 tokens (    2.56 ms per token,   390.03 tokens per second)
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.622.342 I slot print_timing: id  0 | task 285 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.622.345 I slot print_timing: id  0 | task 285 |       total time =     843.53 ms /   330 tokens
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.622.347 I slot print_timing: id  0 | task 285 |    graphs reused =        210
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.622.469 I slot      release: id  0 | task 285 | stop processing: n_tokens = 329, truncated = 0
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.651.851 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.876 (> 0.100 thold), f_keep = 0.985
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.28.651.994 I slot launch_slot_: id  0 | task 291 | processing task, is_child = 0
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.197.219 I slot print_timing: id  0 | task 291 | prompt eval time =     274.21 ms /    49 tokens (    5.60 ms per token,   178.70 tokens per second)
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.197.235 I slot print_timing: id  0 | task 291 |        eval time =     270.96 ms /     6 tokens (   54.19 ms per token,    18.45 tokens per second)
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.197.238 I slot print_timing: id  0 | task 291 |       total time =     545.17 ms /    55 tokens
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.197.241 I slot print_timing: id  0 | task 291 |    graphs reused =        214
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.197.381 I slot      release: id  0 | task 291 | stop processing: n_tokens = 375, truncated = 0
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.228.818 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.702 (> 0.100 thold), f_keep = 0.821
+Oct 09 13:52:26 qdrant-robot bash[298239]: 1.29.228.972 I slot launch_slot_: id  0 | task 299 | processing task, is_child = 0
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.841.358 I slot print_timing: id  0 | task 299 | prompt eval time =    1053.83 ms /   439 tokens (    2.40 ms per token,   416.57 tokens per second)
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.841.375 I slot print_timing: id  0 | task 299 |        eval time =     558.50 ms /    12 tokens (   50.77 ms per token,    19.70 tokens per second)
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.841.378 I slot print_timing: id  0 | task 299 |       total time =    1612.34 ms /   451 tokens
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.841.381 I slot print_timing: id  0 | task 299 |    graphs reused =        224
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.841.524 I slot      release: id  0 | task 299 | stop processing: n_tokens = 450, truncated = 0
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.873.419 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.976
+Oct 09 13:52:28 qdrant-robot bash[298239]: 1.30.873.593 I slot launch_slot_: id  0 | task 316 | processing task, is_child = 0
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.513.648 I slot print_timing: id  0 | task 316 | prompt eval time =    1053.71 ms /   439 tokens (    2.40 ms per token,   416.62 tokens per second)
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.513.666 I slot print_timing: id  0 | task 316 |        eval time =     586.30 ms /    13 tokens (   48.86 ms per token,    20.47 tokens per second)
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.513.670 I slot print_timing: id  0 | task 316 |       total time =    1640.00 ms /   452 tokens
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.513.673 I slot print_timing: id  0 | task 316 |    graphs reused =        235
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.513.815 I slot      release: id  0 | task 316 | stop processing: n_tokens = 451, truncated = 0
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.543.850 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105436647234
+Oct 09 13:52:30 qdrant-robot bash[298239]: 1.32.543.994 I slot launch_slot_: id  0 | task 334 | processing task, is_child = 0
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.33.996.093 I slot print_timing: id  0 | task 334 | prompt eval time =     751.04 ms /   242 tokens (    3.10 ms per token,   322.22 tokens per second)
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.33.996.109 I slot print_timing: id  0 | task 334 |        eval time =     701.01 ms /    15 tokens (   50.07 ms per token,    19.97 tokens per second)
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.33.996.112 I slot print_timing: id  0 | task 334 |       total time =    1452.05 ms /   257 tokens
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.33.996.116 I slot print_timing: id  0 | task 334 |    graphs reused =        248
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.33.996.224 I slot      release: id  0 | task 334 | stop processing: n_tokens = 256, truncated = 0
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.34.026.691 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105438129640
+Oct 09 13:52:31 qdrant-robot bash[298239]: 1.34.026.840 I slot launch_slot_: id  0 | task 354 | processing task, is_child = 0
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.955.506 I slot print_timing: id  0 | task 354 | prompt eval time =     928.60 ms /   377 tokens (    2.46 ms per token,   405.99 tokens per second)
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.955.521 I slot print_timing: id  0 | task 354 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.955.524 I slot print_timing: id  0 | task 354 |       total time =     928.61 ms /   378 tokens
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.955.526 I slot print_timing: id  0 | task 354 |    graphs reused =        248
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.955.655 I slot      release: id  0 | task 354 | stop processing: n_tokens = 377, truncated = 0
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.984.386 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.847 (> 0.100 thold), f_keep = 0.987
+Oct 09 13:52:32 qdrant-robot bash[298239]: 1.34.984.532 I slot launch_slot_: id  0 | task 360 | processing task, is_child = 0
+Oct 09 13:52:33 qdrant-robot bash[298239]: 1.35.871.002 I slot print_timing: id  0 | task 360 | prompt eval time =     316.51 ms /    70 tokens (    4.52 ms per token,   221.16 tokens per second)
+Oct 09 13:52:33 qdrant-robot bash[298239]: 1.35.871.018 I slot print_timing: id  0 | task 360 |        eval time =     569.91 ms /    12 tokens (   51.81 ms per token,    19.30 tokens per second)
+Oct 09 13:52:33 qdrant-robot bash[298239]: 1.35.871.021 I slot print_timing: id  0 | task 360 |       total time =     886.42 ms /    82 tokens
+Oct 09 13:52:33 qdrant-robot bash[298239]: 1.35.871.024 I slot print_timing: id  0 | task 360 |    graphs reused =        258
+Oct 09 13:52:33 qdrant-robot bash[298239]: 1.35.871.172 I slot      release: id  0 | task 360 | stop processing: n_tokens = 450, truncated = 0
+Oct 09 13:55:27 qdrant-robot bash[298239]: 4.29.625.792 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105440004592
+Oct 09 13:55:27 qdrant-robot bash[298239]: 4.29.626.877 I slot launch_slot_: id  0 | task 374 | processing task, is_child = 0
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.654.733 I slot print_timing: id  0 | task 374 | prompt eval time =     818.08 ms /   321 tokens (    2.55 ms per token,   392.38 tokens per second)
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.654.755 I slot print_timing: id  0 | task 374 |        eval time =    1209.72 ms /    25 tokens (   50.41 ms per token,    19.84 tokens per second)
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.654.758 I slot print_timing: id  0 | task 374 |       total time =    2027.80 ms /   346 tokens
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.654.762 I slot print_timing: id  0 | task 374 |    graphs reused =        281
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.654.919 I slot      release: id  0 | task 374 | stop processing: n_tokens = 345, truncated = 0
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.692.968 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.940 (> 0.100 thold), f_keep = 1.000
+Oct 09 13:55:29 qdrant-robot bash[298239]: 4.31.693.507 I slot launch_slot_: id  0 | task 403 | processing task, is_child = 0
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.945.851 I slot print_timing: id  0 | task 403 | prompt eval time =     912.44 ms /   367 tokens (    2.49 ms per token,   402.22 tokens per second)
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.945.867 I slot print_timing: id  0 | task 403 |        eval time =     339.85 ms /     8 tokens (   48.55 ms per token,    20.60 tokens per second)
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.945.870 I slot print_timing: id  0 | task 403 |       total time =    1252.29 ms /   375 tokens
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.945.873 I slot print_timing: id  0 | task 403 |    graphs reused =        287
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.946.038 I slot      release: id  0 | task 403 | stop processing: n_tokens = 374, truncated = 0
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.979.205 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.966 (> 0.100 thold), f_keep = 0.832
+Oct 09 13:55:30 qdrant-robot bash[298239]: 4.32.979.731 I slot launch_slot_: id  0 | task 416 | processing task, is_child = 0
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.34.974.619 I slot print_timing: id  0 | task 416 | prompt eval time =     748.41 ms /   322 tokens (    2.32 ms per token,   430.24 tokens per second)
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.34.974.639 I slot print_timing: id  0 | task 416 |        eval time =    1246.40 ms /    26 tokens (   49.86 ms per token,    20.06 tokens per second)
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.34.974.645 I slot print_timing: id  0 | task 416 |       total time =    1994.81 ms /   348 tokens
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.34.974.650 I slot print_timing: id  0 | task 416 |    graphs reused =        311
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.34.974.808 I slot      release: id  0 | task 416 | stop processing: n_tokens = 347, truncated = 0
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.35.011.869 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.933 (> 0.100 thold), f_keep = 1.000
+Oct 09 13:55:32 qdrant-robot bash[298239]: 4.35.012.391 I slot launch_slot_: id  0 | task 446 | processing task, is_child = 0
+Oct 09 13:55:34 qdrant-robot bash[298239]: 4.36.490.704 I slot print_timing: id  0 | task 446 | prompt eval time =     945.53 ms /   372 tokens (    2.54 ms per token,   393.43 tokens per second)
+Oct 09 13:55:34 qdrant-robot bash[298239]: 4.36.490.720 I slot print_timing: id  0 | task 446 |        eval time =     532.74 ms /    12 tokens (   48.43 ms per token,    20.65 tokens per second)
+Oct 09 13:55:34 qdrant-robot bash[298239]: 4.36.490.722 I slot print_timing: id  0 | task 446 |       total time =    1478.26 ms /   384 tokens
+Oct 09 13:55:34 qdrant-robot bash[298239]: 4.36.490.726 I slot print_timing: id  0 | task 446 |    graphs reused =        321
+Oct 09 13:55:34 qdrant-robot bash[298239]: 4.36.490.894 I slot      release: id  0 | task 446 | stop processing: n_tokens = 383, truncated = 0
+Oct 09 14:08:07 qdrant-robot bash[298239]: 17.09.818.750 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 105620624313
+Oct 09 14:08:07 qdrant-robot bash[298239]: 17.09.818.983 I slot launch_slot_: id  0 | task 463 | processing task, is_child = 0
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.428.732 I slot print_timing: id  0 | task 463 | prompt eval time =    1215.74 ms /   552 tokens (    2.20 ms per token,   454.04 tokens per second)
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.428.749 I slot print_timing: id  0 | task 463 |        eval time =     393.95 ms /     9 tokens (   49.24 ms per token,    20.31 tokens per second)
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.428.751 I slot print_timing: id  0 | task 463 |       total time =    1609.69 ms /   561 tokens
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.428.754 I slot print_timing: id  0 | task 463 |    graphs reused =        328
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.428.928 I slot      release: id  0 | task 463 | stop processing: n_tokens = 560, truncated = 0
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.551.405 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.874 (> 0.100 thold), f_keep = 0.905
+Oct 09 14:08:09 qdrant-robot bash[298239]: 17.11.551.549 I slot launch_slot_: id  0 | task 476 | processing task, is_child = 0
+Oct 09 14:08:10 qdrant-robot bash[298239]: 17.13.148.298 I slot print_timing: id  0 | task 476 | prompt eval time =    1254.00 ms /   580 tokens (    2.16 ms per token,   462.52 tokens per second)
+Oct 09 14:08:10 qdrant-robot bash[298239]: 17.13.148.314 I slot print_timing: id  0 | task 476 |        eval time =     342.70 ms /     8 tokens (   48.96 ms per token,    20.43 tokens per second)
+Oct 09 14:08:10 qdrant-robot bash[298239]: 17.13.148.317 I slot print_timing: id  0 | task 476 |       total time =    1596.70 ms /   588 tokens
+Oct 09 14:08:10 qdrant-robot bash[298239]: 17.13.148.323 I slot print_timing: id  0 | task 476 |    graphs reused =        334
+Oct 09 14:08:10 qdrant-robot bash[298239]: 17.13.148.507 I slot      release: id  0 | task 476 | stop processing: n_tokens = 587, truncated = 0
+Oct 09 14:08:11 qdrant-robot bash[298239]: 17.13.264.941 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.801 (> 0.100 thold), f_keep = 0.882
+Oct 09 14:08:11 qdrant-robot bash[298239]: 17.13.265.091 I slot launch_slot_: id  0 | task 489 | processing task, is_child = 0
+Oct 09 14:08:12 qdrant-robot bash[298239]: 17.15.123.628 I slot print_timing: id  0 | task 489 | prompt eval time =    1421.74 ms /   647 tokens (    2.20 ms per token,   455.07 tokens per second)
+Oct 09 14:08:12 qdrant-robot bash[298239]: 17.15.123.642 I slot print_timing: id  0 | task 489 |        eval time =     436.75 ms /    10 tokens (   48.53 ms per token,    20.61 tokens per second)
+Oct 09 14:08:12 qdrant-robot bash[298239]: 17.15.123.645 I slot print_timing: id  0 | task 489 |       total time =    1858.49 ms /   657 tokens
+Oct 09 14:08:12 qdrant-robot bash[298239]: 17.15.123.649 I slot print_timing: id  0 | task 489 |    graphs reused =        342
+Oct 09 14:08:12 qdrant-robot bash[298239]: 17.15.123.843 I slot      release: id  0 | task 489 | stop processing: n_tokens = 656, truncated = 0
+Oct 09 14:08:13 qdrant-robot bash[298239]: 17.15.257.864 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.824 (> 0.100 thold), f_keep = 0.848
+Oct 09 14:08:13 qdrant-robot bash[298239]: 17.15.258.012 I slot launch_slot_: id  0 | task 504 | processing task, is_child = 0
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.095.874 I slot print_timing: id  0 | task 504 | prompt eval time =    1448.06 ms /   675 tokens (    2.15 ms per token,   466.14 tokens per second)
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.095.887 I slot print_timing: id  0 | task 504 |        eval time =     389.75 ms /     9 tokens (   48.72 ms per token,    20.53 tokens per second)
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.095.890 I slot print_timing: id  0 | task 504 |       total time =    1837.81 ms /   684 tokens
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.095.893 I slot print_timing: id  0 | task 504 |    graphs reused =        349
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.096.091 I slot      release: id  0 | task 504 | stop processing: n_tokens = 683, truncated = 0
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.220.575 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.915 (> 0.100 thold), f_keep = 0.742
+Oct 09 14:08:14 qdrant-robot bash[298239]: 17.17.220.721 I slot launch_slot_: id  0 | task 518 | processing task, is_child = 0
+Oct 09 14:08:16 qdrant-robot bash[298239]: 17.19.132.821 I slot print_timing: id  0 | task 518 | prompt eval time =    1151.11 ms /   554 tokens (    2.08 ms per token,   481.27 tokens per second)
+Oct 09 14:08:16 qdrant-robot bash[298239]: 17.19.132.834 I slot print_timing: id  0 | task 518 |        eval time =     760.95 ms /    17 tokens (   47.56 ms per token,    21.03 tokens per second)
+Oct 09 14:08:16 qdrant-robot bash[298239]: 17.19.132.837 I slot print_timing: id  0 | task 518 |       total time =    1912.06 ms /   571 tokens
+Oct 09 14:08:16 qdrant-robot bash[298239]: 17.19.132.842 I slot print_timing: id  0 | task 518 |    graphs reused =        364
+Oct 09 14:08:16 qdrant-robot bash[298239]: 17.19.133.016 I slot      release: id  0 | task 518 | stop processing: n_tokens = 570, truncated = 0
+Oct 09 14:08:17 qdrant-robot bash[298239]: 17.19.250.043 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.871 (> 0.100 thold), f_keep = 0.889
+Oct 09 14:08:17 qdrant-robot bash[298239]: 17.19.250.181 I slot launch_slot_: id  0 | task 539 | processing task, is_child = 0
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.070.834 I slot print_timing: id  0 | task 539 | prompt eval time =    1293.46 ms /   582 tokens (    2.22 ms per token,   449.95 tokens per second)
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.070.849 I slot print_timing: id  0 | task 539 |        eval time =     527.14 ms /    12 tokens (   47.92 ms per token,    20.87 tokens per second)
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.070.852 I slot print_timing: id  0 | task 539 |       total time =    1820.60 ms /   594 tokens
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.070.855 I slot print_timing: id  0 | task 539 |    graphs reused =        374
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.071.040 I slot      release: id  0 | task 539 | stop processing: n_tokens = 593, truncated = 0
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.190.129 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.834 (> 0.100 thold), f_keep = 0.875
+Oct 09 14:08:18 qdrant-robot bash[298239]: 17.21.190.270 I slot launch_slot_: id  0 | task 556 | processing task, is_child = 0
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.858.652 I slot print_timing: id  0 | task 556 | prompt eval time =    1372.10 ms /   622 tokens (    2.21 ms per token,   453.32 tokens per second)
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.858.666 I slot print_timing: id  0 | task 556 |        eval time =     296.23 ms /     7 tokens (   49.37 ms per token,    20.25 tokens per second)
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.858.669 I slot print_timing: id  0 | task 556 |       total time =    1668.33 ms /   629 tokens
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.858.672 I slot print_timing: id  0 | task 556 |    graphs reused =        379
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.858.866 I slot      release: id  0 | task 556 | stop processing: n_tokens = 628, truncated = 0
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.986.281 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.826 (> 0.100 thold), f_keep = 0.855
+Oct 09 14:08:20 qdrant-robot bash[298239]: 17.22.986.403 I slot launch_slot_: id  0 | task 568 | processing task, is_child = 0
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.882.963 I slot print_timing: id  0 | task 568 | prompt eval time =    1414.50 ms /   650 tokens (    2.18 ms per token,   459.53 tokens per second)
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.882.979 I slot print_timing: id  0 | task 568 |        eval time =     482.01 ms /    11 tokens (   48.20 ms per token,    20.75 tokens per second)
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.882.983 I slot print_timing: id  0 | task 568 |       total time =    1896.51 ms /   661 tokens
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.882.986 I slot print_timing: id  0 | task 568 |    graphs reused =        388
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.883.186 I slot      release: id  0 | task 568 | stop processing: n_tokens = 660, truncated = 0
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.999.460 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.923 (> 0.100 thold), f_keep = 0.768
+Oct 09 14:08:22 qdrant-robot bash[298239]: 17.24.999.598 I slot launch_slot_: id  0 | task 584 | processing task, is_child = 0
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.672.842 I slot print_timing: id  0 | task 584 | prompt eval time =    1144.95 ms /   549 tokens (    2.09 ms per token,   479.49 tokens per second)
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.672.856 I slot print_timing: id  0 | task 584 |        eval time =     528.25 ms /    12 tokens (   48.02 ms per token,    20.82 tokens per second)
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.672.859 I slot print_timing: id  0 | task 584 |       total time =    1673.20 ms /   561 tokens
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.672.862 I slot print_timing: id  0 | task 584 |    graphs reused =        398
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.673.041 I slot      release: id  0 | task 584 | stop processing: n_tokens = 560, truncated = 0
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.789.596 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.879 (> 0.100 thold), f_keep = 0.905
+Oct 09 14:08:24 qdrant-robot bash[298239]: 17.26.789.731 I slot launch_slot_: id  0 | task 600 | processing task, is_child = 0
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.849.202 I slot print_timing: id  0 | task 600 | prompt eval time =    1251.79 ms /   577 tokens (    2.17 ms per token,   460.94 tokens per second)
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.849.219 I slot print_timing: id  0 | task 600 |        eval time =     807.64 ms /    18 tokens (   47.51 ms per token,    21.05 tokens per second)
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.849.222 I slot print_timing: id  0 | task 600 |       total time =    2059.43 ms /   595 tokens
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.849.225 I slot print_timing: id  0 | task 600 |    graphs reused =        414
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.849.405 I slot      release: id  0 | task 600 | stop processing: n_tokens = 594, truncated = 0
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.962.744 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.876 (> 0.100 thold), f_keep = 0.869
+Oct 09 14:08:26 qdrant-robot bash[298239]: 17.28.962.876 I slot launch_slot_: id  0 | task 623 | processing task, is_child = 0
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.30.931.911 I slot print_timing: id  0 | task 623 | prompt eval time =    1301.60 ms /   589 tokens (    2.21 ms per token,   452.52 tokens per second)
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.30.931.924 I slot print_timing: id  0 | task 623 |        eval time =     667.40 ms /    15 tokens (   47.67 ms per token,    20.98 tokens per second)
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.30.931.927 I slot print_timing: id  0 | task 623 |       total time =    1968.99 ms /   604 tokens
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.30.931.930 I slot print_timing: id  0 | task 623 |    graphs reused =        427
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.30.932.117 I slot      release: id  0 | task 623 | stop processing: n_tokens = 603, truncated = 0
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.31.056.285 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.877 (> 0.100 thold), f_keep = 0.897
+Oct 09 14:08:28 qdrant-robot bash[298239]: 17.31.056.406 I slot launch_slot_: id  0 | task 643 | processing task, is_child = 0
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.320.386 I slot print_timing: id  0 | task 643 | prompt eval time =    1360.32 ms /   617 tokens (    2.20 ms per token,   453.57 tokens per second)
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.320.405 I slot print_timing: id  0 | task 643 |        eval time =     903.61 ms /    20 tokens (   47.56 ms per token,    21.03 tokens per second)
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.320.407 I slot print_timing: id  0 | task 643 |       total time =    2263.93 ms /   637 tokens
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.320.410 I slot print_timing: id  0 | task 643 |    graphs reused =        445
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.320.596 I slot      release: id  0 | task 643 | stop processing: n_tokens = 636, truncated = 0
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.435.036 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.949 (> 0.100 thold), f_keep = 0.797
+Oct 09 14:08:31 qdrant-robot bash[298239]: 17.33.435.180 I slot launch_slot_: id  0 | task 668 | processing task, is_child = 0
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.313.098 I slot print_timing: id  0 | task 668 | prompt eval time =    1114.14 ms /   534 tokens (    2.09 ms per token,   479.29 tokens per second)
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.313.117 I slot print_timing: id  0 | task 668 |        eval time =     763.72 ms /    17 tokens (   47.73 ms per token,    20.95 tokens per second)
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.313.120 I slot print_timing: id  0 | task 668 |       total time =    1877.87 ms /   551 tokens
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.313.124 I slot print_timing: id  0 | task 668 |    graphs reused =        460
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.313.295 I slot      release: id  0 | task 668 | stop processing: n_tokens = 550, truncated = 0
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.430.849 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.902 (> 0.100 thold), f_keep = 0.922
+Oct 09 14:08:33 qdrant-robot bash[298239]: 17.35.431.003 I slot launch_slot_: id  0 | task 689 | processing task, is_child = 0
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.528.089 I slot print_timing: id  0 | task 689 | prompt eval time =    1242.17 ms /   562 tokens (    2.21 ms per token,   452.43 tokens per second)
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.528.103 I slot print_timing: id  0 | task 689 |        eval time =     854.86 ms /    19 tokens (   47.49 ms per token,    21.06 tokens per second)
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.528.107 I slot print_timing: id  0 | task 689 |       total time =    2097.04 ms /   581 tokens
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.528.115 I slot print_timing: id  0 | task 689 |    graphs reused =        477
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.528.282 I slot      release: id  0 | task 689 | stop processing: n_tokens = 580, truncated = 0
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.639.378 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.918 (> 0.100 thold), f_keep = 0.874
+Oct 09 14:08:35 qdrant-robot bash[298239]: 17.37.639.513 I slot launch_slot_: id  0 | task 713 | processing task, is_child = 0
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.455.847 I slot print_timing: id  0 | task 713 | prompt eval time =    1147.78 ms /   552 tokens (    2.08 ms per token,   480.93 tokens per second)
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.455.861 I slot print_timing: id  0 | task 713 |        eval time =     668.50 ms /    15 tokens (   47.75 ms per token,    20.94 tokens per second)
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.455.864 I slot print_timing: id  0 | task 713 |       total time =    1816.29 ms /   567 tokens
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.455.870 I slot print_timing: id  0 | task 713 |    graphs reused =        490
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.456.047 I slot      release: id  0 | task 713 | stop processing: n_tokens = 566, truncated = 0
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.568.826 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.874 (> 0.100 thold), f_keep = 0.896
+Oct 09 14:08:37 qdrant-robot bash[298239]: 17.39.568.968 I slot launch_slot_: id  0 | task 732 | processing task, is_child = 0
+Oct 09 14:08:38 qdrant-robot bash[298239]: 17.41.212.027 I slot print_timing: id  0 | task 732 | prompt eval time =    1253.98 ms /   580 tokens (    2.16 ms per token,   462.53 tokens per second)
+Oct 09 14:08:38 qdrant-robot bash[298239]: 17.41.212.040 I slot print_timing: id  0 | task 732 |        eval time =     389.02 ms /     9 tokens (   48.63 ms per token,    20.56 tokens per second)
+Oct 09 14:08:38 qdrant-robot bash[298239]: 17.41.212.043 I slot print_timing: id  0 | task 732 |       total time =    1643.01 ms /   589 tokens
+Oct 09 14:08:38 qdrant-robot bash[298239]: 17.41.212.046 I slot print_timing: id  0 | task 732 |    graphs reused =        497
+Oct 09 14:08:38 qdrant-robot bash[298239]: 17.41.212.226 I slot      release: id  0 | task 732 | stop processing: n_tokens = 588, truncated = 0
+Oct 09 14:08:39 qdrant-robot bash[298239]: 17.41.320.779 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.931 (> 0.100 thold), f_keep = 0.570
+Oct 09 14:08:39 qdrant-robot bash[298239]: 17.41.320.924 I slot launch_slot_: id  0 | task 746 | processing task, is_child = 0
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.751.384 I slot print_timing: id  0 | task 746 | prompt eval time =     831.71 ms /   360 tokens (    2.31 ms per token,   432.84 tokens per second)
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.751.399 I slot print_timing: id  0 | task 746 |        eval time =    1598.70 ms /    35 tokens (   47.02 ms per token,    21.27 tokens per second)
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.751.401 I slot print_timing: id  0 | task 746 |       total time =    2430.41 ms /   395 tokens
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.751.404 I slot print_timing: id  0 | task 746 |    graphs reused =        530
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.751.533 I slot      release: id  0 | task 746 | stop processing: n_tokens = 394, truncated = 0
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.857.629 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.953 (> 0.100 thold), f_keep = 0.865
+Oct 09 14:08:41 qdrant-robot bash[298239]: 17.43.857.770 I slot launch_slot_: id  0 | task 785 | processing task, is_child = 0
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.267.253 I slot print_timing: id  0 | task 785 | prompt eval time =     813.90 ms /   358 tokens (    2.27 ms per token,   439.86 tokens per second)
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.267.272 I slot print_timing: id  0 | task 785 |        eval time =    1595.53 ms /    35 tokens (   46.93 ms per token,    21.31 tokens per second)
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.267.279 I slot print_timing: id  0 | task 785 |       total time =    2409.43 ms /   393 tokens
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.267.286 I slot print_timing: id  0 | task 785 |    graphs reused =        563
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.267.420 I slot      release: id  0 | task 785 | stop processing: n_tokens = 392, truncated = 0
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.388.727 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.557 (> 0.100 thold), f_keep = 0.855
+Oct 09 14:08:44 qdrant-robot bash[298239]: 17.46.388.865 I slot launch_slot_: id  0 | task 824 | processing task, is_child = 0
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.47.925.093 I slot print_timing: id  0 | task 824 | prompt eval time =    1333.06 ms /   601 tokens (    2.22 ms per token,   450.84 tokens per second)
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.47.925.108 I slot print_timing: id  0 | task 824 |        eval time =     203.13 ms /     5 tokens (   50.78 ms per token,    19.69 tokens per second)
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.47.925.111 I slot print_timing: id  0 | task 824 |       total time =    1536.18 ms /   606 tokens
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.47.925.114 I slot print_timing: id  0 | task 824 |    graphs reused =        566
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.47.925.303 I slot      release: id  0 | task 824 | stop processing: n_tokens = 605, truncated = 0
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.48.044.048 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.876 (> 0.100 thold), f_keep = 0.911
+Oct 09 14:08:45 qdrant-robot bash[298239]: 17.48.044.183 I slot launch_slot_: id  0 | task 834 | processing task, is_child = 0
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.286.904 I slot print_timing: id  0 | task 834 | prompt eval time =    1387.85 ms /   629 tokens (    2.21 ms per token,   453.22 tokens per second)
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.286.921 I slot print_timing: id  0 | task 834 |        eval time =     854.82 ms /    19 tokens (   47.49 ms per token,    21.06 tokens per second)
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.286.925 I slot print_timing: id  0 | task 834 |       total time =    2242.67 ms /   648 tokens
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.286.932 I slot print_timing: id  0 | task 834 |    graphs reused =        583
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.287.124 I slot      release: id  0 | task 834 | stop processing: n_tokens = 647, truncated = 0
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.413.461 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.929 (> 0.100 thold), f_keep = 0.784
+Oct 09 14:08:48 qdrant-robot bash[298239]: 17.50.413.599 I slot launch_slot_: id  0 | task 858 | processing task, is_child = 0
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.720.812 I slot print_timing: id  0 | task 858 | prompt eval time =    1126.79 ms /   546 tokens (    2.06 ms per token,   484.56 tokens per second)
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.720.829 I slot print_timing: id  0 | task 858 |        eval time =    1180.38 ms /    26 tokens (   47.22 ms per token,    21.18 tokens per second)
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.720.832 I slot print_timing: id  0 | task 858 |       total time =    2307.17 ms /   572 tokens
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.720.835 I slot print_timing: id  0 | task 858 |    graphs reused =        607
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.721.000 I slot      release: id  0 | task 858 | stop processing: n_tokens = 571, truncated = 0
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.834.926 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.883 (> 0.100 thold), f_keep = 0.888
+Oct 09 14:08:50 qdrant-robot bash[298239]: 17.52.835.066 I slot launch_slot_: id  0 | task 888 | processing task, is_child = 0
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.335.854 I slot print_timing: id  0 | task 888 | prompt eval time =    1250.90 ms /   574 tokens (    2.18 ms per token,   458.87 tokens per second)
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.335.872 I slot print_timing: id  0 | task 888 |        eval time =     249.84 ms /     6 tokens (   49.97 ms per token,    20.01 tokens per second)
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.335.875 I slot print_timing: id  0 | task 888 |       total time =    1500.74 ms /   580 tokens
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.335.882 I slot print_timing: id  0 | task 888 |    graphs reused =        611
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.336.061 I slot      release: id  0 | task 888 | stop processing: n_tokens = 579, truncated = 0
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.452.256 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.895 (> 0.100 thold), f_keep = 0.895
+Oct 09 14:08:52 qdrant-robot bash[298239]: 17.54.452.398 I slot launch_slot_: id  0 | task 899 | processing task, is_child = 0
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.283.112 I slot print_timing: id  0 | task 899 | prompt eval time =    1255.34 ms /   579 tokens (    2.17 ms per token,   461.23 tokens per second)
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.283.128 I slot print_timing: id  0 | task 899 |        eval time =     575.33 ms /    13 tokens (   47.94 ms per token,    20.86 tokens per second)
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.283.134 I slot print_timing: id  0 | task 899 |       total time =    1830.66 ms /   592 tokens
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.283.141 I slot print_timing: id  0 | task 899 |    graphs reused =        622
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.283.320 I slot      release: id  0 | task 899 | stop processing: n_tokens = 591, truncated = 0
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.401.839 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.888 (> 0.100 thold), f_keep = 0.912
+Oct 09 14:08:54 qdrant-robot bash[298239]: 17.56.401.989 I slot launch_slot_: id  0 | task 917 | processing task, is_child = 0
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.319.105 I slot print_timing: id  0 | task 917 | prompt eval time =    1341.88 ms /   607 tokens (    2.21 ms per token,   452.35 tokens per second)
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.319.121 I slot print_timing: id  0 | task 917 |        eval time =     575.18 ms /    13 tokens (   47.93 ms per token,    20.86 tokens per second)
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.319.125 I slot print_timing: id  0 | task 917 |       total time =    1917.06 ms /   620 tokens
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.319.128 I slot print_timing: id  0 | task 917 |    graphs reused =        633
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.319.329 I slot      release: id  0 | task 917 | stop processing: n_tokens = 619, truncated = 0
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.428.937 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.915 (> 0.100 thold), f_keep = 0.819
+Oct 09 14:08:56 qdrant-robot bash[298239]: 17.58.429.082 I slot launch_slot_: id  0 | task 935 | processing task, is_child = 0
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.071.476 I slot print_timing: id  0 | task 935 | prompt eval time =    1157.91 ms /   554 tokens (    2.09 ms per token,   478.45 tokens per second)
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.071.491 I slot print_timing: id  0 | task 935 |        eval time =     484.44 ms /    11 tokens (   48.44 ms per token,    20.64 tokens per second)
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.071.494 I slot print_timing: id  0 | task 935 |       total time =    1642.35 ms /   565 tokens
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.071.496 I slot print_timing: id  0 | task 935 |    graphs reused =        642
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.071.671 I slot      release: id  0 | task 935 | stop processing: n_tokens = 564, truncated = 0
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.193.506 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.871 (> 0.100 thold), f_keep = 0.899
+Oct 09 14:08:57 qdrant-robot bash[298239]: 18.00.193.649 I slot launch_slot_: id  0 | task 950 | processing task, is_child = 0
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.01.957.303 I slot print_timing: id  0 | task 950 | prompt eval time =    1281.89 ms /   582 tokens (    2.20 ms per token,   454.02 tokens per second)
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.01.957.319 I slot print_timing: id  0 | task 950 |        eval time =     481.71 ms /    11 tokens (   48.17 ms per token,    20.76 tokens per second)
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.01.957.322 I slot print_timing: id  0 | task 950 |       total time =    1763.60 ms /   593 tokens
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.01.957.324 I slot print_timing: id  0 | task 950 |    graphs reused =        651
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.01.957.510 I slot      release: id  0 | task 950 | stop processing: n_tokens = 592, truncated = 0
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.02.064.223 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.915 (> 0.100 thold), f_keep = 0.856
+Oct 09 14:08:59 qdrant-robot bash[298239]: 18.02.064.349 I slot launch_slot_: id  0 | task 966 | processing task, is_child = 0
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.836.805 I slot print_timing: id  0 | task 966 | prompt eval time =    1151.29 ms /   554 tokens (    2.08 ms per token,   481.20 tokens per second)
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.836.819 I slot print_timing: id  0 | task 966 |        eval time =     621.13 ms /    14 tokens (   47.78 ms per token,    20.93 tokens per second)
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.836.822 I slot print_timing: id  0 | task 966 |       total time =    1772.41 ms /   568 tokens
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.836.825 I slot print_timing: id  0 | task 966 |    graphs reused =        663
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.837.000 I slot      release: id  0 | task 966 | stop processing: n_tokens = 567, truncated = 0
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.949.827 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.871 (> 0.100 thold), f_keep = 0.894
+Oct 09 14:09:01 qdrant-robot bash[298239]: 18.03.949.956 I slot launch_slot_: id  0 | task 984 | processing task, is_child = 0
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.860.884 I slot print_timing: id  0 | task 984 | prompt eval time =    1289.93 ms /   582 tokens (    2.22 ms per token,   451.19 tokens per second)
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.860.898 I slot print_timing: id  0 | task 984 |        eval time =     620.95 ms /    14 tokens (   47.77 ms per token,    20.94 tokens per second)
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.860.900 I slot print_timing: id  0 | task 984 |       total time =    1910.88 ms /   596 tokens
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.860.903 I slot print_timing: id  0 | task 984 |    graphs reused =        675
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.861.091 I slot      release: id  0 | task 984 | stop processing: n_tokens = 595, truncated = 0
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.975.796 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.927 (> 0.100 thold), f_keep = 0.852
+Oct 09 14:09:03 qdrant-robot bash[298239]: 18.05.975.935 I slot launch_slot_: id  0 | task 1003 | processing task, is_child = 0
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.491.887 I slot print_timing: id  0 | task 1003 | prompt eval time =    1127.14 ms /   547 tokens (    2.06 ms per token,   485.30 tokens per second)
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.491.902 I slot print_timing: id  0 | task 1003 |        eval time =     388.76 ms /     9 tokens (   48.60 ms per token,    20.58 tokens per second)
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.491.905 I slot print_timing: id  0 | task 1003 |       total time =    1515.90 ms /   556 tokens
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.491.908 I slot print_timing: id  0 | task 1003 |    graphs reused =        682
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.492.086 I slot      release: id  0 | task 1003 | stop processing: n_tokens = 555, truncated = 0
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.611.758 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.882 (> 0.100 thold), f_keep = 0.914
+Oct 09 14:09:05 qdrant-robot bash[298239]: 18.07.611.887 I slot launch_slot_: id  0 | task 1016 | processing task, is_child = 0
+Oct 09 14:09:06 qdrant-robot bash[298239]: 18.09.124.558 I slot print_timing: id  0 | task 1016 | prompt eval time =    1263.09 ms /   575 tokens (    2.20 ms per token,   455.23 tokens per second)
+Oct 09 14:09:06 qdrant-robot bash[298239]: 18.09.124.574 I slot print_timing: id  0 | task 1016 |        eval time =     249.53 ms /     6 tokens (   49.91 ms per token,    20.04 tokens per second)
+Oct 09 14:09:06 qdrant-robot bash[298239]: 18.09.124.577 I slot print_timing: id  0 | task 1016 |       total time =    1512.62 ms /   581 tokens
+Oct 09 14:09:06 qdrant-robot bash[298239]: 18.09.124.580 I slot print_timing: id  0 | task 1016 |    graphs reused =        686
+Oct 09 14:09:06 qdrant-robot bash[298239]: 18.09.124.767 I slot      release: id  0 | task 1016 | stop processing: n_tokens = 580, truncated = 0
+Oct 09 14:09:07 qdrant-robot bash[298239]: 18.09.238.208 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.904 (> 0.100 thold), f_keep = 0.895
+Oct 09 14:09:07 qdrant-robot bash[298239]: 18.09.238.341 I slot launch_slot_: id  0 | task 1027 | processing task, is_child = 0
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.737.248 I slot print_timing: id  0 | task 1027 | prompt eval time =    1249.93 ms /   574 tokens (    2.18 ms per token,   459.22 tokens per second)
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.737.263 I slot print_timing: id  0 | task 1027 |        eval time =     248.93 ms /     6 tokens (   49.79 ms per token,    20.09 tokens per second)
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.737.266 I slot print_timing: id  0 | task 1027 |       total time =    1498.86 ms /   580 tokens
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.737.269 I slot print_timing: id  0 | task 1027 |    graphs reused =        690
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.737.445 I slot      release: id  0 | task 1027 | stop processing: n_tokens = 579, truncated = 0
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.856.155 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.885 (> 0.100 thold), f_keep = 0.921
+Oct 09 14:09:08 qdrant-robot bash[298239]: 18.10.856.290 I slot launch_slot_: id  0 | task 1038 | processing task, is_child = 0
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.484.347 I slot print_timing: id  0 | task 1038 | prompt eval time =    1332.62 ms /   602 tokens (    2.21 ms per token,   451.74 tokens per second)
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.484.364 I slot print_timing: id  0 | task 1038 |        eval time =     295.39 ms /     7 tokens (   49.23 ms per token,    20.31 tokens per second)
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.484.367 I slot print_timing: id  0 | task 1038 |       total time =    1628.01 ms /   609 tokens
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.484.370 I slot print_timing: id  0 | task 1038 |    graphs reused =        695
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.484.556 I slot      release: id  0 | task 1038 | stop processing: n_tokens = 608, truncated = 0
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.598.196 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.930 (> 0.100 thold), f_keep = 0.834
+Oct 09 14:09:10 qdrant-robot bash[298239]: 18.12.598.326 I slot launch_slot_: id  0 | task 1050 | processing task, is_child = 0
+Oct 09 14:09:11 qdrant-robot bash[298239]: 18.14.158.322 I slot print_timing: id  0 | task 1050 | prompt eval time =    1125.76 ms /   545 tokens (    2.07 ms per token,   484.12 tokens per second)
+Oct 09 14:09:11 qdrant-robot bash[298239]: 18.14.158.340 I slot print_timing: id  0 | task 1050 |        eval time =     434.19 ms /    10 tokens (   48.24 ms per token,    20.73 tokens per second)
+Oct 09 14:09:11 qdrant-robot bash[298239]: 18.14.158.348 I slot print_timing: id  0 | task 1050 |       total time =    1559.95 ms /   555 tokens
+Oct 09 14:09:11 qdrant-robot bash[298239]: 18.14.158.354 I slot print_timing: id  0 | task 1050 |    graphs reused =        703
+Oct 09 14:09:11 qdrant-robot bash[298239]: 18.14.158.527 I slot      release: id  0 | task 1050 | stop processing: n_tokens = 554, truncated = 0
+Oct 09 14:09:12 qdrant-robot bash[298239]: 18.14.313.626 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.885 (> 0.100 thold), f_keep = 0.915
+Oct 09 14:09:12 qdrant-robot bash[298239]: 18.14.313.753 I slot launch_slot_: id  0 | task 1064 | processing task, is_child = 0
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.815.267 I slot print_timing: id  0 | task 1064 | prompt eval time =    1252.59 ms /   573 tokens (    2.19 ms per token,   457.45 tokens per second)
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.815.282 I slot print_timing: id  0 | task 1064 |        eval time =     248.88 ms /     6 tokens (   49.78 ms per token,    20.09 tokens per second)
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.815.285 I slot print_timing: id  0 | task 1064 |       total time =    1501.47 ms /   579 tokens
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.815.290 I slot print_timing: id  0 | task 1064 |    graphs reused =        707
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.815.468 I slot      release: id  0 | task 1064 | stop processing: n_tokens = 578, truncated = 0
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.932.481 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.909 (> 0.100 thold), f_keep = 0.894
+Oct 09 14:09:13 qdrant-robot bash[298239]: 18.15.932.624 I slot launch_slot_: id  0 | task 1075 | processing task, is_child = 0
+Oct 09 14:09:14 qdrant-robot bash[298239]: 18.17.236.079 I slot print_timing: id  0 | task 1075 | prompt eval time =    1248.88 ms /   569 tokens (    2.19 ms per token,   455.61 tokens per second)
+Oct 09 14:09:14 qdrant-robot bash[298239]: 18.17.236.095 I slot print_timing: id  0 | task 1075 |        eval time =      54.52 ms /     2 tokens (   54.52 ms per token,    18.34 tokens per second)
+Oct 09 14:09:14 qdrant-robot bash[298239]: 18.17.236.098 I slot print_timing: id  0 | task 1075 |       total time =    1303.40 ms /   571 tokens
+Oct 09 14:09:14 qdrant-robot bash[298239]: 18.17.236.101 I slot print_timing: id  0 | task 1075 |    graphs reused =        707
+Oct 09 14:09:14 qdrant-robot bash[298239]: 18.17.236.284 I slot      release: id  0 | task 1075 | stop processing: n_tokens = 570, truncated = 0
+Oct 09 14:09:15 qdrant-robot bash[298239]: 18.17.353.411 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.876 (> 0.100 thold), f_keep = 0.918
+Oct 09 14:09:15 qdrant-robot bash[298239]: 18.17.353.543 I slot launch_slot_: id  0 | task 1082 | processing task, is_child = 0
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.110.980 I slot print_timing: id  0 | task 1082 | prompt eval time =    1322.56 ms /   597 tokens (    2.22 ms per token,   451.40 tokens per second)
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.110.998 I slot print_timing: id  0 | task 1082 |        eval time =     434.83 ms /    10 tokens (   48.31 ms per token,    20.70 tokens per second)
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.111.002 I slot print_timing: id  0 | task 1082 |       total time =    1757.39 ms /   607 tokens
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.111.006 I slot print_timing: id  0 | task 1082 |    graphs reused =        715
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.111.189 I slot      release: id  0 | task 1082 | stop processing: n_tokens = 606, truncated = 0
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.228.735 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.785 (> 0.100 thold), f_keep = 0.881
+Oct 09 14:09:16 qdrant-robot bash[298239]: 18.19.228.872 I slot launch_slot_: id  0 | task 1097 | processing task, is_child = 0
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.381.843 I slot print_timing: id  0 | task 1097 | prompt eval time =    1484.62 ms /   680 tokens (    2.18 ms per token,   458.03 tokens per second)
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.381.858 I slot print_timing: id  0 | task 1097 |        eval time =     668.31 ms /    15 tokens (   47.74 ms per token,    20.95 tokens per second)
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.381.861 I slot print_timing: id  0 | task 1097 |       total time =    2152.93 ms /   695 tokens
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.381.864 I slot print_timing: id  0 | task 1097 |    graphs reused =        728
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.382.063 I slot      release: id  0 | task 1097 | stop processing: n_tokens = 694, truncated = 0
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.507.928 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.768 (> 0.100 thold), f_keep = 0.784
+Oct 09 14:09:19 qdrant-robot bash[298239]: 18.21.508.055 I slot launch_slot_: id  0 | task 1117 | processing task, is_child = 0
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.474.518 I slot print_timing: id  0 | task 1117 | prompt eval time =    1484.42 ms /   708 tokens (    2.10 ms per token,   476.95 tokens per second)
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.474.534 I slot print_timing: id  0 | task 1117 |        eval time =     481.99 ms /    11 tokens (   48.20 ms per token,    20.75 tokens per second)
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.474.536 I slot print_timing: id  0 | task 1117 |       total time =    1966.41 ms /   719 tokens
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.474.539 I slot print_timing: id  0 | task 1117 |    graphs reused =        737
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.474.782 I slot      release: id  0 | task 1117 | stop processing: n_tokens = 718, truncated = 0
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.599.655 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.776 (> 0.100 thold), f_keep = 0.777
+Oct 09 14:09:21 qdrant-robot bash[298239]: 18.23.599.796 I slot launch_slot_: id  0 | task 1133 | processing task, is_child = 0
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.340.888 I slot print_timing: id  0 | task 1133 | prompt eval time =    1492.20 ms /   719 tokens (    2.08 ms per token,   481.84 tokens per second)
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.340.902 I slot print_timing: id  0 | task 1133 |        eval time =     248.84 ms /     6 tokens (   49.77 ms per token,    20.09 tokens per second)
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.340.905 I slot print_timing: id  0 | task 1133 |       total time =    1741.04 ms /   725 tokens
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.340.911 I slot print_timing: id  0 | task 1133 |    graphs reused =        741
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.341.114 I slot      release: id  0 | task 1133 | stop processing: n_tokens = 724, truncated = 0
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.461.225 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.756 (> 0.100 thold), f_keep = 0.780
+Oct 09 14:09:23 qdrant-robot bash[298239]: 18.25.461.364 I slot launch_slot_: id  0 | task 1144 | processing task, is_child = 0
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.109.845 I slot print_timing: id  0 | task 1144 | prompt eval time =    1538.70 ms /   747 tokens (    2.06 ms per token,   485.47 tokens per second)
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.109.861 I slot print_timing: id  0 | task 1144 |        eval time =     109.72 ms /     3 tokens (   54.86 ms per token,    18.23 tokens per second)
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.109.864 I slot print_timing: id  0 | task 1144 |       total time =    1648.43 ms /   750 tokens
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.109.867 I slot print_timing: id  0 | task 1144 |    graphs reused =        742
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.110.089 I slot      release: id  0 | task 1144 | stop processing: n_tokens = 749, truncated = 0
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.216.682 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.929 (> 0.100 thold), f_keep = 0.677
+Oct 09 14:09:24 qdrant-robot bash[298239]: 18.27.216.824 I slot launch_slot_: id  0 | task 1152 | processing task, is_child = 0
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.546.987 I slot print_timing: id  0 | task 1152 | prompt eval time =    1127.52 ms /   546 tokens (    2.07 ms per token,   484.25 tokens per second)
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.547.004 I slot print_timing: id  0 | task 1152 |        eval time =     202.59 ms /     5 tokens (   50.65 ms per token,    19.74 tokens per second)
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.547.008 I slot print_timing: id  0 | task 1152 |       total time =    1330.11 ms /   551 tokens
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.547.016 I slot print_timing: id  0 | task 1152 |    graphs reused =        745
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.547.191 I slot      release: id  0 | task 1152 | stop processing: n_tokens = 550, truncated = 0
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.659.204 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.883 (> 0.100 thold), f_keep = 0.922
+Oct 09 14:09:26 qdrant-robot bash[298239]: 18.28.659.342 I slot launch_slot_: id  0 | task 1161 | processing task, is_child = 0
+Oct 09 14:09:27 qdrant-robot bash[298239]: 18.30.205.344 I slot print_timing: id  0 | task 1161 | prompt eval time =    1250.49 ms /   574 tokens (    2.18 ms per token,   459.02 tokens per second)
+Oct 09 14:09:27 qdrant-robot bash[298239]: 18.30.205.361 I slot print_timing: id  0 | task 1161 |        eval time =     295.46 ms /     7 tokens (   49.24 ms per token,    20.31 tokens per second)
+Oct 09 14:09:27 qdrant-robot bash[298239]: 18.30.205.363 I slot print_timing: id  0 | task 1161 |       total time =    1545.96 ms /   581 tokens
+Oct 09 14:09:27 qdrant-robot bash[298239]: 18.30.205.366 I slot print_timing: id  0 | task 1161 |    graphs reused =        750
+Oct 09 14:09:27 qdrant-robot bash[298239]: 18.30.205.549 I slot      release: id  0 | task 1161 | stop processing: n_tokens = 580, truncated = 0
+Oct 09 14:09:28 qdrant-robot bash[298239]: 18.30.320.691 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.885 (> 0.100 thold), f_keep = 0.890
+Oct 09 14:09:28 qdrant-robot bash[298239]: 18.30.320.834 I slot launch_slot_: id  0 | task 1173 | processing task, is_child = 0
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.016.551 I slot print_timing: id  0 | task 1173 | prompt eval time =    1291.43 ms /   583 tokens (    2.22 ms per token,   451.44 tokens per second)
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.016.560 I slot print_timing: id  0 | task 1173 |        eval time =    1404.25 ms /    31 tokens (   46.81 ms per token,    21.36 tokens per second)
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.016.562 I slot print_timing: id  0 | task 1173 |       total time =    2695.68 ms /   614 tokens
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.016.564 I slot print_timing: id  0 | task 1173 |    graphs reused =        779
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.016.677 I slot      release: id  0 | task 1173 | stop processing: n_tokens = 613, truncated = 0
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.099.275 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.890 (> 0.100 thold), f_keep = 0.887
+Oct 09 14:09:30 qdrant-robot bash[298239]: 18.33.099.351 I slot launch_slot_: id  0 | task 1209 | processing task, is_child = 0
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.669.924 I slot print_timing: id  0 | task 1209 | prompt eval time =    1341.34 ms /   611 tokens (    2.20 ms per token,   455.51 tokens per second)
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.669.939 I slot print_timing: id  0 | task 1209 |        eval time =    1229.19 ms /    27 tokens (   47.28 ms per token,    21.15 tokens per second)
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.669.942 I slot print_timing: id  0 | task 1209 |       total time =    2570.53 ms /   638 tokens
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.669.944 I slot print_timing: id  0 | task 1209 |    graphs reused =        804
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.670.133 I slot      release: id  0 | task 1209 | stop processing: n_tokens = 637, truncated = 0
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.795.350 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.884 (> 0.100 thold), f_keep = 0.870
+Oct 09 14:09:33 qdrant-robot bash[298239]: 18.35.795.492 I slot launch_slot_: id  0 | task 1241 | processing task, is_child = 0
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.37.933.599 I slot print_timing: id  0 | task 1241 | prompt eval time =    1377.43 ms /   627 tokens (    2.20 ms per token,   455.19 tokens per second)
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.37.933.615 I slot print_timing: id  0 | task 1241 |        eval time =     760.63 ms /    17 tokens (   47.54 ms per token,    21.04 tokens per second)
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.37.933.618 I slot print_timing: id  0 | task 1241 |       total time =    2138.06 ms /   644 tokens
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.37.933.621 I slot print_timing: id  0 | task 1241 |    graphs reused =        819
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.37.933.818 I slot      release: id  0 | task 1241 | stop processing: n_tokens = 643, truncated = 0
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.38.053.331 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.887 (> 0.100 thold), f_keep = 0.904
+Oct 09 14:09:35 qdrant-robot bash[298239]: 18.38.053.467 I slot launch_slot_: id  0 | task 1263 | processing task, is_child = 0
+Oct 09 14:09:37 qdrant-robot bash[298239]: 18.40.159.604 I slot print_timing: id  0 | task 1263 | prompt eval time =    1437.60 ms /   655 tokens (    2.19 ms per token,   455.62 tokens per second)
+Oct 09 14:09:37 qdrant-robot bash[298239]: 18.40.159.619 I slot print_timing: id  0 | task 1263 |        eval time =     668.50 ms /    15 tokens (   47.75 ms per token,    20.94 tokens per second)
+Oct 09 14:09:37 qdrant-robot bash[298239]: 18.40.159.622 I slot print_timing: id  0 | task 1263 |       total time =    2106.10 ms /   670 tokens
+Oct 09 14:09:37 qdrant-robot bash[298239]: 18.40.159.625 I slot print_timing: id  0 | task 1263 |    graphs reused =        832
+Oct 09 14:09:37 qdrant-robot bash[298239]: 18.40.159.825 I slot      release: id  0 | task 1263 | stop processing: n_tokens = 669, truncated = 0
+Oct 09 14:09:38 qdrant-robot bash[298239]: 18.40.323.403 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.892 (> 0.100 thold), f_keep = 0.885
+Oct 09 14:09:38 qdrant-robot bash[298239]: 18.40.323.542 I slot launch_slot_: id  0 | task 1283 | processing task, is_child = 0
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.709.711 I slot print_timing: id  0 | task 1283 | prompt eval time =    1436.38 ms /   664 tokens (    2.16 ms per token,   462.27 tokens per second)
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.709.726 I slot print_timing: id  0 | task 1283 |        eval time =     949.75 ms /    21 tokens (   47.49 ms per token,    21.06 tokens per second)
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.709.729 I slot print_timing: id  0 | task 1283 |       total time =    2386.12 ms /   685 tokens
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.709.732 I slot print_timing: id  0 | task 1283 |    graphs reused =        851
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.709.933 I slot      release: id  0 | task 1283 | stop processing: n_tokens = 684, truncated = 0
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.837.218 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.905 (> 0.100 thold), f_keep = 0.915
+Oct 09 14:09:40 qdrant-robot bash[298239]: 18.42.837.360 I slot launch_slot_: id  0 | task 1309 | processing task, is_child = 0
+Oct 09 14:09:42 qdrant-robot bash[298239]: 18.45.209.250 I slot print_timing: id  0 | task 1309 | prompt eval time =    1472.03 ms /   692 tokens (    2.13 ms per token,   470.10 tokens per second)
+Oct 09 14:09:42 qdrant-robot bash[298239]: 18.45.209.263 I slot print_timing: id  0 | task 1309 |        eval time =     899.82 ms /    20 tokens (   47.36 ms per token,    21.12 tokens per second)
+Oct 09 14:09:42 qdrant-robot bash[298239]: 18.45.209.267 I slot print_timing: id  0 | task 1309 |       total time =    2371.85 ms /   712 tokens
+Oct 09 14:09:42 qdrant-robot bash[298239]: 18.45.209.269 I slot print_timing: id  0 | task 1309 |    graphs reused =        869
+Oct 09 14:09:42 qdrant-robot bash[298239]: 18.45.209.468 I slot      release: id  0 | task 1309 | stop processing: n_tokens = 711, truncated = 0
+Oct 09 14:09:43 qdrant-robot bash[298239]: 18.45.376.300 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.903 (> 0.100 thold), f_keep = 0.895
+Oct 09 14:09:43 qdrant-robot bash[298239]: 18.45.376.437 I slot launch_slot_: id  0 | task 1334 | processing task, is_child = 0
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.47.885.230 I slot print_timing: id  0 | task 1334 | prompt eval time =    1469.51 ms /   704 tokens (    2.09 ms per token,   479.07 tokens per second)
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.47.885.244 I slot print_timing: id  0 | task 1334 |        eval time =    1039.24 ms /    23 tokens (   47.24 ms per token,    21.17 tokens per second)
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.47.885.247 I slot print_timing: id  0 | task 1334 |       total time =    2508.75 ms /   727 tokens
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.47.885.250 I slot print_timing: id  0 | task 1334 |    graphs reused =        890
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.47.885.459 I slot      release: id  0 | task 1334 | stop processing: n_tokens = 726, truncated = 0
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.48.015.866 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.904 (> 0.100 thold), f_keep = 0.912
+Oct 09 14:09:45 qdrant-robot bash[298239]: 18.48.016.009 I slot launch_slot_: id  0 | task 1362 | processing task, is_child = 0
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.352.697 I slot print_timing: id  0 | task 1362 | prompt eval time =    1480.06 ms /   732 tokens (    2.02 ms per token,   494.57 tokens per second)
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.352.712 I slot print_timing: id  0 | task 1362 |        eval time =     856.57 ms /    19 tokens (   47.59 ms per token,    21.01 tokens per second)
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.352.715 I slot print_timing: id  0 | task 1362 |       total time =    2336.63 ms /   751 tokens
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.352.718 I slot print_timing: id  0 | task 1362 |    graphs reused =        907
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.352.939 I slot      release: id  0 | task 1362 | stop processing: n_tokens = 750, truncated = 0
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.463.194 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.899 (> 0.100 thold), f_keep = 0.676
+Oct 09 14:09:48 qdrant-robot bash[298239]: 18.50.463.336 I slot launch_slot_: id  0 | task 1386 | processing task, is_child = 0
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.114.718 I slot print_timing: id  0 | task 1386 | prompt eval time =    1169.17 ms /   564 tokens (    2.07 ms per token,   482.39 tokens per second)
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.114.733 I slot print_timing: id  0 | task 1386 |        eval time =     482.17 ms /    11 tokens (   48.22 ms per token,    20.74 tokens per second)
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.114.736 I slot print_timing: id  0 | task 1386 |       total time =    1651.33 ms /   575 tokens
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.114.739 I slot print_timing: id  0 | task 1386 |    graphs reused =        916
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.114.920 I slot      release: id  0 | task 1386 | stop processing: n_tokens = 574, truncated = 0
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.232.326 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.856 (> 0.100 thold), f_keep = 0.883
+Oct 09 14:09:49 qdrant-robot bash[298239]: 18.52.232.462 I slot launch_slot_: id  0 | task 1401 | processing task, is_child = 0
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.53.938.630 I slot print_timing: id  0 | task 1401 | prompt eval time =    1316.88 ms /   592 tokens (    2.22 ms per token,   449.55 tokens per second)
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.53.938.650 I slot print_timing: id  0 | task 1401 |        eval time =     389.21 ms /     9 tokens (   48.65 ms per token,    20.55 tokens per second)
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.53.938.655 I slot print_timing: id  0 | task 1401 |       total time =    1706.09 ms /   601 tokens
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.53.938.658 I slot print_timing: id  0 | task 1401 |    graphs reused =        923
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.53.938.852 I slot      release: id  0 | task 1401 | stop processing: n_tokens = 600, truncated = 0
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.54.053.536 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.883 (> 0.100 thold), f_keep = 0.868
+Oct 09 14:09:51 qdrant-robot bash[298239]: 18.54.053.673 I slot launch_slot_: id  0 | task 1415 | processing task, is_child = 0
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.55.883.594 I slot print_timing: id  0 | task 1415 | prompt eval time =    1299.39 ms /   590 tokens (    2.20 ms per token,   454.06 tokens per second)
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.55.883.610 I slot print_timing: id  0 | task 1415 |        eval time =     530.48 ms /    12 tokens (   48.23 ms per token,    20.74 tokens per second)
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.55.883.613 I slot print_timing: id  0 | task 1415 |       total time =    1829.87 ms /   602 tokens
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.55.883.617 I slot print_timing: id  0 | task 1415 |    graphs reused =        933
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.55.883.801 I slot      release: id  0 | task 1415 | stop processing: n_tokens = 601, truncated = 0
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.56.001.481 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.871 (> 0.100 thold), f_keep = 0.895
+Oct 09 14:09:53 qdrant-robot bash[298239]: 18.56.001.621 I slot launch_slot_: id  0 | task 1432 | processing task, is_child = 0
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.57.901.647 I slot print_timing: id  0 | task 1432 | prompt eval time =    1371.55 ms /   618 tokens (    2.22 ms per token,   450.58 tokens per second)
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.57.901.663 I slot print_timing: id  0 | task 1432 |        eval time =     528.42 ms /    12 tokens (   48.04 ms per token,    20.82 tokens per second)
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.57.901.665 I slot print_timing: id  0 | task 1432 |       total time =    1899.98 ms /   630 tokens
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.57.901.668 I slot print_timing: id  0 | task 1432 |    graphs reused =        943
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.57.901.848 I slot      release: id  0 | task 1432 | stop processing: n_tokens = 629, truncated = 0
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.58.019.660 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.910 (> 0.100 thold), f_keep = 0.879
+Oct 09 14:09:55 qdrant-robot bash[298239]: 18.58.019.803 I slot launch_slot_: id  0 | task 1449 | processing task, is_child = 0
+Oct 09 14:09:57 qdrant-robot bash[298239]: 18.59.923.130 I slot print_timing: id  0 | task 1449 | prompt eval time =    1328.13 ms /   608 tokens (    2.18 ms per token,   457.79 tokens per second)
+Oct 09 14:09:57 qdrant-robot bash[298239]: 18.59.923.142 I slot print_timing: id  0 | task 1449 |        eval time =     575.15 ms /    13 tokens (   47.93 ms per token,    20.86 tokens per second)
+Oct 09 14:09:57 qdrant-robot bash[298239]: 18.59.923.145 I slot print_timing: id  0 | task 1449 |       total time =    1903.28 ms /   621 tokens
+Oct 09 14:09:57 qdrant-robot bash[298239]: 18.59.923.148 I slot print_timing: id  0 | task 1449 |    graphs reused =        954
+Oct 09 14:09:57 qdrant-robot bash[298239]: 18.59.923.333 I slot      release: id  0 | task 1449 | stop processing: n_tokens = 620, truncated = 0
+Oct 09 14:09:57 qdrant-robot bash[298239]: 19.00.044.632 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.890 (> 0.100 thold), f_keep = 0.913
+Oct 09 14:09:57 qdrant-robot bash[298239]: 19.00.044.773 I slot launch_slot_: id  0 | task 1467 | processing task, is_child = 0
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.01.993.535 I slot print_timing: id  0 | task 1467 | prompt eval time =    1373.60 ms /   636 tokens (    2.16 ms per token,   463.02 tokens per second)
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.01.993.549 I slot print_timing: id  0 | task 1467 |        eval time =     575.11 ms /    13 tokens (   47.93 ms per token,    20.87 tokens per second)
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.01.993.552 I slot print_timing: id  0 | task 1467 |       total time =    1948.71 ms /   649 tokens
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.01.993.555 I slot print_timing: id  0 | task 1467 |    graphs reused =        965
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.01.993.740 I slot      release: id  0 | task 1467 | stop processing: n_tokens = 648, truncated = 0
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.02.105.264 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.946 (> 0.100 thold), f_keep = 0.517
+Oct 09 14:09:59 qdrant-robot bash[298239]: 19.02.105.410 I slot launch_slot_: id  0 | task 1485 | processing task, is_child = 0
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.528.691 I slot print_timing: id  0 | task 1485 | prompt eval time =     803.01 ms /   354 tokens (    2.27 ms per token,   440.84 tokens per second)
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.528.706 I slot print_timing: id  0 | task 1485 |        eval time =     620.23 ms /    14 tokens (   47.71 ms per token,    20.96 tokens per second)
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.528.709 I slot print_timing: id  0 | task 1485 |       total time =    1423.24 ms /   368 tokens
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.528.714 I slot print_timing: id  0 | task 1485 |    graphs reused =        977
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.528.843 I slot      release: id  0 | task 1485 | stop processing: n_tokens = 367, truncated = 0
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.638.531 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.969 (> 0.100 thold), f_keep = 0.929
+Oct 09 14:10:01 qdrant-robot bash[298239]: 19.03.638.706 I slot launch_slot_: id  0 | task 1503 | processing task, is_child = 0
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.665.913 I slot print_timing: id  0 | task 1503 | prompt eval time =     801.46 ms /   352 tokens (    2.28 ms per token,   439.20 tokens per second)
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.665.928 I slot print_timing: id  0 | task 1503 |        eval time =    1225.70 ms /    27 tokens (   47.14 ms per token,    21.21 tokens per second)
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.665.935 I slot print_timing: id  0 | task 1503 |       total time =    2027.16 ms /   379 tokens
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.665.939 I slot print_timing: id  0 | task 1503 |    graphs reused =       1002
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.666.067 I slot      release: id  0 | task 1503 | stop processing: n_tokens = 378, truncated = 0
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.779.134 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.569 (> 0.100 thold), f_keep = 0.886
+Oct 09 14:10:03 qdrant-robot bash[298239]: 19.05.779.281 I slot launch_slot_: id  0 | task 1534 | processing task, is_child = 0
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.422.828 I slot print_timing: id  0 | task 1534 | prompt eval time =    1300.77 ms /   589 tokens (    2.21 ms per token,   452.81 tokens per second)
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.422.844 I slot print_timing: id  0 | task 1534 |        eval time =     342.72 ms /     8 tokens (   48.96 ms per token,    20.42 tokens per second)
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.422.847 I slot print_timing: id  0 | task 1534 |       total time =    1643.49 ms /   597 tokens
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.422.854 I slot print_timing: id  0 | task 1534 |    graphs reused =       1008
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.423.038 I slot      release: id  0 | task 1534 | stop processing: n_tokens = 596, truncated = 0
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.538.988 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.882 (> 0.100 thold), f_keep = 0.913
+Oct 09 14:10:05 qdrant-robot bash[298239]: 19.07.539.129 I slot launch_slot_: id  0 | task 1547 | processing task, is_child = 0
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.09.951.952 I slot print_timing: id  0 | task 1547 | prompt eval time =    1372.82 ms /   617 tokens (    2.22 ms per token,   449.44 tokens per second)
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.09.951.968 I slot print_timing: id  0 | task 1547 |        eval time =    1039.96 ms /    23 tokens (   47.27 ms per token,    21.15 tokens per second)
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.09.951.971 I slot print_timing: id  0 | task 1547 |       total time =    2412.78 ms /   640 tokens
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.09.951.977 I slot print_timing: id  0 | task 1547 |    graphs reused =       1029
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.09.952.159 I slot      release: id  0 | task 1547 | stop processing: n_tokens = 639, truncated = 0
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.10.070.713 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.887 (> 0.100 thold), f_keep = 0.870
+Oct 09 14:10:07 qdrant-robot bash[298239]: 19.10.070.852 I slot launch_slot_: id  0 | task 1575 | processing task, is_child = 0
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.779.715 I slot print_timing: id  0 | task 1575 | prompt eval time =    1366.16 ms /   627 tokens (    2.18 ms per token,   458.95 tokens per second)
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.779.729 I slot print_timing: id  0 | task 1575 |        eval time =     342.66 ms /     8 tokens (   48.95 ms per token,    20.43 tokens per second)
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.779.732 I slot print_timing: id  0 | task 1575 |       total time =    1708.82 ms /   635 tokens
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.779.735 I slot print_timing: id  0 | task 1575 |    graphs reused =       1035
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.779.924 I slot      release: id  0 | task 1575 | stop processing: n_tokens = 634, truncated = 0
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.895.225 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.867 (> 0.100 thold), f_keep = 0.896
+Oct 09 14:10:09 qdrant-robot bash[298239]: 19.11.895.375 I slot launch_slot_: id  0 | task 1588 | processing task, is_child = 0
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.797.481 I slot print_timing: id  0 | task 1588 | prompt eval time =    1419.99 ms /   655 tokens (    2.17 ms per token,   461.27 tokens per second)
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.797.496 I slot print_timing: id  0 | task 1588 |        eval time =     482.07 ms /    11 tokens (   48.21 ms per token,    20.74 tokens per second)
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.797.498 I slot print_timing: id  0 | task 1588 |       total time =    1902.06 ms /   666 tokens
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.797.501 I slot print_timing: id  0 | task 1588 |    graphs reused =       1044
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.797.693 I slot      release: id  0 | task 1588 | stop processing: n_tokens = 665, truncated = 0
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.909.483 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.941 (> 0.100 thold), f_keep = 0.504
+Oct 09 14:10:11 qdrant-robot bash[298239]: 19.13.909.627 I slot launch_slot_: id  0 | task 1604 | processing task, is_child = 0
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.572.635 I slot print_timing: id  0 | task 1604 | prompt eval time =     807.72 ms /   356 tokens (    2.27 ms per token,   440.75 tokens per second)
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.572.650 I slot print_timing: id  0 | task 1604 |        eval time =     855.25 ms /    19 tokens (   47.51 ms per token,    21.05 tokens per second)
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.572.653 I slot print_timing: id  0 | task 1604 |       total time =    1662.96 ms /   375 tokens
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.572.656 I slot print_timing: id  0 | task 1604 |    graphs reused =       1061
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.572.791 I slot      release: id  0 | task 1604 | stop processing: n_tokens = 374, truncated = 0
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.690.629 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.963 (> 0.100 thold), f_keep = 0.912
+Oct 09 14:10:13 qdrant-robot bash[298239]: 19.15.690.764 I slot launch_slot_: id  0 | task 1627 | processing task, is_child = 0
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.345.548 I slot print_timing: id  0 | task 1627 | prompt eval time =     801.82 ms /   354 tokens (    2.27 ms per token,   441.50 tokens per second)
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.345.563 I slot print_timing: id  0 | task 1627 |        eval time =     852.93 ms /    19 tokens (   47.38 ms per token,    21.10 tokens per second)
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.345.566 I slot print_timing: id  0 | task 1627 |       total time =    1654.74 ms /   373 tokens
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.345.569 I slot print_timing: id  0 | task 1627 |    graphs reused =       1078
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.345.699 I slot      release: id  0 | task 1627 | stop processing: n_tokens = 372, truncated = 0
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.461.938 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.562 (> 0.100 thold), f_keep = 0.901
+Oct 09 14:10:15 qdrant-robot bash[298239]: 19.17.462.077 I slot launch_slot_: id  0 | task 1650 | processing task, is_child = 0
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.280.989 I slot print_timing: id  0 | task 1650 | prompt eval time =    1243.21 ms /   596 tokens (    2.09 ms per token,   479.40 tokens per second)
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.281.004 I slot print_timing: id  0 | task 1650 |        eval time =     575.65 ms /    13 tokens (   47.97 ms per token,    20.85 tokens per second)
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.281.007 I slot print_timing: id  0 | task 1650 |       total time =    1818.86 ms /   609 tokens
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.281.011 I slot print_timing: id  0 | task 1650 |    graphs reused =       1089
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.281.186 I slot      release: id  0 | task 1650 | stop processing: n_tokens = 608, truncated = 0
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.399.422 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.812 (> 0.100 thold), f_keep = 0.834
+Oct 09 14:10:17 qdrant-robot bash[298239]: 19.19.399.558 I slot launch_slot_: id  0 | task 1667 | processing task, is_child = 0
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.631.600 I slot print_timing: id  0 | task 1667 | prompt eval time =    1374.31 ms /   624 tokens (    2.20 ms per token,   454.05 tokens per second)
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.631.616 I slot print_timing: id  0 | task 1667 |        eval time =     857.69 ms /    19 tokens (   47.65 ms per token,    20.99 tokens per second)
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.631.619 I slot print_timing: id  0 | task 1667 |       total time =    2231.99 ms /   643 tokens
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.631.622 I slot print_timing: id  0 | task 1667 |    graphs reused =       1106
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.631.808 I slot      release: id  0 | task 1667 | stop processing: n_tokens = 642, truncated = 0
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.759.795 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.920 (> 0.100 thold), f_keep = 0.790
+Oct 09 14:10:19 qdrant-robot bash[298239]: 19.21.759.938 I slot launch_slot_: id  0 | task 1691 | processing task, is_child = 0
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.671.463 I slot print_timing: id  0 | task 1691 | prompt eval time =    1148.48 ms /   551 tokens (    2.08 ms per token,   479.76 tokens per second)
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.671.478 I slot print_timing: id  0 | task 1691 |        eval time =     763.00 ms /    17 tokens (   47.69 ms per token,    20.97 tokens per second)
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.671.481 I slot print_timing: id  0 | task 1691 |       total time =    1911.48 ms /   568 tokens
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.671.483 I slot print_timing: id  0 | task 1691 |    graphs reused =       1121
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.671.653 I slot      release: id  0 | task 1691 | stop processing: n_tokens = 567, truncated = 0
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.850.467 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.876 (> 0.100 thold), f_keep = 0.894
+Oct 09 14:10:21 qdrant-robot bash[298239]: 19.23.850.628 I slot launch_slot_: id  0 | task 1712 | processing task, is_child = 0
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.599.263 I slot print_timing: id  0 | task 1712 | prompt eval time =    1267.26 ms /   579 tokens (    2.19 ms per token,   456.89 tokens per second)
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.599.282 I slot print_timing: id  0 | task 1712 |        eval time =     481.32 ms /    11 tokens (   48.13 ms per token,    20.78 tokens per second)
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.599.289 I slot print_timing: id  0 | task 1712 |       total time =    1748.58 ms /   590 tokens
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.599.292 I slot print_timing: id  0 | task 1712 |    graphs reused =       1130
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.599.471 I slot      release: id  0 | task 1712 | stop processing: n_tokens = 589, truncated = 0
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.724.384 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.809 (> 0.100 thold), f_keep = 0.876
+Oct 09 14:10:23 qdrant-robot bash[298239]: 19.25.724.526 I slot launch_slot_: id  0 | task 1728 | processing task, is_child = 0
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.678.187 I slot print_timing: id  0 | task 1728 | prompt eval time =    1378.75 ms /   638 tokens (    2.16 ms per token,   462.74 tokens per second)
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.678.202 I slot print_timing: id  0 | task 1728 |        eval time =     574.86 ms /    13 tokens (   47.91 ms per token,    20.87 tokens per second)
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.678.205 I slot print_timing: id  0 | task 1728 |       total time =    1953.61 ms /   651 tokens
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.678.211 I slot print_timing: id  0 | task 1728 |    graphs reused =       1141
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.678.395 I slot      release: id  0 | task 1728 | stop processing: n_tokens = 650, truncated = 0
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.804.030 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.857 (> 0.100 thold), f_keep = 0.878
+Oct 09 14:10:25 qdrant-robot bash[298239]: 19.27.804.177 I slot launch_slot_: id  0 | task 1746 | processing task, is_child = 0
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.713.073 I slot print_timing: id  0 | task 1746 | prompt eval time =    1426.55 ms /   666 tokens (    2.14 ms per token,   466.86 tokens per second)
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.713.091 I slot print_timing: id  0 | task 1746 |        eval time =     482.30 ms /    11 tokens (   48.23 ms per token,    20.73 tokens per second)
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.713.094 I slot print_timing: id  0 | task 1746 |       total time =    1908.84 ms /   677 tokens
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.713.097 I slot print_timing: id  0 | task 1746 |    graphs reused =       1150
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.713.290 I slot      release: id  0 | task 1746 | stop processing: n_tokens = 676, truncated = 0
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.825.483 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.930 (> 0.100 thold), f_keep = 0.750
+Oct 09 14:10:27 qdrant-robot bash[298239]: 19.29.825.620 I slot launch_slot_: id  0 | task 1762 | processing task, is_child = 0
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.713.686 I slot print_timing: id  0 | task 1762 | prompt eval time =    1127.59 ms /   545 tokens (    2.07 ms per token,   483.33 tokens per second)
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.713.701 I slot print_timing: id  0 | task 1762 |        eval time =     760.43 ms /    17 tokens (   47.53 ms per token,    21.04 tokens per second)
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.713.704 I slot print_timing: id  0 | task 1762 |       total time =    1888.02 ms /   562 tokens
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.713.707 I slot print_timing: id  0 | task 1762 |    graphs reused =       1165
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.713.887 I slot      release: id  0 | task 1762 | stop processing: n_tokens = 561, truncated = 0
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.841.225 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.885 (> 0.100 thold), f_keep = 0.904
+Oct 09 14:10:29 qdrant-robot bash[298239]: 19.31.841.369 I slot launch_slot_: id  0 | task 1783 | processing task, is_child = 0
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.429.844 I slot print_timing: id  0 | task 1783 | prompt eval time =    1247.76 ms /   573 tokens (    2.18 ms per token,   459.22 tokens per second)
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.429.853 I slot print_timing: id  0 | task 1783 |        eval time =     340.67 ms /     8 tokens (   48.67 ms per token,    20.55 tokens per second)
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.429.854 I slot print_timing: id  0 | task 1783 |       total time =    1588.43 ms /   581 tokens
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.429.856 I slot print_timing: id  0 | task 1783 |    graphs reused =       1171
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.429.966 I slot      release: id  0 | task 1783 | stop processing: n_tokens = 580, truncated = 0
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.507.949 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.807 (> 0.100 thold), f_keep = 0.891
+Oct 09 14:10:31 qdrant-robot bash[298239]: 19.33.508.029 I slot launch_slot_: id  0 | task 1796 | processing task, is_child = 0
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.486.810 I slot print_timing: id  0 | task 1796 | prompt eval time =    1394.71 ms /   641 tokens (    2.18 ms per token,   459.60 tokens per second)
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.486.825 I slot print_timing: id  0 | task 1796 |        eval time =     584.03 ms /    13 tokens (   48.67 ms per token,    20.55 tokens per second)
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.486.828 I slot print_timing: id  0 | task 1796 |       total time =    1978.74 ms /   654 tokens
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.486.832 I slot print_timing: id  0 | task 1796 |    graphs reused =       1182
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.487.022 I slot      release: id  0 | task 1796 | stop processing: n_tokens = 653, truncated = 0
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.606.515 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.813 (> 0.100 thold), f_keep = 0.833
+Oct 09 14:10:33 qdrant-robot bash[298239]: 19.35.606.702 I slot launch_slot_: id  0 | task 1814 | processing task, is_child = 0
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.664.414 I slot print_timing: id  0 | task 1814 | prompt eval time =    1437.57 ms /   669 tokens (    2.15 ms per token,   465.37 tokens per second)
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.664.428 I slot print_timing: id  0 | task 1814 |        eval time =     620.09 ms /    14 tokens (   47.70 ms per token,    20.96 tokens per second)
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.664.431 I slot print_timing: id  0 | task 1814 |       total time =    2057.66 ms /   683 tokens
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.664.434 I slot print_timing: id  0 | task 1814 |    graphs reused =       1194
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.664.629 I slot      release: id  0 | task 1814 | stop processing: n_tokens = 682, truncated = 0
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.772.605 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.938 (> 0.100 thold), f_keep = 0.491
+Oct 09 14:10:35 qdrant-robot bash[298239]: 19.37.772.745 I slot launch_slot_: id  0 | task 1833 | processing task, is_child = 0
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.765.517 I slot print_timing: id  0 | task 1833 | prompt eval time =     815.92 ms /   357 tokens (    2.29 ms per token,   437.54 tokens per second)
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.765.531 I slot print_timing: id  0 | task 1833 |        eval time =    1176.80 ms /    26 tokens (   47.07 ms per token,    21.24 tokens per second)
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.765.534 I slot print_timing: id  0 | task 1833 |       total time =    1992.72 ms /   383 tokens
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.765.538 I slot print_timing: id  0 | task 1833 |    graphs reused =       1218
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.765.672 I slot      release: id  0 | task 1833 | stop processing: n_tokens = 382, truncated = 0
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.872.128 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.961 (> 0.100 thold), f_keep = 0.893
+Oct 09 14:10:37 qdrant-robot bash[298239]: 19.39.872.268 I slot launch_slot_: id  0 | task 1863 | processing task, is_child = 0
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.858.282 I slot print_timing: id  0 | task 1863 | prompt eval time =     803.11 ms /   355 tokens (    2.26 ms per token,   442.03 tokens per second)
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.858.297 I slot print_timing: id  0 | task 1863 |        eval time =    1182.86 ms /    26 tokens (   47.31 ms per token,    21.14 tokens per second)
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.858.300 I slot print_timing: id  0 | task 1863 |       total time =    1985.97 ms /   381 tokens
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.858.303 I slot print_timing: id  0 | task 1863 |    graphs reused =       1242
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.858.435 I slot      release: id  0 | task 1863 | stop processing: n_tokens = 380, truncated = 0
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.970.497 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.571 (> 0.100 thold), f_keep = 0.882
+Oct 09 14:10:39 qdrant-robot bash[298239]: 19.41.970.664 I slot launch_slot_: id  0 | task 1893 | processing task, is_child = 0
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.844.404 I slot print_timing: id  0 | task 1893 | prompt eval time =    1298.47 ms /   587 tokens (    2.21 ms per token,   452.07 tokens per second)
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.844.420 I slot print_timing: id  0 | task 1893 |        eval time =     575.22 ms /    13 tokens (   47.94 ms per token,    20.86 tokens per second)
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.844.424 I slot print_timing: id  0 | task 1893 |       total time =    1873.69 ms /   600 tokens
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.844.427 I slot print_timing: id  0 | task 1893 |    graphs reused =       1253
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.844.613 I slot      release: id  0 | task 1893 | stop processing: n_tokens = 599, truncated = 0
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.970.521 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.878 (> 0.100 thold), f_keep = 0.902
+Oct 09 14:10:41 qdrant-robot bash[298239]: 19.43.970.679 I slot launch_slot_: id  0 | task 1911 | processing task, is_child = 0
+Oct 09 14:10:43 qdrant-robot bash[298239]: 19.46.003.521 I slot print_timing: id  0 | task 1911 | prompt eval time =    1364.32 ms /   615 tokens (    2.22 ms per token,   450.77 tokens per second)
+Oct 09 14:10:43 qdrant-robot bash[298239]: 19.46.003.544 I slot print_timing: id  0 | task 1911 |        eval time =     668.47 ms /    15 tokens (   47.75 ms per token,    20.94 tokens per second)
+Oct 09 14:10:43 qdrant-robot bash[298239]: 19.46.003.547 I slot print_timing: id  0 | task 1911 |       total time =    2032.79 ms /   630 tokens
+Oct 09 14:10:43 qdrant-robot bash[298239]: 19.46.003.550 I slot print_timing: id  0 | task 1911 |    graphs reused =       1266
+Oct 09 14:10:43 qdrant-robot bash[298239]: 19.46.003.733 I slot      release: id  0 | task 1911 | stop processing: n_tokens = 629, truncated = 0
+Oct 09 14:12:03 qdrant-robot bash[298239]: 21.06.145.471 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.868 (> 0.100 thold), f_keep = 0.533
+Oct 09 14:12:03 qdrant-robot bash[298239]: 21.06.145.639 I slot launch_slot_: id  0 | task 1931 | processing task, is_child = 0
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.494.812 I slot print_timing: id  0 | task 1931 | prompt eval time =     951.57 ms /   386 tokens (    2.47 ms per token,   405.65 tokens per second)
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.494.827 I slot print_timing: id  0 | task 1931 |        eval time =     397.55 ms /     9 tokens (   49.69 ms per token,    20.12 tokens per second)
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.494.830 I slot print_timing: id  0 | task 1931 |       total time =    1349.11 ms /   395 tokens
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.494.833 I slot print_timing: id  0 | task 1931 |    graphs reused =       1273
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.494.985 I slot      release: id  0 | task 1931 | stop processing: n_tokens = 394, truncated = 0
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.606.249 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.709 (> 0.100 thold), f_keep = 0.865
+Oct 09 14:12:05 qdrant-robot bash[298239]: 21.07.606.396 I slot launch_slot_: id  0 | task 1944 | processing task, is_child = 0
+Oct 09 14:12:06 qdrant-robot bash[298239]: 21.09.156.048 I slot print_timing: id  0 | task 1944 | prompt eval time =    1113.13 ms /   481 tokens (    2.31 ms per token,   432.12 tokens per second)
+Oct 09 14:12:06 qdrant-robot bash[298239]: 21.09.156.063 I slot print_timing: id  0 | task 1944 |        eval time =     436.48 ms /    10 tokens (   48.50 ms per token,    20.62 tokens per second)
+Oct 09 14:12:06 qdrant-robot bash[298239]: 21.09.156.066 I slot print_timing: id  0 | task 1944 |       total time =    1549.60 ms /   491 tokens
+Oct 09 14:12:06 qdrant-robot bash[298239]: 21.09.156.069 I slot print_timing: id  0 | task 1944 |    graphs reused =       1281
+Oct 09 14:12:06 qdrant-robot bash[298239]: 21.09.156.223 I slot      release: id  0 | task 1944 | stop processing: n_tokens = 490, truncated = 0
+Oct 09 14:12:07 qdrant-robot bash[298239]: 21.09.264.350 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.879 (> 0.100 thold), f_keep = 0.696
+Oct 09 14:12:07 qdrant-robot bash[298239]: 21.09.264.491 I slot launch_slot_: id  0 | task 1959 | processing task, is_child = 0
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.484.730 I slot print_timing: id  0 | task 1959 | prompt eval time =     876.81 ms /   388 tokens (    2.26 ms per token,   442.51 tokens per second)
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.484.744 I slot print_timing: id  0 | task 1959 |        eval time =     343.38 ms /     8 tokens (   49.05 ms per token,    20.39 tokens per second)
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.484.746 I slot print_timing: id  0 | task 1959 |       total time =    1220.19 ms /   396 tokens
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.484.749 I slot print_timing: id  0 | task 1959 |    graphs reused =       1287
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.484.886 I slot      release: id  0 | task 1959 | stop processing: n_tokens = 395, truncated = 0
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.593.307 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.748 (> 0.100 thold), f_keep = 0.863
+Oct 09 14:12:08 qdrant-robot bash[298239]: 21.10.593.444 I slot launch_slot_: id  0 | task 1971 | processing task, is_child = 0
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.304.390 I slot print_timing: id  0 | task 1971 | prompt eval time =    1087.46 ms /   456 tokens (    2.38 ms per token,   419.33 tokens per second)
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.304.406 I slot print_timing: id  0 | task 1971 |        eval time =     623.44 ms /    14 tokens (   47.96 ms per token,    20.85 tokens per second)
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.304.408 I slot print_timing: id  0 | task 1971 |       total time =    1710.90 ms /   470 tokens
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.304.411 I slot print_timing: id  0 | task 1971 |    graphs reused =       1299
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.304.564 I slot      release: id  0 | task 1971 | stop processing: n_tokens = 469, truncated = 0
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.496.576 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.890 (> 0.100 thold), f_keep = 0.727
+Oct 09 14:12:10 qdrant-robot bash[298239]: 21.12.496.721 I slot launch_slot_: id  0 | task 1990 | processing task, is_child = 0
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.860.310 I slot print_timing: id  0 | task 1990 | prompt eval time =     881.12 ms /   383 tokens (    2.30 ms per token,   434.67 tokens per second)
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.860.325 I slot print_timing: id  0 | task 1990 |        eval time =     482.41 ms /    11 tokens (   48.24 ms per token,    20.73 tokens per second)
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.860.328 I slot print_timing: id  0 | task 1990 |       total time =    1363.54 ms /   394 tokens
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.860.331 I slot print_timing: id  0 | task 1990 |    graphs reused =       1308
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.860.471 I slot      release: id  0 | task 1990 | stop processing: n_tokens = 393, truncated = 0
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.967.398 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.806 (> 0.100 thold), f_keep = 0.868
+Oct 09 14:12:11 qdrant-robot bash[298239]: 21.13.967.541 I slot launch_slot_: id  0 | task 2005 | processing task, is_child = 0
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.670.819 I slot print_timing: id  0 | task 2005 | prompt eval time =    1032.71 ms /   423 tokens (    2.44 ms per token,   409.60 tokens per second)
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.670.834 I slot print_timing: id  0 | task 2005 |        eval time =     670.51 ms /    15 tokens (   47.89 ms per token,    20.88 tokens per second)
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.670.837 I slot print_timing: id  0 | task 2005 |       total time =    1703.22 ms /   438 tokens
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.670.841 I slot print_timing: id  0 | task 2005 |    graphs reused =       1321
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.670.987 I slot      release: id  0 | task 2005 | stop processing: n_tokens = 437, truncated = 0
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.782.192 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.927 (> 0.100 thold), f_keep = 0.780
+Oct 09 14:12:13 qdrant-robot bash[298239]: 21.15.782.330 I slot launch_slot_: id  0 | task 2025 | processing task, is_child = 0
+Oct 09 14:12:14 qdrant-robot bash[298239]: 21.17.203.643 I slot print_timing: id  0 | task 2025 | prompt eval time =     846.07 ms /   368 tokens (    2.30 ms per token,   434.95 tokens per second)
+Oct 09 14:12:14 qdrant-robot bash[298239]: 21.17.203.659 I slot print_timing: id  0 | task 2025 |        eval time =     575.19 ms /    13 tokens (   47.93 ms per token,    20.86 tokens per second)
+Oct 09 14:12:14 qdrant-robot bash[298239]: 21.17.203.664 I slot print_timing: id  0 | task 2025 |       total time =    1421.26 ms /   381 tokens
+Oct 09 14:12:14 qdrant-robot bash[298239]: 21.17.203.667 I slot print_timing: id  0 | task 2025 |    graphs reused =       1332
+Oct 09 14:12:14 qdrant-robot bash[298239]: 21.17.203.818 I slot      release: id  0 | task 2025 | stop processing: n_tokens = 380, truncated = 0
+Oct 09 14:12:15 qdrant-robot bash[298239]: 21.17.315.810 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.883 (> 0.100 thold), f_keep = 0.897
+Oct 09 14:12:15 qdrant-robot bash[298239]: 21.17.315.946 I slot launch_slot_: id  0 | task 2042 | processing task, is_child = 0
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.857.813 I slot print_timing: id  0 | task 2042 | prompt eval time =     873.54 ms /   386 tokens (    2.26 ms per token,   441.88 tokens per second)
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.857.828 I slot print_timing: id  0 | task 2042 |        eval time =     668.28 ms /    15 tokens (   47.73 ms per token,    20.95 tokens per second)
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.857.831 I slot print_timing: id  0 | task 2042 |       total time =    1541.82 ms /   401 tokens
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.857.834 I slot print_timing: id  0 | task 2042 |    graphs reused =       1345
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.857.978 I slot      release: id  0 | task 2042 | stop processing: n_tokens = 400, truncated = 0
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.966.278 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.947 (> 0.100 thold), f_keep = 0.853
+Oct 09 14:12:16 qdrant-robot bash[298239]: 21.18.966.416 I slot launch_slot_: id  0 | task 2061 | processing task, is_child = 0
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.397.195 I slot print_timing: id  0 | task 2061 | prompt eval time =     831.31 ms /   360 tokens (    2.31 ms per token,   433.05 tokens per second)
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.397.213 I slot print_timing: id  0 | task 2061 |        eval time =    1599.43 ms /    35 tokens (   47.04 ms per token,    21.26 tokens per second)
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.397.216 I slot print_timing: id  0 | task 2061 |       total time =    2430.73 ms /   395 tokens
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.397.218 I slot print_timing: id  0 | task 2061 |    graphs reused =       1378
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.397.352 I slot      release: id  0 | task 2061 | stop processing: n_tokens = 394, truncated = 0
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.508.892 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.784 (> 0.100 thold), f_keep = 0.865
+Oct 09 14:12:19 qdrant-robot bash[298239]: 21.21.509.032 I slot launch_slot_: id  0 | task 2100 | processing task, is_child = 0
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.768.330 I slot print_timing: id  0 | task 2100 | prompt eval time =    1056.88 ms /   435 tokens (    2.43 ms per token,   411.59 tokens per second)
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.768.344 I slot print_timing: id  0 | task 2100 |        eval time =     202.37 ms /     5 tokens (   50.59 ms per token,    19.77 tokens per second)
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.768.347 I slot print_timing: id  0 | task 2100 |       total time =    1259.25 ms /   440 tokens
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.768.349 I slot print_timing: id  0 | task 2100 |    graphs reused =       1381
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.768.497 I slot      release: id  0 | task 2100 | stop processing: n_tokens = 439, truncated = 0
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.879.000 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.897 (> 0.100 thold), f_keep = 0.777
+Oct 09 14:12:20 qdrant-robot bash[298239]: 21.22.879.138 I slot launch_slot_: id  0 | task 2110 | processing task, is_child = 0
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.24.925.094 I slot print_timing: id  0 | task 2110 | prompt eval time =     862.23 ms /   380 tokens (    2.27 ms per token,   440.72 tokens per second)
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.24.925.109 I slot print_timing: id  0 | task 2110 |        eval time =    1183.68 ms /    26 tokens (   47.35 ms per token,    21.12 tokens per second)
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.24.925.112 I slot print_timing: id  0 | task 2110 |       total time =    2045.91 ms /   406 tokens
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.24.925.114 I slot print_timing: id  0 | task 2110 |    graphs reused =       1405
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.24.925.249 I slot      release: id  0 | task 2110 | stop processing: n_tokens = 405, truncated = 0
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.25.040.819 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.826 (> 0.100 thold), f_keep = 0.842
+Oct 09 14:12:22 qdrant-robot bash[298239]: 21.25.040.961 I slot launch_slot_: id  0 | task 2140 | processing task, is_child = 0
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.750.021 I slot print_timing: id  0 | task 2140 | prompt eval time =     992.42 ms /   413 tokens (    2.40 ms per token,   416.16 tokens per second)
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.750.037 I slot print_timing: id  0 | task 2140 |        eval time =     716.60 ms /    16 tokens (   47.77 ms per token,    20.93 tokens per second)
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.750.040 I slot print_timing: id  0 | task 2140 |       total time =    1709.01 ms /   429 tokens
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.750.043 I slot print_timing: id  0 | task 2140 |    graphs reused =       1419
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.750.184 I slot      release: id  0 | task 2140 | stop processing: n_tokens = 428, truncated = 0
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.859.864 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.879 (> 0.100 thold), f_keep = 0.797
+Oct 09 14:12:24 qdrant-robot bash[298239]: 21.26.859.998 I slot launch_slot_: id  0 | task 2161 | processing task, is_child = 0
+Oct 09 14:12:25 qdrant-robot bash[298239]: 21.28.219.051 I slot print_timing: id  0 | task 2161 | prompt eval time =     877.03 ms /   388 tokens (    2.26 ms per token,   442.40 tokens per second)
+Oct 09 14:12:25 qdrant-robot bash[298239]: 21.28.219.068 I slot print_timing: id  0 | task 2161 |        eval time =     481.97 ms /    11 tokens (   48.20 ms per token,    20.75 tokens per second)
+Oct 09 14:12:25 qdrant-robot bash[298239]: 21.28.219.071 I slot print_timing: id  0 | task 2161 |       total time =    1359.00 ms /   399 tokens
+Oct 09 14:12:25 qdrant-robot bash[298239]: 21.28.219.074 I slot print_timing: id  0 | task 2161 |    graphs reused =       1428
+Oct 09 14:12:25 qdrant-robot bash[298239]: 21.28.219.215 I slot      release: id  0 | task 2161 | stop processing: n_tokens = 398, truncated = 0
+Oct 09 14:12:26 qdrant-robot bash[298239]: 21.28.323.825 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.912 (> 0.100 thold), f_keep = 0.889
+Oct 09 14:12:26 qdrant-robot bash[298239]: 21.28.323.968 I slot launch_slot_: id  0 | task 2176 | processing task, is_child = 0
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.778.275 I slot print_timing: id  0 | task 2176 | prompt eval time =     876.12 ms /   388 tokens (    2.26 ms per token,   442.86 tokens per second)
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.778.289 I slot print_timing: id  0 | task 2176 |        eval time =     578.14 ms /    13 tokens (   48.18 ms per token,    20.76 tokens per second)
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.778.292 I slot print_timing: id  0 | task 2176 |       total time =    1454.26 ms /   401 tokens
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.778.294 I slot print_timing: id  0 | task 2176 |    graphs reused =       1439
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.778.432 I slot      release: id  0 | task 2176 | stop processing: n_tokens = 400, truncated = 0
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.887.353 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.929 (> 0.100 thold), f_keep = 0.885
+Oct 09 14:12:27 qdrant-robot bash[298239]: 21.29.887.498 I slot launch_slot_: id  0 | task 2193 | processing task, is_child = 0
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.464.857 I slot print_timing: id  0 | task 2193 | prompt eval time =     862.48 ms /   381 tokens (    2.26 ms per token,   441.75 tokens per second)
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.464.873 I slot print_timing: id  0 | task 2193 |        eval time =     714.83 ms /    16 tokens (   47.66 ms per token,    20.98 tokens per second)
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.464.876 I slot print_timing: id  0 | task 2193 |       total time =    1577.31 ms /   397 tokens
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.464.880 I slot print_timing: id  0 | task 2193 |    graphs reused =       1453
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.465.022 I slot      release: id  0 | task 2193 | stop processing: n_tokens = 396, truncated = 0
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.579.030 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.836 (> 0.100 thold), f_keep = 0.861
+Oct 09 14:12:29 qdrant-robot bash[298239]: 21.31.579.174 I slot launch_slot_: id  0 | task 2213 | processing task, is_child = 0
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.834.049 I slot print_timing: id  0 | task 2213 | prompt eval time =     999.57 ms /   408 tokens (    2.45 ms per token,   408.18 tokens per second)
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.834.068 I slot print_timing: id  0 | task 2213 |        eval time =     255.25 ms /     6 tokens (   51.05 ms per token,    19.59 tokens per second)
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.834.071 I slot print_timing: id  0 | task 2213 |       total time =    1254.82 ms /   414 tokens
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.834.074 I slot print_timing: id  0 | task 2213 |    graphs reused =       1457
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.834.217 I slot      release: id  0 | task 2213 | stop processing: n_tokens = 413, truncated = 0
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.943.046 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.900 (> 0.100 thold), f_keep = 0.826
+Oct 09 14:12:30 qdrant-robot bash[298239]: 21.32.943.205 I slot launch_slot_: id  0 | task 2224 | processing task, is_child = 0
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.068.479 I slot print_timing: id  0 | task 2224 | prompt eval time =     870.49 ms /   379 tokens (    2.30 ms per token,   435.39 tokens per second)
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.068.493 I slot print_timing: id  0 | task 2224 |        eval time =     254.73 ms /     6 tokens (   50.95 ms per token,    19.63 tokens per second)
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.068.496 I slot print_timing: id  0 | task 2224 |       total time =    1125.22 ms /   385 tokens
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.068.499 I slot print_timing: id  0 | task 2224 |    graphs reused =       1461
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.068.634 I slot      release: id  0 | task 2224 | stop processing: n_tokens = 384, truncated = 0
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.177.761 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.846 (> 0.100 thold), f_keep = 0.888
+Oct 09 14:12:31 qdrant-robot bash[298239]: 21.34.177.903 I slot launch_slot_: id  0 | task 2234 | processing task, is_child = 0
+Oct 09 14:12:32 qdrant-robot bash[298239]: 21.35.230.021 I slot print_timing: id  0 | task 2234 | prompt eval time =     997.53 ms /   403 tokens (    2.48 ms per token,   404.00 tokens per second)
+Oct 09 14:12:32 qdrant-robot bash[298239]: 21.35.230.037 I slot print_timing: id  0 | task 2234 |        eval time =      54.53 ms /     2 tokens (   54.53 ms per token,    18.34 tokens per second)
+Oct 09 14:12:32 qdrant-robot bash[298239]: 21.35.230.040 I slot print_timing: id  0 | task 2234 |       total time =    1052.06 ms /   405 tokens
+Oct 09 14:12:32 qdrant-robot bash[298239]: 21.35.230.043 I slot print_timing: id  0 | task 2234 |    graphs reused =       1461
+Oct 09 14:12:32 qdrant-robot bash[298239]: 21.35.230.187 I slot      release: id  0 | task 2234 | stop processing: n_tokens = 404, truncated = 0
+Oct 09 14:12:33 qdrant-robot bash[298239]: 21.35.318.801 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.695 (> 0.100 thold), f_keep = 0.884
+Oct 09 14:12:33 qdrant-robot bash[298239]: 21.35.318.882 I slot launch_slot_: id  0 | task 2241 | processing task, is_child = 0
+Oct 09 14:12:34 qdrant-robot bash[298239]: 21.37.153.279 I slot print_timing: id  0 | task 2241 | prompt eval time =    1161.88 ms /   514 tokens (    2.26 ms per token,   442.39 tokens per second)
+Oct 09 14:12:34 qdrant-robot bash[298239]: 21.37.153.294 I slot print_timing: id  0 | task 2241 |        eval time =     672.48 ms /    15 tokens (   48.03 ms per token,    20.82 tokens per second)
+Oct 09 14:12:34 qdrant-robot bash[298239]: 21.37.153.297 I slot print_timing: id  0 | task 2241 |       total time =    1834.36 ms /   529 tokens
+Oct 09 14:12:34 qdrant-robot bash[298239]: 21.37.153.300 I slot print_timing: id  0 | task 2241 |    graphs reused =       1474
+Oct 09 14:12:34 qdrant-robot bash[298239]: 21.37.153.459 I slot      release: id  0 | task 2241 | stop processing: n_tokens = 528, truncated = 0
+Oct 09 14:12:35 qdrant-robot bash[298239]: 21.37.271.440 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.684 (> 0.100 thold), f_keep = 0.716
+Oct 09 14:12:35 qdrant-robot bash[298239]: 21.37.271.593 I slot launch_slot_: id  0 | task 2261 | processing task, is_child = 0
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.761.002 I slot print_timing: id  0 | task 2261 | prompt eval time =    1240.06 ms /   553 tokens (    2.24 ms per token,   445.95 tokens per second)
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.761.018 I slot print_timing: id  0 | task 2261 |        eval time =     249.30 ms /     6 tokens (   49.86 ms per token,    20.06 tokens per second)
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.761.021 I slot print_timing: id  0 | task 2261 |       total time =    1489.36 ms /   559 tokens
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.761.027 I slot print_timing: id  0 | task 2261 |    graphs reused =       1478
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.761.197 I slot      release: id  0 | task 2261 | stop processing: n_tokens = 558, truncated = 0
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.870.794 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.897 (> 0.100 thold), f_keep = 0.611
+Oct 09 14:12:36 qdrant-robot bash[298239]: 21.38.870.956 I slot launch_slot_: id  0 | task 2272 | processing task, is_child = 0
+Oct 09 14:12:37 qdrant-robot bash[298239]: 21.40.216.100 I slot print_timing: id  0 | task 2272 | prompt eval time =     862.00 ms /   380 tokens (    2.27 ms per token,   440.84 tokens per second)
+Oct 09 14:12:37 qdrant-robot bash[298239]: 21.40.216.114 I slot print_timing: id  0 | task 2272 |        eval time =     483.10 ms /    11 tokens (   48.31 ms per token,    20.70 tokens per second)
+Oct 09 14:12:37 qdrant-robot bash[298239]: 21.40.216.117 I slot print_timing: id  0 | task 2272 |       total time =    1345.10 ms /   391 tokens
+Oct 09 14:12:37 qdrant-robot bash[298239]: 21.40.216.120 I slot print_timing: id  0 | task 2272 |    graphs reused =       1487
+Oct 09 14:12:37 qdrant-robot bash[298239]: 21.40.216.261 I slot      release: id  0 | task 2272 | stop processing: n_tokens = 390, truncated = 0
+Oct 09 14:12:38 qdrant-robot bash[298239]: 21.40.321.335 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.818 (> 0.100 thold), f_keep = 0.874
+Oct 09 14:12:38 qdrant-robot bash[298239]: 21.40.321.482 I slot launch_slot_: id  0 | task 2287 | processing task, is_child = 0
+Oct 09 14:12:39 qdrant-robot bash[298239]: 21.42.185.253 I slot print_timing: id  0 | task 2287 | prompt eval time =    1007.51 ms /   417 tokens (    2.42 ms per token,   413.89 tokens per second)
+Oct 09 14:12:39 qdrant-robot bash[298239]: 21.42.185.267 I slot print_timing: id  0 | task 2287 |        eval time =     856.22 ms /    19 tokens (   47.57 ms per token,    21.02 tokens per second)
+Oct 09 14:12:39 qdrant-robot bash[298239]: 21.42.185.270 I slot print_timing: id  0 | task 2287 |       total time =    1863.72 ms /   436 tokens
+Oct 09 14:12:39 qdrant-robot bash[298239]: 21.42.185.273 I slot print_timing: id  0 | task 2287 |    graphs reused =       1504
+Oct 09 14:12:39 qdrant-robot bash[298239]: 21.42.185.420 I slot      release: id  0 | task 2287 | stop processing: n_tokens = 435, truncated = 0
+Oct 09 14:12:40 qdrant-robot bash[298239]: 21.42.301.550 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.820 (> 0.100 thold), f_keep = 0.869
+Oct 09 14:12:40 qdrant-robot bash[298239]: 21.42.301.694 I slot launch_slot_: id  0 | task 2311 | processing task, is_child = 0
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.260.427 I slot print_timing: id  0 | task 2311 | prompt eval time =    1100.43 ms /   461 tokens (    2.39 ms per token,   418.93 tokens per second)
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.260.445 I slot print_timing: id  0 | task 2311 |        eval time =     858.25 ms /    19 tokens (   47.68 ms per token,    20.97 tokens per second)
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.260.448 I slot print_timing: id  0 | task 2311 |       total time =    1958.68 ms /   480 tokens
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.260.451 I slot print_timing: id  0 | task 2311 |    graphs reused =       1521
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.260.606 I slot      release: id  0 | task 2311 | stop processing: n_tokens = 479, truncated = 0
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.460.331 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.833 (> 0.100 thold), f_keep = 0.866
+Oct 09 14:12:42 qdrant-robot bash[298239]: 21.44.460.490 I slot launch_slot_: id  0 | task 2335 | processing task, is_child = 0
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.660.729 I slot print_timing: id  0 | task 2335 | prompt eval time =    1138.86 ms /   498 tokens (    2.29 ms per token,   437.28 tokens per second)
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.660.742 I slot print_timing: id  0 | task 2335 |        eval time =    1061.32 ms /    23 tokens (   48.24 ms per token,    20.73 tokens per second)
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.660.745 I slot print_timing: id  0 | task 2335 |       total time =    2200.18 ms /   521 tokens
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.660.748 I slot print_timing: id  0 | task 2335 |    graphs reused =       1541
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.660.908 I slot      release: id  0 | task 2335 | stop processing: n_tokens = 520, truncated = 0
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.804.281 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.855 (> 0.100 thold), f_keep = 0.885
+Oct 09 14:12:44 qdrant-robot bash[298239]: 21.46.804.416 I slot launch_slot_: id  0 | task 2363 | processing task, is_child = 0
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.48.971.455 I slot print_timing: id  0 | task 2363 | prompt eval time =    1211.91 ms /   538 tokens (    2.25 ms per token,   443.93 tokens per second)
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.48.971.472 I slot print_timing: id  0 | task 2363 |        eval time =     955.08 ms /    21 tokens (   47.75 ms per token,    20.94 tokens per second)
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.48.971.475 I slot print_timing: id  0 | task 2363 |       total time =    2166.99 ms /   559 tokens
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.48.971.478 I slot print_timing: id  0 | task 2363 |    graphs reused =       1560
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.48.971.651 I slot      release: id  0 | task 2363 | stop processing: n_tokens = 558, truncated = 0
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.49.091.405 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.857 (> 0.100 thold), f_keep = 0.611
+Oct 09 14:12:46 qdrant-robot bash[298239]: 21.49.091.551 I slot launch_slot_: id  0 | task 2389 | processing task, is_child = 0
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.351.865 I slot print_timing: id  0 | task 2389 | prompt eval time =     918.63 ms /   398 tokens (    2.31 ms per token,   433.25 tokens per second)
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.351.879 I slot print_timing: id  0 | task 2389 |        eval time =     341.64 ms /     8 tokens (   48.81 ms per token,    20.49 tokens per second)
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.351.882 I slot print_timing: id  0 | task 2389 |       total time =    1260.27 ms /   406 tokens
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.351.885 I slot print_timing: id  0 | task 2389 |    graphs reused =       1566
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.352.029 I slot      release: id  0 | task 2389 | stop processing: n_tokens = 405, truncated = 0
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.461.110 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.804 (> 0.100 thold), f_keep = 0.842
+Oct 09 14:12:48 qdrant-robot bash[298239]: 21.50.461.251 I slot launch_slot_: id  0 | task 2401 | processing task, is_child = 0
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.018.362 I slot print_timing: id  0 | task 2401 | prompt eval time =    1029.63 ms /   424 tokens (    2.43 ms per token,   411.80 tokens per second)
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.018.378 I slot print_timing: id  0 | task 2401 |        eval time =     527.44 ms /    12 tokens (   47.95 ms per token,    20.86 tokens per second)
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.018.382 I slot print_timing: id  0 | task 2401 |       total time =    1557.07 ms /   436 tokens
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.018.385 I slot print_timing: id  0 | task 2401 |    graphs reused =       1576
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.018.527 I slot      release: id  0 | task 2401 | stop processing: n_tokens = 435, truncated = 0
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.134.401 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.842 (> 0.100 thold), f_keep = 0.855
+Oct 09 14:12:49 qdrant-robot bash[298239]: 21.52.134.664 I slot launch_slot_: id  0 | task 2418 | processing task, is_child = 0
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.708.542 I slot print_timing: id  0 | task 2418 | prompt eval time =    1046.37 ms /   442 tokens (    2.37 ms per token,   422.41 tokens per second)
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.708.557 I slot print_timing: id  0 | task 2418 |        eval time =     527.47 ms /    12 tokens (   47.95 ms per token,    20.85 tokens per second)
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.708.560 I slot print_timing: id  0 | task 2418 |       total time =    1573.83 ms /   454 tokens
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.708.563 I slot print_timing: id  0 | task 2418 |    graphs reused =       1586
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.708.716 I slot      release: id  0 | task 2418 | stop processing: n_tokens = 453, truncated = 0
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.819.784 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.963 (> 0.100 thold), f_keep = 0.753
+Oct 09 14:12:51 qdrant-robot bash[298239]: 21.53.819.929 I slot launch_slot_: id  0 | task 2435 | processing task, is_child = 0
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.245.591 I slot print_timing: id  0 | task 2435 | prompt eval time =     802.94 ms /   354 tokens (    2.27 ms per token,   440.88 tokens per second)
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.245.607 I slot print_timing: id  0 | task 2435 |        eval time =     622.68 ms /    14 tokens (   47.90 ms per token,    20.88 tokens per second)
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.245.610 I slot print_timing: id  0 | task 2435 |       total time =    1425.62 ms /   368 tokens
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.245.612 I slot print_timing: id  0 | task 2435 |    graphs reused =       1598
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.245.742 I slot      release: id  0 | task 2435 | stop processing: n_tokens = 367, truncated = 0
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.353.339 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.806 (> 0.100 thold), f_keep = 0.929
+Oct 09 14:12:53 qdrant-robot bash[298239]: 21.55.353.480 I slot launch_slot_: id  0 | task 2453 | processing task, is_child = 0
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.728.552 I slot print_timing: id  0 | task 2453 | prompt eval time =    1032.32 ms /   423 tokens (    2.44 ms per token,   409.76 tokens per second)
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.728.569 I slot print_timing: id  0 | task 2453 |        eval time =     342.71 ms /     8 tokens (   48.96 ms per token,    20.43 tokens per second)
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.728.572 I slot print_timing: id  0 | task 2453 |       total time =    1375.03 ms /   431 tokens
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.728.575 I slot print_timing: id  0 | task 2453 |    graphs reused =       1604
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.728.723 I slot      release: id  0 | task 2453 | stop processing: n_tokens = 430, truncated = 0
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.860.206 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.820 (> 0.100 thold), f_keep = 0.879
+Oct 09 14:12:54 qdrant-robot bash[298239]: 21.56.860.355 I slot launch_slot_: id  0 | task 2466 | processing task, is_child = 0
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.293.585 I slot print_timing: id  0 | task 2466 | prompt eval time =    1090.80 ms /   461 tokens (    2.37 ms per token,   422.63 tokens per second)
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.293.599 I slot print_timing: id  0 | task 2466 |        eval time =     342.39 ms /     8 tokens (   48.91 ms per token,    20.44 tokens per second)
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.293.602 I slot print_timing: id  0 | task 2466 |       total time =    1433.19 ms /   469 tokens
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.293.605 I slot print_timing: id  0 | task 2466 |    graphs reused =       1610
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.293.762 I slot      release: id  0 | task 2466 | stop processing: n_tokens = 468, truncated = 0
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.402.914 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.958 (> 0.100 thold), f_keep = 0.729
+Oct 09 14:12:56 qdrant-robot bash[298239]: 21.58.403.058 I slot launch_slot_: id  0 | task 2479 | processing task, is_child = 0
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.063.984 I slot print_timing: id  0 | task 2479 | prompt eval time =     805.39 ms /   356 tokens (    2.26 ms per token,   442.02 tokens per second)
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.064.002 I slot print_timing: id  0 | task 2479 |        eval time =     855.49 ms /    19 tokens (   47.53 ms per token,    21.04 tokens per second)
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.064.006 I slot print_timing: id  0 | task 2479 |       total time =    1660.88 ms /   375 tokens
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.064.009 I slot print_timing: id  0 | task 2479 |    graphs reused =       1627
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.064.147 I slot      release: id  0 | task 2479 | stop processing: n_tokens = 374, truncated = 0
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.195.760 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.793 (> 0.100 thold), f_keep = 0.912
+Oct 09 14:12:57 qdrant-robot bash[298239]: 22.00.195.908 I slot launch_slot_: id  0 | task 2502 | processing task, is_child = 0
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.263.798 I slot print_timing: id  0 | task 2502 | prompt eval time =     972.29 ms /   430 tokens (    2.26 ms per token,   442.26 tokens per second)
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.263.812 I slot print_timing: id  0 | task 2502 |        eval time =    1095.56 ms /    24 tokens (   47.63 ms per token,    20.99 tokens per second)
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.263.815 I slot print_timing: id  0 | task 2502 |       total time =    2067.85 ms /   454 tokens
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.263.818 I slot print_timing: id  0 | task 2502 |    graphs reused =       1649
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.263.965 I slot      release: id  0 | task 2502 | stop processing: n_tokens = 453, truncated = 0
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.432.050 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.919 (> 0.100 thold), f_keep = 0.781
+Oct 09 14:13:00 qdrant-robot bash[298239]: 22.02.432.191 I slot launch_slot_: id  0 | task 2530 | processing task, is_child = 0
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.787.905 I slot print_timing: id  0 | task 2530 | prompt eval time =     875.66 ms /   385 tokens (    2.27 ms per token,   439.67 tokens per second)
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.787.919 I slot print_timing: id  0 | task 2530 |        eval time =     480.00 ms /    11 tokens (   48.00 ms per token,    20.83 tokens per second)
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.787.922 I slot print_timing: id  0 | task 2530 |       total time =    1355.67 ms /   396 tokens
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.787.925 I slot print_timing: id  0 | task 2530 |    graphs reused =       1658
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.788.059 I slot      release: id  0 | task 2530 | stop processing: n_tokens = 395, truncated = 0
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.900.837 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.722 (> 0.100 thold), f_keep = 0.863
+Oct 09 14:13:01 qdrant-robot bash[298239]: 22.03.900.978 I slot launch_slot_: id  0 | task 2545 | processing task, is_child = 0
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.565.110 I slot print_timing: id  0 | task 2545 | prompt eval time =    1089.00 ms /   472 tokens (    2.31 ms per token,   433.42 tokens per second)
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.565.125 I slot print_timing: id  0 | task 2545 |        eval time =     575.08 ms /    13 tokens (   47.92 ms per token,    20.87 tokens per second)
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.565.128 I slot print_timing: id  0 | task 2545 |       total time =    1664.08 ms /   485 tokens
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.565.136 I slot print_timing: id  0 | task 2545 |    graphs reused =       1669
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.565.285 I slot      release: id  0 | task 2545 | stop processing: n_tokens = 484, truncated = 0
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.682.411 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.900 (> 0.100 thold), f_keep = 0.705
+Oct 09 14:13:03 qdrant-robot bash[298239]: 22.05.682.544 I slot launch_slot_: id  0 | task 2563 | processing task, is_child = 0
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.071.966 I slot print_timing: id  0 | task 2563 | prompt eval time =     860.89 ms /   379 tokens (    2.27 ms per token,   440.24 tokens per second)
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.071.982 I slot print_timing: id  0 | task 2563 |        eval time =     528.48 ms /    12 tokens (   48.04 ms per token,    20.81 tokens per second)
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.071.985 I slot print_timing: id  0 | task 2563 |       total time =    1389.37 ms /   391 tokens
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.071.988 I slot print_timing: id  0 | task 2563 |    graphs reused =       1679
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.072.120 I slot      release: id  0 | task 2563 | stop processing: n_tokens = 390, truncated = 0
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.181.321 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.718 (> 0.100 thold), f_keep = 0.874
+Oct 09 14:13:04 qdrant-robot bash[298239]: 22.07.181.453 I slot launch_slot_: id  0 | task 2579 | processing task, is_child = 0
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.843.855 I slot print_timing: id  0 | task 2579 | prompt eval time =    1085.49 ms /   475 tokens (    2.29 ms per token,   437.59 tokens per second)
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.843.870 I slot print_timing: id  0 | task 2579 |        eval time =     576.86 ms /    13 tokens (   48.07 ms per token,    20.80 tokens per second)
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.843.874 I slot print_timing: id  0 | task 2579 |       total time =    1662.35 ms /   488 tokens
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.843.877 I slot print_timing: id  0 | task 2579 |    graphs reused =       1690
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.844.037 I slot      release: id  0 | task 2579 | stop processing: n_tokens = 487, truncated = 0
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.947.347 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.955 (> 0.100 thold), f_keep = 0.700
+Oct 09 14:13:06 qdrant-robot bash[298239]: 22.08.947.489 I slot launch_slot_: id  0 | task 2597 | processing task, is_child = 0
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.10.948.504 I slot print_timing: id  0 | task 2597 | prompt eval time =     816.46 ms /   357 tokens (    2.29 ms per token,   437.25 tokens per second)
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.10.948.519 I slot print_timing: id  0 | task 2597 |        eval time =    1184.50 ms /    26 tokens (   47.38 ms per token,    21.11 tokens per second)
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.10.948.522 I slot print_timing: id  0 | task 2597 |       total time =    2000.96 ms /   383 tokens
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.10.948.525 I slot print_timing: id  0 | task 2597 |    graphs reused =       1714
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.10.948.656 I slot      release: id  0 | task 2597 | stop processing: n_tokens = 382, truncated = 0
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.11.088.509 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.810 (> 0.100 thold), f_keep = 0.893
+Oct 09 14:13:08 qdrant-robot bash[298239]: 22.11.088.655 I slot launch_slot_: id  0 | task 2627 | processing task, is_child = 0
+Oct 09 14:13:10 qdrant-robot bash[298239]: 22.12.699.831 I slot print_timing: id  0 | task 2627 | prompt eval time =    1033.59 ms /   421 tokens (    2.46 ms per token,   407.32 tokens per second)
+Oct 09 14:13:10 qdrant-robot bash[298239]: 22.12.699.849 I slot print_timing: id  0 | task 2627 |        eval time =     577.54 ms /    13 tokens (   48.13 ms per token,    20.78 tokens per second)
+Oct 09 14:13:10 qdrant-robot bash[298239]: 22.12.699.852 I slot print_timing: id  0 | task 2627 |       total time =    1611.13 ms /   434 tokens
+Oct 09 14:13:10 qdrant-robot bash[298239]: 22.12.699.855 I slot print_timing: id  0 | task 2627 |    graphs reused =       1725
+Oct 09 14:13:10 qdrant-robot bash[298239]: 22.12.699.995 I slot      release: id  0 | task 2627 | stop processing: n_tokens = 433, truncated = 0
+Oct 09 14:17:14 qdrant-robot bash[298239]: 26.16.266.730 I srv    operator(): operator(): cleaning up before exit...
+Oct 09 14:17:14 qdrant-robot systemd[1]: Stopping qr-p2-granite-dialogue-debug.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.brain serve granite4-h-micro; rc=\$?; kill \$t; exit \$rc'"...
+Oct 09 14:17:14 qdrant-robot bash[298239]: Received second interrupt, terminating immediately.
+Oct 09 14:17:14 qdrant-robot systemd[1]: qr-p2-granite-dialogue-debug.service: Deactivated successfully.
+Oct 09 14:17:14 qdrant-robot systemd[1]: Stopped qr-p2-granite-dialogue-debug.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m robot.brain serve granite4-h-micro; rc=\$?; kill \$t; exit \$rc'".
+Oct 09 14:17:14 qdrant-robot systemd[1]: qr-p2-granite-dialogue-debug.service: Consumed 1min 26.450s CPU time, 4.4G memory peak, 0B memory swap peak.

@@ -78,6 +78,11 @@ D14's starting architecture was superseded by the decisions below. Improve or re
 
 ## Exploring without tunnel vision
 
+- Architecture work follows decision, runnable build, then validation on existing workloads. The lead chooses model, runtime, precision, and process layout; research resolves those choices instead of producing another evaluation plan.
+- Run the required design gate on a selected architecture with its fallback. Begin its smallest runnable implementation after resolving blocking findings. Do not make a planning-document review another prerequisite for a reversible prototype.
+- Reuse existing fixtures, scoring, and deployment. Add an evaluation harness only when the existing tools cannot measure a required fixed outcome, and record that concrete limitation first.
+- Planning records and review counts do not constitute capability progress. Before another architecture planning pass, produce runnable product code and measured answers, or record the specific external blocker that prevents them.
+
 - A design brief names at least two real alternatives and how each would be measured. A brief with one option gets RETHINK.
 - Decisions preserve evidence and tradeoffs; challenge them when a concrete intervention or disputed assumption could raise capabilities. Before reopening an approach, read its prior lessons and results, name what changes, and define a paired comparison (D76, D77). An unchanged sweep adds no decision evidence.
 - Use a cheap local check or recorded-prompt comparison first. Run the full integrated replay once after a material change; keep acceptance measurements on the Jetson.

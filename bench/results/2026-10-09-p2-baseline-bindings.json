@@ -1,0 +1,28 @@
+{
+  "commit": "4d73264",
+  "release": "cd60be65ee79",
+  "hashes": {
+    "robot/main.py": "0c208f60724803f518b9ae49fe49aaabebddf6ea41359ea2b381f65dc2cb187c",
+    "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+    "robot/memory.py": "0e2a2da0e91167e63da2acb276a921a7851f254906fd844012564dd59d731fc3",
+    "robot/tts.py": "6bbe3c3620bea5901c1e0995e0d91e2cd75db628d77fff563c512d4817070240",
+    "robot/asr.py": "0d6c8147e7541eb4f2fa4aac75f56f2fc6acbcaa2e9d2f46e85ede08b14f991d",
+    "robot/audio.py": "069da726df2ba548e7257e4da4149324201471e9316208e88758423421e9855e",
+    "robot/detect.py": "9f4dc961766b04a98785ae2f9b77c6e091995da32a35fc574b454a6e06ed5905",
+    "pyproject.toml": "7270bc927f1619ed709dafd0ad5de07b3c8ac0dfc93b44decb5b4748a021c6bf",
+    "uv.lock": "0bcf60a75fe0f6649d1ec6a9d504b2e74bcba85859d705da7fc3602d80a9aaef",
+    "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727"
+  },
+  "matches": {
+    "robot/main.py": true,
+    "robot/brain.py": true,
+    "robot/memory.py": true,
+    "robot/tts.py": true,
+    "robot/asr.py": true,
+    "robot/audio.py": true,
+    "robot/detect.py": true,
+    "pyproject.toml": true,
+    "uv.lock": true,
+    "models.json": true
+  }
+}

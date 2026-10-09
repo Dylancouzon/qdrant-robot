@@ -1,0 +1,20 @@
+import json,time,urllib.request
+out=open('/home/qdrant/qdrant-robot/shared/results/2026-10-09-p2-granite-tools-probe.jsonl','w')
+def save(r):out.write(json.dumps(r)+'\n');out.flush();print(json.dumps(r),flush=True)
+def post(msgs):
+ body={'messages':msgs,'tools':tools,'tool_choice':'auto','temperature':0,'repeat_penalty':1.0,'cache_prompt':False,'max_tokens':128,'stream':False}
+ req=urllib.request.Request('http://127.0.0.1:8080/v1/chat/completions',json.dumps(body).encode(),{'Content-Type':'application/json'})
+ with urllib.request.urlopen(req,timeout=90) as r:return json.load(r)
+tools=[{'type':'function','function':{'name':'observe_camera','description':'Read the speech-start camera frame to answer a question about the current view.','parameters':{'type':'object','properties':{'question':{'type':'string'}},'required':['question'],'additionalProperties':False}}},{'type':'function','function':{'name':'search_memory','description':'Search stored source evidence about previous observations or visitor statements.','parameters':{'type':'object','properties':{'query':{'type':'string'}},'required':['query'],'additionalProperties':False}}}]
+system='You are Edgy, a robot assistant. Use observe_camera for questions about the current view, and search_memory for questions about earlier observations or statements. Answer only from returned source evidence. Tool results describe facts; earlier assistant replies can be outdated. Give a brief spoken answer.'
+save({'type':'metadata','machine':'Jetson','measurement_label':'J','model':'Granite4-H-Micro Q4','release':'8a578811803e','treatment':'read-only protocol probe; recorded source tool results, no live tools/actions or acceptance'})
+for question,result,expected in [('What am I holding up?','The stop sign is on a table.','observe_camera'),('What did I show you earlier?','Earlier camera observation: a red double-decker bus.','search_memory')]:
+ msgs=[{'role':'system','content':system},{'role':'user','content':question}]
+ reply=post(msgs);message=reply['choices'][0]['message'];save({'type':'tool_proposal','question':question,'expected':expected,'message':message})
+ calls=message.get('tool_calls',[])
+ if len(calls)!=1 or calls[0]['function']['name']!=expected:continue
+ args=json.loads(calls[0]['function']['arguments'])
+ if not isinstance(args,dict) or list(args)!=[('question' if expected=='observe_camera' else 'query')]:continue
+ msgs+=[message,{'role':'tool','tool_call_id':calls[0]['id'],'content':result}]
+ reply=post(msgs);save({'type':'grounded_reply','question':question,'source':result,'message':reply['choices'][0]['message']})
+save({'type':'completion','question_count':2});out.close()

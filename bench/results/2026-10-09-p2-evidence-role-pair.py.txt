@@ -1,0 +1,113 @@
+"""Run-owned comparison of two evidence message roles on existing recorded turns."""
+import hashlib
+import json
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+ROOT = Path('/Users/dylanc/Documents/GitHub/qdrant-robot')
+PROTOTYPE = ROOT / 'build/p2/observer-dialogue'
+sys.path.insert(0, str(PROTOTYPE))
+from robot import brain
+
+URL = 'http://127.0.0.1:18080'
+RESULTS = ROOT / 'bench/results'
+RAW = RESULTS / '2026-10-09-replay-1791567492.jsonl'
+FULL = RESULTS / '2026-10-09-p2-hybrid-m1-fullturns.jsonl'
+STAMP = '2026-10-09-p2-evidence-role'
+
+
+def post(path, body):
+    req = urllib.request.Request(URL + '/' + path, json.dumps(body).encode(),
+                                 {'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=90) as response:
+        return json.load(response)
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+raw = [json.loads(line) for line in RAW.read_text().splitlines()]
+records = [row for row in raw if 'id' in row]
+full = [json.loads(line) for line in FULL.read_text().splitlines()]
+assert len(records) == len(full) == 47
+packets = []
+excluded = []
+for row, turn in zip(records, full, strict=True):
+    assert row['heard'] == turn['question']
+    if turn['verbatim']:
+        excluded.append(row['id'])
+        continue
+    question = turn['question']
+    prior = turn['prompt'][:-1]
+    text = turn['prompt'][-1]['content'][0]['text']
+    suffix = 'Visitor: ' + question
+    assert text.endswith(suffix)
+    evidence = text[:-len(suffix)]
+    system = {'role': 'system', 'content': brain.SYSTEM}
+    control = [system, *prior, {'role': 'user', 'content': turn['prompt'][-1]['content']}]
+    if evidence:
+        candidate = brain.messages(prior, facts=[evidence], question=question)
+        candidate[-1]['content'] = evidence
+    else:
+        candidate = brain.messages(prior, question=question)
+    assert candidate[1:1 + len(prior)] == control[1:1 + len(prior)] == prior
+    assert candidate[0] == control[0]
+    assert candidate[-1]['content'] == evidence if evidence else candidate[-1]['content'] == question
+    metadata = brain.template(candidate)
+    packets.append({'id': row['id'], 'heard': question, 'evidence': evidence,
+                    'history': prior, 'control': control, 'candidate': candidate,
+                    'template': metadata, 'original_answer': turn['answer']})
+assert len(packets) == 39 and len(excluded) == 8
+binding = {'type': 'metadata', 'machine': 'Jetson Orin Nano Super', 'label': 'J',
+           'server_release': '8a578811803e', 'server_unit': 'qr-p2-granite-dialogue-debug',
+           'client_base': '9141a7b', 'client_brain_sha256': sha(PROTOTYPE / 'robot/brain.py'),
+           'raw_sha256': sha(RAW), 'fullturns_sha256': sha(FULL),
+           'runtime': 'llama.cpp9c2e0e491a822adae1f0b1c831adb4160057d24f CUDA sm87 NO_VMM',
+           'model': 'Granite4.0-H-Micro3B Q4_K_M', 'context_tokens': 4096,
+           'max_tokens': 128, 'temperature': 0, 'repeat_penalty': 1.0,
+           'cache_prompt': False, 'tool_choice': 'none', 'n': 39,
+           'excluded_code_ids': excluded, 'script_sha256': sha(Path(__file__)),
+           'limits': 'Recorded source/history diagnostic. No observer, audio, pause/resume, live tools, or acceptance.'}
+(RESULTS / (STAMP + '-packets.json')).write_text(json.dumps({'binding': binding, 'packets': packets}, indent=2) + '\n')
+outputs = {arm: (RESULTS / (STAMP + '-' + arm + '.jsonl')).open('w')
+           for arm in ('control', 'candidate')}
+counts = {arm: 0 for arm in outputs}
+try:
+    for arm, output in outputs.items():
+        output.write(json.dumps({**binding, 'variant': arm}) + '\n')
+        output.flush()
+    for packet in packets:
+        for arm, output in outputs.items():
+            msgs = packet[arm]
+            shared = {'messages': msgs, **packet['template']}
+            rendered = post('apply-template', shared)['prompt']
+            tokens = len(post('tokenize', {'content': rendered, 'parse_special': True,
+                                         'add_special': False})['tokens'])
+            assert tokens + brain.MAX_TOKENS <= brain.CONTEXT_TOKENS
+            started = time.perf_counter()
+            response = post('v1/chat/completions', {**shared, 'temperature': 0,
+                            'repeat_penalty': 1.0, 'cache_prompt': False,
+                            'max_tokens': 128, 'stream': False})
+            choice = response['choices'][0]
+            message = choice['message']
+            assert not message.get('tool_calls'), message
+            assert isinstance(message['content'], str)
+            usage = response['usage']
+            assert usage['prompt_tokens'] == tokens, (tokens, usage)
+            record = {'id': packet['id'], 'heard': packet['heard'], 'answer': message['content'],
+                      'seconds': time.perf_counter() - started, 'rendered_tokens': tokens,
+                      'usage': usage, 'finish_reason': choice['finish_reason'],
+                      'evidence_sha256': hashlib.sha256(packet['evidence'].encode()).hexdigest()}
+            output.write(json.dumps(record) + '\n')
+            output.flush()
+            counts[arm] += 1
+            print(arm, counts[arm], packet['id'], record['answer'], flush=True)
+    for arm, output in outputs.items():
+        output.write(json.dumps({'type': 'completion', 'variant': arm, 'n': counts[arm],
+                                 'expected_n': 39, 'native_inference': 0}) + '\n')
+finally:
+    for output in outputs.values():
+        output.close()

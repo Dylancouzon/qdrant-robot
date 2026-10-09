@@ -1,0 +1,21 @@
+{
+  "label": "J",
+  "kind": "official native runtime loading qualification",
+  "machine": "Jetson Orin Nano Super",
+  "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6",
+  "release": "cd60be65ee79",
+  "unit": "qr-p2-trt-runtime-setup",
+  "native_exit": 0,
+  "wheel_version": "0.11.0",
+  "wheel_bytes": 447070745,
+  "wheel_sha256": "9e6722a5a250d0ba18665911a908aecfc9684722b9d56d944efe31fe6c889d9b",
+  "payload": "jetson-orin-jp72-cu13-sm87",
+  "tensorrt": "10.16.2.10",
+  "environment_path": "2026-10-09-p2-trt-jetson-environment.txt",
+  "journal": "2026-10-09-p2-trt-runtime-setup-journal.log",
+  "script": "2026-10-09-p2-trt-jetson-setup.py.txt",
+  "limits": "Native payload load only. No Gemma checkpoint/engine/build/inference, audio, quality, memory-headroom, or acceptance claim.",
+  "environment_path_sha256": "60fc6bf18706886d62f7c49f53e4f0140e96e0b1804dce35fd1df5cd4fa0cf29",
+  "journal_sha256": "65e90e226370659b1144c66eb1b8455931ab6b07bea835c8ef47ab542aee6e18",
+  "script_sha256": "1dbffa1a24fa266641ffffe119377fbbed4f8a2b08832b51b8b6e60607d8cc84"
+}

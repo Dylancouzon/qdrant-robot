@@ -1,0 +1,6 @@
+{"type": "metadata", "machine": "Jetson", "measurement_label": "J", "model": "Granite4-H-Micro Q4", "release": "8a578811803e", "treatment": "read-only protocol probe; recorded source tool results, no live tools/actions or acceptance"}
+{"type": "tool_proposal", "question": "What am I holding up?", "expected": "observe_camera", "message": {"role": "assistant", "content": "", "tool_calls": [{"type": "function", "function": {"name": "observe_camera", "arguments": "{\"question\": \"What am I holding up?\"}"}, "id": "LuoNfCY85AOHqKSehAdaYTz18rJnTiOO"}]}}
+{"type": "grounded_reply", "question": "What am I holding up?", "source": "The stop sign is on a table.", "message": {"role": "assistant", "content": "You're holding a stop sign."}}
+{"type": "tool_proposal", "question": "What did I show you earlier?", "expected": "search_memory", "message": {"role": "assistant", "content": "", "tool_calls": [{"type": "function", "function": {"name": "search_memory", "arguments": "{\"query\": \"What did I show you earlier?\"}"}, "id": "MYzKjyvdaUgLpxnTr2Ed1zn6k9Zw6ijm"}]}}
+{"type": "grounded_reply", "question": "What did I show you earlier?", "source": "Earlier camera observation: a red double-decker bus.", "message": {"role": "assistant", "content": "I showed you a red double-decker bus earlier."}}
+{"type": "completion", "question_count": 2}
