@@ -5,6 +5,7 @@ description = "A desktop robot whose models and memory (Qdrant Edge) all run on 
 requires-python = "==3.12.*"
 dependencies = [
     "numpy==2.3.3",
+    "tensorrt-edgellm==0.11.0; sys_platform == 'linux' and platform_machine == 'aarch64'",
     "onnx-asr==0.12.0",
     "opencv-python-headless==5.0.0.93",
     "qdrant-edge-py==0.8.0",

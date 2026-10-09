@@ -1,5 +1,4 @@
-"""Decode pauses at the first phrase and resumes with the same answer (D66); an interrupted turn
-closes the brain's stream, whether it fails in the first synthesis or after the resume."""
+"""Native decode continues through speech synthesis; interruption closes its stream."""
 from types import SimpleNamespace as Stub
 
 import numpy as np
@@ -12,17 +11,16 @@ REPLY = ["Nice ", "to ", "meet ", "you. ", "I ", "am ", "Edgy. ", "I ", "run ", 
 
 
 class FakeBrain:
-    """brain.Brain.answer: one delta per word, resumed after `prior`; counts open streams."""
+    """Count active answer streams while the robot speaks."""
 
     def __init__(self):
-        self.priors, self.open = [], 0
+        self.calls, self.open = 0, 0
 
-    def answer(self, msgs, max_tokens=64, prior=""):
-        self.priors.append(prior)
+    def answer(self, msgs, max_tokens=64):
+        self.calls += 1
         self.open += 1
         try:
-            yield from REPLY[min(k for k in range(len(REPLY) + 1)
-                                 if len("".join(REPLY[:k])) >= len(prior)):]
+            yield from REPLY
         finally:
             self.open -= 1
 
@@ -32,6 +30,7 @@ def robot(fail_at: int = 0) -> Robot:
     r.brain, r.stream, said = FakeBrain(), None, []
 
     def say(text: str) -> np.ndarray:
+        assert r.brain.open == 1, "generation stays active through synthesis"
         said.append(text)
         if len(said) == fail_at:
             raise RuntimeError("synthesis failed")
@@ -41,11 +40,11 @@ def robot(fail_at: int = 0) -> Robot:
     return r
 
 
-def test_pause_and_resume() -> None:
+def test_uninterrupted() -> None:
     r, turn = robot(), Turn()
     assert len(r._speak(r._tokens([], turn), turn)) == 3
-    assert turn.answer == "".join(REPLY) and turn.resumed
-    assert r.brain.priors == ["", "Nice to meet you. "], "resumed after the first phrase"
+    assert turn.answer == "".join(REPLY)
+    assert r.brain.calls == 1
     assert r.brain.open == 0 and r.stream is None
 
 
@@ -56,4 +55,4 @@ def test_interrupted(fail_at: int) -> None:
     with pytest.raises(RuntimeError):
         r._speak(tokens, turn)
     assert r.brain.open == 0 and r.stream is None, "no stream left decoding"
-    assert len(r.brain.priors) == fail_at, "a failed first synthesis never resumes"
+    assert r.brain.calls == 1, "interruption cancels the single generation"

@@ -240,6 +240,9 @@ def test_robot_identity(monkeypatch) -> None:
         assert robot._visitor() == track, "her new track continued his lost one"
         assert ask("What's my name?", ana) == "You're Ana. I remember your face."
         assert ask("Thanks!", ana) is None
+        private = "I live in Lisbon."
+        assert ask(private, ana) is None
+        assert private in str(robot.history)
         assert "Remember me, I'm Ben." in said() and "Nice to meet you, I'm Ana." in said()
         hers = robot.memory.points(linked("Ana"))
         held = {r.payload["frame"] for r in robot.memory.shard.scroll(memory.ScrollRequest(
@@ -247,6 +250,11 @@ def test_robot_identity(monkeypatch) -> None:
         assert hers and {f.name for f in (root / "frames").iterdir()} == held, \
             "the frames on disk are the turns' own: enrollment keeps no image"
         assert ask("Please forget me.", ana) == done("forget", "Ana", True)
+        assert "Lisbon" not in str(turns[-1].prompt) + str(turns[-1].told)
+        assert "Lisbon" not in str(robot.history) + str(robot.ready.history)
+        assert ask("Where do I live?", ana) is None
+        assert "Lisbon" not in str(turns[-1].prompt) + str(turns[-1].told)
+        assert "Lisbon" not in str(robot.history)
         assert robot.people.identify(np.eye(DIM)[1]) is None
         assert robot.people.identify(np.eye(DIM)[2])[0] == "Ben", "only the face that asked"
         assert not robot.memory.points([p["id"] for p in hers])

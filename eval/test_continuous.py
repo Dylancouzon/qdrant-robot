@@ -59,7 +59,6 @@ class FakeRobot:
             SimpleNamespace(name=name, is_alive=lambda: True)
             for name in ("_watch", "_detect", "_transcribe", "_work")
         ]
-        self.brain = SimpleNamespace(proc=SimpleNamespace(poll=lambda: None))
         self.memory = SimpleNamespace(
             points=lambda ids: [{"id": 7, "ts": 1000.1, "said": "invented"}]
         )
@@ -176,13 +175,11 @@ def test_missing_transcript_does_not_shift_next_utterance(tmp_path):
     assert utterances[0]["heard"] == "" and utterances[1]["heard"] == "second"
 
 
-@pytest.mark.parametrize("failure", ["thread", "llama", "detector", "pending", "unmatched"])
+@pytest.mark.parametrize("failure", ["thread", "detector", "pending", "unmatched"])
 def test_operational_failures_preserve_earlier_rows(tmp_path, failure):
     def change(robot):
         if failure == "thread":
             robot.threads[0].is_alive = lambda: False
-        elif failure == "llama":
-            robot.brain.proc.poll = lambda: 9
         elif failure == "detector":
             robot.detect_failed = RuntimeError("invented failure")
         elif failure == "pending":

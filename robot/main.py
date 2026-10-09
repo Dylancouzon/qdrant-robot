@@ -143,7 +143,6 @@ class Turn:
     identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
-    resumed: bool = False         # decode paused at the first phrase and resumed (D66)
 
 
 class Robot:
@@ -416,11 +415,8 @@ class Robot:
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
         changed = self.last_frame is not None and scene_change(
             self.last_frame, shot[0]) > SCENE_CHANGE
-        # After the view changes, the brain's earlier answers describe a scene that is gone: keep
-        # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
-        history = [m for m in self.history if m["role"] == "user"] if changed else self.history
-        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
-        self.brain.prefill(brain.messages(history, look.image))
+        # Keep complete exchanges so context can evict old turns after a scene change.
+        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, self.history)
         self.ready = look
 
     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
@@ -445,7 +441,6 @@ class Robot:
         turn.facts = [fact for _, fact in found]
         turn.verbatim = bool(found) and found[0][0] >= VERBATIM
         past = about_past(turn.question)
-        recalled, memories = self._recall(turn, look.frame) if past else ([], [])
         # The frame at speech start: the cached look may show an earlier visitor.
         now, taken = (look.frame, look.taken) if shot[0] is None else shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
@@ -454,6 +449,13 @@ class Robot:
             self.history = []
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
+        track = self._visitor()
+        identity = self._identity(turn, now, track)
+        # Identity actions delete evidence before this turn can retrieve it.
+        if self.ready is None:
+            self._look((now, taken))
+            look = self.ready
+        recalled, memories = self._recall(turn, now) if past else ([], [])
         statements = self._told(question, turn)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
@@ -461,8 +463,7 @@ class Robot:
                       "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
                           (f"seen: {line}", None) for line in memories]}
-        track = self._visitor()
-        recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
+        recalled_answer = identity or self._things(turn) or shown(
             turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
         ) or self._sighted(turn)
         turn.retrieved = time.time()
@@ -471,7 +472,7 @@ class Robot:
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
         sees = about_now(turn.question) or (turn.kind == "sight" and not past)
-        image = look.image if sees else None
+        image = brain.jpeg(now) if sees else None
         msgs = brain.messages(look.history, image, memories, turn.facts,
                               turn.question, look.changed, past, told)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
@@ -656,6 +657,7 @@ class Robot:
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding, self.told = (face_, time.time()), None
+        self.history, self.ready = [], None
         return True
 
     def _things(self, turn: Turn) -> str | None:
@@ -837,19 +839,13 @@ class Robot:
         yield fact
 
     def _tokens(self, msgs: list[dict], turn: Turn) -> Iterator[str]:
-        """The brain's answer as it streams. Decode pauses while the first phrase is
-        synthesized (D66): _speak closes self.stream, and the next delta asked for resumes it
-        with the answer so far as an assistant prefill. Closing this generator closes the
-        stream (an interrupted turn stops decoding)."""
+        """Stream one native answer; interrupted turns close and cancel its generation."""
         self.stream = self.brain.answer(msgs)
         try:
             while (delta := next(self.stream, None)) is not None:
                 turn.first_token = turn.first_token or time.time()
                 turn.answer += delta
                 yield delta
-                if self.stream is None:  # paused
-                    turn.resumed = True
-                    self.stream = self.brain.answer(msgs, prior=turn.answer)
         finally:
             if self.stream:
                 self.stream.close()
@@ -862,9 +858,6 @@ class Robot:
         audio_parts = []
         try:
             for text in phrases(tokens):
-                if not turn.first_phrase and self.stream:  # Kokoro waits for the GPU (D66)
-                    self.stream.close()  # llama-server stops this generation
-                    self.stream = None
                 turn.first_phrase = turn.first_phrase or time.time()
                 pcm = self.voice.say(text)
                 turn.first_audio = turn.first_audio or time.time()

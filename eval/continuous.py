@@ -382,8 +382,8 @@ class Scheduler:
             )
         ):
             raise RuntimeError("required Robot thread died")
-        if self.robot.detect_failed or self.robot.brain.proc.poll() is not None:
-            raise RuntimeError("detector or llama-server failed")
+        if self.robot.detect_failed:
+            raise RuntimeError("detector failed")
         if self.robot.detections != self.last_detections or not self.sources:
             (self.last_detections, self.detect_at) = (self.robot.detections, now)
         elif now - self.detect_at >= TIMEOUTS["schedule"]:

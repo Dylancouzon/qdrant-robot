@@ -1,17 +1,14 @@
-"""The brain: a vision-language model in a supervised llama-server child (GPU), prompted with
-the current frame, memories, facts, and the conversation. The prompt prefix (system, history,
-frame) is prefilled while the visitor is still speaking.
+"""Source-grounded prompts and the native compiled Gemma E2B/MTP brain.
 
-    python -m robot.brain serve qwen3vl-2b     run only the server (benchmarks)
+Legacy llama-server argument helpers remain for frozen bake-off tools. Product answers
+stream uninterrupted from one serialized native runtime; closing a stream cancels it.
 """
 import base64
 import json
 import os
-import subprocess
 import sys
-import time
 import re
-import urllib.request
+import threading
 from collections.abc import Callable, Iterable, Iterator
 
 import cv2
@@ -38,7 +35,7 @@ MODELS = {  # D27: qwen3vl-2b; the others stay for bake-offs. (weights, projecto
                     "q25vl-mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf", []),
     "lfm2vl-3b": ("lfm2-LFM2-VL-3B-Q4_K_M.gguf", "lfm2-mmproj-LFM2-VL-3B-Q8_0.gguf", []),
 }
-MODEL = "qwen3vl-2b"
+MODEL = "gemma4-e2b"
 _SENTENCE = re.compile(r"[^.!?]+[.!?](?=\s|$)")
 IMAGE_WIDTH = 672   # frames are downscaled before encoding; the server caps tokens anyway
 MAX_TOKENS = 64
@@ -157,75 +154,182 @@ def messages(history: list[dict], now: dict | None, memories: list[str] = (), fa
     return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
 
 
+TRT_ROOT = SHARED / "experiments/p2-trt-edge"
+
+
+def native_request(rt, msgs: list[dict], max_tokens: int):
+    """Keep ordered evidence and decode source-owned image bytes for native rendering."""
+    rows, images = [], []
+    for msg in msgs:
+        content = msg["content"]
+        parts = [{"type": "text", "text": content}] if isinstance(content, str) else content
+        contents = []
+        for part in parts:
+            if part["type"] == "text":
+                contents.append(rt.MessageContent("text", part["text"]))
+            elif part["type"] == "image_url":
+                url = part["image_url"]["url"]
+                prefix = "data:image/jpeg;base64,"
+                if not url.startswith(prefix):
+                    raise ValueError("The brain requires a source-owned JPEG data URI")
+                data = base64.b64decode(url[len(prefix):], validate=True)
+                images.append(rt.load_image_from_bytes(data))
+                contents.append(rt.MessageContent("image", ""))
+            else:
+                raise ValueError(f"Unsupported robot content: {part['type']}")
+        row = rt.Message(msg["role"], contents)
+        row.has_content = True
+        row.content_is_array = isinstance(content, list)
+        rows.append(row)
+    row = rt.Request(messages=rows)
+    row.image_buffers = images
+    request = rt.LLMGenerationRequest()
+    request.requests = [row]
+    request.temperature, request.top_k = 0, 1
+    request.max_generate_length = max_tokens
+    request.apply_chat_template = True
+    request.add_generation_prompt = True
+    request.enable_thinking = False
+    request.skip_special_tokens = True
+    return request
+
+
 class Brain:
-    def __init__(self, model: str = MODEL):
-        LOG.parent.mkdir(parents=True, exist_ok=True)
-        with LOG.open("w") as log:  # one server run per file: why it failed stays readable
-            self.proc = subprocess.Popen(server_args(model), stdout=log, stderr=log)
-        for _ in range(600):
-            if self.proc.poll() is not None:
-                raise RuntimeError(f"llama-server exited with {self.proc.returncode}; see {LOG}")
-            try:
-                urllib.request.urlopen(f"{URL}/health", timeout=1).read()
-                break
-            except OSError:
-                time.sleep(0.2)
-        else:
-            raise RuntimeError("llama-server did not become healthy")
+    """One native Gemma INT4/MTP runtime, with generation serialized through cancellation."""
 
-    def _post(self, body: dict):
-        body = {"temperature": 0, "cache_prompt": True,
-                "chat_template_kwargs": {"enable_thinking": False}, **body}
-        req = urllib.request.Request(f"{URL}/v1/chat/completions", json.dumps(body).encode(),
-                                     {"Content-Type": "application/json"})
-        return urllib.request.urlopen(req, timeout=60)
+    def __init__(self, model: str = "gemma4-e2b"):
+        if model != "gemma4-e2b":
+            raise ValueError("This branch runs the compiled Gemma E2B pair")
+        base = json.loads((TRT_ROOT / "engines/llm/base_config.json").read_text())["builder_config"]
+        draft_path = TRT_ROOT / "engines/llm/draft_config.json"
+        draft = json.loads(draft_path.read_text())["builder_config"]
+        visual = json.loads((TRT_ROOT / "engines/visual/config.json").read_text())["builder_config"]
+        self.input_tokens = int(base["max_input_len"])
+        self.image_tokens = int(visual["max_image_tokens_per_image"])
+        if (self.input_tokens != 2048 or int(base["max_kv_cache_capacity"]) != 4096
+                or int(base["max_batch_size"]) != 1 or int(base["max_verify_tree_size"]) != 4
+                or int(draft["max_draft_tree_size"]) != 4
+                or self.image_tokens != 512 or int(visual["max_image_tokens"]) != 512):
+            raise ValueError("The compiled engines do not match the selected robot profile")
+        from tensorrt_edgellm import runtime
+        self.rt = runtime.load()
+        self.lock = threading.Lock()
+        self.channel, self.worker, self.closed = None, None, False
+        self.runtime = self.rt.LLMRuntime(
+            engine_dir=str(TRT_ROOT / "engines/llm"),
+            multimodal_engine_dir=str(TRT_ROOT / "engines"),
+            lora_weights_map={}, draft_top_k=1, draft_step=3, verify_tree_size=4,
+            checkpoint_dir=str(TRT_ROOT / "checkpoints/int4-awq"),
+            draft_checkpoint_dir=str(TRT_ROOT / "checkpoints/assistant"),
+        )
 
-    def prefill(self, msgs: list[dict]) -> None:
-        """Compute the KV cache for a prompt prefix; the next answer reuses it."""
-        with self._post({"messages": msgs, "max_tokens": 0}) as r:
-            r.read()
+    def context(self, msgs: list[dict], max_tokens: int = MAX_TOKENS) -> list[dict]:
+        """Fit complete exchanges with native template counts and the compiled image bound.
 
-    def tokens(self, text: str) -> int:
-        """How many tokens `text` takes."""
-        req = urllib.request.Request(f"{URL}/tokenize", json.dumps({"content": text}).encode(),
-                                     {"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            return len(json.load(r)["tokens"])
+        Gemma4ViTRunner.cpp:118,383,485 expands each image to at most the engine's
+        soft-token limit plus two delimiters. The counted placeholder stays in place.
+        Its cardinality remains reserved until target inference verifies that count.
+        """
+        msgs = list(msgs)
+        while True:
+            text = [{**m, "content": [
+                {"type": "text", "text": "<|image|>"} if p["type"] == "image_url" else p
+                for p in m["content"]]} if isinstance(m["content"], list) else m for m in msgs]
+            images = sum(p["type"] == "image_url" for m in msgs
+                         if isinstance(m["content"], list) for p in m["content"])
+            count = self.runtime.count_prompt_tokens(native_request(self.rt, text, 0))[0]
+            if count + images * (self.image_tokens + 2) + max_tokens <= self.input_tokens:
+                return msgs
+            if len(msgs) < 4 or [m["role"] for m in msgs[1:3]] != ["user", "assistant"]:
+                raise ValueError("Current evidence exceeds the compiled brain context budget")
+            del msgs[1:3]
 
-    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
-               ) -> Iterator[str]:
-        """Stream the answer text, at most MAX_SENTENCES sentences and `max_tokens` tokens.
-        Closing the generator early stops generation; `prior` resumes it: the answer so far,
-        as an assistant prefill, counts against `max_tokens`."""
-        if sentences(prior) >= MAX_SENTENCES:  # paused right after the last sentence
-            return
-        if prior:
-            msgs = msgs + [{"role": "assistant", "content": prior}]
-            if (max_tokens := max_tokens - self.tokens(prior)) <= 0:
-                return
-        text = prior
-        with self._post({"messages": msgs, "max_tokens": max_tokens, "stream": True,
-                         "repeat_penalty": 1.15}) as r:
-            for delta in unecho(prior, _content(r)):
-                yield delta
-                text += delta
-                if sentences(text) >= MAX_SENTENCES:
-                    return
+    def _start(self, msgs: list[dict], max_tokens: int):
+        """Reserve the GPU generation slot until its native worker retires."""
+        self.lock.acquire()
+        try:
+            if self.closed or self.runtime is None:
+                raise RuntimeError("The brain is closed")
+            request = native_request(self.rt, self.context(msgs, max_tokens), max_tokens)
+            channel = self.rt.StreamChannel.create()
+            channel.set_skip_special_tokens(True)
+            request.stream_channels = [channel]
+            self.channel = channel
+            engine, errors = self.runtime, []
+
+            def generate():
+                try:
+                    engine.handle_request(request)
+                except BaseException as error:
+                    errors.append(error)
+                    channel.cancel()
+                finally:
+                    self.lock.release()
+
+            worker = threading.Thread(target=generate, name="trt-generate")
+            self.worker = worker
+            worker.start()
+        except BaseException:
+            self.channel, self.worker = None, None
+            self.lock.release()
+            raise
+        return channel, worker, errors
+
+    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS) -> Iterator[str]:
+        """Stream one uninterrupted answer; closing it cancels and joins native generation."""
+        channel, worker, errors = self._start(msgs, max_tokens)
+        text, finished, early_stop = "", False, False
+        try:
+            while True:
+                chunk = channel.wait_pop(timeout_ms=200)
+                if chunk is None:
+                    if channel.is_finished() or channel.is_cancelled():
+                        break
+                    continue
+                finished = chunk.finished
+                if chunk.text:
+                    text += chunk.text
+                    yield chunk.text
+                    if sentences(text) >= MAX_SENTENCES:
+                        early_stop = True
+                        break
+                if chunk.finished:
+                    break
+        finally:
+            self._retire(channel, worker, finished)
+        if errors and not early_stop:
+            raise errors[0]
+
+    def _retire(self, channel, worker, finished: bool) -> None:
+        if not (finished or channel.is_finished()):
+            channel.cancel()
+        worker.join()
+        if self.channel is channel:
+            self.channel = None
+        if self.worker is worker:
+            self.worker = None
 
     def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
-        """Describe one frame from the frame alone (no persona, no conversation), so a memory
-        is evidence of what was seen; None if `stop` interrupts it."""
         msgs = [{"role": "user", "content": [image, {"type": "text", "text": CAPTION}]}]
         text = ""
-        for delta in self.answer(msgs, max_tokens=48):
-            if stop():
-                return None
-            text += delta
+        stream = self.answer(msgs, max_tokens=48)
+        try:
+            for delta in stream:
+                if stop():
+                    return None
+                text += delta
+        finally:
+            stream.close()
         return text.strip()
 
     def close(self) -> None:
-        self.proc.terminate()
-        self.proc.wait(timeout=10)
+        self.closed = True
+        if self.channel is not None:
+            self.channel.cancel()
+        with self.lock:
+            self.runtime = None
+        if self.worker is not None:
+            self.worker.join()
 
 
 if __name__ == "__main__":
