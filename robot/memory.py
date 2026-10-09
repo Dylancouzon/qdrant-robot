@@ -3,8 +3,10 @@ on disk as evidence, capture time, a caption the VLM wrote from that frame in id
 what the visitor said, and one point per detector track (a sighting: label, region of the frame,
 first and last seen times; no frame). Statements carry a bge vector, so later
 questions find them by vector search ("What drink do I like?" finds "I really love espresso")."""
+import hashlib
 import re
 import time
+import warnings
 from collections.abc import Callable, Collection
 from pathlib import Path
 
@@ -22,6 +24,9 @@ from qdrant_edge import (
     HasIdCondition,
     MatchAny,
     MatchValue,
+    MultiVectorComparator,
+    MultiVectorConfig,
+    PointVectors,
     OrderBy,
     PayloadSchemaType,
     Point,
@@ -44,6 +49,7 @@ THUMB = (64, 36)  # width, height
 RETAIN_S = 12 * 3600
 MAX_POINTS = 20_000
 MAX_FRAME_BYTES = 4 << 30
+FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I)
 TOLD_MIN = 0.5   # bge cosine: relevant statements scored 0.53 to 0.72, unrelated 0.45 to 0.53
 # Questions about the past get recent memories; questions about now do not, because a stale
 # caption in the prompt pulls a 2B brain away from the image (D27).
@@ -239,6 +245,10 @@ class Memory:
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={
                 "image": EdgeVectorParams(size=IMAGE_DIM, distance=Distance.Cosine),
                 "said": EdgeVectorParams(size=TEXT_DIM, distance=Distance.Cosine)}))
+        for slot in ("observed", "dialogue"):
+            self.shard.update(UpdateOperation.create_dense_vector(
+                slot, TEXT_DIM, Distance.Cosine,
+                multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim)))
         for field in ("ts", "last_seen"):  # a no-op when the index exists
             self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
         self.shard.update(UpdateOperation.create_field_index("frame", PayloadSchemaType.Keyword))
@@ -353,6 +363,107 @@ class Memory:
         grey = np.frombuffer(bytes.fromhex(row["thumb"]), np.uint8).reshape(THUMB[::-1])
         row["thumb"] = grey.astype(np.float32)
         return row
+
+    @staticmethod
+    def _event_fields(kind: str) -> tuple[str, str]:
+        if kind == "observation":
+            return "caption", "observed"
+        if kind == "utterance":
+            return "said", "dialogue"
+        raise ValueError(f"Unknown event kind: {kind}")
+
+    def source_event(self, pid: int, kind: str) -> dict | None:
+        """Read complete authority for preparation only, without other-kind text."""
+        field, slot = self._event_fields(kind)
+        rows = self.points([pid])
+        if not rows or not isinstance(rows[0].get(field), str) or not rows[0][field].strip():
+            return None
+        row, text = rows[0], rows[0][field]
+        # Hash binds source identity and kind, including identical texts on different points.
+        digest = hashlib.sha256(f"{pid}\0{kind}\0{text}".encode()).hexdigest()
+        private = kind == "utterance" and bool(FIRST_PERSON.search(text))
+        return {"source_id": pid, "kind": kind, "source_hash": digest, "text": text,
+                "capture_ts": row.get("ts"), "scope": "visitor" if private else "shared",
+                "speech_start": row.get(slot + "_speech_start"),
+                "speech_end": row.get(slot + "_speech_end"),
+                "uncertainty": "model description" if kind == "observation" else "literal ASR",
+                **({"frame": row["frame"]} if kind == "observation" and "frame" in row else {})}
+
+    def index_event(self, pid: int, kind: str, source_hash: str, units: list[dict],
+                    vectors: np.ndarray, speech_start: float | None = None,
+                    speech_end: float | None = None) -> bool:
+        """Serialized-worker write. Never upsert; reject deleted or changed authority."""
+        _, slot = self._event_fields(kind)
+        source = self.source_event(pid, kind)
+        if not source or source["source_hash"] != source_hash:
+            return False
+        if not units or vectors.shape != (len(units), TEXT_DIM) or not np.isfinite(vectors).all():
+            raise ValueError("Invalid source units/vectors")
+        if len(units) > 32:
+            warnings.warn(f"Source {pid}/{kind} has {len(units)} units; measure its cost",
+                          RuntimeWarning, stacklevel=2)
+        cursor = 0
+        for unit in units:
+            if (unit["start"] != cursor or unit["end"] <= cursor or
+                    unit["text"] != source["text"][cursor:unit["end"]] or
+                    not 0 < unit["tokens"] <= 128):
+                raise ValueError("Units must cover complete authority within BGE limits")
+            cursor = unit["end"]
+        if cursor != len(source["text"]):
+            raise ValueError("Source overflow was omitted")
+        if (speech_start is None) != (speech_end is None) or (
+                speech_start is not None and speech_end < speech_start):
+            raise ValueError("Invalid actual speech interval")
+        # Caller serializes this boundary with forget/set/retain, as for all memory writes.
+        current = self.source_event(pid, kind)
+        if not current or current["source_hash"] != source_hash:
+            return False
+        self.shard.update(UpdateOperation.update_vectors([
+            PointVectors(pid, {slot: vectors.tolist()})]))
+        self.shard.update(UpdateOperation.set_payload([pid], {
+            slot + "_hash": source_hash,
+            slot + "_units": [{k: u[k] for k in ("start", "end", "tokens")} for u in units],
+            slot + "_scope": source["scope"], slot + "_source_id": pid,
+            slot + "_speech_start": speech_start, slot + "_speech_end": speech_end}))
+        self.shard.flush()
+        return True
+
+    def events(self, query: np.ndarray, before: float, visitor_since: int,
+               min_score: float, kind: str, n: int = 5,
+               skip: Callable[[str], bool] | None = None) -> list[dict]:
+        """Return bounded relevant spans, validating complete authority and visitor scope."""
+        _, slot = self._event_fields(kind)
+        if n <= 0:
+            return []
+        hits = self.shard.query(QueryRequest(
+            limit=64, query=Query.Nearest(query.tolist(), using=slot),
+            with_payload=True, with_vector=[slot], score_threshold=min_score,
+            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(
+                lt=before, gte=before - RETAIN_S))], should=[
+                FieldCondition(key=slot + "_scope", match=MatchValue("shared")),
+                FieldCondition(key=slot + "_source_id", range=RangeFloat(gt=visitor_since))])))
+        events = []
+        for hit in hits:
+            source = self.source_event(hit.id, kind)
+            if (not source or source["source_hash"] != hit.payload.get(slot + "_hash") or
+                    source["scope"] == "visitor" and hit.id <= visitor_since or
+                    kind == "utterance" and source["speech_end"] is not None and
+                    source["speech_end"] >= before or
+                    (skip is not None and skip(source["text"]))):
+                continue
+            units = hit.payload.get(slot + "_units", [])
+            vectors = np.asarray(hit.vector[slot])
+            if not units or vectors.shape != (len(units), TEXT_DIM):
+                continue
+            unit = units[int(np.argmax(vectors @ query))]
+            unit = {**unit, "text": source["text"][unit["start"]:unit["end"]]}
+            events.append({k: v for k, v in source.items() if k != "text"} | {
+                "score": hit.score, "text": unit["text"],
+                "spans": [{k: unit[k] for k in ("start", "end", "text", "tokens")}],
+                "expiry": source["capture_ts"] + RETAIN_S})
+            if len(events) >= min(n, 5):
+                break
+        return events
 
     def told(self, query: np.ndarray, before: float, n: int = 2) -> list[dict]:
         """Payloads of the visitor's earlier statements closest to `query` (unit bge vector)."""

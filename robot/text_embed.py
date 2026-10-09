@@ -9,7 +9,7 @@ from tokenizers import Tokenizer
 from robot.config import MODELS
 
 DIM = 384
-MAX_TOKENS = 128  # questions and short facts; longer text is truncated
+MAX_TOKENS = 128  # includes special tokens
 
 
 class TextEmbedder:
@@ -22,6 +22,36 @@ class TextEmbedder:
         providers = ([("CUDAExecutionProvider", {"arena_extend_strategy": "kSameAsRequested"})]
                      if cuda else ["CPUExecutionProvider"])
         self.sess = ort.InferenceSession(str(d / "model.onnx"), providers=providers)
+
+    def units(self, text: str) -> list[dict]:
+        """Lossless character spans whose independently encoded text fits BGE."""
+        # Clone tokenizer settings, not the model/session. Offset encoding must not truncate.
+        tok = Tokenizer.from_str(self.tok.to_str())
+        tok.no_truncation()
+        tok.no_padding()
+        offsets = tok.encode(text, add_special_tokens=False).offsets
+        if not offsets:
+            return []
+        units, start, cursor = [], 0, 0
+        while cursor < len(offsets):
+            stop = min(cursor + MAX_TOKENS - 2, len(offsets))
+            end = len(text) if stop == len(offsets) else offsets[stop][0]
+            while len(tok.encode(text[start:end]).ids) > MAX_TOKENS:
+                stop -= 1
+                if stop <= cursor:
+                    raise ValueError("A source token cannot fit the BGE input limit")
+                end = offsets[stop][0]
+            units.append({"start": start, "end": end, "text": text[start:end],
+                          "tokens": len(tok.encode(text[start:end]).ids)})
+            start, cursor = end, stop
+        return units
+
+    def embed_units(self, text: str) -> tuple[list[dict], np.ndarray]:
+        """Embed all units in bounded batches with the existing inference session."""
+        units = self.units(text)
+        vectors = [self([u["text"] for u in units[i:i + 8]])
+                   for i in range(0, len(units), 8)]
+        return units, np.concatenate(vectors) if vectors else np.empty((0, DIM), np.float32)
 
     def __call__(self, texts: list[str]) -> np.ndarray:
         enc = self.tok.encode_batch(texts)

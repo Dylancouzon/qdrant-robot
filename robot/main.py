@@ -11,7 +11,6 @@ import contextlib
 import json
 import os
 import queue
-import re
 import threading
 import time
 import traceback
@@ -30,6 +29,7 @@ from robot.faces import Faces
 from robot.focus import Focus, Track
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
+    FIRST_PERSON,
     Memory,
     about_now,
     about_past,
@@ -78,8 +78,6 @@ DETECT_FPS = 15
 DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
 SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
 LINES = 4  # sighting lines for the brain at most: the newest of each kind
-# A statement about the speaker (D70): recalled only in the conversation it was told in.
-FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I)
 # Identity is the face in the current frame, never a track (design
 # reviews/20261008-161702-78890-design.md): a visitor replacing another keeps the track id.
 # A face step runs only on an identity question and after a turn is spoken (to link it).

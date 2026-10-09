@@ -1,0 +1,33 @@
+import hashlib,json,platform
+from collections import Counter,defaultdict
+from pathlib import Path
+root=Path.cwd(); fixture=root/'eval/dev/event-retrieval.jsonl'; calfixture=root/'eval/dev/event-calibration.jsonl'
+comparison=root/'bench/results/2026-10-09-f1a-mac-comparison-1.jsonl'; calibration=root/'bench/results/2026-10-09-f1a-mac-calibration-1.jsonl'
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def load(p):return [json.loads(x) for x in p.read_text().splitlines()]
+rows=load(comparison); cal=load(calibration); cases={r['id']:r for r in load(fixture)}
+assert rows[-1]['type']=='complete' and rows[-1]['case_count']==24
+assert cal[-1]['type']=='complete' and cal[-1]['case_count']==12
+assert rows[-1]['fixture_hash']==sha(fixture) and cal[-1]['fixture_hash']==sha(calfixture)
+assert rows[-1]['thresholds']==cal[-1]['thresholds']
+assert {r['id'] for r in rows if r['type']=='case'}==set(cases)
+assert len(rows)==26 and len(cal)==14
+counts=defaultdict(Counter); results=[]
+for row in rows:
+    if row['type']!='case':continue
+    case=cases[row['id']]; expected=set(case['expected_source_ids']); mapping={int(k):v for k,v in row['source_id_map'].items()}
+    kinds={s['id']:s.get('kind') for s in case['sources']}; category=case['category']; counts[category]['n']+=1
+    item={'id':case['id'],'category':category,'expected_sources':len(expected)}
+    for arm in ['baseline','candidate']:
+        entries=row[arm];assert len(entries)<=5
+        identifiers={mapping[e['source_id']] for e in entries}
+        supported={mapping[e['source_id']] for e in entries if kinds.get(mapping[e['source_id']])==e['kind']}
+        item[arm+'_matching_ids']=sorted(expected&identifiers);item[arm+'_supporting_ids']=sorted(expected&supported)
+        counts[category][arm+'_source_id_hits']+=len(expected&identifiers)
+        counts[category][arm+'_support_hits']+=len(expected&supported)
+        counts[category][arm+'_entries']+=len(entries)
+    counts[category]['expected_sources']+=len(expected);results.append(item)
+summary={'type':'retrieval_audit','measurement':'E','machine':platform.node(),'fixture_sha256':sha(fixture),'calibration_fixture_sha256':sha(calfixture),'raw_comparison_sha256':sha(comparison),'raw_calibration_sha256':sha(calibration),'thresholds':rows[-1]['thresholds'],'categories':dict(counts),'positive_questions':sum(bool(c['expected_source_ids']) for c in cases.values()),'baseline_support_hits':sum(c['baseline_support_hits'] for c in counts.values()),'candidate_support_hits':sum(c['candidate_support_hits'] for c in counts.values()),'answer_correctness':'unjudged','scope':'Controlled stored-text retrieval; no Jetson measurement, perception result, deployment, or acceptance claim. Original per-case source-ID metrics predate kind-aware code correction.'}
+with (root/'bench/results/2026-10-09-f1a-mac-audit-1.jsonl').open('w') as f:
+    for r in results+[summary]:f.write(json.dumps(r)+'\n')
+print(json.dumps(summary))

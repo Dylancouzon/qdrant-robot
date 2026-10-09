@@ -1,5 +1,7 @@
 # Source-linked event retrieval (F1a)
 
+Status: the first Mac prototype fails its frozen development comparison. Supporting-event recall is12/18 for baseline and5/18 for candidate(E), with no answer judging or Jetson measurement. Its calibration floors are0.755407 for observations and0.750094 for utterances. Preserve these thresholds and raw records; do not adopt or deploy this arm. Astra counsel GO WITH CHANGES directs a score-free diagnostic, then fresh disambiguated calibration/comparison before the next arm.
+
 The continuous baseline scores 10/48. Its older observation, topic reference, and correction answers all fail (D96). D87 still favors better evidence before language training. This task adds semantic access to source records and preserves the existing model and answer paths. J means Jetson measurement, E means elsewhere, and U means proposed.
 
 ## Alternatives and proposed choice
@@ -52,6 +54,14 @@ Acceptance for this task: all generic lifecycle checks pass; every indexed unit 
 
 Stop and report if the installed API cannot represent the contract, native additions break old reads, anonymous facts cross visitors, deletion can restore a source, unit growth breaks the resource budget, or retrieval does not improve the frozen development comparison. After two failed approaches to the same problem, obtain Astra counsel before a third. Operational watchdogs remain separate from healthy work duration (D83).
 
+## First prototype findings
+
+Calibration selected the minimum positive score from only three positives per kind. Close direct questions do not establish a floor for older references. Missing-field negatives can still have useful partial sources; their scores cannot prove source irrelevance or answer sufficiency. The failed arm returns no supporting older-observation or topic-reference events and five/six corrections. A score-free diagnostic returns all18 full supporting spans within five entries(E); every supporting source ranks first within its kind. Supporting scores are0.683–0.754 for observations,0.612–0.721 for topics,and0.734–0.775 for corrections. Native MaxSim remains unrefuted; the high floors caused rejection. Native diagnostic exit0 in16.28s is separately recorded. This used-development diagnostic establishes no answer or adoption gain. Raw source-ID accounting initially credited an unrelated utterance on an observation source; the separate audit requires the correct kind and preserves original records.
+
+The first benchmark also ignored actual utterance_start/end fields, so those records have unknown speech times. Current preparation reads those fields correctly. Initial diff hashes excluded untracked benchmark code and included concurrent lead changes. Exact original source bytes are unverified; reconstructed archives remain ignored and do not establish reproducibility. Future provenance hashes each implementation file. No facts, rubrics, pacing, thresholds, or completed records changed.
+
+Before the next arm, freeze fresh disambiguated calibration and comparison sets, source-kind labels, source relevance separately from fact sufficiency, eligibility filters, merge/tie rules, span budget, and adoption criteria. Compare recalibrated floors against bounded rank-only retrieval, with the production0.5 statement floor as a control. Freeze the calibration procedure first and its resulting thresholds before comparison. Use available query/source fields for kind routing, never expected answer labels. Delay answer generation until retrieval and delivered spans improve. Representative Jetson volume must cover multi-unit sources in both slots; the repeated single-unit volume fixture establishes only a limited diagnostic.
+
 ## Sources
 
 - D51, D54, D56, D60, D61, D68, D70, D75, D79–D83, D87, D95, D96; research/capability-plan.md; research/lessons.md.
@@ -60,4 +70,6 @@ Stop and report if the installed API cannot represent the contract, native addit
 - Official [Edge reading API](https://qdrant.tech/documentation/edge/edge-api/reading-data/), [Edge overview](https://qdrant.tech/documentation/edge/), and [vectors](https://qdrant.tech/documentation/manage-data/vectors/).
 - Official [llama-server endpoints](https://github.com/ggml-org/llama.cpp/blob/9c2e0e4/tools/server/README.md), read 2026-10-09: `/apply-template` and `/tokenize` expose template rendering and token counts. Deployment qualification remains required.
 - Design GO WITH CHANGES: reviews/20261009-055752-11735-design.md. This contract applies prompt, scope/hash, calibration, distinct-unit, volume, and latency requirements.
+- Astra counsel: reviews/20261009-062748-48954-design.md; score-free diagnostic and native-exit/audit receipt in bench/results/2026-10-09-f1a-mac-diagnostic-1.jsonl and operations.jsonl.
+- First Mac arm: bench/results/2026-10-09-f1a-mac-calibration-1.jsonl, comparison-1.jsonl, audit-1.jsonl, and archived audit source. The supporting-event audit is reproducible from raw records; original executable source provenance is incomplete.
 - E API check: bench/results/2026-10-09-f1-schema-api.jsonl. J baseline: bench/results/2026-10-09-continuous-baseline-a.jsonl and sidecars, operations audit, and review PASS reviews/20261009-052607-74465-review.md.
