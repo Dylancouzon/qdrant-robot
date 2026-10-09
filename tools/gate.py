@@ -205,10 +205,9 @@ def selftest() -> None:
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, interrupted)
     if sys.argv[1:2] in (["modules"], ["pytest"]):
-        # ORT 1.30's telemetry worker raced native shutdown on the Mac (D85).
-        # Disable collection before tests or module checks create any ORT sessions.
-        import onnxruntime
-        onnxruntime.disable_telemetry_events()
+        # ORT 1.30's uploader races native shutdown even with API event suppression.
+        # Prevent uploader creation before any test or module imports the runtime.
+        os.environ["ORT_DISABLE_TELEMETRY"] = "1"
     if sys.argv[1:2] == ["pytest"]:
         import pytest
         sys.exit(pytest.main(sys.argv[2:]))

@@ -336,3 +336,19 @@ The Jetson 2B scored 14/24 with original evidence versus 21/24 with verified suf
 Three sufficient-arm failures are below D79/F0's eight-failure trigger. Prioritize source quality, source-linked retrieval, and dialogue continuity; defer LoRA until sufficient production evidence demonstrates the trigger. This is a forced-generative development upper bound, not a deployed gain or integrated acceptance.
 Evidence: bench/results/2026-10-09-bakeoff-evidence-probe-1791527749.jsonl, .judged.jsonl, and 2026-10-09-f0-operations.jsonl; release 51bdbb62cea6, frozen manifest 31451ef2d419add469b3d4fa6ce14d93bf655d3fc6026f7a391751d9122808ca. Fresh challenge and continuous baseline remain pending; result review pending.
 Validation: Sol 6.1 result review PASS reviews/20261009-024234-70640-review.md reproduced counts, paired changes, hashes, rubric provenance, and the route rule.
+
+## D88 2026-10-09: Qualify clock-paced file video before the fresh challenge
+Prefer pull-based newest-due decoding through FileCamera, one lock, monotonic playback, wall-anchor evidence stamps, final-frame hold, and caller-owned cleanup. Keep a decoder thread as the measured fallback; pre-extracted JPEGs add avoidable storage.
+Design GO WITH CHANGES reviews/20261009-025338-83534-design.md: measure concurrent 15 Hz detector, 0.3 s watcher, and 1 s speech reads, plus a 0.5 s detector pause. Freeze per-caller p95 latest() <= one source interval, frame age <= two; require independent frame identity for all returns. Record source rate, skips, counts, and RSS on Jetson.
+Scope: camera.py, source tests/benchmark, replay caller cleanup only. Preserve stored orientation; the old clip benchmark rotates the raw development clip. No model, memory, detector, voice, or OS change. Evidence/brief: research/sight.md and STATE.md. Implementation and qualification pending.
+
+## D89 2026-10-09: Disable the gate telemetry uploader before initialization
+D85 API suppression was intermittent: a third Mac crash aborted after all 78 tests passed in F0b. The same ORT 1.30 HTTP worker caused all three crashes.
+Official v1.30 Privacy.md and telemetry source show API suppression leaves the uploader alive. Set ORT_DISABLE_TELEMETRY=1 before runtime imports in gate pytest/modules; remove the API-only import. Keep dependencies, product inference, checks, exits, and watchdogs unchanged.
+Rejected: ignoring post-test aborts, blind retries, replacing the runtime, or rebuilding it when the installed binary supports this documented flag. Evidence: bench/results/2026-10-09-native-shutdown-diagnosis.jsonl; https://github.com/microsoft/onnxruntime/blob/v1.30.0/docs/Privacy.md. Full checks passed in 13.29 s; task review pending.
+Validation: Sol 6.1 task review PASS reviews/20261009-030935-4181-review.md reproduced counts, native diagnosis, pre-initialization ordering, and retained exit handling.
+
+## D90 2026-10-09: Adopt the qualified pull-based file source
+D88 option A passed its frozen Jetson development check: 572/572 pixel identities, all three callers within 66.67 ms latest and 133.33 ms age p95 budgets; 14.8 unique source fps from a recorded 15 fps clip, 83.34 MiB RSS peak.
+Use FileCamera for paced constant-rate captured files with accurate indexing, preserve stored orientation and final-frame hold, and keep cleanup caller-owned across Robot restarts. No measured reason to implement the decoder-thread alternative. Integrated detection, paging, sustained conversation, and semantic orientation remain unproven.
+Evidence: bench/results/2026-10-09-camera-source-1791529599845132270.jsonl, paired tegrastats, and 2026-10-09-f0b-operations.jsonl; release d7ed8b31a024. Full local checks passed; Sol 6.1 review PASS reviews/20261009-030935-4181-review.md. Carry detector source-error propagation under D71 in research/edge-cases.md.
