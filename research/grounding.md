@@ -11,6 +11,11 @@ As of 2026-10-08 (researcher, Sonnet). Labels: J measured on an Orin Nano, E mea
 - Grammars (GBNF, json_schema) would force citations on every turn and break free chat: skip.
 - Ranked: (1) about 1 h of prompt work (memories last, opinion plus instruction, prefill, 2 to 3 counterfactual demos); (2) about 2 h model swap A/B (Qwen3.5-2B, Gemma 4 E2B); (3) 1 to 2 days RAFT-style LoRA with synthetic data, 20% without relevant evidence, and a GGUF round trip.
 
+## Mac bake-off result (2026-10-08, D74)
+
+- Five brains x nine prompt shapes on the robot's own retrieval prompts (bench/brain_bakeoff.py; m2 /74, visitor /21; code answers 41, 17): qwen3vl-2b 32,14 (current) -> 38,14 (evidence first) or 37,14 (shape I, evidence words after the image, keeps the frame prefill); lfm2vl-3b up to 43,15 (but larger, a longer re-prefill, misreads composites); gemma4-e2b up to 37,15; qwen35-2b up to 31,13; qwen3vl-4b up to 42,16 (does not fit).
+- The gap is mostly the evidence: lines without colours or details, contradictory lines, "your right" for the robot's right, missing "the visitor told you" lines, ownership claimed from weak matches. Even the 4B fails those rows. A LoRA is not the next step.
+
 ## Sources
 
 - https://arxiv.org/abs/2307.03172

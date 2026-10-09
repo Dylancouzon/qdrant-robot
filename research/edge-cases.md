@@ -21,3 +21,5 @@ As of 2026-10-08. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | A missed face on one frame ends a continuing conversation | The visitor loses context | Check face detection on the live day first | reviews/20261008-233058-72473-review.md |
 | Past-frame retrieval runs before the visitor check | A new visitor hears shared frame memories | Review after the whole v1 flow | same |
 | A face step before every turn with history | About 60 ms before the first token | Gate on scene change or run it during speech | V1-B report |
+| Bake-off harness: a running server can answer the health check before the requested model loads | A run labeled with the wrong model | Check the child process and the model identity | reviews/20261008-234551-20256-review.md |
+| Bake-off harness: judge failures ignored | A partial verdict file unnoticed | Check the judge's exit code | same |
