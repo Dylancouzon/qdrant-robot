@@ -242,20 +242,6 @@ def mentions(text: str, labels: Collection[str]) -> bool:
     return bool((named := _naming(labels)) and named.search(text))
 
 
-def unmention(caption: str, labels: Collection[str]) -> str:
-    """`caption` without the clauses that name an ignored kind: a stored turn caption must not
-    bring back what the visitor asked the robot to ignore."""
-    if (named := _naming(labels)) is None:
-        return caption
-    kept = []
-    for s in re.split(r"(?<=[.\n])\s*", caption):
-        head, colon, body = s.rpartition(":")
-        parts = [p.strip(" .") for p in re.split(r",\s*(?:and\s+)?|\s+and\s+", body)]
-        if parts := [p for p in parts if p and not named.search(p)]:
-            kept.append(f"{head}{colon} " * bool(colon) + ", ".join(parts) + "." * ("." in s))
-    return " ".join(kept)
-
-
 def _selftest() -> None:
     import tempfile
     vocab = {"phone", "cup", "mug", "teddy bear", "plush toy", "toy", "chair", "bottle", "laptop",
@@ -290,11 +276,6 @@ def _selftest() -> None:
         "an unknown thing: the caller answers only if something has that name"
     assert q("When is my talk?") is None and q("Where am I from?") is None
     assert q("Is it mine?") is None, "no kind named"
-    assert unmention("Main object: a red mug. Around it: a chair, a lamp, and an armchair.",
-                     ["chair"]) == "Main object: a red mug. Around it: a lamp."
-    assert unmention("Main object: a wooden chair.\nAround it: a rug.", ["chair"]) == \
-        "Around it: a rug."
-    assert unmention("A cupboard and a cup.", ["cup"]) == "A cupboard."
     assert mentions("My armchair is comfy.", ["chair"]) and not mentions("I like tea.", ["chair"])
     assert not mentions("A chair.", [])
     with tempfile.TemporaryDirectory() as tmp:

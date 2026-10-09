@@ -1,0 +1,22 @@
+{
+  "qwen3vl-2b": {
+    "n": 12,
+    "warm_n": 11,
+    "warm_first_token_p50_s": 0.03369394497713074,
+    "warm_answer_p50_s": 0.13713429000927135,
+    "mean_tokens": 16.833333333333332,
+    "maximum_post_answer_vram_mib": 2418,
+    "maximum_rendered_tokens": 518,
+    "overflow": 0
+  },
+  "qwen3vl-4b": {
+    "n": 12,
+    "warm_n": 11,
+    "warm_first_token_p50_s": 0.05442413903074339,
+    "warm_answer_p50_s": 0.12931986601324752,
+    "mean_tokens": 10,
+    "maximum_post_answer_vram_mib": 3834,
+    "maximum_rendered_tokens": 518,
+    "overflow": 0
+  }
+}

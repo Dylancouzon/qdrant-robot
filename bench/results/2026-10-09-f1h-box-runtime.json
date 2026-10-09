@@ -1,0 +1,16 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "ConnectTimeout=10",
+    "-o",
+    "ServerAliveInterval=10",
+    "-o",
+    "ServerAliveCountMax=2",
+    "dylan@192.168.1.74",
+    "cat ~/qdrant-robot-box/llama-server-orin ~/qdrant-robot-box/orin.patch; sha256sum ~/qdrant-robot-box/llama.cpp/build/bin/llama-server ~/qdrant-robot-box/orin.patch; git -C ~/qdrant-robot-box/llama.cpp diff --stat; ~/qdrant-robot-box/venv/bin/python --version; flock -n ~/qdrant-robot-box/gpu.lock true; echo lock_status=$?"
+  ],
+  "native_exit": 0,
+  "stdout": "#!/bin/sh\n# llama-server with the Orin Nano's SM count and compute capability, so kernels split work as on the Jetson.\nGGML_CUDA_NSM=8 GGML_CUDA_CC=870 exec ~/qdrant-robot-box/llama.cpp/build/bin/llama-server \"$@\"\ndiff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu\nindex 33ebfdfa0..f09918c2e 100644\n--- a/ggml/src/ggml-cuda/ggml-cuda.cu\n+++ b/ggml/src/ggml-cuda/ggml-cuda.cu\n@@ -306,7 +306,7 @@ static ggml_cuda_device_info ggml_cuda_init() {\n         info.default_tensor_split[id] = total_vram;\n         total_vram += device_vram;\n         info.devices[id].integrated = false; // Temporarily disabled due to issues with corrupted output (e.g. #15034)\n-        info.devices[id].nsm        = prop.multiProcessorCount;\n+        info.devices[id].nsm        = getenv(\"GGML_CUDA_NSM\") && *getenv(\"GGML_CUDA_NSM\") ? atoi(getenv(\"GGML_CUDA_NSM\")) : prop.multiProcessorCount; // qdrant-robot-box: emulate the Orin (8 SMs)\n         info.devices[id].smpb       = prop.sharedMemPerBlock;\n         info.devices[id].warp_size  = prop.warpSize;\n \n@@ -341,7 +341,7 @@ static ggml_cuda_device_info ggml_cuda_init() {\n                       device_vram_mib);\n #else\n         info.devices[id].smpbo = prop.sharedMemPerBlockOptin;\n-        info.devices[id].cc = 100*prop.major + 10*prop.minor;\n+        info.devices[id].cc = getenv(\"GGML_CUDA_CC\") && *getenv(\"GGML_CUDA_CC\") ? atoi(getenv(\"GGML_CUDA_CC\")) : 100*prop.major + 10*prop.minor; // qdrant-robot-box: emulate the Orin (870)\n         GGML_LOG_INFO(\"  Device %d: %s, compute capability %d.%d, VMM: %s, VRAM: %zu MiB\\n\",\n                       id, prop.name, prop.major, prop.minor, device_vmm ? \"yes\" : \"no\",\n                       device_vram_mib);\n0880c26777df26bcbf1f01ae89f9ef07e08383358824154e659211b46b6eca87  /home/dylan/qdrant-robot-box/llama.cpp/build/bin/llama-server\nb963db437ecde418a9d4ef1c5e55f469e0e01ffa4b8c7e7807ecd790db22ac06  /home/dylan/qdrant-robot-box/orin.patch\n ggml/src/ggml-cuda/ggml-cuda.cu | 4 ++--\n 1 file changed, 2 insertions(+), 2 deletions(-)\nPython 3.12.14\nlock_status=0\n",
+  "stderr": ""
+}

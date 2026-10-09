@@ -1,0 +1,5 @@
+{
+  "native_exit": 0,
+  "stdout": "4193877 bash -c pgrep -af \"f1h-m2-capacity-a|llama-server\"; flock -n ~/qdrant-robot-box/gpu.lock true; /usr/lib/wsl/lib/nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv,noheader,nounits\n363, 0\n",
+  "stderr": ""
+}

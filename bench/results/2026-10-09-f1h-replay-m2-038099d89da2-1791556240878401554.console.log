@@ -1,0 +1,225 @@
+[0;93m2026-10-09 10:30:41.203628227 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"[m
+[0;93m2026-10-09 10:30:42.303171009 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:30:42.303249372 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@1.174] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:30:43.347697056 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:30:43.347782810 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:30:48.992146338 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:30:48.993204861 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:30:49.023422261 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:30:49.023499696 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:30:49.720665979 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.724929954 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.729740933 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.734963597 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.743650416 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.744044822 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:30:49.744103218 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:30:55] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+ok  2.03s m2-removed-clock-1: [What is that round thing in front of you?] That's a clock on a stand right in front of me.
+ok  1.01s m2-removed-clock-2 -EV: [Something is gone now. What was it?] I saw a clock in the center, 6 seconds ago; I do not see it now.
+ok  0.33s m2-removed-clock-3: [Is it still in front of you?] I saw a clock in the center, 7 seconds ago; I do not see it now.
+ok  0.34s m2-removed-laptop-1 +ev: [What was in front of you a moment ago that is not there now?] I saw a monitor in the center, 3 seconds ago; I do not see it now. I saw a keyboard in the center, 3 seconds ago. I see a keyboard on my right now; I cannot tell if it is the same one. I saw a laptop in the center, 3 seconds ago; I do not see it now.
+ok  1.42s m2-removed-snack-1: [What food do you see?] I see two donuts and a banana in this image.
+ok  0.77s m2-removed-snack-2 -EV: [Which one did I take away?] You took away the donut on the left, but I remember seeing it there before.
+ok  0.31s m2-removed-cup-1 +ev: [Was there a cup here earlier?] I saw a cup in the center, 3 seconds ago; I do not see it now.
+ok  1.46s m2-region-a-1: [What is on your left?] On my left, there's an office chair with a colorful striped umbrella resting on it.
+ok  1.45s m2-region-a-2 +ev: [What was on your right before?] Before, there were clothes and a red bag on the right.
+ok  1.38s m2-region-b-1: [What do you see on your right?] I see a colorful striped umbrella and some clothes hanging up in the closet to my right.
+BAD 1.60s m2-region-b-2 +ev: [Was the red bag on your left or on your right?] I remember that around the office chair, there was a red bag hanging from the backrest of the chair.
+ok  0.28s m2-region-c-1 +ev: [What did you see on your right a moment ago?] I saw a clock on my right, 3 seconds ago; I do not see it now.
+ok  1.70s m2-similar-teddy-1: [What is this?] This is a plush teddy bear sitting on a chair in what looks like a cluttered closet or storage area.
+ok  1.44s m2-similar-teddy-2: [And what about this one?] I see it now. This image shows a teddy bear wearing a green hat and sitting in front of a closet with clothes hanging on racks, next to an office chair and a microphone.
+BAD 1.97s m2-similar-teddy-3 +ev: [Which teddy bear did I show you first?] You showed me the teddy bear that was there 15 seconds ago.
+BAD 1.40s m2-similar-teddy-4 +ev: [What was the second bear wearing on its head?] You showed me the teddy bear that was there 22 seconds ago.
+ok  1.36s m2-similar-laptop-1: [What do you see?] I see a cluttered room with a laptop on a desk, a microphone in front of it, and clothes hanging on racks behind me.
+BAD 1.56s m2-similar-laptop-2: [Is this the same laptop as before?] Yes, it's the same laptop. I remember seeing it on the left side with the chair and microphone nearby.
+BAD 1.84s m2-similar-laptop-3 +ev: [What color was the first laptop?] I don't remember the color of the first laptop.
+ok  1.46s m2-similar-phone-1: [What am I holding?] You're holding a gold-colored phone with an old design and a microphone attached to it.
+BAD 2.27s m2-similar-phone-2: [And now?] I see you're in your office space with all that's going on around you.
+ok  0.80s m2-similar-phone-3 +ev: [Was the gold phone the first one or the second one?] The gold phone was the first one.
+ok  1.15s m2-naming-phone-1: [This is my phone.] I don't see a phone held up. Hold it up and say it again.
+ok  2.09s m2-naming-phone-2 -EV: [Have you seen my phone?] I remember seeing your phone. It was golden, sitting near the chair on the left with the clothes rack and hangers nearby, and a microphone to its right—six seconds ago.
+BAD 1.13s m2-naming-phone-3: [Where is my phone?] I don't know which phone is yours.
+ok  0.98s m2-naming-phone-4: [Is this my phone?] I don't know which phone is yours.
+ok  0.91s m2-naming-teddy-1: [This is my teddy bear.] I don't see a teddy bear held up. Hold it up and say it again.
+BAD 1.81s m2-naming-teddy-2: [Which one is my teddy bear?] I don't know which teddy bear is yours.
+ok  0.97s m2-forget-phone-1: [This is my phone.] I don't see a phone held up. Hold it up and say it again.
+ok  1.73s m2-forget-phone-2: [Forget my phone.] I don't know your phone, so there is nothing to forget.
+ok  0.55s m2-forget-phone-3: [Do you remember my phone?] No, I don't know which phone is yours.
+ok  1.31s m2-forget-phone-4: [Is this my phone?] I don't know which phone is yours.
+[0;93m2026-10-09 10:35:25.352149145 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:35:25.352231465 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@284.218] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:35:26.317278803 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:35:26.317357826 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:35:31.762436753 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:35:31.763335610 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:35:31.796794167 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:35:31.796873478 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:35:32.468268395 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.472917297 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.477740216 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.482710778 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.490718933 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.491149861 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:35:32.491215218 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:35:37] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.5s, started in 13.0s
+ok  1.54s m2-forget-phone-5: [Where is my phone?] I don't know which phone is yours.
+ok  0.93s m2-forget-two-1: [This is my teddy bear.] I don't see a teddy bear held up. Hold it up and say it again.
+ok  1.79s m2-forget-two-2: [And this is my laptop.] Got it, that is your laptop. I will remember it.
+ok  1.13s m2-forget-two-3: [Please forget my laptop.] Done. I have forgotten your laptop.
+BAD 0.55s m2-forget-two-4 -EV: [Do you still remember my teddy bear?] No, I don't know which teddy bear is yours.
+ok  0.59s m2-forget-two-5: [And my laptop?] No, I don't know which laptop is yours.
+ok  1.18s m2-ignore-chair-1: [Ignore the chair.] Okay, I will ignore chairs.
+ok  1.09s m2-ignore-chair-2: [What did you see before this bus?] I saw a keyboard on my right, 3 seconds ago; I do not see it now. I saw a laptop on my right, 3 seconds ago; I do not see it now. I saw a computer mouse on my right, 3 seconds ago; I do not see it now.
+ok  0.38s m2-ignore-chair-3: [Did you notice any chairs?] I am ignoring chairs, so I do not remember any.
+[0;93m2026-10-09 10:36:46.135363661 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:36:46.135455544 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@364.996] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:36:47.134382843 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:36:47.134463301 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:36:52.556770076 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:36:52.557707370 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:36:52.588037675 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:36:52.588114004 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:36:53.247562887 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.252348181 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.257096510 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.262544601 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.270378218 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.270819678 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:36:53.270881317 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:36:58] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.3s, started in 12.9s
+BAD 1.12s m2-ignore-chair-4: [What did you see just before this bus?] I saw a lamp on my left, 3 seconds ago; I do not see it now. I saw a lamp in the center, 3 seconds ago; I do not see it now. I saw a person on my left, 39 seconds ago; I do not see it now.
+ok  0.59s m2-ignore-chair-5: [Are you still ignoring chairs?] Yes, I am ignoring chairs.
+ok  1.35s m2-evict-color-1: [My favorite color is green.] I see that you enjoy green!
+ok  1.29s m2-evict-color-2: [Can you tell me a short joke?] Sure! Why don't scientists trust garlic? Because they know it causes them to sneeze!
+BAD 1.04s m2-evict-color-3: [How many legs does a spider have?] I see that the visitor is asking about spiders.
+ok  0.72s m2-evict-color-4: [What is two plus three?] Two plus three equals five.
+ok  1.54s m2-evict-color-5: [What do you see right now?] I see a cluttered room with an office chair, a microphone on a stand, and clothes hanging in racks.
+ok  0.88s m2-evict-color-6 +ev: [What is my favorite color?] You mentioned your favorite color is green.
+ok  1.39s m2-evict-trip-1: [I took the train from Berlin this morning.] That's great! Did you have any trouble getting to your destination? I'm sure it was worth the trip.
+ok  0.38s m2-evict-trip-2: [Is Qdrant written in Rust?] Qdrant is written in Rust, which keeps it fast and memory-safe under heavy load.
+ok  0.58s m2-evict-trip-3: [What is the capital of Japan?] Tokyo! That's right—Japan’s capital. I remember that from my knowledge base.
+ok  1.22s m2-evict-trip-4: [Can you count to five?] Sure, let me go one by one... One, two, three, four, five — got it!
+BAD 0.76s m2-evict-trip-5: [How many wheels does a bicycle have?] I see the bike in the image.
+ok  0.99s m2-evict-trip-6 +ev: [Which city did I come from?] You came from Berlin. That’s right — I remember that detail, and it's clear now.
+ok  0.77s m2-evict-trip-7 +ev: [And how did I travel?] You traveled by train. That’s right — I remember that detail, and it's clear now.
+ok  1.77s m2-evict-talk-1: [I am giving a talk at four o'clock.] I see that you're preparing to give a talk at four o'clock.
+ok  0.82s m2-evict-talk-2: [What is the opposite of hot?] The opposite of hot is cold, but I'm not sure what you mean by "hot" in this context.
+BAD 1.22s m2-evict-talk-3: [Which animal says moo?] I see that you're asking about an animal that says moo.
+ok  0.74s m2-evict-talk-4: [What color is a banana?] Bananas are yellow, but I'm not sure what you mean by "color" in this context.
+ok  0.81s m2-evict-talk-5: [How many minutes are in an hour?] There are sixty minutes in an hour.
+ok  1.58s m2-evict-talk-6: [What do you call frozen water?] You're asking about a type of water that's been turned into ice, and I can help with that.
+ok  0.95s m2-evict-talk-7 +ev: [When is my talk?] You're talking about your talk happening at four o'clock.
+ok  1.20s m2-evict-talk-8 +ev: [What was the first thing I told you?] The first thing you told me was that you're giving a talk at four o'clock.
+ok  1.58s m2-restart-object-1: [What am I showing you?] You're showing me your cluttered office space with an umbrella and clothes hanging nearby.
+[0;93m2026-10-09 10:39:55.207074921 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:39:55.207588933 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@554.068] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:39:56.184491057 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:39:56.184570485 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:40:01.579248135 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:40:01.580249086 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:40:01.611577246 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:40:01.611655747 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:40:02.276013100 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.280778899 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.285561786 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.290752471 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.298999101 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.299423381 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:02.299482424 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:40:07] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.3s, started in 13.2s
+ok  1.88s m2-restart-object-2 -EV: [What did I show you before you restarted?] I remember seeing a bottle, a chair, and an umbrella—none of which are visible now.
+ok  1.28s m2-restart-name-1: [My name is Priya and I build drones.] Hi Priya! That's awesome—drones are such cool tech.
+[0;93m2026-10-09 10:40:26.451918868 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:40:26.451998329 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@585.314] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:40:27.408220357 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:40:27.408283144 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:40:32.541924584 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:40:32.542850392 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:40:32.572907932 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:40:32.572979296 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:40:33.258435033 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.263320563 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.268253167 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.273834029 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.283150697 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.283612065 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:40:33.283684772 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:40:38] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.3s, started in 12.6s
+ok  1.55s m2-restart-name-2: [What is my name?] I don't think we've met yet. What's your name?
+ok  1.13s m2-restart-name-3: [What do I build?] You're building something that looks like a workspace or studio, right? You have all the tools and materials for it in this room.
+ok  1.03s m2-restart-named-1: [This is my phone.] I don't see a phone held up. Hold it up and say it again.
+[0;93m2026-10-09 10:41:02.280630908 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:02.281344094 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@621.145] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:41:03.204690420 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:03.204786392 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:41:08.608469291 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:41:08.609404088 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:41:08.639327116 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:08.639405680 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:41:09.319500323 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.323524387 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.328216802 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.332855583 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.341616161 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.342283457 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:09.342371013 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:41:14] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.2s, started in 13.4s
+ok  2.60s m2-restart-named-2: [Where is my phone?] I don't know which phone is yours.
+ok  1.40s m2-absent-fresh-1: [Have you seen my keys?] I don’t remember seeing your keys, but I can tell you that if they’re missing, it’s possible something happened to them—maybe someone took them or moved them.
+ok  1.19s m2-absent-fresh-2: [What did we talk about yesterday?] I don’t remember exactly what we talked about yesterday, but I do recall that you mentioned a topic related to Qdrant and vector search engines—something we discussed in our conversation.
+[0;93m2026-10-09 10:41:51.523615457 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:51.523707429 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@670.389] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:41:52.475419589 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:52.475500137 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:41:57.746838303 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:41:57.747791785 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:41:57.778231437 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:41:57.778311409 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:41:58.454022754 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.457791336 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.461746903 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.466352931 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.474202942 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.474855707 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:41:58.474921022 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:42:03] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.3s, started in 12.7s
+ok  1.74s m2-absent-fresh-3: [Do you remember anything I showed you?] I do not remember.
+{
+ "summary": "replay",
+ "model": "qwen3vl-2b",
+ "oracle": true,
+ "audio": "audio",
+ "cases": "eval/dev/m2.jsonl",
+ "tegrastats": "f1h-m2-candidate-a-20261009-102852.tegrastats",
+ "machine": "qdrant-robot",
+ "release": "038099d89da2",
+ "n": 74,
+ "n_expected": 74,
+ "score_type": "keyword_and_split; answer correctness is in .judged.jsonl",
+ "correct": 61,
+ "split": 0,
+ "evidence": "14/19",
+ "first_audio_p50_s": 1.1922130584716797,
+ "first_audio_max_s": 2.6010122299194336,
+ "asr_p50_s": null,
+ "first_token_p50_s": 0.763627290725708,
+ "first_phrase_p50_s": 0.8304851055145264,
+ "detect_fps_p50": 14.805675175323941,
+ "detect_fps_min": 12.96267428341139,
+ "audio_dir": "/home/qdrant/qdrant-robot/shared/sessions/replay-1791556241",
+ "note": "oracle: latencies start when the text is submitted (text to audio)"
+}

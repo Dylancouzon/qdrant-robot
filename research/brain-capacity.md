@@ -1,0 +1,44 @@
+# Brain capacity on source-grounded F1h prompts
+
+Completed 2026-10-09. E: the frozen M2 source-grounded text-only comparison scores2B8/12 versus4B7/12, zero wins and one loss. This result supplies no reason to reopen4B integration. All WSL measurements carry label E. Design gate GO WITH CHANGES, exit3, reviews/20261009-102518-23909-design.md, completed72.87s; corrections below were applied.
+
+The changed evidence is F1hA's ordinary generated caption answers. D75's earlier prompts bypassed this evidence in code. The question is whether the same delivered sources produce stronger answers with Qwen3-VL-4B than Qwen3-VL-2B. A result diagnoses model capacity; it does not select a Jetson release.
+
+## Completed M2 diagnostic
+
+The generic predicate selected12 of74 completed F1hA M2 turns and excluded62 code/image/no-source turns. Selection used no outcome. Frozen manifest2026-10-09-f1h-box-m2-bound-packets.json SHA13ab79aa7dd6e8367c85bb93d3c9ed1d8de25d6c2033f6c944f3f76c3135f2e5 binds raw SHA b1d653524ce5a3897065443e38f1aa2b7b78316e80ae7e047b75ff8b78b6b173, fullturn SHA6ca698104c6069bad0feff6ebdf5a57aeedc0207dfda800bf930b060498a4a76, SYSTEM, exact prompt strings, source authority/spans/hashes, unchanged rubrics, candidate release, and implementation hashes. Every selected source digest and span validated against full recorded timing authority.
+
+Both models completed12/12 uninterrupted requests with zero input overflows. Both generation/server teardown exits are0; whole native exit0 in13.73s. Candidate brain source SHA33f9f018653b3b028636dc592b8a17f0c1740d28167c70bfaaecc89cf8b7ff23 supplies exact AST-selected answer/budget/server_args and streaming/sentence helpers. The run-owned runner excludes unused cv2/numpy imports because WSL lacks cv2; no dependency installation or runtime edit occurred. Its SHA783d3d7068994c06c1aee0c55dfa3fc1f9cad404a57e86fc2b906feff6545333 is archived.
+
+Jetson2B8/12, WSL2B8/12, WSL4B7/12 under the unchanged three-vote judge. WSL2B matches Jetson answers9/12 and verdicts12/12. WSL4B has zero wins and one loss. Existing past-object turns score3/7 versus2/7; evicted-conversation turns score5/5 both. The private cache copied existing entries read-only and appended eight new entries only to an owned file. All36 answers were scored uniformly. Scorer native execution0 and scoring exit1 remain separate; incorrect answers remain failed. Votes SHAc826fabeb73d68c904c1b037cdd5d6656a7cc67ef934f05b3c45762edf2253a6. Prior63/93 parity is historical only.
+
+Warm11 request median first-token latency is0.0337s/0.0544s; median full-answer duration0.1371s/0.1293s for2B/4B. Mean lengths16.83/10tokens differ, so this establishes no equal-output speed gain. Maximum post-answer sampled VRAM2418/3834MiB is a lower bound on peak allocation. Maximum rendered input518tokens both; no evidence/history changes were needed. Runner RSS was sampled, but server RSS/peak memory were not measured. No Jetson latency, integrated headroom, paging, sustained conversation, or adoption claim follows.
+
+WSL run directory/home/dylan/qdrant-robot-box/runs/f1h-m2-capacity-a; native runner PID4193401. Both model server logs and completion receipts were collected. Cleanup native0 confirms no runner/server, GPU363MiB/0%, and free lock. Other projects, Ollama, Docker, shared config/runtime, eval fixtures, and shared judge cache remain untouched. Evidence: bench/results/2026-10-09-f1h-box-m2-{qwen3vl-2b,qwen3vl-4b}.jsonl, votes.jsonl, comparison.json, metrics.json, receipt.jsonl, scoring-receipt.json, archived runner/scorer, and cleanup.json.
+
+Next exact command for lead review: `cat bench/results/2026-10-09-f1h-box-m2-comparison.json bench/results/2026-10-09-f1h-box-m2-scoring-receipt.json`.
+
+## Alternatives and measurement
+
+1. Keep 2B and improve source delivery. The lead's unchanged Jetson baseline/F1hA pair measures actual routing, sufficient source delivery, and answer gain. This preserves the measured integrated memory budget.
+2. Test 4B against 2B on identical new F1hA final generated packets. Select all candidate generated turns with nonempty delivered events and no image under the generic runtime about_now/sight/past decision. Freeze this predicate and exact input bytes before scoring. Selection never uses answer outcomes. Preserve system, history, images, source text, model answer limits, and generation settings. Measure paired judged wins/losses and existing capability categories, warm first token/full answer latency, output length, and WSL VRAM/RSS. Carry D66/D68's integrated 4B headroom failure. A positive WSL result requires a separate Jetson budget intervention and paired qualification.
+
+Use existing Brain.answer and Brain.server_args, with the established llama.cpp Orin wrapper. Reuse frozen existing rubrics with owned vote sidecars, or return unjudged answers to the lead. Never write the judge cache. Do not change thresholds, cases, prompts, or training. Existing bench.brain_bakeoff.py replay hardcodes old logs and spent probes, so its CLI cannot run this new comparison unchanged. Its generation, result, and judging conventions guide a small run-owned archived runner. Replay actual logged final messages plus SYSTEM from the raw summary. Preserve history, question, and evidence byte-for-byte. No-image selection prevents unbound image reconstruction. Model templates/tokenizers may differ; preserve the2K bound and report4B overflows without editing inputs. Validate hashes and exact source/image bindings before inference. Skip code turns equally in both arms and publish their count. Require both completion footers and native-zero generation plus server teardown before scoring. Score exits stay separate; an incorrect answer can produce judge exit one. Preserve quality failures without retry. Include new packet parity between WSL2B and logged Jetson2B; prior parity63/93 is historical only.
+
+## Machine inventory
+
+WSL host dylan@192.168.1.74, RTX3080 10GB, driver610.53/KMD610.74, kernel6.6.87.2, llama.cpp9c2e0e491a822adae1f0b1c831adb4160057d24f build11490. GPU idle at0%,363MiB allocated,52C; disk798GB free. Ollama serve and an old build-log waiter remain present. Preserve them and Docker. All four 2B/4B weight/projector SHA256 values match models.json. Inventory native0 is bench/results/2026-10-09-f1h-box-inventory.json. Wrapper SHA943227efd030b3cdd24b9c9e32596f304a2c7b9ba1a800bc75b74d8579e4e69a. Runtime verification native0: binary SHA0880c26777df26bcbf1f01ae89f9ef07e08383358824154e659211b46b6eca87, patch SHAb963db437ecde418a9d4ef1c5e55f469e0e01ffa4b8c7e7807ecd790db22ac06. Wrapper sets NSM8/CC870; Python3.12.14; GPU lock available. Evidence: bench/results/2026-10-09-f1h-box-runtime.json.
+
+## Gate corrections and experiment declaration
+
+Bind raw completion hash, candidate release038099d89da2, exact SYSTEM, final message bytes, delivered event IDs/kinds/source hashes/spans, heard question, existing rubric hash, reviewed source hashes, and model/runtime hashes in a frozen manifest. Reject missing bindings. Image bytes are unnecessary because the authorized predicate excludes image turns. Freeze excluded counts/reasons and input order before inference.
+
+The minimal diagnostic uses one uninterrupted Brain.answer call per packet in both arms. Robot._tokens can pause and resume generation with assistant prefixes; existing raw rows do not fully record that request sequence. Declare this difference and report new WSL2B/Jetson2B answer parity before interpreting4B gains. This is a source-grounding capacity comparison under fixed single-call treatment, with no integrated latency or exact runtime parity claim. Warm cache order stays identical per model; mark the first request cold. Record tokenizer overflow as a failure without trimming. Return unjudged answers to the lead unless an owned vote-cache method is separately validated.
+
+## Operational bounds
+
+One model job at a time under the existing GPU lock. Use a named tracked background native process with stdin closed, startup180s/stall90s/reap10s watchdogs, bounded logs, heartbeat after every request, and explicit native receipt. No overall healthy experiment deadline. SSH commands have45s outer timeout,10s connect timeout,10s keepalive/two missed probes. Reject unsafe contention. Stop for credentials, physical intervention, spending, or OS changes. Keep output under bench/results/2026-10-09-f1h-box-*. Keep runtime/shared configuration/eval/cache/STATE/DECISIONS untouched. Do not touch the Jetson.
+
+No capacity job remains active. The named WSL run f1h-m2-capacity-a completed; model processes exited and the GPU lock is free. No visitor batch is needed to interpret this completed M2 diagnostic. The lead owns task review, integration, shared status, and checkpointing.
+
+Sources: CLAUDE.md; STATE.md; research/lessons.md; research/grounding.md; DECISIONS.md D75/D76/D77/D83/D97-D106; bench/brain_bakeoff.py; robot/brain.py; models.json.

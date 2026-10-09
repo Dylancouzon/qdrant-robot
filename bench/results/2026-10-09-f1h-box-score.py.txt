@@ -1,0 +1,37 @@
+"""Score every frozen capacity answer with the unchanged three-vote judge and private cache."""
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import time
+ROOT = Path(__file__).resolve().parents[2]
+BASE = ROOT / 'bench/results'
+spec = importlib.util.spec_from_file_location('capacity_judge', ROOT / 'eval/judge.py')
+judge = importlib.util.module_from_spec(spec);spec.loader.exec_module(judge)
+cache = BASE / '2026-10-09-f1h-box-m2-private-cache.jsonl'
+assert not cache.exists()
+original = judge.CACHE.read_bytes() if judge.CACHE.exists() else b''
+cache.write_bytes(original);judge.CACHE = cache
+m = json.loads((BASE / '2026-10-09-f1h-box-m2-bound-packets.json').read_text())
+packets = {p['id']:p for p in m['selected']}
+items = []
+for model in ('jetson2b', 'qwen3vl-2b', 'qwen3vl-4b'):
+    if model == 'jetson2b':
+        rows = [{'id':p['id'], 'heard':p['heard'], 'answer':p['jetson_answer']} for p in m['selected']]
+    else:
+        data = [json.loads(s) for s in (BASE / f'2026-10-09-f1h-box-m2-{model}.jsonl').read_text().splitlines()]
+        assert data[-1]['native_generation_exit'] == 0 and data[-1]['n'] == len(packets)
+        rows = data[:-1]
+    assert {r['id'] for r in rows} == set(packets)
+    items += [{'id':model+'/'+r['id'], 'visitor':r['heard'], 'robot':r['answer'],
+               'rubric':packets[r['id']]['rubric']} for r in rows]
+print(json.dumps({'type':'scoring_start','n':len(items),'cache_copy_sha256':hashlib.sha256(original).hexdigest(),'judge_sha256':hashlib.sha256((ROOT/'eval/judge.py').read_bytes()).hexdigest()}),flush=True)
+started=time.monotonic()
+verdicts,new = judge.score_items(items)
+path=BASE/'2026-10-09-f1h-box-m2-votes.jsonl'
+path.write_text(''.join(json.dumps({**i,**v})+'\n' for i,v in zip(items,verdicts,strict=True)))
+code=int(any(not v['pass'] for v in verdicts))
+receipt={'type':'scoring_complete','scoring_exit':code,'native_execution_exit':0,'n':len(items),'new_cached_votes':new,'elapsed_s':time.monotonic()-started,'votes_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+(BASE/'2026-10-09-f1h-box-m2-scoring-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt),flush=True)
+sys.exit(code)

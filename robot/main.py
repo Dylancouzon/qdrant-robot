@@ -36,7 +36,6 @@ from robot.memory import (
     is_question,
     kind_of,
     main_object,
-    shown,
     sighting_answer,
     sighting_query,
     thumb,
@@ -64,7 +63,6 @@ from robot.things import (
     plural,
     mentions,
     question,
-    unmention,
 )
 from robot.tts import RATE, Speaker, phrases
 from robot.view import Screen, View
@@ -123,7 +121,7 @@ class Turn:
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
-    verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
+    verbatim: bool = False        # answered from authoritative state or knowledge in code
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
     events: list[dict] = field(default_factory=list)  # exact source spans delivered to generation
@@ -453,7 +451,7 @@ class Robot:
         turn.facts = [fact for _, fact in found]
         turn.verbatim = bool(found) and found[0][0] >= VERBATIM
         past = about_past(turn.question)
-        recalled, memories = self._recall(turn, look.frame) if past else ([], [])
+        memories = self._recall(turn) if past else []
         # The frame at speech start: the cached look may show an earlier visitor.
         now, taken = (look.frame, look.taken) if shot[0] is None else shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
@@ -469,9 +467,8 @@ class Robot:
                           (f"{event['kind']}: {event['text']}", event["score"])
                           for event in events] + [(f"seen: {line}", None) for _, line in memories]}
         track = self._visitor()
-        recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
-            turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
-        ) or self._sighted(turn)
+        recalled_answer = (self._identity(turn, now, track) or self._things(turn) or
+                           self._sighted(turn))
         turn.retrieved = time.time()
         self.last_frame = look.frame
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
@@ -487,9 +484,7 @@ class Robot:
                 look.history, image, events, memories, turn.facts, turn.question,
                 look.changed, past, turn.speech_start)
             turn.told = [event["text"] for event in turn.events if event["kind"] == "utterance"]
-            recent_ids = {memory["id"] for memory in recalled}
-            turn.memories = list(dict.fromkeys([
-                pid for pid in turn.memories if pid not in recent_ids] + [
+            turn.memories = list(dict.fromkeys(turn.memories + [
                 event["source_id"] for event in turn.events]))
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
@@ -818,27 +813,24 @@ class Robot:
         return said + (f"I last saw your {name} {last}; I don't see it now." if last else
                        f"I don't see your {name} now.")
 
-    def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[tuple[float, str]]]:
-        """Keep newest-first captions for code answers and timed sightings for generation."""
-        recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}  # shown() reads lines
-                    for m in self.memory.recent(before=turn.speech_start)
-                    if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
+    def _recall(self, turn: Turn) -> list[tuple[float, str]]:
+        """Retrieve timed detector sightings and their source IDs for past questions."""
         with self.detecting:  # a consistent snapshot of the tracks
             in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
         newest: dict[str, dict] = {}  # kind -> its newest sighting: one line per object
         for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored):
             newest.setdefault(kind_of(s["label"]), s)
         sights = list(newest.values())[:LINES]
-        turn.memories = [m["id"] for m in recalled + sights]
+        turn.memories = [s["id"] for s in sights]
         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
         lines = [(s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; "
                                   "it is not in view now") for s in sights]
-        return recalled, lines
+        return lines
 
     def _sighted(self, turn: Turn) -> str | None:
         """The answer to a sighting question from the sightings and the tracks in view now, or
         None for another question or when no sighting matches (the brain answers then, with
-        captions). The sightings it names become the turn's evidence."""
+        source spans). The sightings it names become the turn's evidence."""
         if self.detect_failed:  # the tracks in view are stale: claim nothing about now
             return None
         context = [m["content"] for m in self.history[:-3:-1]]  # the last answer first

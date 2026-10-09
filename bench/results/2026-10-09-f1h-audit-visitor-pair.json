@@ -1,0 +1,495 @@
+{
+  "baseline": {
+    "receipt": "bench/results/2026-10-09-f1h-replay-visitor-cd60be65ee79-1791556933425286744.jsonl",
+    "receipt_sha256": "f021560502a61144f53c7f1b92905681ff75ba70a5d8386be2fcba4b5e0ebde4",
+    "raw_sha256": "d1dea0ef8f237543aa3b955837690a1c04a5625faa46df3badf1b8309b8ad6f0",
+    "all_turns_sha256": "b3897ad3a7e40603b4147679d18d4a7048bfb6131eddc556a30aff3cd32276f7",
+    "release": "cd60be65ee79",
+    "implementation_hashes": {
+      "robot/main.py": "0c208f60724803f518b9ae49fe49aaabebddf6ea41359ea2b381f65dc2cb187c",
+      "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+      "robot/memory.py": "0e2a2da0e91167e63da2acb276a921a7851f254906fd844012564dd59d731fc3",
+      "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+      "eval/replay.py": "2eb2d94718b8eb0e6b62d9e6d121610fdb1d6f1edc2530b6ddc497e98e41dea4",
+      "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+      "ENV.txt": "3f6106ec7d815e35438c564968a078931492656e2af38f15b6672107463687ef"
+    },
+    "model": "qwen3vl-2b",
+    "n": 21,
+    "cold_ids": [
+      "visitor-hello",
+      "visitor-restart-bag"
+    ],
+    "scores": {
+      "n": 21,
+      "judged": 16,
+      "singleturn": 21,
+      "speech": 21,
+      "joint": 16
+    },
+    "sessions": {
+      "visitor": {
+        "n": 21,
+        "judged": 16,
+        "singleturn": 21,
+        "speech": 21,
+        "joint": 16
+      }
+    },
+    "categories": {
+      "visitor": {
+        "n": 21,
+        "judged": 16,
+        "singleturn": 21,
+        "speech": 21,
+        "joint": 16
+      }
+    },
+    "turn_scores": [
+      {
+        "id": "visitor-hello",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-how",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-see",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-left",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-moved",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-before",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-gone",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-edge",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-server",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-store",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-rust",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-from",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-enroll",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-consent",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-stranger-know",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-stranger-name",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-return",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-forget",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-forgotten",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-restart-bag",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-restart-who",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      }
+    ],
+    "delivered_events": {},
+    "authority_records": 0,
+    "warm_first_synth": {
+      "n": 19,
+      "p50": 0.5717906951904297,
+      "p95": 1.1270123004913328
+    },
+    "warm_post_transcript_first_synth": {
+      "p50": 0.5717906951904297,
+      "p95": 1.1270123004913328
+    },
+    "warm_answer_synthesis_completion": {
+      "p50": 1.3709564208984375,
+      "p95": 2.5268674612045277
+    },
+    "warm_estimated_synthesized_playback_end": {
+      "p50": 3.9198293685913086,
+      "p95": 10.733579039573666
+    },
+    "loaded_min_mem_available_mib": 1086.22265625,
+    "loaded_system_paging": {
+      "pswpin": 7443,
+      "pswpout": 39055
+    },
+    "limits": [
+      "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+      "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+      "System paging is unattributed.",
+      "Instrumentation differs between baseline and candidate.",
+      "Code/model bytes require archived release bindings; local tree can differ.",
+      "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+    ]
+  },
+  "candidate": {
+    "receipt": "bench/results/2026-10-09-f1h-replay-visitor-038099d89da2-1791557150118981137.jsonl",
+    "receipt_sha256": "b94bfeedd34e67f9e79cc4b2ad33de18e0bd26878afba878b009e7a0d4480227",
+    "raw_sha256": "e30ec0adc338dc1893a41ef5d9efd92e6b628ae17e8b3593021dfd6520e2e612",
+    "all_turns_sha256": "a883890cf654ff7da12cd99348d9c3358fa3c94231b090b0d413b699eab0371a",
+    "release": "038099d89da2",
+    "implementation_hashes": {
+      "robot/main.py": "252eeeeb479f1e943800890c251fd9325a22065797df753a2b581dcf176fea59",
+      "robot/brain.py": "33f9f018653b3b028636dc592b8a17f0c1740d28167c70bfaaecc89cf8b7ff23",
+      "robot/memory.py": "9a5bba45708719361662a92d918229ff8b98f2270987783993b3cfae9bc68327",
+      "robot/text_embed.py": "001fed34ea2f0f127411ed7c20c954ca868027d18e2aac550778a0ca59dd0867",
+      "eval/replay.py": "bcd630867fd51fcd2717b6b427dc8ecb98e5bc121dd449b0853cae5356948b1f",
+      "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+      "ENV.txt": "c3993196e26f9b3aba37ae0f3247c3a9604beae6eceb367e50357a4b40cb8b75"
+    },
+    "model": "qwen3vl-2b",
+    "n": 21,
+    "cold_ids": [
+      "visitor-hello",
+      "visitor-restart-bag"
+    ],
+    "scores": {
+      "n": 21,
+      "judged": 16,
+      "singleturn": 21,
+      "speech": 21,
+      "joint": 16
+    },
+    "sessions": {
+      "visitor": {
+        "n": 21,
+        "judged": 16,
+        "singleturn": 21,
+        "speech": 21,
+        "joint": 16
+      }
+    },
+    "categories": {
+      "visitor": {
+        "n": 21,
+        "judged": 16,
+        "singleturn": 21,
+        "speech": 21,
+        "joint": 16
+      }
+    },
+    "turn_scores": [
+      {
+        "id": "visitor-hello",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-how",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-see",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-left",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-moved",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-before",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-gone",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-edge",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-server",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-store",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-rust",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-from",
+        "judged": false,
+        "singleturn": true,
+        "speech": true,
+        "joint": false
+      },
+      {
+        "id": "visitor-enroll",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-consent",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-stranger-know",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-stranger-name",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-return",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-forget",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-forgotten",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-restart-bag",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      },
+      {
+        "id": "visitor-restart-who",
+        "judged": true,
+        "singleturn": true,
+        "speech": true,
+        "joint": true
+      }
+    ],
+    "delivered_events": {
+      "utterance": 4
+    },
+    "authority_records": 75,
+    "warm_first_synth": {
+      "n": 19,
+      "p50": 0.5664446353912354,
+      "p95": 1.1498102903366088
+    },
+    "warm_post_transcript_first_synth": {
+      "p50": 0.5664446353912354,
+      "p95": 1.1498102903366088
+    },
+    "warm_answer_synthesis_completion": {
+      "p50": 1.3985121250152588,
+      "p95": 2.162417078018186
+    },
+    "warm_estimated_synthesized_playback_end": {
+      "p50": 3.882615804672241,
+      "p95": 10.742797875404355
+    },
+    "loaded_min_mem_available_mib": 1106.1640625,
+    "loaded_system_paging": {
+      "pswpin": 61,
+      "pswpout": 48366
+    },
+    "limits": [
+      "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+      "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+      "System paging is unattributed.",
+      "Instrumentation differs between baseline and candidate.",
+      "Code/model bytes require archived release bindings; local tree can differ.",
+      "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+    ]
+  },
+  "paired_changes": {
+    "judged": {
+      "wins": [],
+      "losses": []
+    },
+    "joint": {
+      "wins": [],
+      "losses": []
+    }
+  },
+  "changed_routes": [],
+  "candidate_code_receipt_matches": {
+    "robot/main.py": true,
+    "robot/brain.py": true,
+    "robot/memory.py": true,
+    "robot/text_embed.py": true,
+    "eval/replay.py": true,
+    "models.json": true
+  },
+  "raw_evidence": {
+    "baseline": "3/4",
+    "candidate": "2/4"
+  },
+  "detection_fps": {
+    "baseline": {
+      "median": 14.790359746363105,
+      "minimum": 13.869406221469172
+    },
+    "candidate": {
+      "median": 14.705891221457685,
+      "minimum": 13.360783495499742
+    }
+  },
+  "first_synth_p50_change_s": -0.005346059799194336,
+  "conclusion_scope": "Development oracle pair only. Instrumentation differs. No adoption, physical audible latency, or safety acceptance."
+}

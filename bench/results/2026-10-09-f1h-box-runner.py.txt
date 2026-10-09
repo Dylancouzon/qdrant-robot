@@ -1,0 +1,99 @@
+"""Run the frozen text-only capacity pair using exact source Brain methods."""
+import ast
+import contextlib
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import threading
+import time
+
+HERE = Path(__file__).resolve().parent
+BOX = Path.home() / 'qdrant-robot-box'
+manifest = json.loads((HERE / 'packets.json').read_text())
+source = (HERE / 'brain.py').read_text()
+assert hashlib.sha256(source.encode()).hexdigest() == manifest['receipt'][0]['implementation_hashes']['robot/brain.py']
+ns = {'__name__': 'capacity_brain'}
+nodes = []
+for node in ast.parse(source).body:
+    if isinstance(node, ast.Import) and all(a.name not in ('cv2', 'numpy') for a in node.names): nodes.append(node)
+    elif isinstance(node, ast.ImportFrom) and node.module == 'collections.abc': nodes.append(node)
+    elif isinstance(node, ast.Assign) and all(getattr(t, 'id', '') not in ('SERVER', 'GGUF', 'LOG') for t in node.targets): nodes.append(node)
+    elif isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in ('server_args', 'sentences', '_content', 'unecho', 'Brain'): nodes.append(node)
+exec(compile(ast.Module(body=nodes, type_ignores=[]), 'archived-brain.py', 'exec'), ns)
+ns.update(SERVER=BOX / 'llama-server-orin', GGUF=BOX / 'models/gguf', URL='http://127.0.0.1:18139')
+brain = ns['Brain'].__new__(ns['Brain'])
+progress = time.monotonic()
+phase = 'startup'
+stop_watch = threading.Event()
+child = None
+failure = None
+
+
+def cleanup():
+    if child is None: return None
+    with contextlib.suppress(ProcessLookupError): os.killpg(child.pid, signal.SIGTERM)
+    try: return child.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        with contextlib.suppress(ProcessLookupError): os.killpg(child.pid, signal.SIGKILL)
+        return child.wait(timeout=10)
+
+
+def watchdog():
+    global failure
+    while not stop_watch.wait(1):
+        limit = 180 if phase == 'startup' else 90
+        if time.monotonic() - progress > limit:
+            failure = f'{phase} stall exceeds {limit}s'
+            cleanup()
+            os._exit(124)
+
+
+def gpu():
+    return subprocess.run(['/usr/lib/wsl/lib/nvidia-smi', '--query-gpu=memory.used,utilization.gpu,temperature.gpu', '--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=10).stdout.strip()
+
+
+lock = (BOX / 'gpu.lock').open('w')
+fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+assert int(gpu().split(',')[1]) < 10, 'GPU contention'
+threading.Thread(target=watchdog, daemon=True).start()
+receipt = {'type': 'start', 'pid': os.getpid(), 'started': time.time(), 'manifest_sha256': hashlib.sha256((HERE / 'packets.json').read_bytes()).hexdigest(), 'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'measurement_label': 'E', 'request_treatment': manifest['request_treatment']}
+(HERE / 'receipt.jsonl').write_text(json.dumps(receipt)+'\n')
+try:
+    for model in ('qwen3vl-2b', 'qwen3vl-4b'):
+        phase = 'startup'; progress = time.monotonic()
+        args = ns['server_args'](model)
+        with (HERE / f'{model}.server.log').open('w') as log:
+            child = subprocess.Popen(args,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
+        (HERE / 'active.json').write_text(json.dumps({'pid':os.getpid(),'server_pid':child.pid,'model':model,'command':args,'log':str(HERE/f'{model}.server.log')}))
+        while True:
+            assert child.poll() is None, 'Server died during startup'
+            try:
+                ns['urllib'].request.urlopen(ns['URL']+'/health',timeout=1).read();break
+            except OSError: time.sleep(.2)
+        phase = 'generation'; progress = time.monotonic()
+        with (HERE / f'{model}.jsonl').open('w') as out:
+            for i, packet in enumerate(manifest['selected']):
+                budget = brain.budget(packet['messages'])
+                overflow = budget['prompt_token_bound'] + budget['output_token_reserve'] > 2048
+                t0 = time.monotonic(); first = None; chunks = []
+                if not overflow:
+                    for delta in brain.answer(packet['messages']):
+                        if first is None: first = time.monotonic()-t0
+                        chunks.append(delta);progress=time.monotonic()
+                answer = ''.join(chunks)
+                row = {'id':packet['id'],'model':model,'heard':packet['heard'],'answer':answer,'overflow':overflow,'budget':budget,'cold':i==0,'first_token_s':first,'answer_s':time.monotonic()-t0,'tokens':brain.tokens(answer),'message_sha256':packet['message_sha256'],'gpu':gpu(),'rss_kib':int(Path('/proc/self/status').read_text().split('VmRSS:')[1].split()[0])}
+                out.write(json.dumps(row)+'\n');out.flush();progress=time.monotonic()
+                print(json.dumps({'progress':i+1,'total':len(manifest['selected']),'model':model,'id':packet['id'],'overflow':overflow}),flush=True)
+            out.write(json.dumps({'summary':'capacity_generation','model':model,'n':len(manifest['selected']),'machine':'box-rtx3080','measurement_label':'E','context':2048,'output_tokens':64,'image_tokens':256,'native_generation_exit':0})+'\n');out.flush()
+        code=cleanup();child=None
+        with (HERE/'receipt.jsonl').open('a') as f:f.write(json.dumps({'type':'model_complete','model':model,'generation_exit':0,'server_exit':code,'finished':time.time()})+'\n')
+        assert code == 0, f'Server teardown exit{code}'
+        progress=time.monotonic()
+    with (HERE/'receipt.jsonl').open('a') as f:f.write(json.dumps({'type':'complete','native_exit':0,'finished':time.time()})+'\n')
+finally:
+    stop_watch.set();cleanup();fcntl.flock(lock,fcntl.LOCK_UN)

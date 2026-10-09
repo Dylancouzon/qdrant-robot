@@ -1,0 +1,2 @@
+{"type": "scoring_start", "n": 36, "cache_copy_sha256": "9e98242e126804a2df231d085d5c39cef33707b58b8758395dfbaf7c4f304bf2", "judge_sha256": "0141e7aab61f140646ec2f72d3415f42edc034141f4637d86b30917abbb6b376"}
+{"type": "scoring_complete", "scoring_exit": 1, "native_execution_exit": 0, "n": 36, "new_cached_votes": 8, "elapsed_s": 11.52212308300659, "votes_sha256": "c826fabeb73d68c904c1b037cdd5d6656a7cc67ef934f05b3c45762edf2253a6"}

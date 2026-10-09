@@ -2459,3 +2459,19 @@
 {"key": "7d94a553d3368470", "pass": true, "why": "Says Paris.", "votes": [true, true, true]}
 {"key": "78fbb138a711eefc", "pass": true, "why": "Says Berlin.", "votes": [true, true, true]}
 {"key": "5d29ca22ed78b610", "pass": false, "why": "Claims the teddy bears are the same as the apples.", "votes": [false, false, false]}
+{"key": "8568fbc83088a688", "pass": false, "why": "Says right; rubric says left.", "votes": [false, false, false]}
+{"key": "a3781eb31ec6d2d4", "pass": false, "why": "Does not say ice.", "votes": [false, false, false]}
+{"key": "2b969d8bfe6896b3", "pass": false, "why": "Does not give the talk time.", "votes": [false, false, false]}
+{"key": "e2aa1018a0d27822", "pass": false, "why": "Does not recall the talk at four o'clock.", "votes": [false, false, false]}
+{"key": "66a898365057a9d2", "pass": false, "why": "Does not say the bag was on its left.", "votes": [false, false, false]}
+{"key": "2ea3ee1bdb17bf9b", "pass": false, "why": "Does not identify the white bear as first.", "votes": [false, false, false]}
+{"key": "d250631c82b03497", "pass": false, "why": "Does not say the second bear wore a green hat.", "votes": [false, false, false]}
+{"key": "fe844ed61a1e535e", "pass": true, "why": "Recalls the gold phone from a moment ago.", "votes": [true, true, true]}
+{"key": "6284e49b30ca52af", "pass": true, "why": "Correctly says Berlin.", "votes": [true, true, true]}
+{"key": "aecaad2f316abb6b", "pass": true, "why": "Correctly says by train.", "votes": [true, true, true]}
+{"key": "1ec010a70c9439ec", "pass": true, "why": "Correctly recalls the talk at four o'clock.", "votes": [true, true, true]}
+{"key": "3a0f214b263dde71", "pass": false, "why": "Omits the stripes and adds unsupported objects.", "votes": [false, false, false]}
+{"key": "58122755de805d06", "pass": false, "why": "Does not say the umbrella was on its left.", "votes": [false, false, false]}
+{"key": "11be72c2168b4180", "pass": false, "why": "Misses the red handbag and contradicts the umbrella's position.", "votes": [false, false, false]}
+{"key": "00f79e73d0ea674b", "pass": false, "why": "Does not identify Qdrant Edge shards.", "votes": [false, false, false]}
+{"key": "2a28c52546c65edf", "pass": false, "why": "Claims not to remember despite stating Berlin.", "votes": [false, false, false]}

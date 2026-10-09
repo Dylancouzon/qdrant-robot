@@ -1,0 +1,43 @@
+{
+  "scores": {
+    "jetson2b": 8,
+    "qwen3vl-2b": 8,
+    "qwen3vl-4b": 7
+  },
+  "n": 12,
+  "wins": [],
+  "losses": [
+    "m2-naming-phone-2"
+  ],
+  "new_verdict_parity": 12,
+  "categories": {
+    "past_objects": {
+      "jetson2b": {
+        "pass": 3,
+        "n": 7
+      },
+      "qwen3vl-2b": {
+        "pass": 3,
+        "n": 7
+      },
+      "qwen3vl-4b": {
+        "pass": 2,
+        "n": 7
+      }
+    },
+    "conversation": {
+      "jetson2b": {
+        "pass": 5,
+        "n": 5
+      },
+      "qwen3vl-2b": {
+        "pass": 5,
+        "n": 5
+      },
+      "qwen3vl-4b": {
+        "pass": 5,
+        "n": 5
+      }
+    }
+  }
+}

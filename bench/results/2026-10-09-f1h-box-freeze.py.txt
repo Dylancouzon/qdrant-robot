@@ -1,0 +1,62 @@
+"""Freeze new F1h text-only source packets without outcome-based selection."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from robot.memory import about_now, about_past
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+p = argparse.ArgumentParser()
+p.add_argument('raw', type=Path)
+p.add_argument('output', type=Path)
+a = p.parse_args()
+rows = [json.loads(line) for line in a.raw.read_text().splitlines()]
+meta = rows[-1]
+assert meta['summary'] == 'replay' and meta['release'] == '038099d89da2'
+turns = [r for r in rows if 'id' in r]
+assert len(turns) == meta['n'] == meta['n_expected']
+assert len({r['id'] for r in turns}) == len(turns)
+case_name = meta['cases']
+assert case_name in ('eval/dev/m2.jsonl', 'eval/dev/visitor.jsonl')
+case_path = ROOT / case_name
+rubrics = {st['id']: st['rubric'] for line in case_path.read_text().splitlines()
+           for st in json.loads(line)['steps'] if 'say' in st}
+selected, excluded = [], []
+for r in turns:
+    assert r['split'] == 1, 'Ambiguous split prompt requires separate export'
+    sees = about_now(r['heard']) or (r['kind'] == 'sight' and not about_past(r['heard']))
+    why = 'code' if r['verbatim'] else 'image' if sees else 'no_sources' if not r['events'] else None
+    if why:
+        excluded.append({'id': r['id'], 'reason': why})
+        continue
+    for event in r['events']:
+        assert event['source_hash'] and event['spans'] and event['source_id']
+        assert all(sp['text'] in event['text'] for sp in event['spans'])
+    messages = [{'role': 'system', 'content': meta['system']}, *r['prompt']]
+    assert all(c['type'] == 'text' for m in messages if isinstance(m['content'], list)
+               for c in m['content'])
+    serialized = json.dumps(messages, ensure_ascii=False, separators=(',', ':'))
+    selected.append({'id': r['id'], 'messages': messages,
+                     'message_sha256': hashlib.sha256(serialized.encode()).hexdigest(),
+                     'heard': r['heard'], 'events': r['events'], 'rubric': rubrics[r['id']],
+                     'jetson_answer': r['answer'], 'prompt_budget': r['prompt_budget']})
+manifest = {'raw': str(a.raw), 'raw_sha256': sha(a.raw), 'release': meta['release'],
+            'cases': case_name, 'cases_sha256': sha(case_path),
+            'selection': 'not verbatim and events and not (about_now(heard) or (kind == sight and not about_past(heard)))',
+            'selected': selected, 'excluded': excluded,
+            'request_treatment': 'one uninterrupted Brain.answer call; Jetson pause/resume differs',
+            'source_hashes': {str(q.relative_to(ROOT)): sha(q) for q in
+                              (ROOT / 'robot/brain.py', ROOT / 'robot/memory.py', ROOT / 'models.json')},
+            'machine': 'box-rtx3080', 'measurement_label': 'E'}
+assert not a.output.exists(), 'Frozen manifests are immutable'
+a.output.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({'selected': len(selected), 'excluded': len(excluded),
+                  'manifest': str(a.output), 'sha256': sha(a.output)}))

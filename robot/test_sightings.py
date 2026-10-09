@@ -18,7 +18,6 @@ def test_sightings() -> None:
         robot.memory, robot.tracker, robot.points = Memory(Path(tmp)), Tracker(), {}
         robot.away, robot.detecting, robot.detect_failed = set(), threading.Lock(), None
         robot.visitors, robot.named, robot.ignored, robot.mine = {}, set(), set(), {}
-        frame = np.zeros((720, 1280, 3), np.uint8)
         clock = Detection("clock", 0.9, (1000, 100, 1200, 300))
         bottle = Detection("bottle", 0.9, (100, 100, 200, 300))
 
@@ -40,7 +39,7 @@ def test_sightings() -> None:
                   for k in range(4)]  # four newer objects, still in view, must not crowd it out
         for k in range(CONFIRM):
             step([bottle, *others], 40.0 + k)
-        _, lines = robot._recall(Turn(speech_start=72.0), frame)
+        lines = robot._recall(Turn(speech_start=72.0))
         assert lines == [(12.0, "60 seconds ago: you saw a clock; it is not in view now")], \
             "the rest is in view now; no sides (D61)"
         robot.vocab, robot.history = {"clock", "bottle", "thing0"}, []

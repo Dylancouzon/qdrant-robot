@@ -170,3 +170,55 @@ def test_runtime_keeps_observations_in_past_questions(tmp_path):
         assert "said" not in past[0] and past[0]["text"] == "A red cup."
     finally:
         robot.memory.shard.close()
+
+
+def test_caption_question_reaches_source_grounded_generation(tmp_path):
+    """A caption question reaches the real bounded context through the normal turn path."""
+    import threading
+    import time
+    from types import SimpleNamespace as Stub
+    from robot import brain
+    from robot.detect import Tracker
+    from robot.main import Look, Robot, Turn
+
+    robot = Robot.__new__(Robot)
+    robot.memory, robot.since, robot.ignored = Memory(tmp_path), 0, set()
+    try:
+        pid = robot.memory.add(FRAME, "question?", ts=100.)
+        caption = "Main object: a red cup. Around it: a table."
+        robot.memory.set(pid, caption=caption)
+        assert index(robot.memory, pid, "observation", caption)
+        robot.wake_word, robot.detections, robot.exchanges = False, 0, 0
+        robot.history, robot.vocab, robot.points = [], {"cup", "table"}, {}
+        robot.tracker, robot.detecting, robot.detect_failed = Tracker(), threading.Lock(), None
+        robot.embed = lambda texts: VECTORS[:1]
+        robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "recall"
+        robot.brain = brain.Brain.__new__(brain.Brain)
+        robot.brain.budget = lambda msgs: {"prompt_token_bound": 100, "output_token_reserve": 64}
+        submitted = []
+
+        def answer(msgs, **kwargs):
+            if not kwargs.get("prior"):
+                submitted.append(msgs)
+                yield "You showed a red cup."
+
+        robot.brain.answer = answer
+        robot.ready = Look(FRAME, 199., {}, 0, False, [])
+        robot._stale = lambda frame: False
+        robot._visitor = lambda: None
+        robot._identity = lambda *args: None
+        robot._things = lambda turn: None
+        robot._store = lambda *args: None
+        robot._log = lambda turn: None
+        robot.voice = Stub(say=lambda text: np.zeros(160))
+        robot.speaker = Stub(play=lambda pcm: None)
+        robot.out, robot.stream = tmp_path, None
+        turn = Turn(question="What did I show you?", speech_start=200., speech_end=201.,
+                    line=time.time())
+        robot._turn(turn, (FRAME, 199.))
+        assert not turn.verbatim and len(submitted) == 1
+        assert turn.events[0]["source_id"] == pid and turn.events[0]["text"] == caption
+        assert caption in submitted[0][-1]["content"][-1]["text"]
+        assert turn.memories == [pid] and turn.answer == "You showed a red cup."
+    finally:
+        robot.memory.shard.close()

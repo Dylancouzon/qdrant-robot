@@ -1,0 +1,9 @@
+{
+  "pid": 49722,
+  "command": [
+    ".venv/bin/python",
+    "-u",
+    "bench/results/2026-10-09-f1h-box-score.py.txt"
+  ],
+  "log": "bench/results/2026-10-09-f1h-box-m2-scoring.log"
+}

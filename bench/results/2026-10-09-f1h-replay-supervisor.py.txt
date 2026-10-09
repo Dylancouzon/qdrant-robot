@@ -1,0 +1,122 @@
+"""Run unchanged replays in a named release with external native-progress supervision."""
+import hashlib
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+from eval.continuous import kill_group, resources
+
+release, cases, mode = sys.argv[1:4]
+base = Path(os.environ['ROBOT_SHARED']).parent
+root = base / 'releases' / release
+assert root.is_dir() and mode in ('audio-real', 'oracle')
+stamp = time.time_ns()
+output = base / 'shared/results' / f'2026-10-09-f1h-replay-{Path(cases).stem}-{release}-{stamp}.jsonl'
+console = output.with_suffix('.console.log')
+telemetry = output.with_suffix('.telemetry.jsonl')
+
+def sha(path):
+    with Path(path).open('rb') as f:
+        return hashlib.file_digest(f, 'sha256').hexdigest()
+
+def emit(row):
+    with output.open('a') as f:
+        f.write(json.dumps(row) + '\n')
+
+sessions = [json.loads(line) for line in (root / cases).read_text().splitlines()]
+expected = sum('say' in step for session in sessions for step in session['steps'])
+inputs = {cases: sha(root / cases)}
+for session in sessions:
+    for step in session['steps']:
+        if 'show' in step:
+            path = Path(cases).parent / step['show']
+            inputs[str(path)] = sha(root / path)
+        if 'say' in step and mode != 'oracle':
+            path = Path(cases).parent / mode / (step['id'] + '.wav')
+            inputs[str(path)] = sha(root / path)
+worker = '"""Observe existing audio/inference calls without changing inputs, cadence, or decisions."""\nimport json\nimport os\nimport runpy\nimport sys\nimport time\nfrom pathlib import Path\n\nroot, observation = sys.argv[1:3]\nos.chdir(root)\nsys.path.insert(0, root)\nsys.argv = sys.argv[3:]\nfrom robot import audio, asr, brain\nfrom eval.continuous import Scheduler\n\npath = Path(observation)\ndef observe(kind, **fields):\n    with path.open(\'a\') as f:\n        f.write(json.dumps({\'type\': kind, \'wall_time\': time.time(), **fields}) + \'\\n\')\n\noriginal_paced = audio.paced\nstream = 0\n\ndef paced(samples, silence_s=0.):\n    global stream\n    stream += 1\n    sid, started, count = stream, time.perf_counter(), 0\n    for chunk in original_paced(samples, silence_s):\n        actual = time.perf_counter() - started\n        due = count / audio.RATE_IN\n        observe(\'chunk\', stream=sid, samples=len(chunk), due_start_s=due,\n                actual_start_s=actual, lateness_s=max(0., actual - due))\n        count += len(chunk)\n        yield chunk\n\naudio.paced = paced\noriginal_feed = asr.Ears.feed\n\ndef feed(self, chunk):\n    started = time.perf_counter()\n    try:\n        return original_feed(self, chunk)\n    finally:\n        observe(\'hear\', samples=len(chunk), elapsed_s=time.perf_counter() - started)\n\nasr.Ears.feed = feed\noriginal_budget = getattr(brain.Brain, \'budget\', None)\nif original_budget:\n    def budget(self, msgs):\n        started = time.perf_counter()\n        try:\n            return original_budget(self, msgs)\n        finally:\n            observe(\'budget\', elapsed_s=time.perf_counter() - started)\n    brain.Brain.budget = budget\noriginal_prefill = brain.Brain.prefill\n\ndef prefill(self, msgs):\n    started = time.perf_counter()\n    observe(\'prefill_start\')\n    try:\n        return original_prefill(self, msgs)\n    finally:\n        observe(\'prefill\', elapsed_s=time.perf_counter() - started)\n\nbrain.Brain.prefill = prefill\noriginal_report = Scheduler.report\n\ndef report(self, now):\n    started = time.perf_counter()\n    try:\n        return original_report(self, now)\n    finally:\n        observe(\'evaluator_report\', elapsed_s=time.perf_counter() - started)\n\nScheduler.report = report\nobserve(\'observer_started\', command=sys.argv, release=os.environ.get(\'ROBOT_RELEASE\'))\nrunpy.run_module(sys.argv[0], run_name=\'__main__\')\nobserve(\'observer_finished\')\n'
+observation = output.with_suffix(".timing.jsonl")
+command = [str(root / '.venv/bin/python'), '-u', '-c', worker, str(root), str(observation), 'eval.replay', cases,
+           *(['--oracle'] if mode == 'oracle' else ['--audio', mode])]
+result_dir = base / 'shared/results'
+existing = set(result_dir.glob('*-replay-*.jsonl'))
+env = {**os.environ, 'ROBOT_RELEASE': release}
+emit({'type': 'metadata', 'release': release, 'cases': cases, 'mode': mode,
+      'command': command, 'expected': expected, 'input_hashes': inputs,
+      'implementation_hashes': {str(path): sha(root / path) for path in
+          ('robot/main.py', 'robot/brain.py', 'robot/memory.py', 'robot/text_embed.py',
+           'eval/replay.py', 'models.json', 'ENV.txt')},
+      'supervisor_sha256': sys.argv[4], 'timed_worker_sha256': hashlib.sha256(worker.encode()).hexdigest(), 'tegrastats': os.environ.get('ROBOT_TEGRASTATS'),
+      'limits': {'startup_s': 180, 'progress_s': 90, 'reap_s': 10},
+      'started': time.time(), 'context_tokens': 2048, 'image_tokens': 256, 'output_tokens': 64})
+print('supervisor output', output, flush=True)
+started = progress = sampled = time.monotonic()
+last_size, phase, error = 0, 'startup', None
+with console.open('wb') as log:
+    proc = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
+                            stdin=subprocess.DEVNULL, env=env, start_new_session=True)
+    try:
+        while proc.poll() is None:
+            now = time.monotonic()
+            size = console.stat().st_size
+            if size != last_size:
+                with console.open('rb') as f:
+                    f.seek(last_size)
+                    lines = f.read().decode(errors='replace').splitlines()
+                last_size, progress = size, now
+                for line in lines:
+                    if line.startswith(('ok ', 'BAD', 'restart:')):
+                        phase = 'replay'
+                        print(line[:400], flush=True)
+            if now - sampled >= 1:
+                with telemetry.open('a') as f:
+                    f.write(json.dumps({'wall_time': time.time(), 'phase': phase,
+                                        'resources': resources(proc.pid)}) + '\n')
+                sampled = now
+            if now - progress > (180 if phase == 'startup' else 90):
+                error = phase + ' stalled'
+                break
+            time.sleep(.1)
+        if error is None and proc.returncode not in (0, 1):
+            error = f'native exit {proc.returncode}'
+        native_exit = proc.returncode
+        try:
+            os.killpg(proc.pid, 0)
+        except ProcessLookupError:
+            pass
+        else:
+            error = error or 'live process-group descendants after native exit'
+        if not kill_group(proc):
+            error = 'reaping timed out'
+        results = set(result_dir.glob('*-replay-*.jsonl')) - existing
+        results = [path for path in results if not path.name.startswith('2026-10-09-f1h-')]
+        if error is None:
+            if len(results) != 1:
+                error = 'missing or ambiguous result'
+            else:
+                raw = results[0]
+                rows = [json.loads(line) for line in raw.read_text().splitlines()]
+                scored = [row for row in rows if 'id' in row]
+                summary = rows[-1]
+                if (summary.get('summary') != 'replay' or summary.get('release') != release or
+                        summary.get('cases') != cases or len(scored) != expected or
+                        summary.get('n_expected') != expected):
+                    error = 'invalid completion counts or bindings'
+                else:
+                    emit({'type': 'completion', 'completed': True, 'native_exit': native_exit,
+                          'result': str(raw), 'result_sha256': sha(raw),
+                          'console_sha256': sha(console), 'telemetry_sha256': sha(telemetry),
+                          'timing_sha256': sha(observation),
+                          'expected': expected, 'observed': len(scored),
+                          'elapsed_s': time.monotonic() - started})
+        if error:
+            emit({'type': 'error', 'error': error, 'native_exit': native_exit,
+                  'console_sha256': sha(console), 'elapsed_s': time.monotonic() - started})
+        print('supervisor finished', error or f'native {native_exit}; complete {expected}', flush=True)
+    finally:
+        kill_group(proc)
+sys.exit(2 if error else native_exit)

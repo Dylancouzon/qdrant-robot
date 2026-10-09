@@ -1,0 +1,2465 @@
+{
+  "workloads": {
+    "m2": {
+      "baseline": {
+        "receipt": "bench/results/2026-10-09-f1h-replay-m2-cd60be65ee79-1791555570944066043.jsonl",
+        "receipt_sha256": "a828fec32a30c5658fc6ac11622f78630a5435211510afe4b1f7a11082254ccc",
+        "raw_sha256": "6e708f2942b224410c4bffd9165538202e18c506e0aa91f00c99b8269ea5f1e7",
+        "all_turns_sha256": "123ff0d46a02a056f83ddfe7c4322d1ac95fda39e98677b6544cda340b5e571c",
+        "release": "cd60be65ee79",
+        "implementation_hashes": {
+          "robot/main.py": "0c208f60724803f518b9ae49fe49aaabebddf6ea41359ea2b381f65dc2cb187c",
+          "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+          "robot/memory.py": "0e2a2da0e91167e63da2acb276a921a7851f254906fd844012564dd59d731fc3",
+          "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+          "eval/replay.py": "2eb2d94718b8eb0e6b62d9e6d121610fdb1d6f1edc2530b6ddc497e98e41dea4",
+          "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+          "ENV.txt": "3f6106ec7d815e35438c564968a078931492656e2af38f15b6672107463687ef"
+        },
+        "model": "qwen3vl-2b",
+        "n": 74,
+        "cold_ids": [
+          "m2-removed-clock-1",
+          "m2-forget-phone-5",
+          "m2-ignore-chair-4",
+          "m2-restart-object-2",
+          "m2-restart-name-2",
+          "m2-restart-named-2",
+          "m2-absent-fresh-3"
+        ],
+        "scores": {
+          "n": 74,
+          "judged": 38,
+          "singleturn": 74,
+          "speech": 73,
+          "joint": 37
+        },
+        "sessions": {
+          "m2-removed-clock": {
+            "n": 3,
+            "judged": 3,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 3
+          },
+          "m2-removed-laptop": {
+            "n": 1,
+            "judged": 0,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 0
+          },
+          "m2-removed-snack": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-removed-cup": {
+            "n": 1,
+            "judged": 1,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 1
+          },
+          "m2-region-a": {
+            "n": 2,
+            "judged": 2,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 2
+          },
+          "m2-region-b": {
+            "n": 2,
+            "judged": 1,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 1
+          },
+          "m2-region-c": {
+            "n": 1,
+            "judged": 1,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 1
+          },
+          "m2-similar-teddy": {
+            "n": 4,
+            "judged": 1,
+            "singleturn": 4,
+            "speech": 4,
+            "joint": 1
+          },
+          "m2-similar-laptop": {
+            "n": 3,
+            "judged": 0,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 0
+          },
+          "m2-similar-phone": {
+            "n": 3,
+            "judged": 2,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 2
+          },
+          "m2-naming-phone": {
+            "n": 4,
+            "judged": 1,
+            "singleturn": 4,
+            "speech": 4,
+            "joint": 1
+          },
+          "m2-naming-teddy": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-forget-phone": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-forget-two": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-ignore-chair": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-evict-color": {
+            "n": 6,
+            "judged": 5,
+            "singleturn": 6,
+            "speech": 5,
+            "joint": 4
+          },
+          "m2-evict-trip": {
+            "n": 7,
+            "judged": 6,
+            "singleturn": 7,
+            "speech": 7,
+            "joint": 6
+          },
+          "m2-evict-talk": {
+            "n": 8,
+            "judged": 4,
+            "singleturn": 8,
+            "speech": 8,
+            "joint": 4
+          },
+          "m2-restart-object": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-restart-name": {
+            "n": 3,
+            "judged": 2,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 2
+          },
+          "m2-restart-named": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-absent-fresh": {
+            "n": 3,
+            "judged": 0,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 0
+          }
+        },
+        "categories": {
+          "removed": {
+            "n": 7,
+            "judged": 4,
+            "singleturn": 7,
+            "speech": 7,
+            "joint": 4
+          },
+          "region": {
+            "n": 5,
+            "judged": 4,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 4
+          },
+          "similar": {
+            "n": 10,
+            "judged": 3,
+            "singleturn": 10,
+            "speech": 10,
+            "joint": 3
+          },
+          "naming": {
+            "n": 6,
+            "judged": 1,
+            "singleturn": 6,
+            "speech": 6,
+            "joint": 1
+          },
+          "forget": {
+            "n": 10,
+            "judged": 6,
+            "singleturn": 10,
+            "speech": 10,
+            "joint": 6
+          },
+          "ignore": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "evict": {
+            "n": 21,
+            "judged": 15,
+            "singleturn": 21,
+            "speech": 20,
+            "joint": 14
+          },
+          "restart": {
+            "n": 7,
+            "judged": 2,
+            "singleturn": 7,
+            "speech": 7,
+            "joint": 2
+          },
+          "absent": {
+            "n": 3,
+            "judged": 0,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 0
+          }
+        },
+        "turn_scores": [
+          {
+            "id": "m2-removed-clock-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-clock-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-clock-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-laptop-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-snack-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-snack-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-cup-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-a-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-a-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-b-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-b-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-region-c-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-teddy-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-teddy-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-teddy-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-teddy-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-laptop-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-laptop-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-laptop-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-phone-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-phone-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-phone-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-naming-phone-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-phone-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-naming-phone-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-phone-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-teddy-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-teddy-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-phone-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-phone-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-two-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-two-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-ignore-chair-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-ignore-chair-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-color-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": false,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-color-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-6",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-trip-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-6",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-7",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-talk-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-6",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-talk-7",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-talk-8",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-object-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-object-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-name-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-restart-name-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-restart-name-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-named-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-named-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          }
+        ],
+        "delivered_events": {},
+        "authority_records": 0,
+        "warm_first_synth": {
+          "n": 67,
+          "p50": 1.1293747425079346,
+          "p95": 1.8119670629501339
+        },
+        "warm_post_transcript_first_synth": {
+          "p50": 1.1293747425079346,
+          "p95": 1.8119670629501339
+        },
+        "warm_answer_synthesis_completion": {
+          "p50": 1.586470365524292,
+          "p95": 3.3391142368316644
+        },
+        "warm_estimated_synthesized_playback_end": {
+          "p50": 4.663098573684692,
+          "p95": 10.758286380767816
+        },
+        "loaded_min_mem_available_mib": 868.61328125,
+        "loaded_system_paging": {
+          "pswpin": 543,
+          "pswpout": 228093
+        },
+        "limits": [
+          "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+          "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+          "System paging is unattributed.",
+          "Instrumentation differs between baseline and candidate.",
+          "Code/model bytes require archived release bindings; local tree can differ.",
+          "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+        ]
+      },
+      "candidate": {
+        "receipt": "bench/results/2026-10-09-f1h-replay-m2-038099d89da2-1791556240878401554.jsonl",
+        "receipt_sha256": "8a964d283d6dab88abc3e372a83c8c85bf9c9c0b6859a9bc831a08ca30d5c9b1",
+        "raw_sha256": "b1d653524ce5a3897065443e38f1aa2b7b78316e80ae7e047b75ff8b78b6b173",
+        "all_turns_sha256": "6ca698104c6069bad0feff6ebdf5a57aeedc0207dfda800bf930b060498a4a76",
+        "release": "038099d89da2",
+        "implementation_hashes": {
+          "robot/main.py": "252eeeeb479f1e943800890c251fd9325a22065797df753a2b581dcf176fea59",
+          "robot/brain.py": "33f9f018653b3b028636dc592b8a17f0c1740d28167c70bfaaecc89cf8b7ff23",
+          "robot/memory.py": "9a5bba45708719361662a92d918229ff8b98f2270987783993b3cfae9bc68327",
+          "robot/text_embed.py": "001fed34ea2f0f127411ed7c20c954ca868027d18e2aac550778a0ca59dd0867",
+          "eval/replay.py": "bcd630867fd51fcd2717b6b427dc8ecb98e5bc121dd449b0853cae5356948b1f",
+          "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+          "ENV.txt": "c3993196e26f9b3aba37ae0f3247c3a9604beae6eceb367e50357a4b40cb8b75"
+        },
+        "model": "qwen3vl-2b",
+        "n": 74,
+        "cold_ids": [
+          "m2-removed-clock-1",
+          "m2-forget-phone-5",
+          "m2-ignore-chair-4",
+          "m2-restart-object-2",
+          "m2-restart-name-2",
+          "m2-restart-named-2",
+          "m2-absent-fresh-3"
+        ],
+        "scores": {
+          "n": 74,
+          "judged": 42,
+          "singleturn": 74,
+          "speech": 72,
+          "joint": 40
+        },
+        "sessions": {
+          "m2-removed-clock": {
+            "n": 3,
+            "judged": 3,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 3
+          },
+          "m2-removed-laptop": {
+            "n": 1,
+            "judged": 0,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 0
+          },
+          "m2-removed-snack": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-removed-cup": {
+            "n": 1,
+            "judged": 1,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 1
+          },
+          "m2-region-a": {
+            "n": 2,
+            "judged": 2,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 2
+          },
+          "m2-region-b": {
+            "n": 2,
+            "judged": 1,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 1
+          },
+          "m2-region-c": {
+            "n": 1,
+            "judged": 1,
+            "singleturn": 1,
+            "speech": 1,
+            "joint": 1
+          },
+          "m2-similar-teddy": {
+            "n": 4,
+            "judged": 1,
+            "singleturn": 4,
+            "speech": 4,
+            "joint": 1
+          },
+          "m2-similar-laptop": {
+            "n": 3,
+            "judged": 1,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 1
+          },
+          "m2-similar-phone": {
+            "n": 3,
+            "judged": 2,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 2
+          },
+          "m2-naming-phone": {
+            "n": 4,
+            "judged": 1,
+            "singleturn": 4,
+            "speech": 4,
+            "joint": 1
+          },
+          "m2-naming-teddy": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-forget-phone": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-forget-two": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-ignore-chair": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "m2-evict-color": {
+            "n": 6,
+            "judged": 5,
+            "singleturn": 6,
+            "speech": 5,
+            "joint": 4
+          },
+          "m2-evict-trip": {
+            "n": 7,
+            "judged": 6,
+            "singleturn": 7,
+            "speech": 6,
+            "joint": 5
+          },
+          "m2-evict-talk": {
+            "n": 8,
+            "judged": 7,
+            "singleturn": 8,
+            "speech": 8,
+            "joint": 7
+          },
+          "m2-restart-object": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-restart-name": {
+            "n": 3,
+            "judged": 2,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 2
+          },
+          "m2-restart-named": {
+            "n": 2,
+            "judged": 0,
+            "singleturn": 2,
+            "speech": 2,
+            "joint": 0
+          },
+          "m2-absent-fresh": {
+            "n": 3,
+            "judged": 0,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 0
+          }
+        },
+        "categories": {
+          "removed": {
+            "n": 7,
+            "judged": 4,
+            "singleturn": 7,
+            "speech": 7,
+            "joint": 4
+          },
+          "region": {
+            "n": 5,
+            "judged": 4,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 4
+          },
+          "similar": {
+            "n": 10,
+            "judged": 4,
+            "singleturn": 10,
+            "speech": 10,
+            "joint": 4
+          },
+          "naming": {
+            "n": 6,
+            "judged": 1,
+            "singleturn": 6,
+            "speech": 6,
+            "joint": 1
+          },
+          "forget": {
+            "n": 10,
+            "judged": 6,
+            "singleturn": 10,
+            "speech": 10,
+            "joint": 6
+          },
+          "ignore": {
+            "n": 5,
+            "judged": 3,
+            "singleturn": 5,
+            "speech": 5,
+            "joint": 3
+          },
+          "evict": {
+            "n": 21,
+            "judged": 18,
+            "singleturn": 21,
+            "speech": 19,
+            "joint": 16
+          },
+          "restart": {
+            "n": 7,
+            "judged": 2,
+            "singleturn": 7,
+            "speech": 7,
+            "joint": 2
+          },
+          "absent": {
+            "n": 3,
+            "judged": 0,
+            "singleturn": 3,
+            "speech": 3,
+            "joint": 0
+          }
+        },
+        "turn_scores": [
+          {
+            "id": "m2-removed-clock-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-clock-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-clock-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-removed-laptop-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-snack-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-snack-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-removed-cup-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-a-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-a-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-b-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-region-b-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-region-c-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-teddy-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-teddy-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-teddy-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-teddy-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-laptop-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-laptop-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-laptop-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-phone-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-similar-phone-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-similar-phone-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-naming-phone-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-phone-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-naming-phone-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-phone-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-teddy-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-naming-teddy-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-phone-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-phone-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-phone-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-two-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-forget-two-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-forget-two-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-ignore-chair-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-ignore-chair-4",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-ignore-chair-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-color-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": false,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-color-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-color-6",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-3",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": false,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-trip-5",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-trip-6",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-trip-7",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-evict-talk-4",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-5",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-6",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-7",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-evict-talk-8",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-restart-object-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-object-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-name-1",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-restart-name-2",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "m2-restart-name-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-named-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-restart-named-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-1",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-2",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "m2-absent-fresh-3",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          }
+        ],
+        "delivered_events": {
+          "observation": 11,
+          "utterance": 6
+        },
+        "authority_records": 249,
+        "warm_first_synth": {
+          "n": 67,
+          "p50": 1.1491918563842773,
+          "p95": 1.8321326732635497
+        },
+        "warm_post_transcript_first_synth": {
+          "p50": 1.1491918563842773,
+          "p95": 1.8321326732635497
+        },
+        "warm_answer_synthesis_completion": {
+          "p50": 1.796891212463379,
+          "p95": 3.408918642997741
+        },
+        "warm_estimated_synthesized_playback_end": {
+          "p50": 4.994567632675171,
+          "p95": 11.458471035957336
+        },
+        "loaded_min_mem_available_mib": 883.19140625,
+        "loaded_system_paging": {
+          "pswpin": 5758,
+          "pswpout": 246228
+        },
+        "limits": [
+          "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+          "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+          "System paging is unattributed.",
+          "Instrumentation differs between baseline and candidate.",
+          "Code/model bytes require archived release bindings; local tree can differ.",
+          "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+        ]
+      },
+      "paired_changes": {
+        "judged": {
+          "wins": [
+            "m2-similar-laptop-1",
+            "m2-evict-trip-4",
+            "m2-evict-talk-6",
+            "m2-evict-talk-7",
+            "m2-evict-talk-8"
+          ],
+          "losses": [
+            "m2-evict-trip-5"
+          ]
+        },
+        "joint": {
+          "wins": [
+            "m2-similar-laptop-1",
+            "m2-evict-talk-6",
+            "m2-evict-talk-7",
+            "m2-evict-talk-8"
+          ],
+          "losses": [
+            "m2-evict-trip-5"
+          ]
+        }
+      },
+      "changed_routes": [
+        {
+          "id": "m2-similar-teddy-3",
+          "baseline_verbatim": true,
+          "candidate_verbatim": false,
+          "candidate_observation_sources": [
+            1791556389248613,
+            1791556378378882
+          ],
+          "baseline_answer": "You showed me stuffed bear, 25 seconds ago.",
+          "candidate_answer": "You showed me the teddy bear that was there 15 seconds ago."
+        },
+        {
+          "id": "m2-restart-object-2",
+          "baseline_verbatim": true,
+          "candidate_verbatim": false,
+          "candidate_observation_sources": [],
+          "baseline_answer": "You showed me umbrella, 22 seconds ago.",
+          "candidate_answer": "I remember seeing a bottle, a chair, and an umbrella\u2014none of which are visible now."
+        }
+      ],
+      "candidate_code_receipt_matches": {
+        "robot/main.py": true,
+        "robot/brain.py": true,
+        "robot/memory.py": true,
+        "robot/text_embed.py": true,
+        "eval/replay.py": true,
+        "models.json": true
+      },
+      "raw_evidence": {
+        "baseline": "14/19",
+        "candidate": "14/19"
+      },
+      "detection_fps": {
+        "baseline": {
+          "median": 14.78374223383695,
+          "minimum": 10.4756946034352
+        },
+        "candidate": {
+          "median": 14.805675175323941,
+          "minimum": 12.96267428341139
+        }
+      },
+      "first_synth_p50_change_s": 0.019817113876342773,
+      "conclusion_scope": "Development oracle pair only. Instrumentation differs. No adoption, physical audible latency, or safety acceptance."
+    },
+    "visitor": {
+      "baseline": {
+        "receipt": "bench/results/2026-10-09-f1h-replay-visitor-cd60be65ee79-1791556933425286744.jsonl",
+        "receipt_sha256": "f021560502a61144f53c7f1b92905681ff75ba70a5d8386be2fcba4b5e0ebde4",
+        "raw_sha256": "d1dea0ef8f237543aa3b955837690a1c04a5625faa46df3badf1b8309b8ad6f0",
+        "all_turns_sha256": "b3897ad3a7e40603b4147679d18d4a7048bfb6131eddc556a30aff3cd32276f7",
+        "release": "cd60be65ee79",
+        "implementation_hashes": {
+          "robot/main.py": "0c208f60724803f518b9ae49fe49aaabebddf6ea41359ea2b381f65dc2cb187c",
+          "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+          "robot/memory.py": "0e2a2da0e91167e63da2acb276a921a7851f254906fd844012564dd59d731fc3",
+          "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+          "eval/replay.py": "2eb2d94718b8eb0e6b62d9e6d121610fdb1d6f1edc2530b6ddc497e98e41dea4",
+          "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+          "ENV.txt": "3f6106ec7d815e35438c564968a078931492656e2af38f15b6672107463687ef"
+        },
+        "model": "qwen3vl-2b",
+        "n": 21,
+        "cold_ids": [
+          "visitor-hello",
+          "visitor-restart-bag"
+        ],
+        "scores": {
+          "n": 21,
+          "judged": 16,
+          "singleturn": 21,
+          "speech": 21,
+          "joint": 16
+        },
+        "sessions": {
+          "visitor": {
+            "n": 21,
+            "judged": 16,
+            "singleturn": 21,
+            "speech": 21,
+            "joint": 16
+          }
+        },
+        "categories": {
+          "visitor": {
+            "n": 21,
+            "judged": 16,
+            "singleturn": 21,
+            "speech": 21,
+            "joint": 16
+          }
+        },
+        "turn_scores": [
+          {
+            "id": "visitor-hello",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-how",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-see",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-left",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-moved",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-before",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-gone",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-edge",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-server",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-store",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-rust",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-from",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-enroll",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-consent",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-stranger-know",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-stranger-name",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-return",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-forget",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-forgotten",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-restart-bag",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-restart-who",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          }
+        ],
+        "delivered_events": {},
+        "authority_records": 0,
+        "warm_first_synth": {
+          "n": 19,
+          "p50": 0.5717906951904297,
+          "p95": 1.1270123004913328
+        },
+        "warm_post_transcript_first_synth": {
+          "p50": 0.5717906951904297,
+          "p95": 1.1270123004913328
+        },
+        "warm_answer_synthesis_completion": {
+          "p50": 1.3709564208984375,
+          "p95": 2.5268674612045277
+        },
+        "warm_estimated_synthesized_playback_end": {
+          "p50": 3.9198293685913086,
+          "p95": 10.733579039573666
+        },
+        "loaded_min_mem_available_mib": 1086.22265625,
+        "loaded_system_paging": {
+          "pswpin": 7443,
+          "pswpout": 39055
+        },
+        "limits": [
+          "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+          "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+          "System paging is unattributed.",
+          "Instrumentation differs between baseline and candidate.",
+          "Code/model bytes require archived release bindings; local tree can differ.",
+          "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+        ]
+      },
+      "candidate": {
+        "receipt": "bench/results/2026-10-09-f1h-replay-visitor-038099d89da2-1791557150118981137.jsonl",
+        "receipt_sha256": "b94bfeedd34e67f9e79cc4b2ad33de18e0bd26878afba878b009e7a0d4480227",
+        "raw_sha256": "e30ec0adc338dc1893a41ef5d9efd92e6b628ae17e8b3593021dfd6520e2e612",
+        "all_turns_sha256": "a883890cf654ff7da12cd99348d9c3358fa3c94231b090b0d413b699eab0371a",
+        "release": "038099d89da2",
+        "implementation_hashes": {
+          "robot/main.py": "252eeeeb479f1e943800890c251fd9325a22065797df753a2b581dcf176fea59",
+          "robot/brain.py": "33f9f018653b3b028636dc592b8a17f0c1740d28167c70bfaaecc89cf8b7ff23",
+          "robot/memory.py": "9a5bba45708719361662a92d918229ff8b98f2270987783993b3cfae9bc68327",
+          "robot/text_embed.py": "001fed34ea2f0f127411ed7c20c954ca868027d18e2aac550778a0ca59dd0867",
+          "eval/replay.py": "bcd630867fd51fcd2717b6b427dc8ecb98e5bc121dd449b0853cae5356948b1f",
+          "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+          "ENV.txt": "c3993196e26f9b3aba37ae0f3247c3a9604beae6eceb367e50357a4b40cb8b75"
+        },
+        "model": "qwen3vl-2b",
+        "n": 21,
+        "cold_ids": [
+          "visitor-hello",
+          "visitor-restart-bag"
+        ],
+        "scores": {
+          "n": 21,
+          "judged": 16,
+          "singleturn": 21,
+          "speech": 21,
+          "joint": 16
+        },
+        "sessions": {
+          "visitor": {
+            "n": 21,
+            "judged": 16,
+            "singleturn": 21,
+            "speech": 21,
+            "joint": 16
+          }
+        },
+        "categories": {
+          "visitor": {
+            "n": 21,
+            "judged": 16,
+            "singleturn": 21,
+            "speech": 21,
+            "joint": 16
+          }
+        },
+        "turn_scores": [
+          {
+            "id": "visitor-hello",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-how",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-see",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-left",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-moved",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-before",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-gone",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-edge",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-server",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-store",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-rust",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-from",
+            "judged": false,
+            "singleturn": true,
+            "speech": true,
+            "joint": false
+          },
+          {
+            "id": "visitor-enroll",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-consent",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-stranger-know",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-stranger-name",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-return",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-forget",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-forgotten",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-restart-bag",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          },
+          {
+            "id": "visitor-restart-who",
+            "judged": true,
+            "singleturn": true,
+            "speech": true,
+            "joint": true
+          }
+        ],
+        "delivered_events": {
+          "utterance": 4
+        },
+        "authority_records": 75,
+        "warm_first_synth": {
+          "n": 19,
+          "p50": 0.5664446353912354,
+          "p95": 1.1498102903366088
+        },
+        "warm_post_transcript_first_synth": {
+          "p50": 0.5664446353912354,
+          "p95": 1.1498102903366088
+        },
+        "warm_answer_synthesis_completion": {
+          "p50": 1.3985121250152588,
+          "p95": 2.162417078018186
+        },
+        "warm_estimated_synthesized_playback_end": {
+          "p50": 3.882615804672241,
+          "p95": 10.742797875404355
+        },
+        "loaded_min_mem_available_mib": 1106.1640625,
+        "loaded_system_paging": {
+          "pswpin": 61,
+          "pswpout": 48366
+        },
+        "limits": [
+          "Oracle timestamps measure text-to-synthesized-audio; no speaker or physical audible measurement.",
+          "Estimated playback end uses first_audio plus WAV duration, not a measured playback end.",
+          "System paging is unattributed.",
+          "Instrumentation differs between baseline and candidate.",
+          "Code/model bytes require archived release bindings; local tree can differ.",
+          "Strict smoke, native-6, retained-volume costs, and safety gates remain pending."
+        ]
+      },
+      "paired_changes": {
+        "judged": {
+          "wins": [],
+          "losses": []
+        },
+        "joint": {
+          "wins": [],
+          "losses": []
+        }
+      },
+      "changed_routes": [],
+      "candidate_code_receipt_matches": {
+        "robot/main.py": true,
+        "robot/brain.py": true,
+        "robot/memory.py": true,
+        "robot/text_embed.py": true,
+        "eval/replay.py": true,
+        "models.json": true
+      },
+      "raw_evidence": {
+        "baseline": "3/4",
+        "candidate": "2/4"
+      },
+      "detection_fps": {
+        "baseline": {
+          "median": 14.790359746363105,
+          "minimum": 13.869406221469172
+        },
+        "candidate": {
+          "median": 14.705891221457685,
+          "minimum": 13.360783495499742
+        }
+      },
+      "first_synth_p50_change_s": -0.005346059799194336,
+      "conclusion_scope": "Development oracle pair only. Instrumentation differs. No adoption, physical audible latency, or safety acceptance."
+    }
+  },
+  "aggregate": {
+    "baseline": {
+      "scores": {
+        "n": 95,
+        "judged": 54,
+        "singleturn": 95,
+        "speech": 94,
+        "joint": 53
+      },
+      "warm": {
+        "first_synth": {
+          "n": 86,
+          "p50": 1.0222312211990356,
+          "p95": 1.7302632331848145
+        },
+        "synthesis_completion": {
+          "n": 86,
+          "p50": 1.4786062240600586,
+          "p95": 3.184219181537628
+        },
+        "estimated_playback_end": {
+          "n": 86,
+          "p50": 4.513080358505249,
+          "p95": 11.075744986534119
+        }
+      }
+    },
+    "candidate": {
+      "scores": {
+        "n": 95,
+        "judged": 58,
+        "singleturn": 95,
+        "speech": 93,
+        "joint": 56
+      },
+      "warm": {
+        "first_synth": {
+          "n": 86,
+          "p50": 1.0200202465057373,
+          "p95": 1.8058139085769653
+        },
+        "synthesis_completion": {
+          "n": 86,
+          "p50": 1.5313453674316406,
+          "p95": 3.2981473207473755
+        },
+        "estimated_playback_end": {
+          "n": 86,
+          "p50": 4.816875576972961,
+          "p95": 11.470465958118439
+        }
+      }
+    }
+  },
+  "fixed_visitor_outcomes": {
+    "baseline": {
+      "visitor-enroll": {
+        "answer": "May I remember your face, Lena? Please say yes or no.",
+        "identity": {
+          "face_px": 92,
+          "claimed": null,
+          "face_ms": 50.0,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-consent": {
+        "answer": "Thank you, Lena. I will remember your face.",
+        "identity": {
+          "face_px": 92,
+          "claimed": null,
+          "face_ms": 63.9,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-stranger-know": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 66,
+          "claimed": null,
+          "face_ms": 77.3,
+          "scores": [
+            [
+              "Lena",
+              0.181,
+              0.169
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-stranger-name": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 66,
+          "claimed": null,
+          "face_ms": 64.6,
+          "scores": [
+            [
+              "Lena",
+              0.181,
+              0.169
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-return": {
+        "answer": "You're Lena. I remember your face.",
+        "identity": {
+          "face_px": 58,
+          "claimed": "Lena",
+          "face_ms": 77.5,
+          "scores": [
+            [
+              "Lena",
+              0.772,
+              0.725
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-forget": {
+        "answer": "Done, Lena. I have forgotten your face.",
+        "identity": {
+          "face_px": 58,
+          "claimed": "Lena",
+          "face_ms": 58.1,
+          "scores": [
+            [
+              "Lena",
+              0.772,
+              0.725
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-forgotten": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 74,
+          "claimed": null,
+          "face_ms": 67.4,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-restart-who": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 75,
+          "claimed": null,
+          "face_ms": 56.8,
+          "scores": []
+        },
+        "judged": true
+      }
+    },
+    "candidate": {
+      "visitor-enroll": {
+        "answer": "May I remember your face, Lena? Please say yes or no.",
+        "identity": {
+          "face_px": 92,
+          "claimed": null,
+          "face_ms": 51.5,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-consent": {
+        "answer": "Thank you, Lena. I will remember your face.",
+        "identity": {
+          "face_px": 92,
+          "claimed": null,
+          "face_ms": 57.1,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-stranger-know": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 66,
+          "claimed": null,
+          "face_ms": 68.3,
+          "scores": [
+            [
+              "Lena",
+              0.181,
+              0.169
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-stranger-name": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 66,
+          "claimed": null,
+          "face_ms": 58.3,
+          "scores": [
+            [
+              "Lena",
+              0.181,
+              0.169
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-return": {
+        "answer": "You're Lena. I remember your face.",
+        "identity": {
+          "face_px": 58,
+          "claimed": "Lena",
+          "face_ms": 71.4,
+          "scores": [
+            [
+              "Lena",
+              0.772,
+              0.725
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-forget": {
+        "answer": "Done, Lena. I have forgotten your face.",
+        "identity": {
+          "face_px": 58,
+          "claimed": "Lena",
+          "face_ms": 64.7,
+          "scores": [
+            [
+              "Lena",
+              0.772,
+              0.725
+            ]
+          ]
+        },
+        "judged": true
+      },
+      "visitor-forgotten": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 74,
+          "claimed": null,
+          "face_ms": 60.2,
+          "scores": []
+        },
+        "judged": true
+      },
+      "visitor-restart-who": {
+        "answer": "I don't think we've met yet. What's your name?",
+        "identity": {
+          "face_px": 75,
+          "claimed": null,
+          "face_ms": 54.6,
+          "scores": []
+        },
+        "judged": true
+      }
+    }
+  },
+  "prototype_selection": {
+    "aggregate_judged_gain": true,
+    "no_category_judged_loss": true,
+    "warm_first_synth_p50_change_s": -0.00221097469329834,
+    "warm_p50_regression_within_0_2s": true,
+    "qualification_scope": "Frozen development oracle pair only; no adoption. Recorded audio, strict smoke/native lifecycle, volume, and remaining safety gates are pending.",
+    "deletion_scope": "Post-delete and post-restart recognition scores are empty; independent disk-level deletion is not established by these logs.",
+    "passes_frozen_95_turn_criterion": true
+  }
+}

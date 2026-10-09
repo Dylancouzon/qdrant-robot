@@ -1,0 +1,82 @@
+[0;93m2026-10-09 10:45:50.416743803 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"[m
+[0;93m2026-10-09 10:45:51.510749480 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:45:51.510822340 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@1.229] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:45:52.606944992 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:45:52.607028535 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:45:58.373413681 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:45:58.374351787 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:45:58.403822759 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:45:58.403899236 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:45:59.078509634 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.082419354 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.086384602 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.090936948 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.098836704 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.099180136 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:45:59.099233872 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:46:04] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+ok  0.62s visitor-hello: [Hello there! I came here from Berlin this morning.] Hello! It's great to meet you from Berlin—what an exciting place!
+ok  0.94s visitor-how: [How are you doing today?] I'm doing great, thanks for asking!
+ok  0.78s visitor-see: [What do you see?] I see a black office chair with mesh backrests in the foreground.
+ok  1.04s visitor-left: [Tell me what's on your left.] I see a colorful striped umbrella resting on an office chair to the left, and behind it is a white door with a gold doorknob.
+ok  0.35s visitor-moved: [I moved the umbrella. Where is it now?] I see an umbrella on my right now.
+BAD 0.68s visitor-before -EV: [And where was it before?] I don't remember.
+BAD 0.31s visitor-gone -EV: [I took one thing away. What is missing?] I saw an umbrella on my right, 3 seconds ago. I see an umbrella in the center now; I cannot tell if it is the same one. I saw a keyboard on my right, 28 seconds ago; I do not see it now.
+ok  0.50s visitor-edge: [So what is Qdrant Edge?] Qdrant Edge is the embedded version of Qdrant. It runs inside the application's own process, with no server. Think of it as SQLite, but for vector search.
+ok  0.40s visitor-server: [Does Qdrant Edge need a server to run?] Qdrant Edge needs no server: it runs inside the application's own process. A Qdrant server is optional, and Edge can restore its snapshots and stay in sync with it.
+ok  0.79s visitor-store: [And where do you store your memories?] I store my memories in the file system of my own machine—on my disk.
+ok  0.37s visitor-rust: [What language is Qdrant written in?] Qdrant is written in Rust, which keeps it fast and memory-safe under heavy load.
+ok  0.77s visitor-from +ev: [By the way, do you remember where I came from?] I don't remember. You said you came from Berlin, but that's not in my memories now.
+ok  0.57s visitor-enroll: [Can you remember my face? I'm Lena.] May I remember your face, Lena? Please say yes or no.
+ok  0.43s visitor-consent: [Yes, you may.] Thank you, Lena. I will remember your face.
+ok  1.18s visitor-stranger-know: [Hi! Do you know me?] I don't think we've met yet. What's your name?
+ok  0.44s visitor-stranger-name: [What's my name?] I don't think we've met yet. What's your name?
+ok  1.15s visitor-return: [I'm back! Do you remember me?] You're Lena. I remember your face.
+ok  0.52s visitor-forget: [Please forget me.] Done, Lena. I have forgotten your face.
+ok  0.47s visitor-forgotten: [Do you remember me?] I don't think we've met yet. What's your name?
+[0;93m2026-10-09 10:48:54.266478652 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:48:54.266566610 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@183.907] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 10:48:55.227074714 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:48:55.227146162 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:49:00.777880910 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:49:00.778944698 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 10:49:00.810425838 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 10:49:00.810491014 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 10:49:01.494658161 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.499154312 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.503801102 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.507961417 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.515732635 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.516145519 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 10:49:01.516206472 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-10:49:06] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+restart: closed in 1.2s, started in 13.4s
+ok  0.47s visitor-restart-bag +ev: [Where was the red bag before you restarted?] I saw a bag on my left, 71 seconds ago; I do not see it now.
+ok  0.57s visitor-restart-who: [Do you know who I am?] I don't think we've met yet. What's your name?
+{
+ "summary": "replay",
+ "model": "qwen3vl-2b",
+ "oracle": true,
+ "audio": "audio",
+ "cases": "eval/dev/visitor.jsonl",
+ "tegrastats": "f1h-visitor-candidate-a-20261009-102853.tegrastats",
+ "machine": "qdrant-robot",
+ "release": "038099d89da2",
+ "n": 21,
+ "n_expected": 21,
+ "score_type": "keyword_and_split; answer correctness is in .judged.jsonl",
+ "correct": 19,
+ "split": 0,
+ "evidence": "2/4",
+ "first_audio_p50_s": 0.5664446353912354,
+ "first_audio_max_s": 1.1839492321014404,
+ "asr_p50_s": null,
+ "first_token_p50_s": 0.21501564979553223,
+ "first_phrase_p50_s": 0.2634396553039551,
+ "detect_fps_p50": 14.705891221457685,
+ "detect_fps_min": 13.360783495499742,
+ "audio_dir": "/home/qdrant/qdrant-robot/shared/sessions/replay-1791557150",
+ "note": "oracle: latencies start when the text is submitted (text to audio)"
+}
