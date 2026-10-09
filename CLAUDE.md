@@ -81,8 +81,8 @@ D14's starting architecture was superseded by the decisions below. Improve or re
 - A design brief names at least two real alternatives and how each would be measured. A brief with one option gets RETHINK.
 - Decisions preserve evidence and tradeoffs; challenge them when a concrete intervention or disputed assumption could raise capabilities. Before reopening an approach, read its prior lessons and results, name what changes, and define a paired comparison (D76, D77). An unchanged sweep adds no decision evidence.
 - Use a cheap local check or recorded-prompt comparison first. Run the full integrated replay once after a material change; keep acceptance measurements on the Jetson.
-- A choice that moves a target is settled by a time-boxed bake-off: prototype the candidates on `spike/*` branches, measure them on the Jetson, merge the winner, record the loser in `DECISIONS.md`.
-- Drop an approach after 90 minutes with no new evidence. After two failed approaches to one problem, run Astra counsel before a third.
+- Settle a choice through a paired comparison. Prototype candidates on `spike/*` branches, measure them on the Jetson, and record both outcomes in `DECISIONS.md`.
+- D83 removes execution deadlines. Continue useful work as long as needed; reassess routes at progress checkpoints and stop on evidence or resource constraints. After two failed approaches to one problem, run Astra counsel before a third.
 
 ## Roles
 
@@ -91,8 +91,8 @@ D14's starting architecture was superseded by the decisions below. Improve or re
 | Lead | The main session | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
 | Researcher | `gpt-6-luna` (D76) | One question needed for the next decision. Never edits code. Two at most at once |
 | Builder | User-selected model, otherwise Opus | One scoped task from a written brief. One builder at a time, except D44's explicit disjoint-work case |
-| Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per architectural decision (model, runtime, process layout, data schema, new module), before building it. Not for reversible small steps |
-| Task review | Codex `gpt-6-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
+| Design gate | Codex `gpt-6.1-sol`, `tools/gate.py design` | Once per architectural decision (model, runtime, process layout, data schema, new module), before building it. Not for reversible small steps |
+| Task review | Codex `gpt-6.1-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
 | Milestone review | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone |
 | Counsel | Codex `gpt-6-astra`, `tools/gate.py design --model gpt-6-astra` | After two failed approaches to the same problem, or an architecture-level doubt |
 
@@ -104,9 +104,9 @@ Brief a builder with: the task ID, the linked decisions, allowed paths, interfac
 
 `tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
 
-- **Design gate** asks: Which measured capability gap does this close? Does it raise the ceiling on this Jetson? What would a strong edge-ML engineer do instead? What is the simplest useful version? What can be deleted?
-- **Review gate** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job.
-- **Milestone gate** judges the milestone's own acceptance criteria, lists unproven final targets separately, and gives counsel on direction.
+- **[Design gate](gates/design.md)** asks: Which measured capability gap does this close? Does it raise the ceiling on this Jetson? What would a strong edge-ML engineer do instead? What is the simplest useful version? What can be deleted?
+- **[Review gate](gates/review.md)** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job. Rules 6–8 cover overfitting, proportion, scope, and carrying optional edge cases.
+- **[Milestone gate](gates/milestone.md)** judges the milestone's own acceptance criteria, lists unproven final targets separately, and checks architectural drift and over-engineering.
 
 ### Safety net (light by design)
 
@@ -168,7 +168,7 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 - On OOM or throttling: keep the kernel log and `tegrastats`, then reduce concurrency or memory before retrying.
 - On low disk: stop downloads and builds; delete only reproducible caches. Never delete memories, backups, or benchmark evidence.
 - Lost SSH: retry with backoff for 15 minutes, keep doing Mac-side work, then record the blocker and ask Dylan.
-- Before long work, record its timeout, disk estimate, and progress signal. Drop an approach after 90 minutes with no new evidence. Retry an infrastructure failure once, after diagnosis.
+- Before long work, record its disk estimate, progress signal, and recovery procedure for a stalled process. Operational watchdogs protect individual commands; they do not set a session or experiment deadline (D83). Retry an infrastructure failure once, after diagnosis.
 
 ## Launch checklist (each autonomous session)
 

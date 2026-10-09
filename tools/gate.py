@@ -24,7 +24,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MODEL = {"design": "gpt-6-sol", "review": "gpt-6-sol", "milestone": "gpt-6-astra"}
+MODEL = {"design": "gpt-6.1-sol", "review": "gpt-6.1-sol", "milestone": "gpt-6-astra"}
 PASSING = {"design": "GO", "review": "PASS", "milestone": "MILESTONE MET"}
 TIMEOUT_S = 900
 CHECK_TIMEOUT_S = 120

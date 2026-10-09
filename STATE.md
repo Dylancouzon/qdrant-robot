@@ -1,16 +1,16 @@
 # State
 
-Last updated: 2026-10-09 02:05 EDT, by the lead. Rewrite, do not append.
+Last updated: 2026-10-09, by the lead. Rewrite, do not append.
 
 ## Active task
 
-P1 planning is complete (D82). Implementation starts in the next autonomous session at F0 in research/capability-plan.md. Read D79 through D82 and research/lessons.md first. Raise the capability ceiling for sustained conversation, perception, and recall on 8 GB, with Qdrant Edge central. All deployed inference stays on the Jetson.
+P1 handoff correction is complete (D83): execution deadlines removed and gate references verified. Implementation starts next session at F0 in research/capability-plan.md. Read D79 through D83 and research/lessons.md first. Raise the capability ceiling for sustained conversation, perception, and recall on 8 GB, with Qdrant Edge central. All deployed inference stays on the Jetson.
 
-Dylan makes Jetson, WSL 3080, and Mac available for the next few hours. Sol is reviewer (explicit `--model gpt-6.1-sol`); Sol 6.1 low agents are fresh implementation workers; Luna does research. Use WSL wherever it accelerates work. Saved and independent real video supports nighttime comparisons. Physical camera/audio/echo checks remain separate. Measured OS changes on dedicated robot hardware are authorized with SSH and rollback preserved.
+Dylan makes Jetson, WSL 3080, and Mac available for ongoing work without a preset deadline (D83). Sol is reviewer (explicit `--model gpt-6.1-sol`); Sol 6.1 low agents are fresh implementation workers; Luna does research. Use WSL wherever it accelerates work. Saved and independent real video supports nighttime comparisons. Physical camera/audio/echo checks remain separate. Measured OS changes on dedicated robot hardware are authorized with SSH and rollback preserved.
 
-P1 review: Astra counsel GO WITH CHANGES resolved; Sol 6.1 PASS in reviews/20261009-015822-12641-review.md. The receipt names the exact plan SHA256. No model, runtime, OS, fixture, or raw benchmark changes occurred. Planning files: research/capability-plan.md, research/lessons.md, STATE.md, DECISIONS.md, and the two reviews. H1 baseline: fcfd32a.
+Initial P1 review: Astra counsel GO WITH CHANGES resolved; Sol 6.1 PASS in reviews/20261009-015822-12641-review.md for the earlier plan SHA256. D83 changes CLAUDE.md, research/capability-plan.md, research/lessons.md, tools/gate.py model defaults, STATE.md, and DECISIONS.md. Gate criteria, runtime, models, OS, fixtures, and raw evidence remain unchanged. Sol 6.1 PASS: reviews/20261009-021318-31433-review.md, with corrected plan SHA256 e391f13e88a7823102e91b2ec48a44188f669d8277ed3061a956b1b257f33ed7.
 
-Current options are hypotheses, not locked choices. Reassess after the first paired result and at least hourly (D81). Record exact evidence, decision, and reopening condition for each route. Preserve at least 75 minutes for final evaluation; drop unfinished optional branches before using that time.
+Current options are hypotheses, not locked choices. Reassess after the first paired result and at least hourly (D81). Record exact evidence, decision, and reopening condition for each route. Complete validation before adoption. Continue healthy work as long as needed; choose or stop routes by evidence, prerequisites, and resources.
 
 | Route | Current status and selection condition |
 | --- | --- |
@@ -26,16 +26,16 @@ Still unresolved: D75's M2 gain from 39 to 44/74 is development-only until its u
 
 First evaluator brief: current FileCamera reads still images, so qualify paced video input before using external footage. Encode the 30-minute challenge in one continuous runtime instance; test restarts separately. Keep source groups and final answers out of training. Prior Objectron exclusions and the COCO manifest gap are in the plan.
 
-Running jobs: none from P1; all researchers and reviews finished. Final read-only check at 06:05 UTC found Jetson release 4387936b8ee9, no robot/benchmark jobs, and the WSL GPU idle with no model loaded. WSL Docker daemon works; GPU-container passthrough is untested. Recheck jobs, release, ownership, and access before execution. H1's native pytest shutdown failure remains unresolved.
+Running jobs: none from this correction; Sol review finished with PASS. Local checks passed in 14.82 s. No remote work from this correction. Initial P1 researchers and reviews finished. Final read-only check at 06:05 UTC found Jetson release 4387936b8ee9, no robot/benchmark jobs, and the WSL GPU idle with no model loaded. WSL Docker daemon works; GPU-container passthrough is untested. Recheck jobs, release, ownership, and access before execution. H1's native pytest shutdown failure remains unresolved.
 
-Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then F0's source contract, evaluator brief, and bounded training/export preflight. Do not repeat the broad brain/prompt sweep without a changed hypothesis. This session ends after committing the reviewed planning records.
+Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then F0's source contract, evaluator brief, and small training/export preflight. Do not repeat the broad brain/prompt sweep without a changed hypothesis. The next session implements; this session only prepares and commits the reviewed handoff.
 
 ## Where to read first
 
-- research/capability-plan.md: the next autonomous session, priorities, source exclusions, worker roles, and stopping rules (D79, D80).
+- research/capability-plan.md: the next autonomous session, priorities, source exclusions, worker roles, required gates, and evidence-based stopping rules (D79, D80, D83).
 - research/lessons.md: every avenue explored and every pitfall, with decision links (CLAUDE.md rule: keep it current). Read it after this file.
 - DECISIONS.md D35 to D75 (today's work); research/v1-plan.md (the adopted v1 plan); research/booth-ux.md (focus, screen, turn-taking); research/assistant-design.md; research/grounding.md (brain bake-off); research/edge-cases.md (logged, not fixed); research/faces.md, research/m2-design.md, research/m3-design.md, research/wakeword.md, research/sight.md, research/endpointing.md; research/one-voice.patch (retrieval-into-brain variant, not applied).
-- gates/review.md rules 6 (overfitting), 7 (proportion), 8 (v1: log edge cases).
+- [Design gate](gates/design.md) checks alternatives and over-engineering. [Task review](gates/review.md) rules 6–8 cover overfitting, proportion, and edge cases. [Milestone gate](gates/milestone.md) checks acceptance and architectural drift. Explicit commands are in the plan.
 
 ## Robot access
 
@@ -63,7 +63,7 @@ Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, th
 
 ## Git
 
-Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting P1 at fcfd32a. V1-E and H1 are merged and pushed. Commit only the reviewed planning documents and lead records in this session.
+Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting this correction at f6dce4f. V1-E, H1, and initial P1 are pushed. Commit only reviewed handoff guidance, matching gate model defaults, lead records, and the new review.
 
 ## Checkpoints
 
