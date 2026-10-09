@@ -1,0 +1,60 @@
+import json,hashlib,subprocess,time
+from pathlib import Path
+import sys
+sys.path.insert(0,str(Path.cwd()))
+import numpy as np
+from eval.score_continuous import inputs
+
+def h(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+p=Path('bench/results/2026-10-09-continuous-baseline-a.jsonl')
+cases=Path('eval/challenge-20261009/visits.jsonl');rubrics=cases.with_name('rubrics.jsonl')
+steps,utterances,rules,footer=inputs(p,cases,rubrics)
+rows=[json.loads(l) for l in p.read_text().splitlines()]
+for folder,key in [('eval/challenge-20261009','fixture_files'),('eval/challenge-audio-20261009','files')]:
+ root=Path(folder);f=json.loads((root/'freeze.json').read_text())
+ for name,meta in f[key].items():
+  path=root/name;assert path.stat().st_size==meta['bytes'] and h(path)==meta['sha256'],name
+oracle=Path('bench/results/2026-10-09-fixture-decode-1791535339564674223.jsonl')
+source_rows={r['file']:r for r in map(json.loads,oracle.read_text().splitlines()) if r.get('type')=='source'}
+visits=[json.loads(l) for l in cases.read_text().splitlines()];sources={st['source_id']:st['show'] for v in visits for st in v['steps'] if 'show' in st}
+probes=[r for r in rows if r.get('type')=='source_probe'];assert len(probes)==12
+for source,file in sources.items():
+ found=[r for r in probes if r['source_id']==source];assert [r['kind'] for r in found]==['switch','final_hold']
+ assert found[0]['sha256']==source_rows[file]['decoded_bgr_sha256'][0]
+ assert found[1]['sha256']==source_rows[file]['decoded_bgr_sha256'][-1]
+audio=[r for r in rows if r.get('type')=='audio'];events=[r for r in rows if r.get('type')=='event'];turns=[r for r in rows if r.get('type')=='turn'];progress=[r for r in rows if r.get('type')=='progress']
+assert sum(r['samples'] for r in audio)==footer['samples']==28800000
+assert len(audio)==footer['chunks'] and [r['chunk'] for r in audio]==list(range(1,len(audio)+1))
+assert len(utterances)==63 and sum(not r['ok'] for r in utterances.values())==footer['failed_steps']
+assert all(all(r['required_threads'].values()) for r in progress)
+assert max(r['lateness_s'] for r in audio+events)<=rows[0]['lateness_s']
+stat=lambda values:{'n':len(values),**{name:float(np.percentile(values,q)) for name,q in [('p50',50),('p95',95),('p99',99)]},'min':float(min(values)),'max':float(max(values))} if values else None
+anchor=next(r['wall'] for r in rows if r.get('type')=='anchor')
+windows=sorted((r['speech_start']-anchor,max(r['done'],r['first_audio']+r['audio_s'])-anchor) for r in turns)
+merged=[]
+for a,b in windows:
+ if merged and a<=merged[-1][1]:merged[-1][1]=max(merged[-1][1],b)
+ else:merged.append([a,b])
+paging={key:{'pswpin':0,'pswpout':0,'intervals':0} for key in ['fully_active','boundary_overlap','idle']}
+for prev,row in zip(progress,progress[1:]):
+ a,b=prev['elapsed_s'],row['elapsed_s']
+ key='fully_active' if any(x<=a and b<=y for x,y in merged) else 'boundary_overlap' if any(x<b and a<y for x,y in merged) else 'idle'
+ paging[key]['intervals']+=1
+ for counter in ['pswpin','pswpout']:
+  delta=row['resources'][counter]-prev['resources'][counter];assert delta>=0;paging[key][counter]+=delta
+startup=next(r for r in rows if r.get('type')=='startup')
+record={'type':'baseline_audit','completed':True,'result':p.name,'result_sha256':h(p),'release':rows[0]['release'],'model':rows[0]['model'],'expected':rows[0]['expected'],'worker_exit':footer['worker_exit'],'duration_s':footer['elapsed_s'],'samples':footer['samples'],'chunks':len(audio),'utterances':len(utterances),'turns':len(turns),'events':len(events),'source_probes_matches':12,'decoder_oracle_sha256':h(oracle),'original_freeze_sha256':h(cases.with_name('freeze.json')),'audio_freeze_sha256':h(Path('eval/challenge-audio-20261009/freeze.json')),'structural_failures':[{k:r[k] for k in ['id','category','scored','split','failure']} for r in utterances.values() if not r['ok']],'startup_s':startup['elapsed_s'],'chunk_lateness_s':stat([r['lateness_s'] for r in audio]),'event_lateness_s':stat([r['lateness_s'] for r in events]),'first_synthesized_audio_from_recorded_speech_end_s':stat([r['first_audio']-r['speech_end'] for r in turns if r['first_audio']]),'turn_detect_fps':stat([r['detect_fps'] for r in turns]),'minimum_schedule_mem_available_mib':min(r['resources']['mem_available_kb'] for r in progress)/1024,'allocated_swap_mib_range':[min(r['resources']['allocated_swap_kb'] for r in progress)/1024,max(r['resources']['allocated_swap_kb'] for r in progress)/1024],'system_paging_intervals':paging,'system_schedule_paging':{key:progress[-1]['resources'][key]-progress[0]['resources'][key] for key in ['pswpin','pswpout']},'paging_interval_definition':'Consecutive progress timestamps. Fully active lies within merged speech-start through max(done, synthesized-first-audio plus audio-duration) windows; boundary overlaps partially; idle does not overlap. System counters do not attribute paging to runtime.','percentile_method':'numpy linear','physical_audible_latency_measured':False,'prompt_tokens_available':False,'scoring_completed':False,'command':['.venv/bin/python','build/overnight/audit-baseline.py'],'analysis_script_sha256':h(Path(__file__))}
+record['maximum_sampled_runtime_swap_kb']=max(m['swap_kb'] for r in progress for m in r['resources']['processes'].values())
+record['process_major_fault_delta_by_pid']={pid:progress[-1]['resources']['processes'].get(pid,{}).get('major_faults',0)-data['major_faults'] for pid,data in progress[0]['resources']['processes'].items()}
+r=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','robot','journalctl -u qr-f0f-baseline-a.service -o json --no-pager'],capture_output=True,text=True,check=True,timeout=45)
+journal=[json.loads(l) for l in r.stdout.splitlines()]
+exits=[r for r in journal if r.get('EXIT_STATUS') is not None]
+record['unit_exit_records']=[{k:r.get(k) for k in ['EXIT_STATUS','EXIT_CODE','CODE_FUNC','MESSAGE','__REALTIME_TIMESTAMP']} for r in exits]
+record['unit_outcome']=[r['MESSAGE'] for r in journal if r.get('CODE_FUNC')=='unit_log_success' or 'Failed with result' in r.get('MESSAGE','')]
+record['unit_start_utc_us']=journal[0]['__REALTIME_TIMESTAMP']
+record['unit_last_utc_us']=journal[-1]['__REALTIME_TIMESTAMP']
+record['unit']='qr-f0f-baseline-a.service'
+record['runtime_exit_interpretation']='Completed worker exits zero; supervisor/unit exits one when recorded structural steps fail. This is completed measurement with failures, not a passing benchmark.'
+record['analysis_script_sha256']=h(Path(__file__))
+Path('bench/results/2026-10-09-f0f-operations.jsonl').write_text(json.dumps(record)+'\n')
+print(json.dumps(record,indent=2))

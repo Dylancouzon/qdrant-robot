@@ -2323,3 +2323,47 @@
 {"key": "6f247e245380b857", "pass": false, "why": "Does not identify the missing handbag.", "votes": [false, false, false]}
 {"key": "e407510bc37978b7", "pass": false, "why": "Does not identify the missing handbag.", "votes": [false, false, false]}
 {"key": "fd37d485b66f5b2b", "pass": true, "why": "States that the visitor came from Berlin.", "votes": [true, true, true]}
+{"key": "c5dabca88b11c9ff", "pass": true, "why": "Correctly identifies the red cover.", "votes": [true, true, true]}
+{"key": "8a1bedef3a302c9d", "pass": false, "why": "Adds an unsupported crane identity and cultural meaning.", "votes": [false, false, true]}
+{"key": "007df08acdb57671", "pass": true, "why": "Suggests reading or listening to music indoors.", "votes": [true, true, true]}
+{"key": "6d42ee0aad13dd52", "pass": false, "why": "Calls the cream bottle body white.", "votes": [false, true, false]}
+{"key": "9841d1382956c683", "pass": false, "why": "Calls the dark burgundy top white.", "votes": [false, false, false]}
+{"key": "0b5465e1d10301c2", "pass": false, "why": "Does not recall the title Little Bets.", "votes": [false, false, false]}
+{"key": "5f06c32c09273cc6", "pass": false, "why": "Does not say the purchase price is unknown.", "votes": [false, false, false]}
+{"key": "8071c2ae7911f40d", "pass": false, "why": "Does not identify the shell.", "votes": [false, false, false]}
+{"key": "eb4329855efb0d33", "pass": false, "why": "Does not give Thursday.", "votes": [false, false, false]}
+{"key": "91bf112dc69bc3c1", "pass": false, "why": "Does not answer whether ownership is known.", "votes": [false, false, false]}
+{"key": "e4e4f4b238bc5d46", "pass": false, "why": "Does not recall the black-and-white fabric.", "votes": [false, false, false]}
+{"key": "ec9c88017137d748", "pass": false, "why": "Does not say Noor travels by ferry.", "votes": [false, false, false]}
+{"key": "e181e07d22904db9", "pass": false, "why": "Does not give the revised start time of six.", "votes": [false, false, false]}
+{"key": "ae060499304091ae", "pass": false, "why": "Does not identify the pier.", "votes": [false, false, false]}
+{"key": "488daa85e4a30704", "pass": false, "why": "Does not recall the book.", "votes": [false, false, false]}
+{"key": "826f1e8b4a1bf80c", "pass": true, "why": "Correctly identifies the purple cover.", "votes": [true, true, true]}
+{"key": "097b6680f64ed9b0", "pass": false, "why": "Lettering is gold or yellow, not white.", "votes": [false, false, false]}
+{"key": "3482af5ead255ac8", "pass": true, "why": "Suggests simple relaxation activities without inventing history.", "votes": [true, true, true]}
+{"key": "9fa5a4937b6accb1", "pass": false, "why": "Does not answer that the bottle body is dark.", "votes": [false, false, false]}
+{"key": "c3aeaece866f0652", "pass": true, "why": "Correctly describes the red top covering.", "votes": [false, true, true]}
+{"key": "30702143afcc80a0", "pass": false, "why": "Does not recall A Taste of Sin.", "votes": [false, false, false]}
+{"key": "d56eb128cf92eb9a", "pass": false, "why": "Claims no memory of the book instead of addressing price.", "votes": [false, false, false]}
+{"key": "bc3a5371670c0d25", "pass": false, "why": "Does not give Saturday.", "votes": [false, false, false]}
+{"key": "d2f240afd9cb6604", "pass": false, "why": "Does not answer whether ownership is known.", "votes": [false, false, false]}
+{"key": "c94205559a65ad39", "pass": false, "why": "Does not recall the floral fabric.", "votes": [false, false, false]}
+{"key": "86ebc8a130509049", "pass": false, "why": "Does not say Soren uses a tram.", "votes": [false, false, false]}
+{"key": "537c97229e0a670e", "pass": false, "why": "Does not give the revised opening hour of eleven.", "votes": [false, false, false]}
+{"key": "e9cfef6579bbbcb1", "pass": false, "why": "Does not identify the meadow.", "votes": [false, false, false]}
+{"key": "af4cdfc8849d6c5a", "pass": false, "why": "Does not recall the book.", "votes": [false, false, false]}
+{"key": "0ccd812205c39f40", "pass": true, "why": "Correctly identifies blue and red.", "votes": [true, true, true]}
+{"key": "3067cf2acc4778e8", "pass": true, "why": "Correctly identifies the white page block.", "votes": [true, true, true]}
+{"key": "abe07409cfb96797", "pass": true, "why": "Suggests an easy sketch without inventing history.", "votes": [true, true, true]}
+{"key": "160c6b21a5846248", "pass": false, "why": "Does not encourage learning to draw and implies a false memory.", "votes": [false, false, false]}
+{"key": "d0208434c582efb5", "pass": true, "why": "Correctly describes the visible amber color.", "votes": [true, true, true]}
+{"key": "307dc85c1f529f80", "pass": false, "why": "Omits the prominent gold or yellow label color.", "votes": [false, false, false]}
+{"key": "da2271677dad0609", "pass": false, "why": "Does not recall Longman.", "votes": [false, false, false]}
+{"key": "8b22248ca7e9ff0f", "pass": false, "why": "Does not address price and claims unrelated sightings.", "votes": [false, false, false]}
+{"key": "3804517ef725d41e", "pass": false, "why": "Does not give Friday.", "votes": [false, false, false]}
+{"key": "972483103f354b29", "pass": true, "why": "Correctly says ownership cannot be determined.", "votes": [true, true, true]}
+{"key": "b98722dfdc0610f3", "pass": false, "why": "Does not recall the tiled floor.", "votes": [false, false, false]}
+{"key": "8790e8f8ed70ea3f", "pass": false, "why": "Does not say Inez travels by bicycle.", "votes": [false, false, false]}
+{"key": "e5f2cd50ce632f65", "pass": false, "why": "Does not give the revised start hour of eight.", "votes": [false, false, false]}
+{"key": "064be763e97d7504", "pass": false, "why": "Does not identify the courtyard.", "votes": [false, false, false]}
+{"key": "5ce59f03bb1c5dc8", "pass": false, "why": "Does not recall the book.", "votes": [false, false, false]}
