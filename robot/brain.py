@@ -214,6 +214,44 @@ class Brain:
                 "prompt_token_bound": count + images * IMAGE_TOKENS,
                 "output_token_reserve": MAX_TOKENS, "context_tokens": CONTEXT_TOKENS}
 
+    def context(self, history: list[dict], now: dict | None, events: list[dict] = (),
+                sightings: list[tuple[float, str]] = (), facts: list[str] = (),
+                question: str | None = None, changed: bool = False,
+                past: bool = False, before: float = 0.0) -> tuple[list[dict], list[dict], dict]:
+        """Fit source spans first, then complete history turns, inside the rendered bound."""
+        started = time.perf_counter()
+        kept, history = list(events), list(history)
+        dropped, removed, attempts, budget_s = [], 0, 0, 0.0
+        while True:
+            observations, told = list(sightings), []
+            for event in kept:
+                line = f"{age(before - event['capture_ts'])}: {event['text']}"
+                if event["kind"] == "observation":
+                    observations.append((event["capture_ts"], line))
+                else:
+                    told.append(line)
+            msgs = messages(history, now, [line for _, line in sorted(observations)], facts,
+                            question, changed, past, told)
+            measured = time.perf_counter()
+            budget = self.budget(msgs)
+            budget_s += time.perf_counter() - measured
+            attempts += 1
+            if budget["prompt_token_bound"] + budget["output_token_reserve"] <= CONTEXT_TOKENS:
+                return msgs, kept, {**budget, "dropped_events": dropped,
+                                    "history_turns_removed": removed, "budget_calls": 2 * attempts,
+                                    "budget_s": budget_s,
+                                    "context_s": time.perf_counter() - started}
+            if kept:
+                dropped.append(kept.pop())
+            elif history:
+                # A changed scene keeps user messages only; each is still one history turn.
+                stop = next((i for i in range(1, len(history))
+                             if history[i]["role"] == "user"), len(history))
+                history = history[stop:]
+                removed += 1
+            else:
+                raise ValueError("Current question, image, and fixed facts exceed context")
+
     def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
                ) -> Iterator[str]:
         """Stream the answer text, at most MAX_SENTENCES sentences and `max_tokens` tokens.

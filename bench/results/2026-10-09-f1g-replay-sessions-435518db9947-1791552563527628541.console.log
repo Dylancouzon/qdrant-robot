@@ -1,0 +1,90 @@
+[0;93m2026-10-09 09:29:23.877505524 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"[m
+[0;93m2026-10-09 09:29:26.342363445 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:29:26.342439960 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@2.482] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 09:29:27.297114057 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:29:27.297206701 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 09:29:33.007529897 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 09:29:33.008480492 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 09:29:33.038813516 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:29:33.038889167 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 09:29:33.754887220 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.758819845 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.763439120 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.768571021 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.776454736 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.776877088 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:29:33.776941346 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-09:29:41] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+ok  1.36s recall-stop-1: [What am I holding up?] You're holding up a stop sign.
+ok  1.06s recall-stop-2 +ev: [What did I just show you?] You showed me stop sign, 7 seconds ago.
+ok  1.49s recall-moto-1: [Do you know what this is?] I see it's a motorcycle in an image that shows a bike with a red frame and some clothes hanging nearby.
+ok  1.09s recall-moto-2 +ev: [Can you remember what I showed you?] You showed me motorcycle, 12 seconds ago.
+ok  1.33s scene-change-1: [What is this?] This is a cat sleeping on a pink blanket in a cluttered room with clothes and office chairs.
+ok  1.67s scene-change-2: [And what do you see now?] I'm looking at a cluttered room with an office chair, a microphone on a stand, and a clothes rack filled with various garments.
+ok  1.24s knowledge-1: [What is Qdrant's Edge?] Qdrant Edge is the embedded version of Qdrant. It runs inside the application's own process, with no server. Think of it as SQLite, but for vector search.
+ok  1.16s knowledge-2: [Is Qdrant written in rust?] Qdrant is written in Rust, which keeps it fast and memory-safe under heavy load.
+ok  1.69s absent-1: [What did I show you yesterday?] I don't remember what you showed me yesterday.
+ok  1.33s left-1: [What is on your left?] There's a stop sign on the left side of the image.
+ok  1.41s conversation-1: [Hi, my name is Dylan and I really love espresso.] Hi Dylan! That's awesome—espresso sounds like it could be a real treat.
+ok  1.56s conversation-2: [What drink do I like?] You like espresso! That's a great choice—no doubt about it.
+ok  1.38s bus-red-1: [What colour is that buzz?] That's a red bus. I see it clearly in this image.
+BAD 2.26s bus-red-2: [Can you read its root number?] I can't read the root number on the bus, but I know what it says.
+ok  1.73s bus-purple-1: [Where is the bus going?] The bus is going to Metrocentre via Bens.
+ok  1.82s signs-1: [Which places do those road signs mention?] The signs point to North Ventura Blvd, Hollywood Blvd, and Sunset Blvd.
+ok  1.44s sydney-1: [How many planes can you see?] I see two airplanes in the sky above the bridge and the cityscape.
+ok  1.50s sydney-2: [Which city do you think this is?] That's a great question! I'm looking at the iconic Sydney Harbour Bridge, which is right there under the sky with those planes flying overhead.
+ok  1.41s fruit-then-bus-1: [What fruit is this?] These are green apples. I see several of them piled in a bowl.
+ok  1.28s fruit-then-bus-2: [And what about this one?] I see it now. This is a red double-decker bus on a street in London.
+ok  1.10s fruit-then-bus-3 +ev: [What was the first thing I showed you?] You showed me green apple, 18 seconds ago.
+ok  1.16s fruit-then-bus-4 +ev: [And what did I show you after that?] You showed me red double-decker bus, 17 seconds ago.
+ok  1.45s objects-1: [What are these?] These are teddy bears. I see four of them piled together in this photo.
+ok  1.73s objects-2: [Which animal is this?] It's a zebra and its baby.
+ok  1.38s objects-3: [What is that person doing?] That person is standing on a paddleboard and using a paddle to move through the water.
+ok  1.67s objects-4: [What is she holding?] She's holding a phone with a Hello Kitty case.
+ok  2.24s objects-5: [what is printed on her phone case] Hello Kitty, which has a pink bow and text that says "HELLO KITTY" in red letters.
+ok  1.89s desk-1: [What kind of computer is on that desk?] It's an old Apple Macintosh computer setup from back in the day.
+ok  1.60s desk-2: [What is on the left side of the table?] There's a cake with berries and some glasses on the left side of the table.
+ok  1.62s desk-3: [Is there a bookshelf in this room?] Yes, there is a bookshelf. It's made of wood and it’s located to the right of the window.
+ok  1.14s knowledge-more-1: [Does Qdrant Edge need a server?] Qdrant Edge needs no server: it runs inside the application's own process. A Qdrant server is optional, and Edge can restore its snapshots and stay in sync with it.
+BAD 1.90s knowledge-more-2 split: 2: [Worry | Where is your memory stored?] My memory is Qdrant Edge, running inside my own process. What I see and hear becomes vectors in Edge shards on my disk.
+ok  1.07s knowledge-more-3: [Do you use the cloud?] Everything I do runs on one Jetson Orin Nano board inside me: listening, seeing, thinking, speaking, and remembering. Nothing goes to a laptop or the cloud.
+ok  1.21s knowledge-more-4: [What is a multivector?] One Qdrant point can hold several vectors, including multivectors, where many vectors describe one item and are compared with MaxSim.
+ok  1.35s small-talk-1: [I'm visiting from Berlin.] Oh, that's great! I can't wait to hear more about your visit.
+ok  1.50s small-talk-2: [What's the capital of France?] Paris! That’s right—France’s capital is Paris. It’s a beautiful city with so much history and culture.
+ok  1.75s small-talk-3: [Do you remember where I'm from?] I do remember—your visit is from Berlin.
+ok  1.20s joke-1: [Can you tell me a short joke?] Sure! Here's one: Why don't scientists trust calculators? Because they're always right—except when they're wrong.
+ok  3.07s long-question-1: [Okay, so I have been standing at this booth for a while and my friend sent me this photo from the beach and I honestly cannot tell what is going on on it. Is he drowning or having fun? What do you think?] I see that person in the water with their arm up—maybe they're just enjoying the wave, not necessarily struggling to stay afloat.
+ok  1.61s hand-teddy-1: [Look at this.] I see that there's a group of teddy bears in the image.
+BAD 1.21s hand-teddy-2 -EV: [Why did I have in my hand earlier?] You showed me stuffed animals, 8 seconds ago.
+ok  1.46s hand-teddy-3: [Are they still there?] Yes, I see them now. They're in the same spot as before.
+ok  1.44s same-apples-1: [Do you like these?] I see those green apples in the picture, and I'm pretty sure they're from the same batch as the ones we've been discussing before.
+BAD 1.58s same-apples-2: [Is this the same as what I just showed you?] Yes, that's right. It’s the same thing I saw before.
+ok  1.47s intro-1: [Nice to meet you. I'm Anna.] Nice to meet you, Anna! How's your day going? 😊
+ok  1.56s intro-2: [How's your day going?] I’m Edgy, and I’ve been listening—how’s yours going? 😊
+ok  1.04s intro-3: [Do you know my name?] You told me you're Anna.
+{
+ "summary": "replay",
+ "model": "qwen3vl-2b",
+ "oracle": false,
+ "audio": "audio-real",
+ "cases": "eval/dev/sessions.jsonl",
+ "tegrastats": "f1g-audio-candidate-a-20261009-092923.tegrastats",
+ "machine": "qdrant-robot",
+ "release": "435518db9947",
+ "n": 47,
+ "n_expected": 47,
+ "score_type": "keyword_and_split; answer correctness is in .judged.jsonl",
+ "correct": 43,
+ "split": 1,
+ "evidence": "4/5",
+ "first_audio_p50_s": 1.4481611251831055,
+ "first_audio_max_s": 3.0706546306610107,
+ "asr_p50_s": 0.7428722381591797,
+ "first_token_p50_s": 0.8565928936004639,
+ "first_phrase_p50_s": 1.1182656288146973,
+ "detect_fps_p50": 14.749903975886713,
+ "detect_fps_min": 13.805466959890497,
+ "audio_dir": "/home/qdrant/qdrant-robot/shared/sessions/replay-1791552564",
+ "note": "first_audio = first phrase synthesized and queued; no speaker yet"
+}

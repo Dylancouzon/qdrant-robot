@@ -41,7 +41,7 @@ def test_sightings() -> None:
         for k in range(CONFIRM):
             step([bottle, *others], 40.0 + k)
         _, lines = robot._recall(Turn(speech_start=72.0), frame)
-        assert lines == ["60 seconds ago: you saw a clock; it is not in view now"], \
+        assert lines == [(12.0, "60 seconds ago: you saw a clock; it is not in view now")], \
             "the rest is in view now; no sides (D61)"
         robot.vocab, robot.history = {"clock", "bottle", "thing0"}, []
         turn = Turn(question="Did the clock leave, or is it still around?", speech_start=72.0)

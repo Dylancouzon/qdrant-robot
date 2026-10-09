@@ -29,7 +29,6 @@ from robot.faces import Faces
 from robot.focus import Focus, Track
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
-    FIRST_PERSON,
     Memory,
     about_now,
     about_past,
@@ -106,6 +105,8 @@ class Look:
     exchanges: int
     changed: bool                 # the view differs from the previous turn's
     history: list[dict]           # the conversation as prefilled with this frame
+    budget: dict = field(default_factory=dict)
+    prefill_s: float = 0.0
 
 
 @dataclass
@@ -125,6 +126,10 @@ class Turn:
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
+    events: list[dict] = field(default_factory=list)  # exact source spans delivered to generation
+    prompt_budget: dict = field(default_factory=dict)
+    prefill_budget: dict = field(default_factory=dict)
+    prefill_s: float = 0.0
     frame_id: int = 0             # the frame this turn saw, stored as a memory
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
@@ -408,7 +413,8 @@ class Robot:
             elif (caption := self.brain.caption(job[2], lambda: self.speaking)) is None:
                 self.uncaptioned.append(job[1:])  # a visitor spoke: retry after their turn
             else:
-                self.memory.set(job[1], caption=caption)
+                if self.memory.set(job[1], caption=caption):
+                    self._index(job[1], "observation")
             self.jobs.task_done()
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
@@ -418,7 +424,11 @@ class Robot:
         # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
         history = [m for m in self.history if m["role"] == "user"] if changed else self.history
         look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
-        self.brain.prefill(brain.messages(history, look.image))
+        msgs, _, look.budget = self.brain.context(history, look.image)
+        look.history = msgs[1:-1]
+        started = time.perf_counter()
+        self.brain.prefill(msgs)
+        look.prefill_s = time.perf_counter() - started
         self.ready = look
 
     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
@@ -452,13 +462,12 @@ class Robot:
             self.history = []
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
-        statements = self._told(question, turn)
-        turn.told = [m["said"] for m in statements]
-        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
+        turn.prefill_budget, turn.prefill_s = look.budget, look.prefill_s
+        events = self._events(question, turn)
         self.panel = {"shards": ["knowledge", "seen"], "ms": 1000 * (time.time() - started),
                       "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
-                          (f"said: {m['said']}", m["score"]) for m in statements] + [
-                          (f"seen: {line}", None) for line in memories]}
+                          (f"{event['kind']}: {event['text']}", event["score"])
+                          for event in events] + [(f"seen: {line}", None) for _, line in memories]}
         track = self._visitor()
         recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
             turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
@@ -470,8 +479,18 @@ class Robot:
         turn.kind = self.route(question)
         sees = about_now(turn.question) or (turn.kind == "sight" and not past)
         image = look.image if sees else None
-        msgs = brain.messages(look.history, image, memories, turn.facts,
-                              turn.question, look.changed, past, told)
+        if recalled_answer or turn.verbatim:
+            msgs = brain.messages(look.history, image, [line for _, line in memories], turn.facts,
+                                  turn.question, look.changed, past)
+        else:
+            msgs, turn.events, turn.prompt_budget = self.brain.context(
+                look.history, image, events, memories, turn.facts, turn.question,
+                look.changed, past, turn.speech_start)
+            turn.told = [event["text"] for event in turn.events if event["kind"] == "utterance"]
+            recent_ids = {memory["id"] for memory in recalled}
+            turn.memories = list(dict.fromkeys([
+                pid for pid in turn.memories if pid not in recent_ids] + [
+                event["source_id"] for event in turn.events]))
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
                        if isinstance(m["content"], list) else m
@@ -509,12 +528,24 @@ class Robot:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
 
-    def _told(self, question: np.ndarray, turn: Turn) -> list[dict]:
-        """The visitor's earlier statements nearest `question`, except those about an ignored
-        kind, and first-person ones (D70) told before this conversation."""
-        return [m for m in self.memory.told(question, before=turn.speech_start, n=4)
-                if not mentions(m["said"], self.ignored) and (
-                    not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
+    def _events(self, question: np.ndarray, turn: Turn) -> list[dict]:
+        """Select five source-kind spans with frozen cosine floors and visitor eligibility."""
+        events = []
+        for kind, floor in (("observation", .53), ("utterance", .55)):
+            if kind == "observation" and not about_past(turn.question):
+                continue  # historical scene descriptions keep their existing past-only role
+            events += self.memory.events(question, turn.speech_start, self.since, floor, kind,
+                                         skip=lambda text: mentions(text, self.ignored))
+        return sorted(events, key=lambda event: (-event["score"],
+                      event["kind"] != "observation", event["source_id"]))[:5]
+
+    def _index(self, pid: int, kind: str, turn: Turn | None = None) -> None:
+        """Prepare complete source units on the serialized memory worker."""
+        if source := self.memory.source_event(pid, kind):
+            units, vectors = self.embed.embed_units(source["text"])
+            self.memory.index_event(pid, kind, source["source_hash"], units, vectors,
+                                    turn.speech_start if turn else None,
+                                    turn.speech_end if turn else None)
 
     def _store(self, turn: Turn, shot: tuple[np.ndarray, float, dict],
                statement: np.ndarray | None, track: int | None) -> None:
@@ -536,6 +567,8 @@ class Robot:
         if seen and seen[1]:
             self.people.link(seen[1], [pid])  # "forget me" deletes it if still kept
         self._retain(time.time())
+        if statement is not None:
+            self._index(pid, "utterance", turn)
         for job in [*self.uncaptioned, (pid, image)]:
             self.jobs.put(("caption", *job))
         self.uncaptioned = []
@@ -785,10 +818,8 @@ class Robot:
         return said + (f"I last saw your {name} {last}; I don't see it now." if last else
                        f"I don't see your {name} now.")
 
-    def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
-        """Captioned frames (newest first) and the Memories lines, oldest first, one short line
-        each with its age: each distinct caption, and the newest sighting of each kind out of
-        view (no sides, D61). What is in view now is the present, not something seen before."""
+    def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[tuple[float, str]]]:
+        """Keep newest-first captions for code answers and timed sightings for generation."""
         recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}  # shown() reads lines
                     for m in self.memory.recent(before=turn.speech_start)
                     if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
@@ -800,12 +831,9 @@ class Robot:
         sights = list(newest.values())[:LINES]
         turn.memories = [m["id"] for m in recalled + sights]
         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
-        captions = {" ".join(m["caption"].split()): m for m in recalled[::-1]  # one line each,
-                    if m["caption"]}  # and one frame told twice is one line
-        lines = sorted([(m["ts"], f"{ago(m['ts'])}: {c}") for c, m in captions.items()] + [
-            (s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; it is not "
-                             "in view now") for s in sights], key=lambda x: x[0])
-        return recalled, [line for _, line in lines]
+        lines = [(s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; "
+                                  "it is not in view now") for s in sights]
+        return recalled, lines
 
     def _sighted(self, turn: Turn) -> str | None:
         """The answer to a sighting question from the sightings and the tracks in view now, or

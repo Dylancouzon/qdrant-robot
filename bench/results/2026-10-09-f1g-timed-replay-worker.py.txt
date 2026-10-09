@@ -1,0 +1,79 @@
+"""Observe existing audio/inference calls without changing inputs, cadence, or decisions."""
+import json
+import os
+import runpy
+import sys
+import time
+from pathlib import Path
+
+root, observation = sys.argv[1:3]
+os.chdir(root)
+sys.path.insert(0, root)
+sys.argv = sys.argv[3:]
+from robot import audio, asr, brain
+from eval.continuous import Scheduler
+
+path = Path(observation)
+def observe(kind, **fields):
+    with path.open('a') as f:
+        f.write(json.dumps({'type': kind, 'wall_time': time.time(), **fields}) + '\n')
+
+original_paced = audio.paced
+stream = 0
+
+def paced(samples, silence_s=0.):
+    global stream
+    stream += 1
+    sid, started, count = stream, time.perf_counter(), 0
+    for chunk in original_paced(samples, silence_s):
+        actual = time.perf_counter() - started
+        due = count / audio.RATE_IN
+        observe('chunk', stream=sid, samples=len(chunk), due_start_s=due,
+                actual_start_s=actual, lateness_s=max(0., actual - due))
+        count += len(chunk)
+        yield chunk
+
+audio.paced = paced
+original_feed = asr.Ears.feed
+
+def feed(self, chunk):
+    started = time.perf_counter()
+    try:
+        return original_feed(self, chunk)
+    finally:
+        observe('hear', samples=len(chunk), elapsed_s=time.perf_counter() - started)
+
+asr.Ears.feed = feed
+original_budget = getattr(brain.Brain, 'budget', None)
+if original_budget:
+    def budget(self, msgs):
+        started = time.perf_counter()
+        try:
+            return original_budget(self, msgs)
+        finally:
+            observe('budget', elapsed_s=time.perf_counter() - started)
+    brain.Brain.budget = budget
+original_prefill = brain.Brain.prefill
+
+def prefill(self, msgs):
+    started = time.perf_counter()
+    observe('prefill_start')
+    try:
+        return original_prefill(self, msgs)
+    finally:
+        observe('prefill', elapsed_s=time.perf_counter() - started)
+
+brain.Brain.prefill = prefill
+original_report = Scheduler.report
+
+def report(self, now):
+    started = time.perf_counter()
+    try:
+        return original_report(self, now)
+    finally:
+        observe('evaluator_report', elapsed_s=time.perf_counter() - started)
+
+Scheduler.report = report
+observe('observer_started', command=sys.argv, release=os.environ.get('ROBOT_RELEASE'))
+runpy.run_module(sys.argv[0], run_name='__main__')
+observe('observer_finished')

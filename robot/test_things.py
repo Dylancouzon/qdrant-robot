@@ -184,19 +184,24 @@ def test_ignore(monkeypatch) -> None:
             "an ignored kind is not stored"
         assert ask(robot, "Are you still ignoring chairs?")[0] == "Yes, I am ignoring chairs."
         v = np.eye(TEXT_DIM, dtype=np.float32)[0]
-        robot.memory.add(frame, "My chair at home is red.", v, ts=time.time())
+        from types import SimpleNamespace
+        robot.embed = SimpleNamespace(embed_units=lambda text: (
+            [{"start": 0, "end": len(text), "text": text, "tokens": 8}], v[None]))
+        pid = robot.memory.add(frame, "My chair at home is red.", v, ts=time.time())
+        robot._index(pid, "utterance")
         robot.last_line = time.time()  # the same conversation
         turn = Turn(speech_start=time.time() + 1)
-        assert robot._told(v, turn) == [], "a statement about chairs is not recalled"
+        assert robot._events(v, turn) == [], "a statement about chairs is not recalled"
         turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1)
         assert robot._sighted(turn) == "I am ignoring chairs, so I do not remember any."
         assert ask(robot, "You can stop ignoring chairs now.")[0] == \
             "Okay, I will notice chairs again."
-        assert [m["said"] for m in robot._told(v, turn)] == ["My chair at home is red."]
+        assert [m["text"] for m in robot._events(v, turn)] == ["My chair at home is red."]
         robot.since = time.time_ns() // 1000
-        assert robot._told(v, turn) == [], "a first-person statement of an earlier visitor (D70)"
-        robot.memory.add(frame, "The booth closes at five.", v, ts=time.time())
-        assert [m["said"] for m in robot._told(v, turn)] == ["The booth closes at five."], \
+        assert robot._events(v, turn) == [], "a first-person statement of an earlier visitor (D70)"
+        pid = robot.memory.add(frame, "The booth closes at five.", v, ts=time.time())
+        robot._index(pid, "utterance")
+        assert [m["text"] for m in robot._events(v, turn)] == ["The booth closes at five."], \
             "a general statement is shared"
         robot.tracker = Tracker()  # a chair that arrives now
         robot._sight([s for _ in range(CONFIRM) for s in robot._track(frame, chair)], frame)

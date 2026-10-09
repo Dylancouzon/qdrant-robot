@@ -152,3 +152,21 @@ def test_event_score_ties_use_stable_source_ids(tmp_path):
                 VECTORS[0], 200., 0, .53, kind, n=2)] == sorted(ids)[:2]
     finally:
         memory.shard.close()
+
+
+def test_runtime_keeps_observations_in_past_questions(tmp_path):
+    from robot.main import Robot, Turn
+    robot = Robot.__new__(Robot)
+    robot.memory, robot.since, robot.ignored = Memory(tmp_path), 0, set()
+    try:
+        pid = robot.memory.add(FRAME, "The booth closes at five.", ts=100.)
+        robot.memory.set(pid, caption="A red cup.")
+        assert index(robot.memory, pid, "observation", "A red cup.")
+        assert index(robot.memory, pid, "utterance", "The booth closes at five.")
+        social = robot._events(VECTORS[0], Turn(question="Hello.", speech_start=200.))
+        assert [event["kind"] for event in social] == ["utterance"]
+        past = robot._events(VECTORS[0], Turn(question="What did you see?", speech_start=200.))
+        assert [event["kind"] for event in past] == ["observation", "utterance"]
+        assert "said" not in past[0] and past[0]["text"] == "A red cup."
+    finally:
+        robot.memory.shard.close()

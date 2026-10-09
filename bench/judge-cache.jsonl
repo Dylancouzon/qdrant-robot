@@ -2428,3 +2428,34 @@
 {"key": "f2dcd7d28143c774", "pass": true, "why": "States the adhesive is unknown.", "votes": [true, true, true]}
 {"key": "cc2e9dc5ff3526f9", "pass": true, "why": "Does not invent an arrival date.", "votes": [false, true, true]}
 {"key": "7d4b6528226233d3", "pass": true, "why": "States the arrival time is unknown.", "votes": [true, true, true]}
+{"key": "9c04d592552d93c5", "pass": true, "why": "Says the visitor showed a stop sign.", "votes": [true, true, true]}
+{"key": "8f3ed3ce94eb8812", "pass": true, "why": "Says the visitor showed a motorcycle.", "votes": [true, true, true]}
+{"key": "1939e5e0c17c5c5c", "pass": true, "why": "Confirms Qdrant is written in Rust.", "votes": [true, true, true]}
+{"key": "0e602b83f6cc7f30", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "6ef026597c974db7", "pass": true, "why": "Says the visitor likes espresso.", "votes": [true, true, true]}
+{"key": "272ba096a1f823d9", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "31bc8a86ee09fc50", "pass": true, "why": "Reads route 15.", "votes": [true, true, true]}
+{"key": "f580454d28629e1b", "pass": true, "why": "Reads Metrocentre and correctly mentions via Bens.", "votes": [true, true, true]}
+{"key": "0d35a53ca2e7bb01", "pass": true, "why": "Says the apple was shown first.", "votes": [true, true, true]}
+{"key": "be2c088f0af2315c", "pass": true, "why": "Says the bus was shown after the apple.", "votes": [true, true, true]}
+{"key": "7c44482cb99ca211", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}
+{"key": "5e33e804239a102e", "pass": true, "why": "Places Qdrant Edge memory on its own disk.", "votes": [true, true, true]}
+{"key": "6501d834949bc18c", "pass": true, "why": "Suggests the person is enjoying the wave.", "votes": [true, false, true]}
+{"key": "e7171ac6fb39e73f", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "645e8ddb579cd32d", "pass": true, "why": "Says the visitor showed stuffed animals.", "votes": [true, true, true]}
+{"key": "9bdf26408be08f2d", "pass": false, "why": "Says the bears remain, but they are gone.", "votes": [false, false, false]}
+{"key": "d2dbdc1a9e78d0b9", "pass": false, "why": "Does not identify teddy bears or the earlier apples.", "votes": [false, false, false]}
+{"key": "224b542351c014e0", "pass": true, "why": "Warmly greets Anna by name.", "votes": [true, true, true]}
+{"key": "e1190a4cb83c95a7", "pass": false, "why": "Does not say how its day is going.", "votes": [false, false, false]}
+{"key": "a2b2bf5879dbd0c5", "pass": true, "why": "Recalls the visitor's name as Anna.", "votes": [true, true, true]}
+{"key": "48c9c0e9daea4390", "pass": true, "why": "Identifies a motorcycle.", "votes": [true, true, true]}
+{"key": "4a7c6c3390ae0695", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "435c9c43977925f3", "pass": true, "why": "Describes embedded, in-process vector search without a server.", "votes": [true, true, true]}
+{"key": "63b508c28d6d573e", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "6e16ae2b6c7289e9", "pass": false, "why": "Does not read route 15.", "votes": [false, false, false]}
+{"key": "74cee5ae62ee1d5d", "pass": true, "why": "Identifies a red double-decker bus.", "votes": [true, true, true]}
+{"key": "3b370fc37f55e183", "pass": true, "why": "Says the apple was shown first.", "votes": [true, true, true]}
+{"key": "2332ae3167993bf7", "pass": true, "why": "Says the bus was shown after the apple.", "votes": [true, true, true]}
+{"key": "7d94a553d3368470", "pass": true, "why": "Says Paris.", "votes": [true, true, true]}
+{"key": "78fbb138a711eefc", "pass": true, "why": "Says Berlin.", "votes": [true, true, true]}
+{"key": "5d29ca22ed78b610", "pass": false, "why": "Claims the teddy bears are the same as the apples.", "votes": [false, false, false]}

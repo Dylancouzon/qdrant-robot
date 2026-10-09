@@ -116,10 +116,10 @@ def test_robot_identity(monkeypatch) -> None:
     import time
     from types import SimpleNamespace as Stub
 
-    from robot import main, memory
+    from robot import brain, main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
-    from robot.main import FIRST_PERSON, Robot, Turn
-    from robot.memory import Memory
+    from robot.main import Robot, Turn
+    from robot.memory import FIRST_PERSON, Memory
     from robot.people import DECLINED, _id
     from robot.text_embed import DIM as TEXT_DIM
     from robot.things import Things
@@ -151,7 +151,12 @@ def test_robot_identity(monkeypatch) -> None:
         robot.out.mkdir(exist_ok=True)
         robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
         robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "social"
-        robot.brain = Stub(prefill=lambda m: None, answer=lambda m, **k: (t for t in ["Okay."]))
+        robot.embed.embed_units = lambda text: ([{"start": 0, "end": len(text),
+                                                "text": text, "tokens": 8}], robot.embed([text]))
+        robot.brain = brain.Brain.__new__(brain.Brain)
+        robot.brain.budget = lambda m: {"prompt_token_bound": 100, "output_token_reserve": 64}
+        robot.brain.prefill = lambda m: None
+        robot.brain.answer = lambda m, **k: (t for t in ["Okay."])
         robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
         robot.speaker = Stub(play=lambda pcm: None)
         return robot
@@ -288,6 +293,8 @@ def test_robot_identity(monkeypatch) -> None:
         assert robot.people.identify(np.eye(DIM)[3])[0] == "Cy", "a yes to the offer enrolls"
         robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[
             [1 if "from" in t else 0 for t in texts]]  # only lines about origin match each other
+        robot.embed.embed_units = lambda text: ([{"start": 0, "end": len(text),
+                                                "text": text, "tokens": 8}], robot.embed([text]))
         assert ask("I'm from Lisbon.", cy) is None
         assert ask("Where am I from?", cy) is None and turns[-1].told == ["I'm from Lisbon."]
         assert "Lisbon" in str(turns[-1].prompt), "Cy's own exchanges stay in the prompt"

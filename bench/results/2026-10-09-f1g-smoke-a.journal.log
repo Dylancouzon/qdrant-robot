@@ -1,0 +1,25 @@
+Started qr-f1g-smoke-a.service - /usr/bin/bash -c "flock /home/qdrant/qdrant-robot/shared/gpu.lock bash -c 'tegrastats --interval 1000 --logfile \$ROBOT_SHARED/results/\$ROBOT_TEGRASTATS & t=\$!; .venv/bin/python -u -m eval.continuous eval/dev/continuous-smoke-20261009/visits.jsonl --audio eval/dev/continuous-smoke-20261009/audio --output /home/qdrant/qdrant-robot/shared/results/2026-10-09-f1g-smoke-a.jsonl; rc=\$?; kill \$t; exit \$rc'".
+[0;93m2026-10-09 09:12:13.355278222 [W:onnxruntime:Default, device_discovery.cc:211 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:91 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"[m
+[0;93m2026-10-09 09:12:14.413879310 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:12:14.413939312 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[ WARN:0@1.327] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[0;93m2026-10-09 09:12:15.427833520 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:12:15.427900371 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 09:12:21.261843633 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 14 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 09:12:21.262752370 [W:onnxruntime:, transformer_memcpy.cc:111 ApplyImpl] 1 Memcpy nodes are added to the graph sub_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-09 09:12:21.293544919 [W:onnxruntime:, session_state.cc:1327 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-09 09:12:21.293615417 [W:onnxruntime:, session_state.cc:1329 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+[0;93m2026-10-09 09:12:22.010975601 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.015659964 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.020509389 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.025989750 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.034134079 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.034552974 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[0;93m2026-10-09 09:12:22.034615281 [W:onnxruntime:Default, scatter_nd.h:51 ScatterNDWithAtomicReduction] ScatterND with reduction=='none' only guarantees to be correct if indices are not duplicated.[m
+[10/09/2026-09:12:27] [TRT] [W] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+terminate called without an active exception
+qr-f1g-smoke-a.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+qr-f1g-smoke-a.service: Failed to kill control group /system.slice/qr-f1g-smoke-a.service, ignoring: Invalid argument
+qr-f1g-smoke-a.service: Failed to kill control group /system.slice/qr-f1g-smoke-a.service, ignoring: Invalid argument
+qr-f1g-smoke-a.service: Failed with result 'exit-code'.
+qr-f1g-smoke-a.service: Consumed 40.983s CPU time, 5.2G memory peak, 0B memory swap peak.

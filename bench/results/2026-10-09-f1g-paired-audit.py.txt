@@ -1,0 +1,124 @@
+"""Audit the completed unchanged audio comparison; preserve the negative integrated result."""
+import hashlib
+import json
+from pathlib import Path
+import numpy as np
+
+ROOT = Path.cwd()
+RESULTS = ROOT / 'bench/results'
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def read(path):
+    return [json.loads(line) for line in Path(path).read_text().splitlines()]
+
+names = {'baseline': ('cd60be65ee79', '1791551942642747121', '1791552444'),
+         'candidate': ('435518db9947', '1791552563527628541', '1791553079')}
+outputs, inputs, statuses = {}, {}, {}
+for arm, (release, stamp, raw_stamp) in names.items():
+    supervisor = RESULTS / f'2026-10-09-f1g-replay-sessions-{release}-{stamp}.jsonl'
+    receipts = read(supervisor)
+    meta, footer = receipts[0], receipts[-1]
+    assert footer['completed'] and footer['native_exit'] == 1
+    assert footer['expected'] == footer['observed'] == 47 and meta['release'] == release
+    for extension in ('console.log', 'telemetry.jsonl'):
+        file = supervisor.with_suffix('.' + extension)
+        assert sha(file) == footer[extension.split('.')[0] + '_sha256']
+    raw = RESULTS / f'2026-10-09-replay-{raw_stamp}.jsonl'
+    assert sha(raw) == footer['result_sha256']
+    rows, summary = read(raw)[:-1], read(raw)[-1]
+    assert summary['release'] == release and summary['n'] == summary['n_expected'] == len(rows) == 47
+    judged = raw.with_suffix('.judged.jsonl')
+    verdicts = {row['id']: row for row in read(judged)}
+    assert [r['id'] for r in rows] == list(verdicts)
+    view_path = ROOT / f'build/f1g/{arm}-speech-input.jsonl'
+    view, speech_path = read(view_path), view_path.with_suffix('.speech.jsonl')
+    speeches = read(speech_path)
+    assert speeches[-1]['completed'] and speeches[-1]['result_sha256'] == sha(view_path)
+    turns_path = ROOT / f'build/f1g/{arm}-audio/turns.jsonl'
+    assert sha(turns_path) == view[-1]['turns_sha256']
+    turns = read(turns_path)
+    assert len(turns) == len(view) - 1 == len(speeches) - 1 == 48
+    assert view[-1]['result_sha256'] == sha(raw)
+    speech_by_step = {}
+    for expected, heard in zip(view[:-1], speeches[:-1], strict=True):
+        assert expected['id'] == heard['id'] and expected['wav'] == heard['wav']
+        wav = ROOT / f'build/f1g/{arm}-audio' / heard['wav']
+        assert sha(wav) == heard['wav_sha256']
+        speech_by_step.setdefault(expected['step_id'], []).append(heard['pass'])
+    cursor, valid_sources = 0, 0
+    source_authority = {turn['frame_id']: turn['question'] for turn in turns if turn['frame_id']}
+    for row in rows:
+        group = turns[cursor:cursor + row['split']]
+        cursor += row['split']
+        assert row['wav'] == group[-1]['wav'] and row['heard'] == ' | '.join(t['question'] for t in group)
+        if arm == 'candidate':
+            budget = row['prompt_budget']
+            if not row['verbatim']:
+                assert budget['prompt_token_bound'] + budget['output_token_reserve'] <= 2048
+                assert budget['budget_calls'] >= 2 and budget['budget_s'] >= 0
+            else:
+                assert not row['events'] and not budget
+            prompt = json.dumps(row['prompt'], ensure_ascii=False)
+            for event in row['events']:
+                assert event['text'] in json.loads(prompt)[-1]['content'][-1]['text']
+                assert event['source_id'] in row['memories']
+                assert event['spans'][0]['text'] == event['text']
+                authority = source_authority[event['source_id']]
+                assert event['kind'] == 'utterance'  # this replay delivers no semantic observations
+                digest = hashlib.sha256(f"{event['source_id']}\0{event['kind']}\0{authority}".encode()).hexdigest()
+                assert event['source_hash'] == digest
+                for span in event['spans']:
+                    assert authority[span['start']:span['end']] == span['text'] and span['tokens'] <= 128
+                valid_sources += 1
+    assert cursor == len(turns)
+    states = read(supervisor.with_suffix('.telemetry.jsonl'))
+    loaded = [row['resources'] for row in states if row['phase'] == 'replay']
+    assert loaded
+    paging = {key: loaded[-1][key] - loaded[0][key] for key in ('pswpin', 'pswpout')}
+    joint = {row['id']: bool(verdicts[row['id']]['pass'] and row['split'] == 1 and
+                            all(speech_by_step[row['id']])) for row in rows}
+    statuses[arm] = {row['id']: verdicts[row['id']]['pass'] for row in rows}
+    inputs[arm] = meta['input_hashes']
+    warm = rows[1:]
+    outputs[arm] = {'judged': sum(statuses[arm].values()), 'joint': sum(joint.values()),
+        'n': len(rows), 'speech_passed': sum(row['pass'] for row in speeches[:-1]),
+        'speech_outputs': len(speeches)-1, 'split_steps': sum(row['split']>1 for row in rows),
+        'keyword_passed': summary['correct'], 'delivered_source_spans': valid_sources,
+        'first_audio_p50_s': float(np.percentile([r['first_audio_s'] for r in rows], 50)),
+        'warm_first_audio_p50_s': float(np.percentile([r['first_audio_s'] for r in warm], 50)),
+        'warm_first_audio_p95_s': float(np.percentile([r['first_audio_s'] for r in warm], 95)),
+        'cold_first_audio_s': rows[0]['first_audio_s'],
+        'detect_fps_min': min(r['detect_fps'] for r in rows),
+        'loaded_sampled_headroom_mib': min(r['mem_available_kb'] for r in loaded)/1024,
+        'loaded_system_paging_pages': paging,
+        'bindings': {str(path.relative_to(ROOT)): sha(path) for path in
+                     (raw, judged, supervisor, speech_path, turns_path, view_path)}}
+    if arm == 'candidate':
+        timing = supervisor.with_suffix('.timing.jsonl')
+        assert sha(timing) == footer['timing_sha256']
+        observed = read(timing)
+        chunks = [r for r in observed if r['type']=='chunk']
+        outputs[arm]['timing'] = {
+            'chunk_count': len(chunks),
+            'first_stream_max_lateness_s': max(r['lateness_s'] for r in chunks if r['stream']==1),
+            'later_stream_max_lateness_s': max(r['lateness_s'] for r in chunks if r['stream']>1),
+            **{kind+'_max_s': max(r['elapsed_s'] for r in observed if r['type']==kind)
+               for kind in ('hear','budget','prefill')}}
+        outputs[arm]['bindings'][str(timing.relative_to(ROOT))] = sha(timing)
+assert inputs['baseline'] == inputs['candidate']
+wins = [key for key in statuses['baseline'] if not statuses['baseline'][key] and statuses['candidate'][key]]
+losses = [key for key in statuses['baseline'] if statuses['baseline'][key] and not statuses['candidate'][key]]
+assert outputs['baseline']['judged']==42 and outputs['candidate']['judged']==41
+assert wins==[] and len(losses)==1
+result={'type':'paired_audio_audit','completed':True,'arms':outputs,'wins':wins,'losses':losses,
+        'input_hashes':inputs['baseline'], 'adopt':False,
+        'limitations':['47 development steps are mostly current sight/code answers; no semantic observation delivered',
+                       'candidate has narrow timing observer; baseline does not',
+                       'system paging has no process/turn attribution',
+                       'synthesized output is not physical audio',
+                       'strict smoke failure and native-6 cleanup remain unresolved'],
+        'audit_sha256':sha(__file__)}
+with (RESULTS/'2026-10-09-f1g-operations.jsonl').open('a') as f:f.write(json.dumps(result)+'\n')
+print(json.dumps(result,indent=2))

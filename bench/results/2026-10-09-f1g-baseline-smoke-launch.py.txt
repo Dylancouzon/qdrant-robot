@@ -1,0 +1,5 @@
+import os,sys,runpy
+root='/home/qdrant/qdrant-robot/releases/cd60be65ee79'
+os.chdir(root);sys.path.insert(0,root);os.environ['ROBOT_RELEASE']='cd60be65ee79'
+sys.argv=['eval.continuous','eval/dev/continuous-smoke-20261009/visits.jsonl','--audio','eval/dev/continuous-smoke-20261009/audio','--output','/home/qdrant/qdrant-robot/shared/results/2026-10-09-f1g-smoke-baseline-a.jsonl']
+runpy.run_module('eval.continuous',run_name='__main__')

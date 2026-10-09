@@ -1,0 +1,12 @@
+"""Restore the retained measured baseline through the project's named-unit workflow."""
+import os
+from pathlib import Path
+base = Path(os.environ['ROBOT_SHARED']).parent
+release = 'cd60be65ee79'
+assert (base / 'releases' / release / 'ENV.txt').is_file()
+old = os.readlink(base / 'current')
+for name, target in [('previous', old), ('current', 'releases/' + release)]:
+    temporary = base / (name + '.f1g-restore')
+    temporary.symlink_to(target)
+    temporary.replace(base / name)
+print('restored', os.readlink(base / 'current'), 'previous', os.readlink(base / 'previous'), flush=True)

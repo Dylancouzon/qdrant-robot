@@ -1,0 +1,2 @@
+{"name": "f1g-audio-baseline-a", "release": "cd60be65ee79", "cases": "eval/dev/sessions.jsonl", "mode": "audio-real", "supervisor_sha256": "ee953362c5a3b2a52c10d2457e287f9f1ff2f893fb1b2484868d05164c05b55b", "started": 1791551941.240484, "launch_exit": 0}
+{"name": "f1g-audio-candidate-a", "release": "435518db9947", "cases": "eval/dev/sessions.jsonl", "mode": "audio-real", "supervisor_sha256": "e3f6d8a9582b7e17424ec15b8da61598d9426fd2fcb0a3dd04cd8e26247fa13d", "started": 1791552562.155196, "launch_exit": 0}
