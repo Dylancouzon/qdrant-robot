@@ -1,0 +1,24 @@
+import hashlib, json, platform, subprocess, tempfile, time
+from pathlib import Path
+from qdrant_edge import EdgeShard, EdgeConfig, EdgeVectorParams, Distance, UpdateOperation, MultiVectorConfig, MultiVectorComparator, Point, PointVectors, Query, QueryRequest
+with tempfile.TemporaryDirectory() as tmp:
+    p=Path(tmp)/'seen'; p.mkdir()
+    s=EdgeShard.create(str(p), EdgeConfig(vectors={'said':EdgeVectorParams(size=384,distance=Distance.Cosine)}))
+    v=[1.0]+[0.0]*383; w=[0.0,1.0]+[0.0]*382
+    s.update(UpdateOperation.upsert_points([Point(1, {'said':v}, {'said':'development check'})]))
+    def create():
+        s.update(UpdateOperation.create_dense_vector('observed',384,Distance.Cosine,multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim)))
+    create(); s.update(UpdateOperation.update_vectors([PointVectors(1, {'observed':[v,w]})]))
+    create(); s.flush(); s.close()
+    s=EdgeShard.load(str(p)); create(); s.flush()
+    hits=s.query(QueryRequest(limit=1,query=Query.Nearest([w],using='observed')))
+    old=s.query(QueryRequest(limit=1,query=Query.Nearest(v,using='said')))
+    assert [h.id for h in hits]==[1] and hits[0].score>0.9999 and [h.id for h in old]==[1]
+    s.update(UpdateOperation.delete_points([1])); s.flush(); s.close()
+    s=EdgeShard.load(str(p))
+    assert not s.retrieve([1],True,True)
+    assert not s.query(QueryRequest(limit=1,query=Query.Nearest([w],using='observed')))
+    s.close()
+    row={'type':'edge_distinct_multivector_check','measurement':'E','machine':platform.node(),'edge_version':'0.8.0','date_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'command':'.venv/bin/python build/overnight/edge-distinct-check.py','probe_archive':'bench/results/2026-10-09-f1-schema-distinct.py.txt','probe_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'dimension':384,'units':2,'vectors_distinct_and_orthogonal':True,'query_matches_only_second_unit':True,'matched_score':hits[0].score,'creation_repeated_before_and_after_reload':True,'old_query_preserved':True,'source_deletion_after_reload_verified':True,'dataset_size':1,'precision':'float32','model':None,'context_limit':None,'image_tokens':None,'live_memory_modified':False}
+    with Path('bench/results/2026-10-09-f1-schema-api.jsonl').open('a') as f: f.write(json.dumps(row)+'\n')
+    print(json.dumps(row))

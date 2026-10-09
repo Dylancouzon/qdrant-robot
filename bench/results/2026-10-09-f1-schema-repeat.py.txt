@@ -1,0 +1,21 @@
+import json, platform, tempfile
+from pathlib import Path
+from qdrant_edge import EdgeShard, EdgeConfig, EdgeVectorParams, Distance, UpdateOperation, MultiVectorConfig, MultiVectorComparator, Point, PointVectors, Query, QueryRequest
+with tempfile.TemporaryDirectory() as tmp:
+    p=Path(tmp)/'seen'; p.mkdir()
+    s=EdgeShard.create(str(p), EdgeConfig(vectors={'said':EdgeVectorParams(size=384,distance=Distance.Cosine)}))
+    v=[1.0]+[0.0]*383
+    s.update(UpdateOperation.upsert_points([Point(1, {'said':v}, {'said':'development check'})]))
+    def create():
+        s.update(UpdateOperation.create_dense_vector('observed',384,Distance.Cosine,multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim)))
+    create()
+    s.update(UpdateOperation.update_vectors([PointVectors(1, {'observed':[v,v]})]))
+    create(); s.flush(); s.close()
+    s=EdgeShard.load(str(p)); create(); s.flush()
+    hits=s.query(QueryRequest(limit=1,query=Query.Nearest([v],using='observed')))
+    old=s.query(QueryRequest(limit=1,query=Query.Nearest(v,using='said')))
+    assert [h.id for h in hits]==[1] and [h.id for h in old]==[1]
+    s.close()
+    row={'type':'edge_repeated_multivector_creation_check','measurement':'E','machine':platform.node(),'edge_version':'0.8.0','dimension':384,'units':2,'creation_repeated_before_and_after_reload':True,'vectors_preserved':True,'existing_query_preserved':True,'live_memory_modified':False}
+    with Path('bench/results/2026-10-09-f1-schema-api.jsonl').open('a') as f: f.write(json.dumps(row)+'\n')
+    print(json.dumps(row))
