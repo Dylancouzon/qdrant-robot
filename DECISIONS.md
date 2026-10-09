@@ -550,3 +550,21 @@ Sol 6.1 high replaces the old CLI audio loop with loopback controls and one owne
 Twenty focused checks pass in 5.07s; full checks pass in 33.46s; Sol52230 review PASS135.83s. Actual acoustic recorded question, returned playback, Mute/Unmute, Stop, fresh Start, and warmup Stop pass. The page remains open and idle; human listening and all final acceptance targets remain pending.
 Recorded TCP returns75,759 samples/3.156625s, independently transcribed as the embedded-Qdrant answer;1.205s input-end to complete phrase excludes physical playback. Reject browser audio machinery and further optional polishing. Carry launcher-timeout/mute-close races under D71.
 Evidence: research/mac-audio-interface.md; bench/results/2026-10-09-mac-audio-{interface,transport}.json and paired journals/WAV/tegrastats; reviews/20261009-193528-52230-review.md; research/edge-cases.md. Current and previous remain cd60; all owned model jobs stop.
+
+## D124 2026-10-09: Build the first complete robot interface prototype
+Dylan expands the preview to camera, people/object detection, Edgy transcripts, and the rest of existing visitor capabilities. Continue with one Sol 6.1 high builder. Reuse D59/D72/D73 in-process view and D122 audio controls, adding transient live state rather than another runtime or persistent schema.
+Show real camera overlays, robot state, user/reply text, and existing memory evidence. Keep anonymous person boxes, code-owned consent/deletion/actions, on-Jetson models/Edge, bounded UI history, token-protected loopback access, and clean Stop. No new model, framework, action API, or inference path.
+Dylan owns live testing and explicitly prohibits the full suite. Apply this limit to builders, review commands, and commit hooks. Syntax and small changed-path checks are allowed; no automated audio replay/live detector run. Build the usable preview, review once, deploy through the existing workflow, and open it idle.
+Evidence: research/mac-audio-interface.md; reviewed audio base dcb1e38/55c0ede; reviews/20261009-193528-52230-review.md. WSL remains untouched. Existing capability and final acceptance gaps remain visible.
+
+## D125 2026-10-09: Keep the preview on the protected robot behavior
+Read-only SHA comparison finds builder dcb1e38 runtime/config matches deployed cd60 except camera.py; lead copies exact cd60 camera source into builder. Coordinator still holds rejected F1 changes in main/brain/memory/things/text_embed. Never deploy that coordinator tree as-is for the UI.
+Build and deploy the UI on the protected runtime plus minimal view/status wiring. Preserve rejected source in existing spike history, and remove its paths from the integrated preview. This changes no selected model, generation policy, evidence assembly, or acceptance target.
+Dylan owns live testing; no full suite or replay is required for this source-integrity comparison. Keep cd60 as rollback and verify source/deployment bindings without loading models. No further planning pass.
+Evidence: build/p2/logs/interface-cd60-source-hashes.json; protected release cd60be65ee79; builder dcb1e38; coordinator8eb5402. Source changes belong to the lead; one Sol high builder continues the UI.
+
+## D126 2026-10-09: Leave the complete prototype ready for human testing
+One Sol6.1/high builder adds live camera overlays, streaming real replies, bounded transcripts, status, supplied evidence, and existing audio controls. Three targeted checks pass1.43s/native0; Sol77868 PASS114.08s/native0. No full suite or automated live tests run, per Dylan.
+Deploy the protected builder branch directly as b2b36d9718da, previouscd60 for rollback. Preserve rejected root F1 source with its matching tests instead of partial restoration. Post-deploy main/view/camera hashes match, and no qr unit runs. The page opens Idle with microphone off.
+Dylan performs Start/Mute/Stop and capability testing. Camera reconnect and overlapping-turn display are optional carried gaps; evidence supplied does not prove generated grounding. No model adoption, physical latency, quality, or acceptance claim follows this preview.
+Evidence: bench/results/2026-10-09-robot-interface-prototype.json; reviews/20261009-195203-77868-review.md; research/mac-audio-interface.md and edge-cases.md; spike/mac-audio-interface; local URL http://127.0.0.1:8765.
