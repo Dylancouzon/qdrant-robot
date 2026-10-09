@@ -252,3 +252,6 @@ V1-D (reviews/20261008-212158-65296-review.md): Kokoro's CPU-side memory is CUDA
 
 ## D69 2026-10-08: A name is not consent; the robot offers once (Dylan)
 Telling a name lets the robot use it in this conversation (D60) but never enrolls a face: faces need explicit consent (CLAUDE.md fixed outcome). When a visitor who is not enrolled gives their name, the robot offers once: "Nice to meet you, Ana! Want me to remember your face so I recognize you next time?"; a yes enrolls through the consent path (two matching faces, vectors only); a no or no answer keeps the name in the conversation only; at most one offer per visitor.
+
+## D70 2026-10-08: Only first-person statements are scoped to the visitor (Dylan)
+Statements about the speaker ("I build drones", "my name is...", "I'm from Berlin") answer only for the same visitor (face match, or the conversation window when no face, as told names, D60); general statements ("the booth closes at 5") stay shared memory any visitor can recall. Part of the v1 retrieval task. Noted, not built: listen for a name introduction only when a new unrecognized face is present (reduces "I'm tired" style false names; the stoplist guard ships now).

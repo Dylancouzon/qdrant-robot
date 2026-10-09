@@ -14,7 +14,7 @@ Next, in order (D55, D61, D62):
 2. D60 identity rulings and the video view hook (D59) in robot/main.py.
 3. Latency: the TTS first phrase takes 0.53 s (Kokoro should be about 0.1 s): measure alone vs during decode, fix.
 4. RAM budget per component with everything active, what can be freed, and whether Qwen3-VL-4B fits (D62: squeeze the bigger model).
-5. Assistant v1 (D61, D62): always retrieve with calibrated per-shard minimum scores; retrieval lines into the brain; actions by rules, then a Qdrant intents shard (replaces route.py), then confirmation; teach the focus object with confirmation (view labels "Smartphone?" or "???" or the name); time-decay Formula and Rrf of statements and sightings; memory panel on the view; answers toward 200 tokens with context and barge-in checked; 2B vs 4B evidence use; compare with today's code answers, then delete them; drop left and right.
+5. Assistant v1 (D61, D62): always retrieve with calibrated per-shard minimum scores; retrieval lines into the brain; actions by rules, then a Qdrant intents shard (replaces route.py), then confirmation; teach the focus object with confirmation (view labels "Smartphone?" or "???" or the name); time-decay Formula and Rrf of statements and sightings; memory panel on the view; answers toward 200 tokens with context and barge-in checked; 2B vs 4B evidence use; compare with today's code answers, then delete them; drop left and right; first-person statements scoped to the visitor, general ones shared (D70).
 6. M2 and M3 gates; live test day (human checklist); then decide optimizations and training from the biggest measured gaps.
 7. M4: speaker (ordered), offline cold start, eight-hour run.
 
