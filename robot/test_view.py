@@ -1,4 +1,5 @@
-"""The booth view with a fake source: token check, JPEG parts, the rate cap, one viewer, close."""
+"""The booth view with a fake source (every box kind, the strip, the panel): token check,
+JPEG parts, the rate cap, one viewer, close."""
 import http.client
 import socket
 import time
@@ -8,7 +9,7 @@ import urllib.request
 import numpy as np
 import pytest
 
-from robot.view import View
+from robot.view import Screen, View
 
 TOKEN = "s3cret"
 
@@ -26,7 +27,13 @@ def parts(conn: http.client.HTTPResponse, seconds: float) -> list[bytes]:
 
 def test_view() -> None:
     frame = np.zeros((720, 1280, 3), np.uint8)
-    view = View(lambda: (frame, [(100, 100, 300, 300, "cup")]), 0, TOKEN, fps=20)
+    screen = Screen([(0, 0, 400, 700, "", "person"), (100, 100, 300, 300, "???", "focus"),
+                     (500, 100, 600, 200, "Dylan's mug", "known"),
+                     (700, 100, 800, 200, "", "other"),
+                     (900, 100, 1000, 200, "Dylan's phone?", "guess")], "Thinking",
+                    [(time.time(), "Remembered: Dylan's mug")],
+                    {"shards": ["things", "memory"], "hits": [("Dylan's mug", 0.91)], "ms": 3.2})
+    view = View(lambda: (frame, screen), 0, TOKEN, fps=20)
     url = f"http://127.0.0.1:{view.port}/"
     try:
         for bad in ("", "?token=wrong"):

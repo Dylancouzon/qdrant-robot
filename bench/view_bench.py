@@ -21,7 +21,7 @@ from robot.brain import URL, Brain
 from robot.camera import Camera
 from robot.config import SHARED
 from robot.detect import Detector, Tracker
-from robot.view import View, draw
+from robot.view import Screen, View, draw
 
 TOKEN = "bench"
 
@@ -57,9 +57,9 @@ class Robotish:
                 continue
             with self.lock:
                 self.tracker.update(self.detect(frame), frame.shape[1], time.time())
-                boxes = [(*t.det.box, t.label) for t in self.tracker.tracks
+                boxes = [(*t.det.box, t.label, "known") for t in self.tracker.tracks
                          if t.missed == 0 and t.reported]
-                self.shown = frame, boxes
+                self.shown = frame, Screen(boxes)
             self.frames += 1
 
     def source(self) -> tuple:
@@ -96,9 +96,9 @@ def encode_ms(bot: Robotish, n: int = 200) -> list[float]:
     """draw() on the live frame and its boxes, the view thread's per-frame work."""
     times = []
     for _ in range(n):
-        frame, boxes = bot.source()
+        frame, screen = bot.source()
         t = time.perf_counter()
-        draw(frame, boxes, 960)
+        draw(frame, screen, 960, time.time())
         times.append((time.perf_counter() - t) * 1000)
         time.sleep(1 / bot.fps)
     return times

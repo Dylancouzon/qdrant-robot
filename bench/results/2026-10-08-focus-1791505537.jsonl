@@ -1,0 +1,10 @@
+{"t": 1.2, "focus": 4, "label": "phone", "held": true}
+{"t": 47.467, "focus": 24, "label": "chair", "held": false}
+{"t": 50.333, "focus": null, "label": null, "held": false}
+{"t": 59.667, "focus": 36, "label": "camera", "held": true}
+{"t": 60.2, "scenery": 1, "label": "bottle"}
+{"t": 60.2, "scenery": 3, "label": "bottle"}
+{"t": 76.4, "focus": null, "label": null, "held": false}
+{"t": 78.467, "focus": 50, "label": "cup", "held": true}
+{"t": 88.733, "end": true}
+{"summary": "focus", "source": "2026-10-08-clip-1791487472.jsonl", "machine": "mac (replay)", "revision": "3c80be5", "diff_sha256": "a3480291282f", "command": "python -m bench.focus_clip bench/results/2026-10-08-clip-1791487472.jsonl", "constants": {"MIN_SIDE": 48, "STEADY": 0.1, "STEADY_S": 1.0, "MOVED": 0.03, "RECENT_S": 3.0, "SCENERY_S": 60.0, "GONE_S": 1.0, "HOLD_S": 5.0, "MARGIN": 1.6, "CUE": 1.5, "HELD": 0.8, "ZONE": [0.25, 0.5, 0.75, 1.0], "BODY": ["badge", "face", "glasses", "hat", "lanyard", "person", "t-shirt"]}, "recognition": "none (nothing taught)", "first_half": {"seconds": 45.0, "takes": 1, "switches_per_min": 1.33, "dwell_p50_s": 46.27, "background_takes": [], "background_seconds": 0, "held_seconds_in_focus": 46.27, "time_to_focus_s": {"0-46.5": 1.0}, "scenery": []}, "second_half": {"seconds": 43.7, "takes": 3, "switches_per_min": 4.12, "dwell_p50_s": 10.27, "background_takes": [[47.467, "chair"]], "background_seconds": 2.87, "held_seconds_in_focus": 27.0, "time_to_focus_s": {"58.5-76": 1.0, "77-89": 1.47}, "scenery": [[60.2, "bottle"], [60.2, "bottle"]]}}
