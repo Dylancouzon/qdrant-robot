@@ -11,6 +11,14 @@ As of 2026-10-09. Initial research by Sonnet; D74 and D75 record completed compa
 - Grammars (GBNF, json_schema) would force citations on every turn and break free chat: skip.
 - The initial prompt/model recommendation was exercised in the bake-off below. D76 and D77 require a concrete intervention or disputed assumption before repeating it. Training remains open; prior prompting results do not establish that a LoRA fixes missing evidence.
 
+## F0 sufficient-evidence diagnostic (2026-10-09, D87)
+
+J: on release 51bdbb62cea6, the same Qwen3-VL-2B generated answers for 24 development questions with original versus verified sufficient evidence. Question, system, history, image policy, and 2K/256-image/64-output/one-sentence limits stayed fixed. The three-vote judge scored 14/24 versus 21/24, with seven paired wins and zero losses. Evidence questions scored 12/20 versus 19/20; four unchanged sight/chat controls scored two/four in both arms. The 11 unchanged packets had equal verdicts, with nine byte-identical answers.
+
+Three sufficient-arm failures remain: a general spider question, the missing red handbag, and the current-room description. F0's eight-failure trigger for language specialization is unmet. Prioritize observation detail, source-linked retrieval, and dialogue continuity; revisit training if correct production evidence still leaves at least eight failures on a comparable development diagnostic. This upper bound does not establish a deployed gain, physical latency, active paging safety, long conversation, or held-out performance. Both arms forced generation, including cases the deployed robot answers in code.
+
+Evidence: bench/results/2026-10-09-bakeoff-evidence-probe-1791527749.jsonl and its .judged.jsonl; f0-evidence-20261009-023549.tegrastats; bench/results/2026-10-09-f0-operations.jsonl. Manifest SHA256: 31451ef2d419add469b3d4fa6ce14d93bf655d3fc6026f7a391751d9122808ca. Query: `python3 tools/results.py --cases eval/dev/evidence-probe.jsonl --limit 1`.
+
 ## Mac bake-off result (2026-10-08, D74)
 
 - Five brains x nine prompt shapes on the robot's own retrieval prompts (bench/brain_bakeoff.py; m2 /74, visitor /21; code answers 41, 17): qwen3vl-2b 32,14 (current) -> 38,14 (evidence first) or 37,14 (shape I, evidence words after the image, keeps the frame prefill); lfm2vl-3b up to 43,15 (but larger, a longer re-prefill, misreads composites); gemma4-e2b up to 37,15; qwen35-2b up to 31,13; qwen3vl-4b up to 42,16 (does not fit).

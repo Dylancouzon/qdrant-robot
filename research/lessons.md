@@ -44,6 +44,7 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 - Face blurring at write time was proposed after review rounds kept finding deletion paths; Dylan called it over-engineering; sightings without frames replaced it (D53 superseded by D54).
 
 ### The assistant and the brain
+- F0 separates source sufficiency from model capacity (D87): the same Jetson 2B scored 14/24 with original evidence and 21/24 with verified sufficient evidence, seven wins and no losses. Source-linked questions scored 12/20 versus 19/20; unchanged controls stayed two/four. Three sufficient-arm failures are below the eight-failure training trigger. Prioritize observations/retrieval; reopen language specialization when adequate production facts still leave enough failures. The forced-generative development upper bound proves no deployed gain or integrated resource safety. Exact files and manifest hash are in research/grounding.md.
 - Model tool routing was rejected: small brains called recall on current sight or missed memory questions (D21). Retrieval in code won. An intents shard and a classifier are separate future choices; do not reopen model tool calls by assuming they were never tested.
 - Early brain comparisons: Qwen3.5-2B lost prefix reuse and was slower; Qwen3.5-4B OOMed; Gemma 4 E2B accepted audio but lost sight accuracy; the 4B lost dev accuracy and caption timeliness on the fixed pipeline (D27, D29, D35). These are measured outcomes, not permanent model bans.
 - Direction: an assistant first, retrieval feeds the brain, actions and identity in code (D61, research/assistant-design.md); the Fable v1 plan: always retrieve with per-shard minimum scores, actions by rules then a Qdrant intents shard then confirmation, no LLM classifier in v1 (D62, research/v1-plan.md). Jev (TypeSafe AI) and open versions were considered for the intent layer.
@@ -98,6 +99,8 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 - Private face data: eval/faces/ is gitignored; tools/jetson.py ships face scenes to shared/faces/<hash> per release (D52); only LFW images go to the Jetson for benches.
 
 ## Machines
+
+- Mac scoring uses `.venv/bin/python eval/judge.py` (Python 3.12), not system `python3` (3.9). The latter can launch the models, then fail at `zip(..., strict=True)` before saving votes. The project pins Python 3.12; use its interpreter for model scoring and eval entrypoints.
 
 - Overnight 2026-10-09 starts on spike/overnight-2026-10-09 from main eb746fe. Keep command watchdogs separate from healthy experiment duration (D83). Reconcile boot IDs, release, service ownership, and progress before restarting jobs. SSH checks use a 10 s connection limit, keepalives, and a 45 s outer watchdog. The WSL disney-demo-qdrant container belongs to another project; leave it running. Authentication commands do not expose remaining usage.
 

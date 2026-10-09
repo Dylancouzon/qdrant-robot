@@ -2302,3 +2302,24 @@
 {"key": "0121e632f845353b", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
 {"key": "242b0c56a783749c", "pass": false, "why": "Omits teddy bears now and apples before.", "votes": [false, false, false]}
 {"key": "c8f53192a070cf43", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "14037d35e26206cc", "pass": false, "why": "Correct object, but falsely places the donut on the left.", "votes": [false, false, false]}
+{"key": "b641a5c670857edb", "pass": true, "why": "Identifies the removed donut.", "votes": [true, true, true]}
+{"key": "00d715e5ccddb214", "pass": false, "why": "Does not identify the first bear.", "votes": [false, false, false]}
+{"key": "4fe7acd7cb88de4c", "pass": true, "why": "Identifies the white bear with red scarf and hat.", "votes": [true, true, true]}
+{"key": "3250bd55e087af83", "pass": true, "why": "Identifies the second bear's green hat.", "votes": [true, true, true]}
+{"key": "fa71b6e8ed13308f", "pass": true, "why": "Says the laptop was black.", "votes": [true, true, true]}
+{"key": "ab7d55897e1d2025", "pass": true, "why": "Recalls green as the visitor's favorite color.", "votes": [true, true, true]}
+{"key": "85a5506c20505234", "pass": true, "why": "Recalls the talk at four o'clock.", "votes": [true, true, true]}
+{"key": "687d41e7d9c5fca1", "pass": true, "why": "Recalls the striped umbrella.", "votes": [false, true, true]}
+{"key": "a944d6e122ab09c7", "pass": true, "why": "Identifies the stop sign.", "votes": [true, true, true]}
+{"key": "5b5d31f5796ed17b", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "9cd8c92e471ddd2a", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "3f7ab1cc5d8a1221", "pass": true, "why": "Says an apple came first.", "votes": [true, true, true]}
+{"key": "0f74193165a88764", "pass": true, "why": "Says an apple came first.", "votes": [true, true, true]}
+{"key": "efc9febf253037d4", "pass": true, "why": "Identifies the bus as the next thing shown.", "votes": [true, true, true]}
+{"key": "b601e857b0231c6e", "pass": true, "why": "Recalls a teddy bear in the visitor's hand.", "votes": [true, true, false]}
+{"key": "baeee642cfd8696a", "pass": true, "why": "Says the bears are no longer there.", "votes": [true, true, true]}
+{"key": "29823428178b847e", "pass": true, "why": "Identifies Hello Kitty on the phone case.", "votes": [true, true, true]}
+{"key": "6f247e245380b857", "pass": false, "why": "Does not identify the missing handbag.", "votes": [false, false, false]}
+{"key": "e407510bc37978b7", "pass": false, "why": "Does not identify the missing handbag.", "votes": [false, false, false]}
+{"key": "fd37d485b66f5b2b", "pass": true, "why": "States that the visitor came from Berlin.", "votes": [true, true, true]}
