@@ -1,0 +1,119 @@
+{
+  "fixture": "eval/dev/m2.jsonl",
+  "fixture_sha256": "b6487e2ecbb7473b0d952ad828b71ad44222c14bc0f61cbf11517d46d06e88ea",
+  "rule": "Include every spoken M2 step with an evidence reference to an earlier spoken step with a show image. Preserve fixture order. Read no answer, rubric, or result.",
+  "turns": [
+    {
+      "session_id": "m2-removed-clock",
+      "turn_id": "m2-removed-clock-2",
+      "source_step_ids": [
+        "m2-removed-clock-1"
+      ]
+    },
+    {
+      "session_id": "m2-removed-snack",
+      "turn_id": "m2-removed-snack-2",
+      "source_step_ids": [
+        "m2-removed-snack-1"
+      ]
+    },
+    {
+      "session_id": "m2-region-a",
+      "turn_id": "m2-region-a-2",
+      "source_step_ids": [
+        "m2-region-a-1"
+      ]
+    },
+    {
+      "session_id": "m2-region-b",
+      "turn_id": "m2-region-b-2",
+      "source_step_ids": [
+        "m2-region-b-1"
+      ]
+    },
+    {
+      "session_id": "m2-similar-teddy",
+      "turn_id": "m2-similar-teddy-3",
+      "source_step_ids": [
+        "m2-similar-teddy-1"
+      ]
+    },
+    {
+      "session_id": "m2-similar-teddy",
+      "turn_id": "m2-similar-teddy-4",
+      "source_step_ids": [
+        "m2-similar-teddy-2"
+      ]
+    },
+    {
+      "session_id": "m2-similar-laptop",
+      "turn_id": "m2-similar-laptop-3",
+      "source_step_ids": [
+        "m2-similar-laptop-1"
+      ]
+    },
+    {
+      "session_id": "m2-similar-phone",
+      "turn_id": "m2-similar-phone-3",
+      "source_step_ids": [
+        "m2-similar-phone-1"
+      ]
+    },
+    {
+      "session_id": "m2-naming-phone",
+      "turn_id": "m2-naming-phone-2",
+      "source_step_ids": [
+        "m2-naming-phone-1"
+      ]
+    },
+    {
+      "session_id": "m2-forget-two",
+      "turn_id": "m2-forget-two-4",
+      "source_step_ids": [
+        "m2-forget-two-1"
+      ]
+    },
+    {
+      "session_id": "m2-evict-color",
+      "turn_id": "m2-evict-color-6",
+      "source_step_ids": [
+        "m2-evict-color-1"
+      ]
+    },
+    {
+      "session_id": "m2-evict-trip",
+      "turn_id": "m2-evict-trip-6",
+      "source_step_ids": [
+        "m2-evict-trip-1"
+      ]
+    },
+    {
+      "session_id": "m2-evict-trip",
+      "turn_id": "m2-evict-trip-7",
+      "source_step_ids": [
+        "m2-evict-trip-1"
+      ]
+    },
+    {
+      "session_id": "m2-evict-talk",
+      "turn_id": "m2-evict-talk-7",
+      "source_step_ids": [
+        "m2-evict-talk-1"
+      ]
+    },
+    {
+      "session_id": "m2-evict-talk",
+      "turn_id": "m2-evict-talk-8",
+      "source_step_ids": [
+        "m2-evict-talk-1"
+      ]
+    },
+    {
+      "session_id": "m2-restart-object",
+      "turn_id": "m2-restart-object-2",
+      "source_step_ids": [
+        "m2-restart-object-1"
+      ]
+    }
+  ]
+}
