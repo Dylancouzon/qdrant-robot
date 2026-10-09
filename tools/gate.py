@@ -74,7 +74,8 @@ def checks() -> int:
                   ["uvx", "vulture", "--min-confidence", "80", *py]]
     tests = [f for f in py if Path(f).name.startswith("test_")]
     if tests:
-        steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
+        steps.append(["uv", "run", "--no-project", "--with", "pytest", "python",
+                      str(ROOT / "tools/gate.py"), "pytest", "-q", *tests])
     # One interpreter shares expensive dependency imports across all existing assertions.
     steps += [[str(ROOT / ".venv/bin/python"), str(ROOT / "tools/gate.py"), "modules"]]
     steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",
@@ -203,6 +204,14 @@ def selftest() -> None:
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, interrupted)
+    if sys.argv[1:2] in (["modules"], ["pytest"]):
+        # ORT 1.30's telemetry worker raced native shutdown on the Mac (D85).
+        # Disable collection before tests or module checks create any ORT sessions.
+        import onnxruntime
+        onnxruntime.disable_telemetry_events()
+    if sys.argv[1:2] == ["pytest"]:
+        import pytest
+        sys.exit(pytest.main(sys.argv[2:]))
     if sys.argv[1:] == ["modules"]:
         module_checks()
         sys.exit(0)

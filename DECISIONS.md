@@ -319,3 +319,14 @@ Validation: local checks passed in 14.82 s; Sol 6.1 PASS reviews/20261009-021318
 Start spike/overnight-2026-10-09 from main eb746fe; commit and push reviewed tasks frequently with their evidence. Main remains unchanged. F0 follows D79 through D83.
 Reconciliation found Jetson release 4387936b8ee9 and both GPUs idle; preserve the other project's WSL container. Use bounded connection checks, command watchdogs, and progress-based recovery; healthy experiments have no overall deadline.
 Evidence: bench/results/2026-10-09-session-status-1791526671.jsonl; Sol 6.1 status review PASS reviews/20261009-021753-38870-review.md. Idle memory and allocated swap establish no active-turn safety. Rejected: waiting indefinitely without a progress check or restarting jobs without inspecting ownership.
+
+## D85 2026-10-09: Prevent ONNX Runtime telemetry shutdown failures in local gates
+Two Mac crash reports locate the H1/F0 abort in the same ONNX Runtime 1.30 telemetry HTTP-response worker. All 69 tests had passed before SIGABRT; the gate correctly failed.
+Launch pytest through tools/gate.py and disable telemetry before pytest or module-check sessions. Preserve every check, assertion, timeout, and exit code; product runtime and inference remain unchanged. This is a measured test-process workaround, not a claim that upstream lifetime code is repaired.
+Evidence: bench/results/2026-10-09-native-shutdown-diagnosis.jsonl; installed disable_telemetry_events docstring and official API https://onnxruntime.ai/docs/api/python/api_summary.html. Rejected: suppressing the abort, accepting pytest text without its exit status, or retrying without diagnosis. Validation pending.
+Validation: all 69 tests and remaining stages exited cleanly in 13.17 s; Sol 6.1 preparation review PASS reviews/20261009-023052-55411-review.md. The workaround remains limited to gate processes.
+
+## D86 2026-10-09: Freeze F0's development evidence comparison before execution
+Freeze 24 development questions, two forced-generative arms, identical model/system/history/image policy and limits; exclude actions, identity, and direction-only questions. Twelve packets correct visual evidence as an oracle upper bound, 11 stay unchanged, and one normalizes a transcript. Keep four ordinary controls.
+Manifest SHA256 31451ef2d419add469b3d4fa6ce14d93bf655d3fc6026f7a391751d9122808ca; bench/evidence_probe.py saves incremental rows and omits completion on failure. The existing history reader separates arms. Prompt-token accounting is unavailable at the sentence stop.
+Evidence: eval/dev/evidence-probe.jsonl and bench/test_evidence_probe.py; all 69 checks passed in 13.17 s; review PASS reviews/20261009-023052-55411-review.md. No capability result yet. The fresh 48-question challenge, continuous baseline, and training branch choice remain pending.
