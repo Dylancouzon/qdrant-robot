@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Memory budget: load and exercise each robot component in turn, as the robot does, and report
 what it costs: the drop in MemAvailable (CPU and GPU share it on a Jetson), the robot process's
-resident (anonymous and file) and GPU (nvmap) memory, and llama-server's. Also saves
-llama-server's buffer sizes.
+resident (anonymous and file), malloc in-use (CUDA module images loaded at a session's first
+run land here), and GPU (nvmap) memory, and llama-server's. Also saves llama-server's buffer
+sizes.
 
     python -m bench.memory_budget [--model qwen3vl-4b] [--server-arg=-ctk --server-arg=q8_0 ...]
         [--cuda-option cudnn_conv_use_max_workspace=0 ...]
 """
 import argparse
+import ctypes
 import json
 import os
 import subprocess
@@ -39,6 +41,20 @@ def rss_mb(pid: int | None) -> tuple[int, int]:
     kb = dict(line.split()[:2] for line in Path(f"/proc/{pid}/status").read_text().splitlines()
               if line.startswith(("RssAnon:", "RssFile:")))
     return int(kb["RssAnon:"]) // 1024, int(kb["RssFile:"]) // 1024
+
+
+class _MallInfo2(ctypes.Structure):
+    _fields_ = [(f, ctypes.c_size_t) for f in ("arena", "ordblks", "smblks", "hblks", "hblkhd",
+                                                "usmblks", "fsmblks", "uordblks", "fordblks",
+                                                "keepcost")]
+
+
+def malloc_mb() -> int:
+    """This process's malloc in-use bytes (glibc mallinfo2), all arenas and large blocks."""
+    libc = ctypes.CDLL("libc.so.6")
+    libc.mallinfo2.restype = _MallInfo2
+    info = libc.mallinfo2()
+    return (info.uordblks + info.hblkhd) >> 20
 
 
 def nvmap_mb() -> dict[int, int]:
@@ -80,8 +96,8 @@ def main() -> None:
         sp = server.proc.pid if server else None
         (ra, rf), (sa, sf) = rss_mb(me), rss_mb(sp)
         row = {"step": name, "mb": last - now, "available_mb": now, "robot_anon_mb": ra,
-               "robot_file_mb": rf, "robot_gpu_mb": gpu.get(me, 0), "server_anon_mb": sa,
-               "server_file_mb": sf, "server_gpu_mb": gpu.get(sp, 0)}
+               "robot_file_mb": rf, "robot_malloc_mb": malloc_mb(), "robot_gpu_mb": gpu.get(me, 0),
+               "server_anon_mb": sa, "server_file_mb": sf, "server_gpu_mb": gpu.get(sp, 0)}
         steps.append(row)
         print(json.dumps(row), flush=True)
         last = now
