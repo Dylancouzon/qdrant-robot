@@ -255,3 +255,6 @@ Telling a name lets the robot use it in this conversation (D60) but never enroll
 
 ## D70 2026-10-08: Only first-person statements are scoped to the visitor (Dylan)
 Statements about the speaker ("I build drones", "my name is...", "I'm from Berlin") answer only for the same visitor (face match, or the conversation window when no face, as told names, D60); general statements ("the booth closes at 5") stay shared memory any visitor can recall. Part of the v1 retrieval task. Noted, not built: listen for a name introduction only when a new unrecognized face is present (reduces "I'm tired" style false names; the stoplist guard ships now).
+
+## D71 2026-10-08: v1 logs edge cases and tests the whole robot first (Dylan)
+Until v1 is tested end to end, review findings that are edge cases are logged in research/edge-cases.md (trigger, risk, proposed fix) instead of fixed; only failures of the main visitor flow or likely failures of fixed outcomes block (gates/review.md rule 8). Order: wire a minimal v1 end to end (retrieval into the brain, Hey Edgy, the focus screen), run the integrated visit and a live test day, change the architecture if they show it, then work the logged cases that actually happen.
