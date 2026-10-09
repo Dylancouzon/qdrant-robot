@@ -1,55 +1,413 @@
 #!/usr/bin/env python3
-"""Talk to the robot from the Mac: streams the Mac microphone to `robot.main --listen` and plays
-its answers. Every model still runs on the Jetson. Half duplex: the microphone is muted while
-an answer plays, so the robot does not hear itself (use headphones to talk over it).
-
-    .venv/bin/python tools/talk.py [--host qdrant-robot.local] [--port 7070]
-"""
+"""Reusable loopback controls for MacBook audio; all robot models run on the Jetson."""
 import argparse
+import contextlib
+import json
+import secrets
+import signal
 import socket
 import struct
+import subprocess
+import sys
 import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 import numpy as np
-import sounddevice as sd
 
-RATE_IN, RATE_OUT, CHUNK = 16000, 24000, 1280  # 80 ms chunks, as the robot expects
-TAIL_S = 0.3                                    # stay muted this long after an answer ends
+ROOT = Path(__file__).resolve().parent.parent
+BASE = "/home/qdrant/qdrant-robot"
+RELEASE = "cd60be65ee79"
+INPUT, OUTPUT = "MacBook Pro Microphone", "MacBook Pro Speakers"
+RATE_IN, RATE_OUT, CHUNK = 16000, 24000, 1280
+TAIL_S = 0.3
+MAX_FRAME = RATE_OUT * 2 * 30  # At most 30 seconds of mono PCM per phrase.
+SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
+       "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
 
 
-def main() -> None:
-    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--host", default="qdrant-robot.local")
-    p.add_argument("--port", type=int, default=7070)
-    a = p.parse_args()
-    conn = socket.create_connection((a.host, a.port))
-    conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    muted_until = [0.0]  # the microphone stays muted until the queued answer audio has played
-    out = sd.OutputStream(samplerate=RATE_OUT, channels=1, dtype="int16")
-    out.start()
+def frame(conn: socket.socket) -> np.ndarray:
+    """Read one bounded phrase, including fragmented headers and payloads."""
+    def exact(size):
+        data = bytearray()
+        while len(data) < size:
+            part = conn.recv(size - len(data))
+            if not part:
+                raise EOFError("Robot audio connection closed")
+            data.extend(part)
+        return data
+    size, = struct.unpack("<I", exact(4))
+    if not 0 < size <= MAX_FRAME or size % 2:
+        raise ValueError(f"Invalid robot audio frame size: {size}")
+    return np.frombuffer(exact(size), dtype="<i2")
 
-    def answers() -> None:
-        played_until = 0.0  # when the audio queued so far finishes playing
-        with conn.makefile("rb") as f:  # buffered: read(n) returns n bytes, or fewer at the end
-            while len(header := f.read(4)) == 4:
-                size = struct.unpack("<I", header)[0]
-                if len(data := f.read(size)) < size:
-                    break
-                pcm = np.frombuffer(data, np.int16)
-                played_until = max(played_until, time.time()) + len(pcm) / RATE_OUT
-                muted_until[0] = max(muted_until[0], played_until + TAIL_S)
+
+def level(pcm: np.ndarray) -> float:
+    return float(np.max(np.abs(pcm.astype(np.float32)), initial=0) / 32768)
+
+
+def devices(sd) -> tuple[int, int]:
+    found = sd.query_devices()
+    chosen = []
+    for name, direction in ((INPUT, "input"), (OUTPUT, "output")):
+        matches = [i for i, d in enumerate(found)
+                   if d["name"] == name and d[f"max_{direction}_channels"] > 0]
+        if len(matches) != 1:
+            raise RuntimeError(f"Expected one {name}; found {len(matches)}")
+        chosen.append(matches[0])
+    sd.check_input_settings(device=chosen[0], channels=1, dtype="int16", samplerate=RATE_IN)
+    sd.check_output_settings(device=chosen[1], channels=1, dtype="int16", samplerate=RATE_OUT)
+    return tuple(chosen)
+
+
+class NativeAudio:
+    """Capture and play one connected stream; the parent can reap native stalls."""
+
+    def __init__(self, fd):
+        import sounddevice as sd
+        self.sd = sd
+        self.conn = socket.socket(fileno=fd)
+        self.stopped = threading.Event()
+        self.manual = threading.Event()
+        self.muted_until = 0.0
+        self.failure = ""
+        self.streams = []
+        self.receiver = None
+
+    @staticmethod
+    def emit(**state):
+        sys.stdout.write(json.dumps(state) + "\n")
+        sys.stdout.flush()
+
+    def halt(self, *_):
+        self.stopped.set()
+        with contextlib.suppress(OSError):
+            self.conn.shutdown(socket.SHUT_RDWR)
+
+    def controls(self):
+        for line in sys.stdin:
+            if line.strip() == "mute":
+                self.manual.set()
+            else:
+                self.manual.clear()
+
+    def answers(self):
+        played_until = 0.0
+        out = self.streams[0]
+        try:
+            while not self.stopped.is_set():
+                pcm = frame(self.conn)
+                played_until = max(played_until, time.monotonic()) + len(pcm) / RATE_OUT
+                self.muted_until = played_until + float(out.latency) + TAIL_S
+                self.emit(output_level=level(pcm), playing=True)
                 out.write(pcm)
+                self.emit(output_level=0, playing=False)
+        except (OSError, EOFError, ValueError, self.sd.PortAudioError) as exc:
+            if not self.stopped.is_set():
+                self.failure = str(exc)
+            self.halt()
 
-    threading.Thread(target=answers, daemon=True).start()
-    print("talking to the robot; Ctrl-C to stop")
-    with sd.InputStream(samplerate=RATE_IN, channels=1, dtype="int16", blocksize=CHUNK) as mic:
-        while True:
-            data, _ = mic.read(CHUNK)
-            if time.time() < muted_until[0]:
-                data = np.zeros_like(data)  # silence keeps the robot's clock and VAD running
-            conn.sendall(data.tobytes())
+    def capture(self, mic):
+        while not self.stopped.is_set():
+            data, overflow = mic.read(CHUNK)
+            if overflow:
+                raise RuntimeError("Microphone overflow; stop and restart the session")
+            suppressed = self.manual.is_set() or time.monotonic() < self.muted_until
+            self.emit(input_level=level(data), suppressed=suppressed)
+            self.conn.sendall(bytes(CHUNK * 2) if suppressed else data.tobytes())
+        if self.failure:
+            raise RuntimeError(self.failure)
+
+    def run(self):
+        signal.signal(signal.SIGTERM, self.halt)
+        threading.Thread(target=self.controls, daemon=True).start()
+        try:
+            self.emit(phase="Opening MacBook audio")
+            incoming, outgoing = devices(self.sd)
+            if self.stopped.is_set():
+                return
+            out = self.sd.OutputStream(device=outgoing, samplerate=RATE_OUT,
+                                       channels=1, dtype="int16")
+            self.streams.append(out)
+            mic = self.sd.InputStream(device=incoming, samplerate=RATE_IN, channels=1,
+                                     dtype="int16", blocksize=CHUNK)
+            self.streams.append(mic)
+            out.start()
+            mic.start()
+            self.emit(phase="Listening")
+            self.receiver = threading.Thread(target=self.answers, daemon=True)
+            self.receiver.start()
+            self.capture(mic)
+        finally:
+            self.halt()
+            for stream in reversed(self.streams):
+                with contextlib.suppress(Exception):
+                    stream.abort()
+                    stream.close()
+            if self.receiver:
+                self.receiver.join(2)
+            self.conn.close()
+
+
+def command(args: list[str]) -> str:
+    result = subprocess.run(args, capture_output=True, text=True, timeout=30)
+    if result.returncode:
+        raise RuntimeError((result.stderr or result.stdout).strip()[-1500:])
+    return result.stdout.strip()
+
+
+def remote(script: str) -> str:
+    return command([*SSH, "robot", script])
+
+
+def reap(process: subprocess.Popen | None) -> None:
+    if process is None:
+        return
+    if process.poll() is None:
+        with contextlib.suppress(ProcessLookupError):
+            process.terminate()
+    try:
+        process.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+        with contextlib.suppress(ProcessLookupError):
+            process.kill()
+        process.wait(timeout=2)
+
+
+class Session:
+    """Own one remote session and tunnel, and keep the page reusable after cleanup."""
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.stopped = threading.Event()
+        self.worker = None
+        self.child = self.reader = self.unit = None
+        self.state = dict(phase="Idle", active=False, muted=False, error="",
+                          input=INPUT, output=OUTPUT, input_level=0, output_level=0)
+
+    def update(self, **state):
+        with self.lock:
+            self.state.update(state)
+
+    def snapshot(self):
+        with self.lock:
+            return dict(self.state)
+
+    def start(self):
+        with self.lock:
+            if self.state["active"] or (self.worker and self.worker.is_alive()):
+                return
+            self.stopped.clear()
+            self.state.update(phase="Connecting", active=True, muted=False, error="")
+            self.worker = threading.Thread(target=self.run, daemon=True)
+            self.worker.start()
+
+    def stop(self):
+        self.stopped.set()
+        if self.worker and self.worker.is_alive():
+            self.update(phase="Stopping")
+        elif self.unit:
+            self.update(phase="Stopping")
+            self.worker = threading.Thread(target=self.retry_stop, daemon=True)
+            self.worker.start()
+
+    def mute(self):
+        with self.lock:
+            child = self.child
+            if child and child.poll() is None:
+                self.state["muted"] = not self.state["muted"]
+                try:
+                    child.stdin.write("mute\n" if self.state["muted"] else "unmute\n")
+                    child.stdin.flush()
+                except (BrokenPipeError, OSError):
+                    self.stopped.set()
+
+    def report(self):
+        report = remote(f"systemctl is-active {self.unit}; "
+                        f"journalctl -u {self.unit} -o cat --no-pager -n 30")
+        if not report or report.splitlines()[0] != "active":
+            raise RuntimeError(f"Jetson session stopped: {report[-1500:]}")
+        return report.splitlines()
+
+    def connect(self, tunnel, port):
+        self.update(phase="Waiting for Jetson audio")
+        while not self.stopped.wait(0.2):
+            if tunnel.poll() is not None:
+                message = tunnel.stderr.read().decode().strip()
+                raise RuntimeError(message or "SSH tunnel closed")
+            if "waiting for a client on port 7070" in self.report():
+                try:
+                    return socket.create_connection(("127.0.0.1", port), timeout=2)
+                except OSError:
+                    continue
+        return None
+
+    def listen(self, conn):
+        conn.settimeout(None)
+        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.update(phase="Warming up Jetson; microphone off")
+        while not self.stopped.wait(0.5):
+            if "listening" in self.report():
+                break
+        if self.stopped.is_set():
+            return
+        child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
+                                  "--audio-fd", str(conn.fileno())], pass_fds=(conn.fileno(),),
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, text=True)
+        with self.lock:
+            self.child = child
+
+        def updates():
+            for line in child.stdout:
+                self.update(**json.loads(line))
+
+        self.reader = threading.Thread(target=updates, daemon=True)
+        self.reader.start()
+        while not self.stopped.wait(0.1):
+            if child.poll() is not None:
+                message = child.stderr.read().strip()[-1500:]
+                raise RuntimeError(message or "Robot audio disconnected")
+
+    def cleanup_remote(self):
+        error = ""
+        if self.unit:
+            try:
+                remote(f'load=$(systemctl show {self.unit} -p LoadState --value); '
+                       f'[ "$load" = not-found ] || sudo systemctl stop {self.unit} || '
+                       f'[ "$(systemctl show {self.unit} -p LoadState --value)" = not-found ]')
+                self.unit = None
+            except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+                error = f"Could not stop owned {self.unit}: {exc}. Select Stop to retry."
+        return error
+
+    def retry_stop(self):
+        error = self.cleanup_remote()
+        self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error)
+
+    def cleanup_local(self, conn, tunnel):
+        if conn:
+            with contextlib.suppress(OSError):
+                conn.shutdown(socket.SHUT_RDWR)
+        reap(self.child)
+        if self.reader:
+            self.reader.join(2)
+        if self.child:
+            self.child.stdin.close()
+            self.child.stdout.close()
+            self.child.stderr.close()
+        self.child = self.reader = None
+        if conn:
+            conn.close()
+        reap(tunnel)
+        if tunnel:
+            tunnel.stderr.close()
+
+    def run(self):
+        name = f"live-mac-{secrets.token_hex(6)}"
+        tunnel = conn = None
+        error = ""
+        try:
+            status = remote(f"readlink -f {BASE}/current; "
+                            "systemctl list-units 'qr-*' --state=active --no-legend --plain")
+            if status.splitlines() != [f"{BASE}/releases/{RELEASE}"]:
+                raise RuntimeError(f"Jetson must be idle on release {RELEASE}. Received: {status}")
+            if self.stopped.is_set():
+                return
+            self.unit = f"qr-{name}.service"
+            command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
+                     "--", "-m", "robot.main", "--listen", "7070"])
+            with socket.socket() as reserve:
+                reserve.bind(("127.0.0.1", 0))
+                port = reserve.getsockname()[1]
+            tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes",
+                                       "-L", f"127.0.0.1:{port}:127.0.0.1:7070", "robot"],
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            conn = self.connect(tunnel, port)
+            if conn:
+                self.listen(conn)
+        except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+            if not self.stopped.is_set():
+                error = str(exc)
+        finally:
+            self.update(phase="Stopping")
+            self.cleanup_local(conn, tunnel)
+            cleanup_error = self.cleanup_remote()
+            error = "\n".join(filter(None, (error, cleanup_error)))
+            self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error,
+                        input_level=0, output_level=0, playing=False, suppressed=False)
+
+
+class Handler(BaseHTTPRequestHandler):
+    session = None
+    token = origin = ""
+
+    def reply(self, code, data, kind="application/json"):
+        self.send_response(code)
+        self.send_header("Content-Type", kind)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def allowed(self):
+        return (self.headers.get("Host") == self.origin.removeprefix("http://") and
+                self.headers.get("Origin", self.origin) == self.origin)
+
+    def do_GET(self):
+        if not self.allowed():
+            self.reply(403, b"Forbidden")
+        elif self.path == "/":
+            page = Path(__file__).with_suffix(".html").read_text().replace("TOKEN", self.token)
+            self.reply(200, page.encode(), "text/html; charset=utf-8")
+        elif self.path == "/status":
+            self.reply(200, json.dumps(self.session.snapshot()).encode())
+        else:
+            self.reply(404, b"Not found")
+
+    def do_POST(self):
+        if (not self.allowed() or self.headers.get("Origin") != self.origin or
+                self.headers.get("X-Session-Token") != self.token):
+            self.reply(403, b"Forbidden")
+            return
+        if self.path not in ("/start", "/mute", "/stop"):
+            self.reply(404, b"Not found")
+            return
+        controls = {"/start": self.session.start, "/mute": self.session.mute,
+                    "/stop": self.session.stop}
+        controls[self.path]()
+        self.reply(200, b"{}")
+
+    def log_message(self, *_):
+        pass
+
+
+def serve(port: int) -> None:
+    session = Session()
+    token = secrets.token_urlsafe(32)
+    Handler.session = session
+    Handler.token = token
+    origin = Handler.origin = f"http://127.0.0.1:{port}"
+
+    with ThreadingHTTPServer(("127.0.0.1", port), Handler) as server:
+        print(f"MacBook audio controls: {origin} (microphone off until Start)", flush=True)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            session.stop()
+            if session.worker:
+                session.worker.join(65)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
+    parser.add_argument("--audio-fd", type=int, help=argparse.SUPPRESS)
+    args = parser.parse_args()
+    if args.audio_fd is not None:
+        NativeAudio(args.audio_fd).run()
+    else:
+        serve(args.port)

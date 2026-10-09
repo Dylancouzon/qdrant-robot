@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edgy · MacBook audio</title>
+<style>
+:root {color-scheme:dark;font:17px system-ui;background:#10151c;color:#edf4fb}
+body {max-width:660px;margin:10vh auto;padding:24px} h1 {font-size:42px;margin-bottom:8px}
+p {color:#a8b8cb;line-height:1.6} .panel {background:#192330;border:1px solid #344052;border-radius:18px;padding:24px;margin-top:28px}
+button {font:inherit;font-weight:650;padding:12px 24px;border:0;border-radius:10px;cursor:pointer;background:#c9fa66;color:#102000;margin:5px 8px 5px 0}
+button.secondary {background:#334257;color:#edf4fb} button:disabled {opacity:.4;cursor:default}
+label {display:block;margin-top:20px;color:#a8b8cb;font-size:14px} meter {width:100%;height:16px}
+#phase {font-size:22px;font-weight:600} #error {white-space:pre-wrap;color:#ffafa9;font-size:14px} #activity {min-height:24px;font-size:14px}
+</style>
+<h1>Talk with Edgy</h1>
+<p>Your MacBook carries the audio. The Jetson sees, listens, answers, and remembers.</p>
+<div class="panel">
+<div id="phase" role="status" aria-live="polite">Idle</div>
+<p id="activity">The microphone starts when you select Start.</p>
+<button id="start" onclick="control('start')">Start</button>
+<button id="mute" class="secondary" onclick="control('mute')" disabled>Mute</button>
+<button id="stop" class="secondary" onclick="control('stop')" disabled>Stop</button>
+<label id="input" for="inlevel">MacBook Pro Microphone</label><meter id="inlevel" min="0" max="1" value="0"></meter>
+<label id="output" for="outlevel">MacBook Pro Speakers</label><meter id="outlevel" min="0" max="1" value="0"></meter>
+<p id="error" role="alert"></p>
+</div>
+<p>Say “Hey Edgy” to begin. You can ask follow-up questions for about 20 seconds after each answer. The microphone sends silence during playback and while muted. Stop releases the audio session; this page stays ready for next time.</p>
+<p>The Mac stores no microphone recording. The Jetson keeps its existing conversation and answer logs.</p>
+<script>
+const el=id=>document.getElementById(id);
+async function control(action) {
+  try {const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN'}});if(!response.ok)throw Error('Control request failed: '+response.status);await status();}
+  catch(error){el('error').textContent=error.message;}
+}
+async function status(){
+  try {
+    const response=await fetch('/status');if(!response.ok)throw Error('Page connection failed');const s=await response.json();
+    el('phase').textContent=s.phase;el('error').textContent=s.error;
+    el('start').disabled=s.active;el('stop').disabled=!s.active;el('mute').disabled=!s.active||s.phase!=='Listening';
+    el('mute').textContent=s.muted?'Unmute':'Mute';el('input').textContent=s.input;el('output').textContent=s.output;
+    el('inlevel').value=s.input_level;el('outlevel').value=s.output_level;
+    el('activity').textContent=s.muted?'Microphone muted':s.suppressed?'Microphone paused for speaker playback':s.phase==='Listening'?'Listening through your MacBook':s.active?'Preparing the connection; please wait':'The microphone starts when you select Start.';
+  } catch(error){el('phase').textContent='Page disconnected';el('error').textContent=error.message;el('start').disabled=true;}
+}
+status();setInterval(status,300);
+</script>
+</html>
