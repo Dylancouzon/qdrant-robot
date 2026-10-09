@@ -2367,3 +2367,64 @@
 {"key": "e5f2cd50ce632f65", "pass": false, "why": "Does not give the revised start hour of eight.", "votes": [false, false, false]}
 {"key": "064be763e97d7504", "pass": false, "why": "Does not identify the courtyard.", "votes": [false, false, false]}
 {"key": "5ce59f03bb1c5dc8", "pass": false, "why": "Does not recall the book.", "votes": [false, false, false]}
+{"key": "1b384f9e8320f18a", "pass": false, "why": "Misses the etched sun.", "votes": [false, false, false]}
+{"key": "6eec2b0e682ae55a", "pass": true, "why": "Identifies the etched sun.", "votes": [true, true, true]}
+{"key": "1e599ee143468e9d", "pass": true, "why": "Identifies the mesh inset.", "votes": [true, true, true]}
+{"key": "bae0aecd9f17ff86", "pass": false, "why": "Misses the mesh inset and invents details.", "votes": [false, false, false]}
+{"key": "db46ace4a66336b6", "pass": false, "why": "Misses the silver tear.", "votes": [false, false, false]}
+{"key": "d8c19787671d6b77", "pass": true, "why": "Identifies the silver tear.", "votes": [true, true, true]}
+{"key": "2a6e39e55719ac23", "pass": true, "why": "Identifies the hexagonal lid.", "votes": [true, true, true]}
+{"key": "5a7cfed30d5f81a2", "pass": false, "why": "Misses the hexagonal lid.", "votes": [false, false, false]}
+{"key": "e6d7e6870f222bfa", "pass": false, "why": "Misses the velvet strap.", "votes": [false, false, false]}
+{"key": "f31dbec8f426c6f0", "pass": true, "why": "Identifies the velvet strap.", "votes": [true, true, true]}
+{"key": "07943908fcb9f498", "pass": true, "why": "Identifies the cork edge.", "votes": [true, true, true]}
+{"key": "89cac0a3f4f9510e", "pass": false, "why": "Misses the cork edge and invents details.", "votes": [false, false, false]}
+{"key": "2f43b28e65101d4b", "pass": false, "why": "Misses the marble base.", "votes": [false, false, false]}
+{"key": "b643c90d250f8343", "pass": true, "why": "Identifies the marble base.", "votes": [true, true, true]}
+{"key": "9e27840e246298b4", "pass": true, "why": "Identifies the ribbed handle.", "votes": [true, true, true]}
+{"key": "0015843357746cbd", "pass": false, "why": "Misses the ribbed handle.", "votes": [false, false, false]}
+{"key": "465bdbfeb2c152c3", "pass": true, "why": "Names the intended kite and festival.", "votes": [true, true, true]}
+{"key": "9541b0c926e46d04", "pass": true, "why": "Names the intended kite and festival.", "votes": [true, true, true]}
+{"key": "e8c301fb174d0825", "pass": true, "why": "Names the intended field guide.", "votes": [true, true, true]}
+{"key": "07525aa004def658", "pass": true, "why": "Names the intended field guide.", "votes": [true, true, true]}
+{"key": "cd86bdc2159b4ba0", "pass": true, "why": "Names the intended coating and bench.", "votes": [true, true, true]}
+{"key": "8adc038c21165b71", "pass": true, "why": "Names the intended coating and bench.", "votes": [true, true, true]}
+{"key": "3df040d63aa964ba", "pass": true, "why": "Names the intended receiver and purpose.", "votes": [true, true, true]}
+{"key": "f0d6aa2497f25542", "pass": true, "why": "Names the intended receiver and purpose.", "votes": [true, true, true]}
+{"key": "622b8da776de726e", "pass": true, "why": "Names the intended jacket and pageant.", "votes": [true, true, true]}
+{"key": "cf46782e6c696585", "pass": true, "why": "Names the intended jacket and pageant.", "votes": [true, true, true]}
+{"key": "5fb9fddb640e7838", "pass": true, "why": "Names the rotating estuary tide model.", "votes": [true, true, true]}
+{"key": "8d285e660d27740e", "pass": true, "why": "Names the rotating estuary tide model.", "votes": [true, true, true]}
+{"key": "8b122f9c1dcd667d", "pass": true, "why": "Names the cargo bicycle and purpose.", "votes": [true, true, true]}
+{"key": "ab3b587ad31b1863", "pass": true, "why": "Names the cargo bicycle and purpose.", "votes": [true, true, true]}
+{"key": "645f9b302769edae", "pass": true, "why": "Names the embossed signs and purpose.", "votes": [true, true, true]}
+{"key": "053fcbb455219726", "pass": true, "why": "Names the embossed signs and purpose.", "votes": [true, true, true]}
+{"key": "64e73cba6f49f0d0", "pass": true, "why": "Gives the current track, Hazel.", "votes": [true, true, true]}
+{"key": "5a307e6762322f55", "pass": true, "why": "Gives the current track, Hazel.", "votes": [true, true, true]}
+{"key": "d04cd7e8204ed7a8", "pass": true, "why": "Gives the revised Saturday evening arrival.", "votes": [true, true, true]}
+{"key": "cf945319279a3527", "pass": true, "why": "Gives the revised Saturday evening arrival.", "votes": [true, true, true]}
+{"key": "272d13d93e24417c", "pass": true, "why": "Gives the current table, Quartz.", "votes": [true, true, true]}
+{"key": "ace481ee8c9f24a6", "pass": true, "why": "Gives the current table, Quartz.", "votes": [true, true, true]}
+{"key": "1930e460d96331a0", "pass": true, "why": "Gives the current rack, Acacia.", "votes": [true, true, true]}
+{"key": "c92e566c73c9d778", "pass": true, "why": "Gives the current rack, Acacia.", "votes": [true, true, true]}
+{"key": "2390b86468fdcccb", "pass": false, "why": "Gives the cancelled time instead of nine forty.", "votes": [false, false, false]}
+{"key": "d1f1a7f9fd4f3289", "pass": false, "why": "Omits the current time, nine forty.", "votes": [false, false, false]}
+{"key": "8036d8667e32b3ce", "pass": false, "why": "Places collection on the porch instead of shed Aspen.", "votes": [false, false, false]}
+{"key": "720b24b0f280b508", "pass": false, "why": "Does not identify shed Aspen as the collection location.", "votes": [false, false, false]}
+{"key": "ae232cc4461b1217", "pass": true, "why": "Gives the current budget, 190 credits.", "votes": [true, true, true]}
+{"key": "26518ac504a9f101", "pass": true, "why": "Gives the current room, Onyx.", "votes": [true, true, true]}
+{"key": "1c8c00e9811b4cde", "pass": true, "why": "Gives the current room, Onyx.", "votes": [true, true, true]}
+{"key": "034f05309156f0ec", "pass": true, "why": "States the donor is unknown.", "votes": [true, true, true]}
+{"key": "a37618db1a631f4e", "pass": true, "why": "States the capacity is unknown.", "votes": [true, true, true]}
+{"key": "d79802457727fe3b", "pass": true, "why": "States the capacity is unknown.", "votes": [true, true, true]}
+{"key": "b65e78ba734209ff", "pass": true, "why": "States the manufacturer is unknown.", "votes": [true, true, true]}
+{"key": "08923f7cbc6698a4", "pass": true, "why": "States the manufacturer is unknown.", "votes": [true, true, true]}
+{"key": "9e3abba82d588307", "pass": true, "why": "States the weight is unknown.", "votes": [true, true, true]}
+{"key": "c3a6623701d00c78", "pass": true, "why": "States the weight is unknown.", "votes": [true, true, true]}
+{"key": "57702a40d79ace9b", "pass": true, "why": "Does not invent a fee.", "votes": [true, true, true]}
+{"key": "6b6274e920c3b7bd", "pass": true, "why": "States the fee is unknown.", "votes": [true, true, true]}
+{"key": "4950c8990d816286", "pass": true, "why": "States the supplier is unknown.", "votes": [true, true, true]}
+{"key": "81693ae1f1633bd7", "pass": true, "why": "Does not invent an adhesive.", "votes": [true, true, true]}
+{"key": "f2dcd7d28143c774", "pass": true, "why": "States the adhesive is unknown.", "votes": [true, true, true]}
+{"key": "cc2e9dc5ff3526f9", "pass": true, "why": "Does not invent an arrival date.", "votes": [false, true, true]}
+{"key": "7d4b6528226233d3", "pass": true, "why": "States the arrival time is unknown.", "votes": [true, true, true]}

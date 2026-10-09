@@ -1,0 +1,178 @@
+"""Paired frozen source-to-answer measurement on Jetson, supervised outside native code."""
+import hashlib
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+from eval.continuous import resources, kill_group
+
+WORKER = r'''
+import hashlib,importlib.metadata,json,os,platform,sys,tempfile,time
+from pathlib import Path
+assert platform.system()=="Linux" and platform.machine()=="aarch64"
+import cv2
+import numpy as np
+from bench import event_retrieval as bench
+from eval.continuous import resources,resource_delta
+from robot import audio,brain,memory,text_embed
+from robot.camera import FileCamera
+from robot.config import ROOT,SHARED
+from robot.main import Robot,Turn
+from robot.tts import RATE
+from robot.memory import Memory,about_past
+from robot.things import mentions
+out=Path(sys.argv[1]);run=SHARED/"sessions"/out.stem
+run.mkdir(parents=True)
+def emit(row):
+    with out.open("a") as f:f.write(json.dumps(row)+"\n")
+def sha(path):
+    with Path(path).open("rb") as f:return hashlib.file_digest(f,"sha256").hexdigest()
+cases=ROOT/"eval/dev/event-retrieval-2.jsonl"
+assert sha(cases)=="73256ac2096a41fc2b6bd09cdf397862db8b65f986241b2d06b5a9ca10a4d44a"
+rows=[json.loads(line) for line in cases.read_text().splitlines()]
+assert len(rows)==32
+thresholds={"observation":0.53,"utterance":0.55}
+weights,projector,_=brain.MODELS[brain.MODEL]
+emit({"type":"bindings","implementation_hashes":{str(p.relative_to(ROOT)):sha(p)
+      for p in [Path(brain.__file__),Path(memory.__file__),Path(text_embed.__file__),
+                Path(bench.__file__),ROOT/"robot/main.py",ROOT/"eval/continuous.py"]},
+      "model_sha256":sha(brain.GGUF/weights),"projector_sha256":sha(brain.GGUF/projector),
+      "runtime_sha256":sha(brain.SERVER),"environment_sha256":sha(ROOT/"ENV.txt"),
+      "model":brain.MODEL,"precision":"Q4_K_M weights; Q8_0 projector; float32 BGE/Edge",
+      "context_tokens":2048,"image_tokens":256,"output_tokens":64,"max_sentences":1,
+      "temperature":0,"repeat_penalty":1.15,"thresholds":thresholds,
+      "calibration_sha256":"c5d098a367560c3d56bae27144dd53c19f4cbbee5d1adfbfcdecf6da1c954000",
+      "fixture_sha256":sha(cases),"python":platform.python_version(),
+      "software":{p:importlib.metadata.version(p) for p in
+                  ["numpy","qdrant-edge-py","onnxruntime-gpu","tokenizers"]},
+      "machine":platform.node(),"cases":str(cases.relative_to(ROOT)),
+      "limits":"Controlled stored text, no ASR input/history/image. Post-transcript timing only."})
+camera_path=run/"blank.png";cv2.imwrite(str(camera_path),np.zeros((360,640,3),np.uint8))
+camera=FileCamera(camera_path)
+robot=Robot(camera,run/"robot",memory=run/"runtime-memory",wake_word=False)
+robot.speaking=True
+robot.jobs.join()
+emit({"type":"phase","phase":"paired","camera_sha256":sha(camera_path)})
+count=0
+try:
+    for ordinal,case in enumerate(rows):
+        with tempfile.TemporaryDirectory(dir=run) as temporary:
+            store=Memory(Path(temporary))
+            try:
+                ids,units,updates=bench.prepare(store,robot.embed,case["sources"])
+                emit({"type":"prepared","id":case["id"],"points":len(ids),
+                      "units":units,"updates":updates})
+                for arm in (("production","calibrated") if ordinal%2==0
+                            else ("calibrated","production")):
+                    robot.brain.prefill(brain.messages([],None))
+                    start=time.time();started=time.monotonic();detected=robot.detections
+                    before=resources(os.getpid())
+                    emit({"type":"phase","phase":"answer","id":case["id"],"arm":arm})
+                    query=robot.embed([case["question"]])[0]
+                    if arm=="production":
+                        entries=bench.production(store,query,case)
+                    else:
+                        candidates=[]
+                        for kind in bench.KINDS:
+                            candidates+=store.events(query,case["query_at"],case["visitor_since"],
+                                thresholds[kind],kind,skip=lambda text:mentions(text,case.get("ignored_kinds",[])))
+                        entries=bench.select(candidates,thresholds)
+                    retrieved=time.monotonic()
+                    original=list(entries);dropped=[]
+                    while True:
+                        observations=[];told=[]
+                        for event in entries:
+                            source=store.source_event(event["source_id"],event["kind"])
+                            assert source and source["source_hash"]==event["source_hash"]
+                            line=f"{brain.age(case['query_at']-source['capture_ts'])}: {event['text']}"
+                            if event["kind"]=="observation":observations.append((source["capture_ts"],line))
+                            else:told.append(line)
+                        msgs=brain.messages([],None,[line for _,line in sorted(observations)],question=case["question"],
+                                            past=about_past(case["question"]),told=told)
+                        budget=robot.brain.budget(msgs)
+                        if budget["prompt_token_bound"]+64<=2048:break
+                        if not entries:raise RuntimeError("Question/system exceeds context")
+                        dropped.append(entries[-1]);entries=entries[:-1]
+                    budgeted=time.monotonic()
+                    metrics=bench.evaluate(case,ids,entries)
+                    if arm=="calibrated" and case["decisive_spans"]:
+                        assert metrics["decisive_spans_delivered"]==len(case["decisive_spans"]),metrics
+                    turn=Turn(question=case["question"],speech_start=start,speech_end=start,
+                              line=start,transcribed=start)
+                    pcm=robot._speak(robot._tokens(msgs,turn),turn)
+                    done=time.monotonic();after=resources(os.getpid())
+                    assert turn.answer.strip() and pcm and turn.first_audio>start
+                    assert robot.detect_failed is None and all(t.is_alive() for t in robot.threads)
+                    wav=run/f"{case['id']}-{arm}.wav"
+                    audio.write_wav(wav,np.concatenate(pcm),RATE)
+                    emit({"type":"answer","id":f"{case['id']}-{arm}","step":case["id"],
+                          "arm":arm,"variant":arm,"category":case["category"],
+                          "heard":case["question"],"answer":turn.answer,"rubric":case["rubric"],
+                          "selected":original,"delivered":entries,"dropped":dropped,
+                          "source_ids":ids,"metrics":metrics,"prompt":msgs,"budget":budget,
+                          "cold":ordinal==0,"query_retrieval_s":retrieved-started,
+                          "budget_s":budgeted-retrieved,"first_audio_s":turn.first_audio-start,
+                          "answer_s":done-started,"detect_fps":(robot.detections-detected)/(done-started),
+                          "resources_before":before,"resources_after":after,
+                          "paging_delta":resource_delta(before,after),"wav":str(wav),
+                          "wav_sha256":sha(wav),"audio_s":len(np.concatenate(pcm))/RATE})
+                    count+=1;print(f"{count}/64 {arm} {case['id']}",flush=True)
+            finally:store.shard.close()
+finally:
+    emit({"type":"phase","phase":"cleanup"})
+    robot.close();camera.close()
+assert count==64
+emit({"type":"worker_complete","n":count})
+'''
+
+base = Path(os.environ['ROBOT_SHARED']) / 'results'
+out = base / f"{time.strftime('%Y-%m-%d')}-paired-event-answers-{time.time_ns()}.jsonl"
+telemetry = out.with_suffix('.telemetry.jsonl')
+with out.open('x') as f:
+    f.write(json.dumps({'type':'metadata','release':os.environ['ROBOT_RELEASE'],
+        'tegrastats':os.environ['ROBOT_TEGRASTATS'],'probe_sha256':sys.argv[1],
+        'worker_sha256':hashlib.sha256(WORKER.encode()).hexdigest(),'expected':64,
+        'measurement':'J paired source-to-answer; ASR loaded but no speech input',
+        'command':'tools/jetson.py run f1f-answers-a -- -c archived-runner SOURCE_SHA256',
+        'watchdogs_s':{'startup':180,'progress':90,'cleanup':60,'reap':10}})+'\n')
+p = subprocess.Popen([sys.executable,'-u','-c',WORKER,str(out)],start_new_session=True)
+last=time.monotonic();phase='startup';reason=None;buffer='';sample=0
+with out.open() as tail,telemetry.open('x') as stats:
+    while p.poll() is None:
+        buffer+=tail.read()
+        lines=buffer.split('\n');buffer=lines.pop()
+        for line in lines:
+            row=json.loads(line);last=time.monotonic()
+            if row.get('type')=='phase':phase=row['phase']
+        now=time.monotonic()
+        if now-sample>=1:
+            stats.write(json.dumps({'wall':time.time(),'phase':phase,'resources':resources(p.pid)})+'\n')
+            stats.flush();sample=now
+        limit=180 if phase=='startup' else 60 if phase=='cleanup' else 90
+        if now-last>limit:
+            reason=f'{phase} progress timeout';os.killpg(p.pid,signal.SIGTERM)
+            try:p.wait(timeout=10)
+            except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait(timeout=10)
+            break
+        time.sleep(0.25)
+rc=p.returncode
+try:
+    os.killpg(p.pid,0)
+except ProcessLookupError:
+    pass
+else:
+    reason=reason or "worker left process-group descendants"
+if not kill_group(p):reason="worker reaping failed"
+if reason:rc=124
+with out.open('a') as f:f.write(json.dumps({'type':'native_exit','native_exit':rc,'reason':reason})+'\n')
+if rc==0:
+    rows=[json.loads(x) for x in out.read_text().splitlines()]
+    assert sum(x.get('type')=='answer' for x in rows)==64
+    assert rows[-2]=={'type':'worker_complete','n':64}
+    with out.open('a') as f:f.write(json.dumps({'summary':'paired_event_answers','completed':True,
+                                              'n':64,'native_exit':0})+'\n')
+print('saved',out,'native_exit',rc,flush=True)
+raise SystemExit(rc)
