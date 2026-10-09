@@ -12,7 +12,7 @@ import sys
 import time
 import re
 import urllib.request
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 
 import cv2
 import numpy as np
@@ -97,6 +97,37 @@ def sentences(text: str) -> int:
                for m in _SENTENCE.findall(text))
 
 
+def _content(r) -> Iterator[str]:
+    """The text deltas of a streamed chat completion."""
+    for raw in r:
+        line = raw.decode().strip()
+        if line.startswith("data: ") and line != "data: [DONE]":
+            for choice in json.loads(line[6:]).get("choices", []):
+                if delta := choice.get("delta", {}).get("content"):
+                    yield delta
+
+
+def unecho(prior: str, deltas: Iterable[str]) -> Iterator[str]:
+    """`deltas` without their leading echo of `prior` (llama-server streams an assistant
+    prefill back first). Text that is not an exact echo is kept and logged, never dropped."""
+    held: str | None = ""
+    for d in deltas:
+        if held is None:
+            yield d
+            continue
+        held += d
+        if not prior.startswith(held[:len(prior)]):
+            print(f"resume: the stream does not echo the prefill; kept {held!r}", flush=True)
+            yield held
+            held = None
+        elif len(held) >= len(prior):
+            if held := held[len(prior):]:
+                yield held
+            held = None
+    if held:
+        print(f"resume: the stream ended inside the echo {held!r}", flush=True)
+
+
 def age(seconds: float) -> str:
     if seconds < 90:
         return f"{round(seconds)} seconds ago"
@@ -151,21 +182,32 @@ class Brain:
         with self._post({"messages": msgs, "max_tokens": 0}) as r:
             r.read()
 
-    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS) -> Iterator[str]:
-        """Stream the answer text, at most MAX_SENTENCES sentences. Closing the generator
-        early stops generation."""
-        text = ""
+    def tokens(self, text: str) -> int:
+        """How many tokens `text` takes."""
+        req = urllib.request.Request(f"{URL}/tokenize", json.dumps({"content": text}).encode(),
+                                     {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return len(json.load(r)["tokens"])
+
+    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
+               ) -> Iterator[str]:
+        """Stream the answer text, at most MAX_SENTENCES sentences and `max_tokens` tokens.
+        Closing the generator early stops generation; `prior` resumes it: the answer so far,
+        as an assistant prefill, counts against `max_tokens`."""
+        if sentences(prior) >= MAX_SENTENCES:  # paused right after the last sentence
+            return
+        if prior:
+            msgs = msgs + [{"role": "assistant", "content": prior}]
+            if (max_tokens := max_tokens - self.tokens(prior)) <= 0:
+                return
+        text = prior
         with self._post({"messages": msgs, "max_tokens": max_tokens, "stream": True,
                          "repeat_penalty": 1.15}) as r:
-            for raw in r:
-                line = raw.decode().strip()
-                if line.startswith("data: ") and line != "data: [DONE]":
-                    for choice in json.loads(line[6:]).get("choices", []):
-                        if delta := choice.get("delta", {}).get("content"):
-                            yield delta
-                            text += delta
-                            if sentences(text) >= MAX_SENTENCES:
-                                return
+            for delta in unecho(prior, _content(r)):
+                yield delta
+                text += delta
+                if sentences(text) >= MAX_SENTENCES:
+                    return
 
     def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
         """Describe one frame from the frame alone (no persona, no conversation), so a memory
@@ -188,6 +230,10 @@ if __name__ == "__main__":
         args = server_args(sys.argv[2] if len(sys.argv) > 2 else MODEL)
         os.execv(args[0], args)
     assert age(30) == "30 seconds ago" and age(600) == "10 minutes ago"
+    assert list(unecho("Hi, I", ["Hi", ", I", " see", " a cup."])) == [" see", " a cup."]
+    assert list(unecho("Hi, I", ["Hi, I s", "ee"])) == [" s", "ee"], "echo and text in one"
+    assert list(unecho("Hi, I", [" see", " it."])) == [" see", " it."], "no echo: all kept"
+    assert list(unecho("Hi, I", ["Hi", " there"])) == ["Hi there"], "a changed echo is kept"
     assert sentences("Of course! Why don't scientists trust atoms?") == 0
     assert sentences("Sure! Here's one: Why don't scientists trust calculators?") == 0
     hello = "Hello there, it is so nice to meet you! I see clothes hanging on a rack."

@@ -9,6 +9,7 @@ times and saves its answer audio.
 import argparse
 import contextlib
 import json
+import os
 import queue
 import threading
 import time
@@ -25,6 +26,7 @@ from robot.asr import Ears, Scribe
 from robot.config import SHARED
 from robot.detect import CONFIRM, Detector, Sighting, Tracker
 from robot.faces import Faces
+from robot.focus import Focus, Track
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     Memory,
@@ -41,13 +43,12 @@ from robot.memory import (
 )
 from robot.people import (
     DECLINED,
-    NO_FACE_SEEN,
-    NOT_SURE,
     THRESHOLD,
     People,
     consent,
     done,
     face,
+    name_in,
     reply,
     request,
 )
@@ -66,6 +67,7 @@ from robot.things import (
     unmention,
 )
 from robot.tts import RATE, Speaker, phrases
+from robot.view import Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
@@ -78,7 +80,8 @@ WHERE = {"left": "on your left", "center": "in the center", "right": "on your ri
 # Identity is the face in the current frame, never a track (design
 # reviews/20261008-161702-78890-design.md): a visitor replacing another keeps the track id.
 # A face step runs only on an identity question and after a turn is spoken (to link it).
-# No usable face: NO_FACE_SEEN; a name told but never enrolled: NOT_SURE (no face is held).
+# Without an enrolled face match, a name told in this conversation answers (D60).
+CONVERSATION_S = 20  # a line this soon after the last one continues the conversation (D63, D65)
 CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 VIEW_S = 0.33  # spacing of the recent views a named object's crops come from
 SETTLE_S = 0.5  # how long a "my phone" turn waits for tracks confirmed after its speech start
@@ -137,6 +140,7 @@ class Turn:
     identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
+    resumed: bool = False         # decode paused at the first phrase and resumed (D66)
 
 
 class Robot:
@@ -163,6 +167,8 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = 0.0  # when self.view was detected
+        self.focus: Focus | None = None  # the focus object and shown names (D63), per frame
+        self.screen: tuple[np.ndarray | None, Screen] = (None, Screen())  # what the view draws
         self.views: deque[tuple[float, np.ndarray, dict]] = deque(maxlen=SHOTS)
         self.mine: dict[int, str] = {}  # track id -> the visitor's object it was named as
         # (name, times asked, [face] of the request): consent asked, the face held only until
@@ -172,6 +178,12 @@ class Robot:
         # identification: RAM only, never written, dropped when another face or no face for
         # CLEAR_S follows (or at a restart). Until then no turn showing that face is stored.
         self.hiding: tuple[np.ndarray, float] | None = None
+        # (name, face or None, offered) the visitor told in this conversation (D60): the face
+        # is held in RAM only, to link the speaker to the name; never written. offered: the
+        # robot offered to remember their face (D69), once per linked visitor.
+        self.told: tuple[str, np.ndarray | None, bool] | None = None
+        self.last_line = 0.0  # when the visitor's last answered line ended (speech end)
+        self.stream: Iterator[str] | None = None  # the brain's answer while a turn decodes
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
         self.history: list[dict] = []
@@ -193,6 +205,9 @@ class Robot:
         for t in self.threads:
             t.start()
         self.ears = Ears(self._heard_start, self._heard_line)
+        token = os.environ.get("ROBOT_VIEW_TOKEN")  # the booth video view (D59), off without one
+        self.video = View(self._shown, int(os.environ.get("ROBOT_VIEW_PORT", "8090")), token,
+                          os.environ.get("ROBOT_VIEW_HOST", "127.0.0.1")) if token else None
 
     def hear(self, chunk: np.ndarray) -> None:
         self.ears.feed(chunk)
@@ -223,7 +238,9 @@ class Robot:
             self.history, self.exchanges, self.ready = [], 0, None
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
+            self.told, self.last_line = None, 0.0
             self.view, self.mine = (None, {}), {}
+            self.focus, self.screen = None, (None, Screen())
             self.views.clear()
 
     def _heard_start(self) -> None:
@@ -288,7 +305,23 @@ class Robot:
             self.view, self.view_at = (frame, self.tracker.view()), time.time()
             if not self.views or time.time() - self.views[-1][0] >= VIEW_S:
                 self.views.append((time.time(), *self.view))
+            self._refocus(frame)
         return found
+
+    def _refocus(self, frame: np.ndarray) -> None:
+        """Feed the focus the tracks in view on the frame just tracked, and keep the view's
+        boxes for that frame (held under self.detecting)."""
+        tracks = [Track(*t) for t in self.tracker.scored()]
+        people = [t.box for t in tracks if t.label == "person"]
+        self.focus = self.focus or Focus(frame.shape[1], frame.shape[0])
+        self.focus.ignored = self.ignored
+        self.focus.update(self.view_at, tracks, people)
+        self.screen = frame, Screen(self.focus.boxes(tracks, people))
+
+    def _shown(self) -> tuple[np.ndarray | None, Screen]:
+        """The view's source: the newest tracked frame and its boxes."""
+        with self.detecting:
+            return self.screen
 
     def _sight(self, found: list[Sighting], frame: np.ndarray) -> None:
         """One point per track (label, region, times; no frame: answers use labels, and a
@@ -423,7 +456,7 @@ class Robot:
             tokens = self._said(turn.facts[0], turn)
         else:
             tokens = self._tokens(msgs, turn)
-        audio_parts = list(self._speak(phrases(tokens), turn))
+        audio_parts = self._speak(tokens, turn)
         turn.done = time.time()
         turn.detect_fps = (self.detections - detections) / (turn.done - started)
         turn.wav = f"{int(turn.line * 1000)}.wav"
@@ -437,6 +470,7 @@ class Robot:
         statement = None if is_question(turn.question) else question  # findable later
         self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
                     statement, track)
+        self.last_line = turn.speech_end
         with (self.out / "turns.jsonl").open("a") as f:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
@@ -460,6 +494,7 @@ class Robot:
         seen = self._whois(frame)
         if self._hidden(seen, track):
             return
+        self._hear_name(turn, seen)
         pid = turn.frame_id = self.memory.add(frame, turn.question, statement, taken)
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it
@@ -497,25 +532,52 @@ class Robot:
     def _identity(self, turn: Turn, frame: np.ndarray, track: int | None) -> str | None:
         """Identity requests answered in code (robot/people.py) from the face in the current
         frame, never from a track: consent, enrollment, "forget me", "do you remember me",
-        "what's my name". None for any other turn."""
+        "what's my name", and the offer to remember a face after "I'm Ana". None for any
+        other turn."""
         asked, self.asking = self.asking, None
         if asked and (answer := self._consent(turn, asked, frame)) is not None:
             return answer
-        if request(turn.question) is None:
+        if (req := request(turn.question)) is None and not name_in(turn.question):
             return None
-        if (seen := self._whois(frame, turn)) is None:
-            return NO_FACE_SEEN
-        vec, name = seen
+        seen = self._whois(frame, turn)
+        vec, name = seen or (None, None)
         turn.identity["claimed"] = name
-        said = reply(turn.question, (name, 1.0) if name else None, True)
-        if said is None:  # a name no enrolled face gives
-            return NOT_SURE
-        answer, action = said
+        self._hear_name(turn, seen)
+        if req is None:
+            return None if name else self._offer(vec)
+        answer, action = reply(turn.question, (name, 1.0) if name else None, seen is not None,
+                               self.told[0] if self.told else None)
         if action and action[0] == "forget":
             return done("forget", action[1], self._forget(track, action[1], vec))
         if action:
             self.asking = action[1], 1, [vec]
         return answer
+
+    def _offer(self, vec: np.ndarray | None) -> str | None:
+        """After a name told by an unknown face, offer once per linked visitor to remember
+        it (D69): a yes from the same face enrolls through _consent; anything else, or no face
+        at the telling (no offer), keeps the name told only."""
+        told, face_, offered = self.told
+        if offered or vec is None:
+            return None
+        self.told = told, face_, True
+        self.asking = told, 2, [vec]  # 2: an unclear reply never re-asks
+        return f"Nice to meet you, {told}! Want me to remember your face so I recognize you " \
+               "next time?"
+
+    def _hear_name(self, turn: Turn, seen: tuple[np.ndarray, str | None] | None) -> None:
+        """Hold the name the visitor tells with the face seen then. A held name stays only
+        while the speaker is linked to it: the face now matches the face it was told with, or
+        it was told without a face, no face is seen now, and this line started at most
+        CONVERSATION_S after the last one ended."""
+        if self.told:
+            held = self.told[1]
+            linked = (float(seen[0] @ held) >= THRESHOLD if seen else False) if held is not None \
+                else not seen and turn.speech_start - self.last_line <= CONVERSATION_S
+            if not linked:
+                self.told = None
+        if name := name_in(turn.question):
+            self.told = name, seen[0] if seen else None, bool(self.told and self.told[2])
 
     def _consent(self, turn: Turn, asked: tuple[str, int, list], frame: np.ndarray
                  ) -> str | None:
@@ -550,7 +612,7 @@ class Robot:
             return False
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
-        self.hiding = face_, time.time()
+        self.hiding, self.told = (face_, time.time()), None
         return True
 
     def _things(self, turn: Turn) -> str | None:
@@ -732,24 +794,49 @@ class Robot:
         yield fact
 
     def _tokens(self, msgs: list[dict], turn: Turn) -> Iterator[str]:
-        for delta in self.brain.answer(msgs):
-            turn.first_token = turn.first_token or time.time()
-            turn.answer += delta
-            yield delta
+        """The brain's answer as it streams. Decode pauses while the first phrase is
+        synthesized (D66): _speak closes self.stream, and the next delta asked for resumes it
+        with the answer so far as an assistant prefill. Closing this generator closes the
+        stream (an interrupted turn stops decoding)."""
+        self.stream = self.brain.answer(msgs)
+        try:
+            while (delta := next(self.stream, None)) is not None:
+                turn.first_token = turn.first_token or time.time()
+                turn.answer += delta
+                yield delta
+                if self.stream is None:  # paused
+                    turn.resumed = True
+                    self.stream = self.brain.answer(msgs, prior=turn.answer)
+        finally:
+            if self.stream:
+                self.stream.close()
+            self.stream = None
         turn.answer = turn.answer.strip()
 
-    def _speak(self, texts: Iterator[str], turn: Turn) -> Iterator[np.ndarray]:
-        for text in texts:
-            turn.first_phrase = turn.first_phrase or time.time()
-            pcm = self.voice.say(text)
-            turn.first_audio = turn.first_audio or time.time()
-            self.speaker.play(pcm)
-            yield pcm
+    def _speak(self, tokens: Iterator[str], turn: Turn) -> list[np.ndarray]:
+        """Synthesize and play the answer phrase by phrase. If synthesis fails, `tokens` is
+        closed, which stops decoding, before the error propagates."""
+        audio_parts = []
+        try:
+            for text in phrases(tokens):
+                if not turn.first_phrase and self.stream:  # Kokoro waits for the GPU (D66)
+                    self.stream.close()  # llama-server stops this generation
+                    self.stream = None
+                turn.first_phrase = turn.first_phrase or time.time()
+                pcm = self.voice.say(text)
+                turn.first_audio = turn.first_audio or time.time()
+                self.speaker.play(pcm)
+                audio_parts.append(pcm)
+        finally:
+            tokens.close()
+        return audio_parts
 
     def close(self) -> None:
         """Finish the queued work, stop the threads, and release the shards and llama-server,
         so a new Robot can open the same memory folder (a restart)."""
         watch, detect, transcribe, work = self.threads
+        if self.video:
+            self.video.close()
         self.closing.set()
         watch.join()               # no more looks
         detect.join()              # no more sightings

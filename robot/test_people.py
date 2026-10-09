@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from robot.config import MODELS, ROOT
 from qdrant_edge import Point, UpdateOperation
-from robot.people import DIM, NO_FACE, People, consent, done, face, reply, request
+from robot.people import DIM, NO_FACE, NOT_MET, People, name_in, consent, done, face, reply, request
 
 LFW = ROOT / "eval/faces/lfw/lfw"  # public photos (gitignored), never team photos
 
@@ -56,15 +56,25 @@ def test_answers() -> None:
     sam = ("Sam", 0.7)
     assert request("Hey, do you still remember me?") == ("remembers", None)
     assert request("Could you remember me? My name is Kai Tanaka.") == ("enroll", "Kai Tanaka")
-    assert request("Please learn my face, I'm lena") == ("enroll", "Lena")
+    assert request("Please learn my face, my name is lena") == ("enroll", "Lena")
+    for said, name in [("I'm Ana from Berlin.", "Ana"), ("Hi, I am Priya.", "Priya"),
+                       ("Call me Jo.", "Jo"), ("This is Omar speaking.", "Omar"),
+                       ("My name's Kai and I build drones.", "Kai")]:
+        assert name_in(said) == name, said
+    for said in ["I'm tired.", "I'm fine, thanks.", "I'm here!", "I'm looking for the bathroom.",
+                 "I am just visiting.", "I'm Sorry.", "I'm lena", "I'm good, and you?"]:
+        assert name_in(said) is None, said
     assert request("Remember me, I'm back!") == ("enroll", None), "'back' is no name"
     assert request("Who am I?") == ("name", None)
     assert request("Please delete my face.") == ("forget", None)
     assert request("Don't forget me!") is None and request("I'm visiting from Lyon.") is None
     assert reply("Do you recognize me?", sam, True)[0] == "You're Sam. I remember your face."
-    assert reply("What's my name?", None, True) is None, "a told name may answer it"
-    assert reply("Have we met?", None, True)[0].startswith("I don't think we've met")
-    assert reply("Have we met?", None, False) == (NO_FACE, None)
+    assert reply("What's my name?", None, True) == (NOT_MET, None)
+    assert reply("What's my name?", None, False, "Ana")[0] == "You told me you're Ana."
+    assert reply("What's my name?", sam, True, "Ana")[0].startswith("You're Sam"), "face wins"
+    assert reply("Have we met?", None, False) == (NOT_MET, None), "no face: still no claim"
+    assert reply("Do you remember me?", None, True, "Jo") == (NOT_MET, None), "told, not known"
+    assert reply("Remember me, I'm Jo.", None, False) == (NO_FACE, None), "enrolling needs one"
     assert reply("Remember me, I'm Jo.", None, True)[1] == ("ask", "Jo")
     assert reply("Remember me, I'm Jo.", sam, True)[1] is None, "already known"
     assert reply("Forget me please.", sam, True) == (None, ("forget", "Sam")), "speak after"
@@ -90,6 +100,10 @@ def test_face_step() -> None:
     assert face(faces, small) is None, "a face under MIN_FACE"
 
 
+def offer(name: str) -> str:
+    return f"Nice to meet you, {name}! Want me to remember your face so I recognize you next time?"
+
+
 def test_robot_identity(monkeypatch) -> None:
     """The robot's identity turns through Robot._turn on real Edge shards, with a fake face
     step (a person's face vector is the pixel value of their frame; 99: the face is hidden)
@@ -106,7 +120,7 @@ def test_robot_identity(monkeypatch) -> None:
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
     from robot.main import Robot, Turn
     from robot.memory import Memory
-    from robot.people import DECLINED, NO_FACE_SEEN, NOT_SURE, _id
+    from robot.people import DECLINED, _id
     from robot.text_embed import DIM as TEXT_DIM
     from robot.things import Things
 
@@ -128,6 +142,7 @@ def test_robot_identity(monkeypatch) -> None:
         robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
         robot.named, robot.ignored, robot.mine = set(), set(), {}
         robot.asking, robot.hiding, robot.detecting = None, None, threading.Lock()
+        robot.told, robot.stream, robot.last_line = None, None, 0.0
         robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
         robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
         robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
@@ -135,7 +150,7 @@ def test_robot_identity(monkeypatch) -> None:
         robot.out.mkdir(exist_ok=True)
         robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
         robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "social"
-        robot.brain = Stub(prefill=lambda m: None, answer=lambda m: iter(["Okay."]))
+        robot.brain = Stub(prefill=lambda m: None, answer=lambda m, **k: (t for t in ["Okay."]))
         robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
         robot.speaker = Stub(play=lambda pcm: None)
         return robot
@@ -169,9 +184,23 @@ def test_robot_identity(monkeypatch) -> None:
 
         ana = frames(1, 60)
         assert steps == [], "no face step without a turn"
-        assert ask("What's my name?", ana) == NOT_SURE
-        assert ask("Nice to meet you, I'm Ana.", ana) is None, "the conversation answers"
-        assert ask("What's my name?", ana) == NOT_SURE, "a told name is not held (ruling due)"
+        assert ask("What's my name?", ana) == NOT_MET
+        assert ask("Nice to meet you, I'm Ana.", ana) == offer("Ana"), "a name: one offer (D69)"
+        assert ask("What's my name?", ana) == "You told me you're Ana.", "no reply keeps the name"
+        assert ask("I'm Ana, as I said.", ana) is None, "the offer is never repeated"
+        assert ask("What's my name?", frames(99, 1)) == NOT_MET, "her face is gone: unlinked"
+        assert ask("I'm Ana.", frames(99, 1)) is None, "told with no face: no offer"
+        assert ask("What's my name?", frames(99, 1)) == "You told me you're Ana.", "a follow-up"
+        for _ in range(main.CONVERSATION_S + 1):
+            next(clock)  # a pause: whoever speaks now may be someone else
+        assert ask("What's my name?", frames(99, 1)) == NOT_MET, "no face after a gap: dropped"
+        assert ask("I'm Ana.", frames(99, 1)) is None
+        assert ask("Yes.", frames(4, 1)) is None and robot.people.identify(np.eye(DIM)[4]) is None \
+            and robot.people.identify(np.eye(DIM)[1]) is None, "another visitor's yes: nobody"
+        assert ask("I'm Ana.", ana) == offer("Ana"), "her face: a new linked visitor, one offer"
+        assert ask("No thanks.", ana) == DECLINED, "no"
+        assert robot.people.identify(np.eye(DIM)[1]) is None, "a no enrolls nothing"
+        assert ask("What's my name?", ana) == "You told me you're Ana.", "the name stays"
         assert ask("Remember me, I'm Ana.", ana).startswith("May I remember your face, Ana?")
         assert ask("Hmm, what?", ana).startswith("Sorry, may I"), "unclear: asked once more"
         assert ask("What's the weather?", ana) is None, "then the conversation goes on"
@@ -190,15 +219,15 @@ def test_robot_identity(monkeypatch) -> None:
             "and the prefilled look of Ana stays valid for his turn"
         assert ask("Do you remember me?", ben).startswith("I don't think we've met")
         assert linked("Ana") == ana_links, "his turn is not linked to her"
-        assert ask("Who am I?", ben) == NOT_SURE and linked("Ana") == ana_links, \
-            "Ben inherits neither Ana's name nor her evidence"
+        assert ask("Who am I?", ben) == NOT_MET and linked("Ana") == ana_links, \
+            "Ben inherits neither Ana's told name nor her evidence"
         assert ask("Remember me, I'm Ben.", ben).startswith("May I")
         assert ask("Yes.", frames(1, 1)) == done("enroll", "Ben", False), "not the face that asked"
         assert ask("Remember me, I'm Ben.", ben).startswith("May I")
         assert ask("Yes.", ben) == done("enroll", "Ben", True)
         assert ask("Great, thanks, robot.", ben) is None
         hidden = frames(99, 1)
-        assert ask("What's my name?", hidden) == NO_FACE_SEEN, "no face: a code answer"
+        assert ask("What's my name?", hidden) == NOT_MET, "no face to link Ben's told name"
         frames(2, 3)
         frames(None, MAX_MISSED + 2)  # Ben leaves; Ana steps in nearby before his track ends
         ana = frames(1, CONFIRM + 1, near)
@@ -246,3 +275,8 @@ def test_robot_identity(monkeypatch) -> None:
             np.eye(DIM)[2]) is None, "after a reopen of both shards"
         assert ask("Do you remember me?", frames(1, CONFIRM + 1)).startswith(
             "I don't think we've met"), "only a new consent could enroll her again"
+        cy = frames(3, 1)
+        assert ask("Hi, I'm Cy.", cy) == offer("Cy") and robot.people.identify(np.eye(DIM)[3]) \
+            is None, "a name alone is never consent"
+        assert ask("Yes, please.", cy) == done("enroll", "Cy", True)
+        assert robot.people.identify(np.eye(DIM)[3])[0] == "Cy", "a yes to the offer enrolls"

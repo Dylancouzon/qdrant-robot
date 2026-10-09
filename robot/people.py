@@ -130,27 +130,35 @@ _REMEMBERS = re.compile(r"\b(do|did|can|could|will|would)\s+you\s+(still\s+)?(re
                         r"^\W*(remember|recogni[sz]e)\s+me\s*\?", re.I)
 _NAME_Q = re.compile(r"\b(what'?s|what is|do you know|tell me|say)\s+my name\b|\bwho am i\b", re.I)
 _ENROLL = re.compile(r"\b(remember|recogni[sz]e|learn|memori[sz]e)\s+(me|my face)\b", re.I)
-_NAME = re.compile(r"\b(?:i'?m|i am|my name is|my name'?s|call me)\s+([a-z][a-z'-]*)"
-                   r"(?:\s+([a-z][a-z'-]*))?", re.I)
-# ponytail: common words after "I'm" that are no name ("I'm back"); the robot also confirms
+# Names: "my name is X", "call me X", "this is X speaking" (any case, up to two words), or
+# "I'm X" / "I am X" with X one capitalized word: Parakeet capitalizes proper names, so
+# "I'm tired" and "I'm looking for..." are no names.
+_CALLED = re.compile(r"\b(?:my name is|my name'?s|call me)\s+([a-z][a-z'-]*)"
+                     r"(?:\s+([a-z][a-z'-]*))?|\bthis is ([a-z][a-z'-]*) speaking\b", re.I)
+_I_AM = re.compile(r"\b[Ii](?:['\u2019]?m| am)\s+([A-Z][a-z'-]*)\b")
+# ponytail: common words that are no name ("I'm Back", "call me back"); the robot also confirms
 # the name in its consent question, where "no" stops a wrong one.
-_NOT_NAMES = {"a", "an", "and", "again", "also", "back", "but", "fine", "from", "glad", "going",
-              "good", "happy", "here", "it", "just", "me", "new", "not", "okay", "ok", "please",
-              "really", "remember", "so", "sorry", "still", "sure", "that", "the", "this", "too",
-              "very", "visiting", "you", "your"}
+_NOT_NAMES = {"a", "actually", "afraid", "again", "all", "also", "an", "and", "at", "back",
+              "bored", "busy", "but", "cold", "curious", "doing", "done", "excited", "fine",
+              "from", "getting", "glad", "going", "good", "great", "happy", "having", "here",
+              "hot", "hungry", "in", "interested", "it", "just", "late", "looking", "lost", "me",
+              "new", "not", "ok", "okay", "on", "only", "please", "pretty", "ready", "really",
+              "remember", "so", "sorry", "still", "sure", "that", "the", "there", "thinking",
+              "this", "tired", "too", "trying", "very", "visiting", "waiting", "well",
+              "wondering", "working", "you", "your"}
 _NO = re.compile(r"\b(no|nope|nah|don'?t|do not|rather not|not really|never)\b", re.I)
 _YES = re.compile(r"\b(yes|yeah|yep|yup|sure|ok(ay)?|of course|go ahead|please do|alright|"
                   r"absolutely|fine|you (may|can))\b", re.I)
 
 DECLINED = "All right, I won't remember your face."
-NO_FACE = "I can't see your face well enough. Please look at me and ask again."
-NO_FACE_SEEN = "I can't see your face right now."
-NOT_SURE = "I'm not sure who you are."
+NO_FACE = "Please look at me and say it again, so I can learn your face."
+NOT_MET = "I don't think we've met yet. What's your name?"
 
 
 def name_in(text: str) -> str | None:
-    """The name a visitor gives ("I'm Sam Lee" -> "Sam Lee"), or None."""
-    m = _NAME.search(text)
+    """The name a visitor gives ("My name is Sam Lee" -> "Sam Lee", "I'm Ana from Berlin" ->
+    "Ana"), or None."""
+    m = _CALLED.search(text) or _I_AM.search(text)
     words = [w for w in (m.groups() if m else ()) if w]
     if not words or words[0].lower() in _NOT_NAMES:
         return None
@@ -172,31 +180,30 @@ def request(text: str) -> tuple[str, str | None] | None:
     return ("enroll", name) if _ENROLL.search(text) else None
 
 
-def reply(text: str, who: tuple[str, float] | None, seen: bool
+def reply(text: str, who: tuple[str, float] | None, seen: bool, told: str | None = None
           ) -> tuple[str | None, tuple[str, str] | None] | None:
     """The spoken answer to an identity request and the caller's next action: ("ask", name)
     means the next turn goes through consent(); ("forget", name) comes with no answer: the
     caller calls People.forget, deletes the evidence, then says done("forget", ...).
-    `who` is People.identify on the visitor's face, `seen` whether a face was found. None
-    when `text` is no identity request, or asks for a name the face does not give: the
-    conversation memory may hold a name the visitor told."""
+    `who` is People.identify on the visitor's face, `seen` whether a face was found, `told`
+    the name the visitor told in this conversation (D60: without a face match it answers
+    "who am I?"). None when `text` is no identity request."""
     req = request(text)
     if req is None:
         return None
     kind, name = req
     if who:
         return _known(kind, name, who[0])
-    if kind == "name":
-        return None
-    if not seen:
-        return NO_FACE, None
+    if kind == "name" and told:  # a name, never a claim to remember the visitor
+        return f"You told me you're {told}.", None
+    if kind in ("name", "remembers"):
+        return NOT_MET, None
     if kind == "forget":
         return "I don't recognize your face, so I have no face of yours to forget.", None
-    if kind == "remembers":
-        return ("I don't think we've met. To have me remember your face, say: remember me, "
-                "and your name.", None)
     if name is None:
         return "Tell me your name too, for example: remember me, I'm Sam.", None
+    if not seen:
+        return NO_FACE, None
     return f"May I remember your face, {name}? Please say yes or no.", ("ask", name)
 
 

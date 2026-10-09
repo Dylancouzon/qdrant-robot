@@ -262,6 +262,11 @@ class Tracker:
         """Track id -> (majority label, box) of the confirmed tracks the last frame matched."""
         return {t.id: (t.label, t.det.box) for t in self.tracks if t.missed == 0 and t.reported}
 
+    def scored(self) -> list[tuple[int, tuple[int, int, int, int], str, float]]:
+        """(id, box, majority label, its share of the detector score) of the tracks in view()."""
+        return [(t.id, t.det.box, t.label, t.votes[t.label] / t.hits)
+                for t in self.tracks if t.missed == 0 and t.reported]
+
     @staticmethod
     def _report(t: _Track) -> Sighting:
         t.reported = t.region, t.label

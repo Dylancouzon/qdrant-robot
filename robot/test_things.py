@@ -35,6 +35,7 @@ def open_robot(root: Path) -> Robot:
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
     robot.vocab = {"phone", "cup", "mug", "chair", "person"}
     robot.faces, robot.hiding, robot.jobs, robot.uncaptioned = None, None, queue.Queue(), []
+    robot.told, robot.focus, robot.last_line = None, None, 0.0
     return robot
 
 
@@ -134,6 +135,8 @@ def test_things(monkeypatch) -> None:
         dets = [Detection("bag", 0.9, CENTER), Detection("chair", 0.9, LEFT)]
         for _ in range(CONFIRM):  # a cup the detector calls a bag, by a chair
             robot._track(frame, dets)
+        assert robot._shown()[0] is frame and {b[4:] for b in robot._shown()[1].boxes} == {
+            ("", "other")}, "the view draws the tracked frame's objects"
         assert ask(robot, "This is my cup.")[0].startswith("I see more than one thing."), \
             "no cup track and two objects: no guess"
         robot.tracker = Tracker()

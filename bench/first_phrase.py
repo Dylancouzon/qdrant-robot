@@ -30,30 +30,10 @@ CASES = [("eval/dev/images/coco-000000000139.jpg", "What do you see?"),
 MODES = ["base", "pause-decode", "pause-detector", "pause-both"]
 
 
-def stream(b: brain.Brain, msgs: list[dict], prior: str = "") -> Iterator[str]:
-    """brain.answer's stream and one-sentence cut, continuing `prior` as an assistant prefill."""
-    msgs = msgs + [{"role": "assistant", "content": prior}] if prior else msgs
-    text, echo = prior, len(prior)  # llama-server streams the prefill back first
-    with b._post({"messages": msgs, "max_tokens": brain.MAX_TOKENS, "stream": True,
-                  "repeat_penalty": 1.15}) as r:
-        for raw in r:
-            line = raw.decode().strip()
-            if line.startswith("data: ") and line != "data: [DONE]":
-                for choice in json.loads(line[6:]).get("choices", []):
-                    if delta := choice.get("delta", {}).get("content"):
-                        delta, echo = delta[echo:], max(0, echo - len(delta))
-                        if not delta:
-                            continue
-                        yield delta
-                        text += delta
-                        if brain.sentences(text) >= brain.MAX_SENTENCES:
-                            return
-
-
 def turn(b: brain.Brain, voice: Speaker, msgs: list[dict], mode: str,
          idle: threading.Event) -> dict:
     t0, said, marks = time.perf_counter(), [], {}
-    gen = stream(b, msgs)
+    gen = b.answer(msgs)
 
     def feed(source: Iterator[str]) -> Iterator[str]:
         for d in source:
@@ -75,7 +55,7 @@ def turn(b: brain.Brain, voice: Speaker, msgs: list[dict], mode: str,
         prior = "".join(said)
         rest = prior[prior.index(first) + len(first):]  # cut but not yet a phrase
         t = time.perf_counter()
-        resumed = feed(stream(b, msgs, prior))
+        resumed = feed(b.answer(msgs, prior=prior))
         nxt = next(resumed, "")
         marks["resume_s"] = time.perf_counter() - t
         cut = phrases(itertools.chain([rest, nxt], resumed))  # streamed, as in a turn
