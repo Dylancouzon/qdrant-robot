@@ -1,38 +1,50 @@
 # State
 
-Last updated: 2026-10-09 01:39 EDT, by the lead. Rewrite, do not append.
+Last updated: 2026-10-09 02:05 EDT, by the lead. Rewrite, do not append.
 
 ## Active task
 
-H1 harness and session-record cleanup is complete (D78), after V1-E merged into main. Baseline was f478a24. Raise the robot's capability ceiling: better perception, conversation, retrieval, and fluid interaction on one 8 GB Jetson, with Qdrant Edge central. Existing targets are a floor. No new runtime intervention has been selected.
+P1 planning is complete (D82). Implementation starts in the next autonomous session at F0 in research/capability-plan.md. Read D79 through D82 and research/lessons.md first. Raise the capability ceiling for sustained conversation, perception, and recall on 8 GB, with Qdrant Edge central. All deployed inference stays on the Jetson.
 
-Delivered: compact offline results, explicit score/provenance labels, bounded gate checks with shared assertion imports and timings, protected code review stamps, updated session guidance, and revalidated audit findings. Decisions can be challenged to raise capability (D77). Full checks passed in 13.33 s with 58 tests; review PASS in `reviews/20261009-013611-82855-review.md`. Robot behavior, models, raw evidence, and fixtures are unchanged.
+Dylan makes Jetson, WSL 3080, and Mac available for the next few hours. Sol is reviewer (explicit `--model gpt-6.1-sol`); Sol 6.1 low agents are fresh implementation workers; Luna does research. Use WSL wherever it accelerates work. Saved and independent real video supports nighttime comparisons. Physical camera/audio/echo checks remain separate. Measured OS changes on dedicated robot hardware are authorized with SSH and rollback preserved.
 
-V1-E is merged (D75): code answers stay because retrieval into the brain missed the frozen comparison by one M2 step. The M2 evidence-fix gain is dev-only until unseen probes confirm it. See research/lessons.md and D75 for exact scores and evidence.
+P1 review: Astra counsel GO WITH CHANGES resolved; Sol 6.1 PASS in reviews/20261009-015822-12641-review.md. The receipt names the exact plan SHA256. No model, runtime, OS, fixture, or raw benchmark changes occurred. Planning files: research/capability-plan.md, research/lessons.md, STATE.md, DECISIONS.md, and the two reviews. H1 baseline: fcfd32a.
 
-Unresolved capability work after cleanup (D75, D76):
+Current options are hypotheses, not locked choices. Reassess after the first paired result and at least hourly (D81). Record exact evidence, decision, and reopening condition for each route. Preserve at least 75 minutes for final evaluation; drop unfinished optional branches before using that time.
 
-1. Rule 6 check: a fresh one-time unseen probe set for the V1-E evidence changes (objects removed, gone, still there, ownership), run once on the Jetson; record the m2 gain (39 -> 44/74, dev-only) as confirmed or not.
-2. The one-voice variant remains unadopted in research/one-voice.patch. Reopen it only with a concrete intervention or new evidence, using D75's frozen comparison; no generic prompt or brain sweep.
-3. Select the next foundation improvement from prior evidence: perception accuracy, sustained conversation, Qdrant retrieval quality, or active-turn memory and latency. Dylan reports conversation already uses swap; estimates and warm snapshots do not establish a larger context fits (D76).
-4. Live test day with Dylan remains open (human checklist below): physical audio, faces at distance, real objects, wake word in noise, and focus in a crowd. Keep current acceptance gaps visible. Add-on v1 features and rare edge cases are secondary to raising core capability.
+| Route | Current status and selection condition |
+| --- | --- |
+| Source-linked Edge events and dialogue | Preferred first build: recency-only captions and lost conversation constrain the foundation. Compare direct retrieval before summaries. |
+| Response distillation plus LoRA | Candidate: only if correct-evidence answers still fail and tiny train/export/image inference succeeds. Teacher targets plus LoRA already constitute response distillation. |
+| Stronger pretrained detector | Candidate: compare nano/small at matched false positives on independent real frames. Diverse views and focused descriptions address distinct recognition/detail gaps. |
+| Detector training | Deferred until reliable annotation, coverage, and a residual detector failure justify it. |
+| Larger VLM/runtime or split text/vision | Open alternatives: qualify compatibility, measured quality, integrated headroom, and latency; earlier failures are evidence, not permanent bans. |
+| OS/provider capacity changes | Eligible when a measured bottleneck blocks capability; no assumed RAM gain from service removal or disabling swap. |
+| Logit/feature distillation | Deferred until response distillation exposes a specific limitation worth the extra alignment and resource cost. |
 
-Running jobs: none from this session; builder, researchers, and review finished. Remote job and deployment state were not checked. Unresolved harness notes: one native pytest teardown abort, future rubric/fixture hashes, and research review-stamp coverage (D78, lessons). Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then choose a concrete foundation intervention using D77 and the linked topic evidence.
+Still unresolved: D75's M2 gain from 39 to 44/74 is development-only until its unseen probes run; research/one-voice.patch remains unadopted. Live conversation paging has no established cause. Keep these limits visible during the new comparisons.
+
+First evaluator brief: current FileCamera reads still images, so qualify paced video input before using external footage. Encode the 30-minute challenge in one continuous runtime instance; test restarts separately. Keep source groups and final answers out of training. Prior Objectron exclusions and the COCO manifest gap are in the plan.
+
+Running jobs: none from P1; all researchers and reviews finished. Final read-only check at 06:05 UTC found Jetson release 4387936b8ee9, no robot/benchmark jobs, and the WSL GPU idle with no model loaded. WSL Docker daemon works; GPU-container passthrough is untested. Recheck jobs, release, ownership, and access before execution. H1's native pytest shutdown failure remains unresolved.
+
+Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then F0's source contract, evaluator brief, and bounded training/export preflight. Do not repeat the broad brain/prompt sweep without a changed hypothesis. This session ends after committing the reviewed planning records.
 
 ## Where to read first
 
+- research/capability-plan.md: the next autonomous session, priorities, source exclusions, worker roles, and stopping rules (D79, D80).
 - research/lessons.md: every avenue explored and every pitfall, with decision links (CLAUDE.md rule: keep it current). Read it after this file.
 - DECISIONS.md D35 to D75 (today's work); research/v1-plan.md (the adopted v1 plan); research/booth-ux.md (focus, screen, turn-taking); research/assistant-design.md; research/grounding.md (brain bake-off); research/edge-cases.md (logged, not fixed); research/faces.md, research/m2-design.md, research/m3-design.md, research/wakeword.md, research/sight.md, research/endpointing.md; research/one-voice.patch (retrieval-into-brain variant, not applied).
 - gates/review.md rules 6 (overfitting), 7 (proportion), 8 (v1: log edge cases).
 
 ## Robot access
 
-- 3080 box: `ssh dylan@192.168.1.74` (key auth; WSL2 Ubuntu 26.04; RTX 3080 10 GB; no passwordless sudo). X1 complete (D75). Use its user-space CUDA 13.2.86 setup and llama.cpp 9c2e0e4; research/lessons.md records commands and partial answer parity. Acceptance numbers stay on the Jetson.
+- 3080 box: `ssh dylan@192.168.1.74` (key auth; WSL2 Ubuntu 26.04; RTX 3080 10 GB; no passwordless sudo). X1 complete (D75). P1 found the GPU idle. Use `/usr/lib/wsl/lib/nvidia-smi` and `~/qdrant-robot-box/venv` (not `.venv`). Use its user-space CUDA 13.2.86 setup and llama.cpp 9c2e0e4; research/lessons.md records commands and partial answer parity. Acceptance numbers stay on the Jetson.
 
 - `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Internet works.
 - Serial fallback only when Dylan plugs in the debug USB-C cable (unplugged now): `/dev/cu.usbmodem*`, 115200 baud, user `qdrant`, password in `.env`.
 - Network: Wi-Fi on the home LAN (192.168.1.238 by DHCP). The course robot's `l6-hotspot` does not autoconnect. Never re-enable the hotspot over SSH.
-- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. Active deployment unverified in this local cleanup; obtain it before a later remote run. Models: `python -m tools.models` verifies `models.json`.
+- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. P1 read-only check at 2026-10-09 05:42 UTC: current release 4387936b8ee9, no robot/benchmark service running. Recheck before execution. Models: `python -m tools.models` verifies `models.json`.
 - Acceptance run from the Mac: `python3 eval/run.py [--model M] [--oracle | --audio audio-real] [cases]` deploys, replays, collects, judges, and checks speech. Real-voice fixtures: `tools/record.py <cases> [--check]`.
 
 ## Finding your way in the evidence
@@ -51,7 +63,7 @@ Running jobs: none from this session; builder, researchers, and review finished.
 
 ## Git
 
-Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting at f478a24. V1-E and spike/detector are merged. Commit only the reviewed H1 cleanup and lead records.
+Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting P1 at fcfd32a. V1-E and H1 are merged and pushed. Commit only the reviewed planning documents and lead records in this session.
 
 ## Checkpoints
 
