@@ -37,6 +37,8 @@ Running jobs: one builder, V1-E (evidence quality: details, no left/right, no co
 
 ## Robot access
 
+- 3080 box (Dylan, 2026-10-08): `ssh dylan@192.168.1.74` (key auth; WSL2 Ubuntu 26.04; RTX 3080 10 GB; CUDA 12.6 at /usr/local/cuda; no passwordless sudo). For brain and prompt bake-offs, parallel text replays, judging, and later training; acceptance numbers stay on the Jetson. Setup task X1 running (llama.cpp 9c2e0e4, parity with the Jetson).
+
 - `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Internet works.
 - Serial fallback only when Dylan plugs in the debug USB-C cable (unplugged now): `/dev/cu.usbmodem*`, 115200 baud, user `qdrant`, password in `.env`.
 - Network: Wi-Fi on the home LAN (192.168.1.238 by DHCP). The course robot's `l6-hotspot` does not autoconnect. Never re-enable the hotspot over SSH.
