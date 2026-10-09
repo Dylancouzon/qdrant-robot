@@ -1,0 +1,62 @@
+"""Audit the unchanged selected smoke, including measured call durations and failure scope."""
+import ast
+import collections
+import hashlib
+import json
+from pathlib import Path
+
+base = Path('bench/results')
+path = base / '2026-10-09-f1i-smoke-candidate-a.jsonl'
+
+def read(p):
+    return [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
+
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+def percentile(v, f):
+    s=sorted(v); i=(len(s)-1)*f; low=int(i)
+    return s[low] + (s[min(low+1,len(s)-1)]-s[low])*(i-low)
+
+rows=read(path); timing=read(path.with_suffix('.timing.jsonl'))
+launch=read(path.with_suffix('.launch.jsonl'))
+launcher=base/'2026-10-09-f1i-smoke-launch.py.txt'
+worker=base/'2026-10-09-f1i-smoke-worker.py.txt'
+assert launch[0]['launcher_sha256']==launch[1]['launcher_sha256']==sha(launcher)
+assert launch[1]['worker_sha256']==sha(worker)
+assert launch[1]['command'][3]==worker.read_text()
+embedded=next(ast.literal_eval(n.value) for n in ast.parse(launcher.read_text()).body
+              if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='WORKER' for t in n.targets))
+assert embedded==worker.read_text()
+meta=next(r for r in rows if r['type']=='metadata')
+assert meta['sha256']==sha(Path(meta['cases']))
+assert meta['lateness_s']==0.5 and meta['release']=='038099d89da2'
+started=next(r for r in timing if r['type']=='observer_started')
+assert started['release']==meta['release']
+assert all(sha(Path(p))==digest for p,digest in started['implementation_hashes'].items())
+ends=collections.defaultdict(list)
+for r in timing:
+    if r['type']=='call_end': ends[r['name']].append(r['elapsed_s'])
+finish=rows[-1]
+completed=finish.get('completed',False) and finish.get('type')=='completion'
+audio=[r for r in rows if r['type']=='audio']
+progress=[r for r in rows if r['type']=='progress']
+turns=[r for r in rows if r['type']=='turn']
+probes=[r for r in rows if r['type']=='source_probe']
+baseline=read(base/'2026-10-09-f1g-smoke-baseline-a.jsonl')
+old={(r['source_id'],r['kind']):r['sha256'] for r in baseline if r['type']=='source_probe'}
+assert all(old[(r['source_id'],r['kind'])]==r['sha256'] for r in probes)
+result=dict(machine=meta['machine'],release=meta['release'],result=str(path),
+            raw_sha256=sha(path),timing_sha256=sha(path.with_suffix('.timing.jsonl')),
+            launch_sha256=sha(path.with_suffix('.launch.jsonl')),
+            compiled_launcher_worker_bindings=True,completed=completed,
+            errors=[r for r in rows if r['type']=='error'],
+            expected=meta['expected'],last_row=finish,
+            observed_audio_chunks=len(audio),observed_audio_samples=sum(r['samples'] for r in audio),
+            max_recorded_audio_lateness_s=max(r['lateness_s'] for r in audio),
+            matching_recorded_source_probes=len(probes),observed_turns=len(turns),
+            calls={k:dict(n=len(v),p50=percentile(v,.5),p95=percentile(v,.95),maximum=max(v))
+                   for k,v in ends.items()},
+            minimum_sampled_available_mib=min(r['resources']['mem_available_kb'] for r in progress)/1024,
+            scope='Development smoke only. Timing observer adds overhead. No physical audible or quality acceptance.')
+print(json.dumps(result,indent=2))

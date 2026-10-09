@@ -1,0 +1,268 @@
+{
+  "reproduced_archived_audit_exactly": true,
+  "audit": {
+    "machine": "qdrant-robot",
+    "release": "038099d89da2",
+    "result": "bench/results/2026-10-09-f1i-smoke-candidate-a.jsonl",
+    "raw_sha256": "8682224302e6de53449adfa8f9f51f8b7c2f5cf7b6cf7f1682476ceee4a5058e",
+    "timing_sha256": "8b134f72449289b0a4dcf9b7fc6b95d04a84a87f7821bc4b8ac38bc949997139",
+    "launch_sha256": "b592e2ae0bd5172be941866f550b3df50b4e76804da97a5c645837068923a954",
+    "compiled_launcher_worker_bindings": true,
+    "completed": true,
+    "errors": [],
+    "expected": {
+      "visits": 2,
+      "show": 2,
+      "scored": 2,
+      "auxiliary": 2
+    },
+    "last_row": {
+      "summary": "continuous",
+      "completed": true,
+      "type": "completion",
+      "counts": {
+        "visits": 2,
+        "show": 2,
+        "scored": 2,
+        "auxiliary": 2
+      },
+      "elapsed_s": 90.10380134599109,
+      "event_ids": [
+        "f0d-smoke-1-show",
+        "f0d-smoke-1-statement",
+        "f0d-smoke-1-question",
+        "f0d-smoke-2-show",
+        "f0d-smoke-2-statement",
+        "f0d-smoke-2-question"
+      ],
+      "utterance_ids": [
+        "f0d-smoke-1-statement",
+        "f0d-smoke-1-question",
+        "f0d-smoke-2-statement",
+        "f0d-smoke-2-question"
+      ],
+      "visit_ids": [
+        "f0d-smoke-1",
+        "f0d-smoke-2"
+      ],
+      "failed_steps": 0,
+      "chunks": 1128,
+      "samples": 1440000,
+      "audio_dir": "/home/qdrant/qdrant-robot/shared/sessions/2026-10-09-f1i-smoke-candidate-a/audio",
+      "memory_dir": "/home/qdrant/qdrant-robot/shared/sessions/2026-10-09-f1i-smoke-candidate-a/memory",
+      "worker_exit": 0
+    },
+    "observed_audio_chunks": 1128,
+    "observed_audio_samples": 1440000,
+    "max_recorded_audio_lateness_s": 0.42037101898924334,
+    "matching_recorded_source_probes": 4,
+    "observed_turns": 4,
+    "calls": {
+      "evaluator_resources": {
+        "n": 99,
+        "p50": 0.09716808999655768,
+        "p95": 0.11034276418795333,
+        "maximum": 0.4268158049962949
+      },
+      "source_latest": {
+        "n": 1655,
+        "p50": 1.8079997971653938e-05,
+        "p95": 0.00019037440215468167,
+        "maximum": 0.1515890549926553
+      },
+      "scheduler_drain": {
+        "n": 2236,
+        "p50": 2.7007990865968168e-05,
+        "p95": 4.086399349034764e-05,
+        "maximum": 0.09721532699768431
+      },
+      "scheduler_report": {
+        "n": 91,
+        "p50": 0.09799518799991347,
+        "p95": 0.11839139200310456,
+        "maximum": 0.4279361869994318
+      },
+      "ears_feed": {
+        "n": 1128,
+        "p50": 0.0030844944922137074,
+        "p95": 0.004095933951612096,
+        "maximum": 0.19405212100537028
+      },
+      "scheduler_feed": {
+        "n": 1128,
+        "p50": 0.003593787507270463,
+        "p95": 0.004811505053658038,
+        "maximum": 0.19633352500386536
+      },
+      "prompt_budget": {
+        "n": 13,
+        "p50": 0.02502632098912727,
+        "p95": 0.03540086600405629,
+        "maximum": 0.03619370600790717
+      },
+      "detector_native": {
+        "n": 1345,
+        "p50": 0.013032793998718262,
+        "p95": 0.013591037000878714,
+        "maximum": 0.1343853160069557
+      },
+      "prefill": {
+        "n": 9,
+        "p50": 0.6532553239958361,
+        "p95": 1.0230917732027591,
+        "maximum": 1.09998265800823
+      },
+      "asr": {
+        "n": 4,
+        "p50": 0.4345681089980644,
+        "p95": 0.528254803850723,
+        "maximum": 0.53743935500097
+      }
+    },
+    "minimum_sampled_available_mib": 1257.1875,
+    "scope": "Development smoke only. Timing observer adds overhead. No physical audible or quality acceptance."
+  },
+  "input_bindings": {
+    "visits": "a2db695673a22ec397d72270c0a5282041f99ca34185359aaf502db15b9dfd0a"
+  },
+  "largest_report": {
+    "name": "scheduler_report",
+    "thread": 289932,
+    "start_wall": 1791560837.6258485,
+    "end_wall": 1791560838.0540693,
+    "elapsed_s": 0.4279361869994318,
+    "call": 3950
+  },
+  "nested_resources": {
+    "name": "evaluator_resources",
+    "thread": 289932,
+    "start_wall": 1791560837.6262727,
+    "end_wall": 1791560838.0536788,
+    "elapsed_s": 0.4268158049962949,
+    "call": 3951
+  },
+  "delayed_audio_chunk": {
+    "type": "audio",
+    "id": null,
+    "samples": 1280,
+    "due_end_s": 46.28,
+    "actual_end_s": 46.700371018989244,
+    "lateness_s": 0.42037101898924334,
+    "chunk": 580
+  },
+  "report_to_delayed_chunk_s": 0.0033004283905029297,
+  "next_scheduler_feed": {
+    "name": "scheduler_feed",
+    "thread": 289932,
+    "start_wall": 1791560838.0541456,
+    "end_wall": 1791560838.0573564,
+    "elapsed_s": 0.0031694690114818513,
+    "call": 3961
+  },
+  "overlapping_calls": [
+    {
+      "name": "detector_native",
+      "thread": 290136,
+      "start_wall": 1791560837.6252065,
+      "end_wall": 1791560837.6736078,
+      "elapsed_s": 0.048064301008707844,
+      "call": 3948
+    },
+    {
+      "name": "source_latest",
+      "thread": 290136,
+      "start_wall": 1791560837.6787,
+      "end_wall": 1791560837.7870755,
+      "elapsed_s": 0.10816308499488514,
+      "call": 3952
+    },
+    {
+      "name": "source_latest",
+      "thread": 290135,
+      "start_wall": 1791560837.755495,
+      "end_wall": 1791560837.907228,
+      "elapsed_s": 0.1515890549926553,
+      "call": 3953
+    },
+    {
+      "name": "detector_native",
+      "thread": 290136,
+      "start_wall": 1791560837.8762395,
+      "end_wall": 1791560837.9191287,
+      "elapsed_s": 0.04273025800648611,
+      "call": 3954
+    },
+    {
+      "name": "source_latest",
+      "thread": 290136,
+      "start_wall": 1791560837.9232514,
+      "end_wall": 1791560837.9683602,
+      "elapsed_s": 0.04478187201311812,
+      "call": 3955
+    },
+    {
+      "name": "detector_native",
+      "thread": 290136,
+      "start_wall": 1791560837.9706829,
+      "end_wall": 1791560837.9840162,
+      "elapsed_s": 0.013203857990447432,
+      "call": 3956
+    },
+    {
+      "name": "source_latest",
+      "thread": 290136,
+      "start_wall": 1791560837.9876444,
+      "end_wall": 1791560837.9912572,
+      "elapsed_s": 0.0034601880033733323,
+      "call": 3957
+    },
+    {
+      "name": "detector_native",
+      "thread": 290136,
+      "start_wall": 1791560837.9935641,
+      "end_wall": 1791560838.0070217,
+      "elapsed_s": 0.01333064200298395,
+      "call": 3958
+    },
+    {
+      "name": "source_latest",
+      "thread": 290136,
+      "start_wall": 1791560838.0107071,
+      "end_wall": 1791560838.0108352,
+      "elapsed_s": 1.516799966339022e-05,
+      "call": 3959
+    },
+    {
+      "name": "detector_native",
+      "thread": 290136,
+      "start_wall": 1791560838.0131912,
+      "end_wall": 1791560838.0263755,
+      "elapsed_s": 0.01295864199346397,
+      "call": 3960
+    },
+    {
+      "name": "evaluator_resources",
+      "thread": 289932,
+      "start_wall": 1791560837.6262727,
+      "end_wall": 1791560838.0536788,
+      "elapsed_s": 0.4268158049962949,
+      "call": 3951
+    },
+    {
+      "name": "scheduler_report",
+      "thread": 289932,
+      "start_wall": 1791560837.6258485,
+      "end_wall": 1791560838.0540693,
+      "elapsed_s": 0.4279361869994318,
+      "call": 3950
+    }
+  ],
+  "interpretation": "The scheduler thread spent almost all of its longest report inside synchronous resource collection before the most delayed audio chunk. Other threads executed during that interval. This supports a scheduler-path telemetry stall, but does not identify why resources took longer or prove a GIL/native root cause.",
+  "binding_limit": "The original smoke metadata binds visits and recorded pixel probes; it does not contain a complete per-input WAV/AVI byte manifest.",
+  "alternatives": [
+    "Move evaluator resource sampling outside the audio scheduling thread, preserving timestamps and watchdog decisions.",
+    "Reduce synchronous resource collection work while preserving measured counters.",
+    "Consider runtime/process isolation only if timing after separating evaluator work still demonstrates native scheduling interference."
+  ],
+  "scope": "One strict development smoke passes timing and native teardown. No causal root fix, physical audible timing, answer-quality, sustained, or paging-free acceptance."
+}

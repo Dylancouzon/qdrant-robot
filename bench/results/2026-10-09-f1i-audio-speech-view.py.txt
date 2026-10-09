@@ -1,0 +1,25 @@
+"""Bind every replay output to its originating step, including split utterances."""
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+raw=Path(sys.argv[1]);directory=Path('build/f1i/candidate-audio')
+rows=[json.loads(x) for x in raw.read_text().splitlines()]
+turns_path=directory/'turns.jsonl'
+turns=[json.loads(x) for x in turns_path.read_text().splitlines()]
+view=[];cursor=0
+for row in rows[:-1]:
+ group=turns[cursor:cursor+row['split']];cursor+=row['split']
+ assert row['heard']==' | '.join(t['question'] for t in group)
+ assert group[-1]['wav']==row['wav'] and group[-1]['answer']==row['answer']
+ for i,t in enumerate(group):
+  view.append(dict(id=f"{row['id']}#{i+1}",step_id=row['id'],wav=t['wav'],answer=t['answer']))
+assert cursor==len(turns) and len(view)==len(turns)
+view.append(dict(summary='all output speech view',audio_dir=rows[-1]['audio_dir'],
+ result_sha256=hashlib.sha256(raw.read_bytes()).hexdigest(),
+ turns_sha256=hashlib.sha256(turns_path.read_bytes()).hexdigest()))
+out=Path('bench/results/2026-10-09-f1i-audio-candidate-speech-input.jsonl')
+out.write_text(''.join(json.dumps(x)+'\n' for x in view))
+Path('bench/results/2026-10-09-f1i-audio-candidate-all-turns.jsonl').write_bytes(turns_path.read_bytes())
+print(out)

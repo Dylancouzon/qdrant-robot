@@ -1,0 +1,68 @@
+"""Time actual continuous scheduler and native calls without changing their inputs."""
+import functools
+import hashlib
+import itertools
+import json
+import os
+import sys
+import threading
+import time
+from pathlib import Path
+
+root, timing = sys.argv[1:3]
+os.chdir(root)
+sys.path.insert(0, root)
+sys.argv = ['eval.continuous', *sys.argv[3:]]
+fd = os.open(timing, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+ids = itertools.count()
+
+
+def observe(kind, **fields):
+    row = dict(type=kind, wall_time=time.time(), monotonic=time.monotonic(),
+               thread=threading.get_native_id(), **fields)
+    data = (json.dumps(row) + '\n').encode()
+    assert len(data) < 4096
+    assert os.write(fd, data) == len(data)
+
+
+def wrap(owner, name, label):
+    original = getattr(owner, name)
+
+    @functools.wraps(original)
+    def measured(*args, **kwargs):
+        call = next(ids)
+        observe('call_start', call=call, name=label)
+        started = time.perf_counter()
+        try:
+            return original(*args, **kwargs)
+        finally:
+            observe('call_end', call=call, name=label,
+                    elapsed_s=time.perf_counter() - started)
+
+    setattr(owner, name, measured)
+
+
+from eval import continuous
+from robot import asr, brain, camera, detect
+
+for owner, name, label in (
+    (continuous.Scheduler, 'report', 'scheduler_report'),
+    (continuous.Scheduler, 'drain', 'scheduler_drain'),
+    (continuous.Scheduler, 'feed', 'scheduler_feed'),
+    (continuous, 'resources', 'evaluator_resources'),
+    (camera.FileCamera, 'latest', 'source_latest'),
+    (asr.Ears, 'feed', 'ears_feed'),
+    (asr.Scribe, '__call__', 'asr'),
+    (detect._TensorRT, '__call__', 'detector_native'),
+    (brain.Brain, 'budget', 'prompt_budget'),
+    (brain.Brain, 'prefill', 'prefill'),
+):
+    wrap(owner, name, label)
+observe('observer_started', command=sys.argv, release=os.environ['ROBOT_RELEASE'],
+        implementation_hashes={p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
+                               for p in ('eval/continuous.py', 'robot/camera.py',
+                                         'robot/main.py', 'robot/brain.py', 'models.json')})
+rc = continuous.main()
+observe('observer_finished', returned_exit=rc)
+os.close(fd)
+sys.exit(rc)

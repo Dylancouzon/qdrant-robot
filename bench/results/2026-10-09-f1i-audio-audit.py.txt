@@ -1,0 +1,137 @@
+"""Compare unchanged recorded audio against its preserved completed baseline."""
+import hashlib
+import json
+import runpy
+from pathlib import Path
+
+P = Path('bench/results')
+validate = runpy.run_path(str(P / '2026-10-09-f1h-audit.py'))['validate_events']
+
+
+def read(path):
+    return [json.loads(x) for x in Path(path).read_text().splitlines() if x.strip()]
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def pct(values, fraction):
+    values=sorted(values); position=(len(values)-1)*fraction; low=int(position)
+    return values[low]+(values[min(low+1,len(values)-1)]-values[low])*(position-low)
+
+
+receipts = {
+    'baseline': P / '2026-10-09-f1g-replay-sessions-cd60be65ee79-1791551942642747121.jsonl',
+    'candidate': P / '2026-10-09-f1i-replay-sessions-038099d89da2-1791561022769530053.jsonl',
+}
+outputs, inputs, statuses, joint_scores, systems = {}, {}, {}, {}, {}
+for arm, receipt in receipts.items():
+    meta, footer=read(receipt)
+    assert footer['completed'] and footer['native_exit'] in (0,1)
+    assert footer['observed']==footer['expected']==47
+    for suffix,key in [('console.log','console_sha256'),('telemetry.jsonl','telemetry_sha256')]:
+        assert sha(receipt.with_suffix('.'+suffix))==footer[key]
+    if arm=='candidate':
+        assert sha(receipt.with_suffix('.timing.jsonl'))==footer['timing_sha256']
+        worker=meta['command'][meta['command'].index('-c')+1]
+        assert hashlib.sha256(worker.encode()).hexdigest()==meta['timed_worker_sha256']
+        assert worker==(P/'2026-10-09-f1i-source-replay-worker.py.txt').read_text()
+        assert sha(P/'2026-10-09-f1i-source-replay-supervisor.py.txt')==meta['supervisor_sha256']
+    raw=P/Path(footer['result']).name
+    assert sha(raw)==footer['result_sha256']
+    rows,summary=read(raw)[:-1],read(raw)[-1]
+    assert summary['n']==summary['n_expected']==len(rows)==47
+    assert summary['cases']=='eval/dev/sessions.jsonl' and summary['release']==meta['release']
+    systems[arm]=summary['system']
+    judged=read(raw.with_suffix('.judged.jsonl'))
+    verdicts={r['id']:r for r in judged}
+    assert [r['id'] for r in rows]==list(verdicts)
+    for row in rows:
+        assert verdicts[row['id']]['robot']==row['answer']
+    prefix='build/f1g/baseline' if arm=='baseline' else 'bench/results/2026-10-09-f1i-audio-candidate'
+    view_path=Path(prefix+'-speech-input.jsonl')
+    speeches=read(view_path.with_suffix('.speech.jsonl'))
+    view=read(view_path)
+    assert speeches[-1]['completed'] and speeches[-1]['result_sha256']==sha(view_path)
+    turns_path=(Path('build/f1g/baseline-audio/turns.jsonl') if arm=='baseline'
+                else P/'2026-10-09-f1i-audio-candidate-all-turns.jsonl')
+    turns=read(turns_path)
+    assert view[-1]['turns_sha256']==sha(turns_path) and view[-1]['result_sha256']==sha(raw)
+    assert len(turns)==len(view)-1==len(speeches)-1
+    audio=Path('build/f1g/baseline-audio' if arm=='baseline' else 'build/f1i/candidate-audio')
+    by_step={}
+    for v,s in zip(view[:-1],speeches[:-1],strict=True):
+        assert v['id']==s['id'] and v['wav']==s['wav'] and v['answer']==s['answer']
+        assert sha(audio/s['wav'])==s['wav_sha256']
+        by_step.setdefault(v['step_id'],[]).append(s['pass'])
+    authority=([r for r in read(receipt.with_suffix('.timing.jsonl')) if r['type']=='source_authority']
+               if arm=='candidate' else [])
+    events={}; cursor=0
+    for row in rows:
+        group=turns[cursor:cursor+row['split']]; cursor+=row['split']
+        assert group and group[-1]['answer']==row['answer'] and group[-1]['wav']==row['wav']
+        for k in ('events','prompt','prompt_budget'):
+            assert group[-1].get(k)==row.get(k),(row['id'],k)
+        assert row['heard']==' | '.join(t['question'] for t in group)
+        for turn in group:
+            if arm=='candidate':
+                for k,n in validate(turn,authority,row['id']).items(): events[k]=events.get(k,0)+n
+                budget=turn.get('prompt_budget')
+                if not turn['verbatim']:
+                    assert budget and budget['prompt_token_bound']+budget['output_token_reserve']<=2048
+    assert cursor==len(turns)
+    fixture=read('eval/dev/sessions.jsonl')
+    cold=[]; pending=True
+    for session in fixture:
+        for step in session['steps']:
+            if 'restart' in step: pending=True
+            if 'say' in step and pending: cold.append(step['id']);pending=False
+    warm=[r for r in rows if r['id'] not in cold]
+    times=[r['first_audio_s'] for r in warm]
+    final_turns=[]; cursor=0
+    for row in rows:
+        cursor+=row['split']
+        if row['id'] not in cold: final_turns.append(turns[cursor-1])
+    completion=[t['done']-t['speech_end'] for t in final_turns]
+    playback=[max(t['done'],t['first_audio']+t['audio_s'])-t['speech_end'] for t in final_turns]
+    loaded=[r['resources'] for r in read(receipt.with_suffix('.telemetry.jsonl')) if r['phase']=='replay']
+    statuses[arm]={r['id']:r['pass'] for r in judged}
+    joint_scores[arm]={r['id']:bool(statuses[arm][r['id']] and r['split']==1 and all(by_step[r['id']])) for r in rows}
+    inputs[arm]=meta['input_hashes']
+    assert all(sha(p)==digest for p,digest in inputs[arm].items())
+    outputs[arm]=dict(release=meta['release'],n=len(rows),judged=sum(statuses[arm].values()),
+        joint=sum(joint_scores[arm].values()),speech_passed=sum(r['pass'] for r in speeches[:-1]),
+        speech_outputs=len(turns),split_steps=sum(r['split']!=1 for r in rows),cold_ids=cold,
+        warm_first_synth=dict(n=len(times),p50=pct(times,.5),p95=pct(times,.95)),
+        warm_synthesis_completion=dict(n=len(completion),p50=pct(completion,.5),p95=pct(completion,.95)),
+        warm_estimated_playback_end=dict(n=len(playback),p50=pct(playback,.5),p95=pct(playback,.95)),
+        sessions={v['id']:dict(n=sum('say' in st for st in v['steps']),
+                              judged=sum(statuses[arm][st['id']] for st in v['steps'] if 'say' in st),
+                              joint=sum(joint_scores[arm][st['id']] for st in v['steps'] if 'say' in st))
+                  for v in fixture},
+        delivered_events=events,generated_steps=sum(not r['verbatim'] for r in rows),
+        detector_minimum_fps=min(r['detect_fps'] for r in rows),
+        loaded_minimum_available_mib=min(r['mem_available_kb'] for r in loaded)/1024,
+        system_paging_pages={k:loaded[-1][k]-loaded[0][k] for k in ('pswpin','pswpout')},
+        bindings={str(p):sha(p) for p in (receipt,raw,raw.with_suffix('.judged.jsonl'),
+                                         view_path,view_path.with_suffix('.speech.jsonl'),turns_path)})
+    if arm=='candidate':
+        timing=read(receipt.with_suffix('.timing.jsonl'))
+        chunks=[r for r in timing if r['type']=='chunk']
+        outputs[arm]['timing']=dict(first_stream_max_lateness_s=max(r['lateness_s'] for r in chunks if r['stream']==1),
+            later_stream_max_lateness_s=max(r['lateness_s'] for r in chunks if r['stream']>1),
+            **{k+'_max_s':max(r['elapsed_s'] for r in timing if r['type']==k)
+               for k in ('hear','budget','prefill','executed_reporter')})
+assert inputs['baseline']==inputs['candidate']
+assert systems['baseline']==systems['candidate']
+assert read(receipts['baseline'])[0]['implementation_hashes']['models.json']==read(receipts['candidate'])[0]['implementation_hashes']['models.json']
+assert outputs['baseline']['judged']==42 and outputs['baseline']['joint']==39
+paired={metric:dict(wins=[k for k in scores['baseline'] if not scores['baseline'][k] and scores['candidate'][k]],
+                    losses=[k for k in scores['baseline'] if scores['baseline'][k] and not scores['candidate'][k]])
+        for metric,scores in [('judged',statuses),('joint',joint_scores)]}
+print(json.dumps(dict(completed=True,arms=outputs,paired_changes=paired,input_hashes=inputs['baseline'],
+    adopt=False,limitations=['Baseline is the preserved earlier same-input/model run, not a fresh randomized pair.',
+    'Candidate observer differs; no causal speedup or physical audio claim.',
+    '47 development questions do not establish held-out or sustained capability.',
+    'System paging remains unattributed; volume, safety, and acceptance remain pending.']),indent=2))

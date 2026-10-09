@@ -2475,3 +2475,11 @@
 {"key": "11be72c2168b4180", "pass": false, "why": "Misses the red handbag and contradicts the umbrella's position.", "votes": [false, false, false]}
 {"key": "00f79e73d0ea674b", "pass": false, "why": "Does not identify Qdrant Edge shards.", "votes": [false, false, false]}
 {"key": "2a28c52546c65edf", "pass": false, "why": "Claims not to remember despite stating Berlin.", "votes": [false, false, false]}
+{"key": "2332336441a261e4", "pass": true, "why": "Correctly recalls the stop sign.", "votes": [true, true, true]}
+{"key": "041978efe40f1662", "pass": false, "why": "Does not recall the motorcycle.", "votes": [false, false, false]}
+{"key": "b124c9d8e070a139", "pass": true, "why": "Correctly identifies the bus as red.", "votes": [true, true, true]}
+{"key": "c6609c0d8edd3819", "pass": true, "why": "Reads route 15 despite the transcription error.", "votes": [true, true, true]}
+{"key": "fed57475511a1e79", "pass": true, "why": "Identifies apples as the first thing shown.", "votes": [true, true, true]}
+{"key": "f55bce4fe2e4ffb7", "pass": false, "why": "Says person instead of bus.", "votes": [false, false, false]}
+{"key": "ae5a35ca185580db", "pass": false, "why": "Does not recall the teddy bears.", "votes": [false, false, false]}
+{"key": "1f2f2fbbce07690f", "pass": false, "why": "Incorrectly says the teddy bears and apples are the same.", "votes": [false, false, false]}

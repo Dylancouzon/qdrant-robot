@@ -1,0 +1,57 @@
+{
+  "release": "038099d89da2",
+  "scope": "Post-run hashes of retained immutable release/shared model files. Not an in-run per-input byte receipt.",
+  "inputs": {
+    "eval/dev/continuous-smoke-20261009/2026-10-09-f0d-smoke-source-a.avi": {
+      "sha256": "31b152a78f82b579d908fcf83692668eb804b84e76a88c02f937c13b577e9d34",
+      "bytes": 1891722
+    },
+    "eval/dev/continuous-smoke-20261009/2026-10-09-f0d-smoke-source-b.avi": {
+      "sha256": "5ebf12f32dbcf5de21bca99348fdb49105dba33987e92fdac1c1cb19d4f4bda1",
+      "bytes": 1546242
+    },
+    "eval/dev/continuous-smoke-20261009/README.md": {
+      "sha256": "2861fb5ac21b489e61baa940e6fef5e697a591ee829468dd15973dab039d69c1",
+      "bytes": 1019
+    },
+    "eval/dev/continuous-smoke-20261009/audio/f0d-smoke-1-question.wav": {
+      "sha256": "8b81952ce2f919b1ae7ee8a47f495cdb56c1acf18032ad83d367a39efa24968d",
+      "bytes": 71370
+    },
+    "eval/dev/continuous-smoke-20261009/audio/f0d-smoke-1-statement.wav": {
+      "sha256": "53f21e904b943286966735b99124e4ecef8a5b4153b6c52e683c52d2e1a0cfeb",
+      "bytes": 90554
+    },
+    "eval/dev/continuous-smoke-20261009/audio/f0d-smoke-2-question.wav": {
+      "sha256": "bf18f28fa1143ee1f9144fed4dfb31e1c09164be920b48759a3c7c5b4ce1aa9d",
+      "bytes": 69054
+    },
+    "eval/dev/continuous-smoke-20261009/audio/f0d-smoke-2-statement.wav": {
+      "sha256": "f8926dabd6293816015d7dd9d045d6a5f4664bed347481efbf2a95f4de46f4be",
+      "bytes": 123528
+    },
+    "eval/dev/continuous-smoke-20261009/sources.json": {
+      "sha256": "165b7f38d6b0ffb0f8444a5f4409ae0bb6709eb7871125fe6b9a9b9c80a75e4b",
+      "bytes": 7942
+    },
+    "eval/dev/continuous-smoke-20261009/visits.jsonl": {
+      "sha256": "a2db695673a22ec397d72270c0a5282041f99ca34185359aaf502db15b9dfd0a",
+      "bytes": 1079
+    }
+  },
+  "models": {
+    "/home/qdrant/qdrant-robot/shared/models/gguf/Qwen3VL-2B-Instruct-Q4_K_M.gguf": {
+      "sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "bytes": 1107409952
+    },
+    "/home/qdrant/qdrant-robot/shared/models/gguf/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf": {
+      "sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82",
+      "bytes": 445053216
+    },
+    "/home/qdrant/qdrant-robot/shared/src/llama.cpp/build/bin/llama-server": {
+      "sha256": "97ac0c4acd6ed57f9ce3d41bbcd8fa195b4742196371930dc7943b3b69f45bd6",
+      "bytes": 72456
+    }
+  },
+  "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6"
+}
