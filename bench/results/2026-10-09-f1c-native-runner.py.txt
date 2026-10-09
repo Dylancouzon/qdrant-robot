@@ -1,0 +1,78 @@
+"""Supervise one frozen development command, including native interpreter teardown."""
+import datetime
+import hashlib
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+mode = sys.argv[1]
+assert mode in ('calibrate', 'compare')
+calibration = Path('bench/results/2026-10-09-f1c-mac-calibration-1.jsonl')
+output = calibration if mode == 'calibrate' else Path('bench/results/2026-10-09-f1c-mac-comparison-1.jsonl')
+operations = Path('bench/results/2026-10-09-f1c-operations.jsonl')
+if output.exists():
+    raise SystemExit('Refusing to overwrite a result')
+command = ['.venv/bin/python', '-m', 'bench.event_retrieval', mode, '--output', str(output)]
+if mode == 'compare':
+    previous = [json.loads(line) for line in operations.read_text().splitlines()]
+    frozen = next(row for row in reversed(previous) if row.get('type') == 'calibration_freeze')
+    assert frozen['native_exit'] == 0
+    assert hashlib.sha256(calibration.read_bytes()).hexdigest() == frozen['sha256']
+    command += ['--calibration', str(calibration)]
+env = dict(os.environ, ORT_DISABLE_TELEMETRY='1')
+log = Path(f'reviews/f1c-{mode}-native.log')
+started = time.monotonic()
+started_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+last_progress = started
+last_size = -1
+reason = None
+with log.open('x') as stream:
+    child = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stream, stderr=stream,
+                             env=env, start_new_session=True)
+    print('Started', mode, 'PID', child.pid, 'log', str(log), flush=True)
+    next_report = started
+    while child.poll() is None:
+        now = time.monotonic()
+        size = output.stat().st_size if output.exists() else 0
+        if size != last_size:
+            last_size, last_progress = size, now
+        if now >= next_report:
+            print(mode, 'elapsed_s', round(now-started, 1), 'output_bytes', size,
+                  'progress_idle_s', round(now-last_progress, 1), flush=True)
+            next_report = now + 10
+        if now-started >= 180 or now-last_progress >= 90:
+            reason = 'command_watchdog' if now-started >= 180 else 'progress_watchdog'
+            os.killpg(child.pid, signal.SIGTERM)
+            try:
+                child.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait(timeout=10)
+            break
+        time.sleep(0.5)
+    code = child.wait(timeout=10)
+receipt = {'type': 'native_exit', 'mode': mode, 'command': command,
+           'started_at': started_at, 'pid': child.pid, 'log': str(log),
+           'native_exit': code, 'elapsed_s': time.monotonic()-started,
+           'command_watchdog_s': 180, 'progress_watchdog_s': 90, 'reap_watchdog_s': 10,
+           'reason': reason, 'ORT_DISABLE_TELEMETRY': '1',
+           'sha256': hashlib.sha256(output.read_bytes()).hexdigest() if output.exists() else None,
+           'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+with operations.open('a') as stream:
+    stream.write(json.dumps(receipt) + '\n')
+print(json.dumps(receipt), flush=True)
+if code or reason:
+    raise SystemExit(code or 124)
+rows = [json.loads(line) for line in output.read_text().splitlines()]
+assert rows[-1]['type'] == 'complete' and rows[-1]['case_count'] == 32
+if mode == 'calibrate':
+    frozen = {'type': 'calibration_freeze', 'native_exit': 0, 'sha256': receipt['sha256'],
+              'thresholds': rows[-1]['thresholds'], 'counts': rows[-1]['counts'],
+              'bindings': rows[-1]['bindings'], 'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+    with operations.open('a') as stream:
+        stream.write(json.dumps(frozen) + '\n')
+    print('Thresholds frozen', rows[-1]['thresholds'], flush=True)

@@ -62,6 +62,14 @@ The first benchmark also ignored actual utterance_start/end fields, so those rec
 
 Before the next arm, freeze fresh disambiguated calibration and comparison sets, source-kind labels, source relevance separately from fact sufficiency, eligibility filters, merge/tie rules, span budget, and adoption criteria. Compare recalibrated floors against bounded rank-only retrieval, with the production0.5 statement floor as a control. Freeze the calibration procedure first and its resulting thresholds before comparison. Use available query/source fields for kind routing, never expected answer labels. Delay answer generation until retrieval and delivered spans improve. Representative Jetson volume must cover multi-unit sources in both slots; the repeated single-unit volume fixture establishes only a limited diagnostic.
 
+## Fresh selection results
+
+F1b freezes independent32-case calibration and32-case comparison under research/event-selection.md(D99). Each source-kind pair separates relevance from fact sufficiency. Scope derives from full authority; no shared per-point override exists. Similar objects have identifying query cues; four decisive facts occur after128 BGE tokens. Recurring distractor patterns limit generalization.
+
+F1c(E,D100) scores all384 calibration pairs before bounded selection. Floors0.53 for observations and0.55 for utterances each retain46/48 relevant pairs and no irrelevant pairs. Thresholds freeze after external native exit0, before comparison. Calibration and comparison finish in23.35s and22.34s. The archived audit reproduces file hashes, floor selection, source-kind support, and complete decisive-span delivery.
+
+Calibrated, ranked, and0.5 control deliver24/24 positive facts, versus16/24 production. Older observations improve0/8 to8/8; topic/correction facts remain8/8. Calibrated preserves every ranked supporting span and reduces unrelated selections from107 to two across32 cases. The0.5 control has16 unrelated selections; production has99. Select calibrated provisionally for paired answers. These controlled stored-text results establish no perception, answer correctness, native production-query cost, or deployed improvement. Actual production candidate filtering/ties, rendered prompt budgets, Jetson resources, old suites, and selected final challenge remain prerequisites. Keep all prior failed records and floors fixed.
+
 ## Sources
 
 - D51, D54, D56, D60, D61, D68, D70, D75, D79–D83, D87, D95, D96; research/capability-plan.md; research/lessons.md.

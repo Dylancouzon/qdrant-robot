@@ -1,0 +1,81 @@
+"""Independently audit frozen source pairs, selected spans, calibration, and native exits."""
+import datetime
+import hashlib
+import json
+from collections import defaultdict
+from pathlib import Path
+
+root = Path('bench/results')
+def rows(path):
+    return [json.loads(line) for line in path.read_text().splitlines()]
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+cal_path = root / '2026-10-09-f1c-mac-calibration-1.jsonl'
+cmp_path = root / '2026-10-09-f1c-mac-comparison-1.jsonl'
+cal, comparison = rows(cal_path), rows(cmp_path)
+ops = rows(root / '2026-10-09-f1c-operations.jsonl')
+for mode, path in [('calibrate', cal_path), ('compare', cmp_path)]:
+    receipt = next(r for r in ops if r.get('mode') == mode and r['type'] == 'native_exit')
+    assert receipt['native_exit'] == 0 and receipt['reason'] is None and receipt['sha256'] == sha(path)
+    data = path.read_bytes().splitlines(keepends=True)
+    footer = json.loads(data[-1])
+    assert footer['type'] == 'complete' and footer['case_count'] == 32
+    assert footer['records_sha256'] == hashlib.sha256(b''.join(data[:-1])).hexdigest()
+    for name, expected in footer['bindings']['implementation_hashes'].items():
+        assert sha(Path(name)) == expected
+frozen = next(r for r in ops if r['type'] == 'calibration_freeze')
+comparison_exit = next(r for r in ops if r.get('mode') == 'compare')
+assert datetime.datetime.fromisoformat(frozen['recorded_at']) < datetime.datetime.fromisoformat(comparison_exit['started_at'])
+assert frozen['sha256'] == sha(cal_path) and frozen['thresholds'] == cal[-1]['thresholds']
+for kind in ['observation', 'utterance']:
+    scores = [r['score'] for r in cal if r['type'] == 'calibration_pair' and r['kind'] == kind and r['eligible'] and r['relevant']]
+    required = (95 * len(scores) + 99) // 100
+    floor = max(i for i in range(-100, 101) if sum(score >= i / 100 for score in scores) >= required) / 100
+    assert floor == frozen['thresholds'][kind]
+truth = {r['id']: r for r in rows(Path('eval/dev/event-retrieval-2.jsonl'))}
+cases = [r for r in comparison if r['type'] == 'case']
+assert len(cases) == len(truth) == 32 and {r['id'] for r in cases} == set(truth)
+summary = defaultdict(lambda: defaultdict(lambda: {'supporting': 0, 'positive': 0, 'facts': 0, 'required_facts': 0, 'unrelated': 0, 'entries': 0}))
+calibrated_preserves_ranked = True
+for row in cases:
+    case = truth[row['id']]
+    labels = {(l['source_id'], l['kind']): l for l in case['source_kind_labels']}
+    authority = {s['id']: s for s in case['sources']}
+    ids = {int(k): v for k, v in row['source_id_map'].items()}
+    reverse = {v: k for k, v in ids.items()}
+    for arm in ['calibrated', 'ranked', '0.5-control']:
+        floors = frozen['thresholds'] if arm == 'calibrated' else {k: -1.0 if arm == 'ranked' else 0.5 for k in ['observation', 'utterance']}
+        selected = sorted([r for r in row['ranks'] if r['eligible'] and r['score'] >= floors[r['kind']]], key=lambda r: (-r['score'], ['observation', 'utterance'].index(r['kind']), reverse[r['source_id']]))[:5]
+        assert [(r['source_id'], r['kind']) for r in selected] == [(ids[e['source_id']], e['kind']) for e in row['arms'][arm]]
+    support = {pair for pair, label in labels.items() if label['sufficient']}
+    delivered = {}
+    for arm, entries in row['arms'].items():
+        assert len(entries) <= 5
+        returned, span_set = set(), set()
+        for event in entries:
+            pid, kind = event['source_id'], event['kind']
+            pair = ids[pid], kind
+            returned.add(pair)
+            text = authority[ids[pid]]['caption' if kind == 'observation' else 'said']
+            assert event['source_hash'] == hashlib.sha256(f'{pid}\0{kind}\0{text}'.encode()).hexdigest()
+            for span in event['spans']:
+                assert span['text'] == text[span['start']:span['end']]
+                if arm != 'production':
+                    assert span['tokens'] <= 128
+                if pair in support:
+                    span_set.add((pair, span['start'], span['end'], span['text']))
+        facts = sum(any((ids[e['source_id']], e['kind']) == (g['source_id'], g['kind']) and s['start'] <= g['start'] and s['end'] >= g['end'] and s['text'][g['start']-s['start']:g['end']-s['start']] == g['text'] for e in entries for s in e['spans']) for g in case['decisive_spans'])
+        supporting = len(returned & support)
+        unrelated = sum(not labels[pair]['relevant'] for pair in returned)
+        metrics = row['results'][arm]
+        assert supporting == metrics['supporting_pairs_returned'] and facts == metrics['decisive_spans_delivered'] and unrelated == metrics['unrelated_returns']
+        out = summary[arm][case['category']]
+        for key, value in [('supporting', supporting), ('positive', len(support)), ('facts', facts), ('required_facts', len(case['decisive_spans'])), ('unrelated', unrelated), ('entries', len(entries))]:
+            out[key] += value
+        delivered[arm] = span_set
+    calibrated_preserves_ranked &= delivered['ranked'] <= delivered['calibrated']
+assert calibrated_preserves_ranked
+result = {'type': 'independent_selection_audit', 'measurement': 'E', 'cases': 32, 'thresholds': frozen['thresholds'], 'summary': {a: dict(v) for a, v in summary.items()}, 'calibrated_preserves_every_ranked_supporting_span': calibrated_preserves_ranked, 'calibration_sha256': sha(cal_path), 'comparison_sha256': sha(cmp_path), 'audit_source_sha256': sha(Path(__file__)), 'answer_correctness': 'unjudged', 'runtime_integration': 'not deployed'}
+print(json.dumps(result, indent=2))
+with (root / '2026-10-09-f1c-operations.jsonl').open('a') as stream:
+    stream.write(json.dumps(result) + '\n')
