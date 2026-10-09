@@ -154,7 +154,7 @@ def session(monkeypatch):
     def remote(script):
         commands.append(script)
         if script.startswith("readlink"):
-            return f"{talk.BASE}/releases/{talk.RELEASE}"
+            return f"{talk.BASE}/releases/test-release"
         if "systemctl stop" in script:
             return ""
         if "journalctl" in script:
@@ -178,10 +178,10 @@ def session(monkeypatch):
         return left
 
     monkeypatch.setattr(talk, "remote", remote)
-    monkeypatch.setattr(talk, "command", lambda args: commands.append(args) or "")
+    monkeypatch.setattr(talk, "command", lambda args, **_: commands.append(args) or "")
     monkeypatch.setattr(talk.subprocess, "Popen", launch)
     monkeypatch.setattr(talk.socket, "create_connection", connect)
-    instance = talk.Session()
+    instance = talk.Session("test-release")
     yield instance, commands, warm
     instance.stop()
     if instance.worker:
@@ -279,7 +279,7 @@ def test_failed_cleanup_blocks_start_until_stop_retry(session, monkeypatch):
 
 
 def test_collected_remote_unit_is_safe_to_clean(monkeypatch):
-    instance = talk.Session()
+    instance = talk.Session("test-release")
     instance.unit = "qr-live-mac-test.service"
     scripts = []
 
@@ -318,3 +318,57 @@ def test_control_requires_local_host_origin_and_token(host, origin, token, code)
     handler.do_POST()
     assert replies[0][0] == code
     assert calls == (["start"] if code == 200 else [])
+
+
+def test_view_proxy_keeps_remote_token_server_side():
+    import http.client
+    from http.server import ThreadingHTTPServer
+    from robot.view import Screen, View
+    view = View(lambda: (None, Screen(status="Thinking", transcript=[{"answer": "A real reply"}])),
+                0, "test-only-view-token")
+    session = talk.Session("test-release")
+    session.view_port, session.view_token = view.port, "test-only-view-token"
+    session.update(view_ready=True)
+    talk.Handler.session, talk.Handler.token = session, "local-page-token"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), talk.Handler)
+    talk.Handler.origin = f"http://127.0.0.1:{server.server_port}"
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=2)
+    try:
+        connection.request("GET", "/")
+        page = connection.getresponse()
+        assert "SameSite=Strict" in page.headers["Set-Cookie"]
+        assert b"test-only-view-token" not in page.read()
+        connection.request("GET", "/robot")
+        denied = connection.getresponse()
+        assert denied.status == 403
+        denied.read()
+        connection.request("GET", "/robot", headers={"Cookie": "edgy=local-page-token"})
+        state = connection.getresponse()
+        assert state.status == 200 and b"A real reply" in state.read()
+    finally:
+        connection.close()
+        server.shutdown()
+        server.server_close()
+        worker.join(2)
+        view.close()
+
+
+def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
+    import jetson
+    calls = []
+    monkeypatch.setenv("ROBOT_VIEW_TOKEN", "test-only-secret")
+    monkeypatch.setattr(jetson, "remote", lambda script, **_: calls.append(script) or 0)
+    assert jetson.run("live-mac-test", ["-m", "robot.main", "--listen", "7070"], False) == 0
+    assert "--preserve-env=ROBOT_VIEW_TOKEN" in calls[0]
+    assert "--setenv=ROBOT_VIEW_TOKEN" in calls[0] and "test-only-secret" not in calls[0]
+    monkeypatch.undo()
+    monkeypatch.setenv("ROBOT_VIEW_TOKEN", "test-only-secret")
+    run_calls = []
+    monkeypatch.setattr(jetson.subprocess, "run", lambda args, **kw:
+                        run_calls.append((args, kw)) or types.SimpleNamespace(returncode=0))
+    assert jetson.remote("echo harmless") == 0
+    args, kw = run_calls[0]
+    assert "test-only-secret" in kw["input"]
+    assert all("test-only-secret" not in arg for arg in args)

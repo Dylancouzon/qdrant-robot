@@ -32,15 +32,19 @@ Checks report stage timings and stop on failure or a 120 s stage timeout. Module
 
 Deployment and remote acceptance use [tools/jetson.py](tools/jetson.py) and [eval/run.py](eval/run.py). Read STATE.md before starting remote work. Topic evidence is indexed in [research/lessons.md](research/lessons.md); raw runs live in `bench/results/`, and reviews live in `reviews/`.
 
-## Talk through your MacBook
+## Use the robot interface
 
 ```sh
-.venv/bin/python tools/talk.py
+.venv/bin/python tools/talk.py --release RELEASE_ID
 open http://127.0.0.1:8765
 ```
 
-Select **Start** to open a fresh Jetson session. The interface uses **MacBook Pro Microphone** and **MacBook Pro Speakers**, regardless of your Mac defaults. It requires SSH access to `robot`, an idle Jetson, and current release `cd60be65ee79`. It uses the existing `tools/jetson.py run` workflow without deploying source.
+Select **Start** to open a fresh Jetson session. The interface uses **MacBook Pro Microphone** and **MacBook Pro Speakers**, regardless of your Mac defaults. Deploy this interface through `tools/jetson.py deploy`, then replace `RELEASE_ID` with its printed release ID. The interface requires SSH access to `robot`, an idle Jetson, and that exact current release. Start uses the existing `tools/jetson.py run` workflow. Deployment alone starts no models or microphone.
 
 Wait for **Listening**, then say "Hey Edgy". Follow-up questions work for about 20 seconds after an answer. **Mute** sends silence while keeping the connection active. Playback also suppresses the microphone, with a short tail to prevent echo. **Stop** releases the microphone, speakers, SSH tunnel, and that interface's Jetson session. The page stays open for repeated use. Stop the local page server with Ctrl-C.
 
 Page loads start no microphone capture. The Mac stores no microphone audio. The Jetson retains its existing session logs and synthesized answer WAVs. All models and Qdrant Edge run on the Jetson. Device access errors appear in the page; macOS may require microphone permission for the launching terminal.
+
+The page shows the annotated Jetson camera, anonymous person boxes, named objects, focus, current robot status, and up to eight real exchanges. Edgy's text appears during generation. The evidence panel shows supplied knowledge, recalled statements, and memory IDs that the existing answer path provides. It reports evidence supplied, rather than asserting that a generated reply used every fact correctly. Consent, naming, recall, forgetting, and ignore rules remain voice actions.
+
+Camera and live state use the existing token-protected Jetson view on loopback port 8090, forwarded through the same owned SSH tunnel as audio. Each Start creates a fresh view token. The launcher sends it through environment and SSH stdin, never command arguments. The local page proxies the feed with its own session cookie; the Jetson token stays off the page. Stop clears the live camera and conversation. UI history stays in RAM; the original MJPEG view route remains available to existing clients.

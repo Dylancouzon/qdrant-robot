@@ -8,6 +8,7 @@
 """
 import argparse
 import hashlib
+import os
 import re
 import shlex
 import subprocess
@@ -31,6 +32,9 @@ def sh(*cmd: str, **kw) -> str:
 
 def remote(script: str, check: bool = True) -> int:
     """Run a bash script on the robot, streaming its output."""
+    # Pass the view secret on stdin, never in SSH/systemd command arguments or logs.
+    if token := os.environ.get("ROBOT_VIEW_TOKEN"):
+        script = f"export ROBOT_VIEW_TOKEN={shlex.quote(token)}\n" + script
     return subprocess.run(["ssh", HOST, "bash -se"], input=script, text=True,
                           check=check).returncode
 
@@ -98,11 +102,13 @@ def run(name: str, cmd: list[str], wait: bool) -> int:
               f"& t=$!; .venv/bin/python -u {job}; rc=$?; kill $t; exit $rc")
     body = f"flock {GPU_LOCK} bash -c {shlex.quote(locked)}"
     flags = "--wait --pipe" if wait else "--no-block"
+    view_env = ("--preserve-env=ROBOT_VIEW_TOKEN" if os.environ.get("ROBOT_VIEW_TOKEN") else "")
+    view_flag = "--setenv=ROBOT_VIEW_TOKEN" if view_env else ""
     return remote(f"""set -eu
 mkdir -p {BASE}/shared/results {BASE}/shared/models
 rel=$(readlink -f {BASE}/current)  # resolved once: a concurrent deploy cannot split provenance
 sudo systemctl reset-failed {unit} 2>/dev/null || true
-sudo systemd-run --unit={unit} {flags} --collect --uid=qdrant --gid=qdrant \\
+sudo {view_env} systemd-run {view_flag} --unit={unit} {flags} --collect --uid=qdrant --gid=qdrant \\
   --working-directory="$rel" --setenv=HOME=/home/qdrant \\
   --setenv=ROBOT_SHARED={BASE}/shared --setenv=PYTHONUNBUFFERED=1 \\
   --setenv=ROBOT_RELEASE="$(basename "$rel")" \\

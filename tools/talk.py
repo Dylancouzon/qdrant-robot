@@ -2,6 +2,8 @@
 """Reusable loopback controls for MacBook audio; all robot models run on the Jetson."""
 import argparse
 import contextlib
+import http.client
+import os
 import json
 import secrets
 import signal
@@ -12,13 +14,13 @@ import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.cookies import SimpleCookie
 from pathlib import Path
 
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
-RELEASE = "cd60be65ee79"
 INPUT, OUTPUT = "MacBook Pro Microphone", "MacBook Pro Speakers"
 RATE_IN, RATE_OUT, CHUNK = 16000, 24000, 1280
 TAIL_S = 0.3
@@ -150,8 +152,8 @@ class NativeAudio:
             self.conn.close()
 
 
-def command(args: list[str]) -> str:
-    result = subprocess.run(args, capture_output=True, text=True, timeout=30)
+def command(args: list[str], env=None) -> str:
+    result = subprocess.run(args, capture_output=True, text=True, timeout=30, env=env)
     if result.returncode:
         raise RuntimeError((result.stderr or result.stdout).strip()[-1500:])
     return result.stdout.strip()
@@ -178,13 +180,16 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Own one remote session and tunnel, and keep the page reusable after cleanup."""
 
-    def __init__(self):
+    def __init__(self, release: str):
+        self.release = release
+        self.view_port = self.view_token = None
         self.lock = threading.Lock()
         self.stopped = threading.Event()
         self.worker = None
         self.child = self.reader = self.unit = None
         self.state = dict(phase="Idle", active=False, muted=False, error="",
-                          input=INPUT, output=OUTPUT, input_level=0, output_level=0)
+                          input=INPUT, output=OUTPUT, input_level=0, output_level=0,
+                          view_ready=False)
 
     def update(self, **state):
         with self.lock:
@@ -205,6 +210,7 @@ class Session:
 
     def stop(self):
         self.stopped.set()
+        self.update(view_ready=False)
         if self.worker and self.worker.is_alive():
             self.update(phase="Stopping")
         elif self.unit:
@@ -252,6 +258,7 @@ class Session:
                 break
         if self.stopped.is_set():
             return
+        self.update(view_ready=True)
         child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
                                   "--audio-fd", str(conn.fileno())], pass_fds=(conn.fileno(),),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -269,6 +276,22 @@ class Session:
             if child.poll() is not None:
                 message = child.stderr.read().strip()[-1500:]
                 raise RuntimeError(message or "Robot audio disconnected")
+
+    def open_view(self, path):
+        with self.lock:
+            if self.stopped.is_set() or not self.state["view_ready"]:
+                raise RuntimeError("Camera session is idle")
+            port, token = self.view_port, self.view_token
+        connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+        try:
+            connection.request("GET", f"{path}?token={token}")
+            response = connection.getresponse()
+            if response.status != 200:
+                raise RuntimeError("Jetson view is unavailable")
+            return connection, response
+        except Exception:
+            connection.close()
+            raise
 
     def cleanup_remote(self):
         error = ""
@@ -311,18 +334,23 @@ class Session:
         try:
             status = remote(f"readlink -f {BASE}/current; "
                             "systemctl list-units 'qr-*' --state=active --no-legend --plain")
-            if status.splitlines() != [f"{BASE}/releases/{RELEASE}"]:
-                raise RuntimeError(f"Jetson must be idle on release {RELEASE}. Received: {status}")
+            if status.splitlines() != [f"{BASE}/releases/{self.release}"]:
+                raise RuntimeError(f"Jetson must be idle on release {self.release}. "
+                                   f"Received: {status}")
             if self.stopped.is_set():
                 return
             self.unit = f"qr-{name}.service"
+            self.view_token = secrets.token_hex(32)
             command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
-                     "--", "-m", "robot.main", "--listen", "7070"])
-            with socket.socket() as reserve:
+                     "--", "-m", "robot.main", "--listen", "7070"],
+                    env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
+            with socket.socket() as reserve, socket.socket() as video_reserve:
                 reserve.bind(("127.0.0.1", 0))
-                port = reserve.getsockname()[1]
+                video_reserve.bind(("127.0.0.1", 0))
+                port, self.view_port = reserve.getsockname()[1], video_reserve.getsockname()[1]
             tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes",
-                                       "-L", f"127.0.0.1:{port}:127.0.0.1:7070", "robot"],
+                                       "-L", f"127.0.0.1:{port}:127.0.0.1:7070",
+                                       "-L", f"127.0.0.1:{self.view_port}:127.0.0.1:8090", "robot"],
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             conn = self.connect(tunnel, port)
             if conn:
@@ -331,7 +359,8 @@ class Session:
             if not self.stopped.is_set():
                 error = str(exc)
         finally:
-            self.update(phase="Stopping")
+            self.update(phase="Stopping", view_ready=False)
+            self.view_port = self.view_token = None
             self.cleanup_local(conn, tunnel)
             cleanup_error = self.cleanup_remote()
             error = "\n".join(filter(None, (error, cleanup_error)))
@@ -347,6 +376,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", kind)
         self.send_header("Cache-Control", "no-store")
+        if kind.startswith("text/html"):
+            self.send_header("Set-Cookie", f"edgy={self.token}; HttpOnly; SameSite=Strict; Path=/")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
@@ -361,10 +392,38 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/":
             page = Path(__file__).with_suffix(".html").read_text().replace("TOKEN", self.token)
             self.reply(200, page.encode(), "text/html; charset=utf-8")
+        elif self.path in ("/camera", "/robot"):
+            cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
+            if cookie is None or not secrets.compare_digest(cookie.value, self.token):
+                self.reply(403, b"Forbidden")
+                return
+            self.proxy_view()
         elif self.path == "/status":
             self.reply(200, json.dumps(self.session.snapshot()).encode())
         else:
             self.reply(404, b"Not found")
+
+    def proxy_view(self):
+        connection = None
+        try:
+            path = "/state" if self.path == "/robot" else "/"
+            connection, response = self.session.open_view(path)
+            if self.path == "/robot":
+                self.reply(200, response.read())
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", response.headers["Content-Type"])
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            while not self.session.stopped.is_set() and (data := response.read1(65536)):
+                self.wfile.write(data)
+                self.wfile.flush()
+        except (OSError, RuntimeError, http.client.HTTPException):
+            if connection is None:
+                self.reply(503, b"View unavailable; start a session first")
+        finally:
+            if connection:
+                connection.close()
 
     def do_POST(self):
         if (not self.allowed() or self.headers.get("Origin") != self.origin or
@@ -383,8 +442,8 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int) -> None:
-    session = Session()
+def serve(port: int, release: str) -> None:
+    session = Session(release)
     token = secrets.token_urlsafe(32)
     Handler.session = session
     Handler.token = token
@@ -405,9 +464,12 @@ def serve(port: int) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
+    parser.add_argument("--release", help="exact Jetson release printed by tools/jetson.py deploy")
     parser.add_argument("--audio-fd", type=int, help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.audio_fd is not None:
         NativeAudio(args.audio_fd).run()
     else:
-        serve(args.port)
+        if not args.release:
+            parser.error("--release is required for the deployed interface release")
+        serve(args.port, args.release)

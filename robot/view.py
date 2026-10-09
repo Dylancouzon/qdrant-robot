@@ -3,6 +3,7 @@ objects, people boxes (never names), a status strip with memory events, and a me
 never writes a frame to disk.
 """
 import hmac
+import json
 import threading
 import time
 from collections.abc import Callable
@@ -32,6 +33,8 @@ class Screen:
     status: str = ""  # Listening, Hearing you, Thinking, or Speaking
     events: list[tuple[float, str]] = field(default_factory=list)  # (time.time(), text)
     memory: dict | None = None
+    transcript: list[dict] = field(default_factory=list)  # transient, bounded by the Robot
+    evidence: dict = field(default_factory=dict)  # supplied to the current answer
 
 
 Source = Callable[[], tuple[np.ndarray | None, Screen]]
@@ -96,6 +99,17 @@ class _Handler(BaseHTTPRequestHandler):
         given = parse_qs(urlparse(self.path).query).get("token", [""])[0]
         if not hmac.compare_digest(given.encode(), view.token):
             self.send_error(403)
+            return
+        if urlparse(self.path).path == "/state":
+            _, screen = view.source()
+            data = json.dumps({"status": screen.status, "transcript": screen.transcript,
+                               "evidence": screen.evidence, "memory": screen.memory}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
             return
         self.send_response(200)
         self.send_header("Content-Type", f"multipart/x-mixed-replace; boundary={BOUNDARY.decode()}")

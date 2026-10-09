@@ -17,7 +17,7 @@ import time
 import traceback
 from collections import deque
 from collections.abc import Callable, Iterator
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 
 import numpy as np
@@ -191,6 +191,9 @@ class Robot:
         # to remember their face (D69), once per conversation.
         self.told: tuple[str, bool] | None = None
         self.last_line = 0.0  # when the answer to the last answered line ended
+        self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
+        self.ui_turn: Turn | None = None
+        self.ui_thinking, self.ui_play_until = False, 0.0
         self.panel: dict | None = None  # the last retrieval, for the view's memory panel
         self.stream: Iterator[str] | None = None  # the brain's answer while a turn decodes
         self.detections = 0                     # frames detected so far
@@ -252,6 +255,8 @@ class Robot:
             self.view, self.mine = (None, {}), {}
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
+            self.ui_turns.clear()
+            self.ui_turn, self.ui_thinking, self.ui_play_until = None, False, 0.0
 
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
@@ -269,9 +274,10 @@ class Robot:
             speech, t_line, speech_end, speech_start, shot = line
             if text := self.scribe(speech):  # empty: noise the VAD took for speech
                 self.asked += 1
-                self.jobs.put(("turn", Turn(question=text, line=t_line,
-                                            transcribed=time.time(), speech_end=speech_end,
-                                            speech_start=speech_start), shot))
+                turn = Turn(question=text, line=t_line, transcribed=time.time(),
+                            speech_end=speech_end, speech_start=speech_start)
+                self.ui_turn, self.ui_thinking = turn, True
+                self.jobs.put(("turn", turn, shot))
             self.lines.task_done()
 
     def _watch(self) -> None:
@@ -331,7 +337,28 @@ class Robot:
     def _shown(self) -> tuple[np.ndarray | None, Screen]:
         """The view's source: the newest tracked frame and its boxes."""
         with self.detecting:
-            return self.screen
+            frame, screen = self.screen
+            status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
+                      "Speaking" if time.time() < self.ui_play_until else
+                      "Thinking" if self.ui_thinking else "Listening")
+            turns = list(self.ui_turns)
+            turn = self.ui_turn
+            if turn is not None and (not turns or turns[-1] is not turn):
+                turns.append(turn)
+            evidence = {}
+            if turn is not None:
+                if not turn.keep or self.hiding:
+                    turns = [turn]  # Deleted visitor/object content leaves the live UI, too.
+                evidence = {"knowledge": turn.facts if not turn.verbatim else
+                            [turn.answer] if turn.answer in turn.facts else [],
+                            "statements": turn.told if not turn.verbatim else [],
+                            "memory_ids": turn.memories,
+                            "answer_path": ("Code" if turn.verbatim else "Generated")
+                            if turn.first_token else ""}
+            transcript = [{"id": str(t.line), "question": t.question, "answer": t.answer}
+                          for t in turns[-8:]]
+            return frame, replace(screen, status=status, transcript=transcript,
+                                  evidence=evidence, memory=self.panel)
 
     def _sight(self, found: list[Sighting], frame: np.ndarray) -> None:
         """One point per track (label, region, times; no frame: answers use labels, and a
@@ -432,12 +459,16 @@ class Robot:
         if self.wake_word and heard is None and \
                 turn.speech_start - self.last_line > CONVERSATION_S:
             turn.kind = "background"  # logged for false-accept checks, never answered or stored
+            self.ui_turn = None
             self._log(turn)
             return
         turn.question = heard or turn.question  # "Hey Edgy." alone: the brain greets back
+        self.ui_turn, self.ui_thinking = turn, True
+        self.ui_turns.append(turn)
         if self._stale(shot[0]):  # the scene changed after the last look
             self._look(shot)
         if (look := self.ready) is None:
+            self.ui_thinking = False
             return  # no camera frame yet: nothing to answer about
         started, detections = time.time(), self.detections
         question = self.embed([turn.question])[0]
@@ -451,6 +482,8 @@ class Robot:
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
         # earlier exchanges or first-person statements reach this prompt.
         if self.history and self._converse(turn, self._whois(now)):
+            self.ui_turns.clear()
+            self.ui_turns.append(turn)
             self.history = []
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
@@ -507,6 +540,11 @@ class Robot:
         self._log(turn)
 
     def _log(self, turn: Turn) -> None:
+        self.ui_thinking = False
+        if not turn.keep or self.hiding:
+            self.panel = None
+            self.ui_turns.clear()
+            self.ui_turns.append(turn)
         with (self.out / "turns.jsonl").open("a") as f:
             f.write(json.dumps(asdict(turn)) + "\n")
         self.turns.put(turn)
@@ -868,6 +906,7 @@ class Robot:
                 turn.first_phrase = turn.first_phrase or time.time()
                 pcm = self.voice.say(text)
                 turn.first_audio = turn.first_audio or time.time()
+                self.ui_play_until = max(self.ui_play_until, time.time()) + len(pcm) / RATE
                 self.speaker.play(pcm)
                 audio_parts.append(pcm)
         finally:

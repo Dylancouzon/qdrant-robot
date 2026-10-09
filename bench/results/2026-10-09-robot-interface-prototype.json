@@ -1,0 +1,101 @@
+{
+  "task": "D124 full robot interface prototype",
+  "protected_release": "cd60be65ee79",
+  "source_branch": "spike/mac-audio-interface",
+  "source_base": "dcb1e386035dc51e1229c428c892f3cd6a67707f",
+  "source_directory": "/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface",
+  "protected_runtime_sha256": {
+    "robot/things.py": "f7041e143592b85bc37a53f0ae23762d17bab809093402b090e2000d67e74725",
+    "robot/config.py": "d9fdb0d00a5035f08eef34a5b1360982f1dbde54dfe2e507962a599d28971d04",
+    "robot/faces.py": "53360716188bf1801d6c7a4017afbd8cac2f3334b9108891c7047fa72a088a6b",
+    "robot/memory.py": "0e2a2da0e91167e63da2acb276a921a7851f254906fd844012564dd59d731fc3",
+    "robot/route.py": "5cbbd9722f53e9d8b26f599414a2b7adc994724b637db94165eae356a3e60dc6",
+    "robot/tts.py": "6bbe3c3620bea5901c1e0995e0d91e2cd75db628d77fff563c512d4817070240",
+    "robot/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "robot/asr.py": "0d6c8147e7541eb4f2fa4aac75f56f2fc6acbcaa2e9d2f46e85ede08b14f991d",
+    "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+    "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+    "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63",
+    "robot/people.py": "b6b6fbd497e638d679a92fc05a07828d44d32a506ffc2a6f7c76125c4fcec4f7",
+    "robot/view.py": "a83b01ad5e29c721f4e2c1a32cd3557442790eb61f65c377241a905c20b337c5",
+    "robot/audio.py": "069da726df2ba548e7257e4da4149324201471e9316208e88758423421e9855e",
+    "robot/main.py": "0c208f60724803f518b9ae49fe49aaabebddf6ea41359ea2b381f65dc2cb187c",
+    "robot/knowledge.py": "27c5d9931fc90ef53fd1cd5c18fd566e4e667ab4ec60e052af2dbff927ce06c5",
+    "robot/detect.py": "9f4dc961766b04a98785ae2f9b77c6e091995da32a35fc574b454a6e06ed5905",
+    "robot/focus.py": "6d15190c22efd6044abf4ccd1b3834498e27c18a82bc9e8a341828560aa598b5",
+    "pyproject.toml": "7270bc927f1619ed709dafd0ad5de07b3c8ac0dfc93b44decb5b4748a021c6bf",
+    "uv.lock": "0bcf60a75fe0f6649d1ec6a9d504b2e74bcba85859d705da7fc3602d80a9aaef",
+    "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727"
+  },
+  "unchanged_runtime_integrity": {
+    "robot/things.py": true,
+    "robot/config.py": true,
+    "robot/faces.py": true,
+    "robot/memory.py": true,
+    "robot/route.py": true,
+    "robot/tts.py": true,
+    "robot/__init__.py": true,
+    "robot/asr.py": true,
+    "robot/text_embed.py": true,
+    "robot/brain.py": true,
+    "robot/camera.py": true,
+    "robot/people.py": true,
+    "robot/audio.py": true,
+    "robot/knowledge.py": true,
+    "robot/detect.py": true,
+    "robot/focus.py": true,
+    "pyproject.toml": true,
+    "uv.lock": true,
+    "models.json": true
+  },
+  "changed_file_sha256": {
+    "README.md": "a616f1456406f4caae270b91369caede1a081b9e376a25fd22728e53dc1f43c2",
+    "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63",
+    "robot/main.py": "591494f10d17f043e1b14a016ca5f24715baf0239fb63c5ba78a0d3be066920b",
+    "robot/test_view.py": "4c505cecc38e345bfa636fce26ece63506eb0bf3d92df92d75a91a0f9f451f40",
+    "robot/view.py": "0e1c1d8de12181177000e647cc5dce9b82ec9ec543361fe92e25839d883a60e6",
+    "tools/jetson.py": "dc84440bae7b2b70899ec5f78064b4530c0563f8005128d6b66f8ac781ca3216",
+    "tools/talk.html": "b346c6bd50b11e22ba3b679c1d51469c8a54c4d7f71cfa3b7105e025937f6143",
+    "tools/talk.py": "b7806ee5ec5fc88731de7d327cc45c4f2e130308c83838abd18276280596e8eb",
+    "tools/test_talk.py": "16d636764576dd33b52a7d78c3bceffb2718d7d56e0c34e57a1297faec3abe7a"
+  },
+  "builder_checks": {
+    "syntax": "pass",
+    "changed_path_ruff": "pass",
+    "diff_check": "pass",
+    "targeted_checks": [
+      "robot/test_view.py::test_live_state_preserves_stream_and_real_text",
+      "tools/test_talk.py::test_view_proxy_keeps_remote_token_server_side",
+      "tools/test_talk.py::test_workflow_view_token_uses_stdin_and_inherited_environment"
+    ],
+    "targeted_result": "3 passed",
+    "elapsed_seconds": 1.43,
+    "native_exit": 0
+  },
+  "qualification": "Live UI testing pending Dylan; no full suite, audio replay, microphone capture, or camera experiment. Deployment and idle-page rendering do not establish live UI behavior or product acceptance.",
+  "review": {
+    "verdict": "PASS",
+    "model": "gpt-6.1-sol",
+    "path": "reviews/20261009-195203-77868-review.md",
+    "elapsed_seconds": 114.08,
+    "native_exit": 0
+  },
+  "deployment": {
+    "release": "b2b36d9718da",
+    "previous": "cd60be65ee79",
+    "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface/tools/jetson.py deploy",
+    "native_exit": 0,
+    "remote_file_sha256": {
+      "robot/main.py": "591494f10d17f043e1b14a016ca5f24715baf0239fb63c5ba78a0d3be066920b",
+      "robot/view.py": "0e1c1d8de12181177000e647cc5dce9b82ec9ec543361fe92e25839d883a60e6",
+      "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63"
+    }
+  },
+  "preview": {
+    "server_pid": 84019,
+    "url": "http://127.0.0.1:8765",
+    "microphone": "off",
+    "live_test": "pending Dylan",
+    "idle_render": "Chrome accessibility state and screenshot show Idle, camera placeholder, conversation/evidence panels, Start enabled, Mute/Stop disabled."
+  }
+}

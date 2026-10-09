@@ -53,3 +53,24 @@ def test_view() -> None:
         view.close()
     with pytest.raises(ConnectionRefusedError):
         socket.create_connection(("127.0.0.1", view.port), timeout=2)
+
+
+def test_live_state_preserves_stream_and_real_text():
+    import json
+    screen = Screen(status="Thinking", transcript=[{"question": "Where is it?", "answer": "I see"}],
+                    evidence={"memory_ids": [17], "knowledge": ["An actual stored fact"]})
+    view = View(lambda: (np.zeros((60, 100, 3), np.uint8), screen), 0, TOKEN, fps=5)
+    url = f"http://127.0.0.1:{view.port}"
+    try:
+        stream = urllib.request.urlopen(f"{url}/?token={TOKEN}", timeout=2)
+        with pytest.raises(urllib.error.HTTPError) as denied:
+            urllib.request.urlopen(f"{url}/state?token=wrong", timeout=2)
+        assert denied.value.code == 403
+        with urllib.request.urlopen(f"{url}/state?token={TOKEN}", timeout=2) as response:
+            state = json.load(response)
+        assert state["transcript"] == screen.transcript
+        assert state["evidence"] == screen.evidence and state["status"] == "Thinking"
+        assert b"Content-Length:" in stream.read(120), "state requests keep MJPEG alive"
+        stream.close()
+    finally:
+        view.close()
