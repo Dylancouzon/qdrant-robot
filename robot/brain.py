@@ -42,6 +42,8 @@ MODEL = "qwen3vl-2b"
 _SENTENCE = re.compile(r"[^.!?]+[.!?](?=\s|$)")
 IMAGE_WIDTH = 672   # frames are downscaled before encoding; the server caps tokens anyway
 MAX_TOKENS = 64
+CONTEXT_TOKENS = 2048
+IMAGE_TOKENS = 256
 MAX_SENTENCES = 1   # one sentence: second sentences were where hedges and stale details crept in
 MIN_WORDS = 6       # shorter sentences ("Of course!", "I see it now.") do not count
 SYSTEM = (
@@ -79,8 +81,9 @@ def server_args(model: str) -> list[str]:
     # Memory (bench/memory_budget.py): prompts stay under about 1,000 tokens, so 2,048 of
     # context; no host-RAM prompt cache (8 GiB by default, it pushed the robot into swap).
     return [str(SERVER), "-m", str(GGUF / weights), "-mm", str(GGUF / mmproj), "-ngl", "99",
-            "-fa", "on", "-c", "2048", "-ub", "256", "--cache-ram", "0", "-np", "1", "--jinja",
-            "--image-max-tokens", "256", "--reasoning", "off", "--host", "127.0.0.1",
+            "-fa", "on", "-c", str(CONTEXT_TOKENS), "-ub", "256", "--cache-ram", "0",
+            "-np", "1", "--jinja",
+            "--image-max-tokens", str(IMAGE_TOKENS), "--reasoning", "off", "--host", "127.0.0.1",
             "--port", URL.rsplit(":", 1)[1], *extra]
 
 
@@ -187,10 +190,29 @@ class Brain:
 
     def tokens(self, text: str) -> int:
         """How many tokens `text` takes."""
-        req = urllib.request.Request(f"{URL}/tokenize", json.dumps({"content": text}).encode(),
+        return len(self._json("tokenize", {"content": text})["tokens"])
+
+    def _json(self, path: str, body: dict) -> dict:
+        req = urllib.request.Request(f"{URL}/{path}", json.dumps(body).encode(),
                                      {"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=10) as r:
-            return len(json.load(r)["tokens"])
+            return json.load(r)
+
+    def budget(self, msgs: list[dict]) -> dict:
+        """Count rendered text and reserve image/output tokens before generation.
+
+        Image placeholders remain in the rendered count, so the additional image reserve
+        gives a conservative bound rather than an exact multimodal token count.
+        """
+        rendered = self._json("apply-template", {
+            "messages": msgs, "chat_template_kwargs": {"enable_thinking": False}})["prompt"]
+        count = len(self._json("tokenize", {"content": rendered, "parse_special": True,
+                                            "add_special": False})["tokens"])
+        images = sum(c.get("type") == "image_url" for m in msgs
+                     if isinstance(m["content"], list) for c in m["content"])
+        return {"rendered_tokens": count, "image_token_reserve": images * IMAGE_TOKENS,
+                "prompt_token_bound": count + images * IMAGE_TOKENS,
+                "output_token_reserve": MAX_TOKENS, "context_tokens": CONTEXT_TOKENS}
 
     def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
                ) -> Iterator[str]:

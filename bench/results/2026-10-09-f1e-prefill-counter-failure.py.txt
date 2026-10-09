@@ -1,0 +1,103 @@
+"""Generic Jetson template/tokenizer qualification, with an external native watchdog.
+
+Pass this source to tools/jetson.py run NAME -- -c SOURCE SOURCE_SHA256.
+"""
+import hashlib
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+WORKER = r'''
+import hashlib,json,platform,sys,time
+from pathlib import Path
+import numpy as np
+from robot import brain
+from robot.config import SHARED
+assert platform.system()=="Linux" and platform.machine()=="aarch64"
+path=Path(sys.argv[1])
+def emit(row):
+    with path.open("a") as f:f.write(json.dumps(row)+"\n")
+def sha(path):
+    with Path(path).open("rb") as f:return hashlib.file_digest(f,"sha256").hexdigest()
+weights,projector,_=brain.MODELS[brain.MODEL]
+emit({"type":"bindings","brain_sha256":sha(Path(brain.__file__)),
+      "weights_sha256":sha(brain.GGUF/weights),"projector_sha256":sha(brain.GGUF/projector),
+      "server_sha256":sha(brain.SERVER),"model":brain.MODEL,
+      "context_tokens":brain.CONTEXT_TOKENS,"image_tokens":brain.IMAGE_TOKENS,
+      "output_tokens":brain.MAX_TOKENS,"machine":platform.node()})
+b=brain.Brain()
+try:
+    image=brain.jpeg(np.zeros((360,640,3),np.uint8))
+    history=[{"role":"user","content":"The opening time is nine."},
+             {"role":"assistant","content":"The opening time is nine in the morning."}]
+    cases=[("text",brain.messages([],None,question="When does the booth open?")),
+           ("history",brain.messages(history,None,["2 minutes ago: a blue book."],
+                   question="What book was there?",past=True)),
+           ("image",brain.messages([],image,question="What do you see?")),
+           ("overflow",brain.messages([],None,["A blue book. "*800],question="What was there?"))]
+    for name,msgs in cases:
+        started=time.monotonic()
+        rendered=b._json("apply-template",{"messages":msgs,
+                    "chat_template_kwargs":{"enable_thinking":False}})["prompt"]
+        bound=b.budget(msgs)
+        assert "<|im_start|>" in rendered and "Visitor:" in rendered
+        assert bound["rendered_tokens"]==len(b._json("tokenize",{
+              "content":rendered,"parse_special":True,"add_special":False})["tokens"])
+        fits=bound["prompt_token_bound"]+bound["output_token_reserve"]<=bound["context_tokens"]
+        usage=None
+        if name=="overflow":
+            assert not fits
+        else:
+            assert fits
+            with b._post({"messages":msgs,"max_tokens":0}) as response:data=json.load(response)
+            usage=data["usage"]
+            assert usage["completion_tokens"]==0,usage
+            assert 0<usage["prompt_tokens"]<=bound["prompt_token_bound"],(name,usage,bound)
+            if name in ("text","history"):
+                assert usage["prompt_tokens"]==bound["rendered_tokens"],(name,usage,bound)
+        emit({"type":"case","id":name,"budget":bound,"fits":fits,"usage":usage,
+              "rendered_prompt":rendered,"elapsed_s":time.monotonic()-started})
+        print("qualified",name,bound,usage,flush=True)
+finally:
+    b.close()
+emit({"type":"worker_complete","n":len(cases)})
+'''
+
+base = Path(os.environ['ROBOT_SHARED']) / 'results'
+path = base / f"{time.strftime('%Y-%m-%d')}-prompt-budget-{time.time_ns()}.jsonl"
+with path.open('x') as stream:
+    stream.write(json.dumps({'type': 'metadata', 'release': os.environ['ROBOT_RELEASE'],
+        'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'probe_sha256': sys.argv[1],
+        'worker_sha256': hashlib.sha256(WORKER.encode()).hexdigest(), 'expected': 4,
+        'command': 'tools/jetson.py run f1e-budget-a -- -c archived-probe SOURCE_SHA256',
+        'measurement': 'J', 'watchdog_s': 180, 'reap_s': 10}) + '\n')
+started = time.monotonic()
+p = subprocess.Popen([sys.executable, '-u', '-c', WORKER, str(path)], start_new_session=True)
+reason = None
+try:
+    rc = p.wait(timeout=180)
+except subprocess.TimeoutExpired:
+    reason = 'native worker timeout'
+    os.killpg(p.pid, signal.SIGTERM)
+    try:
+        p.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        os.killpg(p.pid, signal.SIGKILL)
+        p.wait(timeout=10)
+    rc = 124
+with path.open('a') as stream:
+    stream.write(json.dumps({'type': 'native_exit', 'native_exit': rc, 'reason': reason,
+                            'elapsed_s': time.monotonic() - started}) + '\n')
+if rc == 0:
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert sum(row.get('type') == 'case' for row in rows) == 4
+    assert rows[-2] == {'type': 'worker_complete', 'n': 4}
+    with path.open('a') as stream:
+        stream.write(json.dumps({'summary': 'prompt_budget', 'completed': True, 'n': 4,
+                                'native_exit': 0}) + '\n')
+print('saved', path, 'native_exit', rc, flush=True)
+raise SystemExit(rc)

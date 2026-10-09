@@ -1,0 +1,8 @@
+{"__REALTIME_TIMESTAMP": "1791548285097320", "MESSAGE": null}
+{"__REALTIME_TIMESTAMP": "1791548290836418", "MESSAGE": "Traceback (most recent call last):"}
+{"__REALTIME_TIMESTAMP": "1791548290836418", "MESSAGE": "  File \"<string>\", line 46, in <module>"}
+{"__REALTIME_TIMESTAMP": "1791548290836418", "MESSAGE": "AssertionError: [{'finish_reason': 'length', 'index': 0, 'message': {'role': 'assistant', 'content': 'I'}}]"}
+{"__REALTIME_TIMESTAMP": "1791548290959402", "MESSAGE": "saved /home/qdrant/qdrant-robot/shared/results/2026-10-09-prompt-budget-1791548285170124918.jsonl native_exit 1"}
+{"__REALTIME_TIMESTAMP": "1791548290982180", "MESSAGE": "qr-f1e-budget-b.service: Main process exited, code=exited, status=1/FAILURE", "EXIT_STATUS": "1", "EXIT_CODE": "exited"}
+{"__REALTIME_TIMESTAMP": "1791548290982802", "MESSAGE": "qr-f1e-budget-b.service: Failed with result 'exit-code'."}
+{"__REALTIME_TIMESTAMP": "1791548290982940", "MESSAGE": "qr-f1e-budget-b.service: Consumed 6.104s CPU time."}

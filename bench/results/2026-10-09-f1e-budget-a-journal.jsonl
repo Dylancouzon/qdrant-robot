@@ -1,0 +1,8 @@
+{"__REALTIME_TIMESTAMP": "1791548187125516", "MESSAGE": null}
+{"__REALTIME_TIMESTAMP": "1791548194255165", "MESSAGE": "Traceback (most recent call last):"}
+{"__REALTIME_TIMESTAMP": "1791548194255165", "MESSAGE": "  File \"<string>\", line 45, in <module>"}
+{"__REALTIME_TIMESTAMP": "1791548194255165", "MESSAGE": "AssertionError: {'completion_tokens': 1, 'prompt_tokens': 315, 'total_tokens': 316, 'prompt_tokens_details': {'cached_tokens': 0}}"}
+{"__REALTIME_TIMESTAMP": "1791548194384038", "MESSAGE": "saved /home/qdrant/qdrant-robot/shared/results/2026-10-09-prompt-budget-1791548187205049459.jsonl native_exit 1"}
+{"__REALTIME_TIMESTAMP": "1791548194406223", "MESSAGE": "qr-f1e-budget-a.service: Main process exited, code=exited, status=1/FAILURE", "EXIT_STATUS": "1", "EXIT_CODE": "exited"}
+{"__REALTIME_TIMESTAMP": "1791548194410660", "MESSAGE": "qr-f1e-budget-a.service: Failed with result 'exit-code'."}
+{"__REALTIME_TIMESTAMP": "1791548194410803", "MESSAGE": "qr-f1e-budget-a.service: Consumed 6.699s CPU time."}
