@@ -41,3 +41,5 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - F1a calibration ambiguity (D97): several questions name an object with two eligible descriptions. One expected source ID cannot establish instance resolution. Preserve the frozen calibration as source-ranking development data. Use separate disambiguated cases before claiming same-instance resolution. This does not change the24-case comparison. Evidence: reviews/20261009-060639-22828-review.md.
 
 - F1a candidate limit (D98): 64 higher-ranked hits can fail hydration or ignored-kind checks and hide eligible sources beyond the limit. Carry under D71. If measured visits expose this loss, filter before limiting or fetch another bounded page. Source: robot/memory.py events(); reviews/20261009-064447-68946-review.md.
+
+- F1b synthetic history patterns (D99): distractor sentence patterns recur across distinct invented venues. This limits generalization evidence. If varied visitor histories reduce recall, measure the gap in the selected final-candidate challenge without expanding the fixture freeze. Source: reviews/20261009-071035-215-review.md.

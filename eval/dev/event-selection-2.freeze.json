@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "slot_map": {
+    "observation": "observed",
+    "utterance": "dialogue"
+  },
+  "protocol_file": "research/event-selection.md",
+  "protocol_sha256": "ba715791e2efd049adebc81c6235861cb70a4051c2cc75469d0d8039fa7929dc",
+  "files": {
+    "eval/dev/event-calibration-2.jsonl": {
+      "sha256": "acb2b31d5e8552a957b8b92ca2f2acdac9f0e1ebbb9c63de8d23cae77518cdd3",
+      "questions": 32
+    },
+    "eval/dev/event-retrieval-2.jsonl": {
+      "sha256": "73256ac2096a41fc2b6bd09cdf397862db8b65f986241b2d06b5a9ca10a4d44a",
+      "questions": 32
+    }
+  },
+  "counts": {
+    "calibration_per_kind": {
+      "observation": 16,
+      "utterance": 16
+    },
+    "comparison_per_category": {
+      "older-observation": 8,
+      "topic-reference": 8,
+      "correction": 8,
+      "absent-evidence": 8
+    },
+    "long_sources": [
+      {
+        "case_id": "cmp2-observation-01",
+        "kind": "observation",
+        "tokens_before_fact": 159
+      },
+      {
+        "case_id": "cmp2-observation-02",
+        "kind": "observation",
+        "tokens_before_fact": 157
+      },
+      {
+        "case_id": "cmp2-topic-01",
+        "kind": "utterance",
+        "tokens_before_fact": 153
+      },
+      {
+        "case_id": "cmp2-topic-02",
+        "kind": "utterance",
+        "tokens_before_fact": 157
+      }
+    ]
+  },
+  "tokenizer": {
+    "path": "models/bge-small/tokenizer.json",
+    "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+    "unit_limit_including_special_tokens": 128
+  },
+  "source_exclusions": [
+    "All challenge data, wording, rubrics, images, transcripts, and failure records.",
+    "All bench/results files and raw F1a records.",
+    "All prior fixture domains and entity names; old development files read for schema only.",
+    "Production memories, private people, and real perception sources."
+  ],
+  "limits": "Invented stored captions and literal utterances test retrieval only. No image, ASR, physical perception, identity, or answer correctness claim is established.",
+  "gold_usage": "Evaluation only. Labels and decisive spans must never route retrieval or select indexed units.",
+  "label_semantics": "Relevance includes related partial and superseded sources. Sufficiency means the source-kind pair supports the current requested fact. Similar alternates are relevant but insufficient. Every nonempty source-kind pair is labeled.",
+  "span_semantics": "Zero-based half-open Python character offsets into caption or said. Spans include full decisive sentences.",
+  "frozen_before_embeddings": true,
+  "commands": "No embeddings, inference, threshold tuning, or comparison scoring were run.",
+  "selection_protocol": {
+    "arms": [
+      "calibrated",
+      "ranked",
+      "0.5-control"
+    ],
+    "score": "raw cosine native MaxSim per source-kind",
+    "merge": "Both kinds in descending raw cosine; exact ties favor observation, then source ID.",
+    "max_entries": 5,
+    "delivery": "Best-scoring indexed unit per selected source-kind, exact offsets and source hash.",
+    "calibration": "Highest grid floor -1.00 to 1.00 by 0.01 retaining at least 95% of relevant pairs per kind. Sufficiency and comparison never tune floors.",
+    "separate_measures": [
+      "supporting-source recall",
+      "delivered decisive-fact coverage",
+      "absent-case unrelated selections"
+    ],
+    "pre_generation": "No generation until retrieval improves; rendered 2048 context reserves 64 output and 256 image tokens."
+  },
+  "validation_file": {
+    "path": "eval/test_event_selection.py",
+    "sha256": "d007171a02b441b9d86ce0aa511cd30b5850f0e874abd2598708ffd940d67aea"
+  },
+  "validation_command": ".venv/bin/python eval/test_event_selection.py (120-second subprocess watchdog)",
+  "scope_semantics": "Scope is derived per source kind from literal text using existing Memory visitor rules; source points do not declare a shared override."
+}
