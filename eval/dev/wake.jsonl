@@ -1,0 +1,18 @@
+{"id": "wake-1", "say": "Hey Edgy, what do you see?", "wake": true}
+{"id": "wake-2", "say": "Hi Edgy, do you remember me?", "wake": true}
+{"id": "wake-3", "say": "Okay Edgy, what is Qdrant Edge?", "wake": true}
+{"id": "wake-4", "say": "Hey Edgy what did I show you", "wake": true}
+{"id": "wake-5", "say": "Hey Edgy, tell me a joke.", "wake": true}
+{"id": "wake-6", "say": "Hi Edgy, where is my phone?", "wake": true}
+{"id": "wake-7", "say": "Okay Edgy, how fast is your memory?", "wake": true}
+{"id": "wake-8", "say": "Hey Edgy, what's my name?", "wake": true}
+{"id": "wake-9", "say": "Hey Edgy.", "wake": true}
+{"id": "wake-bg-1", "say": "Qdrant Edge is fast.", "wake": false}
+{"id": "wake-bg-2", "say": "Have you tried Qdrant Edge on a Jetson?", "wake": false}
+{"id": "wake-bg-3", "say": "That design is a bit edgy.", "wake": false}
+{"id": "wake-bg-4", "say": "Edgy, what do you see?", "wake": false}
+{"id": "wake-bg-5", "say": "Hey, what do you see over there?", "wake": false}
+{"id": "wake-bg-6", "say": "Hey Eddie, come over here.", "wake": false}
+{"id": "wake-bg-7", "say": "The edge of the table is sharp.", "wake": false}
+{"id": "wake-bg-8", "say": "Okay, so what is Qdrant Edge?", "wake": false}
+{"id": "wake-bg-9", "say": "Hi, I am looking for the Qdrant booth.", "wake": false}

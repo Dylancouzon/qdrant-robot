@@ -35,7 +35,8 @@ def open_robot(root: Path) -> Robot:
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
     robot.vocab = {"phone", "cup", "mug", "chair", "person"}
     robot.faces, robot.hiding, robot.jobs, robot.uncaptioned = None, None, queue.Queue(), []
-    robot.told, robot.focus, robot.last_line = None, None, 0.0
+    robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0.0, None, 0
+    robot.panel = None
     return robot
 
 
@@ -62,6 +63,11 @@ def show(robot: Robot, objects: list[tuple[int, tuple]], frames: int = CONFIRM) 
             robot._sight(found, frame)
 
 
+def hold(robot: Robot, box: tuple) -> None:
+    """The visitor holds up the object in `box`: the focus takes its track (Focus.freeze)."""
+    robot.focus.freeze(next(t for t, (_, b) in robot.view[1].items() if b == box))
+
+
 def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
     turn = Turn(question=text, speech_start=time.time() + 1)
     return robot._things(turn), turn
@@ -73,6 +79,9 @@ def test_things(monkeypatch) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         robot = open_robot(Path(tmp))
         show(robot, [(GOLD, CENTER)])
+        assert ask(robot, "This is my phone.")[0] == "I don't see a phone held up. Hold it " \
+            "up and say it again.", "an object nobody holds up is not the focus"
+        hold(robot, CENTER)
         said, turn = ask(robot, "This is my phone.")
         assert said == "Got it, that is your phone. I will remember it." and turn.named == "phone"
         assert store(robot, turn) == 1
@@ -119,11 +128,9 @@ def test_things(monkeypatch) -> None:
         assert ask(robot, "Where is my phone?")[0] == "I don't know which phone is yours."
         assert not any("phone" in x for x in statements(robot)), "nothing of it after a restart"
         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
-        assert ask(robot, "This is my phone.")[0] == "I see more than one thing. Please hold " \
-            "your phone up alone and say it again."
-        show(robot, [], LOST + 1)
-        show(robot, [(GOLD, CENTER)])
-        assert ask(robot, "This is my phone.")[0].startswith("Got it")
+        hold(robot, RIGHT)
+        assert ask(robot, "This is my phone.")[0].startswith("Got it"), "the focus, of two"
+        robot.focus.thaw()
         show(robot, [], LOST + 1)
         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
         assert ask(robot, "Can you see my phone?")[0] == "Yes, your phone is here now."
@@ -137,12 +144,9 @@ def test_things(monkeypatch) -> None:
             robot._track(frame, dets)
         assert robot._shown()[0] is frame and {b[4:] for b in robot._shown()[1].boxes} == {
             ("", "other")}, "the view draws the tracked frame's objects"
-        assert ask(robot, "This is my cup.")[0].startswith("I see more than one thing."), \
-            "no cup track and two objects: no guess"
-        robot.tracker = Tracker()
-        for _ in range(CONFIRM):
-            robot._track(frame, dets[:1])
-        assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the one object binds"
+        hold(robot, CENTER)
+        assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the focus, any label"
+        robot.focus.thaw()
         assert robot.things.named("cup", ["cup"])["labels"] == ["bag", "cup", "mug"]
         robot.tracker, robot.mine = Tracker(), {}  # as Robot.reset: track ids start over
         frame[300:600, 540:740] = GOLD
@@ -156,6 +160,7 @@ def test_things(monkeypatch) -> None:
         frame[300:600, 540:740] = BLACK
         found = [s for _ in range(CONFIRM)
                  for s in robot._track(frame, [Detection("phone", 0.9, CENTER)])]
+        hold(robot, CENTER)
         assert ask(robot, "This is my phone.")[0].startswith("Got it")
         assert ask(robot, "Forget my phone.")[0].startswith("Done")
         robot._sight(found, frame)  # the track's sighting, queued behind those two turns
@@ -180,12 +185,19 @@ def test_ignore(monkeypatch) -> None:
         assert ask(robot, "Are you still ignoring chairs?")[0] == "Yes, I am ignoring chairs."
         v = np.eye(TEXT_DIM, dtype=np.float32)[0]
         robot.memory.add(frame, "My chair at home is red.", v, ts=time.time())
-        assert robot._told(v, time.time() + 1) == [], "a statement about chairs is not recalled"
+        robot.last_line = time.time()  # the same conversation
+        turn = Turn(speech_start=time.time() + 1)
+        assert robot._told(v, turn) == [], "a statement about chairs is not recalled"
         turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1)
         assert robot._sighted(turn) == "I am ignoring chairs, so I do not remember any."
         assert ask(robot, "You can stop ignoring chairs now.")[0] == \
             "Okay, I will notice chairs again."
-        assert [m["said"] for m in robot._told(v, time.time() + 1)] == ["My chair at home is red."]
+        assert [m["said"] for m in robot._told(v, turn)] == ["My chair at home is red."]
+        robot.since = time.time_ns() // 1000
+        assert robot._told(v, turn) == [], "a first-person statement of an earlier visitor (D70)"
+        robot.memory.add(frame, "The booth closes at five.", v, ts=time.time())
+        assert [m["said"] for m in robot._told(v, turn)] == ["The booth closes at five."], \
+            "a general statement is shared"
         robot.tracker = Tracker()  # a chair that arrives now
         robot._sight([s for _ in range(CONFIRM) for s in robot._track(frame, chair)], frame)
         assert [s["label"] for s in robot.memory.sightings(time.time() + 1, 9)] == ["chair"]

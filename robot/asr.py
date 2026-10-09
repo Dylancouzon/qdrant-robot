@@ -31,12 +31,22 @@ _FIXES = [(re.compile(rf"\b(?:{_QDRANT}|quadr[aeiou]n\w*?)(?:age|ed?ge)\b", re.I
            "Qdrant Edge"),  # "quadrantage", "quadrundage"
           (re.compile(rf"\b{_QDRANT}s?\b", re.I), "Qdrant"),
           (re.compile(r"\bmulti[ -]vector", re.I), "multivector")]  # the knowledge phrasing
+# The wake phrase (D65): "hey", "hi", or "okay", then the name as Parakeet spells it on
+# synthetic voices (eval/dev/wake.jsonl: Edgie, Eji, Aji, Achie; "Hiyaji" for "Hi Edgy").
+# Never the name alone: "edgy" is a word, and "edge" is said all day at the booth.
+_WAKE = re.compile(r"^\W*(?:(?:hey|hi|hiya|okay|ok)\W+(?:edgy|edgie|edgey|eji|aji|achie)|hiyaji)"
+                   r"\b\W*", re.I)
 
 
 def normalize(text: str) -> str:
     for pattern, name in _FIXES:
         text = pattern.sub(name, text)
     return text.strip()
+
+
+def woken(text: str) -> str | None:
+    """`text` without its leading wake phrase, or None when it starts with none."""
+    return text[m.end():] if (m := _WAKE.match(text)) else None
 
 
 class Scribe:
@@ -142,6 +152,12 @@ if __name__ == "__main__":
     assert normalize("quadrant edge") == "Qdrant edge"
     assert normalize("What is Quadranth Edge?") == "What is Qdrant Edge?"
     assert normalize("What is a multi vector?") == "What is a multivector?"
+    assert woken("Hey Edgie, what do you see?") == "what do you see?"
+    assert woken("Hiyaji, do you remember me?") == "do you remember me?"
+    assert woken("okay edgy") == "" and woken("Hey Eji what did I show you?") is not None
+    for other in ("Edgy, what do you see?", "Qdrant Edge is fast.", "Hey, that edge is sharp.",
+                  "That is edgy.", "Hey Eddie, come here.", "Hey Edge, hi."):
+        assert woken(other) is None, other
     ears = object.__new__(Ears)  # only the buffer and line logic, without loading a model
     ears.fed, ears.buffer = 0, np.zeros(4, np.float32)
     ears.keep(np.array([1, 2, 3], np.float32))

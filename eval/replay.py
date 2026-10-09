@@ -170,8 +170,8 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
     stamp = time.strftime("%Y-%m-%d")
     out = SHARED / "sessions" / f"replay-{int(time.time())}"
     camera = FileCamera()
-    rows = run(sessions, lambda memory: Robot(camera, out, memory=memory, model=model), path,
-               oracle, audio)
+    rows = run(sessions, lambda memory: Robot(camera, out, memory=memory, model=model,
+                                              wake_word=False), path, oracle, audio)
     firsts = sorted(r["first_audio_s"] for r in rows if r["first_audio_s"] is not None)
     summary = {"summary": "replay", "model": model, "oracle": oracle, "audio": audio,
                "cases": str(path), "system": SYSTEM,  # the prompt rows leave it out

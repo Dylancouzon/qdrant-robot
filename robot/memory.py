@@ -360,7 +360,7 @@ class Memory:
             limit=n, query=Query.Nearest(query.tolist(), using="said"), with_payload=True,
             score_threshold=TOLD_MIN,
             filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before))])))
-        return [self._row(h) for h in hits]
+        return [{**self._row(h), "score": h.score} for h in hits]
 
     def recent(self, before: float, n: int = 3) -> list[dict]:
         """Payloads (id, ts, frame, said, caption, thumb) of the newest captioned frames before

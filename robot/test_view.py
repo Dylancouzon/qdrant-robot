@@ -32,7 +32,8 @@ def test_view() -> None:
                      (700, 100, 800, 200, "", "other"),
                      (900, 100, 1000, 200, "Dylan's phone?", "guess")], "Thinking",
                     [(time.time(), "Remembered: Dylan's mug")],
-                    {"shards": ["things", "memory"], "hits": [("Dylan's mug", 0.91)], "ms": 3.2})
+                    {"shards": ["things", "memory"], "ms": 3.2,
+                     "hits": [("Dylan's mug", 0.91), ("seen: a mug", None)]})
     view = View(lambda: (frame, screen), 0, TOKEN, fps=20)
     url = f"http://127.0.0.1:{view.port}/"
     try:

@@ -118,7 +118,7 @@ def test_robot_identity(monkeypatch) -> None:
 
     from robot import main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
-    from robot.main import Robot, Turn
+    from robot.main import FIRST_PERSON, Robot, Turn
     from robot.memory import Memory
     from robot.people import DECLINED, _id
     from robot.text_embed import DIM as TEXT_DIM
@@ -143,6 +143,7 @@ def test_robot_identity(monkeypatch) -> None:
         robot.named, robot.ignored, robot.mine = set(), set(), {}
         robot.asking, robot.hiding, robot.detecting = None, None, threading.Lock()
         robot.told, robot.stream, robot.last_line = None, None, 0.0
+        robot.face, robot.since, robot.panel, robot.wake_word = None, 0, None, False
         robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
         robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
         robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
@@ -184,7 +185,12 @@ def test_robot_identity(monkeypatch) -> None:
 
         ana = frames(1, 60)
         assert steps == [], "no face step without a turn"
-        assert ask("What's my name?", ana) == NOT_MET
+        robot.wake_word = True  # D65
+        assert ask("What's my name?", ana) is None and turns[-1].kind == "background"
+        assert ask("Hey Edgy, what's my name?", ana) == NOT_MET
+        assert turns[-1].question == "what's my name?", "the wake phrase is stripped"
+        assert ask("What's my name?", ana) == NOT_MET, "a follow-up within CONVERSATION_S"
+        robot.wake_word = False
         assert ask("Nice to meet you, I'm Ana.", ana) == offer("Ana"), "a name: one offer (D69)"
         assert ask("What's my name?", ana) == "You told me you're Ana.", "no reply keeps the name"
         assert ask("I'm Ana, as I said.", ana) is None, "the offer is never repeated"
@@ -280,3 +286,15 @@ def test_robot_identity(monkeypatch) -> None:
             is None, "a name alone is never consent"
         assert ask("Yes, please.", cy) == done("enroll", "Cy", True)
         assert robot.people.identify(np.eye(DIM)[3])[0] == "Cy", "a yes to the offer enrolls"
+        robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[
+            [1 if "from" in t else 0 for t in texts]]  # only lines about origin match each other
+        assert ask("I'm from Lisbon.", cy) is None
+        assert ask("Where am I from?", cy) is None and turns[-1].told == ["I'm from Lisbon."]
+        assert "Lisbon" in str(turns[-1].prompt), "Cy's own exchanges stay in the prompt"
+        assert ask("So which town do I live in?", frames(5, 1)) is None, "a paraphrase"
+        assert not any(FIRST_PERSON.search(x) for x in turns[-1].told) and "Lisbon" not in str(
+            turns[-1].prompt), "a visitor replacing Cy within the window gets none of Cy's " \
+            "statements or exchanges (D70)"
+        assert ask("Where am I from?", frames(5, 1)) is None and turns[-1].told == []
+        assert ask("Where am I from?", cy) is None and turns[-1].told == [], \
+            "nor does Cy after that new conversation"
