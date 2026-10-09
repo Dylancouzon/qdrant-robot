@@ -57,12 +57,8 @@ def vote(passes: list[list[dict]]) -> list[dict]:
     return out
 
 
-def main(result: Path, cases: Path) -> int:
-    rubric = {st["id"]: st["rubric"] for line in cases.read_text().splitlines()
-              for st in json.loads(line)["steps"] if "say" in st}
-    rows = [r for r in map(json.loads, result.read_text().splitlines()) if "id" in r]
-    items = [{"id": r["id"], "visitor": r["heard"], "robot": r["answer"],
-              "rubric": rubric[r["id"]]} for r in rows]
+def score_items(items: list[dict]) -> tuple[list[dict], int]:
+    """Apply the shared cached majority judge to either replay or continuous items."""
     # An answer already judged under the same rubric keeps its verdict: the judge alone flipped
     # 5 of 60 identical answers between two runs (D46). New answers get a majority of VOTES.
     cache = {c["key"]: c for c in map(json.loads, CACHE.read_text().splitlines())
@@ -77,6 +73,16 @@ def main(result: Path, cases: Path) -> int:
                 f.write(json.dumps(cache[key(i)]) + "\n")
     verdicts = [{"id": i["id"], **{k: cache[key(i)][k] for k in ("pass", "why", "votes")}}
                 for i in items]
+    return verdicts, len(new)
+
+
+def main(result: Path, cases: Path) -> int:
+    rubric = {st["id"]: st["rubric"] for line in cases.read_text().splitlines()
+              for st in json.loads(line)["steps"] if "say" in st}
+    rows = [r for r in map(json.loads, result.read_text().splitlines()) if "id" in r]
+    items = [{"id": r["id"], "visitor": r["heard"], "robot": r["answer"],
+              "rubric": rubric[r["id"]]} for r in rows]
+    verdicts, new_count = score_items(items)
     judged = result.with_suffix(".judged.jsonl")
     pairs = list(zip(items, verdicts, strict=True))
     judged.write_text("".join(json.dumps({**i, **v}) + "\n" for i, v in pairs))
@@ -84,7 +90,7 @@ def main(result: Path, cases: Path) -> int:
         if not v["pass"]:
             print(f"FAIL {i['id']}: {v['why']}\n     [{i['visitor']}] {i['robot']}")
     passed = sum(v["pass"] for v in verdicts)
-    print(f"judged {passed}/{len(verdicts)} pass ({MODEL}, {len(new)} new, majority of "
+    print(f"judged {passed}/{len(verdicts)} pass ({MODEL}, {new_count} new, majority of "
           f"{VOTES}); saved {judged}")
     return 0 if passed == len(verdicts) else 1
 
