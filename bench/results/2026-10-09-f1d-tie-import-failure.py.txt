@@ -1,0 +1,25 @@
+"""Probe native equal-score source ordering through the production event API."""
+import hashlib
+import importlib.metadata
+import json
+import tempfile
+from pathlib import Path
+import numpy as np
+from qdrant_edge import Point, UpdateOperation
+from robot.memory import Memory
+
+vector = np.eye(384, dtype=np.float32)[0]
+with tempfile.TemporaryDirectory() as directory:
+    memory = Memory(Path(directory))
+    try:
+        for pid in range(1, 9):
+            payload = {'ts': 1.0, 'said': 'The venue opens at noon.', 'caption': 'A red schedule.', 'thumb': bytes(64*36).hex()}
+            memory.shard.update(UpdateOperation.upsert_points([Point(pid, {}, payload)]))
+            for kind in ['observation', 'utterance']:
+                source = memory.source_event(pid, kind)
+                unit = {'start': 0, 'end': len(source['text']), 'text': source['text'], 'tokens': 8}
+                assert memory.index_event(pid, kind, source['source_hash'], [unit], vector.reshape(1, -1))
+        actual = {kind: [e['source_id'] for e in memory.events(vector, 10.0, 0, 0.53, kind)] for kind in ['observation', 'utterance']}
+        print(json.dumps({'type': 'generic_native_tie', 'measurement': 'E', 'expected': [1,2,3,4,5], 'actual': actual, 'matches': all(ids == [1,2,3,4,5] for ids in actual.values()), 'qdrant_edge_py': importlib.metadata.version('qdrant-edge-py'), 'memory_sha256': hashlib.sha256(Path('robot/memory.py').read_bytes()).hexdigest(), 'probe_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}), flush=True)
+    finally:
+        memory.shard.close()

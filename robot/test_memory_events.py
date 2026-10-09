@@ -133,3 +133,22 @@ def test_actual_speech_after_query(tmp_path):
     assert memory.events(VECTORS[0], 200., 0, .9, "utterance") == []
     assert memory.events(VECTORS[0], 300., 0, .9, "utterance")
     memory.shard.close()
+
+
+def test_event_score_ties_use_stable_source_ids(tmp_path):
+    memory = Memory(tmp_path)
+    try:
+        ids = []
+        for _ in range(8):
+            pid = memory.add(FRAME, "The venue opens at noon.", ts=100.)
+            memory.set(pid, caption="A red schedule.")
+            assert index(memory, pid, "observation", "A red schedule.")
+            assert index(memory, pid, "utterance", "The venue opens at noon.")
+            ids.append(pid)
+        for kind in ("observation", "utterance"):
+            events = memory.events(VECTORS[0], 200., 0, .53, kind)
+            assert [event["source_id"] for event in events] == sorted(ids)[:5]
+            assert [event["source_id"] for event in memory.events(
+                VECTORS[0], 200., 0, .53, kind, n=2)] == sorted(ids)[:2]
+    finally:
+        memory.shard.close()

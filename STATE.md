@@ -4,7 +4,7 @@ Last updated: 2026-10-09, by the lead. Rewrite, do not append.
 
 ## Active task
 
-F1c source-selection checkpoint is reviewed; commit/push before F1d production-query and prompt-budget qualification(D97–D100). Branch spike/overnight-2026-10-09 is at pushedd8487bc, twelve reviewed checkpoints. Main remains eb746fe. All scoped workers finished. Lead owns STATE, DECISIONS, integration, and machines.
+F1d qualifies actual Memory.events against the frozen selected packets(D97–D100). Branch spike/overnight-2026-10-09 is at pushed32bbe7c, thirteen reviewed checkpoints. Main remains eb746fe. All scoped workers finished. Lead owns STATE, DECISIONS, integration, and machines.
 
 Native source-owned observed/dialogue MaxSim remains provisional. Preserve source/hash, exact literal authority, actual capture/speech times, visitor boundaries,12h/20,000-point/4GiB retention, consent/identity/actions, ignored kinds, deletion/pending writes, restart, and rollback. Keep BGE384/128 and brain2K/64-output/256-image. No training, context increase, model/OS change, or ordinary-code deletion.
 
@@ -14,15 +14,15 @@ F1c(E,D100): production16/24 source/facts versus24/24 for calibrated,ranked,and0
 
 Evidence: bench/results/2026-10-09-f1c-mac-{calibration,comparison}-1.jsonl, operations.jsonl, archived native-runner.py.txt/audit.py.txt. CalibrationSHAc5d098a367560c3d56bae27144dd53c19f4cbbee5d1adfbfcdecf6da1c954000; comparisonSHA2c2773fa305ed396bed17b4750cb446440e92bebb491aa22fd7c119232cbe652. Native exits0 in23.35s/22.34s; thresholds freeze before comparison. Independent audit reproduces all pairs, selections, hashes, and exact spans. Sol6.1 review PASS reviews/20261009-073249-27709-review.md finished203.99s. Eight focused tests and full checks25.02s pass. Prior F1b freeze PASS reviews/20261009-071517-6377-review.md.
 
-Current changed paths: STATE,DECISIONS(D100),research/event-benchmark.md,event-memory.md,lessons.md,edge-cases.md;bench/event_retrieval.py,test_event_retrieval.py;F1c raw results, operations, archived supervisor/audit, and review receipt. No runtime hooks or deployment. Parked unqualified Brain budget patch/test remain ignored underbuild/f1a/archives. Current prototype code is additive in Memory/TextEmbedder; main only imports the unchanged FIRST_PERSON regex.
+F1c committed/pushed32bbe7c. Current F1d changed paths: STATE,DECISIONS(D101),robot/memory.py(one sort),robot/test_memory_events.py,generic tie/API probe and failed-launch archives/results/operations,research/event-delivery.md,event-memory.md,lessons.md. Memory/events changes only if a measured tie mismatch requires the frozen rule. No runtime hooks or deployment. Parked unqualified Brain budget patch/test remain ignored underbuild/f1a/archives. Current prototype code is additive in Memory/TextEmbedder; main only imports the unchanged FIRST_PERSON regex.
 
-Running jobs: no gate, builder, benchmark, judge, or model process active. Mac caffeinatePID37805 remains awake; logreviews/overnight-awake.log. Robot currentcd60be65ee79, previousf96b251e7518, boot09b4bb27-f975-441c-9d00-7af446ec7de6. Reconcile before remote work. Last10:58UTC: noqr units/models,6,035MiB available,104MiB allocatedswap,105GB disk free. WSL idle for this work; preservedisney-demo-qdrant. Claude/Codex auth and tools/githooks verified; latest quota observed07:20UTC35%weekly used, Claude remaining unknown.
+Running jobs: actual API45626/exec22111 completed native0 in22.14s on Mac, cwd repository; command .venv/bin/python bench/results/2026-10-09-f1d-api-probe.py.txt, output2026-10-09-f1d-mac-api-1.jsonl, log reviews/f1d-api-native-2.log;180s group watchdog,10s reap. Full checks PASS26.11s; no active check process. Sol6.1 review PASS reviews/20261009-075131-50293-review.md finished188.61s. No active gate. No builder/judge/model active. Mac caffeinatePID37805 remains awake; logreviews/overnight-awake.log. Robot currentcd60be65ee79, previousf96b251e7518, boot09b4bb27-f975-441c-9d00-7af446ec7de6. Reconcile before remote work. Last10:58UTC: noqr units/models,6,035MiB available,104MiB allocatedswap,105GB disk free. WSL idle for this work; preservedisney-demo-qdrant. Claude/Codex auth and tools/githooks verified; latest quota observed07:20UTC35%weekly used, Claude remaining unknown.
 
 Operational watchdogs: gates900s/group, checks120s/stage; SSH10s connect/keepalives and45s outer; deploy300s, collect/push120s, reap10s. F1c native supervisor uses180s command/90s progress, logs every10s, and preserves nonzero/incomplete runs. Healthy work has no total deadline(D83). Named remote units use no--wait; inspect progress each minute. Preserve partial logs, diagnose, then retry infrastructure once. F1c artifacts below5MB; production memories remain unopened.
 
 Remaining F1 adoption checks: qualify actual Memory.events filtering/candidate limits/ties on the frozen comparison; implement rendered2K budget with64-output/256-image reserves and exact delivered source/span logs. Require paired base-model answer gain without category loss;1,000 Jetson queries/bothslots/multiunits at>=4,500 points,20,000stress before cap claims;all-model headroom>=500MiB, reported paging/latency/detection,<=0.2s p50 synthesized regression, unchanged development/safety suites. Only the selected final candidate reruns the unchanged fresh challenge. No intermediate challenge tuning.
 
-Next command: stage the reviewed F1c checkpoint, git diff --cached --check, commit with300s watchdog, and push with120s watchdog. Then freeze F1d's paired actual-retrieval/prompt-budget qualification before product hooks. research/event-memory.md and research/lessons.md carry the current evidence and limits.
+Generic tie native0 reports3–7vsfrozen1–5; Memory.events now sorts score/source-ID before early hydration. Six focused tests pass3.34s. Launch/import and binding-key guard failures occurred before model/shard creation; preserved inF1d operations and failed-source archives. Actual32 packets match frozen sources/hashes/spans/results exactly;24 supporting facts, two unrelated returns. Generic after probe yields1–5 for both kinds,native0 in0.70s. Next command: stage F1d code/test/evidence/review, git diff --cached --check, commit with300s watchdog, and push with120s watchdog. Then qualify the rendered prompt budget under D97. Brief research/event-delivery.md fixes acceptance and stopping rules. research/event-memory.md and research/lessons.md carry the current evidence and limits.
 
 ## Completed overnight evidence
 
@@ -70,11 +70,6 @@ Unmet: source contract/integrated gain, D75 unseen probes, exact rendered prompt
 ## Git
 
 Dylan requests commits and pushes throughout this overnight session. Working branch: spike/overnight-2026-10-09, from main eb746fe, tracking origin/spike/overnight-2026-10-09. Main is unchanged. Commit each reviewed task with its evidence and push this branch. Remote origin is github.com/Dylancouzon/qdrant-robot (private).
-
-## Checkpoints
-
-- C6: replay split scoring, length-scaled hangover, overfitting rule, M2 fixtures (D37, D38).
-- C0, C1: harness and architecture rethink. C2: M1.1 (`reviews/20261008-010719-8012-review.md`). C3: M1.2 (`reviews/20261008-020746-59698-review.md`). C4: M1.3 quality work (`reviews/20261008-084259-59432-review.md`). C5: repo hygiene, Edge benchmark, 4B re-run, recorder check (D34 to D36).
 
 ## Unmet targets
 

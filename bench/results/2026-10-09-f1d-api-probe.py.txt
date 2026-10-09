@@ -1,0 +1,56 @@
+"""Compare actual event API delivery against the frozen source-selection packets."""
+import hashlib
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from bench import event_retrieval as bench
+from robot.memory import Memory
+from robot.text_embed import TextEmbedder
+
+root = Path('bench/results')
+cal_path = root / '2026-10-09-f1c-mac-calibration-1.jsonl'
+cmp_path = root / '2026-10-09-f1c-mac-comparison-1.jsonl'
+ops = [json.loads(line) for line in (root / '2026-10-09-f1c-operations.jsonl').read_text().splitlines()]
+frozen = next(r for r in ops if r['type'] == 'calibration_freeze')
+assert frozen['native_exit'] == 0 and bench.digest(cal_path) == frozen['sha256']
+original = subprocess.check_output(['git', 'show', '32bbe7c:robot/memory.py'], text=True)
+replacement = original.replace('        for hit in hits:\n            source = self.source_event(hit.id, kind)', '        for hit in sorted(hits, key=lambda hit: (-hit.score, hit.id)):\n            source = self.source_event(hit.id, kind)')
+assert Path('robot/memory.py').read_text() == replacement
+current = bench.bindings()
+for key in ['manifest_sha256', 'fixture_hashes', 'protocol_sha256', 'model_hashes']:
+    assert current[key] == frozen['bindings'][key]
+for name in [str(Path(bench.__file__)), 'robot/text_embed.py']:
+    assert current['implementation_hashes'][name] == frozen['bindings']['implementation_hashes'][name]
+expected = {r['id']: r for r in map(json.loads, cmp_path.read_text().splitlines()) if r['type'] == 'case'}
+cases = bench.frozen(bench.DEV)
+embedder = TextEmbedder()
+output = root / '2026-10-09-f1d-mac-api-1.jsonl'
+with output.open('x') as stream:
+    def emit(row):
+        stream.write(json.dumps(row) + '\n'); stream.flush()
+    emit({'type': 'provenance', **bench.provenance(), 'probe_sha256': bench.digest(Path(__file__)), 'frozen_calibration_sha256': bench.digest(cal_path), 'frozen_comparison_sha256': bench.digest(cmp_path), 'memory_change': 'Only score/source-ID ordering before hydration; calibration/indexing unchanged'})
+    for case in cases:
+        with tempfile.TemporaryDirectory() as directory:
+            memory = Memory(Path(directory))
+            try:
+                ids, units, timings = bench.prepare(memory, embedder, case['sources'])
+                query = embedder([case['question']])[0]
+                entries = []
+                for kind in bench.KINDS:
+                    entries += memory.events(query, case['query_at'], case['visitor_since'], frozen['thresholds'][kind], kind)
+                entries = bench.select(entries, frozen['thresholds'])
+                predicted = expected[case['id']]['arms']['calibrated']
+                def signature(event):
+                    return event['source_id'], event['kind'], event['source_hash'], event['spans']
+                matches = [signature(e) for e in entries] == [signature(e) for e in predicted]
+                result = bench.evaluate(case, ids, entries)
+                assert result == expected[case['id']]['results']['calibrated']
+                assert matches
+                emit({'type': 'case', 'id': case['id'], 'category': case['category'], 'source_id_map': ids, 'matches_frozen_packet': matches, 'unit_count': units, 'updates': timings, 'entries': entries, 'result': result})
+                print('Qualified', case['id'], flush=True)
+            finally:
+                memory.shard.close()
+    emit({'type': 'complete', 'cases': len(cases), 'all_packets_match': True, 'answer_correctness': 'unjudged; API qualification only'})

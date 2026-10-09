@@ -443,7 +443,7 @@ class Memory:
                 FieldCondition(key=slot + "_scope", match=MatchValue("shared")),
                 FieldCondition(key=slot + "_source_id", range=RangeFloat(gt=visitor_since))])))
         events = []
-        for hit in hits:
+        for hit in sorted(hits, key=lambda hit: (-hit.score, hit.id)):
             source = self.source_event(hit.id, kind)
             if (not source or source["source_hash"] != hit.payload.get(slot + "_hash") or
                     source["scope"] == "visitor" and hit.id <= visitor_since or

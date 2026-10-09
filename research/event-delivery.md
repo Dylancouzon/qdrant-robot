@@ -1,0 +1,13 @@
+# F1d actual retrieval qualification
+
+D100 selects calibrated source spans provisionally. The development benchmark inspected every source in each small fixture. Qualify the actual Memory.events path before generation. Compare its calibrated five-entry source-kind packets against the immutable F1c packets on the unchanged32-case development fixture. Use the same BGE/model bytes, frozen0.53/0.55 floors, source authority, speech times, scope, ignored rules, and best-unit delivery. Record exact source IDs, hashes, spans, and differences. This establishes API behavior on controlled sources, not representative cost or answer quality.
+
+First run a generic native tie probe with more than five eligible equal-score sources. The frozen rule sorts raw cosine descending, observations first for exact cross-kind ties, then numeric source ID. Record actual results before changing code. If native ordering differs, make the smallest Memory.events change that matches the fixed rule. Keep the64-candidate bound and carry its existing exhaustion risk under D71. Do not add pagination, new models, filters based on expected labels, or a different calibration policy.
+
+Acceptance: actual retrieval preserves all24 supporting sources and exact decisive spans, with no category loss or cross-visitor/stale-source return; the generic tie probe follows the frozen rule; independent native exit is zero; all executed/source/model/input hashes are recorded. Run relevant generic checks after any API edit, then one Sol6.1 task review and commit/push. Stop on lost sources, changed authority/scope, or native failure and diagnose before proceeding. The lead owns this qualification; no worker or remote change is required.
+
+Use an archived executable probe under bench/results and ignored build/f1d for temporary work. Disk below5MB. Per-command watchdog180s maximum and reaping10s; inspect completed cases and output bytes each minute. Preserve partial results and native stderr. Production memory remains unopened and Jetson stays oncd60be65ee79. There is no healthy experiment deadline(D83).
+
+After this checkpoint, resume the parked Brain budget work under D97. Qualify deployed chat-template/tokenizer endpoints and exact delivered spans within2,048 tokens, reserving64 output and256 image tokens. Freeze paired base-model answer inputs/settings before generation. Require answer gain without category loss; representative Jetson costs, integration, paging, safety regressions, and final challenge remain separate prerequisites. No answer gain belongs to this API checkpoint.
+
+Sources: D97–D100, research/event-memory.md, research/event-selection.md, reviews/20261009-073249-27709-review.md, and the frozen F1c calibration/comparison/native receipts.
