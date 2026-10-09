@@ -1,14 +1,33 @@
-# Lessons: avenues explored and pitfalls (2026-10-08 to 2026-10-09)
+# Lessons: avenues explored and pitfalls (2026-10-07 to 2026-10-09)
 
-The session log a new session reads after STATE.md: every avenue tried, its outcome, and where the evidence lives; then the pitfalls. Decisions are in DECISIONS.md (Dnn); evidence in bench/results/ and reviews/.
+Read this after STATE.md, then the task's linked decisions and topic evidence. Decisions are in DECISIONS.md (Dnn); evidence is in bench/results/ and reviews/. Use `python3 tools/results.py` before opening raw turn logs. D76 and D77 prioritize the capability ceiling and permit challenging decisions with a concrete intervention, disputed assumption, and paired validation.
+
+## Current evidence to locate first
+
+D75 kept evidence fixes and code answers. The one-voice path missed the frozen comparison by one M2 step; `research/one-voice.patch` remains unapplied. The M2 gain is dev-only until unseen probes confirm it. Every row below is a separate Jetson oracle record and release, with judged answer scores rather than raw keyword scores.
+
+| D75 comparison | Judged | Raw file in bench/results/ |
+| --- | --- | --- |
+| M2 HEAD | 39/74 | 2026-10-08-replay-1791518506.jsonl |
+| M2 retrieval into the brain | 38/74 | 2026-10-09-replay-1791520325.jsonl |
+| M2 code answers with evidence fixes | 44/74 | 2026-10-09-replay-1791521394.jsonl |
+| Visitor HEAD | 16/21 | 2026-10-08-replay-1791516596.jsonl |
+| Visitor retrieval into the brain | 17/21 | 2026-10-09-replay-1791520659.jsonl |
+| Visitor code answers with evidence fixes | 16/21 | 2026-10-09-replay-1791521641.jsonl |
+| M3 after fixes | 33/33 | 2026-10-09-replay-1791522418.jsonl |
+| Sessions after fixes | 42/47 | 2026-10-09-replay-1791522070.jsonl |
+
+For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It reports 62/74 keyword checks separately from 44/74 judged answers for the evidence-fix run. A recorded completion footer is not acceptance or full fixture coverage. No history query makes an automatic paired-win claim across releases.
 
 ## Avenues explored
 
 ### Speech and latency
+- ASR: Moonshine Tiny's 4.3% synthetic WER hid damaging "Qdrant" misses; Small and Medium were slower. Parakeet int8 on CPU won (D22, D24). GPU int8 offered no latency advantage; fp32 used 3,152 MB. Real-voice replay exposed endpointing failures after synthetic tests looked good (D36).
 - Real-voice replay misaligned turns when a pause split a question: the replay now collects every turn per step and marks splits BAD (D38).
 - Endpointing: a global longer hangover was rejected (adds latency to every turn); a length-scaled hangover (0.35 s, 0.7 s after 4 s of speech) removed long-question splits (D38). A turn merge for pauses after a short fragment was designed but not built (research/endpointing.md, reviews/20261008-100527-35955-design.md).
 - TTS first phrase was slow because Kokoro shares the GPU with llama decode and the detector (0.16 s alone, 0.35 to 0.55 s in a turn); pausing decode at the first phrase and resuming with a prefill cut first audio from 1.61 to about 1.4 s p50 with audio (D66, D72; bench/first_phrase.py).
 - Wake word "Hey Edgy" (Dylan kept the name; "Edgy" alone collides with "Qdrant Edge"): arm A, spotting in the Parakeet transcript, 7/9 synthetic wake lines and 0/9 background lines; arm B (openWakeWord) only if A fails on real voices (D65, D73, research/wakeword.md).
+- TTS alternatives already tested: Kokoro int8 fell back badly on CPU and CUDA (RTF 2.4 to 4.6); a fp16 conversion failed; TensorRT EP was blocked by shape inference (research/stack.md). CUDA arena shrinkage bounded growth; `kSameAsRequested` alone increased it (D28). The upstream fp16 asset is a distinct, untested candidate, not a repeat of that conversion (D77).
 
 ### Sight and objects
 - 512 vs 256 image tokens: no gain beyond noise, scene-change turns up to 0.49 s slower: 256 kept (D39, research/sight.md). Detector labels in the sight prompt were the next arm, not run.
@@ -25,14 +44,29 @@ The session log a new session reads after STATE.md: every avenue tried, its outc
 - Face blurring at write time was proposed after review rounds kept finding deletion paths; Dylan called it over-engineering; sightings without frames replaced it (D53 superseded by D54).
 
 ### The assistant and the brain
+- Model tool routing was rejected: small brains called recall on current sight or missed memory questions (D21). Retrieval in code won. An intents shard and a classifier are separate future choices; do not reopen model tool calls by assuming they were never tested.
+- Early brain comparisons: Qwen3.5-2B lost prefix reuse and was slower; Qwen3.5-4B OOMed; Gemma 4 E2B accepted audio but lost sight accuracy; the 4B lost dev accuracy and caption timeliness on the fixed pipeline (D27, D29, D35). These are measured outcomes, not permanent model bans.
 - Direction: an assistant first, retrieval feeds the brain, actions and identity in code (D61, research/assistant-design.md); the Fable v1 plan: always retrieve with per-shard minimum scores, actions by rules then a Qdrant intents shard then confirmation, no LLM classifier in v1 (D62, research/v1-plan.md). Jev (TypeSafe AI) and open versions were considered for the intent layer.
 - Retrieval into the brain lost to code answers (m2 34 vs 41/74) (D73); a Mac bake-off of five brains x nine prompt shapes found the gap is mostly the evidence, not the brain; the 4B only matches code answers (D74, research/grounding.md).
-- Evidence fixes (one line per memory, no sides, no duplicates, commands not stored as statements, instruction after the image) raised code answers to 44/74 (dev-only) and brought one voice to a tie (38 vs 39/74); the one-voice patch is saved (D75, research/one-voice.patch).
+- Evidence fixes (one line per memory, no sides, no duplicates, commands not stored as statements, instruction after the image) raised code answers to 44/74 (dev-only). One voice scored 38 versus HEAD's 39/74 and missed the frozen rule by one step; the patch is saved (D75).
 - Bigger brain: Qwen3-VL-4B leaves about 190 MB against the 500 MB floor; Kokoro's CPU memory is CUDA kernel code, not waste; routes left: Kokoro on CPU, fp16 Kokoro, Piper, a smaller 4B setup (D66, D68).
 - Training (LoRA on the 3080 box) is open but not yet justified: the evidence was the bottleneck (D74).
+- Long conversation remains unmeasured: the context-budget probe sized a synthetic 1,300-token prompt plus 64 output tokens under 2K/four exchanges. The five-brain bake-off kept 2K/64/one sentence. No 4K or 8K sustained-conversation result was found. On scene change, prefill drops assistant messages; retaining linguistic continuity while removing stale visual claims is open (D27, D77; research/grounding.md).
+
+### Runtime and memory
+- TensorRT Edge-LLM was deferred because its INT4 build needed an x86 NVIDIA host; FP16 nearly filled RAM (D19). The 3080 host now exists, which changes that premise but establishes no new runtime result. Jetson wheels require the actual Python, architecture, CUDA, and execution provider (research/stack.md).
+- `--cache-ram 0`, arena controls, and disabling Parakeet weight prepacking recovered measured headroom (D28). D66 then found integrated replay restart churn with growing swap. D76 also records live conversation swap, whose cause is unresolved. Never infer active paging is absent from 1,144 MB MemAvailable (D68).
+- 4B q8_0 KV was already tested: available memory rose from about 190 to 231 MB, still below the 500 MB floor (D66). The 2B q8_0 estimate is not an integrated measurement. CPU TTS, a different TTS model, and upstream fp16 weights remain distinct interventions; weight-file size is not RAM savings (research/stack.md).
+
+### Foundation audit still open (D77)
+- Scene recall only searches recent captions, not caption meaning. D27 protects present questions from stale context; it does not ban semantic recall. Caption BGE search with source/time filters is a candidate (research/grounding.md).
+- Captions request a second "Around it" sentence but share the spoken-answer sentence stop. The contract mismatch is verified; its contribution to replay misses is unproven (research/grounding.md).
+- Named-object enrollment uses nearby timed crops, not diverse viewpoints; recognized names are not passed into the view's focus update. Detector trials stayed at nano 384x640, and a missing box prevents teaching. See research/booth-ux.md for the unimplemented paths and evidence limits.
+- Work queues and playback are unbounded; speech start does not cancel queued playback. Their effect on sustained conversation and swap remains unmeasured (research/grounding.md). Negated or modal object-forgetting phrases can trigger deletion; the explicit-action guard is logged in research/edge-cases.md.
 
 ### Process
 - Review gate rules added today: overfitting (rule 6, D38), proportion and scope (rule 7, D55), v1 mode logs edge cases (rule 8, D71); breadth first (D40); edge cases in research/edge-cases.md.
+- H1 makes result history readable offline and keeps old evidence intact. Gate checks share dependency imports, report timings, and kill process groups at the stage limit. A review cannot stamp a tree changed during its run. Targets remain a floor; the next capability intervention follows the largest measured gap (D76, D77).
 - Judge noise: the single-vote judge flipped 5 of 60 identical answers; now three votes with a verdict cache (D46).
 - Milestones: M1 met under D40 (reviews/20261008-111211-5165-milestone.md); M2 and M3 gates not yet run.
 
@@ -40,15 +74,17 @@ The session log a new session reads after STATE.md: every avenue tried, its outc
 
 - Judge variance and llama-server variance: identical prompts can give different answers; compare paired runs, use the judge cache, and do not read a 1 to 3 step change as real.
 - Mac llama.cpp is not the robot: the Mac Homebrew build matched the Jetson on 51/93; the 3080 box at the Jetson's commit with GGML_CUDA_NSM=8 matches 63/93 (D75). Rank brains on the box; accept on the Jetson.
-- Real-time replays are slow (5 to 15 min each) and serialize on the Jetson GPU lock: iterate in text mode on the touched sessions, run the full audio set once.
+- Real-time replays are slow (5 to 15 min each) and serialize on the Jetson GPU lock: inspect prior results, iterate in text mode on the touched sessions, and run the full audio set once after a material change. Reopening an avenue needs a concrete changed intervention or assumption and a paired comparison.
 - Review loops grow scope: each round found another edge case (privacy deletion paths, D53). Use rules 7 and 8: block only main-flow and fixed-outcome failures, log the rest.
 - Overfitting traps: builders copied a dev question into a knowledge phrasing (removed, D38 era), printed held-out phrasings once (not tuned on), chose a rule with the whole live clip in view (both halves now labeled dev, D67). The M1 held-out set reuses a dev frame; bench/results holds held-out transcripts.
 - Composite fixtures paste objects with no person: the focus never forms, so naming is untested in replays (live day).
 - Stale frames: the brain's cached look can show an earlier visitor; identity and stored evidence must use the speech-start frame (D56, D72).
 - Parallel builders share one working tree: commit only a task's files; a deploy ships everything in the tree, including another builder's uncommitted edits.
-- In-process replay restarts grow swap (about 1 GB in long runs); a real restart is a new process; measure in the eight-hour run.
+- In-process replay restarts grow swap (about 1 GB in long runs); a real restart is a new process. Live conversation also uses swap (D76), with no established cause. Measure paging during active turns and longer conversations before proposing a context increase from estimates.
 - Live sessions with Dylan: wait for "ready", send a snapshot with the zones first, cue every step to the end (memory: live-session-instructions).
 - Tools: the Jetson's ffmpeg has no V4L2 input (record clips with OpenCV in the release venv); `grep` on the Mac is aliased to rtk (use /usr/bin/grep); codex exec needs stdin closed (tools/gate.py does it); the pre-commit hook's "no PASS review" reminder is approximate and never blocks.
+- H1 local checks: pytest reported 58 passed, then exited with `libc++abi: recursive_mutex lock failed: Invalid argument`. A direct rerun of all 58 tests passed with exit 0. Both uv's pytest overlay and `.venv` use Python 3.12.13 and the same base interpreter; native packages come from `.venv`. The native shutdown cause is unresolved. Gate discovery now sorts paths so untracked tests keep the same order after commit; every non-zero exit still fails the gate.
+- H1 review passed (D78; reviews/20261009-013611-82855-review.md). Two optional logging gaps remain: sidecar matching verifies transcript and answer, not a changed rubric; research files remain excluded from the code-tree stamp. Future changes can record fixture/rubric hashes and include reviewed research in stamp coverage. Neither limitation changes existing raw results.
 - Private face data: eval/faces/ is gitignored; tools/jetson.py ships face scenes to shared/faces/<hash> per release (D52); only LFW images go to the Jetson for benches.
 
 ## Machines

@@ -1,6 +1,6 @@
 # Jetson software stack: what works on this robot
 
-As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12, 15W mode). Labels: J measured here, E elsewhere, U unverified.
+Qualification began 2026-10-07 on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12, 15W mode). Later integrated memory findings are dated below; MAXN_SUPER is current (D31). Labels: J measured here, E elsewhere, U unverified.
 
 ## Summary
 
@@ -17,6 +17,8 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 
 ## Memory budget (bench/memory_budget.py, MemAvailable drop per component, J)
 
+This table is the early M1 budget (D28), before all later components. D68's integrated 2B snapshot reported 1,144 MB available; the 4B left about 190 MB. Live conversation now uses swap (D76), with an unresolved cause. A MemAvailable snapshot measures neither active paging nor sustained-conversation safety.
+
 | Component | Before limits | After limits |
 | --- | --- | --- |
 | bge-small, ORT CUDA (includes the process's CUDA context) | 370 MB | 442 MB |
@@ -29,6 +31,12 @@ As of 2026-10-07, measured on our robot (L4T R39.2.0, Ubuntu 24.04, Python 3.12,
 - ORT's CUDA arena keeps a block per input shape. `kSameAsRequested` alone made Kokoro grow more (+1,340 MB); arena shrinkage after each run (`memory.enable_memory_arena_shrinkage`) bounds it with no speed loss (RTF 0.13).
 - Parakeet int8 on the CPU: no memory arena and no weight prepacking (one copy of the weights).
 - Qwen3.5-4B Q4_K_M was killed by the OOM killer at load (4.6 GB anonymous RSS).
+
+### Memory interventions still untested or incomplete (D77)
+
+- 4B q8_0 KV was tested: about 190 to 231 MB available (D66), despite cache shrinking from 288 to 153 MiB (bench/results/2026-10-08-memory-1791503851.jsonl and 2026-10-08-memory-1791504678.jsonl). This did not meet the floor. The 2B q8_0 estimate, 224 to 119 MiB KV, remains an estimate. No integrated result establishes its gain or conversation quality.
+- The upstream Kokoro fp16 asset is distinct from D68's failed conversion. The official [model-files-v1.1 release](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1) and [exporter](https://github.com/thewh1teagle/kokoro-onnx/blob/main/scripts/export.py) provide a candidate path; it has not been downloaded or tested here. File-size reduction is not measured RAM savings. Compare actual loaded/exercised memory, speech quality, and contention with the current fp32 path.
+- Kokoro on CPU was measured to free about 640 MB with a short phrase up to 0.83 s (D68); Piper and smaller 4B arrangements remain alternatives. Choose a concrete intervention, then measure the whole active turn. Existing traces of replay-restart churn do not explain the reported live swap.
 
 ## Speech timings
 

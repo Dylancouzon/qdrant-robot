@@ -9,9 +9,12 @@ exit 0 only when the verdict passes (3 = act on findings, 124 = timeout).
 
 --model overrides the gate's default model (counsel: design --model gpt-6-astra).
 """
+from __future__ import annotations
+
 import argparse
 import contextlib
 import os
+import runpy
 import shutil
 import signal
 import subprocess
@@ -24,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MODEL = {"design": "gpt-6-sol", "review": "gpt-6-sol", "milestone": "gpt-6-astra"}
 PASSING = {"design": "GO", "review": "PASS", "milestone": "MILESTONE MET"}
 TIMEOUT_S = 900
+CHECK_TIMEOUT_S = 120
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
 SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.detect", "robot.memory",
@@ -61,8 +65,9 @@ def reviewed(tree: str) -> bool:
 
 def checks() -> int:
     """Deterministic checks every commit to main must pass. Prints the size delta."""
-    py = [f for f in git("ls-files", "--cached", "--others", "--exclude-standard",
-                         "*.py").splitlines() if not f.startswith("refs/")]
+    # git lists untracked files first; keep test order stable when files become tracked.
+    py = sorted(f for f in git("ls-files", "--cached", "--others", "--exclude-standard",
+                              "*.py").splitlines() if not f.startswith("refs/"))
     steps = []
     if py:
         steps += [["uvx", "ruff", "check", *py],  # rules in ruff.toml
@@ -70,17 +75,57 @@ def checks() -> int:
     tests = [f for f in py if Path(f).name.startswith("test_")]
     if tests:
         steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
-    # Module self-checks that run without models or devices (the Mac venv has the packages).
-    steps += [[str(ROOT / ".venv/bin/python"), "-m", m] for m in SELFTESTS]
+    # One interpreter shares expensive dependency imports across all existing assertions.
+    steps += [[str(ROOT / ".venv/bin/python"), str(ROOT / "tools/gate.py"), "modules"]]
     steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",
                                                                     "tools/gate.py")]
+    started = time.monotonic()
     for cmd in steps:
-        r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-        if r.returncode:
-            print(f"FAILED: {' '.join(cmd[:3])}\n{r.stdout[-3000:]}{r.stderr[-1000:]}")
-            return 1
+        code = check_step(cmd)
+        if code:
+            return code
+    print(f"checks passed in {time.monotonic() - started:.2f}s")
     print(git("diff", "--shortstat", "HEAD") or "no tracked changes")
     return 0
+
+
+def stop(proc: subprocess.Popen) -> None:
+    """Clean up the full command group even when the launcher has already exited."""
+    with contextlib.suppress(ProcessLookupError):
+        os.killpg(proc.pid, signal.SIGKILL)
+    proc.wait()
+
+
+def check_step(cmd: list[str]) -> int:
+    label = " ".join(cmd[:4])
+    print(f"checking: {label} (limit {CHECK_TIMEOUT_S}s)", flush=True)
+    started = time.monotonic()
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        stdout, stderr = proc.communicate(timeout=CHECK_TIMEOUT_S)
+    except subprocess.TimeoutExpired:
+        stop(proc)
+        stdout, stderr = proc.communicate()
+        print(f"TIMEOUT: {label}\n{stdout[-3000:]}{stderr[-1000:]}", flush=True)
+        return 124
+    finally:
+        stop(proc)
+    elapsed = time.monotonic() - started
+    if proc.returncode:
+        print(f"FAILED ({elapsed:.2f}s): {label}\n{stdout[-3000:]}{stderr[-1000:]}")
+        return 1
+    print(f"passed ({elapsed:.2f}s): {label}", flush=True)
+    return 0
+
+
+def module_checks() -> None:
+    # Script invocation places tools/ on sys.path, while module assertions import robot/.
+    sys.path.insert(0, str(ROOT))
+    for module in SELFTESTS:
+        started = time.monotonic()
+        runpy.run_module(module, run_name="__main__")
+        print(f"{module}: {time.monotonic() - started:.2f}s", flush=True)
 
 
 def precommit() -> int:
@@ -110,15 +155,18 @@ def interrupted(_signum, _frame):
 
 
 def run(gate: str, what: str, model: str) -> int:
+    tree = code_tree("worktree")
     reviews = ROOT / "reviews"
     reviews.mkdir(exist_ok=True)
     out = reviews / f"{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}-{gate}.md"
     prompt = (ROOT / "gates" / f"{gate}.md").read_text() + f"\nWhat to judge: {what}\n"
     cmd = ["codex", "exec", "--model", model, "-s", "read-only",
            "--skip-git-repo-check", "-C", str(ROOT), "-o", str(out), prompt]
+    started = time.monotonic()
+    print(f"{gate}: {model}, tree={tree}, limit={TIMEOUT_S}s; log: {out}.log", flush=True)
     with open(f"{out}.log", "w") as log:
         # stdin closed: codex exec otherwise waits for input forever.
-        proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=log,
+        proc = subprocess.Popen(cmd, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log,
                                 stderr=log, start_new_session=True)
         try:
             proc.wait(timeout=TIMEOUT_S)
@@ -128,16 +176,17 @@ def run(gate: str, what: str, model: str) -> int:
         finally:
             # Covers timeout and Ctrl-C: never leave a Codex process group behind.
             # The launcher may have exited while its children still run.
-            with contextlib.suppress(ProcessLookupError):
-                os.killpg(proc.pid, signal.SIGKILL)
-            proc.wait()
+            stop(proc)
     if proc.returncode or not out.exists():
         print(f"codex failed ({proc.returncode}); log: {out}.log", file=sys.stderr)
         return proc.returncode or 1
     response = out.read_text()
-    out.write_text(f"<!-- tree: {code_tree('worktree')} -->\n{response}")
     print(response)
-    print(f"\nsaved: {out.relative_to(ROOT)}")
+    if code_tree("worktree") != tree:
+        print("code changed during the gate; verdict has no tree stamp", file=sys.stderr)
+        return 3
+    out.write_text(f"<!-- tree: {tree} -->\n{response}")
+    print(f"\nsaved: {out.relative_to(ROOT)} ({time.monotonic() - started:.2f}s)")
     return 0 if verdict(response) == PASSING[gate] else 3
 
 
@@ -153,6 +202,10 @@ def selftest() -> None:
 
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, interrupted)
+    if sys.argv[1:] == ["modules"]:
+        module_checks()
+        sys.exit(0)
     if sys.argv[1:] == ["selftest"]:
         selftest()
         sys.exit(0)
@@ -165,5 +218,4 @@ if __name__ == "__main__":
     parser.add_argument("what", help="what to judge, with paths and evidence")
     parser.add_argument("--model", help="override the gate's default model")
     args = parser.parse_args()
-    signal.signal(signal.SIGTERM, interrupted)
     sys.exit(run(args.gate, args.what, args.model or MODEL[args.gate]))

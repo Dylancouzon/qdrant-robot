@@ -10,32 +10,32 @@ A desktop robot that sees, listens, talks, and remembers, with every model and e
 
 ## Session start (and after every compaction)
 
-1. Read this file, then `STATE.md`, then the `DECISIONS.md` entries that the active task links.
-2. Reconcile `STATE.md` with reality: `git status`, and on the Jetson the running jobs and the deployed release. Fix `STATE.md` first if it is wrong.
-3. Read `research/` only for the topic of the active task.
+1. Read this file, `STATE.md`, and `research/lessons.md`. Then read the decisions linked to the active task and its explored alternatives.
+2. The lead reconciles `STATE.md` with `git status`. Before remote work, check running jobs and the deployed release. Builders report discrepancies.
+3. Read the task's topic files and compact results with `python3 tools/results.py`. Inspect individual rows or logs only for the question being resolved.
 4. Finish and review the active task before you start another. Commit only if the Git section of `STATE.md` allows it. Otherwise, leave the diff and evidence as a verified checkpoint and record it in `STATE.md`.
 
 ## Goal
 
-Reach the capabilities of `refs/reachy-edge-memory` with no laptop: same idea, our own architecture. That demo stores memory on the robot but runs every model on a laptop over HTTP. We run all of it on the Jetson. Expect architecture changes: for example one process, GPU inference, one resident VLM, and no HTTP between components.
+Raise the capability ceiling for perception, sustained conversation, useful retrieval, and fluid interaction on one 8 GB Jetson (D61, D62, D76). Qdrant Edge is central to how the assistant remembers and uses evidence. The reference `refs/reachy-edge-memory` establishes the initial capabilities; every model runs on our Jetson. Architecture, model size, training, and context length remain choices to test against the largest measured gaps.
 
-Capabilities to reach (from the reference README, "What to ask it"):
+Visitor capabilities, with the current evidence paths (D21, D54, D61, D75):
 
 | Visitor says | Answered from |
 | --- | --- |
 | "What do you see?" | The camera, now |
-| "What was on your left?", "What did I show you?" | Stored frames (image vector plus text vector on one point) |
-| "What did we talk about?" | The conversation window, then the conversation memory shard through a `remember` tool |
+| "What did I show you?", "Where is my phone?" | Stored captions, detector sightings, and named-object crop vectors |
+| "What did we talk about?" | The conversation window and retrieved statements from Qdrant Edge |
 | "Do you remember me?" | Face match against people (one point per person, several face shots as a multivector, MaxSim) |
 | "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with several question phrasings as a multivector) |
 
-The robot has no motors. "Left" and "right" mean the left and right parts of the wide-angle frame.
+The robot has no motors. D61 removed left and right logic from the product direction. Historical results can still contain those words.
 
 Priority order when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. A Wikipedia knowledge shard is an add-on after M4, never at the cost of the core loop.
 
 ## Targets
 
-Final targets for M4. Each milestone in `STATE.md` has its own interim numbers. M1 measures the first baselines. Change a target only through an evidence-backed `DECISIONS.md` entry; an unmet target stays visible in `STATE.md` until then.
+These targets are a floor, not the capability ceiling (D76). Passing a milestone never ends work on the largest perception, conversation, or retrieval gaps. Each milestone in `STATE.md` has interim numbers. Change a target only through an evidence-backed `DECISIONS.md` entry; unmet targets stay visible.
 
 | Metric | Target |
 | --- | --- |
@@ -63,23 +63,24 @@ Final targets for M4. Each milestone in `STATE.md` has its own interim numbers. 
 
 Fixed (change only with Dylan): every model runs on the Jetson; memory lives in Qdrant Edge in-process; answers cite stored evidence; faces need explicit consent; "forget me" deletes for real; releases can roll back; runs are reproducible; unmet targets stay visible; answer quality comes first.
 
-Open (the build decides by measurement): model family, runtime, process count, CPU or GPU placement, precision, detector cadence, training, and every item of the starting architecture below.
+Open (the build decides by measurement): model family, runtime, process count, CPU or GPU placement, precision, detector cadence, training, and context and answer lengths.
 
-## Starting architecture (a hypothesis, not a rule)
+## Current measured design
 
-Validated by research and Astra counsel on 2026-10-07 (D14). Replace any part that a measurement beats.
+D14's starting architecture was superseded by the decisions below. Improve or replace the current design when new evidence supports it.
 
-- **Brain:** one resident multimodal model takes the visitor's audio, the current frame, and retrieved memories, and streams text with tool calls. First candidate: Gemma 4 E2B at INT4 (NVIDIA lists audio, image, and text input). Fallback, swapping only this path: a streaming ASR (Moonshine) in front of Qwen3-VL-2B.
-- **Perception:** YOLO26n on TensorRT FP16 with ByteTrack, about 10 fps, event-driven (embed only new or changed tracks and explicit "remember this" requests). Faces: YuNet for detection and landmarks, a small aligned-face embedder (EdgeFace or MobileFaceNet) on new faces or identity requests. A combined detector is a later training project, only if YuNet measurably misses.
-- **Embeddings:** pooled SigLIP 2 vectors for object crops, frames, and text queries; bge-small for conversation and knowledge. Patch multivectors are deferred until a measured miss on similar objects.
-- **Voice:** Silero VAD; streaming TTS (Kokoro) that emits short clauses with a maximum wait, faster than playback; interruption cancels the turn.
-- **Scheduling:** bounded GPU tasks with speech first, detection deadlines, and deferred embedding writes. Capture runs independently and drops stale frames. Start CPU sessions at one thread and allocate by measured contention across the six cores.
-- **Generation limits to start:** one active generation, 2,048-token context, bounded image tokens, 64 output tokens. Preallocate buffers and warm every path at boot.
-- **Memory:** points carry timestamps, boxes, track IDs, and robot-relative regions. Tools run in code against Edge, validate arguments, and resolve times in code. Memory stores observed evidence, never generated recollections. Retention is bounded.
+- **Brain:** Qwen3-VL-2B on llama.cpp; retrieval runs in code, without model tool calls (D21, D35). Evidence follows the image (shape I). Code answers stay because retrieval into the brain missed D75's frozen comparison by one M2 step. The alternate path is saved in `research/one-voice.patch`.
+- **Perception:** YOLOE-26n with tracking, label voting, and short-track merging (D43, D56). Named objects use DINOv2-small crop multivectors in Edge (D64). YuNet detects faces; w600k_r50 uses two-shot support for identity (D45, D56). Focus and the view are wired (D67, D72, D73).
+- **Voice:** Silero VAD and Parakeet int8 on CPU (D24, D38); Kokoro on CUDA. Decode pauses during the first phrase to reduce contention (D66, D72). Hey Edgy opens a follow-up window (D65, D73).
+- **Generation:** one active generation, 2,048-token context, 256 image tokens, and 64 output tokens with a sentence cap (D28, D39, D72). These short-answer runs establish no sustained-conversation result. Longer context and answers need integrated latency, quality, and paging measurements.
+- **Memory:** observed evidence in Qdrant Edge; sightings store labels and times without frames, while turn captions retain source evidence (D25, D54). Retention has a time window and hard caps (D51, D56). Identity, consent, deletion, and other actions run in code.
+- **Headroom:** the 4B did not fit the integrated budget (D66, D68). The reported live conversation uses swap (D76). MemAvailable snapshots and KV estimates cannot establish room for longer context or prove that active paging is absent.
 
 ## Exploring without tunnel vision
 
 - A design brief names at least two real alternatives and how each would be measured. A brief with one option gets RETHINK.
+- Decisions preserve evidence and tradeoffs; challenge them when a concrete intervention or disputed assumption could raise capabilities. Before reopening an approach, read its prior lessons and results, name what changes, and define a paired comparison (D76, D77). An unchanged sweep adds no decision evidence.
+- Use a cheap local check or recorded-prompt comparison first. Run the full integrated replay once after a material change; keep acceptance measurements on the Jetson.
 - A choice that moves a target is settled by a time-boxed bake-off: prototype the candidates on `spike/*` branches, measure them on the Jetson, merge the winner, record the loser in `DECISIONS.md`.
 - Drop an approach after 90 minutes with no new evidence. After two failed approaches to one problem, run Astra counsel before a third.
 
@@ -87,9 +88,9 @@ Validated by research and Astra counsel on 2026-10-07 (D14). Replace any part th
 
 | Role | Who | When |
 | --- | --- | --- |
-| Lead | The main session (Opus) | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
-| Researcher | `researcher` subagent (Sonnet) | One question needed for the next decision. Never edits code. Two at most at once |
-| Builder | `builder` subagent (Opus) | One scoped task from a written brief. One builder at a time |
+| Lead | The main session | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
+| Researcher | `gpt-6-luna` (D76) | One question needed for the next decision. Never edits code. Two at most at once |
+| Builder | User-selected model, otherwise Opus | One scoped task from a written brief. One builder at a time, except D44's explicit disjoint-work case |
 | Design gate | Codex `gpt-6-sol`, `tools/gate.py design` | Once per architectural decision (model, runtime, process layout, data schema, new module), before building it. Not for reversible small steps |
 | Task review | Codex `gpt-6-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
 | Milestone review | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone |
@@ -103,7 +104,7 @@ Brief a builder with: the task ID, the linked decisions, allowed paths, interfac
 
 `tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
 
-- **Design gate** asks: Is this the best solution? Is this the best way to build what we are trying to build? What would a strong edge-ML engineer do instead? What is the simplest version that meets the target? What can be deleted?
+- **Design gate** asks: Which measured capability gap does this close? Does it raise the ceiling on this Jetson? What would a strong edge-ML engineer do instead? What is the simplest useful version? What can be deleted?
 - **Review gate** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job.
 - **Milestone gate** judges the milestone's own acceptance criteria, lists unproven final targets separately, and gives counsel on direction.
 
@@ -111,8 +112,9 @@ Brief a builder with: the task ID, the linked decisions, allowed paths, interfac
 
 Gates are mainly a habit, not a lock. One extra layer helps:
 
-- `tools/githooks/pre-commit` (enable once per clone: `git config core.hooksPath tools/githooks`) runs `tools/gate.py checks`: ruff with a complexity limit of 10 (`ruff.toml`), vulture for dead code, and our tests. It blocks only when those fail, and prints the size delta.
+- `tools/githooks/pre-commit` (enable once per clone: `git config core.hooksPath tools/githooks`) runs `tools/gate.py checks`: ruff, vulture, tests, and existing module assertions in one interpreter. Each stage has a 120 s limit and reports elapsed time. It blocks on failure or timeout and prints the size delta.
 - The same hook prints a reminder when no PASS review matches the staged code. It never blocks on that.
+- A gate stamps the tree it started with only if that tree still matches when the gate finishes. A changed tree exits 3.
 - `spike/*` branches are for free exploration; bring the winner to `main` with a review.
 
 Resolve every blocking finding. To reject a finding, record the evidence in `DECISIONS.md`. Rerun a gate only after a material change, never to ask again about unchanged work. A better approach wins over sunk cost when evidence supports it, not on a reviewer's preference alone.
@@ -135,10 +137,12 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 ## Benchmarks and evaluation
 
 - Define acceptance fixtures before choosing models. Keep development fixtures separate from held-out acceptance fixtures in `eval/`.
-- Fixtures cover current sight, past frames (including left and right, and similar objects), conversation eviction and recall, people (including unknown people), knowledge, absent memories, restart, and deletion. Each case stores the expected evidence IDs and acceptable answers. Score retrieval and answer correctness separately.
+- Fixtures cover current sight, past observations, similar objects, conversation eviction and recall, people (including unknown people), knowledge, absent memories, restart, and deletion. Each case stores expected evidence IDs and acceptable answers. Historical fixtures can retain superseded direction words. Score retrieval and answer correctness separately.
 - Each benchmark run writes `bench/results/YYYY-MM-DD-<what>-<run id>.jsonl` with: code revision or diff hash, machine, software and model versions, precision, context and image-token limits, dataset size, the command, sample counts, and percentiles.
 - Separate cold start from warm turns. Per turn, record endpointing, ASR done, retrieval, first token, first audible output, and answer done. Milestone acceptance uses at least 100 representative turns and 1,000 queries per shard; smaller checks are fine while building.
 - Log memory, swap, temperatures, and clocks (`tegrastats`) during every Jetson run. Peak headroom is measured with every component active.
+- Read replay and bake-off history with `python3 tools/results.py` and exact cases, model, machine, or release filters. Each file and variant stays separate. `correct` in raw replay summaries is a keyword-and-split heuristic; `.judged.jsonl` supplies judged answer scores. Missing judgments or a missing completion footer are explicit, never passes. A footer establishes recorded completion; legacy files can lack an expected fixture count.
+- Oracle, synthetic speech, recorded voice, live interaction, and logged-prompt bake-offs answer different questions. A synthesized first phrase is not physical audible latency. Short bounded turns do not establish long-conversation quality or memory safety.
 - M4 needs held-out acceptance, all targets, offline cold start, restart persistence, deletion checks, and an eight-hour active run with no restart.
 
 ## Context hygiene
@@ -195,6 +199,6 @@ Most of the time no one is near the robot. Every capability must be testable fro
 - **Live interaction during development.** Use the camera's microphone (on the Jetson) or a Mac client that streams Mac mic audio in and plays answers. Every model still runs on the Jetson. Report file-generation latency and Mac-transport latency separately.
 - **Final acceptance (M4).** A Jetson-connected speaker and microphone, the Mac disconnected, offline cold start, full spoken interaction. Measure physical audible latency with an acoustic recording or an audio loopback.
 - **Scoring.** Each replay command exits non-zero when any required step fails. It records ASR text, tool arguments, retrieved evidence IDs, answer text, output audio, and stage timestamps. Score retrieval and answers separately against the fixture. Transcribe output audio independently on the Mac; empty, truncated, or wrong speech fails.
-- **Coverage.** Current and remembered left and right regions, similar objects, conversation eviction, absent memories, identity uncertainty, a new visitor replacing the last one, consent, restart, and deletion (verify after restart, including images and pending writes). Calibrate thresholds on development fixtures; freeze held-out fixtures before tuning.
+- **Coverage.** Current and remembered objects, similar instances, conversation eviction, absent memories, identity uncertainty, visitor changes, consent, restart, and deletion (verify after restart, including images and pending writes). Calibrate thresholds on development fixtures; freeze held-out fixtures before tuning.
 - **Provenance.** Store generated captions and replies with their source evidence. A generated statement alone never counts as an observed fact.
 - **Human test days.** When Dylan is at the robot, prepare a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.

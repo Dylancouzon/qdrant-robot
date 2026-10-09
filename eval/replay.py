@@ -3,6 +3,7 @@
 starts with an empty memory, shows fixture frames, speaks fixture WAVs at real-time pace, waits,
 and restarts the robot on the same memory. Exits non-zero when a keyword or evidence check
 fails. Acceptance also needs the judge: run both through `eval/run.py` on the Mac.
+Read past scores offline with `python3 tools/results.py`; `correct` is a keyword heuristic.
 
     python -m eval.replay [--model qwen3vl-4b] [--oracle | --audio audio-real] [cases]
 """
@@ -178,6 +179,8 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
                "tegrastats": os.environ.get("ROBOT_TEGRASTATS"),
                "machine": platform.node(),
                "release": os.environ.get("ROBOT_RELEASE"), "n": len(rows),
+               "n_expected": sum("say" in st for s in sessions for st in s["steps"]),
+               "score_type": "keyword_and_split; answer correctness is in .judged.jsonl",
                "correct": sum(r["ok"] for r in rows),
                "split": sum(r["split"] > 1 for r in rows),
                "evidence": f"{sum(r['evidence_ok'] is True for r in rows)}/"
@@ -196,7 +199,8 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
                         "first_audio = first phrase synthesized and queued; no speaker yet")}
     results = SHARED / "results" / f"{stamp}-replay-{int(time.time())}.jsonl"
     results.write_text("".join(json.dumps(r) + "\n" for r in [*rows, summary]))
-    print(json.dumps(summary, indent=1))
+    # Preserve the full prompt in the evidence file, keep the console summary readable.
+    print(json.dumps({k: v for k, v in summary.items() if k != "system"}, indent=1))
     passed = all(r["ok"] and r["evidence_ok"] is not False for r in rows)
     return 0 if passed else 1
 

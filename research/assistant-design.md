@@ -1,13 +1,15 @@
 # The assistant: retrieval feeds the brain, actions in code
 
-As of 2026-10-08. Labels: J measured on an Orin Nano, E measured elsewhere, U unverified. Gated GO WITH CHANGES (reviews/20261008-190813-295-design.md, D61).
+Direction adopted in D61 on 2026-10-08; implementation status updated 2026-10-09. Labels: J measured on an Orin Nano, E measured elsewhere, U unverified. Gated GO WITH CHANGES (reviews/20261008-190813-295-design.md, D61).
 
 ## Summary
 
 - Direction (Dylan, 2026-10-08): the robot is a conversational assistant first; memory is context, not the answer path. Retrieval feeds the LLM (one voice); every answer comes from the brain. Vector search is central, including for what the robot sees. People name objects ("Dylan's phone"), as in `refs/qdrant-edge-memory-robot`. No left or right logic (the robot cannot rotate). Open conversation, no guided questions. Answers longer than 64 tokens. A minimum retrieval score keeps the brain from answering from a random memory. v1 first, then measure headroom, then decide on a bigger brain or training.
-- Today (D48, D56): six code paths answer before the brain (identity, shown, sightings, knowledge verbatim, and soon named objects); the 2B brain gets long context blocks and often ignores them (D43). Answers are capped at 64 tokens and one sentence.
+- Current (D75): code answers stay. Retrieval into the brain scored 38/74 versus HEAD's 39/74 and missed the frozen rule by one M2 step. Evidence fixes raised code answers to 44/74, dev-only pending unseen probes. The alternate path is research/one-voice.patch; answers remain at 64 tokens and one sentence (D72). See research/grounding.md for the completed bake-off and D77's open retrieval/conversation questions.
 
 ## Proposal
+
+The following describes the intended direction, not completed runtime features. D63 kept 64 tokens for v1. Longer answers and context require integrated memory, latency, and interruption measurements; D76 records live conversation swap.
 
 1. **Turn flow.** ASR text -> action router -> (an action: run it in code, then the brain says one line about the result) or (a question or chat: embed once with bge, search every shard in parallel in Qdrant Edge, keep hits above each shard's minimum score, pass at most a few short evidence lines with ages to the brain with the current frame and the conversation window; the brain answers). Below every threshold, the brain answers as a plain assistant with no memory lines.
 2. **Shards.** knowledge (facts, MaxSim over phrasings), conversation (statements and the robot's answers), objects (taught objects: crop views as a DINOv2 multivector plus a bge vector of the spoken name; sightings of recognized objects with times), people (face shots, D45), all existing or planned.

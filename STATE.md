@@ -1,20 +1,23 @@
 # State
 
-Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
+Last updated: 2026-10-09 01:39 EDT, by the lead. Rewrite, do not append.
 
 ## Active task
 
-Paused 2026-10-09 01:15 at a clean point (Dylan). v1 runs end to end on the Jetson (D73, D75): Hey Edgy (arm A), visitor-scoped memory and history, consent offer after a name (D69), faces (M3 33/33, zero false identities), named objects with DINOv2 (D64), focus object and booth screen with the memory panel (D67), evidence fixes (D75), decode pause (first audio about 1.4 s p50 with audio). Code answers stay; one voice ties them (research/one-voice.patch).
+H1 harness and session-record cleanup is complete (D78), after V1-E merged into main. Baseline was f478a24. Raise the robot's capability ceiling: better perception, conversation, retrieval, and fluid interaction on one 8 GB Jetson, with Qdrant Edge central. Existing targets are a floor. No new runtime intervention has been selected.
 
-Next session, in order:
+Delivered: compact offline results, explicit score/provenance labels, bounded gate checks with shared assertion imports and timings, protected code review stamps, updated session guidance, and revalidated audit findings. Decisions can be challenged to raise capability (D77). Full checks passed in 13.33 s with 58 tests; review PASS in `reviews/20261009-013611-82855-review.md`. Robot behavior, models, raw evidence, and fixtures are unchanged.
+
+V1-E is merged (D75): code answers stay because retrieval into the brain missed the frozen comparison by one M2 step. The M2 evidence-fix gain is dev-only until unseen probes confirm it. See research/lessons.md and D75 for exact scores and evidence.
+
+Unresolved capability work after cleanup (D75, D76):
 
 1. Rule 6 check: a fresh one-time unseen probe set for the V1-E evidence changes (objects removed, gone, still there, ownership), run once on the Jetson; record the m2 gain (39 -> 44/74, dev-only) as confirmed or not.
-2. One voice decision: rerun research/one-voice.patch vs the code answers with the box (bench/brain_bakeoff.py --host dylan@192.168.1.74) for prompt and brain variants, then once on the Jetson; retire the code answers when not worse (D61, D74).
-3. Wire the remaining v1 pieces only if cheap: the greeting (D63), intents shard (D62), Formula decay and Rrf (D62). Otherwise straight to:
-4. Live test day with Dylan (human checklist below; speaker first if it has arrived): faces at distance, real objects, Hey Edgy in noise, focus in a crowd, echo; record everything as fixtures; then promote the edge cases that actually happen (research/edge-cases.md).
-5. After the live day (D62): decide optimizations and training from the biggest measured gaps (brain size: the 4B needs about 400 to 900 MB freed, D68; detector hand class; LoRA on the 3080 box).
+2. The one-voice variant remains unadopted in research/one-voice.patch. Reopen it only with a concrete intervention or new evidence, using D75's frozen comparison; no generic prompt or brain sweep.
+3. Select the next foundation improvement from prior evidence: perception accuracy, sustained conversation, Qdrant retrieval quality, or active-turn memory and latency. Dylan reports conversation already uses swap; estimates and warm snapshots do not establish a larger context fits (D76).
+4. Live test day with Dylan remains open (human checklist below): physical audio, faces at distance, real objects, wake word in noise, and focus in a crowd. Keep current acceptance gaps visible. Add-on v1 features and rare edge cases are secondary to raising core capability.
 
-Running jobs: none. The 3080 box (dylan@192.168.1.74) is idle; ~/qdrant-robot-box holds llama.cpp 9c2e0e4 and the GGUFs.
+Running jobs: none from this session; builder, researchers, and review finished. Remote job and deployment state were not checked. Unresolved harness notes: one native pytest teardown abort, future rubric/fixture hashes, and research review-stamp coverage (D78, lessons). Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then choose a concrete foundation intervention using D77 and the linked topic evidence.
 
 ## Where to read first
 
@@ -24,17 +27,17 @@ Running jobs: none. The 3080 box (dylan@192.168.1.74) is idle; ~/qdrant-robot-bo
 
 ## Robot access
 
-- 3080 box (Dylan, 2026-10-08): `ssh dylan@192.168.1.74` (key auth; WSL2 Ubuntu 26.04; RTX 3080 10 GB; CUDA 12.6 at /usr/local/cuda; no passwordless sudo). For brain and prompt bake-offs, parallel text replays, judging, and later training; acceptance numbers stay on the Jetson. Setup task X1 running (llama.cpp 9c2e0e4, parity with the Jetson).
+- 3080 box: `ssh dylan@192.168.1.74` (key auth; WSL2 Ubuntu 26.04; RTX 3080 10 GB; no passwordless sudo). X1 complete (D75). Use its user-space CUDA 13.2.86 setup and llama.cpp 9c2e0e4; research/lessons.md records commands and partial answer parity. Acceptance numbers stay on the Jetson.
 
 - `ssh robot` works with a key (Host entry in `~/.ssh/config`: `qdrant-robot.local`, user `qdrant`). Passwordless sudo works. Internet works.
 - Serial fallback only when Dylan plugs in the debug USB-C cable (unplugged now): `/dev/cu.usbmodem*`, 115200 baud, user `qdrant`, password in `.env`.
 - Network: Wi-Fi on the home LAN (192.168.1.238 by DHCP). The course robot's `l6-hotspot` does not autoconnect. Never re-enable the hotspot over SSH.
-- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. Deployed: `5fd5253828fa` (the held-out run; the timeout revert after it touches only eval/replay.py). Models: `python -m tools.models` verifies `models.json`.
+- Workflow: `tools/jetson.py deploy | run NAME [--wait] -- ARGS | collect | rollback`. Releases in `/home/qdrant/qdrant-robot/releases/<hash>`, `current` and `previous` symlinks; models, memory, results, llama.cpp in `shared/`. Active deployment unverified in this local cleanup; obtain it before a later remote run. Models: `python -m tools.models` verifies `models.json`.
 - Acceptance run from the Mac: `python3 eval/run.py [--model M] [--oracle | --audio audio-real] [cases]` deploys, replays, collects, judges, and checks speech. Real-voice fixtures: `tools/record.py <cases> [--check]`.
 
 ## Finding your way in the evidence
 
-- One line per run: `grep -h '"summary"' bench/results/*.jsonl` (model, release, n, correct, p50s, `tegrastats` file, the system prompt once). Per-turn rows hold the heard text, answer, evidence ids, stage times, and the prompt without the system message.
+- Compact history: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`. It keeps judged answers, keyword checks, and evidence scores separate, with machine, release, mode, and incomplete judging visible. Inspect individual raw rows only for the question being resolved; README.md documents filters and supported formats.
 - `<result>.judged.jsonl`: one verdict per turn (`pass`, `why`). `*.tegrastats`: memory, clocks, temperatures, named `<job>-<date>-<time>.tegrastats`; a result's summary row names its file. Files without a date are from before 2026-10-08 04:00.
 - `tools/gate.py checks` runs ruff, vulture, pytest, the module self-checks (`python -m robot.<module>`), and the tool selftests. The pre-commit hook runs it.
 
@@ -48,7 +51,7 @@ Running jobs: none. The 3080 box (dylan@192.168.1.74) is idle; ~/qdrant-robot-bo
 
 ## Git
 
-Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Branches: `main` (everything reviewed), `spike/detector` (rebased on main, unmerged), `box/3080` (mailbox, at main).
+Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting at f478a24. V1-E and spike/detector are merged. Commit only the reviewed H1 cleanup and lead records.
 
 ## Checkpoints
 
@@ -66,7 +69,7 @@ Each milestone ends with a robot a visitor can use. Interim numbers are proposed
 | ID | Milestone | Visitor experience and acceptance |
 | --- | --- | --- |
 | M1 | It talks | Answers questions about the current camera view and about Qdrant aloud, on the Jetson alone. 90% correct or more; audio latency 2 s median, 4 s p95 or better; 30 minutes without restart |
-| M2 | It remembers | Recalls removed objects, left and right observations, and evicted conversation, including after a restart. Dylan (2026-10-08): name an object by voice ("this is my phone": several crops as one multivector point, MaxSim) and recall it by name, labels on the video view, "forget my phone" deletes it, "ignore the chair" stops remembering it. 90% per capability; Edge search 10 ms p99; M1 speech targets held |
+| M2 | It remembers | Recalls removed objects, similar instances, and evicted conversation, including after a restart. Names an object by voice ("this is my phone": crop multivectors, MaxSim), recalls it by name, labels the view, deletes on "forget my phone", and stops remembering ignored kinds. D61 removed left/right from the product direction; historical fixtures remain. 90% per capability; Edge search 10 ms p99; M1 speech targets held |
 | M3 | It knows you | Enrolls a face with consent, recognizes returning visitors (face multivector, MaxSim), handles a new visitor replacing the last, forgets on request. 90% known-person recognition; zero false identities on held-out strangers |
 | M4 | Booth-ready | Every capability offline with Jetson-connected audio for eight hours. Final CLAUDE.md targets: 1.2 s p50 and 2 s p95 audible latency, 15 fps tracking while talking, 500 MB headroom with no swap, held-out eval at target |
 | M5 | Add-on | Offline Wikipedia knowledge shard, only if every M4 target still holds |
@@ -85,7 +88,7 @@ Fixtures so far are photos and recorded audio fed as files; the live camera was 
 
 1. Audio: the camera microphone is the input. Speaker ordered (Waveshare USB card, 8 ohm 5 W): plug into the Jetson, run with `--speaker`, measure audible latency, check echo into the camera microphone, compare the card's microphone if any. Test the camera microphone at about 1 m with background noise before buying another microphone.
 2. Faces (M3.2): Dylan, then colleagues if present, at 0.5, 1, and 2 m, frontal and turned: record clips to recalibrate the face threshold on robot-camera frames (D45: dev margin 0.011).
-3. Objects (M2): show, name, remove, and move real objects (phone, mug, bag) left and right; record the session as fixtures.
+3. Objects (M2): show, name, remove, rotate, and return real objects (phone, mug, bag); record recognition and recall as fixtures.
 4. Spoken session end to end with the speaker: every capability, interruptions, a long pause mid-question.
 5. Calibrate `SCENE_CHANGE` on a lit, static scene; watch for the camera USB port fault (D32).
 

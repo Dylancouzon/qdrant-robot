@@ -4,10 +4,18 @@ As of 2026-10-08. A Fable design pass on Dylan's request, with the repo and both
 
 ## Summary
 
+Implementation status (2026-10-09, D77): focus and the screen run in the robot (D72, D73), but recognized names are not passed to `Focus.update()`. Enrollment crops are selected by time, not diverse viewpoints. The sections below describe the adopted design, with these open paths still unimplemented.
+
 - One focus object at a time on screen: salience = sqrt(area) x (1 minus distance from center) x 1.5 when the box overlaps the largest person box (held up). The focus changes only when it is gone for 1 s, or after 5 s if a challenger scores 1.6 x the incumbent. It freezes from the speech start of a naming turn until the bind.
 - Screen: known objects get a solid label ("Dylan's phone"); the focus gets a thick orange box with "Smartphone?" (majority label score at least 0.4) or "???", and a hint "Say: this is my ..."; other unknowns get a thin grey box; people get a box and no name (D59). A status strip shows Listening, Hearing you, Thinking, Speaking, and memory events for 6 s.
 - Zero unprompted speech in v1.
 - Grounding (J): 15 fps detector, CONFIRM 3 frames, MAX_MISSED 1 s; DINOv2 MaxSim threshold 0.822 at zero false matches, 15 ms per crop, back-to-back crops halve decode (D57); first audio 1.61 s p50 (D58); VAD hangover 0.35 s; one worker thread, one llama slot. Reference robot ideas reused: salience, a stability gate, requery every 2 s, focus margin 1.6, a guess band.
+
+## Verified gaps to compare (D77)
+
+- Three enrollment crops span about 0.66 s; there is no viewpoint-diversity rule. `Things.score()` asks Edge for one candidate. D64's Mac re-identification result matched 15/22 phones and 15/35 teddies with zero false matches; diverse physical views have no measured benefit yet. Compare diverse views with timed crops at the same false-match limit before growing stored views.
+- `Robot._refocus()` calls `Focus.update()` without `recognized`, leaving the existing known-name and guess-band screen path unwired. Candidate: pass bounded recognition results into that path, then measure view stability and GPU contention. D63's screen design is not evidence that this path shipped.
+- Recorded detector trials used nano at 384x640. A missing box prevents focus and teaching; cross-label crop matching cannot recover it. A threshold-only fix has counterexamples: orange at 0.10 and a false background bottle at 0.10 (D43, research/detector.md). Compare detector or resolution changes on labeled real-object frames; the 90 s live clip has no ground-truth labels. Hand detection and depth remain candidates, not measured solutions.
 
 ## 1. Focus object
 
