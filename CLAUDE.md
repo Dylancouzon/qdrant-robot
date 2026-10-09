@@ -147,6 +147,7 @@ The repo must stay the cleanest, most optimized version of itself. Every task le
 - `DECISIONS.md` is append-only. Each entry is five lines or fewer: date, decision, why, rejected alternatives, evidence path.
 - `research/` holds one file per topic: summary first, sources last. Replace an outdated finding; do not stack corrections. Label numbers J (measured on an Orin Nano), E (measured elsewhere), or U (unverified).
 - `reviews/` keeps gate verdicts (logs are ignored). Record the outcome in `DECISIONS.md` when it changes a decision.
+- `research/lessons.md` logs every important lesson for future sessions (Dylan, 2026-10-09): each avenue explored with its outcome and decision link, each pitfall with its fix or workaround, and machine access and setup. Add to it as lessons happen, not only at the end; before any pause, compaction, or session end, check that the session's lessons are in it and that `STATE.md` links it. Replace an outdated lesson rather than stacking corrections.
 
 ## Mac-to-Jetson workflow
 

@@ -18,7 +18,7 @@ Running jobs: none. The 3080 box (dylan@192.168.1.74) is idle; ~/qdrant-robot-bo
 
 ## Where to read first
 
-- research/lessons.md: every avenue explored and every pitfall of 2026-10-08/09, with decision links. Read it after this file.
+- research/lessons.md: every avenue explored and every pitfall, with decision links (CLAUDE.md rule: keep it current). Read it after this file.
 - DECISIONS.md D35 to D75 (today's work); research/v1-plan.md (the adopted v1 plan); research/booth-ux.md (focus, screen, turn-taking); research/assistant-design.md; research/grounding.md (brain bake-off); research/edge-cases.md (logged, not fixed); research/faces.md, research/m2-design.md, research/m3-design.md, research/wakeword.md, research/sight.md, research/endpointing.md; research/one-voice.patch (retrieval-into-brain variant, not applied).
 - gates/review.md rules 6 (overfitting), 7 (proportion), 8 (v1: log edge cases).
 
