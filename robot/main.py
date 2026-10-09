@@ -77,7 +77,7 @@ SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
 DETECT_FPS = 15
 DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
 SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
-WHERE = {"left": "on your left", "center": "in the center", "right": "on your right"}
+LINES = 4  # sighting lines for the brain at most: the newest of each kind
 # A statement about the speaker (D70): recalled only in the conversation it was told in.
 FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I)
 # Identity is the face in the current frame, never a track (design
@@ -496,7 +496,10 @@ class Robot:
                                         {"role": "assistant", "content": turn.answer}]
                         )[-2 * HISTORY_TURNS:]
         self.exchanges += 1
-        statement = None if is_question(turn.question) else question  # findable later
+        # Findable later; a command ("this is my phone") is an action, never evidence of
+        # ownership (things.py holds what was named).
+        statement = None if is_question(turn.question) or command(
+            turn.question, self.vocab) else question
         self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
                     statement, track)
         # The answer ends when its audio does (the speech end in tests without audio).
@@ -785,20 +788,26 @@ class Robot:
                        f"I don't see your {name} now.")
 
     def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
-        """Captioned frames (newest first) and the Memories lines, oldest first: captions and
-        sightings. What is in view now is the present, not something seen before."""
-        recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}
+        """Captioned frames (newest first) and the Memories lines, oldest first, one short line
+        each with its age: each distinct caption, and the newest sighting of each kind out of
+        view (no sides, D61). What is in view now is the present, not something seen before."""
+        recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}  # shown() reads lines
                     for m in self.memory.recent(before=turn.speech_start)
                     if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
         with self.detecting:  # a consistent snapshot of the tracks
             in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
-        sights = self.memory.sightings(before=turn.speech_start, hide=in_view, skip=self.ignored)
+        newest: dict[str, dict] = {}  # kind -> its newest sighting: one line per object
+        for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored):
+            newest.setdefault(kind_of(s["label"]), s)
+        sights = list(newest.values())[:LINES]
         turn.memories = [m["id"] for m in recalled + sights]
         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
-        lines = sorted([(m["ts"], f"{ago(m['ts'])}: {m['caption']}") for m in recalled[::-1]] + [
-            (s["last_seen"], f"{ago(s['last_seen'])}: {s['label']} {WHERE[s['region']]}")
-            for s in sights], key=lambda x: x[0])
-        return recalled, [f"{k}. {line}" for k, (_, line) in enumerate(lines, 1)]
+        captions = {" ".join(m["caption"].split()): m for m in recalled[::-1]  # one line each,
+                    if m["caption"]}  # and one frame told twice is one line
+        lines = sorted([(m["ts"], f"{ago(m['ts'])}: {c}") for c, m in captions.items()] + [
+            (s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; it is not "
+                             "in view now") for s in sights], key=lambda x: x[0])
+        return recalled, [line for _, line in lines]
 
     def _sighted(self, turn: Turn) -> str | None:
         """The answer to a sighting question from the sightings and the tracks in view now, or

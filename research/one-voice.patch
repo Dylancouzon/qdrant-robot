@@ -1,0 +1,983 @@
+diff --git a/bench/brain_bakeoff.py b/bench/brain_bakeoff.py
+index 43fe8db..88c91e6 100644
+--- a/bench/brain_bakeoff.py
++++ b/bench/brain_bakeoff.py
+@@ -4,11 +4,15 @@ in logged replays (same history, evidence lines, and fixture frame) through one
+ several prompt shapes, then judges each shape with eval/judge.py (three votes, cached).
+ 
+     .venv/bin/python -m bench.brain_bakeoff qwen3vl-2b [A,B,C,...]   (Homebrew llama-server)
++    .venv/bin/python -m bench.brain_bakeoff --host dylan@192.168.1.74 qwen3vl-2b A   (RTX 3080)
++    .venv/bin/python -m bench.brain_bakeoff parity <bake-off files>   (variant A vs the robot)
+ 
+-Code answers (identity, named objects, verbatim facts) stay as logged: v1 keeps them in code.
++Code answers (identity, actions, verbatim facts) stay as logged: v1 keeps them in code.
+ """
+ import json
+ import re
++import shlex
++import socket
+ import subprocess
+ import sys
+ import tempfile
+@@ -28,6 +32,21 @@ SETS = {  # name: (cases, logged replay whose prompts are replayed)
+     "m2b": ("eval/probes/m2b.jsonl", "2026-10-08-replay-1791479641.jsonl"),
+     "m2c": ("eval/probes/m2c.jsonl", "2026-10-08-replay-1791484406.jsonl"),
+ }
++HOSTS = {  # where llama-server runs: (binary, GGUF folder, GPU lock, machine, llama.cpp build)
++    None: ("llama-server", str(brain.GGUF), None, "mac-m5pro",
++           "homebrew 0.6.0 build 11429 d81235049 (Metal)"),
++    # Dylan's RTX 3080 (WSL2), set up by ~/qdrant-robot-box/{cuda,build}.sh plus orin.patch;
++    # llama-server-orin sets the Orin's 8 SMs and compute capability 8.7, so kernels split
++    # and pick their paths as on the Jetson.
++    "dylan@192.168.1.74": ("qdrant-robot-box/llama-server-orin",
++                           "qdrant-robot-box/models/gguf", "qdrant-robot-box/gpu.lock",
++                           "box-rtx3080",
++                           "9c2e0e4+orin.patch CUDA 13.2.86 sm_86 NO_VMM NSM=8 CC=870"),
++    "robot": ("/home/qdrant/qdrant-robot/shared/src/llama.cpp/build/bin/llama-server",
++              "/home/qdrant/qdrant-robot/shared/models/gguf",
++              "/home/qdrant/qdrant-robot/shared/gpu.lock", "qdrant-robot",
++              "9c2e0e4 CUDA 13.2 sm_87 NO_VMM (Release)"),
++}
+ EVIDENCE = ("Memories", "The visitor told you")  # Facts are knowledge, not memories
+ PAST_NOTE = brain.PAST.strip()
+ CITE = re.compile(r"\s*\[\d+\]")
+@@ -44,7 +63,7 @@ DEMOS = (  # H: counterfactual demonstrations, where only the memory gives the a
+ def parse(text: str) -> tuple[list[tuple[str, list[str]]], str, str]:
+     """A logged user text as (blocks of (title, lines), notes, question): the inverse of
+     brain.messages."""
+-    *blocks, tail = text.split("\n\n")
++    *blocks, tail = text.removeprefix(brain.EVIDENCE).split("\n\n")
+     notes, question = tail.rsplit("Visitor: ", 1)
+     return [(b.split(":\n- ", 1)[0], b.split(":\n- ", 1)[1].split("\n- ")) for b in blocks], \
+         notes, question
+@@ -109,10 +128,20 @@ def frames(cases: Path) -> dict[str, Path]:
+     return out
+ 
+ 
+-def serve(model: str) -> subprocess.Popen:
+-    args = ["llama-server", *brain.server_args(model)[1:]]
+-    proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
++def serve(model: str, host: str | None) -> subprocess.Popen:
++    """llama-server with the robot's arguments, on the Mac or over SSH on `host` behind a
++    tunnel; the remote server waits for the host's GPU lock and stops when SSH closes."""
++    server, gguf, lock, *_ = HOSTS[host]
++    args = [server, *(a.replace(str(brain.GGUF), gguf) for a in brain.server_args(model)[1:])]
++    if host:
++        port = brain.URL.rsplit(":", 1)[1]
++        args = ["ssh", "-o", "ExitOnForwardFailure=yes", "-L", f"{port}:127.0.0.1:{port}", host,
++                f"exec 9>{lock}; flock 9; {shlex.join(args)} & read _; kill $!"]
++    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
++                            stderr=subprocess.DEVNULL)
+     for _ in range(600):
++        if proc.poll() is not None:
++            raise RuntimeError(f"llama-server exited with {proc.returncode}")
+         try:
+             urllib.request.urlopen(f"{brain.URL}/health", timeout=1).read()
+             return proc
+@@ -130,10 +159,10 @@ def decode_speed() -> float:
+         return json.load(r)["timings"]["predicted_per_second"]
+ 
+ 
+-def replay(model: str, variants: list[str], run: str) -> list[Path]:
++def replay(model: str, variants: list[str], run: str, host: str | None = None) -> list[Path]:
+     import cv2
+     b = brain.Brain.__new__(brain.Brain)  # the robot's answer path, on a server started here
+-    proc = serve(model)
++    proc = serve(model, host)
+     try:
+         speed = decode_speed()
+         system = json.loads((OUT / SETS["m2"][1]).read_text().splitlines()[-1])["system"]
+@@ -174,8 +203,8 @@ def replay(model: str, variants: list[str], run: str) -> list[Path]:
+             path = OUT / f"2026-10-08-bakeoff-{model}-{name}-{run}.jsonl"
+             weights, mmproj, _ = brain.MODELS[model]
+             summary = {"summary": "brain_bakeoff", "model": model, "set": name, "cases": cases,
+-                       "replayed": logged, "variants": variants, "machine": "mac-m5pro",
+-                       "llama_cpp": "homebrew 0.6.0 build 11429 d81235049 (Metal)",
++                       "replayed": logged, "variants": variants, "machine": HOSTS[host][3],
++                       "llama_cpp": HOSTS[host][4],
+                        "decode_tok_s": round(speed, 1), "max_tokens": brain.MAX_TOKENS,
+                        "image_max_tokens": 256, "context": 2048,
+                        "gguf_mb": round(sum((brain.GGUF / f).stat().st_size
+@@ -212,6 +241,18 @@ def judge(path: Path, chunk: int = 80) -> None:
+                            stdout=subprocess.DEVNULL)
+ 
+ 
++def parity(path: Path) -> None:
++    """How many brain answers under variant A (the robot's own prompt) are identical to the
++    answers the robot logged, so a machine can stand in for the Jetson."""
++    rows = [r for r in map(json.loads, path.read_text().splitlines()) if "id" in r]
++    meta = json.loads(path.read_text().splitlines()[-1])
++    logged = {r["id"]: r["answer"].strip() for r in map(
++        json.loads, (OUT / meta["replayed"]).read_text().splitlines()) if "id" in r}
++    a = [r for r in rows if r["variant"] == "A" and not r["code"]]
++    print(f"{meta['machine']} {meta['model']} {meta['set']}: "
++          f"{sum(r['answer'] == logged[r['step']] for r in a)}/{len(a)} identical to the robot")
++
++
+ def table(paths: list[Path]) -> None:
+     """One line per brain, set, and variant from judged bake-off files: judged correct (code
+     answers included), brain answers correct, answerable-from-evidence correct, evidence use
+@@ -260,11 +301,20 @@ if __name__ == "__main__":
+     assert shape("I", "S", text, img)[1]["content"][0] == img, "I keeps the image first"
+     assert shape("B", "S", text, img)[1]["content"][1] == img
+     print("selftest ok")
+-    if sys.argv[1:2] == ["judge"]:
+-        for p in sys.argv[2:]:
++    host, argv = None, sys.argv[1:]
++    if argv[:1] == ["--host"]:
++        host, argv = argv[1], argv[2:]
++        with socket.socket() as s:  # a free port: the tunnel's local end, and the remote port
++            s.bind(("127.0.0.1", 0))
++            brain.URL = f"http://127.0.0.1:{s.getsockname()[1]}"
++    if argv[:1] == ["judge"]:
++        for p in argv[1:]:
+             judge(Path(p))
+-    elif sys.argv[1:2] == ["table"]:
+-        table([Path(p) for p in sys.argv[2:]])
+-    elif sys.argv[1:]:
+-        variants = list(sys.argv[2] if len(sys.argv) > 2 else "ABCDEFGH")
+-        print(*replay(sys.argv[1], variants, str(int(time.time()))), sep="\n")
++    elif argv[:1] == ["table"]:
++        table([Path(p) for p in argv[1:]])
++    elif argv[:1] == ["parity"]:
++        for p in argv[1:]:
++            parity(Path(p))
++    elif argv:
++        variants = list(argv[1] if len(argv) > 1 else "ABCDEFGH")
++        print(*replay(argv[0], variants, str(int(time.time())), host), sep="\n")
+diff --git a/bench/judge-cache.jsonl b/bench/judge-cache.jsonl
+index a5e2704..69a1cf7 100644
+--- a/bench/judge-cache.jsonl
++++ b/bench/judge-cache.jsonl
+@@ -2228,3 +2228,54 @@
+ {"key": "a50c595e13a97dbd", "pass": true, "why": "Says it does not know the phone's whereabouts.", "votes": [true, true, true]}
+ {"key": "baffb18fd15cd77b", "pass": false, "why": "Does not describe the living room.", "votes": [false, false, false]}
+ {"key": "3c453f52f0032a20", "pass": false, "why": "Fails to recognize the gold phone.", "votes": [false, false, false]}
++{"key": "e39c3f9b513332c6", "pass": false, "why": "Does not say the second bear wore a green hat.", "votes": [false, false, false]}
++{"key": "5626d3d943480aa5", "pass": false, "why": "Does not identify the black slider phone.", "votes": [false, false, false]}
++{"key": "2e838860c414203c", "pass": true, "why": "Correctly says the gold phone came first.", "votes": [true, true, true]}
++{"key": "0f3cb94136dc4edb", "pass": false, "why": "Invents a chair and does not say the phone is gone.", "votes": [false, false, false]}
++{"key": "3ddda3497cd4f2f0", "pass": false, "why": "Does not describe the living room.", "votes": [false, false, false]}
++{"key": "4929a502e9a875a6", "pass": true, "why": "Recalls the visitor's talk at four o'clock.", "votes": [true, true, false]}
++{"key": "203ba4ac1649f988", "pass": false, "why": "Places the clock on the left and does not identify its removal.", "votes": [false, false, false]}
++{"key": "21791191d8429317", "pass": false, "why": "Says the clock is still there.", "votes": [false, false, false]}
++{"key": "ec113b72879fd7b6", "pass": false, "why": "Adds a monitor and does not identify the black laptop.", "votes": [false, false, false]}
++{"key": "878403d204c5a458", "pass": false, "why": "Does not identify the blue Pepsi cup or say it is gone.", "votes": [false, false, false]}
++{"key": "88cbf1b2ddea30e5", "pass": false, "why": "Places the red bag on the right.", "votes": [false, false, false]}
++{"key": "dcd8880c2b9fe376", "pass": false, "why": "Does not recall the clock on the right.", "votes": [false, false, false]}
++{"key": "5bf81063cd792095", "pass": false, "why": "Does not identify the white bear as first.", "votes": [false, false, false]}
++{"key": "03faf310d76fc86b", "pass": false, "why": "Does not recall the green hat.", "votes": [false, false, false]}
++{"key": "86d5ccb7335bb6fb", "pass": false, "why": "Calls the silver laptop the same as the black one.", "votes": [false, false, false]}
++{"key": "0da20f57bcb9d7bd", "pass": false, "why": "Denies seeing the visitor's gold phone.", "votes": [false, false, false]}
++{"key": "3f0f2d95279ec6d0", "pass": false, "why": "Does not identify the visitor's brown bear.", "votes": [false, false, false]}
++{"key": "f7c8a075c98974ec", "pass": true, "why": "Says it does not remember the phone.", "votes": [true, true, true]}
++{"key": "018a2117ef8d2154", "pass": true, "why": "Does not claim to know whose phone it is.", "votes": [true, true, true]}
++{"key": "8f6e05467e226f0d", "pass": true, "why": "Says it has no memory of the phone's location.", "votes": [true, true, true]}
++{"key": "416a77f4b31cca49", "pass": false, "why": "Denies remembering the bear, which was retained.", "votes": [false, false, false]}
++{"key": "80b6942d2ff2cda0", "pass": false, "why": "Claims to remember the forgotten laptop.", "votes": [false, false, false]}
++{"key": "a3278c87d440315d", "pass": false, "why": "Repeats the bus instead of naming the earlier scenes.", "votes": [false, false, false]}
++{"key": "93b60b69018a2658", "pass": true, "why": "Says it has no chairs in memory.", "votes": [true, true, true]}
++{"key": "9be7a432514b79d2", "pass": false, "why": "Does not describe the living room.", "votes": [false, false, false]}
++{"key": "0f53339f220db559", "pass": true, "why": "Says two wheels.", "votes": [true, true, true]}
++{"key": "9838d98555bb953c", "pass": true, "why": "Says Berlin.", "votes": [true, true, true]}
++{"key": "4367abf7c880374f", "pass": true, "why": "Says by train.", "votes": [true, true, true]}
++{"key": "d662ea351ff75f89", "pass": true, "why": "Says ice.", "votes": [true, true, true]}
++{"key": "5307a694938d4bf3", "pass": true, "why": "Says four o'clock.", "votes": [true, true, true]}
++{"key": "575de6d9527130cc", "pass": true, "why": "Recalls the visitor's talk at four o'clock.", "votes": [true, true, true]}
++{"key": "2fe7c92a136da92c", "pass": false, "why": "Does not identify the umbrella as striped.", "votes": [false, false, false]}
++{"key": "3a16e2226b532461", "pass": false, "why": "Does not recognize the gold phone as the visitor's.", "votes": [false, false, false]}
++{"key": "379b2799e61b71c8", "pass": false, "why": "Invents a conversation about Qdrant.", "votes": [false, false, false]}
++{"key": "040519e4ead5fc9a", "pass": true, "why": "Places the striped umbrella on its left.", "votes": [true, true, true]}
++{"key": "85eedb6d81ea8145", "pass": true, "why": "Places the striped umbrella on its right now.", "votes": [true, true, true]}
++{"key": "c4897d7894ca7043", "pass": false, "why": "Says it was on the right, not the left.", "votes": [false, false, false]}
++{"key": "ce76ba43de1a982c", "pass": false, "why": "Does not identify the missing red handbag.", "votes": [false, false, false]}
++{"key": "8f6da7b3ee8531d3", "pass": true, "why": "Says Qdrant Edge stores data on its own disk.", "votes": [true, true, true]}
++{"key": "6c10e46c026906fa", "pass": false, "why": "Names Berlin but falsely denies remembering the exchange.", "votes": [false, true, false]}
++{"key": "2da0c84073fed6b9", "pass": false, "why": "Invents a monitor and omits the black laptop detail.", "votes": [false, false, false]}
++{"key": "aa3903a0b1b29d9e", "pass": false, "why": "Omits the blue Pepsi cup and that it is gone.", "votes": [false, false, false]}
++{"key": "1c090fddd51b4193", "pass": false, "why": "Does not recall the green hat.", "votes": [false, false, false]}
++{"key": "9f800c37a25dc3e5", "pass": false, "why": "Says they are the same laptop; they are different.", "votes": [false, false, false]}
++{"key": "7ab0b8a349c2fe13", "pass": false, "why": "Does not identify the visitor's brown bear.", "votes": [false, false, false]}
++{"key": "a4e74dec5e824477", "pass": true, "why": "Says it no longer remembers the phone.", "votes": [true, true, true]}
++{"key": "47b104c880081d01", "pass": false, "why": "Does not answer whether it remembers the laptop.", "votes": [false, false, false]}
++{"key": "9851d021fa8577bd", "pass": false, "why": "Omits the couch and suitcase from the earlier scene.", "votes": [false, false, false]}
++{"key": "350c4c07d150e79a", "pass": false, "why": "Does not describe the living room.", "votes": [false, false, false]}
++{"key": "3e8fc65935f22de5", "pass": true, "why": "Correctly says the visitor traveled by train.", "votes": [true, true, true]}
++{"key": "9aac9f1e1d5c6510", "pass": false, "why": "Does not identify the striped umbrella.", "votes": [false, false, false]}
+diff --git a/robot/brain.py b/robot/brain.py
+index 1213a48..ae9da02 100644
+--- a/robot/brain.py
++++ b/robot/brain.py
+@@ -67,6 +67,8 @@ SYSTEM = (
+ CHANGED = "The view has changed since your last answer.\n"
+ # "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
+ PAST = "The visitor asks about the past: answer from the lines above.\n"
++# Before the evidence, after the image, so the prefilled prefix holds (shape I, D74).
++EVIDENCE = "Answer from these memories; if one answers the question, use it.\n\n"
+ # Main object first: recall answers with the first thing a caption names (prompt probes, D29).
+ CAPTION = ("Answer in this form: 'Main object: <the most prominent object>. Around it: "
+            "<other things, with left, center, or right>.'")
+@@ -150,7 +152,8 @@ def messages(history: list[dict], now: dict | None, memories: list[str] = (), fa
+         text = "".join(f"{title}:\n- " + "\n- ".join(lines) + "\n\n"
+                        for title, lines in blocks if lines)
+         note = (CHANGED if changed and history else "") + (PAST if past else "")
+-        content.append({"type": "text", "text": f"{text}{note}Visitor: {question}"})
++        lead = EVIDENCE if memories or told else ""
++        content.append({"type": "text", "text": f"{lead}{text}{note}Visitor: {question}"})
+     return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
+ 
+ 
+@@ -244,6 +247,9 @@ if __name__ == "__main__":
+     m = messages([], now, ["2 minutes ago: a red mug"], ["Qdrant is written in Rust."], "Hi?")
+     text = m[-1]["content"][-1]["text"]
+     assert m[-1]["content"][0] == now and "Memories:" in text and "Facts:" in text
++    assert text.startswith(EVIDENCE), "the evidence instruction follows the image"
++    assert not messages([], now, facts=["x"], question="Hi?")[-1]["content"][-1]["text"].startswith(
++        EVIDENCE), "facts alone are not memories"
+     assert messages([], now)[-1]["content"] == [now], "the prefill prompt is a prefix"
+     hist = [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello!"}]
+     note = messages(hist, now, question="And now?", changed=True)[-1]["content"][-1]["text"]
+diff --git a/robot/main.py b/robot/main.py
+index b384df9..c261e78 100644
+--- a/robot/main.py
++++ b/robot/main.py
+@@ -36,10 +36,8 @@ from robot.memory import (
+     article,
+     is_question,
+     kind_of,
++    kinds,
+     main_object,
+-    shown,
+-    sighting_answer,
+-    sighting_query,
+     thumb,
+ )
+ from robot.people import (
+@@ -76,8 +74,9 @@ SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
+ # Camera rate: unthrottled detection halved LLM decode (research/detector.md).
+ DETECT_FPS = 15
+ DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
+-SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
+-WHERE = {"left": "on your left", "center": "in the center", "right": "on your right"}
++SIGHTINGS = 12  # the newest sightings an evidence query reads, before one line per kind
++LINES = 4  # sighting evidence lines at most
++IT = re.compile(r"\b(?:it|them|that one)\b", re.I)  # a follow-up about the last thing named
+ # A statement about the speaker (D70): recalled only in the conversation it was told in.
+ FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I)
+ # Identity is the face in the current frame, never a track (design
+@@ -124,7 +123,7 @@ class Turn:
+     facts: list[str] = field(default_factory=list)
+     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
+     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
+-    verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
++    verbatim: bool = False        # answered in code (identity, actions, a fact), no LLM
+     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
+     prompt: list = field(default_factory=list)  # the brain's messages without images or system
+     frame_id: int = 0             # the frame this turn saw, stored as a memory
+@@ -425,9 +424,11 @@ class Robot:
+ 
+     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
+         """Answer about the frame shown when this line's speech started, or about an earlier
+-        look of the same scene; the frame used is the one stored as evidence. A line is
+-        answered only after the wake phrase, or as a follow-up within CONVERSATION_S of the
+-        last answer (D65); the wake phrase is not part of the question."""
++        look of the same scene; the frame used is the one stored as evidence. Identity and
++        actions are answered in code; every other line goes to the brain with the evidence the
++        shards hold (one voice, D61). A line is answered only after the wake phrase, or as a
++        follow-up within CONVERSATION_S of the last answer (D65); the wake phrase is not part of
++        the question."""
+         heard = woken(turn.question)
+         if self.wake_word and heard is None and \
+                 turn.speech_start - self.last_line > CONVERSATION_S:
+@@ -443,9 +444,7 @@ class Robot:
+         question = self.embed([turn.question])[0]
+         found = self.knowledge.search(question)
+         turn.facts = [fact for _, fact in found]
+-        turn.verbatim = bool(found) and found[0][0] >= VERBATIM
+         past = about_past(turn.question)
+-        recalled, memories = self._recall(turn, look.frame) if past else ([], [])
+         # The frame at speech start: the cached look may show an earlier visitor.
+         now, taken = (look.frame, look.taken) if shot[0] is None else shot
+         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
+@@ -454,17 +453,12 @@ class Robot:
+             self.history = []
+             self._look((now, taken))  # re-prefilled without the earlier exchanges
+             look = self.ready
+-        statements = self._told(question, turn)
+-        turn.told = [m["said"] for m in statements]
+-        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
+-        self.panel = {"shards": ["knowledge", "seen"], "ms": 1000 * (time.time() - started),
+-                      "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
+-                          (f"said: {m['said']}", m["score"]) for m in statements] + [
+-                          (f"seen: {line}", None) for line in memories]}
+         track = self._visitor()
+-        recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
+-            turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
+-        ) or self._sighted(turn)
++        coded = self._identity(turn, now, track) or self._things(turn)
++        memories, told = ([], []) if coded else self._evidence(
++            turn, question, found, past, look.frame)
++        if not coded and found and found[0][0] >= VERBATIM:
++            coded = turn.facts[0]  # a Qdrant fact asked nearly word for word, spoken as written
+         turn.retrieved = time.time()
+         self.last_frame = look.frame
+         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
+@@ -478,13 +472,8 @@ class Robot:
+         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
+                        if isinstance(m["content"], list) else m
+                        for m in msgs if m["role"] != "system"]
+-        if recalled_answer:
+-            turn.verbatim = True
+-            tokens = self._said(recalled_answer, turn)
+-        elif turn.verbatim:
+-            tokens = self._said(turn.facts[0], turn)
+-        else:
+-            tokens = self._tokens(msgs, turn)
++        turn.verbatim = bool(coded)
++        tokens = self._said(coded, turn) if coded else self._tokens(msgs, turn)
+         audio_parts = self._speak(tokens, turn)
+         turn.done = time.time()
+         turn.detect_fps = (self.detections - detections) / (turn.done - started)
+@@ -496,7 +485,10 @@ class Robot:
+                                         {"role": "assistant", "content": turn.answer}]
+                         )[-2 * HISTORY_TURNS:]
+         self.exchanges += 1
+-        statement = None if is_question(turn.question) else question  # findable later
++        # Findable later; a command ("this is my phone") is an action, never evidence of
++        # ownership (things.py holds what was named).
++        statement = None if is_question(turn.question) or command(
++            turn.question, self.vocab) else question
+         self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
+                     statement, track)
+         # The answer ends when its audio does (the speech end in tests without audio).
+@@ -656,8 +648,8 @@ class Robot:
+         return True
+ 
+     def _things(self, turn: Turn) -> str | None:
+-        """Commands and questions about the visitor's things (robot/things.py): naming,
+-        "forget my phone", ignore rules, and "where is my phone?". None for any other turn."""
++        """Commands about the visitor's things (robot/things.py): naming, "forget my phone",
++        ignore rules, and whether a kind is ignored. None for any other turn."""
+         if cmd := command(turn.question, self.vocab):
+             kind, name, labels = cmd
+             if kind == "name":
+@@ -670,19 +662,11 @@ class Robot:
+             self.ignored = self.things.ignored()
+             return (f"Okay, I will ignore {plural(name)}." if kind == "ignore" else
+                     f"Okay, I will notice {plural(name)} again.")
+-        if (asked := question(turn.question, self.vocab)) is None:
++        asked = question(turn.question, self.vocab)
++        if asked is None or asked[0] != "ignoring":
+             return None
+-        mode, name, labels = asked
+-        self._settle(turn.speech_start)
+-        if mode == "ignoring":
+-            return (f"Yes, I am ignoring {plural(name)}." if set(labels) & self.ignored else
+-                    f"No, I am not ignoring {plural(name)}.")
+-        if (named := self.things.named(name, labels)) is None:
+-            # Not an object ("my favorite color"), or "have you seen my keys?" without named
+-            # keys: the sightings or the brain answer.
+-            return None if mode == "seen" or not labels else (
+-                "No, I" if mode == "remember" else "I") + f" don't know which {name} is yours."
+-        return self._mine(turn, mode, named)
++        return (f"Yes, I am ignoring {plural(asked[1])}." if set(asked[2]) & self.ignored else
++                f"No, I am not ignoring {plural(asked[1])}.")
+ 
+     def _settle(self, since: float) -> None:
+         """Wait, at most SETTLE_S, until the view holds tracks confirmed after `since` (the
+@@ -730,98 +714,121 @@ class Robot:
+         self.named = self.things.labels()
+         return f"Done. I have forgotten your {named['name']}."
+ 
+-    def named_evidence(self, turn: Turn, named: dict, this: bool = False
+-                       ) -> tuple[list[str], int | None, int, str]:
+-        """Retrieval for a question about the visitor's object `named`: evidence lines (what
+-        it looks like, when it was named, each object in view with its score, its latest
+-        matched sightings), the track in view that matches it at MATCH or above (None: no
+-        claim), how many tracks of its kind are in view, and when it was last seen ("20
+-        seconds ago"). Every object in view is scored, whatever its label; `this`: only the
+-        one nearest the center. Sets turn.memories to the evidence ids."""
++    def _evidence(self, turn: Turn, question: np.ndarray, found: list[tuple[float, str]],
++                  past: bool, frame: np.ndarray) -> tuple[list[str], list[str]]:
++        """Retrieval for every line the code does not answer (D61, D62), from one bge vector:
++        the visitor's statements above their minimum score, the visitor's object the line asks
++        about, and what was seen (captions and sightings). Returns the Memories lines and the
++        statement lines, each with its age; sets the turn's told and evidence ids, and the
++        view's memory panel. `found`: the Qdrant facts, already searched."""
++        started = time.time()
++        statements = self._told(question, turn)
++        turn.told = [m["said"] for m in statements]
++        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
++        memories = self._named(turn) or self._seen(turn, frame, past)
++        self.panel = {"shards": ["knowledge", "seen", "things"],
++                      "ms": 1000 * (time.time() - started),
++                      "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
++                          (f"said: {m['said']}", m["score"]) for m in statements] + [
++                          (f"seen: {line}", None) for line in memories]}
++        return memories, told
++
++    def _named(self, turn: Turn) -> list[str]:
++        """Evidence lines for a question about one of the visitor's things ("where is my
++        phone?"): what it looks like and when it was named, then whether it is in view now. An
++        object in view is the visitor's only when its crop matches at MATCH or above (any label);
++        "is this my phone?" scores only the object nearest the center. Adds the evidence ids."""
++        asked = question(turn.question, self.vocab)
++        if asked is None or asked[0] == "ignoring":
++            return []
++        mode, name, labels = asked
++        if (named := self.things.named(name, labels)) is None:
++            # "my favorite color" is no object: the statements answer it.
++            return [f"Nothing is saved as the visitor's {name}."] if labels else []
++        self._settle(turn.speech_start)
+         name = named["name"]
+         with self.detecting:
+             frame, view = self.view
+             here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+         found = {t: box for t, (label, box) in view.items() if label != "person"}  # any label
+-        if this:
++        if mode == "this":
+             found = {t: found[t] for t in [_central(found, frame.shape[1])] if t}
+         scores = {t: self._score(named, v) for t, v in zip(
+             found, self.crops([cut(frame, b) for b in found.values()]) if found else [],
+             strict=True)}
+-        mine = max(scores, key=scores.__getitem__, default=None)
+-        mine = mine if mine is not None and scores[mine] >= MATCH else None
+-        past = self.memory.sightings(turn.speech_start, 3, here, named=[name])
++        mine = [t for t, score in scores.items() if score >= MATCH]
++        same = [view[t][0] for t in found if view[t][0] in named["labels"]]
++        past = self.memory.sightings(turn.speech_start, 1, here, named=[name])
+         turns = self.memory.points(named["turns"])
+-        turn.memories = [t["id"] for t in turns] + [s["id"] for s in past] + (
+-            [self.points[mine]] if mine in self.points else [])
++        turn.memories += [t["id"] for t in turns] + [s["id"] for s in past] + [
++            self.points[t] for t in mine if t in self.points]
+         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
+         looks = next((x for t in turns if (x := main_object(t.get("caption", "")))), name)
+-        lines = [f"The visitor's {name}: {looks}" + (
+-            f", named {ago(turns[-1]['ts'])}" if turns else "")] + [
+-            f"In view now: {view[t][0]}, match {scores[t]:.2f} (needs {MATCH})" for t in found] + [
+-            f"Matched sighting: {x['label']}, last seen {ago(x['last_seen'])}" for x in past]
+-        last = ago(past[0]["last_seen"]) if past else ago(turns[-1]["ts"]) if turns else ""
+-        return lines, mine, sum(view[t][0] in named["labels"] for t in found), last
++        lines = [f"{ago(turns[-1]['ts'])}: the visitor named their {name}, {looks}" if turns
++                 else f"The visitor's {name}: {looks}"]
++        if mine:
++            return lines + [f"In view now: the visitor's {name}."]
++        if same:
++            lines.append(f"In view now: {article(same[0])} that does not match the visitor's "
++                         f"{name}; it may be someone else's.")
++        else:
++            lines.append(f"The visitor's {name} is not in view now.")
++        return lines + [f"{ago(s['last_seen'])}: the visitor's {name}, last seen." for s in past]
+ 
+     def _score(self, named: dict, v: np.ndarray) -> float:
+         """A crop vector's MaxSim score against the requested object `named`."""
+         hit = self.things.score(v, named["name"])
+         return hit[1] if hit else 0.0
+ 
+-    def _mine(self, turn: Turn, mode: str, named: dict) -> str:
+-        """A minimal code answer from named_evidence until those lines go to the brain."""
+-        name = named["name"]
+-        _, mine, found, last = self.named_evidence(turn, named, mode == "this")
+-        if mode == "this":
+-            return (f"I don't see {article(name)} right now." if not found else
+-                    f"Yes, this is your {name}." if mine is not None else
+-                    f"No, I don't think this is your {name}.")
+-        said = f"Yes, I remember your {name}. " * (mode == "remember")
+-        if mine is not None:
+-            return said + f"Yes, your {name} is here now."
+-        if found:
+-            return said + f"I see {article(name)}, but I am not sure it is yours."
+-        return said + (f"I last saw your {name} {last}; I don't see it now." if last else
+-                       f"I don't see your {name} now.")
+-
+-    def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
+-        """Captioned frames (newest first) and the Memories lines, oldest first: captions and
+-        sightings. What is in view now is the present, not something seen before."""
+-        recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}
+-                    for m in self.memory.recent(before=turn.speech_start)
+-                    if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
+-        with self.detecting:  # a consistent snapshot of the tracks
+-            in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+-        sights = self.memory.sightings(before=turn.speech_start, hide=in_view, skip=self.ignored)
+-        turn.memories = [m["id"] for m in recalled + sights]
++    def _seen(self, turn: Turn, frame: np.ndarray, past: bool) -> list[str]:
++        """Memories lines, oldest first, for a question about the past or one that names a kind
++        ("is the cup still there?"): captions of earlier scenes (past only), and one line per
++        kind of sighting, the newest: in view now, or its age and that it is gone. A kind the
++        visitor asked to ignore gets one line saying so. Adds the evidence ids."""
++        named = kinds(turn.question, self.vocab)
++        if not named and IT.search(turn.question) and self.history:  # "is it still there?"
++            last = kinds(self.history[-1]["content"], self.vocab)  # the robot's last answer
++            named = last if len({kind_of(x) for x in last}) == 1 else set()
++        lines = [(0.0, f"You were asked to ignore {plural(k)}: you do not remember them.")
++                 for k in sorted({kind_of(x) for x in named & self.ignored})]
++        named -= self.ignored
++        if not past and not named:
++            return [x for _, x in lines]
+         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
+-        lines = sorted([(m["ts"], f"{ago(m['ts'])}: {m['caption']}") for m in recalled[::-1]] + [
+-            (s["last_seen"], f"{ago(s['last_seen'])}: {s['label']} {WHERE[s['region']]}")
+-            for s in sights], key=lambda x: x[0])
+-        return recalled, [f"{k}. {line}" for k, (_, line) in enumerate(lines, 1)]
+-
+-    def _sighted(self, turn: Turn) -> str | None:
+-        """The answer to a sighting question from the sightings and the tracks in view now, or
+-        None for another question or when no sighting matches (the brain answers then, with
+-        captions). The sightings it names become the turn's evidence."""
+-        if self.detect_failed:  # the tracks in view are stale: claim nothing about now
+-            return None
+-        context = [m["content"] for m in self.history[:-3:-1]]  # the last answer first
+-        if (query := sighting_query(turn.question, context, self.vocab)) is None:
+-            return None
+-        if (labels := query[1].get("label")) and labels <= self.ignored:
+-            return f"I am ignoring {plural(kind_of(min(labels)))}, so I do not remember any."
+-        with self.detecting:
++        if past:  # what is in view now is the present, not something seen before
++            captions = {}
++            for m in self.memory.recent(before=turn.speech_start)[::-1]:
++                text = " ".join(unmention(m["caption"], self.ignored).split())
++                if text and np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > \
++                        SCENE_CHANGE and text not in captions:  # one turn frame, two turns
++                    captions[text] = m
++            lines += [(m["ts"], f"{ago(m['ts'])}: {text}") for text, m in captions.items()]
++            turn.memories += [m["id"] for m in captions.values()]
++        if not self.detect_failed:  # else the tracks in view are stale: claim nothing
++            lines += self._kinds(turn, named)
++        return [x for _, x in sorted(lines, key=lambda x: x[0])]
++
++    def _kinds(self, turn: Turn, named: set[str]) -> list[tuple[float, str]]:
++        """(time, line) per kind of sighting, the newest: in view now, or its age and that it
++        is gone; for the `named` labels, else for the kinds seen before (a past question)."""
++        with self.detecting:  # a consistent snapshot of the tracks
+             here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+-        # Enough tracks to group by kind and region before the answer limit (ponytail: a
+-        # window, not a group-by; Edge 0.8 has none. Facet on label if one kind floods it).
+-        past = self.memory.sightings(turn.speech_start, SIGHTINGS, here, self.ignored, **query[1])
+-        now = [p for p in self.memory.points(here) if p["label"] not in self.ignored]
+-        if found := sighting_answer(*query, past, now,
+-                                    lambda ts: brain.age(turn.speech_start - ts)):
+-            answer, turn.memories = found
+-            return answer
+-        return None
++        now = [p for p in self.memory.points(here) if p["label"] not in self.ignored and (
++            not named or p["label"] in named)]
++        before = self.memory.sightings(turn.speech_start, SIGHTINGS, here, self.ignored,
++                                       **({"label": named} if named else {}))
++        newest: dict[str, dict] = {}  # kind -> its newest sighting: in view now wins
++        for s in now + before:
++            newest.setdefault(kind_of(s["label"]), s)
++        if not named:  # only the kinds seen before, gone or back in view
++            newest = {k: s for k, s in newest.items() if k in {kind_of(x["label"]) for x in before}}
++        sights = list(newest.values())[:LINES]
++        turn.memories += [s["id"] for s in sights]
++        ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
++        return [(float("inf"), f"In view now: {article(s['label'])}") if s["id"] in here else
++                (s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; it is "
++                                 "not in view now")
++                for s in sights]
+ 
+     def _said(self, fact: str, turn: Turn) -> Iterator[str]:
+         turn.first_token, turn.answer = time.time(), fact
+diff --git a/robot/memory.py b/robot/memory.py
+index 718e2ca..59a06c8 100644
+--- a/robot/memory.py
++++ b/robot/memory.py
+@@ -5,7 +5,7 @@ first and last seen times; no frame). Statements carry a bge vector, so later
+ questions find them by vector search ("What drink do I like?" finds "I really love espresso")."""
+ import re
+ import time
+-from collections.abc import Callable, Collection
++from collections.abc import Collection
+ from pathlib import Path
+ 
+ import cv2
+@@ -63,15 +63,6 @@ _ASKS = re.compile(r"^(what|where|who|whom|whose|when|why|how|which|is|are|was|w
+                    r"can|could|will|would|should|have|has|tell me)\b", re.I)
+ 
+ 
+-# "What did I show you?" and its variants: the demo's key memory question, answered in code
+-# from the newest memory's main object, because the 2B brain often ignored a present memory.
+-_SHOWN = re.compile(r"\b(show|showed|shown|hold|holding|held|in my hands?|bring|brought)\b",
+-                    re.I)
+-_FIRST = re.compile(r"\bfirst\b", re.I)
+-# Anything that narrows which memory is meant (a time, a place, a comparison) goes to the
+-# brain with the memories instead: the code path only knows "newest" and "first".
+-_NARROWED = re.compile(r"\b(same|different|like|similar|compare|yesterday|today|morning|"
+-                       r"hour|hours|minutes?|ago|week|left|right|center|middle)\b", re.I)
+ _MAIN = re.compile(r"Main object:\s*([^.\n]+)")
+ 
+ 
+@@ -80,22 +71,8 @@ def main_object(caption: str) -> str | None:
+     return x.group(1).strip() if (x := _MAIN.search(caption)) else None
+ 
+ 
+-def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
+-    """The answer to "what did I show you" from memories (newest first), or None when the
+-    question is another kind or no memory names a main object."""
+-    if not (about_past(question) and _SHOWN.search(question)) or _NARROWED.search(question):
+-        return None
+-    named = [(m, x) for m in memories if (x := main_object(m["caption"]))]
+-    if not named:
+-        return None
+-    m, thing = named[-1] if _FIRST.search(question) else named[0]
+-    return f"You showed me {thing}, {age(m)}."
+-
+-
+-# Sighting questions ("what was on your left?", "is the cup still there?", "what is gone?"),
+-# answered in code from the detector's sightings and what it tracks now: the 2B brain ignored
+-# sighting lines in its prompt (D43). Each group is one kind of thing for a visitor: detector
+-# labels that flicker on one object, and the words people use for them.
++# Each group is one kind of thing for a visitor: detector labels that flicker on one object,
++# and the words people use for them ("mugs" names cup and mug).
+ KINDS = ["cup|mug", "teddy bear|plush toy|toy|teddy|plush|stuffed animal",
+          "bag|backpack|handbag|purse|rucksack|suitcase", "phone|mobile|cellphone|smartphone",
+          "laptop|computer", "monitor|screen|display|tv|television",
+@@ -103,20 +80,6 @@ KINDS = ["cup|mug", "teddy bear|plush toy|toy|teddy|plush|stuffed animal",
+          "glasses|sunglasses|spectacles", "headphones|headset|earphones", "t-shirt|shirt",
+          "bicycle|bike", "motorcycle|motorbike", "keys|key", "dog|puppy", "cat|kitten",
+          "person|man|woman|someone|somebody|people|visitor", "photo|picture|photograph"]
+-SAID = 3  # sightings named in one answer at most
+-_SIDE = re.compile(r"\b(?:your|my|the)\s+(left|right)\b|\b(left|right)[\s-](?:side|hand|corner)\b|"
+-                   r"\b(center|centre|middle)\b", re.I)
+-_GONE = re.compile(r"\b(gone|missing|disappear\w*|vanish\w*|took|taken|take away|removed?|"
+-                   r"chang\w*|no longer|not (?:there|here)|isn't (?:there|here))\b", re.I)
+-_STILL = re.compile(r"\b(still|anymore|any more|no longer)\b", re.I)
+-_SEES = re.compile(r"\b(see|sees|seen|saw|spot\w*|notic\w*|make out|find|found|there|here|around|"
+-                   r"anywhere|in view|in front)\b", re.I)
+-_PERFECT = re.compile(r"\b(have|has|ever)\b", re.I)  # "have you seen", "has anyone left"
+-_NOW_TOO = re.compile(r"\b(now|have|has|ever)\b", re.I)  # a past question that reaches now
+-_WHERE = re.compile(r"\bwhere\b", re.I)
+-_IT = re.compile(r"\b(it|them|they|that one)\b", re.I)
+-_WHAT = re.compile(r"\b(what|which|anything|something)\b", re.I)
+-
+ 
+ def _groups(vocab: Collection[str]) -> list[list[str]]:
+     return [g.split("|") for g in KINDS] + [[label] for label in vocab]
+@@ -134,31 +97,6 @@ def kinds(text: str, vocab: Collection[str]) -> set[str]:
+     return {w for g in groups if any(f" {x} " in text for x in g) for w in g if w in vocab}
+ 
+ 
+-def sighting_query(question: str, context: list[str], vocab: Collection[str]
+-                   ) -> tuple[str, dict[str, set[str]], bool] | None:
+-    """What a sighting question asks, or None for any other question: ("kind", {"label": ...})
+-    for where a named thing is or was; ("gone", match) for what left the view; ("seen", match)
+-    for what was seen, optionally {"region": ...}; and whether it asks about now too. "it" is
+-    the one object the newest text of `context` (the last exchange, newest first) names."""
+-    labels, regions = kinds(question, vocab), {
+-        "center" if g in ("centre", "middle") else g.lower()
+-        for m in _SIDE.finditer(question) for g in m.groups() if g}
+-    where, still, gone = (bool(x.search(question)) for x in (_WHERE, _STILL, _GONE))
+-    if not labels and _IT.search(question) and (where or still):
+-        labels = next((k for k in (kinds(c, vocab) for c in context) if k), set())
+-        labels = labels if len(set(map(kind_of, labels))) == 1 else set()
+-    now = not about_past(question) or still or bool(_NOW_TOO.search(question))
+-    past = about_past(question) or bool(_PERFECT.search(question))
+-    if labels and (where or gone or (past or still) and (regions or _SEES.search(question))):
+-        return "kind", {"label": labels}, now
+-    match = {"region": regions} if regions else {}
+-    if labels or not _WHAT.search(question):
+-        return None
+-    if gone:
+-        return "gone", match, False
+-    return ("seen", match, now) if past and (regions or _SEES.search(question)) else None
+-
+-
+ def article(label: str) -> str:
+     return label if label.endswith("s") else f"{'an' if label[0] in 'aeiou' else 'a'} {label}"
+ 
+@@ -167,54 +105,6 @@ def kind_of(label: str) -> str:
+     return next((g.split("|")[0] for g in KINDS if label in g.split("|")), label)
+ 
+ 
+-def sighting_answer(mode: str, match: dict[str, set[str]], now_too: bool, past: list[dict],
+-                    now: list[dict], ago: Callable[[float], str]) -> tuple[str, list[int]] | None:
+-    """The spoken answer to a sighting_query and the ids of the sightings it names, or None
+-    when no sighting matches: captions then answer, as they cover objects the detector cannot
+-    name. `past`: sightings out of view, newest first (already matched); `now`: every sighting
+-    in view. Each sighting is one track; tracks of one kind in one region are named together,
+-    because the detector cannot tell whether they are the same object."""
+-    visible: dict[str, list[str]] = {}  # kind -> regions in view, over the whole frame
+-    for s in now:
+-        visible.setdefault(kind_of(s["label"]), []).append(s["region"])
+-    now = [s for s in now if all(s[k] in v for k, v in match.items())]
+-    groups: dict[tuple[str, str], list[dict]] = {}
+-    for s in (now if now_too and mode != "gone" else []) + past:
+-        groups.setdefault(_key(s), []).append(s)
+-    named = list(groups.values())[:SAID]
+-    if not named:
+-        return None
+-    ids = {s["id"] for s in now}
+-    return (" ".join(_described(g, ids, visible.get(kind_of(g[0]["label"]), []), ago)
+-                     for g in named), [s["id"] for g in named for s in g])
+-
+-
+-def _key(s: dict) -> tuple[str, str]:
+-    return kind_of(s["label"]), s["region"]
+-
+-
+-def _side(region: str) -> str:
+-    # Spoken to the visitor: the robot's own left and right (image left is the robot's left).
+-    return "in the center" if region == "center" else f"on my {region}"
+-
+-
+-def _described(group: list[dict], now: set[int], visible: list[str],
+-               ago: Callable[[float], str]) -> str:
+-    """One kind in one region: in view now (the first track), or last seen, then where the
+-    same kind is in view now, anywhere in the frame (a moved object is a new track)."""
+-    s, unsure = group[0], "; I cannot tell if it is the same one."
+-    thing, where = article(s["label"]), _side(s["region"])
+-    if s["id"] in now:
+-        earlier = [x for x in group if x["id"] not in now]
+-        return f"I see {thing} {where} now." + (
+-            f" I also saw {thing} there {ago(earlier[0]['last_seen'])}{unsure}" if earlier else "")
+-    saw = f"I saw {thing} {where}, {ago(s['last_seen'])}"
+-    if visible:
+-        there = "there" if s["region"] in visible else " and ".join(map(_side, sorted(visible)))
+-        return f"{saw}. I see {thing} {there} now{unsure}"
+-    return f"{saw}; I do not see {'them' if s['label'].endswith('s') else 'it'} now."
+-
+-
+ def about_past(question: str) -> bool:
+     return bool(_PAST.search(question))
+ 
+@@ -398,55 +288,11 @@ class Memory:
+         return [{"id": r.id, **r.payload}
+                 for r in self.shard.retrieve(list(ids), True, False)] if ids else []
+ 
+-def _sighting_selftest() -> None:
++def _kinds_selftest() -> None:
+     vocab = {"cup", "mug", "bag", "backpack", "keys", "umbrella", "potted plant", "lamp", "clock"}
+-    q = lambda text, *context: sighting_query(text, list(context), vocab)  # noqa: E731
+     assert kinds("Did you spot any mugs or backpacks?", vocab) == {"cup", "mug", "bag", "backpack"}
+     assert kinds("the flowers", vocab) == {"potted plant"} and kinds("a giraffe", vocab) == set()
+-    assert q("Where did my umbrella end up?") == ("kind", {"label": {"umbrella"}}, False)
+-    assert q("Can you still make out the plant?") == ("kind", {"label": {"potted plant"}}, True)
+-    assert q("Has anyone left their keys around here?") == ("kind", {"label": {"keys"}}, True)
+-    assert q("Was the clock in the middle or on the right side?")[::2] == ("kind", False)
+-    assert q("Could you tell if it is still there?", "I see a lamp on my right now.") == (
+-        "kind", {"label": {"lamp"}}, True), "'it' is the one thing the last exchange named"
+-    assert q("Is it still there?", "A lamp and a clock.", "the lamp?") is None, "ambiguous 'it'"
+-    assert q("Hmm, which thing vanished from the middle?") == ("gone", {"region": {"center"}},
+-                                                               False)
+-    assert q("Anything changed since then?") == ("gone", {}, False)
+-    assert q("Tell me what sat to the left-hand side a minute ago, what was it?") == (
+-        "seen", {"region": {"left"}}, False)
+-    assert q("So what did you notice during my break?") == ("seen", {}, False)
+-    for other in ("What's on your right?", "Is this the same bag as before?", "What color "
+-                  "was the umbrella?", "Do you still remember my mug?", "What do you see "
+-                  "right now?", "What did we chat about earlier?", "Is it heavy?"):
+-        assert q(other) is None, other
+-    ago = lambda ts: f"{100 - ts:.0f} seconds ago"  # noqa: E731
+-    lamp = {"id": 1, "label": "lamp", "region": "right", "last_seen": 10.0}
+-    mug = {"id": 2, "label": "mug", "region": "left", "last_seen": 80.0}
+-    cup = {"id": 3, "label": "cup", "region": "left", "last_seen": 60.0}  # maybe the same mug
+-    clock = {"id": 4, "label": "clock", "region": "right", "last_seen": 50.0}
+-    new_mug = {"id": 5, "label": "mug", "region": "left", "last_seen": 90.0}
+-    assert sighting_answer("gone", {}, False, [mug, cup, clock], [lamp], ago) == (
+-        "I saw a mug on my left, 20 seconds ago; I do not see it now. I saw a clock on my "
+-        "right, 50 seconds ago; I do not see it now.", [2, 3, 4]), "one kind and side, together"
+-    assert sighting_answer("gone", {}, False, [mug], [new_mug], ago)[0] == (
+-        "I saw a mug on my left, 20 seconds ago. I see a mug there now; I cannot tell if it is "
+-        "the same one."), "a new mug on the same side does not hide the earlier one"
+-    assert sighting_answer("seen", {"region": {"right"}}, False, [clock], [lamp], ago) == (
+-        "I saw a clock on my right, 50 seconds ago; I do not see it now.", [4]), \
+-        "a past question leaves out what is in view now"
+-    assert sighting_answer("kind", {"label": {"mug", "cup"}}, True, [mug], [new_mug], ago)[0] \
+-        == ("I see a mug on my left now. I also saw a mug there 20 seconds ago; I cannot tell "
+-            "if it is the same one.")
+-    many = [{**cup, "id": 10 + k, "last_seen": 70.0 - k} for k in range(9)]
+-    assert sighting_answer("seen", {}, False, many + [clock], [], ago)[1][-1] == 4, \
+-        "repeated sightings of one kind leave room for others"
+-    moved = {"id": 6, "label": "clock", "region": "left", "last_seen": 95.0}  # a new track
+-    assert sighting_answer("seen", {"region": {"right"}}, False, [clock], [moved, lamp], ago)[
+-        0] == ("I saw a clock on my right, 50 seconds ago. I see a clock on my left now; I "
+-               "cannot tell if it is the same one."), "no 'not seen' claim when it moved sides"
+-    assert sighting_answer("kind", {"label": {"keys"}}, True, [], [lamp], ago) is None
+-    assert sighting_answer("seen", {"region": {"center"}}, True, [], [lamp], ago) is None
++
+ 
+ def _retain_selftest(seen: Memory, frames: Path, img: np.ndarray) -> None:
+     global MAX_POINTS, MAX_FRAME_BYTES
+@@ -535,17 +381,7 @@ if __name__ == "__main__":
+     assert not about_past("What is on your left?") and not about_past("What color is it?")
+     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
+     assert is_question("is Qdrant written in Rust.") and is_question("Where am I from?")
+-    mems = [{"caption": "Main object: a bus. Around it: a street."},
+-            {"caption": "Main object: green apples\nAround it: a bowl."}]
+-    ago = lambda m: "just now"  # noqa: E731
+-    assert shown("What did I just show you?", mems, ago) == "You showed me a bus, just now."
+-    assert shown("What was the first thing I showed you?", mems, ago).startswith(
+-        "You showed me green apples")
+-    assert shown("Is this the same thing I showed you?", mems, ago) is None
+-    assert shown("What did we talk about?", mems, ago) is None
+-    assert shown("What did I show you yesterday?", mems, ago) is None
+-    assert shown("What did I show you on the left?", mems, ago) is None
+     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
+-    _sighting_selftest()
++    _kinds_selftest()
+     print("selftest ok")
+ 
+diff --git a/robot/test_sightings.py b/robot/test_sightings.py
+index 3aa2ea7..aeb5cbb 100644
+--- a/robot/test_sightings.py
++++ b/robot/test_sightings.py
+@@ -40,23 +40,22 @@ def test_sightings() -> None:
+                   for k in range(4)]  # four newer objects, still in view, must not crowd it out
+         for k in range(CONFIRM):
+             step([bottle, *others], 40.0 + k)
+-        _, lines = robot._recall(Turn(speech_start=72.0), frame)
+-        assert lines == ["1. 60 seconds ago: clock on your right"], "the rest is in view now"
+         robot.vocab, robot.history = {"clock", "bottle", "thing0"}, []
+-        turn = Turn(question="Did the clock leave, or is it still around?", speech_start=72.0)
+-        assert robot._sighted(turn) == "I saw a clock on my right, 60 seconds ago; " \
+-            "I do not see it now." and turn.memories == [clock_row["id"]]
++        robot.memory.recent = lambda before: []  # no captioned turns: sightings only
++        turn = Turn(question="What did you see before?", speech_start=72.0)
++        assert robot._seen(turn, frame, True) == [
++            "60 seconds ago: you saw a clock; it is not in view now"], \
++            "the rest is in view now and was never seen before"
++        assert turn.memories == [clock_row["id"]]
+         turn = Turn(question="Can you see a bottle anywhere now?", speech_start=72.0)
+-        assert robot._sighted(turn) is None, "a question about now goes to the brain"
+-        turn = Turn(question="Have you ever spotted a bottle?", speech_start=72.0)
+-        assert robot._sighted(turn) == "I see a bottle on my left now.", "in view: Edge ids"
+-        assert robot._sighted(Turn(question="What is the capital of Peru?")) is None
++        assert robot._seen(turn, frame, False) == ["In view now: a bottle"], "no side words (D61)"
++        assert robot._seen(Turn(question="What is the capital of Peru?"), frame, False) == []
+         moved = Detection("bottle", 0.9, (1000, 400, 1100, 600))  # jumps right: a new track
+         for k in range(LOST + 1):
+             step([moved, *others], 80.0 + k)
+-        turn = Turn(question="Earlier, what did you spot on your left side?", speech_start=99.0)
+-        assert robot._sighted(turn) == "I saw a bottle on my left, 57 seconds ago. I see a " \
+-            "bottle on my right now; I cannot tell if it is the same one.", turn.answer
++        turn = Turn(question="Did you see the bottle earlier?", speech_start=99.0)
++        assert robot._seen(turn, frame, True) == ["In view now: a bottle"], \
++            "one line per kind: the bottle in view now replaces the older sighting"
+ 
+ 
+ def test_return_and_turnover(monkeypatch) -> None:
+@@ -86,7 +85,10 @@ def test_return_and_turnover(monkeypatch) -> None:
+             step([back])
+         [pid] = robot.points.values()
+         turn = Turn(question="Is the cup still there?", speech_start=float(next(clock)))
+-        assert robot._sighted(turn) == "I see a cup on my left now.", turn.answer
++        assert robot._seen(turn, None, False) == ["In view now: a cup"]
++        robot.history = [{"role": "assistant", "content": "I see a cup on the table."}]
++        turn = Turn(question="Is it still there?", speech_start=float(next(clock)))
++        assert robot._seen(turn, None, False) == ["In view now: a cup"], "it: the last answer's"
+         for k in range(6):  # other cups come and go on the right while earlier ones are gone
+             x, y = 860 + 200 * (k % 2), 50 + 220 * (k // 2)  # apart: none continues another
+             for _ in range(CONFIRM):
+@@ -123,5 +125,6 @@ def test_detector_failure(monkeypatch) -> None:
+     robot._detect()  # returns once detection stops
+     assert isinstance(robot.detect_failed, RuntimeError) and robot.detect is None
+     assert len(loads) == 1 + main.DETECT_RESTARTS, "the first load plus one per restart"
+-    turn = main.Turn(question="What was on your left?")
+-    assert robot._sighted(turn) is None, "no sighting answer once detection has stopped"
++    robot.memory, robot.points, robot.ignored, robot.vocab = None, {}, set(), {"cup"}
++    turn = main.Turn(question="Is the cup still there?")
++    assert robot._seen(turn, None, False) == [], "no sighting lines once detection has stopped"
+diff --git a/robot/test_things.py b/robot/test_things.py
+index dc7e2fa..1924d09 100644
+--- a/robot/test_things.py
++++ b/robot/test_things.py
+@@ -73,6 +73,17 @@ def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
+     return robot._things(turn), turn
+ 
+ 
++def lines(robot: Robot, text: str) -> tuple[list[str], Turn]:
++    """The evidence lines the brain gets for a question about the visitor's things."""
++    turn = Turn(question=text, speech_start=time.time() + 1)
++    return robot._named(turn), turn
++
++
++MINE = "In view now: the visitor's phone."
++OTHER = "In view now: a phone that does not match the visitor's phone; it may be someone else's."
++NONE = ["Nothing is saved as the visitor's phone."]
++
++
+ def test_things(monkeypatch) -> None:
+     monkeypatch.setattr(main, "SETTLE_S", 0)  # the test's speech starts after its frames
+     monkeypatch.setattr(main, "face", lambda faces, frame: None)
+@@ -86,46 +97,43 @@ def test_things(monkeypatch) -> None:
+         assert said == "Got it, that is your phone. I will remember it." and turn.named == "phone"
+         assert store(robot, turn) == 1
+         naming = turn.frame_id
+-        assert ask(robot, "Is this my phone?")[0] == "Yes, this is your phone."
++        assert lines(robot, "Is this my phone?")[0][-1] == MINE
+         show(robot, [], LOST + 1)  # taken away
+         robot.memory.set(naming, caption="Main object: a gold keypad phone. Around it: a desk.")
+-        said, turn = ask(robot, "Have you seen my phone?")
+-        assert said.startswith("I last saw your phone ") and naming in turn.memories
+-        named = robot.things.named("phone", ["phone"])
+-        lines = robot.named_evidence(Turn(speech_start=time.time() + 1), named)[0]
+-        assert lines[0].startswith("The visitor's phone: a gold keypad phone, named ")
+-        assert lines[1].startswith("Matched sighting: phone, last seen "), lines
++        said, turn = lines(robot, "Have you seen my phone?")
++        assert said[0].endswith("the visitor named their phone, a gold keypad phone")
++        assert said[1:2] == ["The visitor's phone is not in view now."], said
++        assert said[2].endswith("the visitor's phone, last seen.") and naming in turn.memories
+         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
+-        assert ask(robot, "Where is my phone?")[0] == "Yes, your phone is here now."
++        assert lines(robot, "Where is my phone?")[0][-1] == MINE
+         mine = [s for s in robot.memory.sightings(time.time() + 1, 9) if s.get("named")]
+         assert [s["region"] for s in mine] == ["right", "center"], "a new track is matched"
+         show(robot, [], LOST + 1)
+         show(robot, [(BLACK, CENTER)])
+-        assert ask(robot, "Is this my phone?")[0] == "No, I don't think this is your phone."
+-        assert ask(robot, "Where is my phone?")[0] == "I see a phone, but I am not sure it " \
+-            "is yours.", "a same-kind phone under MATCH is never called the visitor's"
++        assert lines(robot, "Is this my phone?")[0][1] == OTHER
++        assert lines(robot, "Where is my phone?")[0][1] == OTHER, \
++            "a same-kind phone under MATCH is never called the visitor's"
+         show(robot, [], LOST + 1)
+-        assert ask(robot, "Where is my phone?")[0].startswith("I last saw your phone ")
++        assert lines(robot, "Where is my phone?")[0][-1].endswith("phone, last seen.")
+         robot.memory.shard.close()
+         robot.things.shard.close()
+ 
+         robot = open_robot(Path(tmp))  # a restart
+         show(robot, [(GOLD, LEFT)])
+-        assert ask(robot, "Where is my phone?")[0] == "Yes, your phone is here now."
+-        assert ask(robot, "Do you remember my phone?")[0].startswith("Yes, I remember your phone.")
++        assert lines(robot, "Where is my phone?")[0][-1] == MINE
++        assert lines(robot, "Do you remember my phone?")[0][-1] == MINE
+         said, turn = ask(robot, "Forget my phone.")
+         assert said == "Done. I have forgotten your phone." and store(robot, turn) == 0, \
+             "the forget turn is not stored: it would be a new statement about the phone"
+         assert not robot.memory.points([naming]), "the naming turn's frame and words go too"
+         assert not [s for s in robot.memory.sightings(time.time() + 1, 99) if s.get("named")]
+-        assert ask(robot, "Is this my phone?")[0] == "I don't know which phone is yours."
+-        assert ask(robot, "Do you remember my phone?")[0] == "No, I don't know which phone " \
+-            "is yours."
++        assert lines(robot, "Is this my phone?")[0] == NONE
++        assert lines(robot, "Do you remember my phone?")[0] == NONE
+         robot.memory.shard.close()
+         robot.things.shard.close()
+ 
+         robot = open_robot(Path(tmp))
+-        assert ask(robot, "Where is my phone?")[0] == "I don't know which phone is yours."
++        assert lines(robot, "Where is my phone?")[0] == NONE
+         assert not any("phone" in x for x in statements(robot)), "nothing of it after a restart"
+         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
+         hold(robot, RIGHT)
+@@ -133,7 +141,7 @@ def test_things(monkeypatch) -> None:
+         robot.focus.thaw()
+         show(robot, [], LOST + 1)
+         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
+-        assert ask(robot, "Can you see my phone?")[0] == "Yes, your phone is here now."
++        assert lines(robot, "Can you see my phone?")[0][-1] == MINE
+         robot.memory.shard.close()
+         robot.things.shard.close()
+ 
+@@ -189,7 +197,8 @@ def test_ignore(monkeypatch) -> None:
+         turn = Turn(speech_start=time.time() + 1)
+         assert robot._told(v, turn) == [], "a statement about chairs is not recalled"
+         turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1)
+-        assert robot._sighted(turn) == "I am ignoring chairs, so I do not remember any."
++        assert robot._seen(turn, frame, True) == [
++            "You were asked to ignore chairs: you do not remember them."]
+         assert ask(robot, "You can stop ignoring chairs now.")[0] == \
+             "Okay, I will notice chairs again."
+         assert [m["said"] for m in robot._told(v, turn)] == ["My chair at home is red."]

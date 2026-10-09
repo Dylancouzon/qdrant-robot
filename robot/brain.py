@@ -67,6 +67,8 @@ SYSTEM = (
 CHANGED = "The view has changed since your last answer.\n"
 # "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
 PAST = "The visitor asks about the past: answer from the lines above.\n"
+# Before the evidence, after the image, so the prefilled prefix holds (shape I, D74).
+EVIDENCE = "Answer from these memories; if one answers the question, use it.\n\n"
 # Main object first: recall answers with the first thing a caption names (prompt probes, D29).
 CAPTION = ("Answer in this form: 'Main object: <the most prominent object>. Around it: "
            "<other things, with left, center, or right>.'")
@@ -150,7 +152,8 @@ def messages(history: list[dict], now: dict | None, memories: list[str] = (), fa
         text = "".join(f"{title}:\n- " + "\n- ".join(lines) + "\n\n"
                        for title, lines in blocks if lines)
         note = (CHANGED if changed and history else "") + (PAST if past else "")
-        content.append({"type": "text", "text": f"{text}{note}Visitor: {question}"})
+        lead = EVIDENCE if memories or told else ""
+        content.append({"type": "text", "text": f"{lead}{text}{note}Visitor: {question}"})
     return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
 
 
@@ -244,6 +247,9 @@ if __name__ == "__main__":
     m = messages([], now, ["2 minutes ago: a red mug"], ["Qdrant is written in Rust."], "Hi?")
     text = m[-1]["content"][-1]["text"]
     assert m[-1]["content"][0] == now and "Memories:" in text and "Facts:" in text
+    assert text.startswith(EVIDENCE), "the evidence instruction follows the image"
+    assert not messages([], now, facts=["x"], question="Hi?")[-1]["content"][-1]["text"].startswith(
+        EVIDENCE), "facts alone are not memories"
     assert messages([], now)[-1]["content"] == [now], "the prefill prompt is a prefix"
     hist = [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello!"}]
     note = messages(hist, now, question="And now?", changed=True)[-1]["content"][-1]["text"]

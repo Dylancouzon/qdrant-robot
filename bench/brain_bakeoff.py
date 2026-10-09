@@ -4,11 +4,15 @@ in logged replays (same history, evidence lines, and fixture frame) through one 
 several prompt shapes, then judges each shape with eval/judge.py (three votes, cached).
 
     .venv/bin/python -m bench.brain_bakeoff qwen3vl-2b [A,B,C,...]   (Homebrew llama-server)
+    .venv/bin/python -m bench.brain_bakeoff --host dylan@192.168.1.74 qwen3vl-2b A   (RTX 3080)
+    .venv/bin/python -m bench.brain_bakeoff parity <bake-off files>   (variant A vs the robot)
 
-Code answers (identity, named objects, verbatim facts) stay as logged: v1 keeps them in code.
+Code answers (identity, actions, verbatim facts) stay as logged: v1 keeps them in code.
 """
 import json
 import re
+import shlex
+import socket
 import subprocess
 import sys
 import tempfile
@@ -28,6 +32,21 @@ SETS = {  # name: (cases, logged replay whose prompts are replayed)
     "m2b": ("eval/probes/m2b.jsonl", "2026-10-08-replay-1791479641.jsonl"),
     "m2c": ("eval/probes/m2c.jsonl", "2026-10-08-replay-1791484406.jsonl"),
 }
+HOSTS = {  # where llama-server runs: (binary, GGUF folder, GPU lock, machine, llama.cpp build)
+    None: ("llama-server", str(brain.GGUF), None, "mac-m5pro",
+           "homebrew 0.6.0 build 11429 d81235049 (Metal)"),
+    # Dylan's RTX 3080 (WSL2), set up by ~/qdrant-robot-box/{cuda,build}.sh plus orin.patch;
+    # llama-server-orin sets the Orin's 8 SMs and compute capability 8.7, so kernels split
+    # and pick their paths as on the Jetson.
+    "dylan@192.168.1.74": ("qdrant-robot-box/llama-server-orin",
+                           "qdrant-robot-box/models/gguf", "qdrant-robot-box/gpu.lock",
+                           "box-rtx3080",
+                           "9c2e0e4+orin.patch CUDA 13.2.86 sm_86 NO_VMM NSM=8 CC=870"),
+    "robot": ("/home/qdrant/qdrant-robot/shared/src/llama.cpp/build/bin/llama-server",
+              "/home/qdrant/qdrant-robot/shared/models/gguf",
+              "/home/qdrant/qdrant-robot/shared/gpu.lock", "qdrant-robot",
+              "9c2e0e4 CUDA 13.2 sm_87 NO_VMM (Release)"),
+}
 EVIDENCE = ("Memories", "The visitor told you")  # Facts are knowledge, not memories
 PAST_NOTE = brain.PAST.strip()
 CITE = re.compile(r"\s*\[\d+\]")
@@ -44,7 +63,7 @@ DEMOS = (  # H: counterfactual demonstrations, where only the memory gives the a
 def parse(text: str) -> tuple[list[tuple[str, list[str]]], str, str]:
     """A logged user text as (blocks of (title, lines), notes, question): the inverse of
     brain.messages."""
-    *blocks, tail = text.split("\n\n")
+    *blocks, tail = text.removeprefix(brain.EVIDENCE).split("\n\n")
     notes, question = tail.rsplit("Visitor: ", 1)
     return [(b.split(":\n- ", 1)[0], b.split(":\n- ", 1)[1].split("\n- ")) for b in blocks], \
         notes, question
@@ -109,10 +128,20 @@ def frames(cases: Path) -> dict[str, Path]:
     return out
 
 
-def serve(model: str) -> subprocess.Popen:
-    args = ["llama-server", *brain.server_args(model)[1:]]
-    proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+def serve(model: str, host: str | None) -> subprocess.Popen:
+    """llama-server with the robot's arguments, on the Mac or over SSH on `host` behind a
+    tunnel; the remote server waits for the host's GPU lock and stops when SSH closes."""
+    server, gguf, lock, *_ = HOSTS[host]
+    args = [server, *(a.replace(str(brain.GGUF), gguf) for a in brain.server_args(model)[1:])]
+    if host:
+        port = brain.URL.rsplit(":", 1)[1]
+        args = ["ssh", "-o", "ExitOnForwardFailure=yes", "-L", f"{port}:127.0.0.1:{port}", host,
+                f"exec 9>{lock}; flock 9; {shlex.join(args)} & read _; kill $!"]
+    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
     for _ in range(600):
+        if proc.poll() is not None:
+            raise RuntimeError(f"llama-server exited with {proc.returncode}")
         try:
             urllib.request.urlopen(f"{brain.URL}/health", timeout=1).read()
             return proc
@@ -130,10 +159,10 @@ def decode_speed() -> float:
         return json.load(r)["timings"]["predicted_per_second"]
 
 
-def replay(model: str, variants: list[str], run: str) -> list[Path]:
+def replay(model: str, variants: list[str], run: str, host: str | None = None) -> list[Path]:
     import cv2
     b = brain.Brain.__new__(brain.Brain)  # the robot's answer path, on a server started here
-    proc = serve(model)
+    proc = serve(model, host)
     try:
         speed = decode_speed()
         system = json.loads((OUT / SETS["m2"][1]).read_text().splitlines()[-1])["system"]
@@ -174,8 +203,8 @@ def replay(model: str, variants: list[str], run: str) -> list[Path]:
             path = OUT / f"2026-10-08-bakeoff-{model}-{name}-{run}.jsonl"
             weights, mmproj, _ = brain.MODELS[model]
             summary = {"summary": "brain_bakeoff", "model": model, "set": name, "cases": cases,
-                       "replayed": logged, "variants": variants, "machine": "mac-m5pro",
-                       "llama_cpp": "homebrew 0.6.0 build 11429 d81235049 (Metal)",
+                       "replayed": logged, "variants": variants, "machine": HOSTS[host][3],
+                       "llama_cpp": HOSTS[host][4],
                        "decode_tok_s": round(speed, 1), "max_tokens": brain.MAX_TOKENS,
                        "image_max_tokens": 256, "context": 2048,
                        "gguf_mb": round(sum((brain.GGUF / f).stat().st_size
@@ -210,6 +239,18 @@ def judge(path: Path, chunk: int = 80) -> None:
                 part.write_text("\n".join(lines[:end]) + "\n")
             subprocess.run([sys.executable, str(ROOT / "eval/judge.py"), str(part), str(steps)],
                            stdout=subprocess.DEVNULL)
+
+
+def parity(path: Path) -> None:
+    """How many brain answers under variant A (the robot's own prompt) are identical to the
+    answers the robot logged, so a machine can stand in for the Jetson."""
+    rows = [r for r in map(json.loads, path.read_text().splitlines()) if "id" in r]
+    meta = json.loads(path.read_text().splitlines()[-1])
+    logged = {r["id"]: r["answer"].strip() for r in map(
+        json.loads, (OUT / meta["replayed"]).read_text().splitlines()) if "id" in r}
+    a = [r for r in rows if r["variant"] == "A" and not r["code"]]
+    print(f"{meta['machine']} {meta['model']} {meta['set']}: "
+          f"{sum(r['answer'] == logged[r['step']] for r in a)}/{len(a)} identical to the robot")
 
 
 def table(paths: list[Path]) -> None:
@@ -260,11 +301,20 @@ if __name__ == "__main__":
     assert shape("I", "S", text, img)[1]["content"][0] == img, "I keeps the image first"
     assert shape("B", "S", text, img)[1]["content"][1] == img
     print("selftest ok")
-    if sys.argv[1:2] == ["judge"]:
-        for p in sys.argv[2:]:
+    host, argv = None, sys.argv[1:]
+    if argv[:1] == ["--host"]:
+        host, argv = argv[1], argv[2:]
+        with socket.socket() as s:  # a free port: the tunnel's local end, and the remote port
+            s.bind(("127.0.0.1", 0))
+            brain.URL = f"http://127.0.0.1:{s.getsockname()[1]}"
+    if argv[:1] == ["judge"]:
+        for p in argv[1:]:
             judge(Path(p))
-    elif sys.argv[1:2] == ["table"]:
-        table([Path(p) for p in sys.argv[2:]])
-    elif sys.argv[1:]:
-        variants = list(sys.argv[2] if len(sys.argv) > 2 else "ABCDEFGH")
-        print(*replay(sys.argv[1], variants, str(int(time.time()))), sep="\n")
+    elif argv[:1] == ["table"]:
+        table([Path(p) for p in argv[1:]])
+    elif argv[:1] == ["parity"]:
+        for p in argv[1:]:
+            parity(Path(p))
+    elif argv:
+        variants = list(argv[1] if len(argv) > 1 else "ABCDEFGH")
+        print(*replay(argv[0], variants, str(int(time.time())), host), sep="\n")

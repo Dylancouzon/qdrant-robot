@@ -23,3 +23,8 @@ As of 2026-10-08. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | A face step before every turn with history | About 60 ms before the first token | Gate on scene change or run it during speech | V1-B report |
 | Bake-off harness: a running server can answer the health check before the requested model loads | A run labeled with the wrong model | Check the child process and the model identity | reviews/20261008-234551-20256-review.md |
 | Bake-off harness: judge failures ignored | A partial verdict file unnoticed | Check the judge's exit code | same |
+| Bake-off shape I adds the evidence instruction twice on newer prompts | Misleading shape comparisons | Add it only when absent | reviews/20261009-011200-49661-review.md |
+| 64 recent sightings of one kind hide older kinds | A missing memory line | Page farther back if a live visit shows it | same |
+| Sightings carry no details (colour, accessories) | "Which teddy had the hat?" fails | Detail from the crop or caption at sighting time | V1-E report |
+| TOLD_MIN 0.5 lets unrelated statements through | Odd memory lines ("talk at four" for minutes) | Calibrate on dev with absent memories | V1-E report |
+| Commands stored before V1-E come back as told lines in old shards | False ownership in old memory | Retention expires them (12 h) | V1-E report |

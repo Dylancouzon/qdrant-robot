@@ -4,36 +4,23 @@ Last updated: 2026-10-08 10:40, by the lead. Rewrite, do not append.
 
 ## Active task
 
-**Breadth first (D40):** every feature end to end on the Jetson, known gaps carried here, tuning after M3. M1 works end to end (talks, sees, recalls, knows Qdrant); its accuracy and latency targets stay unmet below.
+Paused 2026-10-09 01:15 at a clean point (Dylan). v1 runs end to end on the Jetson (D73, D75): Hey Edgy (arm A), visitor-scoped memory and history, consent offer after a name (D69), faces (M3 33/33, zero false identities), named objects with DINOv2 (D64), focus object and booth screen with the memory panel (D67), evidence fixes (D75), decode pause (first audio about 1.4 s p50 with audio). Code answers stay; one voice ties them (research/one-voice.patch).
 
-**M2.2a done** (D48): sighting questions answered in code; one-time probes 7/8. **Next active: M2.2c live-track stability** (D47): majority label per track, merge a short track into a neighbor with the same label and side, bound stored sightings; measure on `shared/clips/live-items-1.avi` (needs a clip source in the replay) and the 64-window question.
+Next session, in order:
 
-Next, in order (D55, D61, D62):
+1. Rule 6 check: a fresh one-time unseen probe set for the V1-E evidence changes (objects removed, gone, still there, ownership), run once on the Jetson; record the m2 gain (39 -> 44/74, dev-only) as confirmed or not.
+2. One voice decision: rerun research/one-voice.patch vs the code answers with the box (bench/brain_bakeoff.py --host dylan@192.168.1.74) for prompt and brain variants, then once on the Jetson; retire the code answers when not worse (D61, D74).
+3. Wire the remaining v1 pieces only if cheap: the greeting (D63), intents shard (D62), Formula decay and Rrf (D62). Otherwise straight to:
+4. Live test day with Dylan (human checklist below; speaker first if it has arrived): faces at distance, real objects, Hey Edgy in noise, focus in a crowd, echo; record everything as fixtures; then promote the edge cases that actually happen (research/edge-cases.md).
+5. After the live day (D62): decide optimizations and training from the biggest measured gaps (brain size: the 4B needs about 400 to 900 MB freed, D68; detector hand class; LoRA on the 3080 box).
 
-1. M2.2b (builder running): object naming actions, DINOv2 matching, forget, ignore; recall as retrieval.
-2. D60 identity rulings and the video view hook (D59) in robot/main.py.
-3. Latency: the TTS first phrase takes 0.53 s (Kokoro should be about 0.1 s): measure alone vs during decode, fix.
-4. RAM budget per component with everything active, what can be freed, and whether Qwen3-VL-4B fits (D62: squeeze the bigger model).
-5. Assistant v1 (D61, D62): always retrieve with calibrated per-shard minimum scores; retrieval lines into the brain; actions by rules, then a Qdrant intents shard (replaces route.py), then confirmation; teach the focus object with confirmation (view labels "Smartphone?" or "???" or the name); time-decay Formula and Rrf of statements and sightings; memory panel on the view; answers toward 200 tokens with context and barge-in checked; 2B vs 4B evidence use; compare with today's code answers, then delete them; drop left and right; first-person statements scoped to the visitor, general ones shared (D70).
-6. M2 and M3 gates; live test day (human checklist); then decide optimizations and training from the biggest measured gaps.
-7. M4: speaker (ordered), offline cold start, eight-hour run.
+Running jobs: none. The 3080 box (dylan@192.168.1.74) is idle; ~/qdrant-robot-box holds llama.cpp 9c2e0e4 and the GGUFs.
 
-Stop (D55, D71): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks; edge cases go to research/edge-cases.md until v1 is tested end to end.
+## Where to read first
 
-Running jobs: one builder, V1-E (evidence quality: details, no left/right, no contradictions, missing told lines, ownership only on strong matches, prompt shape I; then paired retrieval-into-brain vs code answers on the Jetson; delete the code answers if not worse, D74). Fast checks on the Mac bake-off harness while building, one full Jetson set at the end.
-
-## Known gaps (carried, D40)
-
-- Audio in the integrated visit (D58): "Qdrant hatch" for "Qdrant Edge"; a short opener ("Okay, so...") splits a question.
-- Privacy (D54): a turn frame showing a visitor who was not identified in it survives "forget me" until 12 h retention evicts it.
-- Live camera (D47): tracks fragment and labels flicker on real frames (52 tracks, 11 relabeled, in a 90 s clip); sightings are unbounded (185 in a 30-minute soak). Next M2 work: majority label per track, merge short tracks, bound stored sightings.
-- M2 answers: the 2B ignores sighting lines; the detector misses objects outside its 50-word vocabulary or at low score (D43). Decode 28.2 tok/s with the detector at 15 fps (target 30).
-- Swap grows at in-process replay restarts (44 to 756 MB), with or without the detector; a real restart is a new process.
-- Answers: real-voice dev 42/47 (89%), held-out real voices 18/26 (69%, use 2 of D29) against 90%. Sight naming in clutter is the main miss (D39: more image tokens did not help).
-- Latency: first synthesized audio 1.45 s p50 dev, 1.58 s held-out, against 1.2 s; no speaker yet.
-- A pause over 0.35 s after a short fragment splits the question (knowledge-more-2, 1.34 s).
-- The 2B sometimes ignores "The visitor told you" lines (intro-3, small-talk-3 in oracle).
-- Held-out leaks: M1 held-out reuses dev frame `live/closet-night.jpg`; `bench/results` holds held-out transcripts.
+- research/lessons.md: every avenue explored and every pitfall of 2026-10-08/09, with decision links. Read it after this file.
+- DECISIONS.md D35 to D75 (today's work); research/v1-plan.md (the adopted v1 plan); research/booth-ux.md (focus, screen, turn-taking); research/assistant-design.md; research/grounding.md (brain bake-off); research/edge-cases.md (logged, not fixed); research/faces.md, research/m2-design.md, research/m3-design.md, research/wakeword.md, research/sight.md, research/endpointing.md; research/one-voice.patch (retrieval-into-brain variant, not applied).
+- gates/review.md rules 6 (overfitting), 7 (proportion), 8 (v1: log edge cases).
 
 ## Robot access
 
