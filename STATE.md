@@ -20,7 +20,7 @@ Next, in order (D55, D61, D62):
 
 Stop (D55, D71): privacy-mechanism expansion, tracker polish, fixture growth beyond acceptance checks; edge cases go to research/edge-cases.md until v1 is tested end to end.
 
-Running jobs: one builder, V1-B (minimal v1 end to end: retrieval into the brain with per-shard minimum scores, compare then delete the code answer paths, Hey Edgy arm A, naming via Focus.target(), memory panel; then the whole-robot test). Edge cases go to research/edge-cases.md (D71).
+Running jobs: one builder, V1-E (evidence quality: details, no left/right, no contradictions, missing told lines, ownership only on strong matches, prompt shape I; then paired retrieval-into-brain vs code answers on the Jetson; delete the code answers if not worse, D74). Fast checks on the Mac bake-off harness while building, one full Jetson set at the end.
 
 ## Known gaps (carried, D40)
 
