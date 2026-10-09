@@ -4,31 +4,21 @@ Last updated: 2026-10-09, by the lead. Rewrite, do not append.
 
 ## Active task
 
-P1 handoff correction is complete (D83): execution deadlines removed and gate references verified. Implementation starts next session at F0 in research/capability-plan.md. Read D79 through D83 and research/lessons.md first. Raise the capability ceiling for sustained conversation, perception, and recall on 8 GB, with Qdrant Edge central. All deployed inference stays on the Jetson.
+Overnight session starts from main eb746fe on spike/overnight-2026-10-09. The branch exists on origin. Session reconciliation is complete; F0 is next (D79 through D83, research/capability-plan.md). Freeze 24 development questions and compare original versus verified sufficient evidence on the same 2B and settings. Specialize only if at least eight sufficient-evidence answers fail. Freeze the independent challenge before tuning; acceptance remains on the Jetson.
 
-Dylan makes Jetson, WSL 3080, and Mac available for ongoing work without a preset deadline (D83). Sol is reviewer (explicit `--model gpt-6.1-sol`); Sol 6.1 low agents are fresh implementation workers; Luna does research. Use WSL wherever it accelerates work. Saved and independent real video supports nighttime comparisons. Physical camera/audio/echo checks remain separate. Measured OS changes on dedicated robot hardware are authorized with SSH and rollback preserved.
+Dylan requests frequent commits and pushes on this branch and safeguards against hung processes. Finish each scoped task, run its review, and push its evidence checkpoint. Long jobs need progress signals, bounded command watchdogs, and recorded recovery. Poll non-blocking jobs; diagnose absent progress before stopping anything. D83 still allows healthy work without an overall deadline.
 
-Initial P1 review: Astra counsel GO WITH CHANGES resolved; Sol 6.1 PASS in reviews/20261009-015822-12641-review.md for the earlier plan SHA256. D83 changes CLAUDE.md, research/capability-plan.md, research/lessons.md, tools/gate.py model defaults, STATE.md, and DECISIONS.md. Gate criteria, runtime, models, OS, fixtures, and raw evidence remain unchanged. Sol 6.1 PASS: reviews/20261009-021318-31433-review.md, with corrected plan SHA256 e391f13e88a7823102e91b2ec48a44188f669d8277ed3061a956b1b257f33ed7.
+Current choices: direct source-linked event/dialogue retrieval first; response distillation plus LoRA only after F0 and tiny export qualification; stronger pretrained detector before training. Larger runtimes and OS capacity changes remain alternatives needing paired evidence. Identity, consent, deletion, Jetson-only inference, provenance, and rollback remain fixed. See research/capability-plan.md and research/lessons.md.
 
-Current options are hypotheses, not locked choices. Reassess after the first paired result and at least hourly (D81). Record exact evidence, decision, and reopening condition for each route. Complete validation before adoption. Continue healthy work as long as needed; choose or stop routes by evidence, prerequisites, and resources.
+Unresolved: D75 M2 44/74 is development-only; unseen probes remain pending. research/one-voice.patch remains unadopted. Live conversation paging has no established cause. H1 native pytest shutdown abort remains unresolved. The new 48-question challenge and continuous baseline have not run.
 
-| Route | Current status and selection condition |
-| --- | --- |
-| Source-linked Edge events and dialogue | Preferred first build: recency-only captions and lost conversation constrain the foundation. Compare direct retrieval before summaries. |
-| Response distillation plus LoRA | Candidate: only if correct-evidence answers still fail and tiny train/export/image inference succeeds. Teacher targets plus LoRA already constitute response distillation. |
-| Stronger pretrained detector | Candidate: compare nano/small at matched false positives on independent real frames. Diverse views and focused descriptions address distinct recognition/detail gaps. |
-| Detector training | Deferred until reliable annotation, coverage, and a residual detector failure justify it. |
-| Larger VLM/runtime or split text/vision | Open alternatives: qualify compatibility, measured quality, integrated headroom, and latency; earlier failures are evidence, not permanent bans. |
-| OS/provider capacity changes | Eligible when a measured bottleneck blocks capability; no assumed RAM gain from service removal or disabling swap. |
-| Logit/feature distillation | Deferred until response distillation exposes a specific limitation worth the extra alignment and resource cost. |
+Running jobs: no robot or benchmark service on Jetson; release 4387936b8ee9, same boot 09b4bb27-f975-441c-9d00-7af446ec7de6, 105 GB free, about 6,037 MiB idle available, 106 MiB allocated swap. WSL GPU idle at 362/10,240 MiB; Ollama daemon is resident without a loaded model. Existing disney-demo-qdrant container belongs to another project; leave it alone. WSL has about 798 GB free and 6,216 MiB allocated swap. These idle figures establish no runtime safety.
 
-Still unresolved: D75's M2 gain from 39 to 44/74 is development-only until its unseen probes run; research/one-voice.patch remains unadopted. Live conversation paging has no established cause. Keep these limits visible during the new comparisons.
+Mac awake process: PID 37805, repo directory, `caffeinate -dimsu`, reviews/overnight-awake.log. Claude and Codex authentication work. gpt-6.1-sol and gpt-6-luna exist in the local model cache; gate defaults select Sol 6.1. Remaining provider usage is unverified because the authentication commands expose no quota. core.hooksPath is tools/githooks. No local gate or benchmark worker was found at reconciliation.
 
-First evaluator brief: current FileCamera reads still images, so qualify paced video input before using external footage. Encode the 30-minute challenge in one continuous runtime instance; test restarts separately. Keep source groups and final answers out of training. Prior Objectron exclusions and the COCO manifest gap are in the plan.
+Changed paths: STATE.md, research/lessons.md, and the session status evidence. Status evidence: bench/results/2026-10-09-session-status-1791526671.jsonl. Prior P1 review PASS: reviews/20261009-021318-31433-review.md. D83 and the plan criteria remain unchanged. Session status review PASS: reviews/20261009-021753-38870-review.md.
 
-Running jobs: none from this correction; Sol review finished with PASS. Local checks passed in 14.82 s. No remote work from this correction. Initial P1 researchers and reviews finished. Final read-only check at 06:05 UTC found Jetson release 4387936b8ee9, no robot/benchmark jobs, and the WSL GPU idle with no model loaded. WSL Docker daemon works; GPU-container passthrough is untested. Recheck jobs, release, ownership, and access before execution. H1's native pytest shutdown failure remains unresolved.
-
-Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, then F0's source contract, evaluator brief, and small training/export preflight. Do not repeat the broad brain/prompt sweep without a changed hypothesis. The next session implements; this session only prepares and commits the reviewed handoff.
+Next command: `git add STATE.md DECISIONS.md research/lessons.md bench/results/2026-10-09-session-status-1791526671.jsonl reviews/20261009-021753-38870-review.md`, commit and push; then freeze F0's 24 development comparisons.
 
 ## Where to read first
 
@@ -63,7 +53,7 @@ Next command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`, th
 
 ## Git
 
-Standing approval to commit and push (CLAUDE.md). Remote `origin` = github.com/Dylancouzon/qdrant-robot (private). Working branch: main, starting this correction at f6dce4f. V1-E, H1, and initial P1 are pushed. Commit only reviewed handoff guidance, matching gate model defaults, lead records, and the new review.
+Dylan requests commits and pushes throughout this overnight session. Working branch: spike/overnight-2026-10-09, from main eb746fe, tracking origin/spike/overnight-2026-10-09. Main is unchanged. Commit each reviewed task with its evidence and push this branch. Remote origin is github.com/Dylancouzon/qdrant-robot (private).
 
 ## Checkpoints
 

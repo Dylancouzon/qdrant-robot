@@ -314,3 +314,8 @@ Dylan removes the overall time limit. Readiness phases replace session, experime
 This supersedes scheduling limits in D79, D81, and D82, including clock-based abandonment. Measurement protocols, resource controls, command watchdogs, and architecture choices remain unchanged.
 Design and review still check alternatives, over-engineering, scope, and overfitting; milestone review checks drift and acceptance. Align design/task defaults with Sol 6.1 and link exact gate files and commands in the handoff. Astra remains milestone reviewer and counsel. Evidence: Dylan's corrections; research/capability-plan.md.
 Validation: local checks passed in 14.82 s; Sol 6.1 PASS reviews/20261009-021318-31433-review.md. Plan SHA256 e391f13e88a7823102e91b2ec48a44188f669d8277ed3061a956b1b257f33ed7. Gate criteria and robot behavior unchanged.
+
+## D84 2026-10-09: Preserve overnight checkpoints on a dedicated branch (Dylan)
+Start spike/overnight-2026-10-09 from main eb746fe; commit and push reviewed tasks frequently with their evidence. Main remains unchanged. F0 follows D79 through D83.
+Reconciliation found Jetson release 4387936b8ee9 and both GPUs idle; preserve the other project's WSL container. Use bounded connection checks, command watchdogs, and progress-based recovery; healthy experiments have no overall deadline.
+Evidence: bench/results/2026-10-09-session-status-1791526671.jsonl; Sol 6.1 status review PASS reviews/20261009-021753-38870-review.md. Idle memory and allocated swap establish no active-turn safety. Rejected: waiting indefinitely without a progress check or restarting jobs without inspecting ownership.

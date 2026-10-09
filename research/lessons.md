@@ -98,5 +98,7 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 
 ## Machines
 
+- Overnight 2026-10-09 starts on spike/overnight-2026-10-09 from main eb746fe. Keep command watchdogs separate from healthy experiment duration (D83). Reconcile boot IDs, release, service ownership, and progress before restarting jobs. SSH checks use a 10 s connection limit, keepalives, and a 45 s outer watchdog. The WSL disney-demo-qdrant container belongs to another project; leave it running. Authentication commands do not expose remaining usage.
+
 - Robot: `ssh robot` (qdrant-robot.local, user qdrant). See STATE.md, Robot access.
 - 3080 box: `ssh dylan@192.168.1.74` (key auth from the Mac; WSL2 Ubuntu 26.04, RTX 3080 10 GB, 16 cores, 25 GB RAM; no passwordless sudo). ~/qdrant-robot-box: cuda.sh (CUDA 13.2.86 in user space; system CUDA 12.6 fails with GCC 15), build.sh (uv venv with cmake and ninja, llama.cpp 9c2e0e4, orin.patch, sm_86, GGML_CUDA_NO_VMM=ON), llama-server-orin (sets GGML_CUDA_NSM=8, GGML_CUDA_CC=8.7), models/ (GGUFs checked against models.json). Ollama 0.35.1 with gemma4:12b and qwen3.5:9b is also installed: not for parity (different llama.cpp and packaging); possible later as a stronger judge or data generator. Run: `.venv/bin/python -m bench.brain_bakeoff --host dylan@192.168.1.74 <brain> <shape>`.
