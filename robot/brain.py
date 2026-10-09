@@ -77,8 +77,23 @@ SYSTEM = (
     "listed facts, close to their wording; Qdrant is a vector search engine. Your memories "
     "and what the visitor told you are real: answer from them; 'do you remember X?' asks "
     "for X, so say X. Only when none of them answers a question about the past, say you do "
-    "not remember."
+    "not remember. Treat tool results as source evidence and earlier replies as possibly "
+    "outdated. Preserve source uncertainty. Do not infer possession, agency, or named "
+    "referents absent from the evidence."
 )
+EVIDENCE_TOOL = {"type": "function", "function": {
+    "name": "source_evidence",
+    "description": "Code-supplied camera observations, memories, visitor statements, and facts.",
+    "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
+}}
+
+
+def template(msgs: list[dict]) -> dict:
+    """The same dialogue template metadata for counting, prefill, and generation."""
+    return {"chat_template_kwargs": {"enable_thinking": False}, "tool_choice": "none",
+            **({"tools": [EVIDENCE_TOOL]} if any(m["role"] == "tool" for m in msgs) else {})}
+
+
 # "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
 PAST = "The visitor asks about the past: answer from the lines above.\n"
 EVIDENCE = "Answer from these memories; if one answers the question, use it.\n\n"
@@ -186,8 +201,9 @@ def messages(history: list[dict], now: str = "", memories: list[str] = (), facts
              ) -> list[dict]:
     """The dialogue prompt, text only. Without a question it is the prefix that prefill caches:
     the system prompt and the conversation. `now`: the observer's line about the speech-start
-    frame, with its capture time ("" when the turn does not look). `past`: the question is
-    about the past, so the answer comes from memories."""
+    frame, with its capture time ("" when the turn does not look). Evidence follows the
+    exact visitor question as one code-constructed call and matching tool result. `past`
+    adds the existing past-evidence hint to the result."""
     if question is None:
         return [{"role": "system", "content": SYSTEM}, *history,
                 {"role": "user", "content": [{"type": "text", "text": ""}]}]
@@ -197,9 +213,15 @@ def messages(history: list[dict], now: str = "", memories: list[str] = (), facts
                    for title, lines in blocks if lines)
     lead = EVIDENCE if memories or told else ""
     note = PAST if past else ""
-    return [{"role": "system", "content": SYSTEM}, *history,
-            {"role": "user", "content": [{"type": "text", "text":
-                                          f"{camera}{lead}{text}{note}Visitor: {question}"}]}]
+    msgs = [{"role": "system", "content": SYSTEM}, *history,
+            {"role": "user", "content": question}]
+    if camera or text:
+        msgs += [{"role": "assistant", "content": "", "tool_calls": [{
+            "id": "source_evidence", "type": "function",
+            "function": {"name": "source_evidence", "arguments": "{}"}}]},
+            {"role": "tool", "tool_call_id": "source_evidence",
+             "content": f"{camera}{lead}{text}{note}"}]
+    return msgs
 
 
 class Brain:
@@ -228,7 +250,7 @@ class Brain:
 
     def prefill(self, msgs: list[dict]) -> None:
         """Compute the dialogue cache for a prompt prefix; the next answer reuses it."""
-        with self._post({"messages": msgs, "max_tokens": 0}) as r:
+        with self._post({"messages": msgs, **template(msgs), "max_tokens": 0}) as r:
             r.read()
 
     def tokens(self, text: str) -> int:
@@ -238,7 +260,7 @@ class Brain:
     def rendered(self, msgs: list[dict]) -> int:
         """How many dialogue tokens `msgs` take, as the chat template renders them."""
         prompt = self._json("apply-template", {
-            "messages": msgs, "chat_template_kwargs": {"enable_thinking": False}})["prompt"]
+            "messages": msgs, **template(msgs)})["prompt"]
         return len(self._json("tokenize", {"content": prompt, "parse_special": True,
                                            "add_special": False})["tokens"])
 
@@ -275,7 +297,8 @@ class Brain:
                 return
         text = prior
         with self._post({"messages": msgs, "max_tokens": max_tokens, "stream": True,
-                         "repeat_penalty": 1.15}, url) as r:
+                         "repeat_penalty": 1.0 if url == URL else 1.15,
+                         **(template(msgs) if url == URL else {})}, url) as r:
             for delta in unecho(prior, _content(r)):
                 yield delta
                 text += delta
@@ -324,16 +347,16 @@ if __name__ == "__main__":
     assert sentences(two) == 2
     now = "0 seconds ago: a red mug on a desk"
     m = messages([], now, ["2 minutes ago: a blue cap"], ["Qdrant is written in Rust."], "Hi?")
-    text = m[-1]["content"][-1]["text"]
+    text = m[-1]["content"]
     assert text.startswith("Camera now:\n- " + now) and "Memories:" in text and "Facts:" in text
     assert EVIDENCE + "Memories:" in text, "the evidence instruction leads the memories"
-    assert not messages([], facts=["x"], question="Hi?")[-1]["content"][-1]["text"].startswith(
+    assert not messages([], facts=["x"], question="Hi?")[-1]["content"].startswith(
         EVIDENCE), "facts alone are not memories"
     hist = [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello!"}]
-    assert messages(hist)[:-1] == messages(hist, now, question="And now?")[:-1], \
+    assert messages(hist)[:-1] == messages(hist, now, question="And now?")[:len(hist) + 1], \
         "the prefill prompt is a prefix"
     assert all(c.get("type") == "text" for m in messages(hist, now, question="Hi?")
-               if isinstance(m["content"], list) for c in m["content"]), "no image for Granite"
+               if isinstance(m.get("content"), list) for c in m["content"]), "no image for Granite"
 
     # Evidence priority: the current observation, memories, and the output reserve are kept;
     # the oldest complete exchanges go first, and only whole exchanges.
@@ -346,8 +369,9 @@ if __name__ == "__main__":
         messages(turns[-len(kept) - 2:], now, ["2 minutes ago: a blue cap"], question="Hi?")
     ) + MAX_TOKENS, "as many exchanges as fit, no more"
     assert 0 < len(kept) < len(turns) and kept == turns[-len(kept):] and len(kept) % 2 == 0
-    assert kept[0]["role"] == "user" and msgs[1:-1] == kept, "the newest complete exchanges"
-    assert now in msgs[-1]["content"][0]["text"] and "a blue cap" in msgs[-1]["content"][0]["text"]
+    assert kept[0]["role"] == "user" and msgs[1:1 + len(kept)] == kept, \
+        "the newest complete exchanges"
+    assert now in msgs[-1]["content"] and "a blue cap" in msgs[-1]["content"]
     b.rendered = lambda msgs: CONTEXT_TOKENS
     try:
         b.context([], now, question="Hi?")

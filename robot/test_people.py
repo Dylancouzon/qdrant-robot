@@ -316,7 +316,7 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("What is this?", moved) is None
         assert abs(looked[-1][0] - moved.mean()) < 2 and looked[-1][1] == "What is this?", \
             "the observer sees the speech-start frame and the question"
-        text = turns[-1].prompt[-1]["content"][0]["text"]
+        text = turns[-1].prompt[-1]["content"]
         assert text.startswith("Camera now:\n- speech-start camera frame captured at ") and \
             f"{turns[-1].speech_start:.6f}, 0 seconds ago: {SEEN}" in turns[-1].observation
         said_at = turns[-1].prompt.index({"role": "user", "content": "I'm from Lisbon."})
