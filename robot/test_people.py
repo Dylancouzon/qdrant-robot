@@ -1,4 +1,5 @@
 """People memory on a real Edge shard with synthetic face vectors, and the identity answers."""
+import base64
 import tempfile
 from pathlib import Path
 
@@ -100,6 +101,15 @@ def test_face_step() -> None:
     assert face(faces, small) is None, "a face under MIN_FACE"
 
 
+SEEN = "a grey wall"  # what the fake observer says
+
+
+def brightness(image: dict) -> float:
+    """The mean pixel of an encoded frame (brain.jpeg)."""
+    data = base64.b64decode(image["image_url"]["url"].split(",", 1)[1])
+    return float(cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR).mean())
+
+
 def offer(name: str) -> str:
     return f"Nice to meet you, {name}! Want me to remember your face so I recognize you next time?"
 
@@ -116,7 +126,7 @@ def test_robot_identity(monkeypatch) -> None:
     import time
     from types import SimpleNamespace as Stub
 
-    from robot import main, memory
+    from robot import brain, main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
     from robot.main import FIRST_PERSON, Robot, Turn
     from robot.memory import Memory
@@ -124,8 +134,7 @@ def test_robot_identity(monkeypatch) -> None:
     from robot.text_embed import DIM as TEXT_DIM
     from robot.things import Things
 
-    steps = []
-
+    steps, looked = [], []  # looked: (mean pixel, question) of each observer call
     def fake_face(faces, frame):
         steps.append(1)
         k = int(frame[0, 0, 0])
@@ -146,12 +155,15 @@ def test_robot_identity(monkeypatch) -> None:
         robot.face, robot.since, robot.panel, robot.wake_word = None, 0, None, False
         robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
         robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
-        robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
+        robot.prefilled, robot.detections = None, 0
         robot.out = root / "out"
         robot.out.mkdir(exist_ok=True)
         robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
         robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "social"
-        robot.brain = Stub(prefill=lambda m: None, answer=lambda m, **k: (t for t in ["Okay."]))
+        robot.brain = brain.Brain.__new__(brain.Brain)  # the real budget, no servers
+        robot.brain.rendered = lambda msgs: 0
+        robot.brain.answer = lambda m, **k: (t for t in ["Okay."])
+        robot.brain.observe = lambda image, q: looked.append((brightness(image), q)) or SEEN
         robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
         robot.speaker = Stub(play=lambda pcm: None)
         return robot
@@ -219,10 +231,8 @@ def test_robot_identity(monkeypatch) -> None:
         assert turns[-1].identity["claimed"] == "Ana" and turns[-1].identity["face_px"] == 120
         assert turns[-1].identity["scores"][0][::2] == ["Ana", 1.0], "the two-shot value logged"
         track, ana_links = robot._visitor(), linked("Ana")
-        robot._look((ana, float(next(clock))))  # idle time prefills Ana's frame (_watch)
         ben = frames(2, 3)  # Ben steps into Ana's place: the track goes on
-        assert robot._visitor() == track and not robot._stale(ben), \
-            "and the prefilled look of Ana stays valid for his turn"
+        assert robot._visitor() == track
         assert ask("Do you remember me?", ben).startswith("I don't think we've met")
         assert linked("Ana") == ana_links, "his turn is not linked to her"
         assert ask("Who am I?", ben) == NOT_MET and linked("Ana") == ana_links, \
@@ -240,6 +250,10 @@ def test_robot_identity(monkeypatch) -> None:
         assert robot._visitor() == track, "her new track continued his lost one"
         assert ask("What's my name?", ana) == "You're Ana. I remember your face."
         assert ask("Thanks!", ana) is None
+        private = "I live in Lisbon."
+        assert ask(private, ana) is None
+        robot.prefilled = list(robot.history)
+        assert private in str(robot.history) and private in str(robot.prefilled)
         assert "Remember me, I'm Ben." in said() and "Nice to meet you, I'm Ana." in said()
         hers = robot.memory.points(linked("Ana"))
         held = {r.payload["frame"] for r in robot.memory.shard.scroll(memory.ScrollRequest(
@@ -247,6 +261,12 @@ def test_robot_identity(monkeypatch) -> None:
         assert hers and {f.name for f in (root / "frames").iterdir()} == held, \
             "the frames on disk are the turns' own: enrollment keeps no image"
         assert ask("Please forget me.", ana) == done("forget", "Ana", True)
+        assert robot.prefilled is None
+        assert "Lisbon" not in str(turns[-1].prompt) + str(turns[-1].told)
+        assert "Lisbon" not in str(robot.history)
+        assert ask("Where do I live?", ana) is None
+        assert "Lisbon" not in str(turns[-1].prompt) + str(turns[-1].told)
+        assert "Lisbon" not in str(robot.history)
         assert robot.people.identify(np.eye(DIM)[1]) is None
         assert robot.people.identify(np.eye(DIM)[2])[0] == "Ben", "only the face that asked"
         assert not robot.memory.points([p["id"] for p in hers])
@@ -291,6 +311,18 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("I'm from Lisbon.", cy) is None
         assert ask("Where am I from?", cy) is None and turns[-1].told == ["I'm from Lisbon."]
         assert "Lisbon" in str(turns[-1].prompt), "Cy's own exchanges stay in the prompt"
+        moved = cy.copy()
+        moved[1:] = 200  # the scene changes; fake_face still finds Cy (pixel 0, 0)
+        assert ask("What is this?", moved) is None
+        assert abs(looked[-1][0] - moved.mean()) < 2 and looked[-1][1] == "What is this?", \
+            "the observer sees the speech-start frame and the question"
+        text = turns[-1].prompt[-1]["content"][0]["text"]
+        assert text.startswith("Camera now:\n- speech-start camera frame captured at ") and \
+            f"{turns[-1].speech_start:.6f}, 0 seconds ago: {SEEN}" in turns[-1].observation
+        said_at = turns[-1].prompt.index({"role": "user", "content": "I'm from Lisbon."})
+        assert turns[-1].prompt[said_at + 1]["role"] == "assistant", \
+            "a scene change keeps the whole conversation, answers included (D111)"
+        assert turns[-2].observation == "", "a turn not about the present does not look"
         assert ask("So which town do I live in?", frames(5, 1)) is None, "a paraphrase"
         assert not any(FIRST_PERSON.search(x) for x in turns[-1].told) and "Lisbon" not in str(
             turns[-1].prompt), "a visitor replacing Cy within the window gets none of Cy's " \

@@ -1,6 +1,6 @@
 """The robot: hears a line, looks, recalls, answers aloud, and remembers what its detector
-tracks. One process; the LLM runs in a supervised llama-server child. Every turn logs its stage
-times and saves its answer audio.
+tracks. One process; the dialogue and observer models run in supervised llama-server children.
+Every turn logs its stage times and saves its answer audio.
 
     python -m robot.main                       camera, camera microphone, no speaker
     python -m robot.main --speaker plughw:1,0  ... and an ALSA speaker
@@ -70,8 +70,7 @@ from robot.things import (
 from robot.tts import RATE, Speaker, phrases
 from robot.view import Screen, View
 
-HISTORY_TURNS = 4  # the conversation window, in exchanges
-WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
+WATCH_S = 0.3      # how often idle time checks whether the prefilled conversation is stale
 SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
 # Camera rate: unthrottled detection halved LLM decode (research/detector.md).
 DETECT_FPS = 15
@@ -95,21 +94,6 @@ def _central(boxes: dict[int, tuple], width: int) -> int | None:
     return min(boxes, key=lambda t: abs(sum(boxes[t][::2]) / 2 - width / 2), default=None)
 
 
-def scene_change(a: np.ndarray, b: np.ndarray) -> float:
-    return float(np.abs(thumb(a).astype(np.float32) - thumb(b)).mean())
-
-
-@dataclass
-class Look:
-    """A frame whose prompt prefix, after `exchanges` exchanges, is in the brain's KV cache."""
-    frame: np.ndarray
-    taken: float                  # capture time: the evidence time of what the brain saw
-    image: dict
-    exchanges: int
-    changed: bool                 # the view differs from the previous turn's
-    history: list[dict]           # the conversation as prefilled with this frame
-
-
 @dataclass
 class Visitor:
     """What a person track carries for its life only (D49)."""
@@ -126,7 +110,9 @@ class Turn:
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
-    prompt: list = field(default_factory=list)  # the brain's messages without images or system
+    prompt: list = field(default_factory=list)  # the brain's messages without the system
+    observation: str = ""         # the observer's line on the speech-start frame, with its age
+    budget: dict = field(default_factory=dict)  # Brain.context: tokens and history kept
     frame_id: int = 0             # the frame this turn saw, stored as a memory
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
@@ -195,14 +181,13 @@ class Robot:
         self.stream: Iterator[str] | None = None  # the brain's answer while a turn decodes
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
+        # The conversation: complete exchanges that fit the dialogue budget (Brain.context).
         self.history: list[dict] = []
-        self.exchanges = 0                      # counts every exchange; history is capped
-        self.last_frame: np.ndarray | None = None  # the frame of the previous turn
+        self.prefilled: list[dict] | None = None  # the history whose prefix is in the cache
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
         self.lines: queue.Queue = queue.Queue()  # finished lines for the final transcript
         self.asked = 0                          # turns queued so far (one per heard line)
         self.turns: queue.Queue[Turn] = queue.Queue()  # finished turns, for replay and logs
-        self.ready: Look | None = None          # the frame whose prompt prefix is prefilled
         self.speaking = False                   # a visitor is mid-line: background work yields
         self.speech_start = 0.0
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
@@ -244,8 +229,8 @@ class Robot:
             self.memory = Memory(memory)
             self.things = Things(memory)
             self.named, self.ignored = self.things.labels(), self.things.ignored()
-            self.history, self.exchanges, self.ready = [], 0, None
-            self.last_frame, self.points, self.tracker = None, {}, Tracker()
+            self.history, self.prefilled = [], None
+            self.points, self.tracker = {}, Tracker()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
             self.since, self.panel = time.time_ns() // 1000, None
@@ -256,8 +241,8 @@ class Robot:
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
         self.start_frame = self.camera.latest()  # what the visitor sees as they speak
-        if self._stale(self.start_frame[0]):
-            self.jobs.put(("look", self.start_frame))
+        if self._stale():
+            self.jobs.put(("prefill",))
 
     def _heard_line(self, speech: np.ndarray, speech_end: float) -> None:
         self.speaking = False
@@ -275,11 +260,10 @@ class Robot:
             self.lines.task_done()
 
     def _watch(self) -> None:
-        # Keep a recent frame prefilled while nobody speaks, so a turn rarely waits for one.
+        # Keep the conversation prefilled while nobody speaks, so a turn rarely waits for it.
         while not self.closing.wait(WATCH_S):
-            shot = self.camera.latest()
-            if not self.speaking and self.jobs.empty() and self._stale(shot[0]):
-                self.jobs.put(("look", shot))
+            if not self.speaking and self.jobs.empty() and self._stale():
+                self.jobs.put(("prefill",))
 
     def _detect(self) -> None:
         # Detection and tracking at camera rate on the newest frame; sightings are written by
@@ -393,16 +377,15 @@ class Robot:
             p for t, p in self.points.items() if t not in self.away}))
         self.points = {t: p for t, p in self.points.items() if p not in evicted}
 
-    def _stale(self, frame: np.ndarray | None) -> bool:
-        """The prefilled look no longer matches `frame` or the conversation."""
-        return frame is not None and (self.ready is None or self.ready.exchanges != self.exchanges
-                                      or scene_change(self.ready.frame, frame) > SCENE_CHANGE)
+    def _stale(self) -> bool:
+        """The prefilled prefix no longer matches the conversation."""
+        return self.prefilled != self.history
 
     def _work(self) -> None:
-        # One worker: llama-server jobs run in order, and a turn reuses the last look.
+        # One worker: llama-server jobs run in order, one generation at a time.
         while (job := self.jobs.get()) is not None:  # None: close() stops the thread
-            if job[0] == "look":
-                self._look(job[1])
+            if job[0] == "prefill":
+                self._prefill()
             elif job[0] == "turn":
                 self._turn(*job[1:])
             elif job[0] == "sight":
@@ -413,21 +396,18 @@ class Robot:
                 self.memory.set(job[1], caption=caption)
             self.jobs.task_done()
 
-    def _look(self, shot: tuple[np.ndarray, float]) -> None:
-        changed = self.last_frame is not None and scene_change(
-            self.last_frame, shot[0]) > SCENE_CHANGE
-        # After the view changes, the brain's earlier answers describe a scene that is gone: keep
-        # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
-        history = [m for m in self.history if m["role"] == "user"] if changed else self.history
-        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
-        self.brain.prefill(brain.messages(history, look.image))
-        self.ready = look
+    def _prefill(self) -> None:
+        """Prefill the dialogue prefix: the system prompt and the conversation, text only."""
+        history = self.history
+        self.brain.prefill(brain.messages(history))
+        self.prefilled = history
 
     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
-        """Answer about the frame shown when this line's speech started, or about an earlier
-        look of the same scene; the frame used is the one stored as evidence. A line is
-        answered only after the wake phrase, or as a follow-up within CONVERSATION_S of the
-        last answer (D65); the wake phrase is not part of the question."""
+        """Answer about the frame shown when this line's speech started: the observer looks at
+        it for the question, and it is the frame stored as evidence. The conversation goes on
+        across scene changes; a new visitor ends it (D60, D70). A line is answered only after
+        the wake phrase, or as a follow-up within CONVERSATION_S of the last answer (D65); the
+        wake phrase is not part of the question."""
         heard = woken(turn.question)
         if self.wake_word and heard is None and \
                 turn.speech_start - self.last_line > CONVERSATION_S:
@@ -435,25 +415,25 @@ class Robot:
             self._log(turn)
             return
         turn.question = heard or turn.question  # "Hey Edgy." alone: the brain greets back
-        if self._stale(shot[0]):  # the scene changed after the last look
-            self._look(shot)
-        if (look := self.ready) is None:
+        if shot[0] is None:  # a typed line before the first frame at its speech start
+            shot = self.camera.latest()
+        if shot[0] is None:
             return  # no camera frame yet: nothing to answer about
+        now, taken = shot  # the frame at speech start: the turn's sight and stored evidence
         started, detections = time.time(), self.detections
         question = self.embed([turn.question])[0]
         found = self.knowledge.search(question)
         turn.facts = [fact for _, fact in found]
         turn.verbatim = bool(found) and found[0][0] >= VERBATIM
         past = about_past(turn.question)
-        recalled, memories = self._recall(turn, look.frame) if past else ([], [])
-        # The frame at speech start: the cached look may show an earlier visitor.
-        now, taken = (look.frame, look.taken) if shot[0] is None else shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
         # earlier exchanges or first-person statements reach this prompt.
         if self.history and self._converse(turn, self._whois(now)):
             self.history = []
-            self._look((now, taken))  # re-prefilled without the earlier exchanges
-            look = self.ready
+        track = self._visitor()
+        identity = self._identity(turn, now, track)
+        # Identity actions can delete evidence: retrieve only after they finish.
+        recalled, memories = self._recall(turn, now) if past else ([], [])
         statements = self._told(question, turn)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
@@ -461,28 +441,26 @@ class Robot:
                       "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
                           (f"seen: {line}", None) for line in memories]}
-        track = self._visitor()
-        recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
+        code = identity or self._things(turn) or shown(
             turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
-        ) or self._sighted(turn)
+        ) or self._sighted(turn) or (turn.facts[0] if turn.verbatim else None)
         turn.retrieved = time.time()
-        self.last_frame = look.frame
-        # Each kind of turn gets only its evidence: the image for sight, or whenever the question
+        # Each kind of turn gets only its evidence: a look for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
         sees = about_now(turn.question) or (turn.kind == "sight" and not past)
-        image = look.image if sees else None
-        msgs = brain.messages(look.history, image, memories, turn.facts,
-                              turn.question, look.changed, past, told)
-        # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
-        turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
-                       if isinstance(m["content"], list) else m
-                       for m in msgs if m["role"] != "system"]
-        if recalled_answer:
+        image = brain.jpeg(now)
+        if code is None and sees and (seen := self.brain.observe(image, turn.question)):
+            turn.observation = (f"speech-start camera frame captured at {taken:.6f}, "
+                                f"{brain.age(max(0.0, turn.speech_start - taken))}: {seen}")
+        # Current evidence first, then the newest complete exchanges that fit; only those stay.
+        msgs, self.history, turn.budget = self.brain.context(
+            self.history, turn.observation, memories, turn.facts, turn.question, past, told)
+        # Logged without the system prompt (brain.SYSTEM, fixed per release).
+        turn.prompt = [m for m in msgs if m["role"] != "system"]
+        if code is not None:
             turn.verbatim = True
-            tokens = self._said(recalled_answer, turn)
-        elif turn.verbatim:
-            tokens = self._said(turn.facts[0], turn)
+            tokens = self._said(code, turn)
         else:
             tokens = self._tokens(msgs, turn)
         audio_parts = self._speak(tokens, turn)
@@ -492,16 +470,13 @@ class Robot:
         spoken = np.concatenate(audio_parts or [np.zeros(1)])
         turn.audio_s = len(spoken) / RATE
         audio.write_wav(self.out / turn.wav, spoken, RATE)
-        self.history = (self.history + [{"role": "user", "content": turn.question},
-                                        {"role": "assistant", "content": turn.answer}]
-                        )[-2 * HISTORY_TURNS:]
-        self.exchanges += 1
+        self.history = self.history + [{"role": "user", "content": turn.question},
+                                       {"role": "assistant", "content": turn.answer}]
         # Findable later; a command ("this is my phone") is an action, never evidence of
         # ownership (things.py holds what was named).
         statement = None if is_question(turn.question) or command(
             turn.question, self.vocab) else question
-        self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
-                    statement, track)
+        self._store(turn, (now, taken, image), statement, track)
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
@@ -655,6 +630,7 @@ class Robot:
             return False
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
+        self.history, self.prefilled = [], None
         self.hiding, self.told = (face_, time.time()), None
         return True
 

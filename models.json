@@ -214,5 +214,29 @@
   "url": "https://huggingface.co/Idiap/EdgeFace-S-GAMMA/resolve/a1c171036159e94bd4c766088370a37d0899d31f/edgeface_s_gamma_05.pt",
   "sha256": "dc59abda2e8580399fd115a1eeb07e1f21156196db604b884407bcf0f17efb07",
   "license": "CC-BY-NC-SA-4.0 (D42)"
+ },
+ {
+  "path": "gguf/granite-4.0-h-micro-Q4_K_M.gguf",
+  "url": "https://huggingface.co/ibm-granite/granite-4.0-h-micro-GGUF/resolve/dc1dd2585fac18a78001c677d33ef8a7bbb7eb68/granite-4.0-h-micro-Q4_K_M.gguf",
+  "sha256": "bcc78b9b25450101d1ad90d4b9a264e1bac892f534dfb76066f4eec792fdf023",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/SmolVLM2-500M-Video-Instruct-Q8_0.gguf",
+  "url": "https://huggingface.co/ggml-org/SmolVLM2-500M-Video-Instruct-GGUF/resolve/ccd7aae53bcb1997355c2f094959e72b3642ce17/SmolVLM2-500M-Video-Instruct-Q8_0.gguf",
+  "sha256": "6f67b8036b2469fcd71728702720c6b51aebd759b78137a8120733b4d66438bc",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "gguf/mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf",
+  "url": "https://huggingface.co/ggml-org/SmolVLM2-500M-Video-Instruct-GGUF/resolve/ccd7aae53bcb1997355c2f094959e72b3642ce17/mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf",
+  "sha256": "921dc7e259f308e5b027111fa185efcbf33db13f6e35749ddf7f5cdb60ef520b",
+  "license": "Apache-2.0"
+ },
+ {
+  "path": "kokoro/kokoro-v1.0.fp16.onnx",
+  "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.0.fp16.onnx",
+  "sha256": "f3a290d384fbb27966d462905c71a46cef9e5fd00516b40df32a0b4afe77ac96",
+  "license": "Apache-2.0"
  }
 ]
