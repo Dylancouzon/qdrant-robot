@@ -1,0 +1,5 @@
+# F0d development smoke
+
+This fixed 90 s smoke exercises two visits in one Robot process. It uses previously consumed development footage. Two 3 s upright MJPG clips hold their final frames; four synthetic utterances exercise the active voice stack. Source extraction used tools/jetson.py run f0d-source-prep on release d7ed8b31a024, with an independent 90 s child-group watchdog. The source unit finished in two seconds with exit zero.
+
+Frozen pass limits: two visits, two show events at 0/45 s, four spoken events at 10/25/55/70 s, two scored questions, and two auxiliary statements. Require exact source/held-frame pixels, unambiguous original speech interval association, no lost chunks, event/chunk lateness at most 0.5 s, live required threads, and no detector stall over 10 s. A separate supervisor must see zero worker exit before publishing completion. Record answer and paging failures without calling them target passes. This checks evaluator integration, not fresh answer quality or physical audio latency.

@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "purpose": "development source/scheduler integration only",
+  "duration_s": 90,
+  "visits": 2,
+  "spoken": 4,
+  "scored": 2,
+  "auxiliary": 2,
+  "shows": 2,
+  "limits": {
+    "max_lateness_s": 0.5,
+    "max_detector_stall_s": 10
+  },
+  "files": {
+    "2026-10-09-f0d-smoke-source-a.avi": {
+      "bytes": 1891722,
+      "sha256": "31b152a78f82b579d908fcf83692668eb804b84e76a88c02f937c13b577e9d34"
+    },
+    "2026-10-09-f0d-smoke-source-b.avi": {
+      "bytes": 1546242,
+      "sha256": "5ebf12f32dbcf5de21bca99348fdb49105dba33987e92fdac1c1cb19d4f4bda1"
+    },
+    "README.md": {
+      "bytes": 1019,
+      "sha256": "2861fb5ac21b489e61baa940e6fef5e697a591ee829468dd15973dab039d69c1"
+    },
+    "audio/f0d-smoke-1-question.wav": {
+      "bytes": 71370,
+      "sha256": "8b81952ce2f919b1ae7ee8a47f495cdb56c1acf18032ad83d367a39efa24968d"
+    },
+    "audio/f0d-smoke-1-statement.wav": {
+      "bytes": 90554,
+      "sha256": "53f21e904b943286966735b99124e4ecef8a5b4153b6c52e683c52d2e1a0cfeb"
+    },
+    "audio/f0d-smoke-2-question.wav": {
+      "bytes": 69054,
+      "sha256": "bf18f28fa1143ee1f9144fed4dfb31e1c09164be920b48759a3c7c5b4ce1aa9d"
+    },
+    "audio/f0d-smoke-2-statement.wav": {
+      "bytes": 123528,
+      "sha256": "f8926dabd6293816015d7dd9d045d6a5f4664bed347481efbf2a95f4de46f4be"
+    },
+    "sources.json": {
+      "bytes": 7942,
+      "sha256": "165b7f38d6b0ffb0f8444a5f4409ae0bb6709eb7871125fe6b9a9b9c80a75e4b"
+    },
+    "visits.jsonl": {
+      "bytes": 1079,
+      "sha256": "a2db695673a22ec397d72270c0a5282041f99ca34185359aaf502db15b9dfd0a"
+    }
+  }
+}
