@@ -1,0 +1,123 @@
+{
+  "status": "native_api_inspected",
+  "model_inference": false,
+  "classes": {
+    "LLMRuntime": {
+      "doc": "Unified LLM inference runtime with optional speculative decoding.",
+      "members": [
+        "capture_decoding_cuda_graph",
+        "count_prompt_tokens",
+        "get_context_cache_metrics",
+        "get_eagle_generation_metrics",
+        "get_generation_metrics",
+        "get_multimodal_metrics",
+        "get_prefill_metrics",
+        "get_speaker_names",
+        "get_spec_decode_generation_metrics",
+        "handle_request",
+        "handle_request_streaming_audio",
+        "handle_request_tts",
+        "has_draft_model",
+        "load_omni",
+        "save_system_prompt_kv_cache"
+      ],
+      "__init__": "__init__(*args, **kwargs)\nOverloaded function.\n\n1. __init__(self: tensorrt_edgellm._edgellm_runtime.LLMRuntime, engine_dir: str, multimodal_engine_dir: str = '', lora_weights_map: collections.abc.Mapping[str, str] = {}, checkpoint_dir: str = '', context_cache_config: tensorrt_edgellm._edgellm_runtime.ContextCacheConfig = <tensorrt_edgellm._edgellm_runtime.ContextCacheConfig object at 0xffffac1d25f0>) -> None\n\nConstruct for vanilla (non-speculative) decoding\n\n2. __init__(self: tensorrt_edgellm._edgellm_runtime.LLMRuntime, engine_dir: str, multimodal_engine_dir: str, lora_weights_map: collections.abc.Mapping[str, str], draft_top_k: typing.SupportsInt | typing.SupportsIndex, draft_step: typing.SupportsInt | typing.SupportsIndex, verify_tree_size: typing.SupportsInt | typing.SupportsIndex, checkpoint_dir: str = '', draft_checkpoint_dir: str = '', context_cache_config: tensorrt_edgellm._edgellm_runtime.ContextCacheConfig = <tensorrt_edgellm._edgellm_runtime.ContextCacheConfig object at 0xffffa517eb70>, dflash_block_size: typing.SupportsInt | typing.SupportsIndex = 0) -> None\n\nConstruct for speculative decoding\n",
+      "count_prompt_tokens": "count_prompt_tokens(self: tensorrt_edgellm._edgellm_runtime.LLMRuntime, request: tensorrt_edgellm._edgellm_runtime.LLMGenerationRequest) -> list[int]\n\nHandle an explicit text token-count request\n",
+      "handle_request": "handle_request(self: tensorrt_edgellm._edgellm_runtime.LLMRuntime, request: tensorrt_edgellm._edgellm_runtime.LLMGenerationRequest) -> tensorrt_edgellm._edgellm_runtime.LLMGenerationResponse\n\nProcess a generation request and return the response\n"
+    },
+    "Message": {
+      "doc": null,
+      "members": [
+        "content_is_array",
+        "content_is_null",
+        "contents",
+        "has_content",
+        "has_reasoning_content",
+        "has_tool_calls",
+        "name",
+        "reasoning_content",
+        "role",
+        "tool_call_id",
+        "tool_calls"
+      ],
+      "__init__": "__init__(*args, **kwargs)\nOverloaded function.\n\n1. __init__(self: tensorrt_edgellm._edgellm_runtime.Message) -> None\n\n2. __init__(self: tensorrt_edgellm._edgellm_runtime.Message, role: str, contents: collections.abc.Sequence[tensorrt_edgellm._edgellm_runtime.MessageContent]) -> None\n"
+    },
+    "MessageContent": {
+      "doc": null,
+      "members": [
+        "content",
+        "type"
+      ],
+      "__init__": "__init__(*args, **kwargs)\nOverloaded function.\n\n1. __init__(self: tensorrt_edgellm._edgellm_runtime.MessageContent) -> None\n\n2. __init__(self: tensorrt_edgellm._edgellm_runtime.MessageContent, type: str, content: str) -> None\n"
+    },
+    "Request": {
+      "doc": null,
+      "members": [
+        "audio_buffers",
+        "guided_decoding",
+        "image_buffers",
+        "logit_bias",
+        "messages",
+        "sampling_seed",
+        "stop_strings"
+      ],
+      "__init__": "__init__(*args, **kwargs)\nOverloaded function.\n\n1. __init__(self: tensorrt_edgellm._edgellm_runtime.Request) -> None\n\n2. __init__(self: tensorrt_edgellm._edgellm_runtime.Request, messages: collections.abc.Sequence[tensorrt_edgellm._edgellm_runtime.Message]) -> None\n"
+    },
+    "LLMGenerationRequest": {
+      "doc": null,
+      "members": [
+        "add_generation_prompt",
+        "apply_chat_template",
+        "context_cache_commit_policy",
+        "context_cache_lookup_policy",
+        "context_cache_replay_tail_length",
+        "disable_spec_decode",
+        "enable_thinking",
+        "formatted_requests",
+        "lora_weights_name",
+        "max_generate_length",
+        "num_logprobs",
+        "parallel_tool_calls",
+        "reasoning_effort",
+        "recurrent_capture_interval",
+        "requests",
+        "sampling_seed",
+        "save_system_prompt_kv_cache",
+        "skip_special_tokens",
+        "spec_proposal_sampling",
+        "stream_channels",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_p"
+      ],
+      "__init__": "__init__(self: tensorrt_edgellm._edgellm_runtime.LLMGenerationRequest) -> None\n"
+    },
+    "StreamChannel": {
+      "doc": null,
+      "members": [
+        "cancel",
+        "create",
+        "get_reason",
+        "get_skip_special_tokens",
+        "get_stream_interval",
+        "is_cancelled",
+        "is_finished",
+        "set_skip_special_tokens",
+        "set_stream_interval",
+        "try_pop",
+        "wait_pop"
+      ],
+      "__init__": "Initialize self.  See help(type(self)) for accurate signature.",
+      "create": "create() -> tensorrt_edgellm._edgellm_runtime.StreamChannel\n",
+      "wait_pop": "wait_pop(self: tensorrt_edgellm._edgellm_runtime.StreamChannel, timeout_ms: typing.SupportsInt | typing.SupportsIndex) -> tensorrt_edgellm._edgellm_runtime.StreamChunk | None\n",
+      "cancel": "cancel(self: tensorrt_edgellm._edgellm_runtime.StreamChannel) -> None\n"
+    },
+    "load_image_from_bytes": {
+      "doc": "load_image_from_bytes(data: bytes) -> tensorrt_edgellm._edgellm_runtime.ImageData\n\nLoad image from bytes\n",
+      "members": [],
+      "__init__": "Initialize self.  See help(type(self)) for accurate signature."
+    }
+  }
+}

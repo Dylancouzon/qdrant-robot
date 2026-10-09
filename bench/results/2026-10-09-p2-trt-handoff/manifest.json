@@ -1,0 +1,17 @@
+[
+  {
+    "path": "build/p2/logs/trt-handoff/journal.txt",
+    "bytes": 2558,
+    "sha256": "1e2cc554a10448b4d30b2998a500396053f4dead4024cd71548d4f9bde005c54"
+  },
+  {
+    "path": "build/p2/logs/trt-handoff/kernel.txt",
+    "bytes": 908,
+    "sha256": "74fd2d54a953f170a363655ad1f4b785b704b74cb9319e68a3d7cfe8be298703"
+  },
+  {
+    "path": "build/p2/logs/trt-handoff/status.txt",
+    "bytes": 1033,
+    "sha256": "35b66396a0cb60f1b15cdb1833560849c66f2857bbc2d115476c97d80da71699"
+  }
+]

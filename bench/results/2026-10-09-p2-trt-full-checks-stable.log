@@ -1,0 +1,14 @@
+checking: uvx ruff check bench/asr_bench.py (limit 120s)
+passed (0.07s): uvx ruff check bench/asr_bench.py
+checking: uvx vulture --min-confidence 80 (limit 120s)
+passed (0.20s): uvx vulture --min-confidence 80
+checking: uv run --no-project --with (limit 120s)
+passed (13.07s): uv run --no-project --with
+checking: /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/gate.py modules (limit 120s)
+passed (1.89s): /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/gate.py modules
+checking: /Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/jetson.py selftest (limit 120s)
+passed (0.05s): /Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/jetson.py selftest
+checking: /Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/gate.py selftest (limit 120s)
+passed (0.02s): /Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/trt-edge/tools/gate.py selftest
+checks passed in 15.30s
+8 files changed, 267 insertions(+), 107 deletions(-)

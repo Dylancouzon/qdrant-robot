@@ -1,0 +1,8 @@
+Running as unit: qr-p2-trt-native-api.service
+{"status": "native_api_inspected", "path": "/home/qdrant/qdrant-robot/shared/results/2026-10-09-p2-trt-native-api.json", "model_inference": false}
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 563ms
+CPU time consumed: 559ms
+Memory peak: 3.5M
+Memory swap peak: 0B

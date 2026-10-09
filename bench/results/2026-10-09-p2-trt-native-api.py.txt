@@ -1,0 +1,14 @@
+from pathlib import Path
+import json
+from tensorrt_edgellm import runtime
+rt = runtime.load()
+names = ("LLMRuntime", "Message", "MessageContent", "Request", "LLMGenerationRequest", "StreamChannel", "load_image_from_bytes")
+result = {"status": "native_api_inspected", "model_inference": False, "classes": {}}
+for name in names:
+ obj = getattr(rt, name)
+ result["classes"][name] = {"doc": getattr(obj, "__doc__", None), "members": [x for x in dir(obj) if not x.startswith("_")]}
+ for method in ("__init__", "count_prompt_tokens", "handle_request", "create", "wait_pop", "cancel"):
+  if hasattr(obj, method): result["classes"][name][method] = getattr(getattr(obj, method), "__doc__", None)
+path = Path("/home/qdrant/qdrant-robot/shared/results/2026-10-09-p2-trt-native-api.json")
+path.write_text(json.dumps(result, indent=2) + "\n")
+print(json.dumps({"status": result["status"], "path": str(path), "model_inference": False}))

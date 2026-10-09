@@ -1,0 +1,10 @@
+Oct 09 16:50:38 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 16:50:39 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 16:50:39 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 16:50:39 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 16:50:39 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 16:50:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 16:53:33 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 16:53:33 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 09 16:53:33 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 16:54:58 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12

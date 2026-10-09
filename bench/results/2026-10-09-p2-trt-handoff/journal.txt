@@ -1,0 +1,12 @@
+Oct 09 16:46:49 Str0keWtf systemd[962]: Started p2-trt-quantize-native-retry.service - [systemd-run] /usr/bin/flock /home/dylan/qdrant-robot-box/gpu.lock /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/tensorrt-edgellm-quantize llm --model_dir checkpoints/base --mtp_draft_dir checkpoints/assistant --output_dir checkpoints/int4-awq-native-retry --quantization int4_awq --device cuda.
+Oct 09 16:47:01 Str0keWtf flock[128544]: /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/lib/python3.12/site-packages/modelopt/torch/__init__.py:51: UserWarning: transformers 5.14.1 is not tested with current version of modelopt and may cause issues. Please install recommended version with `pip install -U nvidia-modelopt[hf]` if working with HF models.
+Oct 09 16:47:01 Str0keWtf flock[128544]:   _warnings.warn(
+Oct 09 16:47:05 Str0keWtf flock[128544]: [transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Oct 09 16:53:32 Str0keWtf flock[128544]: Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:   3%|▎         | 65/1951 [00:00<00:06, 287.56it/s]Loading weights:  14%|█▍        | 278/1951 [00:00<00:01, 973.96it/s]Loading weights:  21%|██        | 407/1951 [00:00<00:01, 1027.29it/s]Loading weights:  31%|███       | 598/1951 [00:00<00:01, 1307.96it/s]Loading weights:  39%|███▊      | 754/1951 [00:00<00:01, 681.55it/s] Loading weights:  39%|███▊      | 754/1951 [00:21<00:01, 681.55it/s]Loading weights:  39%|███▊      | 755/1951 [05:41<21:55,  1.10s/it] Loading weights: 100%|██████████| 1951/1951 [05:41<00:00,  5.71it/s]
+Oct 09 16:53:32 Str0keWtf flock[128544]: Image calibration dataset: mmmu
+Oct 09 16:53:32 Str0keWtf flock[128544]: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Oct 09 16:53:38 Str0keWtf flock[128544]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4VisionAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 16:53:38 Str0keWtf flock[128544]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4TextAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 16:53:38 Str0keWtf flock[128544]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4AudioAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 16:53:38 Str0keWtf flock[128544]: Inserted 1840 quantizers
+Oct 09 16:53:40 Str0keWtf flock[128544]: awq_lite: Caching activation statistics...

@@ -1,0 +1,36 @@
+{
+  "files": [
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/diagnostics-stack-native-first-cache.txt",
+      "bytes": 2524,
+      "sha256": "2e7e69df5d1f8ae79453a98a163a07de789f91ebad976c5219ada473ad74cd8f"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/kernel.txt",
+      "bytes": 71415,
+      "sha256": "60025814bc0f78ab70e9aa116936f936cf0c941850d2222929385ffe93f1fa99"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/manifest.json",
+      "bytes": 907,
+      "sha256": "9b3094d2274546f963e819122d717d668444e9404740d4e47f8d28b8692ff2f7"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/quantize-native.log",
+      "bytes": 13998,
+      "sha256": "0a254c5a6a623d06a3d89e50cfa8dc7349e955f131522d105c484f7f00efeee1"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/stopped-unit.txt",
+      "bytes": 115,
+      "sha256": "9557db239482696e5db3a0731c471938414df6918ce83ad284b0b40b6f45e0b8"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-native/unit.txt",
+      "bytes": 9496,
+      "sha256": "59c85ed6b1544ed699f6471d7dce075995f8d252efd7c9dd211b566dc10fbc83"
+    }
+  ],
+  "status": "INTERRUPTED_OPERATOR_SEQUENCING_ERROR",
+  "completed_export": false
+}

@@ -1,0 +1,55 @@
+{
+  "status": "INTERRUPTED",
+  "machine": "WSL RTX 3080 10GB",
+  "unit": "p2-trt-quantize.service",
+  "invocation": "18d4965055764fb3ab0736a737db9df9",
+  "flock_pid": 59725,
+  "python_pid": 59730,
+  "exec_main_code": 2,
+  "exec_main_status": 15,
+  "native_completion": false,
+  "checkpoint_produced": false,
+  "reason": "Lead-selected resource correction after active eager quantization stacks and verified optional CUDA extension PATH failure. Static temporary-memory pressure; no measured paging, deadlock, native OOM, or quality retry claim.",
+  "evidence": [
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/diagnostics-stack-1625.txt",
+      "bytes": 3848,
+      "sha256": "a65e28211b955e0ebff785b86c216fa514fea1ad8f554ffbbbbca9557db93bf6"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/diagnostics-stack-1626.txt",
+      "bytes": 3848,
+      "sha256": "26ad470e7f9ac4843de9e7daf1b109e40cef6f29dc0ccce92af1b0074c521f02"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/diagnostics-stack-1629.txt",
+      "bytes": 3848,
+      "sha256": "a65e28211b955e0ebff785b86c216fa514fea1ad8f554ffbbbbca9557db93bf6"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/kernel.txt",
+      "bytes": 71235,
+      "sha256": "747a90c3cfe34b8e52780f44f67a67ec47f623de2923c52810369480e02eeed1"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/quantize-journal.txt",
+      "bytes": 2489,
+      "sha256": "368b04bcd3ecc3ff9dd748b2ca54266a3bc13bd0b85d26d96147ef9bc2cc7b61"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/quantize.log",
+      "bytes": 16274,
+      "sha256": "1d01fff52922a5e58f10dff56cf522837ca4ca3c87fb29ceb08f2f17d527c52e"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/stopped-unit.txt",
+      "bytes": 115,
+      "sha256": "0036003f68adb901af6cf06c1b3701637e1b57bf04f82b63a76bdcdd6a690f62"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-interrupted-original/unit.txt",
+      "bytes": 9160,
+      "sha256": "ed91d0c9f5372f2e1d0482084623ab7b05d80a2d97fa4e976bb4315e4a22a3ef"
+    }
+  ]
+}

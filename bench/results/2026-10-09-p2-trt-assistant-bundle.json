@@ -1,0 +1,9 @@
+{
+  "artifact": "build/p2/inputs/trt-transfer/assistant-metadata.tar",
+  "bytes": 222033920,
+  "sha256": "9da354befc24230d158db2d2687e376265a42687d091c1dc7754605a3a64bd35",
+  "source_files": 15,
+  "tar_members": 16,
+  "includes_base_weights": false,
+  "model_inference": false
+}

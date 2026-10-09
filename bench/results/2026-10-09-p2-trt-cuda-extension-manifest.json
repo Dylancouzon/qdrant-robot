@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "machine": "WSL RTX3080",
+  "unit": "p2-trt-cuda-extension.service",
+  "invocation": "90c54ecb6482475fb1cd882f88e72008",
+  "native_exit": 0,
+  "actual_cuda_fp16_int4_axis_exact_comparison": true,
+  "compile_seconds": 58.2,
+  "model_inference": false,
+  "checkpoint_produced": false,
+  "files": [
+    {
+      "path": "bench/results/2026-10-09-p2-trt-cuda-extension-unit.txt",
+      "bytes": 7089,
+      "sha256": "c963b896f41d1df7905d644bb72559fbe93902e76f7072ffc8304aa0a1a2699b"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-cuda-extension.log",
+      "bytes": 1282,
+      "sha256": "3a5bdfa4167d1461aa8a4679cd52d0b80d7d26b3e29d8d945af69b674c89f8aa"
+    },
+    {
+      "path": "bench/results/2026-10-09-p2-trt-verify_cuda_extension.py.txt",
+      "bytes": 639,
+      "sha256": "3658cb0389ff0575ba3f2f13e3d36f7ae74aac4f028009f63bef90af1f2a6d53"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "native_request_image_and_text": true,
+  "native_channel_cancel_flag": true,
+  "model_inference": false,
+  "generation_cancellation": false,
+  "adapter_function_sha256": "314c3ae192f9f3f824d847658e69a4c2f8b123d052e79590cb68bb78dab7d1c9"
+}

@@ -1,0 +1,18 @@
+Fri Oct  9 16:56:16 EDT 2026
+5f4af7d6-879e-48eb-979a-45e715f1d626
+ActiveState=active
+SubState=running
+InvocationID=b9ec1e261ba04407938c9be35eec3f1d
+MainPID=128539
+ExecMainStartTimestamp=Fri 2026-10-09 16:46:49 EDT
+ExecMainStatus=0
+MemoryCurrent=8481345536
+MemorySwapCurrent=0
+    PID     ELAPSED     TIME S COMMAND
+ 128544       09:27 01:01:44 R /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/python /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/tensorrt-edgellm-quantize llm --model_dir checkpoints/base --mtp_draft_dir checkpoints/assistant --output_dir checkpoints/int4-awq-native-retry --quantization int4_awq --device cuda
+memory.used [MiB], memory.total [MiB], utilization.gpu [%], utilization.memory [%], power.draw [W]
+10004 MiB, 10240 MiB, 100 %, 0 %, 139.58 W
+               total        used        free      shared  buff/cache   available
+Mem:            25Gi       9.2Gi       3.9Gi       233Mi        13Gi        16Gi
+Swap:          7.0Gi       6.2Gi       869Mi
+CHECKPOINT_OUTPUT_ABSENT

@@ -1,0 +1,47 @@
+import base64,json
+from pathlib import Path
+from tensorrt_edgellm import runtime
+rt=runtime.load()
+def native_request(rt, msgs: list[dict], max_tokens: int):
+    """Keep ordered evidence and decode source-owned image bytes for native rendering."""
+    rows, images = [], []
+    for msg in msgs:
+        content = msg["content"]
+        parts = [{"type": "text", "text": content}] if isinstance(content, str) else content
+        contents = []
+        for part in parts:
+            if part["type"] == "text":
+                contents.append(rt.MessageContent("text", part["text"]))
+            elif part["type"] == "image_url":
+                url = part["image_url"]["url"]
+                prefix = "data:image/jpeg;base64,"
+                if not url.startswith(prefix):
+                    raise ValueError("The brain requires a source-owned JPEG data URI")
+                images.append(rt.load_image_from_bytes(base64.b64decode(url[len(prefix):], validate=True)))
+                contents.append(rt.MessageContent("image", ""))
+            else:
+                raise ValueError(f"Unsupported robot content: {part['type']}")
+        row = rt.Message(msg["role"], contents)
+        row.has_content = True
+        row.content_is_array = isinstance(content, list)
+        rows.append(row)
+    row = rt.Request(messages=rows)
+    row.image_buffers = images
+    request = rt.LLMGenerationRequest()
+    request.requests = [row]
+    request.temperature, request.top_k = 0, 1
+    request.max_generate_length = max_tokens
+    request.apply_chat_template = True
+    request.add_generation_prompt = True
+    request.enable_thinking = False
+    request.skip_special_tokens = True
+    return request
+image={"type":"image_url","image_url":{"url":'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYFBgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCAAYACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCOiiigAooooAKKKKACiiigD//Z'}}
+req=native_request(rt,[{"role":"system","content":"Use source evidence"},{"role":"user","content":[image,{"type":"text","text":"Source point 23: gray frame"}]}],64)
+row=req.requests[0]
+assert len(row.image_buffers)==1 and len(row.messages)==2
+assert [(p.type,p.content) for p in row.messages[-1].contents]==[("image",""),("text","Source point 23: gray frame")]
+assert req.max_generate_length==64 and req.apply_chat_template and req.add_generation_prompt and not req.enable_thinking
+channel=rt.StreamChannel.create();channel.set_skip_special_tokens(True);channel.cancel();assert channel.is_cancelled()
+result={"status":"PASS","native_request_image_and_text":True,"native_channel_cancel_flag":True,"model_inference":False,"generation_cancellation":False,"adapter_function_sha256":'314c3ae192f9f3f824d847658e69a4c2f8b123d052e79590cb68bb78dab7d1c9'}
+path=Path("/home/qdrant/qdrant-robot/shared/results/2026-10-09-p2-trt-native-serialization.json");path.write_text(json.dumps(result,indent=2)+"\n");print(json.dumps(result))

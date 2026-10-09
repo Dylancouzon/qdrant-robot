@@ -1,0 +1,798 @@
+Oct 06 01:52:05 Str0keWtf kernel: Linux version 6.6.87.2-microsoft-standard-WSL2 (root@439a258ad544) (gcc (GCC) 11.2.0, GNU ld (GNU Binutils) 2.37) #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025
+Oct 06 01:52:05 Str0keWtf kernel: Command line: initrd=\initrd.img WSL_ROOT_INIT=1 panic=-1 nr_cpus=16 hv_utils.timesync_implicit=1 console=hvc0 debug pty.legacy_count=0 WSL_ENABLE_CRASH_DUMP=1
+Oct 06 01:52:05 Str0keWtf kernel: KERNEL supported cpus:
+Oct 06 01:52:05 Str0keWtf kernel:   Intel GenuineIntel
+Oct 06 01:52:05 Str0keWtf kernel:   AMD AuthenticAMD
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-provided physical RAM map:
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-e820: [mem 0x00000000000e0000-0x00000000000e0fff] reserved
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-e820: [mem 0x0000000000100000-0x00000000001fffff] ACPI data
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-e820: [mem 0x0000000000200000-0x00000000f7ffffff] usable
+Oct 06 01:52:05 Str0keWtf kernel: BIOS-e820: [mem 0x0000000100000000-0x0000000687ffffff] usable
+Oct 06 01:52:05 Str0keWtf kernel: NX (Execute Disable) protection: active
+Oct 06 01:52:05 Str0keWtf kernel: APIC: Static calls initialized
+Oct 06 01:52:05 Str0keWtf kernel: DMI not present or invalid.
+Oct 06 01:52:05 Str0keWtf kernel: Hypervisor detected: Microsoft Hyper-V
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: privilege flags low 0x2e7f, high 0x3b8030, hints 0x9a4e24, misc 0xe4bed7b6
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: Nested features: 0x3e0101
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: LAPIC Timer Frequency: 0xc3500
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: Using hypercall for remote TLB flush
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: hyperv_clocksource_tsc_page: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: hyperv_clocksource_msr: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+Oct 06 01:52:05 Str0keWtf kernel: tsc: Marking TSC unstable due to running on Hyper-V
+Oct 06 01:52:05 Str0keWtf kernel: tsc: Detected 3792.011 MHz processor
+Oct 06 01:52:05 Str0keWtf kernel: e820: update [mem 0x00000000-0x00000fff] usable ==> reserved
+Oct 06 01:52:05 Str0keWtf kernel: e820: remove [mem 0x000a0000-0x000fffff] usable
+Oct 06 01:52:05 Str0keWtf kernel: last_pfn = 0x688000 max_arch_pfn = 0x400000000
+Oct 06 01:52:05 Str0keWtf kernel: MTRR map: 5 entries (4 fixed + 1 variable; max 20), built from 8 variable MTRRs
+Oct 06 01:52:05 Str0keWtf kernel: x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+Oct 06 01:52:05 Str0keWtf kernel: last_pfn = 0xf8000 max_arch_pfn = 0x400000000
+Oct 06 01:52:05 Str0keWtf kernel: Using GB pages for direct mapping
+Oct 06 01:52:05 Str0keWtf kernel: RAMDISK: [mem 0x04be4000-0x04e8bfff]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Early table checksum verification disabled
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: RSDP 0x00000000000E0000 000024 (v02 VRTUAL)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: XSDT 0x0000000000100000 000044 (v01 VRTUAL MICROSFT 00000001 MSFT 00000001)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: FACP 0x0000000000101000 000114 (v06 VRTUAL MICROSFT 00000001 MSFT 00000001)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: DSDT 0x00000000001011B8 01E11C (v02 MSFTVM DSDT01   00000001 INTL 20230628)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: FACS 0x0000000000101114 000040
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: OEM0 0x0000000000101154 000064 (v01 VRTUAL MICROSFT 00000001 MSFT 00000001)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT 0x000000000011F2D4 0003B0 (v02 VRTUAL MICROSFT 00000001 MSFT 00000001)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: APIC 0x000000000011F684 0000C8 (v04 VRTUAL MICROSFT 00000001 MSFT 00000001)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving FACP table memory at [mem 0x101000-0x101113]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving DSDT table memory at [mem 0x1011b8-0x11f2d3]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving FACS table memory at [mem 0x101114-0x101153]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving OEM0 table memory at [mem 0x101154-0x1011b7]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving SRAT table memory at [mem 0x11f2d4-0x11f683]
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Reserving APIC table memory at [mem 0x11f684-0x11f74b]
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x00 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x01 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x02 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x03 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x04 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x05 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x06 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x07 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x08 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x09 -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0a -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0b -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0c -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0d -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0e -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: SRAT: PXM 0 -> APIC 0x0f -> Node 0
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xf7ffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x100000000-0x687ffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x688000000-0x9ffdfffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x1000000000-0xffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x10000000000-0x1ffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x20000000000-0x3ffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x40000000000-0x7ffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x80000000000-0xfffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x100000000000-0x1fffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x200000000000-0x3fffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x400000000000-0x7fffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x800000000000-0xffffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x1000000000000-0x1ffffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x2000000000000-0x3ffffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x4000000000000-0x7ffffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: SRAT: Node 0 PXM 0 [mem 0x8000000000000-0xfffffffffffff] hotplug
+Oct 06 01:52:05 Str0keWtf kernel: NUMA: Node 0 [mem 0x00000000-0xf7ffffff] + [mem 0x100000000-0x687ffffff] -> [mem 0x00000000-0x687ffffff]
+Oct 06 01:52:05 Str0keWtf kernel: NODE_DATA(0) allocated [mem 0x687fde000-0x687ffffff]
+Oct 06 01:52:05 Str0keWtf kernel: Zone ranges:
+Oct 06 01:52:05 Str0keWtf kernel:   DMA32    [mem 0x0000000000001000-0x00000000ffffffff]
+Oct 06 01:52:05 Str0keWtf kernel:   Normal   [mem 0x0000000100000000-0x0000000687ffffff]
+Oct 06 01:52:05 Str0keWtf kernel:   Device   empty
+Oct 06 01:52:05 Str0keWtf kernel: Movable zone start for each node
+Oct 06 01:52:05 Str0keWtf kernel: Early memory node ranges
+Oct 06 01:52:05 Str0keWtf kernel:   node   0: [mem 0x0000000000001000-0x000000000009ffff]
+Oct 06 01:52:05 Str0keWtf kernel:   node   0: [mem 0x0000000000200000-0x00000000f7ffffff]
+Oct 06 01:52:05 Str0keWtf kernel:   node   0: [mem 0x0000000100000000-0x0000000687ffffff]
+Oct 06 01:52:05 Str0keWtf kernel: Initmem setup node 0 [mem 0x0000000000001000-0x0000000687ffffff]
+Oct 06 01:52:05 Str0keWtf kernel: On node 0, zone DMA32: 1 pages in unavailable ranges
+Oct 06 01:52:05 Str0keWtf kernel: On node 0, zone DMA32: 352 pages in unavailable ranges
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: PM-Timer IO Port: 0x408
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: LAPIC_NMI (acpi_id[0x01] dfl dfl lint[0x1])
+Oct 06 01:52:05 Str0keWtf kernel: IOAPIC[0]: apic_id 16, version 17, address 0xfec00000, GSI 0-23
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Using ACPI (MADT) for SMP configuration information
+Oct 06 01:52:05 Str0keWtf kernel: smpboot: Allowing 16 CPUs, 0 hotplug CPUs
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0x000a0000-0x000dffff]
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0x000e0000-0x000e0fff]
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0x000e1000-0x000fffff]
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0x00100000-0x001fffff]
+Oct 06 01:52:05 Str0keWtf kernel: PM: hibernation: Registered nosave memory: [mem 0xf8000000-0xffffffff]
+Oct 06 01:52:05 Str0keWtf kernel: [mem 0xf8000000-0xffffffff] available for PCI devices
+Oct 06 01:52:05 Str0keWtf kernel: Booting paravirtualized kernel on Hyper-V
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645519600211568 ns
+Oct 06 01:52:05 Str0keWtf kernel: setup_percpu: NR_CPUS:8192 nr_cpumask_bits:16 nr_cpu_ids:16 nr_node_ids:1
+Oct 06 01:52:05 Str0keWtf kernel: percpu: Embedded 63 pages/cpu s221184 r8192 d28672 u262144
+Oct 06 01:52:05 Str0keWtf kernel: pcpu-alloc: s221184 r8192 d28672 u262144 alloc=1*2097152
+Oct 06 01:52:05 Str0keWtf kernel: pcpu-alloc: [0] 00 01 02 03 04 05 06 07 [0] 08 09 10 11 12 13 14 15 
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: PV spinlocks enabled
+Oct 06 01:52:05 Str0keWtf kernel: PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: Kernel command line: initrd=\initrd.img WSL_ROOT_INIT=1 panic=-1 nr_cpus=16 hv_utils.timesync_implicit=1 console=hvc0 debug pty.legacy_count=0 WSL_ENABLE_CRASH_DUMP=1
+Oct 06 01:52:05 Str0keWtf kernel: Unknown kernel command line parameters "WSL_ROOT_INIT=1 WSL_ENABLE_CRASH_DUMP=1", will be passed to user space.
+Oct 06 01:52:05 Str0keWtf kernel: random: crng init done
+Oct 06 01:52:05 Str0keWtf kernel: Dentry cache hash table entries: 4194304 (order: 13, 33554432 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: Inode-cache hash table entries: 2097152 (order: 12, 16777216 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: Fallback order for Node 0: 0 
+Oct 06 01:52:05 Str0keWtf kernel: Built 1 zonelists, mobility grouping on.  Total pages: 6708224
+Oct 06 01:52:05 Str0keWtf kernel: Policy zone: Normal
+Oct 06 01:52:05 Str0keWtf kernel: mem auto-init: stack:off, heap alloc:on, heap free:off
+Oct 06 01:52:05 Str0keWtf kernel: software IO TLB: area num 16.
+Oct 06 01:52:05 Str0keWtf kernel: Memory: 4123740K/27261564K available (20480K kernel code, 3457K rwdata, 13496K rodata, 4492K init, 6208K bss, 598352K reserved, 0K cma-reserved)
+Oct 06 01:52:05 Str0keWtf kernel: SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=16, Nodes=1
+Oct 06 01:52:05 Str0keWtf kernel: ftrace: allocating 55808 entries in 218 pages
+Oct 06 01:52:05 Str0keWtf kernel: ftrace: allocated 218 pages with 5 groups
+Oct 06 01:52:05 Str0keWtf kernel: Dynamic Preempt: none
+Oct 06 01:52:05 Str0keWtf kernel: rcu: Preemptible hierarchical RCU implementation.
+Oct 06 01:52:05 Str0keWtf kernel: rcu:         RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=16.
+Oct 06 01:52:05 Str0keWtf kernel:         Trampoline variant of Tasks RCU enabled.
+Oct 06 01:52:05 Str0keWtf kernel:         Rude variant of Tasks RCU enabled.
+Oct 06 01:52:05 Str0keWtf kernel:         Tracing variant of Tasks RCU enabled.
+Oct 06 01:52:05 Str0keWtf kernel: rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+Oct 06 01:52:05 Str0keWtf kernel: rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=16
+Oct 06 01:52:05 Str0keWtf kernel: Using NULL legacy PIC
+Oct 06 01:52:05 Str0keWtf kernel: NR_IRQS: 524544, nr_irqs: 552, preallocated irqs: 0
+Oct 06 01:52:05 Str0keWtf kernel: rcu: srcu_init: Setting srcu_struct sizes based on contention.
+Oct 06 01:52:05 Str0keWtf kernel: Console: colour dummy device 80x25
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Core revision 20230628
+Oct 06 01:52:05 Str0keWtf kernel: Failed to register legacy timer interrupt
+Oct 06 01:52:05 Str0keWtf kernel: APIC: Switch to symmetric I/O mode setup
+Oct 06 01:52:05 Str0keWtf kernel: x2apic enabled
+Oct 06 01:52:05 Str0keWtf kernel: APIC: Switched APIC routing to: physical x2apic
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: Host Build 10.0.26100.9168-9-0
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: enabling crash_kexec_post_notifiers
+Oct 06 01:52:05 Str0keWtf kernel: Hyper-V: Using IPI hypercalls
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI() replaced with hv_send_ipi()
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI_mask() replaced with hv_send_ipi_mask()
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI_mask_allbutself() replaced with hv_send_ipi_mask_allbutself()
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI_allbutself() replaced with hv_send_ipi_allbutself()
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI_all() replaced with hv_send_ipi_all()
+Oct 06 01:52:05 Str0keWtf kernel: APIC: send_IPI_self() replaced with hv_send_ipi_self()
+Oct 06 01:52:05 Str0keWtf kernel: Calibrating delay loop (skipped), value calculated using timer frequency.. 7584.02 BogoMIPS (lpj=15168044)
+Oct 06 01:52:05 Str0keWtf kernel: Last level iTLB entries: 4KB 64, 2MB 8, 4MB 8
+Oct 06 01:52:05 Str0keWtf kernel: Last level dTLB entries: 4KB 64, 2MB 32, 4MB 32, 1GB 4
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : Spectre BHI mitigation: SW BHB clearing on vm exit
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : Mitigation: Enhanced / Automatic IBRS
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : Spectre v2 / PBRSB-eIBRS: Retire a single CALL on VMEXIT
+Oct 06 01:52:05 Str0keWtf kernel: RETBleed: Mitigation: Enhanced IBRS
+Oct 06 01:52:05 Str0keWtf kernel: Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+Oct 06 01:52:05 Str0keWtf kernel: Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+Oct 06 01:52:05 Str0keWtf kernel: MMIO Stale Data: Vulnerable: Clear CPU buffers attempted, no microcode
+Oct 06 01:52:05 Str0keWtf kernel: SRBDS: Unknown: Dependent on hypervisor status
+Oct 06 01:52:05 Str0keWtf kernel: GDS: Unknown: Dependent on hypervisor status
+Oct 06 01:52:05 Str0keWtf kernel: x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+Oct 06 01:52:05 Str0keWtf kernel: x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+Oct 06 01:52:05 Str0keWtf kernel: x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+Oct 06 01:52:05 Str0keWtf kernel: x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+Oct 06 01:52:05 Str0keWtf kernel: x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using 'compacted' format.
+Oct 06 01:52:05 Str0keWtf kernel: Freeing SMP alternatives memory: 44K
+Oct 06 01:52:05 Str0keWtf kernel: pid_max: default: 32768 minimum: 301
+Oct 06 01:52:05 Str0keWtf kernel: LSM: initializing lsm=capability,landlock,yama,safesetid,selinux,integrity
+Oct 06 01:52:05 Str0keWtf kernel: landlock: Up and running.
+Oct 06 01:52:05 Str0keWtf kernel: Yama: becoming mindful.
+Oct 06 01:52:05 Str0keWtf kernel: SELinux:  Initializing.
+Oct 06 01:52:05 Str0keWtf kernel: Mount-cache hash table entries: 65536 (order: 7, 524288 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: Mountpoint-cache hash table entries: 65536 (order: 7, 524288 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: smpboot: CPU0: Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz (family: 0x6, model: 0xa5, stepping: 0x5)
+Oct 06 01:52:05 Str0keWtf kernel: RCU Tasks: Setting shift to 4 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=16.
+Oct 06 01:52:05 Str0keWtf kernel: RCU Tasks Rude: Setting shift to 4 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=16.
+Oct 06 01:52:05 Str0keWtf kernel: RCU Tasks Trace: Setting shift to 4 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=16.
+Oct 06 01:52:05 Str0keWtf kernel: Performance Events: Skylake events, 32-deep LBR, full-width counters, Intel PMU driver.
+Oct 06 01:52:05 Str0keWtf kernel: ... version:                4
+Oct 06 01:52:05 Str0keWtf kernel: ... bit width:              48
+Oct 06 01:52:05 Str0keWtf kernel: ... generic registers:      4
+Oct 06 01:52:05 Str0keWtf kernel: ... value mask:             0000ffffffffffff
+Oct 06 01:52:05 Str0keWtf kernel: ... max period:             00007fffffffffff
+Oct 06 01:52:05 Str0keWtf kernel: ... fixed-purpose events:   3
+Oct 06 01:52:05 Str0keWtf kernel: ... event mask:             000000070000000f
+Oct 06 01:52:05 Str0keWtf kernel: signal: max sigframe size: 1776
+Oct 06 01:52:05 Str0keWtf kernel: rcu: Hierarchical SRCU implementation.
+Oct 06 01:52:05 Str0keWtf kernel: rcu:         Max phase no-delay instances is 1000.
+Oct 06 01:52:05 Str0keWtf kernel: smp: Bringing up secondary CPUs ...
+Oct 06 01:52:05 Str0keWtf kernel: smpboot: x86: Booting SMP configuration:
+Oct 06 01:52:05 Str0keWtf kernel: .... node  #0, CPUs:        #2  #4  #6  #8 #10 #12 #14  #1  #3  #5  #7  #9 #11 #13 #15
+Oct 06 01:52:05 Str0keWtf kernel: MMIO Stale Data CPU bug present and SMT on, data leak possible. See https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/processor_mmio_stale_data.html for more details.
+Oct 06 01:52:05 Str0keWtf kernel: smp: Brought up 1 node, 16 CPUs
+Oct 06 01:52:05 Str0keWtf kernel: smpboot: Max logical packages: 1
+Oct 06 01:52:05 Str0keWtf kernel: smpboot: Total of 16 processors activated (121344.35 BogoMIPS)
+Oct 06 01:52:05 Str0keWtf kernel: node 0 deferred pages initialised in 28ms
+Oct 06 01:52:05 Str0keWtf kernel: devtmpfs: initialized
+Oct 06 01:52:05 Str0keWtf kernel: x86/mm: Memory block size: 128MB
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+Oct 06 01:52:05 Str0keWtf kernel: futex hash table entries: 4096 (order: 6, 262144 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: pinctrl core: initialized pinctrl subsystem
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_NETLINK/PF_ROUTE protocol family
+Oct 06 01:52:05 Str0keWtf kernel: DMA: preallocated 4096 KiB GFP_KERNEL pool for atomic allocations
+Oct 06 01:52:05 Str0keWtf kernel: DMA: preallocated 4096 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+Oct 06 01:52:05 Str0keWtf kernel: audit: initializing netlink subsys (disabled)
+Oct 06 01:52:05 Str0keWtf kernel: audit: type=2000 audit(1791265922.044:1): state=initialized audit_enabled=0 res=1
+Oct 06 01:52:05 Str0keWtf kernel: thermal_sys: Registered thermal governor 'step_wise'
+Oct 06 01:52:05 Str0keWtf kernel: thermal_sys: Registered thermal governor 'user_space'
+Oct 06 01:52:05 Str0keWtf kernel: cpuidle: using governor ladder
+Oct 06 01:52:05 Str0keWtf kernel: cpuidle: using governor menu
+Oct 06 01:52:05 Str0keWtf kernel: acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+Oct 06 01:52:05 Str0keWtf kernel: dca service started, version 1.12.1
+Oct 06 01:52:05 Str0keWtf kernel: PCI: Fatal: No config space access function found
+Oct 06 01:52:05 Str0keWtf kernel: kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+Oct 06 01:52:05 Str0keWtf kernel: HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+Oct 06 01:52:05 Str0keWtf kernel: HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+Oct 06 01:52:05 Str0keWtf kernel: HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+Oct 06 01:52:05 Str0keWtf kernel: HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+Oct 06 01:52:05 Str0keWtf kernel: cryptd: max_cpu_qlen set to 1000
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Added _OSI(Module Device)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Added _OSI(Processor Device)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Added _OSI(3.0 _SCP Extensions)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Added _OSI(Processor Aggregator Device)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: 1 ACPI AML tables successfully acquired and loaded
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: _OSC evaluation for CPUs failed, trying _PDC
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Interpreter enabled
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: PM: (supports S0 S5)
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Using IOAPIC for interrupt routing
+Oct 06 01:52:05 Str0keWtf kernel: PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+Oct 06 01:52:05 Str0keWtf kernel: PCI: Using E820 reservations for host bridge windows
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: Enabled 1 GPEs in block 00 to 0F
+Oct 06 01:52:05 Str0keWtf kernel: iommu: Default domain type: Translated
+Oct 06 01:52:05 Str0keWtf kernel: iommu: DMA domain TLB invalidation policy: lazy mode
+Oct 06 01:52:05 Str0keWtf kernel: SCSI subsystem initialized
+Oct 06 01:52:05 Str0keWtf kernel: libata version 3.00 loaded.
+Oct 06 01:52:05 Str0keWtf kernel: pps_core: LinuxPPS API ver. 1 registered
+Oct 06 01:52:05 Str0keWtf kernel: pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+Oct 06 01:52:05 Str0keWtf kernel: PTP clock support registered
+Oct 06 01:52:05 Str0keWtf kernel: EDAC MC: Ver: 3.0.0
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: Vmbus version:5.3
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: Unknown GUID: 6e382d18-3336-4f4b-acc4-2b7703d4df4a
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: Unknown GUID: dde9cbc0-5060-4436-9448-ea1254a5d177
+Oct 06 01:52:05 Str0keWtf kernel: NetLabel: Initializing
+Oct 06 01:52:05 Str0keWtf kernel: NetLabel:  domain hash size = 128
+Oct 06 01:52:05 Str0keWtf kernel: NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+Oct 06 01:52:05 Str0keWtf kernel: NetLabel:  unlabeled traffic allowed by default
+Oct 06 01:52:05 Str0keWtf kernel: PCI: Using ACPI for IRQ routing
+Oct 06 01:52:05 Str0keWtf kernel: PCI: System does not support PCI
+Oct 06 01:52:05 Str0keWtf kernel: vgaarb: loaded
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: Switched to clocksource hyperv_clocksource_tsc_page
+Oct 06 01:52:05 Str0keWtf kernel: VFS: Disk quotas dquot_6.6.0
+Oct 06 01:52:05 Str0keWtf kernel: VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+Oct 06 01:52:05 Str0keWtf kernel: FS-Cache: Loaded
+Oct 06 01:52:05 Str0keWtf kernel: pnp: PnP ACPI init
+Oct 06 01:52:05 Str0keWtf kernel: pnp: PnP ACPI: found 1 devices
+Oct 06 01:52:05 Str0keWtf kernel: clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_INET protocol family
+Oct 06 01:52:05 Str0keWtf kernel: IP idents hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: tcp_listen_portaddr_hash hash table entries: 16384 (order: 6, 262144 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: TCP established hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: TCP bind hash table entries: 65536 (order: 9, 2097152 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: TCP: Hash tables configured (established 262144 bind 65536)
+Oct 06 01:52:05 Str0keWtf kernel: UDP hash table entries: 16384 (order: 7, 524288 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: UDP-Lite hash table entries: 16384 (order: 7, 524288 bytes, linear)
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_UNIX/PF_LOCAL protocol family
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_XDP protocol family
+Oct 06 01:52:05 Str0keWtf kernel: PCI: CLS 0 bytes, default 64
+Oct 06 01:52:05 Str0keWtf kernel: PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+Oct 06 01:52:05 Str0keWtf kernel: software IO TLB: mapped [mem 0x00000000f4000000-0x00000000f8000000] (64MB)
+Oct 06 01:52:05 Str0keWtf kernel: Trying to unpack rootfs image as initramfs...
+Oct 06 01:52:05 Str0keWtf kernel: Freeing initrd memory: 2720K
+Oct 06 01:52:05 Str0keWtf kernel: RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+Oct 06 01:52:05 Str0keWtf kernel: Initialise system trusted keyrings
+Oct 06 01:52:05 Str0keWtf kernel: Key type blacklist registered
+Oct 06 01:52:05 Str0keWtf kernel: workingset: timestamp_bits=36 max_order=23 bucket_order=0
+Oct 06 01:52:05 Str0keWtf kernel: squashfs: version 4.0 (2009/01/31) Phillip Lougher
+Oct 06 01:52:05 Str0keWtf kernel: fuse: init (API version 7.39)
+Oct 06 01:52:05 Str0keWtf kernel: SGI XFS with ACLs, security attributes, realtime, verbose warnings, quota, no debug enabled
+Oct 06 01:52:05 Str0keWtf kernel: 9p: Installing v9fs 9p2000 file system support
+Oct 06 01:52:05 Str0keWtf kernel: Key type asymmetric registered
+Oct 06 01:52:05 Str0keWtf kernel: Asymmetric key parser 'x509' registered
+Oct 06 01:52:05 Str0keWtf kernel: Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+Oct 06 01:52:05 Str0keWtf kernel: io scheduler mq-deadline registered
+Oct 06 01:52:05 Str0keWtf kernel: io scheduler kyber registered
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_pci
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci c4b741f5-5582-4c98-8f8b-2e082933c396: PCI VMBus probing: Using version 0x10004
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci c4b741f5-5582-4c98-8f8b-2e082933c396: PCI host bridge to bus 5582:00
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus 5582:00: root bus resource [mem 0x9ffe00000-0x9ffe02fff window]
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus 5582:00: No busn resource found for root bus, will use [bus 00-ff]
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: [1af4:1043] type 00 class 0x010000
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: reg 0x10: [mem 0x9ffe00000-0x9ffe00fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: reg 0x18: [mem 0x9ffe01000-0x9ffe01fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: reg 0x20: [mem 0x9ffe02000-0x9ffe02fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus 5582:00: busn_res: [bus 00-ff] end is updated to 00
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: BAR 0: assigned [mem 0x9ffe00000-0x9ffe00fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: BAR 2: assigned [mem 0x9ffe01000-0x9ffe01fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci 5582:00:00.0: BAR 4: assigned [mem 0x9ffe02000-0x9ffe02fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci c1aa3eab-235f-4d86-b74f-c8d60f47f688: PCI VMBus probing: Using version 0x10004
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci c1aa3eab-235f-4d86-b74f-c8d60f47f688: PCI host bridge to bus 235f:00
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus 235f:00: No busn resource found for root bus, will use [bus 00-ff]
+Oct 06 01:52:05 Str0keWtf kernel: pci 235f:00:00.0: [1414:008e] type 00 class 0x030200
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus 235f:00: busn_res: [bus 00-ff] end is updated to 00
+Oct 06 01:52:05 Str0keWtf kernel: ioatdma: Intel(R) QuickData Technology Driver 5.00
+Oct 06 01:52:05 Str0keWtf kernel: virtio-pci 5582:00:00.0: enabling device (0000 -> 0002)
+Oct 06 01:52:05 Str0keWtf kernel: Serial: 8250/16550 driver, 8 ports, IRQ sharing enabled
+Oct 06 01:52:05 Str0keWtf kernel: Linux agpgart interface v0.103
+Oct 06 01:52:05 Str0keWtf kernel: AMD-Vi: AMD IOMMUv2 functionality not available on this system - This is not a bug.
+Oct 06 01:52:05 Str0keWtf kernel: ACPI: bus type drm_connector registered
+Oct 06 01:52:05 Str0keWtf kernel: printk: console [hvc0] enabled
+Oct 06 01:52:05 Str0keWtf kernel: brd: module loaded
+Oct 06 01:52:05 Str0keWtf kernel: loop: module loaded
+Oct 06 01:52:05 Str0keWtf kernel: Loading iSCSI transport class v2.0-870.
+Oct 06 01:52:05 Str0keWtf kernel: rdac: device handler registered
+Oct 06 01:52:05 Str0keWtf kernel: Microchip SmartPQI Driver (v2.1.24-046)
+Oct 06 01:52:05 Str0keWtf kernel: VMware PVSCSI driver - version 1.0.7.0-k
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_storvsc
+Oct 06 01:52:05 Str0keWtf kernel: PPP generic driver version 2.4.2
+Oct 06 01:52:05 Str0keWtf kernel: VMware vmxnet3 virtual NIC driver - version 1.7.0.0-k-NAPI
+Oct 06 01:52:05 Str0keWtf kernel: scsi host0: storvsc_host_t
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_netvsc
+Oct 06 01:52:05 Str0keWtf kernel: Fusion MPT base driver 3.04.20
+Oct 06 01:52:05 Str0keWtf kernel: Copyright (c) 1999-2008 LSI Corporation
+Oct 06 01:52:05 Str0keWtf kernel: Fusion MPT SPI Host driver 3.04.20
+Oct 06 01:52:05 Str0keWtf kernel: Fusion MPT SAS Host driver 3.04.20
+Oct 06 01:52:05 Str0keWtf kernel: Fusion MPT misc device (ioctl) driver 3.04.20
+Oct 06 01:52:05 Str0keWtf kernel: mptctl: Registered with Fusion MPT base driver
+Oct 06 01:52:05 Str0keWtf kernel: mptctl: /dev/mptctl @ (major,minor=10,220)
+Oct 06 01:52:05 Str0keWtf kernel: i8042: PNP: No PS/2 controller found.
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hyperv_keyboard
+Oct 06 01:52:05 Str0keWtf kernel: rtc_cmos 00:00: RTC can wake from S4
+Oct 06 01:52:05 Str0keWtf kernel: rtc_cmos 00:00: registered as rtc0
+Oct 06 01:52:05 Str0keWtf kernel: rtc_cmos 00:00: setting system clock to 2026-10-06T05:52:02 UTC (1791265922)
+Oct 06 01:52:05 Str0keWtf kernel: rtc_cmos 00:00: alarms up to one month, 114 bytes nvram
+Oct 06 01:52:05 Str0keWtf kernel: device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+Oct 06 01:52:05 Str0keWtf kernel: device-mapper: uevent: version 1.0.3
+Oct 06 01:52:05 Str0keWtf kernel: device-mapper: ioctl: 4.48.0-ioctl (2023-03-01) initialised: dm-devel@redhat.com
+Oct 06 01:52:05 Str0keWtf kernel: intel_pstate: CPU model not supported
+Oct 06 01:52:05 Str0keWtf kernel: hv_utils: Registering HyperV Utility Driver
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_utils
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_balloon
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver dxgkrnl
+Oct 06 01:52:05 Str0keWtf kernel: hv_utils: TimeSync IC version 4.0
+Oct 06 01:52:05 Str0keWtf kernel: hv_balloon: Using Dynamic Memory protocol version 2.0
+Oct 06 01:52:05 Str0keWtf kernel: Free page reporting enabled
+Oct 06 01:52:05 Str0keWtf kernel: hv_balloon: Cold memory discard hint enabled with order 9
+Oct 06 01:52:05 Str0keWtf kernel: drop_monitor: Initializing network drop monitor service
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_INET6 protocol family
+Oct 06 01:52:05 Str0keWtf kernel: Segment Routing with IPv6
+Oct 06 01:52:05 Str0keWtf kernel: In-situ OAM (IOAM) with IPv6
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_PACKET protocol family
+Oct 06 01:52:05 Str0keWtf kernel: 9pnet: Installing 9P2000 support
+Oct 06 01:52:05 Str0keWtf kernel: NET: Registered PF_VSOCK protocol family
+Oct 06 01:52:05 Str0keWtf kernel: hv_vmbus: registering driver hv_sock
+Oct 06 01:52:05 Str0keWtf kernel: IPI shorthand broadcast: enabled
+Oct 06 01:52:05 Str0keWtf kernel: AVX2 version of gcm_enc/dec engaged.
+Oct 06 01:52:05 Str0keWtf kernel: AES CTR mode by8 optimization enabled
+Oct 06 01:52:05 Str0keWtf kernel: sched_clock: Marking stable (284004700, 3646300)->(307646800, -19995800)
+Oct 06 01:52:05 Str0keWtf kernel: registered taskstats version 1
+Oct 06 01:52:05 Str0keWtf kernel: Loading compiled-in X.509 certificates
+Oct 06 01:52:05 Str0keWtf kernel: ima: No TPM chip found, activating TPM-bypass!
+Oct 06 01:52:05 Str0keWtf kernel: ima: Allocated hash algorithm: sha256
+Oct 06 01:52:05 Str0keWtf kernel: ima: No architecture policies found
+Oct 06 01:52:05 Str0keWtf kernel: RAS: Correctable Errors collector initialized.
+Oct 06 01:52:05 Str0keWtf kernel: clk: Disabling unused clocks
+Oct 06 01:52:05 Str0keWtf kernel: Freeing unused decrypted memory: 2028K
+Oct 06 01:52:05 Str0keWtf kernel: Freeing unused kernel image (initmem) memory: 4492K
+Oct 06 01:52:05 Str0keWtf kernel: Write protecting the kernel read-only data: 34816k
+Oct 06 01:52:05 Str0keWtf kernel: Freeing unused kernel image (rodata/data gap) memory: 840K
+Oct 06 01:52:05 Str0keWtf kernel: Run /init as init process
+Oct 06 01:52:05 Str0keWtf kernel:   with arguments:
+Oct 06 01:52:05 Str0keWtf kernel:     /init
+Oct 06 01:52:05 Str0keWtf kernel:   with environment:
+Oct 06 01:52:05 Str0keWtf kernel:     HOME=/
+Oct 06 01:52:05 Str0keWtf kernel:     TERM=linux
+Oct 06 01:52:05 Str0keWtf kernel:     WSL_ROOT_INIT=1
+Oct 06 01:52:05 Str0keWtf kernel:     WSL_ENABLE_CRASH_DUMP=1
+Oct 06 01:52:05 Str0keWtf kernel: scsi 0:0:0:0: Direct-Access     Msft     Virtual Disk     1.0  PQ: 0 ANSI: 5
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: Attached scsi generic sg0 type 0
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: [sda] 795880 512-byte logical blocks: (407 MB/389 MiB)
+Oct 06 01:52:05 Str0keWtf kernel: scsi 0:0:0:1: Direct-Access     Msft     Virtual Disk     1.0  PQ: 0 ANSI: 5
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: [sda] Write Protect is on
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: [sda] Mode Sense: 0f 00 80 00
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: Attached scsi generic sg1 type 0
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: [sdb] 381016 512-byte logical blocks: (195 MB/186 MiB)
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:0: [sda] Attached SCSI disk
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: [sdb] Write Protect is on
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: [sdb] Mode Sense: 0f 00 80 00
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: [sdb] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:1: [sdb] Attached SCSI disk
+Oct 06 01:52:05 Str0keWtf kernel: scsi 0:0:0:2: Direct-Access     Msft     Virtual Disk     1.0  PQ: 0 ANSI: 5
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: Attached scsi generic sg2 type 0
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] 14680072 512-byte logical blocks: (7.52 GB/7.00 GiB)
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] 4096-byte physical blocks
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] Write Protect is off
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] Mode Sense: 0f 00 00 00
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:2: [sdc] Attached SCSI disk
+Oct 06 01:52:05 Str0keWtf kernel: EXT4-fs (sda): mounted filesystem 00000000-0000-0000-0000-000000000000 ro without journal. Quota mode: none.
+Oct 06 01:52:05 Str0keWtf kernel: EXT4-fs (sdb): mounted filesystem 00000000-0000-0000-0000-000000000000 ro without journal. Quota mode: none.
+Oct 06 01:52:05 Str0keWtf kernel: tun: Universal TUN/TAP device driver, 1.6
+Oct 06 01:52:05 Str0keWtf kernel: bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+Oct 06 01:52:05 Str0keWtf kernel: Bridge firewalling registered
+Oct 06 01:52:05 Str0keWtf kernel: Adding 7340032k swap on /dev/sdc.  Priority:-2 extents:1 across:7340032k 
+Oct 06 01:52:05 Str0keWtf kernel: hv_netvsc fc232fd7-4443-4791-a539-deef713ec4d4 loopback0: renamed from eth1
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci 656c6728-c59f-486a-8a50-e38e1b916a67: PCI VMBus probing: Using version 0x10004
+Oct 06 01:52:05 Str0keWtf kernel: hv_pci 656c6728-c59f-486a-8a50-e38e1b916a67: PCI host bridge to bus c59f:00
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus c59f:00: root bus resource [mem 0xc00000000-0xe00001fff window]
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus c59f:00: No busn resource found for root bus, will use [bus 00-ff]
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: [1af4:105a] type 00 class 0x088000
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: reg 0x10: [mem 0xe00000000-0xe00000fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: reg 0x18: [mem 0xe00001000-0xe00001fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: reg 0x20: [mem 0xc00000000-0xdffffffff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci_bus c59f:00: busn_res: [bus 00-ff] end is updated to 00
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: BAR 4: assigned [mem 0xc00000000-0xdffffffff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: BAR 0: assigned [mem 0xe00000000-0xe00000fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: pci c59f:00:00.0: BAR 2: assigned [mem 0xe00001000-0xe00001fff 64bit]
+Oct 06 01:52:05 Str0keWtf kernel: virtio-pci c59f:00:00.0: enabling device (0000 -> 0002)
+Oct 06 01:52:05 Str0keWtf kernel: virtiofs virtio1: Cache len: 0x200000000 @ 0xc00000000
+Oct 06 01:52:05 Str0keWtf kernel: scsi 0:0:0:3: Direct-Access     Msft     Virtual Disk     1.0  PQ: 0 ANSI: 5
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: Attached scsi generic sg3 type 0
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] 2147483648 512-byte logical blocks: (1.10 TB/1.00 TiB)
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] 4096-byte physical blocks
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] Write Protect is off
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] Mode Sense: 0f 00 00 00
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Oct 06 01:52:05 Str0keWtf kernel: sd 0:0:0:3: [sdd] Attached SCSI disk
+Oct 06 01:52:05 Str0keWtf kernel: EXT4-fs (sdd): mounted filesystem 3c8e28e9-f8b6-4f9b-8a7f-290758f1d47d r/w with ordered data mode. Quota mode: none.
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_is_feature_enabled: Ioctl failed: -22
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -22
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -22
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -22
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf unknown: Failed to connect to system scope bus via local transport: No such file or directory
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_query_adapter_info: Ioctl failed: -2
+Oct 06 01:52:05 Str0keWtf systemd-journald[48]: Collecting audit messages is disabled.
+Oct 06 01:52:05 Str0keWtf kernel: weston[333]: memfd_create() called without MFD_EXEC or MFD_NOEXEC_SEAL set
+Oct 06 01:52:05 Str0keWtf systemd-journald[48]: Received client request to flush runtime journal.
+Oct 06 01:52:05 Str0keWtf systemd-journald[48]: File /var/log/journal/292f8f82938f4a92a5806d93085a8f1f/system.journal corrupted or uncleanly shut down, renaming and replacing.
+Oct 06 01:52:07 Str0keWtf kernel: kvm_intel: Using Hyper-V Enlightened VMCS
+Oct 06 01:52:07 Str0keWtf kernel: TCP: eth4: Driver has suspect GRO implementation, TCP performance may be compromised.
+Oct 06 01:52:09 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 01:52:10 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 01:52:10 Str0keWtf kernel: Initializing XFRM netlink socket
+Oct 06 01:52:12 Str0keWtf kernel: docker0: port 1(veth79d8261) entered blocking state
+Oct 06 01:52:12 Str0keWtf kernel: docker0: port 1(veth79d8261) entered disabled state
+Oct 06 01:52:12 Str0keWtf kernel: veth79d8261: entered allmulticast mode
+Oct 06 01:52:12 Str0keWtf kernel: veth79d8261: entered promiscuous mode
+Oct 06 01:52:12 Str0keWtf kernel: eth0: renamed from vethfca4965
+Oct 06 01:52:12 Str0keWtf kernel: docker0: port 1(veth79d8261) entered blocking state
+Oct 06 01:52:12 Str0keWtf kernel: docker0: port 1(veth79d8261) entered forwarding state
+Oct 06 01:52:14 Str0keWtf systemd-journald[48]: File /var/log/journal/292f8f82938f4a92a5806d93085a8f1f/user-1000.journal corrupted or uncleanly shut down, renaming and replacing.
+Oct 06 01:52:50 Str0keWtf kernel: hv_balloon: Max. dynamic memory size: 26624 MB
+Oct 06 06:24:08 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 06:43:09 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 06 06:53:33 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 08:21:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 08:23:33 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 09:47:30 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:47:47 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:47:47 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:48:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:48:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:48:29 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 09:48:29 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 10:43:04 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 10:43:04 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:11:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:30:33 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:33:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:34:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:40:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 11:45:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 12:14:33 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 12:59:03 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 14:23:33 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 19:01:06 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 06 19:10:12 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 06 19:10:43 Str0keWtf kernel: misc dxg: dxgk: dxgvmb_send_create_allocation: send_create_allocation failed ffffffb5
+Oct 06 19:10:43 Str0keWtf kernel: misc dxg: dxgk: dxgkio_create_allocation: Ioctl failed: -75
+Oct 06 19:10:47 Str0keWtf unknown: WSL (315) ERROR: No buffer space available @telemetry.cpp:190 (StartTelemetryAgent)
+Oct 06 23:02:08 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:02:21 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:02:21 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:02:39 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:02:39 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:16 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:16 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:23 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:23 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:25:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:55:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 06 23:55:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:13:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:13:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:33:46 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:33:46 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:34:37 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:34:37 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:46:56 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:46:56 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:51:42 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 00:51:42 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 01:14:02 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 01:14:02 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 01:30:00 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 01:30:00 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 03:28:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 03:28:49 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 05:05:37 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 05:05:37 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 05:50:04 Str0keWtf kernel: kworker/0:0: page allocation failure: order:7, mode:0xdc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null),cpuset=/,mems_allowed=0
+Oct 07 05:50:04 Str0keWtf kernel: CPU: 0 PID: 2339292 Comm: kworker/0:0 Not tainted 6.6.87.2-microsoft-standard-WSL2 #1
+Oct 07 05:50:04 Str0keWtf kernel: Workqueue: hv_pri_chan vmbus_add_channel_work
+Oct 07 05:50:04 Str0keWtf kernel: Call Trace:
+Oct 07 05:50:04 Str0keWtf kernel:  <TASK>
+Oct 07 05:50:04 Str0keWtf kernel:  dump_stack_lvl+0x4c/0x70
+Oct 07 05:50:04 Str0keWtf kernel:  dump_stack+0x14/0x20
+Oct 07 05:50:04 Str0keWtf kernel:  warn_alloc+0x10d/0x190
+Oct 07 05:50:04 Str0keWtf kernel:  ? __alloc_pages_direct_compact+0x19d/0x290
+Oct 07 05:50:04 Str0keWtf kernel:  __alloc_pages_slowpath.constprop.0+0xdb6/0xe80
+Oct 07 05:50:04 Str0keWtf kernel:  __alloc_pages+0x31c/0x350
+Oct 07 05:50:04 Str0keWtf kernel:  ? __pfx_hvs_channel_cb+0x10/0x10
+Oct 07 05:50:04 Str0keWtf kernel:  vmbus_alloc_ring+0x78/0xd0
+Oct 07 05:50:04 Str0keWtf kernel:  vmbus_open+0x2a/0x80
+Oct 07 05:50:04 Str0keWtf kernel:  hvs_probe+0x41d/0x4e0
+Oct 07 05:50:04 Str0keWtf kernel:  vmbus_probe+0x3f/0xa0
+Oct 07 05:50:04 Str0keWtf kernel:  really_probe+0x1b2/0x420
+Oct 07 05:50:04 Str0keWtf kernel:  ? __pfx___device_attach_driver+0x10/0x10
+Oct 07 05:50:04 Str0keWtf kernel:  __driver_probe_device+0x7e/0x170
+Oct 07 05:50:04 Str0keWtf kernel:  driver_probe_device+0x23/0xa0
+Oct 07 05:50:04 Str0keWtf kernel:  __device_attach_driver+0x92/0x120
+Oct 07 05:50:04 Str0keWtf kernel:  bus_for_each_drv+0x8a/0xe0
+Oct 07 05:50:04 Str0keWtf kernel:  __device_attach+0xc1/0x1f0
+Oct 07 05:50:04 Str0keWtf kernel:  device_initial_probe+0x17/0x20
+Oct 07 05:50:05 Str0keWtf kernel:  bus_probe_device+0x9d/0xa0
+Oct 07 05:50:05 Str0keWtf kernel:  device_add+0x683/0x8a0
+Oct 07 05:50:05 Str0keWtf kernel:  ? hrtimer_init+0x2c/0x80
+Oct 07 05:50:05 Str0keWtf kernel:  device_register+0x1f/0x30
+Oct 07 05:50:05 Str0keWtf kernel:  vmbus_device_register+0x87/0x130
+Oct 07 05:50:05 Str0keWtf kernel:  vmbus_add_channel_work+0x146/0x1c0
+Oct 07 05:50:05 Str0keWtf kernel:  process_one_work+0x186/0x3c0
+Oct 07 05:50:05 Str0keWtf kernel:  ? __pfx_worker_thread+0x10/0x10
+Oct 07 05:50:05 Str0keWtf kernel:  worker_thread+0x1f6/0x390
+Oct 07 05:50:05 Str0keWtf kernel:  ? _raw_spin_unlock_irqrestore+0x2b/0x50
+Oct 07 05:50:05 Str0keWtf kernel:  ? __pfx_worker_thread+0x10/0x10
+Oct 07 05:50:05 Str0keWtf kernel:  kthread+0x107/0x140
+Oct 07 05:50:05 Str0keWtf kernel:  ? __pfx_kthread+0x10/0x10
+Oct 07 05:50:05 Str0keWtf kernel:  ret_from_fork+0x3d/0x60
+Oct 07 05:50:05 Str0keWtf kernel:  ? __pfx_kthread+0x10/0x10
+Oct 07 05:50:05 Str0keWtf kernel:  ret_from_fork_asm+0x1b/0x30
+Oct 07 05:50:05 Str0keWtf kernel:  </TASK>
+Oct 07 05:50:05 Str0keWtf kernel: Mem-Info:
+Oct 07 05:50:05 Str0keWtf kernel: active_anon:202439 inactive_anon:1053881 isolated_anon:26
+                                   active_file:1336461 inactive_file:3193262 isolated_file:0
+                                   unevictable:0 dirty:491 writeback:0
+                                   slab_reclaimable:490582 slab_unreclaimable:112909
+                                   mapped:57903 shmem:469232 pagetables:101367
+                                   sec_pagetables:0 bounce:0
+                                   kernel_misc_reclaimable:0
+                                   free:79454 free_pcp:1537 free_cma:0
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 active_anon:809756kB inactive_anon:4215524kB active_file:5345844kB inactive_file:12773048kB unevictable:0kB isolated(anon):104kB isolated(file):0kB mapped:231612kB dirty:1964kB writeback:0kB shmem:1876928kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0kB writeback_tmp:0kB kernel_stack:12944kB pagetables:405468kB sec_pagetables:0kB all_unreclaimable? no
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 DMA32 free:108388kB boost:0kB min:6744kB low:10736kB high:14728kB reserved_highatomic:2048KB active_anon:239212kB inactive_anon:757884kB active_file:685160kB inactive_file:1715592kB unevictable:0kB writepending:1592kB present:4061820kB managed:3995648kB mlocked:0kB bounce:0kB free_pcp:300kB local_pcp:0kB free_cma:0kB
+Oct 07 05:50:05 Str0keWtf kernel: lowmem_reserve[]: 0 22138 22138 22138
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 Normal free:209428kB boost:0kB min:38308kB low:60976kB high:83644kB reserved_highatomic:90112KB active_anon:570544kB inactive_anon:3457640kB active_file:4660964kB inactive_file:11057480kB unevictable:0kB writepending:220kB present:23199744kB managed:22677688kB mlocked:0kB bounce:0kB free_pcp:5844kB local_pcp:0kB free_cma:0kB
+Oct 07 05:50:05 Str0keWtf kernel: lowmem_reserve[]: 0 0 0 0
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 DMA32: 942*4kB (UMEH) 2187*8kB (UMEH) 1190*16kB (UMEH) 497*32kB (UMEH) 314*64kB (UMEH) 128*128kB (UME) 62*256kB (UME) 0*512kB 0*1024kB 0*2048kB 0*4096kB = 108560kB
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 Normal: 9411*4kB (ME) 902*8kB (MEH) 2203*16kB (UMEH) 1206*32kB (UMEH) 20*64kB (UME) 3*128kB (UM) 1*256kB (U) 0*512kB 0*1024kB 19*2048kB (H) 12*4096kB (H) = 208684kB
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 hugepages_total=0 hugepages_free=0 hugepages_surp=0 hugepages_size=1048576kB
+Oct 07 05:50:05 Str0keWtf kernel: Node 0 hugepages_total=0 hugepages_free=0 hugepages_surp=0 hugepages_size=2048kB
+Oct 07 05:50:05 Str0keWtf kernel: 5007925 total pagecache pages
+Oct 07 05:50:05 Str0keWtf kernel: 8942 pages in swap cache
+Oct 07 05:50:05 Str0keWtf kernel: Free swap  = 3790568kB
+Oct 07 05:50:05 Str0keWtf kernel: Total swap = 7340032kB
+Oct 07 05:50:05 Str0keWtf kernel: 6815391 pages RAM
+Oct 07 05:50:05 Str0keWtf kernel: 0 pages HighMem/MovableOnly
+Oct 07 05:50:05 Str0keWtf kernel: 147057 pages reserved
+Oct 07 05:50:05 Str0keWtf kernel: 0 pages hwpoisoned
+Oct 07 07:13:05 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:18 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:18 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:30 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 07:13:30 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 08:10:50 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 08:10:50 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 08:11:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 08:11:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 09:10:44 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 09:10:44 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 09:40:27 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 10:58:58 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 11:13:26 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 11:14:26 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 11:17:26 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 11:20:26 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 11:26:06 Str0keWtf unknown: Failed to refresh allocated ports, 
+Oct 07 11:26:06 Str0keWtf unknown: Exception thrown by void NetlinkTransaction::Execute(const std::function<void (const NetlinkResponse &)> &) in NetlinkTransaction.cpp:35:Error in netlink transaction.
+                           Innermost exception: Exception thrown by NetlinkResponse NetlinkChannel::ReceiveNetlinkResponse() in .\NetlinkChannel.hxx:116:recvmsg(9, (56 bytes) {a0,26,10,69,93,75,00,00,80,00,00,00,00,00,00,00,90,26,10,69,93,75,00,00,01,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00}, 34) failed with errno=105 (No buffer space available)
+                           Request: (72 bytes) {48,00,00,00,14,00,05,03,05,77,0e,00,00,00,00,00,02,06,00,00,ff,ff,ff,ff,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00}
+                           Responses: (seen: 0) []
+Oct 07 11:26:06 Str0keWtf unknown: 
+Oct 07 12:03:14 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 12:03:25 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 12:03:25 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 13:50:57 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 13:50:57 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 14:10:11 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 14:10:29 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 14:10:29 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 15:14:27 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 15:14:27 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 15:17:56 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 15:24:26 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 15:59:27 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 16:10:56 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 16:18:56 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 07 16:52:09 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 16:52:14 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 16:52:14 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 18:47:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 18:47:07 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:47:07 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:47:15 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:48:27 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:48:27 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:58:07 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 18:58:11 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 19:00:47 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 19:22:54 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 19:22:56 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 21:09:58 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:10:01 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:10:01 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:10:19 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:10:19 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:55:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 21:55:07 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 21:55:10 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 21:55:36 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 21:58:06 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 07 22:19:20 Str0keWtf kernel: misc dxg: dxgk: dxgvmb_send_sync_msg: wait_for_completion failed: fffffe00
+Oct 07 22:19:20 Str0keWtf kernel: misc dxg: dxgk: dxgvmb_send_sync_msg: wait_for_completion failed: fffffe00
+Oct 07 22:19:20 Str0keWtf kernel: misc dxg: dxgk: dxgvmb_send_sync_msg: wait_for_completion failed: fffffe00
+Oct 07 22:19:20 Str0keWtf kernel: misc dxg: dxgk: process_completion_packet: did not find packet to complete
+Oct 07 22:19:20 Str0keWtf kernel: misc dxg: dxgk: process_completion_packet: did not find packet to complete
+Oct 07 22:59:13 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 22:59:27 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 07 22:59:27 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 00:31:21 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 00:31:21 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 00:47:07 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 00:50:09 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 00:50:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 00:50:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 01:21:54 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 01:21:54 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 01:22:12 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 01:22:12 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 01:28:38 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 01:35:36 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 02:31:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:04 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:05 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:12 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:12 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:34 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:34 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:41 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:32:41 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:34:10 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 02:34:10 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:39:22 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:39:22 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:39:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:39:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:42:27 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 03:42:27 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 04:32:22 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 04:32:22 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 05:18:15 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 07:16:45 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 07:19:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 07:32:16 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 07:35:45 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 08:06:16 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 08:18:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 08:34:02 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 08:35:37 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 08:35:38 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 09:04:46 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 09:04:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 09:12:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 11:32:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 11:34:16 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 12:15:50 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 12:23:39 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 12:27:44 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 12:27:44 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 12:28:01 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 12:28:01 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 13:08:48 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 13:08:48 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 15:36:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:36:30 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:36:30 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:38:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:38:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:38:28 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:38:28 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:40:46 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 15:40:46 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 18:33:18 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 18:34:38 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 18:42:33 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 18:50:42 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 18:59:14 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 18:59:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 18:59:43 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 18:59:43 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 19:19:14 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 08 19:19:14 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 08 19:49:47 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 08 23:51:16 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 00:06:59 Str0keWtf kernel: traps: llama-bench[3981840] trap divide error ip:707018bed5c8 sp:7ffc566a0670 error:0 in libggml-cuda.so.0.26.0[707018033000+10d2000]
+Oct 09 00:06:59 Str0keWtf kernel: llama-bench: llama-bench: potentially unexpected fatal signal 8.
+Oct 09 00:06:59 Str0keWtf kernel: CPU: 4 PID: 3981840 Comm: llama-bench Not tainted 6.6.87.2-microsoft-standard-WSL2 #1
+Oct 09 00:06:59 Str0keWtf kernel: RIP: 0033:0x707018bed5c8
+Oct 09 00:06:59 Str0keWtf kernel: Code: f7 f0 83 c0 01 89 85 48 fe ff ff 80 bd 5c ff ff ff 00 0f 84 4a 05 00 00 0f af b5 98 fd ff ff 41 0f af f7 8d 4c 33 ff 89 c8 99 <f7> fb 6b c6 64 29 d1 99 f7 f9 83 f8 59 7e 0a 41 81 fd ff ff 0f 00
+Oct 09 00:06:59 Str0keWtf kernel: RSP: 002b:00007ffc566a0670 EFLAGS: 00010202
+Oct 09 00:06:59 Str0keWtf kernel: RAX: 000000000000001f RBX: 0000000000000000 RCX: 000000000000001f
+Oct 09 00:06:59 Str0keWtf kernel: RDX: 0000000000000000 RSI: 0000000000000020 RDI: 0000000000000008
+Oct 09 00:06:59 Str0keWtf kernel: RBP: 00007ffc566a0900 R08: 0000000000000001 R09: 0000000000000020
+Oct 09 00:06:59 Str0keWtf kernel: R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+Oct 09 00:06:59 Str0keWtf kernel: R13: 000000000000035c R14: 00007ffc566a0a90 R15: 0000000000000001
+Oct 09 00:06:59 Str0keWtf kernel: FS:  000070701d0b5000 GS:  0000000000000000
+Oct 09 00:16:31 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 00:31:24 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 00:45:54 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 06:45:24 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 08:09:17 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:09:28 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:09:28 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:09:58 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:09:58 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:10:42 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 08:10:42 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 10:25:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 10:25:24 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 10:46:54 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 13:19:10 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:19:20 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:19:20 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:19:24 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:19:24 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 13:21:24 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 13:22:32 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:22:45 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:22:45 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:22:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:22:51 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:23:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:23:07 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:23:54 Str0keWtf unknown: WSL (271) ERROR: CheckConnection: getaddrinfo() failed: -5
+Oct 09 13:23:54 Str0keWtf kernel: mini_init (254): drop_caches: 1
+Oct 09 13:43:34 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 13:43:36 Str0keWtf systemd-journald[48]: Under memory pressure, flushing caches.
+Oct 09 13:47:05 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 09 13:54:11 Str0keWtf kernel: misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12
+Oct 09 16:17:54 Str0keWtf kernel: ptrace attach of "/home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/python /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/tensorrt-edgellm-quantize llm --model_dir checkpoints/base --mtp_draft_dir checkpoints/assistant --output_dir checkpoints/int4-awq --quantization int4_awq --device cuda"[64350] was attempted by "head -c 100 /proc/59730/syscall"[120189]

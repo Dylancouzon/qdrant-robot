@@ -1,0 +1,18 @@
+Oct 09 13:37:49 Str0keWtf systemd[962]: Started p2-trt-quantize.service - [systemd-run] /usr/bin/flock /home/dylan/qdrant-robot-box/gpu.lock /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/bin/tensorrt-edgellm-quantize llm --model_dir checkpoints/base --mtp_draft_dir checkpoints/assistant --output_dir checkpoints/int4-awq --quantization int4_awq --device cuda.
+Oct 09 13:38:43 Str0keWtf flock[59730]: /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/lib/python3.12/site-packages/modelopt/torch/__init__.py:51: UserWarning: transformers 5.14.1 is not tested with current version of modelopt and may cause issues. Please install recommended version with `pip install -U nvidia-modelopt[hf]` if working with HF models.
+Oct 09 13:38:43 Str0keWtf flock[59730]:   _warnings.warn(
+Oct 09 13:39:32 Str0keWtf flock[59730]: [transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Oct 09 13:47:04 Str0keWtf flock[59730]: [2.5K blob data]
+Oct 09 13:47:04 Str0keWtf flock[59730]: Image calibration dataset: mmmu
+Oct 09 13:47:04 Str0keWtf flock[59730]: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Oct 09 13:47:26 Str0keWtf flock[59730]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4VisionAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 13:47:26 Str0keWtf flock[59730]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4TextAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 13:47:26 Str0keWtf flock[59730]: Registered <class 'transformers.models.gemma4.modeling_gemma4.Gemma4AudioAttention'> to _QuantAttention for KV Cache quantization
+Oct 09 13:47:26 Str0keWtf flock[59730]: Inserted 1840 quantizers
+Oct 09 13:47:28 Str0keWtf flock[59730]: awq_lite: Caching activation statistics...
+Oct 09 14:00:29 Str0keWtf flock[59730]: [10.9K blob data]
+Oct 09 14:00:29 Str0keWtf flock[59730]: awq_lite: Searching parameters...
+Oct 09 14:00:34 Str0keWtf flock[59730]: [104B blob data]
+Oct 09 14:00:34 Str0keWtf flock[59730]: /home/dylan/qdrant-robot-box/experiments/p2-trt-edge/venv/lib/python3.12/site-packages/modelopt/torch/utils/cpp_extension.py:97: UserWarning: Ninja is required to load C++ extensions (pip install ninja to get it)
+Oct 09 14:00:34 Str0keWtf flock[59730]: Unable to load extension modelopt_cuda_ext and falling back to CPU version.
+Oct 09 14:00:34 Str0keWtf flock[59730]:   warnings.warn(fail_msg)

@@ -1,0 +1,8 @@
+Running as unit: qr-p2-trt-native-serialization.service; invocation ID: d1a918808ac0481eaa0477bc7444406c
+{"status": "PASS", "native_request_image_and_text": true, "native_channel_cancel_flag": true, "model_inference": false, "generation_cancellation": false, "adapter_function_sha256": "314c3ae192f9f3f824d847658e69a4c2f8b123d052e79590cb68bb78dab7d1c9"}
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 765ms
+CPU time consumed: 689ms
+Memory peak: 1.5M
+Memory swap peak: 0B
