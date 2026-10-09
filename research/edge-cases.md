@@ -12,3 +12,9 @@ As of 2026-10-08. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Identical prompts give different answers | Noisy comparisons | Paired runs, the judge cache, more turns | D56 |
 | Ignored statements filtered after retrieval | Relevant statements missed when the top hits are all ignored | Filter during retrieval | reviews/20261008-195032-46869-review.md |
 | Detector mislabels or misses phones | Named phones not recognized | Label-free matching (done); detector vocabulary later | D64 |
+| Two of nine synthetic "Hey Edgy" lines missed ("Eti", "A ag") | The visitor repeats | Real booth voices before more aliases; arm B if needed | reviews/20261008-230525-97862-review.md |
+| Background speech within 20 s of an answer becomes a follow-up | The robot answers another speaker | Check on the live day; tie follow-ups to the facing person | same |
+| The follow-up clock uses queued WAV length, no speaker | The window boundary differs from playback | Measure with the speaker | same |
+| Lines without the wake phrase still trigger a prefill | GPU waste | Skip prefill until woken | V1-B report |
+| Focus not frozen at the naming turn's speech start | A wrong bind | Freeze at speech start | V1-B report |
+| Naming fixtures paste objects with no person | No focus forms, naming not tested | Held-object scenes or the live day | V1-B report |
