@@ -22,6 +22,7 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 ## Avenues explored
 
 ### Speech and latency
+- F0e freezes63 synthetic utterances separately from D91 data: all57 original files remain unchanged, allWAVs and endpoint gaps pass the1,800s preflight. Six heldout voices rotate across48 scored and15 auxiliary steps. Inputs total8,366,664bytes, maximum7.567s. Jetson deployed decoder cd60be65ee79 matches710/710 reverse-indexed frames to sequential pixels across six15fps480x640 clips and exits successfully under an external90s watchdog. Pin this deployed oracle, not Mac pixel hashes, before baseline. Evidence:2026-10-09-f0e-operations.jsonl and2026-10-09-fixture-decode-1791535339564674223.jsonl (D94, Sol6.1 review PASS).
 - ASR: Moonshine Tiny's 4.3% synthetic WER hid damaging "Qdrant" misses; Small and Medium were slower. Parakeet int8 on CPU won (D22, D24). GPU int8 offered no latency advantage; fp32 used 3,152 MB. Real-voice replay exposed endpointing failures after synthetic tests looked good (D36).
 - Real-voice replay misaligned turns when a pause split a question: the replay now collects every turn per step and marks splits BAD (D38).
 - Endpointing: a global longer hangover was rejected (adds latency to every turn); a length-scaled hangover (0.35 s, 0.7 s after 4 s of speech) removed long-question splits (D38). A turn merge for pauses after a short fragment was designed but not built (research/endpointing.md, reviews/20261008-100527-35955-design.md).
@@ -85,7 +86,7 @@ For example: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 5`. It 
 
 ## Pitfalls
 
-- New timed data has separate reviewer rubrics and no audio yet. The legacy fixture validator assumed inline rubrics and WAVs. Keep show paths relative to the fixture, validate timed data through its source-aware manifest check, and retain legacy audio assertions. Raw cache verification belongs in preparation, so ordinary checks work without ignored downloads (D91).
+- New timed data has separate reviewer rubrics and a separately frozen audio folder. The legacy fixture validator assumed inline rubrics and WAVs. Keep show paths relative to the fixture, validate timed data through its source-aware manifest check, and retain legacy audio assertions. Raw cache verification belongs in preparation, so ordinary checks work without ignored downloads (D91).
 
 - Judge variance and llama-server variance: identical prompts can give different answers; compare paired runs, use the judge cache, and do not read a 1 to 3 step change as real.
 - Mac llama.cpp is not the robot: the Mac Homebrew build matched the Jetson on 51/93; the 3080 box at the Jetson's commit with GGML_CUDA_NSM=8 matches 63/93 (D75). Rank brains on the box; accept on the Jetson.
