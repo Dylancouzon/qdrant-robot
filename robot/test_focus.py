@@ -1,5 +1,4 @@
-"""The focus object's rules on synthetic tracks: take, hold 5 s, margin 1.6, release after 1 s,
-freeze, scenery, worn items, the teaching zone, and the name band with hysteresis."""
+"""Focus selection intervals, drawing continuity, and named-track hysteresis on real Focus."""
 import pytest
 
 from robot import focus as F
@@ -50,6 +49,8 @@ def test_worn_small_objects_hidden_and_outside_zone_fallback() -> None:
     assert f.focus == 3, "the eligible outside-zone object is the fallback"
     mug = Track(4, (500, 500, 600, 600), "mug", 0.8)  # on the mat in the zone, nobody holds it
     run(f, 2, 1.2, [mug], people=())
+    assert f.focus is None, "loss retains the selection-change interval"
+    run(f, 3.2, 3.0, [mug], people=())
     assert f.focus == 4
 
 
@@ -78,20 +79,6 @@ def test_release_after_one_second() -> None:
     assert f.focus is None
 
 
-def test_freeze() -> None:
-    f = Focus(W, H)
-    a, b = phone(), phone((600, 200, 900, 520), 2, "book")
-    _, t = run(f, 0, 6, [a])
-    f.freeze(1)
-    _, t = run(f, t, 3, [a, b])
-    assert f.focus == 1, "frozen while naming"
-    _, t = run(f, t, 3, [])
-    assert f.focus == 1, "frozen even out of view: the naming turn decides"
-    f.thaw()
-    run(f, t, 1.2, [b])
-    assert f.focus == 2
-
-
 def test_scenery() -> None:
     f = Focus(W, H)
     mug = Track(1, (500, 500, 600, 600), "mug", 0.8)
@@ -102,7 +89,9 @@ def test_scenery() -> None:
     assert 1 in f.scenery and events + back == [], "a short miss keeps the mark"
     moved = Track(1, (560, 500, 660, 600), "mug", 0.8)
     run(f, t, 0.2, [moved], people=())
-    assert f.scenery == set() and f.focus == 1, "moving makes it a candidate again"
+    assert f.scenery == set() and f.focus is None
+    run(f, t + .2, 2, [moved], people=())
+    assert f.focus == 1, "moving makes it a candidate again"
 
 
 def test_name_band_and_hysteresis() -> None:
@@ -117,14 +106,14 @@ def test_name_band_and_hysteresis() -> None:
     assert f.focus is None, "a named object never holds the focus"
     assert f.boxes([phone()], [])[0][4:] == ("Dylan's phone", "known")
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: ("Dylan's phone", 0.79)})
-    assert f.names() == {1: ("Dylan's phone", False)}
-    assert f.boxes([phone()], [])[0][5] == "focus", "uncertain preferences may be taught"
+    assert f.names() == {1: ("Dylan's phone", True)}
+    assert f.boxes([phone()], [])[0][5] == "known", "an accepted label survives a weaker view"
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: (None, 0.0)})
-    assert not f.names() and f.name(1), "a miss hides the label, retaining only query preference"
+    assert f.names() == {1: ("Dylan's phone", True)}, "two weak queries retain the display"
     events, t = run(f, t, DT, [phone()], recognized={1: ("Dylan's phone", 0.7)})
     assert ("name", 1, None) in events and f.names() == {}, "the third miss clears it"
-    run(f, t, 0.2, [phone()])
-    assert f.focus == 1, "unnamed again: it may take the focus"
+    run(f, t, 4, [phone()])
+    assert f.focus == 1, "unnamed again after the selection interval"
 
 
 def test_guess_never_takes_focus_and_one_box_per_name() -> None:
@@ -164,7 +153,7 @@ def test_small_target_and_fresh_scores() -> None:
     f = Focus(W, H)
     small = phone((500, 200, 560, 360))
     run(f, 0, 2, [small])
-    f.freeze(small.id)
+    f.focus = small.id
     assert f.target([small]) is None and f.boxes([small], []) == []
     f.bind(small.id, "wallet")
     assert f.boxes([small], []) == [], "known items follow the same minimum"
@@ -172,8 +161,8 @@ def test_small_target_and_fresh_scores() -> None:
     f.update(2.1, [large], [])
     f.bind(large.id, "wallet")
     f.update(2.2, [large], [], recognized={large.id: (None, 0)})
-    assert f.name(large.id) == "wallet" and not f.names()
-    assert all(b[5] != "known" for b in f.boxes([large], []))
+    assert f.names() == {large.id: ("wallet", True)}
+    assert f.named[large.id].score == 0, "display confidence is separate from the fresh query"
 
 
 @pytest.mark.parametrize("box", [(500, 200, 619, 500), (500, 200, 800, 319)])
@@ -223,7 +212,7 @@ def test_size_dip_does_not_override_name_invalidation(monkeypatch, reason):
     else:
         for now in (100.1, 100.15, 100.2):
             f.update(now, [large], [], recognized={1: (None, 0)})
-            assert not f.names(), "a real query miss downgrades immediately"
+            assert bool(f.names()) == (now < 100.2), "the third weak query clears the display"
     f.update(100.4, [large], [])
     assert f.name(1) is None and not f.names()
 
@@ -242,13 +231,14 @@ def test_display_age_conflicts_gaps_and_delayed_results():
     f.update(11.2, [a], [], recognized={1: ("Phone", 0.99)})
     assert f.names() == {1: ("Phone", True)}
     f.update(11.3, [a], [], recognized={1: (None, 0)})
-    assert not f.names(), "a genuine miss removes confirmed display immediately"
+    assert f.names() == {1: ("Phone", True)}, "one weak query retains bounded display continuity"
     f.update(11.4, [], [])
     assert f.name(1) == "Phone", "a short gap retains display-only preference"
     f.update(11.5, [a], [], recognized={1: ("Phone", 0.99)}, recognized_at=11.2)
-    assert not f.names(), "delayed results cannot confirm an ID after a gap"
+    assert f.names() == {1: ("Phone", True)}, "a delayed result cannot change the retained display"
+    assert f.named[1].score == 0 and f.named[1].refreshed == 11.2
     f.bind(1, "Phone", 11.2)
-    assert not f.names(), "binding source age also respects the gap"
+    assert f.named[1].score == 0, "binding source age also respects the gap"
     f.bind(1, "Phone", 11.5)
     f.ignored = {"phone"}
     f.update(11.6, [a], [])
@@ -273,7 +263,7 @@ def test_drawing_smoothing_raw_authority_motion_and_gap():
     jitter = phone((510, 190, 590, 370))
     f.update(10, [original], [])
     f.update(10.1, [jitter], [])
-    f.freeze(1)
+    f.focus = 1
     shown = f.boxes([jitter], [])[0][:4]
     assert shown == (504, 196, 596, 364)
     assert jitter.box == (510, 190, 590, 370), "drawing never changes the raw crop box"
@@ -287,7 +277,7 @@ def test_drawing_smoothing_raw_authority_motion_and_gap():
     assert f.boxes([original], [])[0][:4] == original.box, "a gap clears drawing history"
     r = Focus(W, H)
     r.update(10, [original], [])
-    r.freeze(1)
+    r.focus = 1
     assert r.boxes([original], [])[0][:4] == original.box, "new session has no drawing history"
 
 
@@ -315,9 +305,8 @@ def test_challenger_requires_continuous_priority():
     assert f.focus == 1
     _, t = run(f, t, 0.4, [a, big_b, c])
     assert f.focus == 2
-    f.freeze(1)
     f.update(t, [a, big_b, c], [PERSON])
-    assert f.challenger[0] is None and f.focus == 1
+    assert f.challenger[0] is None and f.focus == 2
 
 
 def test_stationary_size_outlier_and_ignore_clear_drawing():
@@ -325,7 +314,7 @@ def test_stationary_size_outlier_and_ignore_clear_drawing():
     a = phone()
     enlarged = phone((400, 100, 700, 460))  # same center, three times the width
     f.update(10, [a], [])
-    f.freeze(1)
+    f.focus = 1
     f.update(10.1, [enlarged], [])
     assert f.boxes([enlarged], [])[0][:4] == (465, 165, 635, 395)
     f.ignored = {"phone"}
@@ -344,19 +333,19 @@ def test_mixed_known_unknown_short_occlusion_and_config(monkeypatch):
     unknown = phone((700, 400, 900, 650), 2)
     run(f, 10, 1.2, [known, unknown])
     f.bind(1, "Chosen name")
-    f.update(11.3, [known, unknown], [PERSON])
+    f.update(14.4, [known, unknown], [PERSON])
     assert sorted(b[5] for b in f.boxes([known, unknown], [])) == ["focus", "known"]
     epoch = f.epoch(1)
-    f.update(11.4, [unknown], [PERSON])
+    f.update(14.5, [unknown], [PERSON])
     assert f.epoch(1) > epoch and f.name(1) == "Chosen name"
-    assert any(b[4] == "Chosen name" for b in f.boxes([unknown], [], 11.45))
-    f.update(11.5, [known, unknown], [PERSON], recognized={1: ("Wrong", .99)},
-             recognized_at=11.3)
+    assert any(b[4] == "Chosen name" for b in f.boxes([unknown], [], 14.55))
+    f.update(14.6, [known, unknown], [PERSON], recognized={1: ("Wrong", .99)},
+             recognized_at=14.4)
     assert f.name(1) == "Chosen name", "a short-gap cached display grants no source authority"
-    f.update(11.8, [unknown], [PERSON])
+    f.update(14.9, [unknown], [PERSON])
     assert f.name(1) is None
     tiny = phone((0, 0, 119, 250), 3)
-    f.update(12, [tiny, unknown], [])
+    f.update(15, [tiny, unknown], [])
     f.bind(3, "Tiny")
     assert all(b[4] != "Tiny" for b in f.boxes([tiny, unknown], []))
 
@@ -394,3 +383,44 @@ def test_known_unknown_and_neutral_outlines_keep_source_geometry_and_filtering(m
         assert boxes == [(*known.box, "Visitor's chosen name", "known"),
                          (*unknown.box, "???", "focus"), (*other.box, "", "other")]
     assert varied.box != source[varied.id] and f.geometry(latest)[varied.id] != source[varied.id]
+
+
+@pytest.mark.parametrize("reason", ["loss", "recognized", "size"])
+def test_global_selection_interval_survives_release(reason):
+    f = Focus(W, H)
+    a, b = phone(), phone((900, 300, 1050, 500), 2)
+    run(f, 0, 1.2, [a, b])
+    assert f.focus == 1
+    changed = f.changed
+    if reason == "recognized":
+        f.bind(1, "Chosen")
+    transitions = []
+    old = f.focus
+    for k in range(110):
+        now = 1.2 + k * DT
+        tracks = [b] if reason == "loss" else [a, b]
+        if reason == "size":
+            tracks = [phone((500, 200, 550, 360)), b]
+        f.update(now, tracks, [PERSON])
+        if f.focus != old:
+            transitions.append((now, f.focus))
+            old = f.focus
+        if now - changed < F.SWITCH_S:
+            assert f.focus != 2
+            assert not any(box[:4] == b.box and box[4] == "???"
+                           for box in f.boxes(tracks, []))
+    assert transitions[-1][1] == 2
+    assert transitions[-1][0] - changed >= F.SWITCH_S
+    assert all(b[0] - a[0] >= F.SWITCH_S
+               for a, b in zip(transitions, transitions[1:], strict=False))
+
+
+def test_duplicate_name_abstains_even_when_one_match_becomes_weak():
+    f = Focus(W, H)
+    a, b = phone(), phone((700, 200, 800, 360), 2)
+    f.update(10, [a, b], [])
+    f.bind(1, "Chosen")
+    f.bind(2, "Chosen")
+    f.update(10.1, [a, b], [], recognized={1: (None, 0)})
+    assert not f.names(), "a weak view must not release the competing accepted claim"
+    assert all(box[5] != "known" for box in f.boxes([a, b], []))

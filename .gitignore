@@ -3,7 +3,7 @@ reviews/*.log
 models/
 edge-data/
 __pycache__/
-.venv/
+.venv
 *.engine
 *.onnx
 *.gguf

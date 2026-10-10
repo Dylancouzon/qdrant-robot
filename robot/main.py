@@ -524,8 +524,9 @@ class Robot:
         for t in tracks:
             name, score = recognized.get(t.id, (None, 0.0))
             claims = {i for i, n in self.focus.named.items()
-                      if i in self.focus.visible and n.score >= SURE and
-                      (n.name or n.run[0]) == name}
+                      if i in self.focus.visible and
+                      ((n.name == name and n.confidence >= SURE) or
+                       (n.run[0] == name and n.score >= SURE))}
             if name and score >= SURE and t.label not in self.ignored and claims == {t.id}:
                 pid = self.points.get(t.id)
                 row = self.memory.points([pid]) if pid else []
@@ -934,6 +935,18 @@ class Robot:
             self.jobs.put(("control", action, data))
         return True
 
+    def _ignore_vectors(self, crops, shot, chosen, gallery):
+        """Borrow saved views only when the exact current crop verifies the chosen name."""
+        if gallery != self.recognition.epoch:
+            return None
+        current = crops([shot])
+        if chosen:
+            hit = self.things.score(current[0], chosen)
+            if not hit or hit[0] != chosen or hit[1] < MATCH:
+                return None
+            return self.things.descriptors(chosen)
+        return current
+
     def _item_control(self, action, data):
         if action == "restore":
             if data.get("session") != self.session_id or \
@@ -943,8 +956,9 @@ class Robot:
                 lambda f, c: self.things.restore_item(data["id"]), mutate=True)
             if restored:
                 with self.detecting:
-                    self.focus.excluded = {i: p for i, p in self.focus.excluded.items()
-                                           if p != data["id"]}
+                    if self.focus:
+                        self.focus.excluded = {i: p for i, p in self.focus.excluded.items()
+                                               if p != data["id"]}
                     self.verified = None
             return "I will notice that item again." if restored else "That selection expired."
         with self.detecting:
@@ -954,25 +968,28 @@ class Robot:
             accepted = self.focus.names().get(track)
             chosen = accepted[0] if accepted and accepted[1] else None
             title = chosen or self.view[1][track][0].capitalize()
-            views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
-                     if track in v[2] and self.focus.accepts(track, v[0])]
-            shots = [cut(f, v[track][1]) for _, f, v in views[:SHOTS]]
-        def capture(faces, crops):
-            return self.things.descriptors(chosen) if chosen else crops(shots)
-        vectors = self.recognition.call(capture)
+            taken = self.view_taken
+            shot = cut(self.view[0], self.view[1][track][1])
+        vectors = self.recognition.call(
+            lambda f, c: self._ignore_vectors(c, shot, chosen, data["gallery"]))
+        if vectors is None:
+            return "That selection expired. Select it again."
         # Mutation invalidates the gallery epoch before entering the owner. The source
         # epoch, session, and selected geometry still have to be current at persistence.
         def persist(faces, crops):
             with self.detecting:
-                if not self._valid_item({**data, "gallery": self.recognition.epoch}):
+                if self.recognition.epoch != data["gallery"] + 1 or \
+                        not self._valid_item({**data, "gallery": self.recognition.epoch}) or \
+                        not self.focus.accepts(track, taken):
                     return None
                 ident = self.things.ignore_item(title, vectors)
                 self.focus.excluded[track] = ident
                 hidden = self.things.hidden_names()
                 self.focus.named = {i: n for i, n in self.focus.named.items()
                                     if n.name not in hidden}
-                self.focus.thaw()
-                self.focus.focus = None
+                if self.focus.focus == track:
+                    self.focus.focus, self.focus.changed = None, time.time()
+                    self.focus.challenger = None, 0.0
                 self.verified = None
                 return ident
         ident = self.recognition.call(persist, mutate=True)

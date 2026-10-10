@@ -87,8 +87,8 @@ def show(robot: Robot, objects: list[tuple[int, tuple]], frames: int = CONFIRM) 
 
 
 def hold(robot: Robot, box: tuple) -> None:
-    """The visitor holds up the object in `box`: the focus takes its track (Focus.freeze)."""
-    robot.focus.freeze(next(t for t, (_, b) in robot.view[1].items() if b == box))
+    """Select the confirmed fixture track before exercising real naming and action paths."""
+    robot.focus.focus = next(t for t, (_, b) in robot.view[1].items() if b == box)
 
 
 def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
@@ -152,7 +152,6 @@ def test_things(monkeypatch) -> None:
         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
         hold(robot, RIGHT)
         assert ask(robot, "This is my phone.")[0].startswith("Got it"), "the focus, of two"
-        robot.focus.thaw()
         show(robot, [], LOST + 1)
         show(robot, [(BLACK, LEFT), (GOLD, RIGHT)])
         assert ask(robot, "Can you see my phone?")[0] == "Yes, your phone is here now."
@@ -168,7 +167,6 @@ def test_things(monkeypatch) -> None:
             "eligible objects have neutral outlines before teaching focus settles"
         hold(robot, CENTER)
         assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the focus, any label"
-        robot.focus.thaw()
         assert robot.things.named("cup", ["cup"])["labels"] == ["bag", "cup", "mug"]
         # Robot.reset also clears the old associations.
         robot.tracker, robot.points, robot.focus = Tracker(), {}, None
@@ -295,7 +293,7 @@ def test_unknown_current_answers_use_ram(robot):
 def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     r = robot
     frame = frame_of(r)
-    r.focus.freeze(next(iter(r.view[1])))
+    r.focus.focus = next(iter(r.view[1]))
     r.focus.seen[next(iter(r.view[1]))].shown = (1, 2, 3, 4)
     assert command("Track this as my wallet", r.vocab)[0:2] == ("name", "wallet")
     answer, turn = ask(r, "Track this as my wallet")
@@ -347,6 +345,11 @@ def test_fresh_recognition_sightings_and_miss(robot):
     assert seen["named"] == "wallet"
     frame_of(r, BLACK)
     preview(r)
+    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"]
+    preview(r)
+    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    preview(r)
     assert all(b[5] != "known" for b in r._shown()[1].boxes)
     assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"]
     assert not list(r.memory.frames.iterdir()), "idle recognition saves sightings, not images"
@@ -382,7 +385,7 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
     r = open_robot(tmp_path)
     frame_of(r)
-    r.focus.freeze(next(iter(r.view[1])))
+    r.focus.focus = next(iter(r.view[1]))
     assert ask(r, "This is my phone")[0].startswith("Got it")
     count = r.memory.shard.count(CountRequest())
     assert ask(r, "Ignore phones")[0].startswith("Okay")
@@ -431,7 +434,6 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
     r.people.enroll("Ana", [v, v], time.time())
     show(r, [(GOLD, LEFT), (BLACK, CENTER), (90, RIGHT)])
     hold(r, LEFT)
-    r.focus.thaw()
     r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
     r.named = r.things.labels()
     taken = r.view_taken + 1.2
@@ -519,7 +521,7 @@ def test_spoken_names_categories_case_and_restart(tmp_path):
 def test_case_only_reteach_and_forget_all_evidence(robot):
     r = robot
     frame_of(r)
-    r.focus.freeze(next(iter(r.view[1])))
+    r.focus.focus = next(iter(r.view[1]))
     assert ask(r, "This is Dylan's smartphone")[0].startswith("Got it")
     answer, turn = ask(r, "Track this as my DYLAN'S SMARTPHONE")
     assert "Dylan's smartphone" in answer and turn.named == "Dylan's smartphone"
@@ -534,7 +536,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     r = robot
     frame_of(r)
     track = next(iter(r.view[1]))
-    r.focus.freeze(track)
+    r.focus.focus = track
     ask(r, "This is my phone")
     ask(r, "Track this as my Dylan's smartphone")
     crop = r.recognition.crops([main.cut(r.view[0], r.view[1][track][1])])[0]
@@ -556,7 +558,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     # A different instance on an uninterrupted ID must escape the preference after real misses.
     frame_of(r, BLACK)
     preview(r)
-    assert r.focus.names() == {}
+    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
     preview(r)
     preview(r)
     assert r.focus.name(track) is None
@@ -616,7 +618,7 @@ def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, m
     try:
         frame_of(r)
         track = next(iter(r.view[1]))
-        r.focus.freeze(track)
+        r.focus.focus = track
         ask(r, "This is my phone")
         ask(r, "Track this as my Dylan's smartphone")
         data = r._shown(False)[1].control
@@ -660,7 +662,7 @@ def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot):
     r = robot
     frame_of(r)
     track = next(iter(r.view[1]))
-    r.focus.freeze(track)
+    r.focus.focus = track
     data = r._shown(False)[1].control
     selected = next(t for t in data["targets"] if t["track"] == track)
     data = {**data, **selected}
@@ -670,7 +672,7 @@ def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot):
     assert r._item_control("ignore", data).startswith("That selection expired")
     assert not r.things.preferences()
     frame_of(r)
-    r.focus.freeze(track)
+    r.focus.focus = track
     state = r._shown(False)[1].control
     data = {**state, **state["targets"][0]}
     assert r._item_control("ignore", data).startswith("Okay")
@@ -684,7 +686,7 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     r = robot
     frame_of(r)
     track = next(iter(r.view[1]))
-    r.focus.freeze(track)
+    r.focus.focus = track
     ask(r, "This is my phone")
     ask(r, "Track this as my Dylan's smartphone")
     r.things.ignore_item("Other phone", stub_crops([np.full((4, 4, 3), BLACK)]))
@@ -741,7 +743,10 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     r._track(frame, dets)
     preview(r)
     assert calls[-1] == "Dylan's smartphone"
-    assert not r.focus.names() and not r._shown()[1].boxes, "a crop miss downgrades immediately"
+    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
+    assert [b[4] for b in r._shown()[1].boxes] == ["Dylan's smartphone"]
+    assert not r._shown(False)[1].control["targets"], \
+        "retained labels cannot authorize low-confidence actions"
     preview(r)
     preview(r)
     assert r.focus.name(chosen) is None, "three fresh misses clear the low-confidence preference"
@@ -751,7 +756,7 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
     r = robot
     frame_of(r, label="book")
     track = next(iter(r.view[1]))
-    r.focus.freeze(track)
+    r.focus.focus = track
     ask(r, "Track this as my chosen item")
     preview(r)
     source = r.view_taken
@@ -795,3 +800,131 @@ def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypat
         preview(r)
     assert set(queries) == {GOLD, BLACK, 90}, "oldest due visits each track during generation"
     assert any(b[4] == "Chosen" for b in r._shown()[1].boxes)
+
+
+@pytest.mark.parametrize("named", [False, True])
+def test_item_ignore_preserves_selection_interval_or_unrelated_focus(robot, monkeypatch, named):
+    r = robot
+    start = time.time()
+    monkeypatch.setattr(main.time, "time", lambda: start)
+    show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
+    frame = r.view[0]
+    dets = [Detection("phone", .9, box) for box in (CENTER, RIGHT)]
+    monkeypatch.setattr(main.time, "time", lambda: start + 1.1)
+    r._track(frame, dets, start + 1.1)
+    chosen = next(i for i, (_, box) in r.view[1].items() if box == CENTER)
+    other = next(i for i, (_, box) in r.view[1].items() if box == RIGHT)
+    assert r.focus.focus == chosen
+    if named:
+        r.things.name("Other", ["phone"], stub_crops([np.full((4, 4, 3), BLACK)]))
+        r.named = r.things.labels()
+        r.focus.bind(other, "Other")
+    state = r._shown(False)[1].control
+    target = next(t for t in state["targets"] if t["track"] == (other if named else chosen))
+    assert r._item_control("ignore", {**state, **target}).startswith("Okay")
+    assert r.focus.focus == (chosen if named else None)
+    for offset in (1.2, 2.5, 4.09):
+        monkeypatch.setattr(main.time, "time", lambda offset=offset: start + offset)
+        r._track(frame, dets, start + offset)
+        preview(r)
+        assert r.focus.focus == (chosen if named else None)
+    monkeypatch.setattr(main.time, "time", lambda: start + 4.2)
+    r._track(frame, dets, start + 4.2)
+    preview(r)
+    assert r.focus.focus == (chosen if named else other)
+
+
+def test_duplicate_accepted_name_blocks_fresh_write_after_one_weak_query(robot, monkeypatch):
+    r = robot
+    show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
+    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.named = r.things.labels()
+    tracks = list(r.focus.visible)
+    for track in tracks:
+        r.focus.bind(track, "Chosen")
+    monkeypatch.setattr(r.things, "score", lambda v, name=None: (None, 0))
+    preview(r)
+    monkeypatch.setattr(r.things, "score", lambda v, name=None: ("Chosen", .99))
+    preview(r)
+    assert not r.focus.names()
+    assert r.memory.sightings(time.time() + 1) == [], \
+        "a fresh score cannot override a competing accepted claim"
+
+
+
+def test_retained_name_cannot_ignore_saved_object_after_same_track_replacement(robot):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.focus = track
+    answer, turn = ask(r, "This is my wallet")
+    assert answer.startswith("Got it")
+    saved = r.things.descriptors("wallet").copy()
+    # The new physical object retains the same track and normal detector confidence.
+    frame_of(r, BLACK)
+    preview(r)
+    assert r.focus.named[track].score == 0
+    assert r.focus.names() == {track: ("wallet", True)}
+    state = r._shown(False)[1].control
+    data = {**state, **next(t for t in state["targets"] if t["track"] == track)}
+    assert r._valid_item(data), "the display selection alone is not a fresh identity match"
+    calls = []
+    r.recognition.crops = lambda shots: calls.append(shots[0].copy()) or stub_crops(shots)
+    gallery = r.recognition.epoch
+    assert r._item_control("ignore", data).startswith("That selection expired")
+    assert len(calls) == 1 and calls[0].mean() == BLACK
+    assert r.recognition.epoch == gallery and not r.things.preferences()
+    assert not r.focus.excluded and not r.things.hidden_names()
+    np.testing.assert_array_equal(r.things.descriptors("wallet"), saved)
+    assert r.memory.points(turn.memories)[0]["named"] == "wallet"
+    assert ask(r, "Forget my wallet")[0].startswith("Done")
+    assert not r.memory.points(turn.memories)
+    assert r.things.named("wallet", []) is None
+
+
+def test_unknown_ignore_embeds_only_current_crop_after_same_track_replacement(robot):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.focus = track
+    frame_of(r, BLACK)
+    assert any(image[CENTER[1]:CENTER[3], CENTER[0]:CENTER[2]].mean() == GOLD
+               for _, image, _ in r.views), "old buffered source belongs to the other item"
+    state = r._shown(False)[1].control
+    data = {**state, **next(t for t in state["targets"] if t["track"] == track)}
+    calls = []
+    r.recognition.crops = lambda shots: calls.extend(shots) or stub_crops(shots)
+    assert r._item_control("ignore", data).startswith("Okay")
+    assert len(calls) == 1 and calls[0].mean() == BLACK
+    assert r.things.excluded(stub_crops([np.full((4, 4, 3), BLACK)])[0])
+    assert not r.things.excluded(stub_crops([np.full((4, 4, 3), GOLD)])[0])
+
+
+
+def test_persisted_preference_restores_before_first_focus_frame(tmp_path):
+    r = open_robot(tmp_path)
+    vectors = stub_crops([np.full((4, 4, 3), GOLD)])
+    ident = r.things.ignore_item("Phone", vectors)
+    close_robot(r)
+    r = open_robot(tmp_path)
+    try:
+        assert r.focus is None and len(r.things.preferences()) == 1
+        state = {"session": r.session_id, "gallery": r.recognition.epoch, "id": ident}
+        for stale in ({"session": "old"}, {"gallery": state["gallery"] + 1}):
+            assert r._item_control("restore", {**state, **stale}).startswith("That selection")
+            assert len(r.things.preferences()) == 1 and r.recognition.epoch == state["gallery"]
+        r.verified = object()  # A successful Restore must clear saved display state too.
+        assert r._control("restore", state), "Restore admission does not require a camera frame"
+        job = r.jobs.get_nowait()
+        assert job[0] == "control"
+        assert r._item_control(*job[1:]).startswith("I will notice")
+        r.jobs.task_done()
+        assert r.focus is None and not r.things.preferences() and r.verified is None
+        assert r.recognition.epoch == state["gallery"] + 1
+    finally:
+        close_robot(r)
+    reopened = Things(tmp_path)
+    try:
+        assert not reopened.preferences() and reopened.excluded(vectors[0]) is None
+    finally:
+        reopened.shard.close()

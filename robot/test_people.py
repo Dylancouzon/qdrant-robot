@@ -112,17 +112,15 @@ def test_robot_identity(monkeypatch) -> None:
     (the look stays valid), or whose new track merges into another's lost track, inherits no
     name, consent, or evidence; after "forget me" nothing of that face is stored."""
     import queue
-    import threading
     import time
     from types import SimpleNamespace as Stub
 
     from robot import main, memory
-    from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
+    from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection
     from robot.main import FIRST_PERSON, Robot, Turn
-    from robot.memory import Memory
     from robot.people import DECLINED, _id
     from robot.text_embed import DIM as TEXT_DIM
-    from robot.things import Things
+    from robot.test_things import open_robot
 
     steps = []
 
@@ -136,16 +134,10 @@ def test_robot_identity(monkeypatch) -> None:
     clock = iter(range(int(time.time()), int(time.time()) + 10_000))  # wall clock, as turns
 
     def make(root: Path) -> Robot:
-        robot = Robot.__new__(Robot)  # every part a turn uses, with stub models
-        robot.people = People(root)
-        robot.memory, robot.things = Memory(root), Things(root)
-        robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
-        robot.named, robot.ignored, robot.mine = set(), set(), {}
-        robot.asking, robot.hiding, robot.detecting = None, None, threading.Lock()
-        robot.told, robot.stream, robot.last_line = None, None, 0.0
-        robot.face, robot.since, robot.panel, robot.wake_word = None, 0, None, False
-        robot.uncaptioned, robot.jobs, robot.turns = [], queue.Queue(), queue.Queue()
-        robot.faces, robot.detect_failed, robot.vocab, robot.history = None, None, set(), []
+        robot = open_robot(root)  # current model-free owner, tracking, UI, and real Edge shards
+        robot.asking, robot.stream, robot.wake_word = None, None, False
+        robot.turns = queue.Queue()
+        robot.vocab = set()
         robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
         robot.out = root / "out"
         robot.out.mkdir(exist_ok=True)
@@ -241,16 +233,22 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("What's my name?", ana) == "You're Ana. I remember your face."
         assert ask("Thanks!", ana) is None
         assert "Remember me, I'm Ben." in said() and "Nice to meet you, I'm Ana." in said()
+        assert not list((root / "frames").iterdir()), "ordinary identity turns store text only"
+        crop = robot.memory.add(ana[:80, :80], "Ana's selected source crop", ts=time.time())
+        robot.people.link("Ana", [crop])
+        [source] = robot.memory.points([crop])
+        assert (root / "frames" / source["frame"]).exists(), "deletion covers a real saved image"
         hers = robot.memory.points(linked("Ana"))
         held = {r.payload["frame"] for r in robot.memory.shard.scroll(memory.ScrollRequest(
             limit=999, with_payload=["frame"]))[0] if "frame" in r.payload}
         assert hers and {f.name for f in (root / "frames").iterdir()} == held, \
-            "the frames on disk are the turns' own: enrollment keeps no image"
+            "only the explicit linked source crop saves an image"
         assert ask("Please forget me.", ana) == done("forget", "Ana", True)
         assert robot.people.identify(np.eye(DIM)[1]) is None
         assert robot.people.identify(np.eye(DIM)[2])[0] == "Ben", "only the face that asked"
         assert not robot.memory.points([p["id"] for p in hers])
-        assert not any((root / "frames" / p["frame"]).exists() for p in hers), "and frames"
+        assert not any((root / "frames" / p["frame"]).exists()
+                       for p in hers if "frame" in p), "and frames"
         assert "Thanks!" not in said() and "Great, thanks, robot." in said(), \
             "her linked turns go, Ben's stay"
         frames(None, LOST + 2)  # the detector loses her: no person track at all

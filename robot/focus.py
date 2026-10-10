@@ -18,6 +18,7 @@ MOVED = 0.03  # of the frame width: a center shift that counts as moved (static 
 RECENT_S = 3.0  # appeared or moved this recently: an interaction cue
 SCENERY_S = 60.0  # still this long: scenery, until it moves or leaves and returns
 GONE_S = 1.0  # out of view, or unfit for the focus, this long: released and forgotten
+SWITCH_S = 3.0  # minimum interval between unknown-focus transitions, including releases
 HOLD_S = 5.0  # a challenger may take the focus only after the focus held it this long
 CHALLENGE_S = 1.0  # the same challenger must exceed the margin continuously
 SMOOTH = 0.35  # drawing coordinates only, one update per source frame
@@ -60,7 +61,8 @@ class _Name:
     """A track's name with hysteresis: set after SET_N agreeing queries at GUESS or more,
     cleared after CLEAR_N queries under GUESS in a row."""
     name: str | None = None
-    score: float = 0.0
+    score: float = 0.0  # latest query, never retained to authorize a write
+    confidence: float = 0.0  # accepted display confidence through bounded weak queries
     run: tuple[str | None, int] = (None, 0)  # the last queried name and how many agree
     misses: int = 0
     refreshed: float = 0.0
@@ -68,18 +70,19 @@ class _Name:
     def heard(self, name: str | None, score: float, taken: float) -> bool:
         """Count one recognition result; True when the shown name changed."""
         old = self.name
-        self.score = score  # Hysteresis keeps a name, never the confidence of an older frame.
+        self.score = score
         if name is None or score < GUESS:
             self.run, self.misses = (None, 0), self.misses + 1
             if self.misses >= CLEAR_N:
-                self.name = None
+                self.name, self.confidence = None, 0.0
             return self.name != old
         self.misses = 0
         self.run = (name, self.run[1] + 1 if self.run[0] == name else 1)
         if name != self.name:
-            self.name = None  # A conflicting result cannot color the old name green.
+            self.name, self.confidence = None, 0.0  # Conflicting positives abstain immediately.
         if name == old or self.run[1] >= SET_N:
             self.name = name
+            self.confidence = max(self.confidence, score)
         self.refreshed = taken
         return self.name != old
 
@@ -104,8 +107,8 @@ class Focus:
     height: int
     ignored: set[str] = field(default_factory=set)
     focus: int | None = None
-    frozen: bool = False
     scenery: set[int] = field(default_factory=set)
+    changed: float = -math.inf  # last selection change, retained across loss and recognition
     since: float = 0.0  # when the focus took it
     fit: float = 0.0  # when the focus was last fit to hold it
     now: float = 0.0
@@ -211,7 +214,8 @@ class Focus:
     def bind(self, track: int, name: str, taken: float | None = None) -> None:
         taken = self.now if taken is None else taken
         if self.accepts(track, taken):
-            self.named[track] = _Name(name=name, score=1.0, run=(name, SET_N), refreshed=taken)
+            self.named[track] = _Name(name=name, score=1.0, confidence=1.0,
+                                      run=(name, SET_N), refreshed=taken)
 
     def forget(self, name: str) -> None:
         self.named = {i: n for i, n in self.named.items() if name not in (n.name, n.run[0])}
@@ -237,9 +241,6 @@ class Focus:
                 * CUE ** self._held(t) * CUE ** recent * CUE ** (inside(t.box, zone) == 1))
 
     def _refocus(self, live: dict[int, Track]) -> None:
-        if self.frozen:
-            self.challenger = None, 0.0
-            return
         cur = live.get(self.focus)
         if cur is not None and self._fit(cur):
             self.fit = self.now
@@ -260,8 +261,13 @@ class Focus:
             if self.now - self.challenger[1] < CHALLENGE_S:
                 return
         self.challenger = None, 0.0
-        self.focus = best and best.id
-        self.since = self.fit = self.now
+        next_focus = best and best.id
+        if next_focus is not None and self.now - self.changed < SWITCH_S:
+            next_focus = self.focus if cur is not None else None
+        if next_focus != self.focus:
+            self.changed = self.now
+            self.focus = next_focus
+            self.since = self.fit = self.now
 
     def name(self, track: int) -> str | None:
         """Accepted name for fresh re-verification; display age is separate."""
@@ -276,18 +282,10 @@ class Focus:
             seen = self.seen.get(i)
             if seen and seen.track and self.eligible(seen.track, pending=True) and \
                     (i in self.visible or now - seen.last <= OCCLUSION_S) and \
-                    n.name and n.score >= GUESS:
-                grouped.setdefault(n.name, []).append((i, n.score))
+                    n.name and n.confidence >= GUESS:
+                grouped.setdefault(n.name, []).append((i, n.confidence))
         return {hits[0][0]: (name, hits[0][1] >= SURE)
                 for name, hits in grouped.items() if len(hits) == 1}
-
-    def freeze(self, track: int | None) -> None:
-        """Hold the focus on `track` from the speech start of a naming turn until thaw()."""
-        self.focus, self.frozen, self.since, self.fit = track, True, self.now, self.now
-        self.challenger = None, 0.0
-
-    def thaw(self) -> None:
-        self.frozen = False
 
     def target(self, tracks: list[Track]) -> int | None:
         """The object a naming turn binds to: the focus, else the most salient object held up,

@@ -1,0 +1,391 @@
+{
+  "baseline": {
+    "task": "D140 incremental detection",
+    "stage": "baseline",
+    "release": "cc8b526812e5",
+    "machine": "Jetson Orin Nano Super 8GB",
+    "classification": "J development recording; preserved quality failure",
+    "command": "tools/jetson.py run d140-baseline-s -- /home/qdrant/qdrant-robot/shared/sessions/d139_runtime_check.py --model s --learning",
+    "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "source_packages": "release ENV.txt and pyproject.toml/uv.lock",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": false,
+      "ignore_accepted": true,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": false,
+      "restore_persists": true
+    },
+    "native_exit": 1,
+    "failure": "Required common-flow checks failed",
+    "metrics": {
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 10.077500866298784,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.11891481876373282,
+        "longest_repeated_source_s": 0,
+        "detect_fps": 14.961212824582041,
+        "render_ms_p50": 13.388966995989904,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 7.777702092879734,
+        "unique_named_face_sources": 129,
+        "face_named_fraction": 0.6789473684210526,
+        "source_age_p95": 0.1671294689178467,
+        "longest_repeated_source_s": 0.10195541381835938,
+        "detect_fps": 14.973399267244657,
+        "render_ms_p50": 13.388423001742922,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 9.457409717196875,
+        "unique_named_face_sources": 30,
+        "face_named_fraction": 0.23076923076923078,
+        "source_age_p95": 0.1673841118812561,
+        "longest_repeated_source_s": 0.09998250007629395,
+        "detect_fps": 14.961312093598334,
+        "render_ms_p50": 13.024947998928837,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 90,
+        "unique_source_fps": 9.74355674443834,
+        "unique_named_face_sources": 68,
+        "face_named_fraction": 0.7555555555555555,
+        "source_age_p95": 0.15998708009719848,
+        "longest_repeated_source_s": 0.10004711151123047,
+        "detect_fps": 15.06852380244534,
+        "render_ms_p50": 12.964499997906387,
+        "phone_named_fraction": 0.0
+      },
+      "phone_named_movement": {
+        "samples": 150,
+        "unique_source_fps": 9.463102935584025,
+        "unique_named_face_sources": 109,
+        "face_named_fraction": 0.7266666666666667,
+        "source_age_p95": 0.16922744512557983,
+        "longest_repeated_source_s": 0.1083831787109375,
+        "detect_fps": 14.96646776337048,
+        "render_ms_p50": 13.980332994833589,
+        "phone_named_fraction": 0.84
+      },
+      "phone_restored": {
+        "samples": 150,
+        "unique_source_fps": 8.993243635271833,
+        "unique_named_face_sources": 58,
+        "face_named_fraction": 0.38666666666666666,
+        "source_age_p95": 0.17054084539413447,
+        "longest_repeated_source_s": 0.199570894241333,
+        "detect_fps": 14.69791310540695,
+        "render_ms_p50": 13.734154490521178,
+        "phone_named_fraction": 0.7533333333333333
+      },
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 47,
+        "hidden": 42,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 50,
+        "hidden": 45,
+        "pass": false
+      },
+      "paging_before": {
+        "pswpin": 1240219,
+        "pswpout": 9348450,
+        "MemAvailable_kB": 6143476
+      },
+      "paging_after": {
+        "pswpin": 1240352,
+        "pswpout": 9359204,
+        "MemAvailable_kB": 3023700
+      }
+    },
+    "private_evidence": "build/d140/baseline-s/{summary,samples,events}.json; remote shared/sessions/d139-runtime-d140-baseline-s-20261010-015934",
+    "tegrastats": "d140-baseline-s-20261010-015934.tegrastats"
+  },
+  "hysteresis": {
+    "task": "D140 incremental detection",
+    "stage": "hysteresis prototype",
+    "release": "c3266cb71ba9",
+    "machine": "Jetson Orin Nano Super 8GB",
+    "classification": "J development recording; preserved quality failure",
+    "command": "tools/jetson.py run d140-hysteresis-s -- /home/qdrant/qdrant-robot/shared/sessions/d139_runtime_check.py --model s --learning",
+    "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "source_packages": "release ENV.txt and pyproject.toml/uv.lock",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": true,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": true,
+      "restore_persists": true
+    },
+    "native_exit": 1,
+    "failure": "Required common-flow checks failed",
+    "metrics": {
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 10.077529549286595,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.13390908241271973,
+        "longest_repeated_source_s": 0,
+        "detect_fps": 15.038774865858457,
+        "render_ms_p50": 13.78186851798091,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 7.883524749088534,
+        "unique_named_face_sources": 126,
+        "face_named_fraction": 0.6631578947368421,
+        "source_age_p95": 0.16714030504226685,
+        "longest_repeated_source_s": 0.10181593894958496,
+        "detect_fps": 14.973406067060772,
+        "render_ms_p50": 13.415096516837366,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 9.922365930696735,
+        "unique_named_face_sources": 42,
+        "face_named_fraction": 0.3230769230769231,
+        "source_age_p95": 0.1671450614929199,
+        "longest_repeated_source_s": 0.10006237030029297,
+        "detect_fps": 15.038585863712237,
+        "render_ms_p50": 12.880756010417826,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 96,
+        "unique_source_fps": 10.079967052687872,
+        "unique_named_face_sources": 82,
+        "face_named_fraction": 0.8645833333333334,
+        "source_age_p95": 0.19161605834960938,
+        "longest_repeated_source_s": 0.009256124496459961,
+        "detect_fps": 14.960793204515683,
+        "render_ms_p50": 13.878829005989246,
+        "phone_named_fraction": 0.0
+      },
+      "phone_named_movement": {
+        "samples": 150,
+        "unique_source_fps": 8.993320911520707,
+        "unique_named_face_sources": 94,
+        "face_named_fraction": 0.6266666666666667,
+        "source_age_p95": 0.1671439528465271,
+        "longest_repeated_source_s": 0.10866117477416992,
+        "detect_fps": 14.96649674081431,
+        "render_ms_p50": 15.018375517684035,
+        "phone_named_fraction": 0.9333333333333333
+      },
+      "phone_restored": {
+        "samples": 150,
+        "unique_source_fps": 8.993305225917704,
+        "unique_named_face_sources": 67,
+        "face_named_fraction": 0.44666666666666666,
+        "source_age_p95": 0.1670866847038269,
+        "longest_repeated_source_s": 0.10073113441467285,
+        "detect_fps": 14.96647063716155,
+        "render_ms_p50": 13.143494492396712,
+        "phone_named_fraction": 0.9066666666666666
+      },
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 49,
+        "hidden": 45,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 49,
+        "hidden": 46,
+        "pass": false
+      },
+      "paging_before": {
+        "pswpin": 1244046,
+        "pswpout": 9359204,
+        "MemAvailable_kB": 6120164
+      },
+      "paging_after": {
+        "pswpin": 1244283,
+        "pswpout": 9361707,
+        "MemAvailable_kB": 2948704
+      }
+    },
+    "private_evidence": "build/d140/hysteresis-s/{summary,samples,events}.json; remote shared/sessions/d139-runtime-d140-hysteresis-s-20261010-020449",
+    "tegrastats": "d140-hysteresis-s-20261010-020449.tegrastats",
+    "review": "FIX reviews/20261010-020450-41450-review.md; current-crop Ignore authority blocking"
+  },
+  "paired_changes": {
+    "motion": [
+      0.84,
+      0.9333333333333333
+    ],
+    "restore": [
+      0.7533333333333333,
+      0.9066666666666666
+    ],
+    "adoption": false,
+    "limitations": "One development pair, sameS model/floor120/media/adapter. Ignore/face/resource final acceptance remain open."
+  },
+  "ignore_immediately_after_teaching": {
+    "release": "a049ed8b85cf",
+    "tegrastats": "d140-ignore-current-20261010-021606.tegrastats",
+    "adapter_sha256": "35ec67b5ff55e04b3156df1ba9411a8f9f4953825e36052a64042bb7b486f847",
+    "media_sha256": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J scoped development control check",
+    "required_checks": {
+      "teaching": true,
+      "physical_binding": true,
+      "ignore_queued": true,
+      "ignore_committed": false,
+      "fresh_crop_verified": false
+    },
+    "after_warmup_budget_s": 45,
+    "turn_wait_s": 15,
+    "held_derivation": {
+      "original_frame": 15,
+      "frames": 750,
+      "fps": 15,
+      "sha256": "90512ef794997bc04263179f6c7fd9d31642bf3e37563d0df877b6eb33ed77ab"
+    },
+    "warmup_s": 15.849623465997865,
+    "failure": "Fresh current-crop Ignore did not commit",
+    "completed": false,
+    "native_exit": 1,
+    "command": "tools/jetson.py run d140-ignore-current -- /home/qdrant/qdrant-robot/shared/sessions/d140-ignore-check.py",
+    "machine": "Jetson Orin Nano Super 8GB",
+    "limitation": "Native1 before current-crop embed; action expires at execution. Caption queued before Ignore is suspected; exact failing predicate not logged. Real after-teaching queued-control limitation stays open.",
+    "private_evidence": "build/d140/ignore-current/{failed-adapter.py,summary.json,details.json,tegrastats}"
+  },
+  "idle_ignore_restore_failed": {
+    "release": "a049ed8b85cf",
+    "machine": "Jetson Orin Nano Super 8GB",
+    "command": "tools/jetson.py run d140-ignore-idle -- /home/qdrant/qdrant-robot/shared/sessions/d140-ignore-check.py",
+    "unit": "qr-d140-ignore-idle",
+    "invocation": "bf2eb12b363e4b16bfe6f806583461b1",
+    "start": "2026-10-10 02:19:57 EDT",
+    "completion": false,
+    "failure": "Restore before first post-reset detection dereferences focusNone at main959; _work dies; close hangs at jobs.join. Lead stops owned job. No completion footer.",
+    "classification": "J product lifecycle failure; interrupted cleanup",
+    "private_evidence": "build/d140/ignore-current/idle-failed-journal.log; remote shared/sessions/d140-ignore-d140-ignore-idle-20261010-021957",
+    "tegrastats": "d140-ignore-idle-20261010-021957.tegrastats"
+  },
+  "ignore_restore_repaired": {
+    "release": "3a3f7f93181e",
+    "tegrastats": "d140-ignore-restored-20261010-022528.tegrastats",
+    "adapter_sha256": "5f14df63745f8e578c17e4aa28ee17fd8b5f783aad02796b83b9295ea6b25811",
+    "media_sha256": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J scoped idle development control check; queued post-teaching failure remains",
+    "previous_adapter_sha256": "35ec67b5ff55e04b3156df1ba9411a8f9f4953825e36052a64042bb7b486f847",
+    "required_checks": {
+      "teaching": true,
+      "physical_binding": true,
+      "idle_before_selection": true,
+      "ignore_queued": true,
+      "ignore_committed": true,
+      "fresh_crop_verified": true,
+      "ignore_reopened": true,
+      "restore_queued": true,
+      "restore_committed": true,
+      "restore_reopened": true,
+      "within_budget": true
+    },
+    "after_warmup_budget_s": 45,
+    "turn_wait_s": 15,
+    "held_derivation": {
+      "original_frame": 15,
+      "frames": 750,
+      "fps": 15,
+      "sha256": "90512ef794997bc04263179f6c7fd9d31642bf3e37563d0df877b6eb33ed77ab"
+    },
+    "warmup_s": 16.734948560013436,
+    "completed": true,
+    "native_exit": 0,
+    "phase": "complete",
+    "cleanup_completed": true,
+    "after_warmup_s": 8.479835306992754,
+    "command": "tools/jetson.py run d140-ignore-restored -- /home/qdrant/qdrant-robot/shared/sessions/d140-ignore-check.py",
+    "machine": "Jetson Orin Nano Super 8GB",
+    "unit": "qr-d140-ignore-restored",
+    "invocation": "152d993632c8406cb57d4b3d08cfe769",
+    "private_evidence": "build/d140/ignore-restored/{summary,details}.json and tegrastats",
+    "review": "PASS reviews/20261010-022300-63548-review.md tree930b4f2f",
+    "limits": "Idle controls on held original phone frame only. Moving exclusion, immediate post-teaching queue usability, model adoption, face continuity, and system paging remain unqualified."
+  },
+  "precommit_checks": {
+    "lint": "PASS",
+    "dead_code": "PASS",
+    "pytest": {
+      "passed": 128,
+      "skipped": 1,
+      "failed": 5,
+      "seconds": 29.34
+    },
+    "native_exit": 1,
+    "commit_created": false,
+    "failures": [
+      "robot/test_people.py::test_robot_identity",
+      "robot/test_sightings.py::test_sightings",
+      "robot/test_sightings.py::test_return_and_turnover",
+      "robot/test_speak.py::test_pause_and_resume",
+      "robot/test_speak.py::test_interrupted[2]"
+    ],
+    "note": "Old manual Robot fixtures miss current runtime fields and call outdated _sight signature. Preserve assertions while repair is investigated."
+  },
+  "fixture_repair_checks": {
+    "command": "VIRTUAL_ENV=/Users/dylanc/Documents/GitHub/qdrant-robot/.venv .venv/bin/python tools/gate.py checks",
+    "machine": "Mac",
+    "native_exit": 0,
+    "seconds": 45.37,
+    "pytest_seconds": 43.36,
+    "pytest_counts": "134 collected; 133 passed and one preexisting skip inferred from successful native exit and unchanged collection. Successful gate stdout omits pytest counts.",
+    "affected_tests": {
+      "passed": 10,
+      "existing_skips": 1,
+      "seconds": 13.39
+    },
+    "independent_peer_tests": {
+      "passed": 36,
+      "existing_skips": 1,
+      "seconds": 29.96
+    },
+    "receipt": "private build/d140/fixture-checks.log",
+    "runtime_changes": false,
+    "review": "PASS reviews/20261010-023436-76875-review.md; treee314513d; 239.84s/native0"
+  }
+}
