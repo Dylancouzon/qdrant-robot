@@ -61,3 +61,6 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - D124 preview, Sol77868 PASS: an interrupted MJPEG connection can leave a frozen image while state polling works (tools/talk.html:52). On observation, clear cameraActive on image failure and retry the existing stream.
 - D124 preview, Sol77868 PASS: overlapping speech transcripts can temporarily show another turn's status/evidence (robot/main.py:277). On observation, separate queued question text from the active answer. Dylan performs live testing; these optional display gaps do not justify another test or review pass.
+
+- D127/D128 preview, Sol38457 PASS: a named object returning on a new undersized track cannot enter recognition and may remain invisible. If Dylan observes it, allow bounded recognition before excluding tiny unknown boxes.
+- D127/D128 preview, Sol38457 PASS: speech interruption can drop a teaching-crop caption. Named vector recall remains available, but historical descriptions can be missing. If observed, retain only interrupted, still-selected crop work for idle retry.

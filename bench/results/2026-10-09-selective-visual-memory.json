@@ -1,0 +1,87 @@
+{
+  "task": "D127/D128 selective visual memory and source-frame names",
+  "measurement_label": "E",
+  "source_branch": "spike/mac-audio-interface",
+  "source_base": "a7eeae360b6c3d855737067662b4acbc830d967b",
+  "source_directory": "/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface",
+  "diff_sha256": "29ca9111cd58aacfa64a0a2f64494678a04d8745d3c69e6a9993ff54e93f830e",
+  "changed_file_sha256": {
+    "README.md": "08cf40650b7330817913e638a39a77b3b0535664198b8fff3dca0e16d44713d5",
+    "robot/focus.py": "4db0ea2c4b53c8934ae4f617f69515504912810e38f155f00a70d88fef5fbe1d",
+    "robot/main.py": "edb809a41ed10bdd4cd6c540f67823722d89e331c7428f4d556555399a4dd987",
+    "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+    "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+    "robot/test_focus.py": "7675888168fffd7ba2f80b934ff63e4aea05a0d95b944ef9b98e4213e621816e",
+    "robot/test_people.py": "4860d613d5dac9606af147f4c051c506de0d2db5a091a2917d64efaf7555b3a9",
+    "robot/test_things.py": "95fbb49eaa372a20dca923b342d46ce34f92cf517373d940a629ede9bb03f535",
+    "robot/things.py": "8bcded33a2e6ff45ba7bd67669199b989860bf199c29543789ee06ed20d7846b",
+    "robot/view.py": "de6764f9516874d12b08eb6e5781088f2dd82f24860dc6b055655bdc2a491d86",
+    "tools/talk.html": "6be8f53e36ea0349582a60db62f8f02a6655ba387714b1a32bf9fe329f890320"
+  },
+  "builder_checks": {
+    "focused_command": "ORT_DISABLE_TELEMETRY=1 PYTHONPATH=/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/lib/python3.12/site-packages:. uv run --no-project --python 3.12 --with pytest pytest -q robot/test_things.py robot/test_focus.py robot/test_people.py::test_face_position_matches_selected_detection",
+    "result": "22 passed",
+    "elapsed_seconds": 6.62,
+    "native_exit": 0,
+    "changed_path_ruff": "pass",
+    "syntax": "pass"
+  },
+  "qualification": "Temporary local Edge shards and stub perception only. No full suite, module selfchecks, replay, live camera/microphone/model test, or production memory access. Dylan owns live qualification.",
+  "review": {
+    "verdict": "PASS",
+    "model": "gpt-6.1-sol",
+    "path": "reviews/20261009-202622-38457-review.md",
+    "elapsed_seconds": 176.21,
+    "native_exit": 0,
+    "code_tree": "b2b89b3a2dafa0a9f841195e9978195d2053128d"
+  },
+  "deployment": {
+    "status": "deployed",
+    "release": "c182f8518376",
+    "previous": "b2b36d9718da",
+    "retained_protected_release": "cd60be65ee79",
+    "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface/tools/jetson.py deploy",
+    "native_exit": 0,
+    "remote_file_sha256": {
+      "robot/main.py": "edb809a41ed10bdd4cd6c540f67823722d89e331c7428f4d556555399a4dd987",
+      "robot/view.py": "de6764f9516874d12b08eb6e5781088f2dd82f24860dc6b055655bdc2a491d86",
+      "robot/focus.py": "4db0ea2c4b53c8934ae4f617f69515504912810e38f155f00a70d88fef5fbe1d",
+      "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+      "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+      "robot/things.py": "8bcded33a2e6ff45ba7bd67669199b989860bf199c29543789ee06ed20d7846b"
+    },
+    "old_user_unit": "qr-live-mac-f25e12d13bbc.service stopped after explicit upgrade readiness",
+    "new_user_unit": "qr-live-mac-1c5eb3448bee.service started by Dylan"
+  },
+  "unchanged_protected_runtime_integrity": {
+    "robot/config.py": true,
+    "robot/faces.py": true,
+    "robot/route.py": true,
+    "robot/tts.py": true,
+    "robot/__init__.py": true,
+    "robot/asr.py": true,
+    "robot/text_embed.py": true,
+    "robot/brain.py": true,
+    "robot/camera.py": true,
+    "robot/audio.py": true,
+    "robot/knowledge.py": true,
+    "robot/detect.py": true,
+    "pyproject.toml": true,
+    "uv.lock": true,
+    "models.json": true
+  },
+  "carried_edges": [
+    "A named object returning on a new undersized track can be hidden before recognition.",
+    "Interrupted teaching crop captions can lose descriptions; named vector recall survives."
+  ],
+  "source_commit": "7a7f3db93e1117e7830f25fa7b1f23d5b566351d",
+  "source_pushed": "origin/spike/mac-audio-interface",
+  "preview": {
+    "server_pid": 48631,
+    "url": "http://127.0.0.1:8765",
+    "tab_id": "1202942054",
+    "idle_reopen": "DOM verified Idle, Start enabled, Mute/Stop disabled, camera placeholder; no agent Start",
+    "subsequent_user_start": "Dylan started new session; latest Listening/active/view_ready true",
+    "live_qualification": "Dylan testing; no agent camera/microphone/replay/model test"
+  }
+}

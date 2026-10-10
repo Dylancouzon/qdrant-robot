@@ -1,0 +1,97 @@
+{
+  "machine": "WSL RTX3080",
+  "measurement_label": "E",
+  "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+  "unit": "p2-trt-quantize-native-retry.service",
+  "invocation": "b9ec1e261ba04407938c9be35eec3f1d",
+  "python_pid": 128544,
+  "active_state": "active/running",
+  "gpu_memory_mib": 10014,
+  "gpu_memory_total_mib": 10240,
+  "gpu_utilization_percent": 100,
+  "unit_swap_bytes": 0,
+  "search_samples_reported": "0/128",
+  "activation_samples_completed": "128/128",
+  "checkpoint": "absent",
+  "samples": [
+    {
+      "capture_time_utc": "2026-10-10T00:10:03.750450+00:00",
+      "private_raw_path": "build/p2/logs/wsl-live-locals-1.json",
+      "raw_sha256": "c6fb84556003ad784988eeb8b7c976cd994bb77b552f440b46f07a7fc557c7c2",
+      "native_exit": 0,
+      "frames": [
+        {
+          "function": "forward",
+          "module": "modelopt/torch/quantization/model_calib.py",
+          "line": 1222,
+          "locals": {
+            "self": "<QuantLinear at 0x72f0ce9c40b0>",
+            "alpha": "0.10000000149011612"
+          }
+        },
+        {
+          "function": "forward",
+          "module": "transformers/models/gemma4/modeling_gemma4.py",
+          "line": 1249,
+          "locals": {
+            "self": "<QuantGemma4TextAttention at 0x72f0d4828770>"
+          }
+        },
+        {
+          "function": "forward",
+          "module": "transformers/models/gemma4/modeling_gemma4.py",
+          "line": 1419,
+          "locals": {
+            "self": "<Gemma4TextDecoderLayer at 0x72f0cff79b50>"
+          }
+        },
+        {
+          "function": "forward",
+          "module": "transformers/models/gemma4/modeling_gemma4.py",
+          "line": 1725,
+          "locals": {
+            "self": "<Gemma4TextModel at 0x72f0db221c40>",
+            "decoder_layer": "<Gemma4TextDecoderLayer at 0x72f0cff79b50>"
+          }
+        }
+      ]
+    },
+    {
+      "capture_time_utc": "2026-10-10T00:10:34.878784+00:00",
+      "private_raw_path": "build/p2/logs/wsl-live-locals-2.json",
+      "raw_sha256": "e0a6940addca141d552e6bebaa95366fa674aed97f37a11bdadc49f2804c4637",
+      "native_exit": 0,
+      "frames": [
+        {
+          "function": "forward",
+          "module": "modelopt/torch/quantization/model_calib.py",
+          "line": 1234,
+          "locals": {
+            "self": "<QuantLinear at 0x72f0dc922db0>",
+            "alpha": "0.800000011920929"
+          }
+        },
+        {
+          "function": "forward",
+          "module": "transformers/models/gemma4/modeling_gemma4.py",
+          "line": 1454,
+          "locals": {
+            "self": "<Gemma4TextDecoderLayer at 0x72f0dc920d40>"
+          }
+        },
+        {
+          "function": "forward",
+          "module": "transformers/models/gemma4/modeling_gemma4.py",
+          "line": 1725,
+          "locals": {
+            "self": "<Gemma4TextModel at 0x72f0db221c40>",
+            "decoder_layer": "<Gemma4TextDecoderLayer at 0x72f0dc920d40>"
+          }
+        }
+      ]
+    }
+  ],
+  "finding": "Fresh read-only samples show different QuantLinear and Gemma4TextDecoderLayer instances and alpha settings; the search advances inside its first sample. No observed deadlock or diagnosed search failure. Export/inference remain pending.",
+  "mutations": "none; no stop, restart, checkpoint change, or other-project mutation",
+  "eta": "unknown"
+}
