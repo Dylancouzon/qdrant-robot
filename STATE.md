@@ -20,7 +20,7 @@ Jetson 12 short replies decode at 29.69 tok/s median, with 0.453 s first-token m
 
 Evidence: bench/results/2026-10-10-gemma-litert-screen.json publishes numerical outcomes, native commands/exits, hashes, memory, and paired judgments. Private source-packets.json restores the original from 5220bbb and verifies frozen source SHA256 d6267e6b03d07f517644b8f673d0e981fec353b81c2494966010bb27c8c0b4a3. Private build/gemma-fit-20261010 holds frozen packets/rubrics, upstream SDK copies, scripts, full model, and {wsl,jetson}-evidence raw replies, judgments, native receipts, logs, and telemetry. Original cache-directory failure native one and WSL software-Vulkan signal 11 remain preserved. No production data appears in the public audit.
 
-Changed paths: STATE.md, DECISIONS.md, research/gemma-fit.md, research/lessons.md, bench/judge-cache.jsonl, the sanitized audit, and design/task review records. No tracked runtime, fixture, configuration, production model, release link, or memory change. Required checks pass native zero in 92.39 s (E). Task review passes native zero in 220.67 s (E), with no blockers: reviews/20261010-134937-83780-review.md. Commit/push are next.
+Changed paths: STATE.md, DECISIONS.md, research/gemma-fit.md, research/lessons.md, bench/judge-cache.jsonl, the sanitized audit, and design/task review records. No tracked runtime, fixture, configuration, production model, release link, or memory change. Required checks pass native zero in 92.39 s (E). Task review passes native zero in 220.67 s (E), with no blockers: reviews/20261010-134937-83780-review.md. Checkpoint a33528a commits and pushes to origin/spike/llm-experiments. The real commit hook passes native zero in 91.93 s (E).
 
 ## Jobs and recovery
 
@@ -34,7 +34,7 @@ Mac relay session 65404 and judge sessions are complete. Local task review PID 8
 
 Jetson boot 09b4bb27-f975-441c-9d00-7af446ec7de6; current releases/7f67670fa91e; previous releases/6781adbb7189. Production memories, accepted Qwen/CUDA-Kokoro runtime, shared models, and closed backup remain unchanged. Do not relaunch the preview for this experiment. WSL access is ssh dylan@192.168.1.74, project /home/dylan/qdrant-robot-box, lock gpu.lock. Jetson access is ssh robot, lock /home/qdrant/qdrant-robot/shared/gpu.lock. No other owner's services were changed.
 
-Git: standing project approval permits scoped commit/push after task review and required checks. Commit this rejected-adoption experiment checkpoint to spike/llm-experiments, then push that branch. Keep main and product deployment unchanged. User limits this session to this checkpoint; do not continue into intent work.
+Git: reviewed experiment checkpoint a33528a is committed and pushed to origin/spike/llm-experiments. Standing project approval covers the closing records commit. Main and product deployment remain unchanged. All owned experiment, review, check, and commit jobs are terminal. User limits this session to this checkpoint; stop here and keep intent work for the next session.
 
 ## Next session: intent parsing and tool execution optimization
 
@@ -42,4 +42,4 @@ research/answer-evidence.md preserves the reviewed seven-session/30-turn plan an
 
 Final targets remain unmet: physical audible 1.2 s p50/2.0 s p95, 90% per capability, zero stranger identity claims, 30 tok/s decode, sustained 15 fps detection, Edge 10 ms p99, 500 MB full-stack reserve, and no turn paging. M4 also needs held-out acceptance, offline cold start, restart/deletion, and eight active hours. Standalone Gemma results establish none of these acceptance claims.
 
-Exact next command: git add the eight reviewed record/cache/audit files; git commit through tools/githooks; git push -u origin spike/llm-experiments. Record the successful Git checkpoint, then stop this session.
+Exact next command in the next authorized session: cat research/answer-evidence.md research/lessons.md. Reconcile machines and design-review intent/tool implementation with accepted Qwen fixed across arms. This session ends at the reviewed Gemma checkpoint.

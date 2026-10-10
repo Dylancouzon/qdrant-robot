@@ -1136,6 +1136,10 @@
     "review_seconds": 220.67,
     "checks_native_exit": 0,
     "checks_seconds": 92.39,
-    "checks_log": "build/gemma-fit-20261010/checks.log"
+    "checks_log": "build/gemma-fit-20261010/checks.log",
+    "checkpoint_commit": "a33528a",
+    "checkpoint_pushed": "origin/spike/llm-experiments",
+    "real_commit_hook_native_exit": 0,
+    "real_commit_hook_seconds": 91.93
   }
 }
