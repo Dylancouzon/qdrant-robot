@@ -1,10 +1,10 @@
 # State
 
-Updated2026-10-09 at23:42EDT by the lead. D136/D137 common preview repair is reviewed and deployed as623954f5cdb8. Pause after scoped commit/push and clean checks. WSL preparation continues under a completion-only watcher; Dylan will start another session for subsequent work.
+Updated2026-10-09 at23:43EDT by the lead. D136/D137 common preview repair is reviewed and deployed as623954f5cdb8. Pause requested by Dylan; no new architecture work in this session. WSL preparation continues under a completion-only watcher; Dylan will start another session for subsequent work.
 
 ## Product checkpoint
 
-Protected UI source is /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface on spike/mac-audio-interface. Root spike/overnight-2026-10-09 contains rejected F1 code and records only; never deploy root. Main eb746fe stays unchanged. Obtain current bookkeeping SHAs with git log -1 in each worktree.
+Protected UI source is /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface on spike/mac-audio-interface, reviewed product commit44d2dc6 is pushed. Root spike/overnight-2026-10-09 contains rejected F1 code and records only; never deploy root. Main eb746fe stays unchanged. Obtain current bookkeeping SHAs with git log -1 in each worktree.
 
 The view shows continuously recognized unambiguous objects plus one unknown teaching focus. The copied face card is removed; consenting names appear only on exact verified source face frames. One serial recognition owner runs independently of conversation/detection. Item-only persistent Do not track that and Restore controls use descriptors in existing Things; category-ignore remains separate. Exact chosen names, consent, real deletion, source evidence, authentication, and rollback remain fixed. Configurable OBJECT_MIN_SIDE120 follows the actual126-127px green-capped bottle. Unknown confidence stays0.25; confirmed-name continuation uses existing0.10. Raw geometry governs crops/writes; smoothed geometry governs drawing.
 
@@ -37,9 +37,9 @@ When the exact job becomes terminal, the automation records native exit/endtime,
 
 ## Git and exact next steps
 
-Commit/push only the reviewed protected D136/D137 task and root records, under standing approval. Use per-command git -c core.hooksPath=/dev/null because the user prohibits full-suite hooks; normal hooks remain tools/githooks. Protected changed paths: robot/{config,detect,faces,focus,main,recognition,things,view}.py and related tests, tools/talk.py/html/test_talk.py, README.md, task receipts/reviews, and lead records. Root changes only STATE/DECISIONS/research/{mac-audio-interface,lessons,edge-cases} and task receipts/reviews. Raw media, private memory, biometrics, tokens, transcripts, and diagnostic locals stay ignored.
+Reviewed product44d2dc6 is committed/pushed; synchronized final handoff records follow on both spikes. Standing approval applies to scoped records. Use per-command git -c core.hooksPath=/dev/null because the user prohibits full-suite hooks; normal hooks remain tools/githooks. Protected changed paths: robot/{config,detect,faces,focus,main,recognition,things,view}.py and related tests, tools/talk.py/html/test_talk.py, README.md, task receipts/reviews, and lead records. Root changes only STATE/DECISIONS/research/{mac-audio-interface,lessons,edge-cases} and task receipts/reviews. Raw media, private memory, biometrics, tokens, transcripts, and diagnostic locals stay ignored.
 
-Exact next commands before pause: git diff --check and inspect scoped staged files in each worktree; commit/push reviewed spike changes without full-suite hooks; verify clean trees, current623 release, no robot job/GPU holder, original Idle/mic off, server73794, and enabled completion watcher. Then pause. If WSL has finished meanwhile, record its exact outcome and inventory only. Do not start another architecture task.
+Exact next action: let the enabled completion watcher record the WSL outcome and notify Dylan. Read-only reconciliation command is in the WSL section. Preview623 is Idle/mic off; server73794 remains ready, robot jobs/GPU holders are absent. Dylan will initiate the next architectural session. Do not start export/engines or another model task from this handoff.
 
 Human follow-up: press Start for a fresh live session; teach one object with its full chosen name, observe stable green label alongside one unknown, ignore only that item, move it away/back, and Restore. Judge continuous box motion, face-name cadence, and responsive lower controls. Current room light may differ from the saved recordings. Detector baseline missed the microphone in60backgroundframes; model/detector capability work belongs to later architecture work, not a fabricated overlay.
 
