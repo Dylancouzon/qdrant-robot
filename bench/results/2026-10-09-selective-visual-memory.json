@@ -51,7 +51,7 @@
       "robot/things.py": "8bcded33a2e6ff45ba7bd67669199b989860bf199c29543789ee06ed20d7846b"
     },
     "old_user_unit": "qr-live-mac-f25e12d13bbc.service stopped after explicit upgrade readiness",
-    "new_user_unit": "qr-live-mac-1c5eb3448bee.service started by Dylan"
+    "new_user_unit": "qr-live-mac-1c5eb3448bee.service started by Dylan, later replaced by qr-live-mac-7ab53f128dba.service"
   },
   "unchanged_protected_runtime_integrity": {
     "robot/config.py": true,
@@ -79,9 +79,16 @@
   "preview": {
     "server_pid": 48631,
     "url": "http://127.0.0.1:8765",
-    "tab_id": "1202942054",
+    "tab_id": "1202942045",
     "idle_reopen": "DOM verified Idle, Start enabled, Mute/Stop disabled, camera placeholder; no agent Start",
     "subsequent_user_start": "Dylan started new session; latest Listening/active/view_ready true",
-    "live_qualification": "Dylan testing; no agent camera/microphone/replay/model test"
+    "live_qualification": "Dylan testing; no agent camera/microphone/replay/model test",
+    "duplicate_tab_recovery": {
+      "closed_tab": "1202942054",
+      "cause": "A new MJPEG viewer replaces the old one.",
+      "result": "Dylan confirms feed is moving after duplicate closure and original reload.",
+      "session_restart": false
+    },
+    "subsequent_feedback": "Dylan reports choppy video and recognized objects blinking; follow-up remains pending."
   }
 }

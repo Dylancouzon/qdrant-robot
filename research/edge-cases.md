@@ -59,8 +59,13 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - Mac audio interface (D122, Sol52230 PASS): a workflow-launcher timeout can leave its SSH descendant holding pipes and delay cleanup. If observed, reap the launcher process group on timeout. A queued Mute request can race with closing the native child stdin and raise ValueError; detach the child under the shared lock before closing pipes if observed. Normal native Start/Mute/Stop and warmup Stop pass. Both are carried under D71; no product architecture change.
 
-- D124 preview, Sol77868 PASS: an interrupted MJPEG connection can leave a frozen image while state polling works (tools/talk.html:52). On observation, clear cameraActive on image failure and retry the existing stream.
+- D124 preview, Sol77868 PASS: a second MJPEG viewer replaces the first, leaving its frozen image while state polling works. Dylan observed this; closing the duplicate and reloading the original restored motion. Keep one preview tab. Other disconnect recovery remains unimplemented; this incident did not prove socket timeout.
 - D124 preview, Sol77868 PASS: overlapping speech transcripts can temporarily show another turn's status/evidence (robot/main.py:277). On observation, separate queued question text from the active answer. Dylan performs live testing; these optional display gaps do not justify another test or review pass.
 
 - D127/D128 preview, Sol38457 PASS: a named object returning on a new undersized track cannot enter recognition and may remain invisible. If Dylan observes it, allow bounded recognition before excluding tiny unknown boxes.
 - D127/D128 preview, Sol38457 PASS: speech interruption can drop a teaching-crop caption. Named vector recall remains available, but historical descriptions can be missing. If observed, retain only interrupted, still-selected crop work for idle retry.
+
+- D129 display: continuous object replacement without a detectable tracking gap can retain the previous green display association for at most two seconds. Fresh crop matches alone authorize writes; a real miss immediately downgrades the label, and three misses restore global matching. No extra tracking machinery is justified by this carried risk.
+- D130/D131 naming: teaching one physical object under different distinct names retains prior named records. The current continuous association re-verifies the latest explicit name. After a gap or restart, a global vector tie can recover an older alias. Historical alias migration remains outside this correction.
+
+- D129-D131 review87875: after a tracking gap or restart, equal crop scores can recover an older alias. Historical rename/alias migration is outside this task. A possessive "What about Ana's smartphone?" parses the name without a reply mode; carry until observed.

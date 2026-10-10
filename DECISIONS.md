@@ -579,3 +579,19 @@ Evidence: Dylan live feedback and two explicit answers; research/mac-audio-inter
 Dylan clarifies that ignored kinds need persistent memory so Edgy remembers what to ignore. Retain existing Things ignore/unignore rule points across restart. These rules describe user preferences; ignored detections create no new visual evidence.
 Object deletion removes the named object and linked visual evidence, while the independent class ignore rule remains until unignore. This clarification preserves the existing rule path and adds no schema, model, or architecture.
 Evidence: Dylan explicit clarification; robot/things.py ignore/ignored on protected preview branch; D127 and research/mac-audio-interface.md. Include rule restart and no-visual-write checks in the scoped implementation.
+
+## D129 2026-10-09: Separate live video from recognition display refresh
+Dylan reports choppy video and blinking labels after D127; _shown holds old labeled frames, and skipped crop queries erase display names. Choose current tracked video with bounded object-only display hysteresis, keeping fresh source scores as sole write authority.
+Keep person boxes anonymous on current frames; show the actual matched face crop and name in a finite-age inset. Never transfer identity by person track. Consent, deletion, ignore rules, thresholds, inference budgets, and models stay fixed.
+Reject frozen labeled full frames; anonymous current video remains fallback. Scoped model-free regressions and one task review precede Dylan-owned physical qualification; no full suite or automated live experiments.
+Evidence: Dylan live feedback; protected7a7f3db robot/main.py _shown/_preview and focus.py boxes; research/mac-audio-interface.md. This supersedes D127 full-frame display policy only.
+
+## D130 2026-10-09: Preserve the visitor's explicit object name
+Dylan says "Dylan's smartphone" but sees phone. _thing replaces recognized names with category aliases, and the parser excludes possessives. Preserve explicit object names separately from detector categories; use categories for matching/ignore, and consistent normalized lookup for recall/forget.
+Accept possessive names in explicit teaching phrases without treating introductions or ordinary conversation as object enrollment. Keep existing category-based recall and persistent ignore preferences; do not guess historical renames.
+Evidence: Dylan live feedback; protected7a7f3db robot/things.py _THING/_thing/command and Things.named; research/mac-audio-interface.md. Include varied names and persistence/deletion in the scoped model-free checks; no model or schema change.
+
+## D131 2026-10-09: Reverify the explicit object name before competing aliases
+A temporary real-Edge/stub-Robot sequence reproduces phone overriding a new "Dylan's smartphone" binding: both score1.0, and unrestricted nearest retrieval returns phone. This breaks the current naming flow.
+Use the existing by-name query for a continuously tracked accepted name with the same crop embedding/query budget. Retain that RAM verification preference beyond display expiry; green display still expires after two seconds, and fresh scores alone authorize writes. Gaps, misses, conflicts, ignore, and deletion clear preference through existing Focus state.
+Reject historical alias migration or extra inference/cache machinery; global matching resumes once the association clears. Evidence: research/mac-audio-interface.md and bench/results/2026-10-09-preview-display-names.json. Stop unfinished review74012/native130 before the material fix; review the corrected tree once.
