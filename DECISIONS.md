@@ -600,3 +600,8 @@ Reject historical alias migration or extra inference/cache machinery; global mat
 D129-D131 and responsive/auto-scroll source1b9496b pass29 scoped checks and Sol87875 PASS. Dylan authorizes restart; deploy protected364d83474b31, previousc182, retainingcd60 and a closed-shard backup. Five changed runtime/UI hashes and19 protected unchanged paths match.
 Reload original preview only and start one fresh session at Dylan's request. System unit qr-live-mac-b6cae9c835d3 is Listening; Dylan owns physical qualification. No full suite or automated live tests.
 Evidence: bench/results/2026-10-09-preview-display-names.json; WSL same-job fresh progress in 2026-10-09-wsl-awq-restart-status.json. No architecture/model adoption or final-target claim.
+
+## D133 2026-10-09: Read actual AWQ batch counters
+Initial0/128 journal search entry is stale. Saved py-spy _calibrate_multimodal locals establish31/32 then43 then45 completed search batches, zero NaN skips; correct previous reports and receipts. Installed loop increments after each model forward and searches alpha candidates inside layers.
+Preserve the same active job; reject first-batch stall inference from that log entry. Export/ETA remain unqualified. No model, calibration, service, or architecture change.
+Evidence: bench/results/2026-10-09-wsl-awq-counter-status.json and corrections in live-progress/restart-status receipts; installed quantize.py836-850/model_calib.py1221-1239; raw locals ignored.
