@@ -1,6 +1,6 @@
 # State
 
-Updated 2026-10-10. Checkout: /Users/dylanc/Documents/GitHub/qdrant-robot. Branch: spike/llm-experiments. The authorized Gemma/Qwen full-stack comparison is complete and reviewed. The closing commit and push are next. Intent parsing and tool execution optimization remain next session only. The live preview remains paused.
+Updated 2026-10-10. Checkout: /Users/dylanc/Documents/GitHub/qdrant-robot. Branch: spike/llm-experiments. The authorized Gemma/Qwen full-stack comparison is complete and reviewed. Comparison commit 469d8f5 is complete and pushed; this status records its closing receipts. Intent parsing and tool execution optimization remain next session only. The live preview remains paused.
 
 ## Read first
 
@@ -42,7 +42,7 @@ The initial baseline stops before replay answers with signal 15/wrapper 143 beca
 
 Dylan selects Claude Code Opus 5.5 instead of the default Sol task reviewer and chooses background execution. Canonical claude-opus-5-5 is verified; frozen three-vote gpt-6-sol answer scoring stays unchanged. Reviews review-mv2tghdr-pd4tj0 and review-mv2tozcr-uzq6p8 return PASS WITH CHANGES. Their findings are resolved, and two reviewer count errors are corrected with evidence. Final review review-mv2tsr0d-ads48c returns PASS with no blockers; preserve reviews/20261010-opus55-full-stack-final-review.md and both earlier verbatim reports. Its small wording nits are resolved without changing results.
 
-Required source checks pass native zero in 94.40 s, build/gemma-fit-20261010/full-stack/checks.log. All six raw replay files pass tools/results.py completion and exact-judgment checks. The aggregate JSON is an explicit format exception and must be read directly. The closing commit hook remains required.
+Required source checks pass native zero in 94.40 s, build/gemma-fit-20261010/full-stack/checks.log. All six raw replay files pass tools/results.py completion and exact-judgment checks. The aggregate JSON is an explicit format exception and must be read directly. The actual commit hook passes native zero in 93.29 s, full-stack/commit.log. Commit 469d8f5 completes native zero; full-stack/commit-receipt.json retains its command and timing.
 
 ## Machines and terminal jobs
 
@@ -56,9 +56,9 @@ Preserve remote stores and private evidence. Use rsync -aS for sparse files and 
 
 ## Changes and Git
 
-Changed paths: STATE.md, DECISIONS.md, research/gemma-fit.md, research/lessons.md, research/edge-cases.md, research/experiments.md, bench/judge-cache.jsonl, bench/results/2026-10-10-gemma-full-stack.json, and four full-stack design/review records. No tracked runtime, fixture, or configuration change. The comparison review passes and all blockers are resolved. Standing project approval permits the closing commit and push. Main and deployment stay unchanged; checkpoints a33528a and d2f929d are already pushed.
+Comparison commit paths: STATE.md, DECISIONS.md, research/gemma-fit.md, research/lessons.md, research/edge-cases.md, research/experiments.md, bench/judge-cache.jsonl, bench/results/2026-10-10-gemma-full-stack.json, and four full-stack design/review records. No tracked runtime, fixture, or configuration change. The comparison review passes and all blockers are resolved. Comparison commit 469d8f5 is reviewed and pushed to origin/spike/llm-experiments, native zero. The full-stack/push.log and push-receipt.json retain the push receipt. This final status reconciliation is bookkeeping only; standing approval covers its commit and push. Main and deployment stay unchanged; checkpoints a33528a and d2f929d are already pushed.
 
-Exact next command: git diff --check. Stage the listed record paths, inspect the staged diff, and commit through tools/githooks/pre-commit. Save its native receipt in build/gemma-fit-20261010/full-stack/commit.log, then push origin spike/llm-experiments. Record terminal commit/push receipts before ending the session.
+Exact next command for the next session: cat research/answer-evidence.md. Reconcile branch, deployed release, and jobs before designing intent/tool changes. This session stops after saving the final status receipt; no parser implementation starts here.
 
 ## Next session: intent parsing and tool execution optimization
 
