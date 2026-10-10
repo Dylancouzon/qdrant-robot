@@ -69,3 +69,5 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - D130/D131 naming: teaching one physical object under different distinct names retains prior named records. The current continuous association re-verifies the latest explicit name. After a gap or restart, a global vector tie can recover an older alias. Historical alias migration remains outside this correction.
 
 - D129-D131 review87875: after a tracking gap or restart, equal crop scores can recover an older alias. Historical rename/alias migration is outside this task. A possessive "What about Ana's smartphone?" parses the name without a reply mode; carry until observed.
+
+- D134 preview: a continuous person ID can change label away and back without resetting source continuity. A delayed exact-source card can return within two seconds; no name labels current body pixels. If observed, invalidate sources before that person-label interruption. Card clamping can overlap the source face when neither side has room; use fixed-corner fallback if human testing finds it obstructive. Sol45876 PASS carries both under D71.
