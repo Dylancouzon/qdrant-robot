@@ -1,0 +1,74 @@
+{
+  "task": "D134 box smoothing, sustained focus priority, source-anchored face card",
+  "measurement_label": "E",
+  "source_base": "07067e4b54a211b97d0b5b465135e90cabf4f8e5",
+  "source_branch": "spike/mac-audio-interface",
+  "source_directory": "/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface",
+  "changed_file_sha256": {
+    "robot/focus.py": "d26fac931f5197761763f02154d114e43f074015537afd81ac5fa39aaecd5ea0",
+    "robot/main.py": "5bf4e1f80ad33b623bb11a288f71a6718c2f76d6402f7acc48df95f0d151028d",
+    "robot/view.py": "2e9189b2926c71aff42f60df582fe06f9dd615aae539d8dcb96a94001101d2ec",
+    "robot/test_focus.py": "157588684ec7eae583cee4a276e33e35479d0ad50e55606fd90b2bec8502ad07",
+    "robot/test_things.py": "5a787af9df820b178fcc7c5c885997f4d7e688c299f46726ec42d34031403e14",
+    "robot/test_view.py": "1364d3edfc2d3a87c30214242234641cd1d06bbb1e6423f211974af1336b2f1f"
+  },
+  "diff_sha256": "452a5ee15c67cd25d654b6ba86558b70b1de3165cf2a795e00c6291aebd3a357",
+  "design": {
+    "path": "reviews/20261009-213712-34450-design.md",
+    "verdict": "GO WITH CHANGES",
+    "native_exit": 3,
+    "tree_stamp": null,
+    "reason": "Authorized smoothing stage landed during design. Face-policy conditions resolved in completed code."
+  },
+  "checks": {
+    "command": "ORT_DISABLE_TELEMETRY=1 PYTHONPATH=/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/lib/python3.12/site-packages:. uv run --no-project --python 3.12 --with pytest pytest -q robot/test_focus.py robot/test_things.py robot/test_view.py",
+    "passed": 36,
+    "elapsed_seconds": 11.2,
+    "native_exit": 0,
+    "ruff_changed_paths": "pass",
+    "python_syntax": "pass",
+    "diff_whitespace": "pass"
+  },
+  "recorded_geometry": {
+    "source": "bench/results/2026-10-08-clip-1791487472.jsonl",
+    "frames": 90,
+    "phone_samples": 90,
+    "adjacent_steps": 89,
+    "raw_mean_edge_step_px": 3.27,
+    "drawn_mean_edge_step_px": 2.71,
+    "mode": "Bounded recorded coordinates only; no source pixels, models, live testing, or integrated replay. Limited development check, not physical smoothness qualification."
+  },
+  "visual_check": {
+    "fixture": "build/p2/logs/source-face-card-synthetic.png",
+    "synthetic_pixels_only": true,
+    "reviewer_fixture": "/tmp/overlay-review-fixture.png",
+    "result": "Legible source crop/name/age card beside immutable source geometry; all text contained, current body anonymous."
+  },
+  "qualification": "Dylan owns live qualification. No full suite/hooks/module selfchecks/automated live model/audio/replay. Memory policy and identity authority unchanged.",
+  "review": {
+    "status": "complete",
+    "path": "reviews/20261009-214603-45876-review.md",
+    "model": "gpt-6.1-sol",
+    "code_tree": "23fa82445227540b0436450d29406a6e776d97e6",
+    "verdict": "PASS",
+    "elapsed_seconds": 177.34,
+    "native_exit": 0,
+    "blocking_findings": []
+  },
+  "deployment": {
+    "status": "pending review",
+    "current_preserved": "364d83474b31",
+    "candidate_release": "1384f8a50c52"
+  },
+  "peer_review": {
+    "reviewer": "overlay_reviewer",
+    "model": "gpt-6.1-sol",
+    "verdict": "PASS",
+    "blocking_findings": [],
+    "scope": "Full six-file diff and inert visual fixture. Stationary size outlier and current-person gap validation findings resolved; raw authority, sustained priority, source placement, expiry/deletion verified by reading. No full suite/live tests."
+  },
+  "carried_edges": [
+    "A continuous person ID can change label away and back without a detection gap. A delayed historical source card can return within its two-second expiry; no live body identity is claimed.",
+    "Spatial card clamping can overlap the source face when neither side has space. Use fixed-corner fallback if physical testing finds this obstructive."
+  ]
+}

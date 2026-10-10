@@ -51,8 +51,8 @@ def test_hold_and_margin() -> None:
     assert f.focus == 1
     _, t = run(f, t, 4.3, [a, b])
     assert f.focus == 1, "no switch before 5 s"
-    _, t = run(f, t, 0.8, [a, b])
-    assert f.focus == 2, "a 1.6x challenger takes it after 5 s"
+    _, t = run(f, t, 1.8, [a, b])
+    assert f.focus == 2, "a sustained 1.6x challenger takes it after the hold"
     f = Focus(W, H)
     _, t = run(f, 0, 1.2, [a])
     c = phone((480, 180, 620, 380), 3, "camera")  # about 1.4x: under the margin
@@ -204,3 +204,68 @@ def test_epoch_two_query_acquisition():
         f.update(t, [phone()], [], recognized={1: ("Wallet", 0.9)})
     assert f.names() == {1: ("Wallet", True)}
     assert f.named[1].refreshed == 1791570000.5
+
+
+def test_drawing_smoothing_raw_authority_motion_and_gap():
+    f = Focus(W, H)
+    original = phone()
+    jitter = phone((510, 190, 590, 370))
+    f.update(10, [original], [])
+    f.update(10.1, [jitter], [])
+    shown = f.boxes([jitter], [])[0][:4]
+    assert shown == (504, 196, 596, 364)
+    assert jitter.box == (510, 190, 590, 370), "drawing never changes the raw crop box"
+    f.update(10.1, [jitter], [])
+    assert f.boxes([jitter], [])[0][:4] == shown, "preview repeats cannot smooth twice"
+    moved = phone((700, 200, 800, 360))
+    f.update(10.2, [moved], [])
+    assert f.boxes([moved], [])[0][:4] == moved.box, "large motion snaps immediately"
+    f.update(10.3, [], [])
+    f.update(10.4, [original], [])
+    assert f.boxes([original], [])[0][:4] == original.box, "a gap clears drawing history"
+    r = Focus(W, H)
+    assert r.boxes([original], [])[0][:4] == original.box, "new session has no drawing history"
+
+
+def test_challenger_requires_continuous_priority():
+    f = Focus(W, H)
+    a = phone()
+    b = phone((700, 220, 800, 320), 2, "book")
+    c = phone((580, 240, 680, 340), 3, "cup")
+    big_b = phone((600, 110, 900, 430), 2, "book")
+    big_c = phone((470, 130, 790, 450), 3, "cup")
+    _, t = run(f, 0, 7, [a])
+    _, t = run(f, t, 1.2, [a, b, c])
+    for _ in range(3):
+        _, t = run(f, t, 0.5, [a, big_b, c])
+        _, t = run(f, t, 0.5, [a, b, big_c])
+        assert f.focus == 1, "alternating priorities never build a continuous challenge"
+    _, t = run(f, t, 0.5, [a, big_b, c])
+    _, t = run(f, t, 0.1, [a, b, c])
+    assert f.challenger[0] is None, "losing the margin clears pending priority"
+    _, t = run(f, t, 0.7, [a, big_b, c])
+    assert f.focus == 1
+    f.update(t, [a], [PERSON])
+    assert f.challenger[0] is None, "a gap clears pending priority"
+    _, t = run(f, t + DT, 0.8, [a, big_b, c])
+    assert f.focus == 1
+    _, t = run(f, t, 0.4, [a, big_b, c])
+    assert f.focus == 2
+    f.freeze(1)
+    f.update(t, [a, big_b, c], [PERSON])
+    assert f.challenger[0] is None and f.focus == 1
+
+
+def test_stationary_size_outlier_and_ignore_clear_drawing():
+    f = Focus(W, H)
+    a = phone()
+    enlarged = phone((400, 100, 700, 460))  # same center, three times the width
+    f.update(10, [a], [])
+    f.update(10.1, [enlarged], [])
+    assert f.boxes([enlarged], [])[0][:4] == (465, 165, 635, 395)
+    f.ignored = {"phone"}
+    f.update(10.2, [enlarged], [])
+    assert f.seen[1].shown is None
+    f.ignored.clear()
+    f.update(10.3, [a], [])
+    assert f.boxes([a], [])[0][:4] == a.box

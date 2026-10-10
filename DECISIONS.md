@@ -605,3 +605,9 @@ Evidence: bench/results/2026-10-09-preview-display-names.json; WSL same-job fres
 Initial0/128 journal search entry is stale. Saved py-spy _calibrate_multimodal locals establish31/32 then43 then45 completed search batches, zero NaN skips; correct previous reports and receipts. Installed loop increments after each model forward and searches alpha candidates inside layers.
 Preserve the same active job; reject first-batch stall inference from that log entry. Export/ETA remain unqualified. No model, calibration, service, or architecture change.
 Evidence: bench/results/2026-10-09-wsl-awq-counter-status.json and corrections in live-progress/restart-status receipts; installed quantize.py836-850/model_calib.py1221-1239; raw locals ignored.
+
+## D134 2026-10-09: Smooth boxes and require sustained focus priority
+Dylan reports jumpy boxes, rapid unknown-focus changes, and a disconnected corner name card. Choose display-only smoothing and one second of the same raw-salience challenger; keep current focus while fit. Raw geometry retains crop/write/association authority.
+Move exact face crop/name/source age into one bounded card beside immutable source face coordinates. Current person outlines stay anonymous; no identity follows a track. Clear on absence even when busy, and reject old in-flight sources after a gap.
+Reject cached named live-body outlines and frozen matched full frames. Fixed-corner source card remains fallback. Models, budgets, thresholds, memory policy, consent, and deletion stay fixed; Dylan owns physical qualification.
+Evidence: research/mac-audio-interface.md; peer overlay_reviewer; design34450 GO WITH CHANGES/native3, accepted conditions. No tree stamp because authorized smoothing landed during design; final task review must stamp complete frozen code.

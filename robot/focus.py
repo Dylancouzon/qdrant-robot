@@ -17,6 +17,9 @@ RECENT_S = 3.0  # appeared or moved this recently: an interaction cue
 SCENERY_S = 60.0  # still this long: scenery, until it moves or leaves and returns
 GONE_S = 1.0  # out of view, or unfit for the focus, this long: released and forgotten
 HOLD_S = 5.0  # a challenger may take the focus only after the focus held it this long
+CHALLENGE_S = 1.0  # the same challenger must exceed the margin continuously
+SMOOTH = 0.35  # drawing coordinates only, one update per source frame
+SNAP = 0.08  # frame-width center change: follow large movement, smooth size changes
 MARGIN = 1.6  # ... and only with this many times the focus's salience
 CUE = 1.5  # salience factor per cue: held up, appeared or moved recently
 HELD = 0.8  # fraction of a box inside a person or hand box: held up, to take the focus
@@ -47,6 +50,7 @@ class _Seen:
     path: deque  # (time, center) over the last STEADY_S
     last: float = 0.0  # last in view
     continuous: float = 0.0  # source time after the last detection gap
+    shown: tuple | None = None  # smoothed drawing box; never used for crops or selection
 
 
 @dataclass
@@ -106,6 +110,7 @@ class Focus:
     seen: dict[int, _Seen] = field(default_factory=dict)
     named: dict[int, _Name] = field(default_factory=dict)
     visible: set[int] = field(default_factory=set)
+    challenger: tuple[int | None, float] = (None, 0.0)
     held: list[Box] = field(default_factory=list)  # this frame's person and hand boxes
 
     def update(self, now: float, tracks: list[Track], people: list[Box], hands: list[Box] = (),
@@ -140,8 +145,16 @@ class Focus:
     def _see(self, t: Track) -> None:
         c = _center(t.box)
         s = self.seen.setdefault(t.id, _Seen(self.now, self.now, c, deque()))
-        if t.id not in self.visible:
+        gap = t.id not in self.visible
+        if gap:
             s.continuous = self.now
+        if t.label in self.ignored:
+            s.shown = None
+        elif gap or s.shown is None or \
+                math.dist(_center(s.shown), _center(t.box)) > SNAP * self.width:
+            s.shown = t.box
+        elif self.now > s.last:
+            s.shown = tuple(a + SMOOTH * (b - a) for a, b in zip(s.shown, t.box, strict=True))
         s.last = self.now
         s.path.append((self.now, c))
         while s.path[0][0] < self.now - STEADY_S:
@@ -192,11 +205,13 @@ class Focus:
 
     def _refocus(self, live: dict[int, Track]) -> None:
         if self.frozen:
+            self.challenger = None, 0.0
             return
         cur = live.get(self.focus)
         if cur is not None and self._fit(cur, KEEP):
             self.fit = self.now
         elif self.focus is not None and not self.name(self.focus) and self.now - self.fit < GONE_S:
+            self.challenger = None, 0.0
             return  # a moment out of view or out of the zone keeps it; a name drops it at once
         else:
             cur = None
@@ -204,7 +219,14 @@ class Focus:
                    key=self.salience, default=None)
         if cur is not None and (best is None or best.id == cur.id or self.now - self.since < HOLD_S
                                 or self.salience(best) < MARGIN * self.salience(cur)):
+            self.challenger = None, 0.0
             return
+        if cur is not None:
+            if best.id != self.challenger[0]:
+                self.challenger = best.id, self.now
+            if self.now - self.challenger[1] < CHALLENGE_S:
+                return
+        self.challenger = None, 0.0
         self.focus = best and best.id
         self.since = self.fit = self.now
 
@@ -227,6 +249,7 @@ class Focus:
     def freeze(self, track: int | None) -> None:
         """Hold the focus on `track` from the speech start of a naming turn until thaw()."""
         self.focus, self.frozen, self.since, self.fit = track, True, self.now, self.now
+        self.challenger = None, 0.0
 
     def thaw(self) -> None:
         self.frozen = False
@@ -246,14 +269,19 @@ class Focus:
               now: float | None = None) -> list[tuple]:
         """Current boxes with bounded object associations; people stay anonymous."""
         names = self.names(now)
-        out = [(*b, "", "person") for b in people]
+        drawn = {t.id: tuple(round(v) for v in self.seen[t.id].shown)
+                 if t.id in self.seen and self.seen[t.id].shown is not None else t.box
+                 for t in tracks}
+        person_boxes = {t.box: drawn[t.id] for t in tracks if t.label == "person"}
+        out = [(*person_boxes.get(b, b), "", "person") for b in people]
         for t in tracks:
+            box = drawn[t.id]
             if t.id in names:
                 name, sure = names[t.id]
-                out.append((*t.box, name if sure else name + "?", "known" if sure else "guess"))
+                out.append((*box, name if sure else name + "?", "known" if sure else "guess"))
             elif t.id == self.focus and self.sized(t):
-                out.append((*t.box, t.label.capitalize() + "?" if t.score >= KIND_SCORE
+                out.append((*box, t.label.capitalize() + "?" if t.score >= KIND_SCORE
                             else "???", "focus"))
             elif t.label not in BODY and (self.sized(t) or t.id in names):
-                out.append((*t.box, "", "other"))
+                out.append((*box, "", "other"))
         return out

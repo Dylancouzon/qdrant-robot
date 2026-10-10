@@ -278,6 +278,7 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     r = robot
     frame = frame_of(r)
     r.focus.freeze(next(iter(r.view[1])))
+    r.focus.seen[next(iter(r.view[1]))].shown = (1, 2, 3, 4)
     assert command("Track this as my wallet", r.vocab)[0:2] == ("name", "wallet")
     answer, turn = ask(r, "Track this as my wallet")
     assert answer.startswith("Got it")
@@ -389,15 +390,18 @@ def test_source_face_inset_and_current_video(robot, monkeypatch):
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
     preview(r)
     newer = frame_of(r, BLACK, people=True)
+    r._track(newer, [Detection("phone", 0.9, CENTER),
+                     Detection("person", 0.9, (350, 0, 1050, 720))])
     frame, screen = r._shown()
     assert frame is newer and all(not b[4] for b in screen.boxes if b[5] == "person")
-    taken, crop, name = screen.face_match
+    taken, crop, name, source_box, source_id = screen.face_match
     assert name == "Ana" and taken < r.view_taken
+    assert source_box == (500, 100, 600, 200), "new person motion cannot move source coordinates"
     assert np.array_equal(crop, source[100:200, 500:600])
     r.ui_thinking = True
     assert r._shown()[0] is newer
     r.ui_thinking = False
-    r.face_match = taken - 3, crop, name
+    r.face_match = taken - 3, crop, name, source_box, source_id
     assert r._shown()[1].face_match is None
     # A replacement face on the same person track clears the source match.
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
@@ -477,8 +481,10 @@ def test_source_face_crop_clamps_edges_and_suppresses_empty(robot, monkeypatch):
     r.people.enroll("Ana", [v, v], time.time())
     frame = frame_of(r)
     frame[100:200, :80] = 170
+    for _ in range(CONFIRM):
+        r._track(frame, [Detection("phone", 0.9, CENTER),
+                         Detection("person", 0.9, (-100, 0, 1280, 720))])
     tracks = [Track(*t) for t in r.tracker.scored()]
-    tracks += [Track(999, (-100, 0, 1280, 720), "person", 0.9)]
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (-10, 100, 80, 200)))
     r._preview(frame, r.view_taken, tracks)
     assert r.face_match[1].shape == (100, 80, 3) and r.face_match[1].mean() == 170
@@ -530,3 +536,23 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     ask(r, "Forget my Dylan's smartphone")
     assert not r.focus.names()
     assert all(n.name != "Dylan's smartphone" for n in r.focus.named.values())
+
+
+def test_face_gap_during_generation_rejects_old_preview(robot, monkeypatch):
+    r = robot
+    v = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [v, v], time.time())
+    source = frame_of(r, people=True)
+    source_time = r.view_taken
+    source_tracks = [Track(*t) for t in r.tracker.scored()]
+    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
+    preview(r)
+    assert r.face_match is not None
+    r.ui_thinking = True
+    frame_of(r, people=False)
+    assert r.face_match is None, "absence clears evidence before any renderer request"
+    assert r._shown()[1].face_match is None, "absence clears evidence during generation"
+    r.ui_thinking = False
+    frame_of(r, people=True)
+    r._preview(source, source_time, source_tracks)
+    assert r.face_match is None, "in-flight source before a gap cannot restore the card"

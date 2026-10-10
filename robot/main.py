@@ -69,7 +69,7 @@ from robot.things import (
     unmention,
 )
 from robot.tts import RATE, Speaker, phrases
-from robot.view import Screen, View
+from robot.view import FaceMatch, Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
@@ -174,7 +174,7 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = self.view_taken = 0.0  # detection time, source capture time
-        self.face_match: tuple[float, np.ndarray, str] | None = None
+        self.face_match: FaceMatch | None = None
         self.preview_due, self.preview_queued, self.preview_cursor = 0.0, False, 0
         self.crop_times: deque[float] = deque()  # at most three idle crop queries per second
         self.focus: Focus | None = None  # the focus object and shown names (D63), per frame
@@ -347,6 +347,10 @@ class Robot:
         self.focus = self.focus or Focus(frame.shape[1], frame.shape[0])
         self.focus.ignored = self.ignored
         self.focus.update(self.view_taken, tracks, people)
+        if self.face_match and (self.face_match[4] not in {t.id for t in tracks
+                                                         if t.label == "person"} or
+                                not self.focus.accepts(self.face_match[4], self.face_match[0])):
+            self.face_match = None
         self.screen = frame, Screen(self.focus.boxes(tracks, people), memory=self.panel)
 
     def _shown(self) -> tuple[np.ndarray | None, Screen]:
@@ -398,11 +402,11 @@ class Robot:
             return
         with self.detecting:
             focus = self.focus
-        people = [t.box for t in tracks if t.label == "person"]
         found_face = located_face(self.faces, frame)
         scores = self.people.scores(found_face[0]) if found_face else []
         person = scores[0][0] if scores and scores[0][2] >= THRESHOLD else None
-        person_boxes = [b for b in people if found_face and inside(found_face[2], b) >= 0.8]
+        person_tracks = [t for t in tracks if t.label == "person" and found_face
+                         and inside(found_face[2], t.box) >= 0.8]
         recognized = {}
         eligible = self.things.visual_links(self.ignored)
         candidates = [t for t in tracks if eligible and t.label not in BODY
@@ -431,15 +435,17 @@ class Robot:
                               [t.box for t in current if t.label == "person"],
                               recognized=recognized, recognized_at=taken)
             self.face_match = None
-            if person and len(person_boxes) == 1:
+            if person and len(person_tracks) == 1 and \
+                    person_tracks[0].id in {t.id for t in current if t.label == "person"} and \
+                    self.focus.accepts(person_tracks[0].id, taken):
                 h, w = frame.shape[:2]
                 box = tuple(max(0, min(v, limit)) for v, limit in
                             zip(found_face[2], (w, h, w, h), strict=True))
                 crop = cut(frame, box)
                 if crop.size:
-                    self.face_match = taken, crop.copy(), person
+                    self.face_match = taken, crop.copy(), person, box, person_tracks[0].id
         self._remember_matches(frame, taken, tracks, recognized,
-                               person if len(person_boxes) == 1 else None)
+                               person if len(person_tracks) == 1 else None)
 
     def _remember_matches(self, frame: np.ndarray, taken: float, tracks: list[Track],
                           recognized: dict, person: str | None) -> None:
