@@ -299,18 +299,16 @@ class Focus:
         return best and best.id
 
     def boxes(self, tracks: list[Track], people: list[Box],
-              now: float | None = None) -> list[tuple]:
-        """Current boxes with bounded object associations; people stay anonymous."""
+              now: float | None = None, *, geometry: dict[int, Box] | None = None) -> list[tuple]:
+        """Current object labels on current or explicitly supplied source geometry."""
         names = self.names(now)
         now = self.now if now is None else now
-        tracks = [*tracks, *(s.track for i, s in self.seen.items()
-                             if i not in self.visible and now - s.last <= OCCLUSION_S
-                             and s.track and s.track.label not in BODY)]
-        drawn = {t.id: tuple(round(v) for v in self.seen[t.id].shown)
-                 if t.id in self.seen and self.seen[t.id].shown is not None else t.box
-                 for t in tracks}
-        out = [(*drawn[t.id], "", "person") for t in tracks
-               if t.label == "person" and self.eligible(t)]
+        if geometry is None:
+            tracks = [*tracks, *(s.track for i, s in self.seen.items()
+                                 if i not in self.visible and now - s.last <= OCCLUSION_S
+                                 and s.track and s.track.label not in BODY)]
+        drawn = self.geometry(tracks) if geometry is None else geometry
+        out = []
         for t in tracks:
             if t.label in BODY or not self.eligible(
                     t, pending=names.get(t.id, (None, False))[1]):
@@ -323,3 +321,9 @@ class Focus:
                 out.append((*box, t.label.capitalize() + "?" if t.score >= KIND_SCORE
                             else "???", "focus"))
         return out
+
+    def geometry(self, tracks: list[Track]) -> dict[int, Box]:
+        """Snapshot drawing coordinates without names or selection policy."""
+        return {t.id: tuple(round(v) for v in self.seen[t.id].shown)
+                if t.id in self.seen and self.seen[t.id].shown is not None else t.box
+                for t in tracks}

@@ -262,7 +262,7 @@ def preview(r, clear=True):
         r.crop_times.clear()  # each call represents a later idle interval
     r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
                {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
-               list(r.screen[1].boxes), r.recognition.epoch)
+               r.focus.geometry([Track(*t) for t in r.tracker.scored()]), r.recognition.epoch)
     drain_matches(r)
 
 
@@ -329,14 +329,14 @@ def test_fresh_recognition_sightings_and_miss(robot):
     for _ in range(3):
         r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
                {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
-               list(r.screen[1].boxes), r.recognition.epoch)
+               r.focus.geometry([Track(*t) for t in r.tracker.scored()]), r.recognition.epoch)
     drain_matches(r)
     assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
     [seen] = r.memory.sightings(time.time() + 1)
     newest = frame_of(r)
     r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
                {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
-               list(r.screen[1].boxes), r.recognition.epoch)
+               r.focus.geometry([Track(*t) for t in r.tracker.scored()]), r.recognition.epoch)
     drain_matches(r)
     assert r._shown()[0] is newest
     assert len(calls) == 3, "idle crop queries are bounded to three per second"
@@ -414,13 +414,62 @@ def test_verified_face_frame_and_anonymous_replacement(robot, monkeypatch):
     newer = frame_of(r, BLACK, people=True)
     frame, screen = r._shown()
     assert frame is source and (500, 100, 600, 200, "Ana", "known") in screen.boxes
-    assert all(not b[4] for b in r.screen[1].boxes if b[5] == "person")
+    assert not any(b[5] == "person" for b in r.screen[1].boxes)
+    assert any(t[2] == "person" for t in r.tracker.scored()), "person tracking stays internal"
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
                                                                   (500, 100, 600, 200)))
     preview(r)
     assert r.verified is None and r._shown()[0] is newer
-    assert all(not b[4] for b in r._shown()[1].boxes if b[5] == "person")
+    assert not any(b[5] == "person" for b in r._shown()[1].boxes)
     assert r._forget(None, "Ana", v) and r.verified is None
+
+
+def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monkeypatch):
+    r = robot
+    v = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [v, v], time.time())
+    show(r, [(GOLD, LEFT), (BLACK, CENTER), (90, RIGHT)])
+    hold(r, LEFT)
+    r.focus.thaw()
+    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.named = r.things.labels()
+    taken = r.view_taken + 1.2
+    monkeypatch.setattr(main.time, "time", lambda: taken)
+    frame = r.view[0]
+    dets = [Detection("phone", .9, b) for b in (LEFT, CENTER, RIGHT)]
+    dets.append(Detection("person", .9, (300, 0, 1000, 720)))
+    for _ in range(CONFIRM):
+        r._track(frame, dets, taken)
+    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
+    for _ in range(2):
+        r.crop_due.clear()
+        preview(r)
+    chosen = next(i for i, (_, b) in r.view[1].items() if b == LEFT)
+    teaching = next(i for i, (_, b) in r.view[1].items() if b == CENTER)
+    assert r.focus.names() == {chosen: ("Chosen", True)} and r.focus.focus == teaching
+    verified = r.verified
+    assert verified is not None
+    for source in [None, verified] * 4:
+        r.verified = source
+        _, screen = r._shown()
+        assert r.focus.focus == teaching, "presentation does not change the selected focus"
+        assert [b[:4] for b in screen.boxes if b[5] == "focus"] == [CENTER]
+        assert any(b[4] == "Chosen" for b in screen.boxes)
+        assert next(t for t in screen.control["targets"] if t["track"] == teaching)["title"] \
+            == "Unknown phone"
+        assert not any(b[5] == "person" for b in screen.boxes)
+    # Newer movement cannot move an object overlay on the older verified image.
+    moved = (580, 300, 780, 600)
+    monkeypatch.setattr(main.time, "time", lambda: taken + .05)
+    dets[1] = Detection("phone", .9, moved)
+    r._track(frame.copy(), dets, taken + .05)
+    shown, screen = r._shown(False)
+    assert shown is frame and [b[:4] for b in screen.boxes if b[5] == "focus"] == [CENTER]
+    # A short gap preserves the chosen association, but invalidates its older source geometry.
+    r._track(frame.copy(), dets[1:], taken + .08)
+    r._track(frame.copy(), dets, taken + .10)
+    assert r.focus.name(chosen) == "Chosen"
+    assert not any(b[4] == "Chosen" for b in r._shown(False)[1].boxes)
 
 
 def test_spoken_names_categories_case_and_restart(tmp_path):

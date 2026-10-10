@@ -176,7 +176,7 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = self.view_taken = 0.0  # detection time, source capture time
-        self.verified = None  # exact verified frame, source time, gallery epoch, boxes
+        self.verified = None  # exact verified frame, source time, gallery epoch, source overlays
         self.shown_taken = 0.0
         self.session_id = secrets.token_hex(16)
         self.control_message = ""
@@ -354,10 +354,11 @@ class Robot:
             self._refocus(frame)
             if time.monotonic() >= self.preview_due:
                 self.preview_due = max(self.preview_due + 0.1, time.monotonic())
+                tracks = [Track(*t) for t in self.tracker.scored()]
                 self.recognition.submit((frame, self.view_taken,
-                    [Track(*t) for t in self.tracker.scored()],
+                    tracks,
                     {i: self.focus.epoch(i) for i in self.focus.visible}, self.session_id,
-                    list(self.screen[1].boxes)))
+                    self.focus.geometry(tracks)))
         return found
 
     def _refocus(self, frame: np.ndarray) -> None:
@@ -380,16 +381,21 @@ class Robot:
         """The view's source: the newest tracked frame and its boxes."""
         with self.detecting:
             frame, screen = self.screen
-            if self.focus:
-                tracks = [Track(*t) for t in self.tracker.scored()]
-                screen = replace(screen, boxes=self.focus.boxes(
-                    tracks, [t.box for t in tracks if t.label == "person"], time.time()))
+            tracks = [Track(*t) for t in self.tracker.scored()] if self.focus else []
+            shown_tracks, geometry, faces = tracks, None, []
             taken = self.view_taken
             if self.verified and self.verified[0] >= self.shown_taken and \
                     time.time() - self.verified[0] <= 0.2 and \
                     self.verified[2] == self.recognition.epoch:
-                taken, frame, _, boxes, _ = self.verified
-                screen = replace(screen, boxes=boxes)
+                taken, frame, _, (source, face), _ = self.verified
+                shown_tracks = [t for t in tracks if t.id in source and
+                                self.focus.accepts(t.id, taken) and
+                                self.focus.epoch(t.id) == source[t.id][1]]
+                geometry = {i: box for i, (box, _) in source.items()}
+                faces = [face]
+            if self.focus:
+                screen = replace(screen, boxes=self.focus.boxes(
+                    shown_tracks, [], time.time(), geometry=geometry) + faces)
             if display:
                 self.shown_taken = max(self.shown_taken, taken)
             targets = []
@@ -436,7 +442,7 @@ class Robot:
             else:
                 self.away.discard(s.track)
 
-    def _preview(self, frame, taken, tracks, epochs, session, boxes, gallery):
+    def _preview(self, frame, taken, tracks, epochs, session, geometry, gallery):
         """Model-owner background work; fresh results alone authorize selected writes."""
         if time.time() - taken > PREVIEW_TTL or gallery != self.recognition.epoch:
             return
@@ -469,22 +475,23 @@ class Robot:
             self.focus.update(self.view_taken, current,
                               [t.box for t in current if t.label == "person"],
                               recognized=recognized, recognized_at=taken)
-            self._verified_frame(frame, taken, tracks, valid, found_face, person, boxes, gallery)
+            self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry, gallery)
             # Persist in the conversation worker, with a second source/epoch check.
             if recognized and not self.matches_pending:
                 self.matches_pending = True
                 self.jobs.put(("matches", frame, taken, tracks, recognized, person,
                                epochs, session, gallery))
 
-    def _verified_frame(self, frame, taken, tracks, valid, face, person, boxes, gallery):
+    def _verified_frame(self, frame, taken, tracks, valid, face, person, geometry, gallery):
         """A name stays on its exact matched image; current anonymous video is the fallback."""
         people = [t for t in tracks if t.label == "person" and face and
                   self.focus.eligible(t) and inside(face[2], t.box) >= 0.8]
         if person and len(people) == 1 and people[0].id in valid:
-            boxes = [b for b in boxes if b[5] != "person"]
-            boxes.append((*face[2], person, "known"))
+            source = {t.id: (geometry[t.id], self.focus.epoch(t.id)) for t in tracks
+                      if t.id in valid and self.focus.eligible(t, pending=True)}
+            overlays = source, (*face[2], person, "known")
             if self.verified is None or taken > self.verified[0]:
-                self.verified = taken, frame, gallery, boxes, people[0].id
+                self.verified = taken, frame, gallery, overlays, people[0].id
         elif self.verified and taken >= self.verified[0]:
             self.verified = None
 

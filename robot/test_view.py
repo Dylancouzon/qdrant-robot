@@ -27,7 +27,7 @@ def parts(conn: http.client.HTTPResponse, seconds: float) -> list[bytes]:
 
 def test_view() -> None:
     frame = np.zeros((720, 1280, 3), np.uint8)
-    screen = Screen([(0, 0, 400, 700, "", "person"), (100, 100, 300, 300, "???", "focus"),
+    screen = Screen([(100, 100, 300, 300, "???", "focus"),
                      (500, 100, 600, 200, "Dylan's mug", "known"),
                      (700, 100, 800, 200, "", "other"),
                      (900, 100, 1000, 200, "Dylan's phone?", "guess")], "Thinking",

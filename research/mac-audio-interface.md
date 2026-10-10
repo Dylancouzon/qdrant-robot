@@ -1,8 +1,10 @@
 # Mac audio interface
 
-D136 source is frozen on the protected `spike/mac-audio-interface` branch. Sol46346 passes tree `1d77da417dd52f59657dc283cfb00479e7b2453a` in151.57s/native0(E). Jetson candidate `623954f5cdb8` passes common recorded bottle learning, continuous labeling, persistent item ignore, reset, restore, and other-item descriptor checks. Independent actual browser review passes moving feed, source-bound face names, no copied card, and no tiny boxes. Normal live settings are restored Idle with microphone off. STATE.md owns live process and handoff status.
+D138 corrects stale focus publication on the protected `spike/mac-audio-interface` branch. Sol96960 passes frozen tree `3a225f71e73b142864f3addacc2745cd99e2b30a` in183.32s/native0(E). Deployed `08ff2193ddc7` matches704 source hashes. One independent recorded review observes the same laptop focus across named and unnamed face frames, with only a green verified face box and no body outline(J). Normal live settings return Idle with microphone off. STATE.md owns live process and handoff status. D136 memory/recognition behavior remains qualified only within its recorded bounds.
 
 ## Current behavior
+
+Recognition snapshots drawing geometry and source epochs. The display applies current names and focus to current or exact verified source coordinates through one publication route. Source membership, continuity, and epochs reject old geometry after gaps or merges. Person detection supplies internal held-object and face-validation cues; the view draws the verified face box for people. This changes no inference cadence, model, raw crop, or persistence policy.
 
 One serial recognition owner handles faces and crop embeddings independently of conversation and detection. Background recognition admits at most three object crops per second, oldest due first; priority conversation batches keep the existing behavior. Bounded queues, source timestamps, gallery epochs, and detection-gap epochs reject stale work. Reset pauses admission before draining and closing owners.
 
@@ -40,4 +42,4 @@ Dylan will start a separate session for WSL checkpoint export, TensorRT engines,
 
 ## Evidence
 
-See D124-D137 in DECISIONS.md; bench/results/2026-10-09-liveview-repair.json; reviews/20261009-231341-46346-review.md; research/lessons.md. Prior preview receipts preserve D127-D135 implementations and their superseded physical results. Raw recordings, private memory, transcripts, and numerical locals stay outside Git.
+See D124-D138 in DECISIONS.md; bench/results/2026-10-09-liveview-repair.json; reviews/20261009-231341-46346-review.md; research/lessons.md. The D138 focus-publication receipt and20261010-d138-recorded-browser-review.md preserve the latest correction. Prior preview receipts preserve D127-D135 implementations and their superseded physical results. Raw recordings, private memory, transcripts, and numerical locals stay outside Git.
