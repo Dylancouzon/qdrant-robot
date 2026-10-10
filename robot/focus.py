@@ -55,6 +55,7 @@ class _Seen:
     track: Track | None = None
     epoch: int = 0
     exclude_misses: int = 0  # consecutive queried misses of a continuous item preference
+    admitted: float | None = None  # last full-size source after raw UI admission
 
 
 @dataclass
@@ -133,12 +134,13 @@ class Focus:
             if i not in live and now > s.last:
                 s.epoch += 1
                 s.continuous = now
+                s.admitted = None
                 if now - s.last > OCCLUSION_S:
                     self.named.pop(i, None)
                     self.excluded.pop(i, None)
                     s.exclude_misses = 0
                     s.shown = None
-        # Size gates display and queries, but does not erase an accepted continuous name.
+        # Raw size gates names, actions, and queries without erasing a continuous preference.
         self.named = {i: n for i, n in self.named.items()
                       if i not in live or (self.confident(live[i], pending=True) and
                       live[i].label not in self.ignored and i not in self.excluded and
@@ -168,18 +170,24 @@ class Focus:
         gap = t.id not in self.visible
         if gap:
             s.continuous = self.now
+            s.admitted = None
+            s.shown = None
             if self.now - s.last > OCCLUSION_S:
                 self.named.pop(t.id, None)
                 self.excluded.pop(t.id, None)
                 s.exclude_misses = 0
-                s.shown = None
-        if not self.eligible(t, pending=True):
+        if t.label in self.ignored or t.id in self.excluded:
             s.shown = None
-        elif s.shown is None or \
-                math.dist(_center(s.shown), _center(t.box)) > SNAP * self.width:
+            s.admitted = None
+        elif s.shown is None or (s.track and
+                math.dist(_center(s.track.box), c) > SNAP * self.width):
             s.shown = t.box
+            s.admitted = None
         elif self.now > s.last:
             s.shown = tuple(a + SMOOTH * (b - a) for a, b in zip(s.shown, t.box, strict=True))
+        if self.eligible(t) or (s.admitted is not None and self.sized(t) and
+                t.score >= DETECT_LOW and t.id not in self.checking):
+            s.admitted = self.now
         s.last, s.track = self.now, t
         s.path.append((self.now, c))
         while s.path[0][0] < self.now - STEADY_S:
@@ -207,6 +215,14 @@ class Focus:
         return (self.sized(t) and self.confident(t, pending=pending) and
                 t.label not in self.ignored and t.id not in self.excluded and
                 (pending or t.id not in self.checking))
+
+    def drawable(self, t: Track) -> bool:
+        """Previously admitted, currently matched LOW tracks retain drawing, not action rights."""
+        seen = self.seen.get(t.id)
+        return bool(t.id in self.visible and seen and seen.admitted is not None and
+                    t.score >= DETECT_LOW and t.label not in self.ignored and
+                    t.id not in self.excluded and t.id not in self.checking and
+                    (self.sized(t) or 0 <= self.now - seen.admitted <= OCCLUSION_S))
 
     def epoch(self, track: int) -> int:
         return self.seen[track].epoch
@@ -280,6 +296,7 @@ class Focus:
         if preference:
             self.excluded[track] = preference
             seen.exclude_misses = 0
+            seen.admitted = None
         elif track in self.excluded:
             seen.exclude_misses += 1
             if seen.exclude_misses >= CLEAR_N:
@@ -327,29 +344,24 @@ class Focus:
               now: float | None = None, *, geometry: dict[int, Box] | None = None) -> list[tuple]:
         """Current object labels on current or explicitly supplied source geometry."""
         names = self.names(now)
-        now = self.now if now is None else now
-        if geometry is None:
-            tracks = [*tracks, *(s.track for i, s in self.seen.items()
-                                 if i not in self.visible and now - s.last <= OCCLUSION_S
-                                 and s.track and s.track.label not in BODY)]
         drawn = self.geometry(tracks) if geometry is None else geometry
         out = []
         for t in tracks:
-            if t.label in BODY or not self.eligible(
-                    t, pending=names.get(t.id, (None, False))[1]):
+            if t.label in BODY or t.id not in drawn or t.id not in self.visible or \
+                    t.label in self.ignored or t.id in self.excluded or t.id in self.checking:
                 continue
             box = drawn[t.id]
             if t.id in names and names[t.id][1]:
                 name, sure = names[t.id]
                 out.append((*box, name, "known"))
-            elif t.id == self.focus and self.sized(t):
+            elif t.id == self.focus:
                 out.append((*box, "???", "focus"))
             else:
                 out.append((*box, "", "other"))
         return out
 
     def geometry(self, tracks: list[Track]) -> dict[int, Box]:
-        """Snapshot drawing coordinates without names or selection policy."""
+        """Snapshot source drawing admission and geometry; names and selection stay current."""
         return {t.id: tuple(round(v) for v in self.seen[t.id].shown)
                 if t.id in self.seen and self.seen[t.id].shown is not None else t.box
-                for t in tracks}
+                for t in tracks if t.label in BODY or self.drawable(t)}

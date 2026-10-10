@@ -813,3 +813,73 @@ UnmodifiedDetector() onb4de1cf59fee verifiesS/FP16/pinnedhashes/stop-sign.892/na
 All1789sends received/28QAhashesmatch; person263unique/96.34%, butperson214.7ms/conversation453.8msholddiagnostics fail. Paging16in67out/systemwide, peakRAM6286MB/64.343C. No broad smoothness/sustained15/no-paging/FPR/M4claim. Cup73.78% remainsrecordedgap.
 Keepselecteddevelopmentdefault/path/pins/recipe; no scene tuning/modelbuild/options/runtimechanges. Nanoa929release/source/models/backupretained; rollbackavailable, actualrollbacknotrunthisincrement. Worker/peer source/AST/artifactchecksPASS; taskreview/realhooknext.
 Evidence: bench/results/2026-10-10-d146-detector-default.json; build/d146/{default-jetson.log,phone-jetson.log,phone}; currentb4de1cf59fee. Useroverfit/overengineeringsteering staysbinding.
+
+## D147 2026-10-10: Correct the artificial drawing snap first
+Dylan rejects D146 because the same face/object and grey boxes jump, resize, and blink. Limit this session to box stability with minimal regression; coverage percentages do not qualify visual continuity.
+Select consecutive raw geometry for the existing SNAP test and preserve drawing history through eligibility-only dips. Keep raw crop/action/write admission and actual gap/merge/session resets. Reject model/threshold/descriptor changes and richer tracking machinery for this measured correction.
+Why: received same-track phone geometry jumps 102.7 px while raw motion is 43.75 px. Repeated confidence crossings cause grey visibility toggles; faces bypass smoothing and some display eligibility uses current rather than selected-source tracks. These remain separate box-path corrections after the first small fix.
+Evidence: build/d146/phone/{samples,attempts,events}.json; worker/reviewer D147 read-only source and received-receipt audit. Add only observer received JPEG capture to the existing private stream adapter for continuous visual review.
+
+## D147 continuation 2026-10-10: Use existing tracking confidence for drawing continuity
+Select existing HIGH admission/LOW continuation for drawing a confirmed, currently source-matched object after genuine raw UI admission. Keep raw crop/action/write and Focus._fit/name-safety gates unchanged. Clear admission on gap, merge, session, or Ignore; preserve bounded 200 ms size-only continuation and capture-time drawing membership.
+Why: bounded 200 ms confidence grace reduces background chair 24->20 and microphone 63->49 transitions, leaving the main defect. Tracker already uses HIGH .25/LOW .10, but per-frame UI HIGH admission defeats that continuity. Reject longer grace/new thresholds/prediction and the abandoned confidence-grace path.
+Tradeoff: a strong false-positive proposal can remain grey while LOW detections actually match it. It cannot acquire a name, focus action, or write through drawing continuation. Verify the same background video, actual loss, and new weak-object rejection. Face coordinate smoothing remains current-source/owner/epoch/name guarded, with no identity carry.
+Evidence: worker existing D146 background trace and independent reviewer source audit; existing config/Tracker semantics. Pair original baseline received video against the smallest candidate and verify the live Jetson before handback.
+
+## D147 measured continuation 2026-10-10: Remove drawing cutoffs and unfinished face packets
+Candidate 6781 reduces 103 px artificial snap to 36 px; same-track raw/draw IoU>=.431 with p95 lag 46.9->55.2 px (J). Remaining actual phone outline gap occurs after 200 ms size grace expires while phone remains matched LOW, 114 px at 12.2 s. Select boolean draw admission through currently matched LOW regardless crop floor; keep raw crop/action/write/name-safety gates. Drawing labels may skip floor only with unchanged current confident/score/conflict guards; below floor cannot requery, an explicit tradeoff.
+Face empty packets 10.133/10.267 precede positive completion by 19/7 ms. Withhold unfinished same-person source only while capture interval from prior completed face<=existing 200 ms, same person/epoch/session/gallery; completed negative and expired continuity immediately restore fallback. No identity carry/new timer/TTL/cadence/model. Reject indefinite waiting/unbounded pending withhold; stalled active/latest must resume anonymous video.
+Evidence: build/d147/{baseline,candidate}/actualreceivedJPEGs; independent peer exact source/hash/phone floor/face event audits. Live empty room observer 69746 remains running on frozen 6781; final candidate must pair recorded received flow/live USB again after material change. One formal review after completed box task.
+
+## D147 counsel 2026-10-10: Compare fixed drawing filters before selection
+Astra 54509 GO WITH CHANGES 119.49 s/native 3 rejects premature median choice; resolve by fixed offline EMA/median-three+EMA/stock BoT-SORT XYWH comparison, native Kalman dt 1/frame units, one capture update, no runtime edit until measured. No additional planning gate after blocking changes resolved.
+Freeze before candidate output: stationary edge p95<=20/max<=25 px, center p95<=11/max<=15 px; include epoch reset jumps separately. Phone additional filter displacement p95/max<=5 px, IoU floor loss<=.03, max step<=38 px. Existing face sequences needed before any new face filter; retained current EMA label-reset correction remains separate. These are development selection limits, not localization truth/general accuracy.
+Reference full tracking is not validated by its Kalman alone. Keep raw association/crop/action/write/identity authority, no inference/model/query/options, and one bounded selected filter. Reject new filter if gaps/resets or motion lag defeat limits; main chair failure stays blocking.
+Evidence: reviews/20261010-085950-54509-design.md; build/d147/stability-brief.txt/reset-boundaries.json. Worker fixed comparison pending; Jetson recorded/USB/user feedback still required.
+
+## D147 fixed comparison 2026-10-10: Reject coordinate-only replacements
+Fixed median-three+EMA keeps chair edge p95/max 41.08/119.78 px including resets and adds phone lag~35–50 px (E). Stock XYWH improves moving phone lag but chair 81.73/121.04 px worsens. Standard 95% 4D gate rejects ordinary motion~3 s, yields negative extents/drift/min IoU 0. No runtime adoption or coefficient/threshold sweep.
+Existing EMA reconstructs live exact draw geometry within .598 px; raw phone reconstruction omits 30/29 same-epoch observed gaps>100 ms and 20/27 received sources, so 49.91 px simulated EMA step is not actual 36 px display proof. Keep receipt limitations and all rejected frames.
+Next root alternative: standard OpenCV pyramidal Lucas–Kanade image feature tracking for drawing, with raw detector reacquisition; compare against current EMA before product adoption. Qdrant/raw cropping/IDs/actions/identity untouched. Jetson OpenCV 5 has LK but no KCF/CSRT/contrib; neural trackers need new models, so reject those without benefit proof. Required architecture counsel before prototype.
+Evidence: build/d147/{filter-comparison,gated-filter-comparison,reset-boundaries}.json, pinned Ultralytics 69c95d1/provenance; Astra 54509 counsel. Stationary jitter remains blocking.
+
+## D147 pixel counsel 2026-10-10: Prototype standard optical flow with bounded drawing continuity
+Astra 66007 GO WITH CHANGES 112.83 s/native 3 approves offline LK/robust similarity prototype after reset clarification. Keep one reduced previous gray frame/bounded features, one update per distinct capture; replenish features on each matched source inside projected drawing box. Failed fit uses existing EMA, no cascades/models/threads.
+Resolve brief gap block: advance bounded drawing features through current pixels for<=existing 200 ms; keep unmatched sources invisible and count absence failures. On same track return keep pixel-supported geometry; preserve raw identity epochs/actions/crops/writes/checking and HIGH admission. Hard reset long loss/merge/Ignore/session/raw large motion. No per-track image cache.
+Received JPEG overlays contaminate LK patches, so mask full renderer footprints/patch support and classify diagnostic only; clean original phone and synthetic transform tests needed. Jetson qualification must use original source pixels and actual Robot/MJPEG, retained fixed limits/native failures and Dylan feedback. Defer MIL/Nano and new face filter.
+Evidence: reviews/20261010-090925-66007-design.md, build/d147/pixel-tracking-brief.txt/pixel-media-access.json. Proceed one ignored prototype before product extraction; reject feature background lock or whole-sequence failure without tuning.
+
+## D147 clean camera fixture 2026-10-10: Capture original pixels for tracking diagnosis
+Existing frozen USB observer captures rendered JPEGs; overlay patches can manufacture LK stability. Existing camera/file sources provide clean pixels but no clean live fixture with raw proposal trajectory. Add ignored bounded 30 s capture using actual Camera/Detector/Tracker/default S only, lossless PNGs/source-timestamps/raw boxes; no new product harness/model/Qdrant query or production memory write.
+Use existing named unit/gpu.lock/tegrastats workflow; announced preview Stop then restore current 6781. Estimate 500 MB private frames; per-frame count progress, completion footer, narrow collect/actual hashes. This is diagnostic source fixture, not integrated runtime acceptance/performance.
+Evidence: build/d147/clean_camera_capture.py and clean-camera-jetson.log; current one preview subscriber paused before camera ownership. Final actual Robot/MJPEG/frozen protocol/live Dylan feedback still required.
+
+## D147 pixel rejection 2026-10-10: Stop filter experiments and return to detector differences
+Frozen LK execution/selfcheck native 0 but quality REJECT (E): phone extra lag 390.74/428.67 px, min IoU 0; short-gap chair edge 17.83/119.19 px. Independent reviewer confirms self-recruited background features and cumulative rotated-AABB expansion. No runtime adoption or parameter rescue.
+Clean USB fixture native 0 records 202 lossless captures/348,211,638 bytes/29.997 s (J), no production writes. PNG encoding gives 6.73 fps, so capture performance and normal 15 fps short gaps remain unqualified; preview restored on 6781.
+Dylan challenges over-engineering. Stop more filtering approaches; verify reference entry-point/model selection and prior detector lessons before one focused paired comparison. Existing source-reviewed policy fix remains undeployed; stationary jitter remains blocking.
+Evidence: build/d147/lk-{comparison,readiness}.json/lk-phone-drift.jpg/clean-camera-jetson.log; reference cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9.
+
+## D147 final scope 2026-10-10: Preserve accepted live behavior and repair unknown styling only
+Dylan accepts live 6781 as reasonably good and narrows remaining failure to ??? blinking around the same object. He will physically verify the final fix; this is the requested good-enough stopping point. Stop reference/model/filter comparisons.
+Restore exact accepted-live source; retain undeployed broader step privately. Remove per-frame raw eligibility from selected, source-admitted ??? styling, while preserving current geometry/visible/Ignore/checking/body guards and raw teaching/query/write authority. No absent-track retention or timing/model/face change.
+Acceptance: alternating matched HIGH/LOW sources retain ???; below LOW/unadmitted/ignored/checking/departed tracks stay hidden, selection intervals/actions unchanged. Targeted tests, reviewer, current Jetson deployment/preview, then Dylan verification. Actual detector misses remain a documented brief-gap limitation.
+Evidence: build/d147/accepted-live-baseline/robot and undeployed-step; recorded live chair 121 orange/grey transitions; final focused receipt pending.
+
+## D147 acceptance and hygiene 2026-10-10: Close at the requested good-enough checkpoint
+Dylan accepts final live 7f67670fa91e and asks for clean current guides plus Claude Code Opus comparison against pre-overnight 30639f5. Freeze runtime; stop model/filter work. Sol 99667 PASS 247.30 s/native 0 and 54 Mac/Jetson Focus passes support the checkpoint; true missed detections remain a bounded gap.
+Rewrite STATE and topic guides around current behavior, link immutable decisions/audits, and archive detailed historical lessons without losing source notes or owner updates. Correct the stale nano default and superseded body/dropout/automatic-view descriptions.
+Preserve other-owner WSL metadata whole; independent review verifies 17 private files/sizes/hashes and retained unavailable original native exit. Integrate reconciled whole files instead of partial staging. Required real hook and commit/push remain final mechanical checks.
+Evidence: reviews/20261010-093839-99667-review.md; d147-box-continuity audit; research/archive/lessons-2026-10-10.md; requested Opus hygiene verdict pending.
+
+## D147 review repairs 2026-10-10: Preserve history and provide a readable session index
+Claude Code Opus compared the full working snapshot with 30639f5. Its needs-attention verdict has no runtime blocker; repair command spacing, machine navigation, baseline descriptions, and test receipts.
+Keep committed decisions append-only. Repair whitespace in uncommitted D147 text without changing its words, numbers, or evidence. The D140-D147 outcome index in research/lessons.md provides one plain outcome and audit link per task.
+Against 47f6eff, D147 includes face-outline smoothing and drawing admission; against accepted live 6781adbb7189, the final fix changes one display condition. Require the real full-suite hook before closing; runtime stays frozen.
+Evidence: reviews/20261010-opus-session-hygiene.md; research/lessons.md; bench/results/2026-10-10-d147-box-continuity.json.
+
+## D148 parked 2026-10-10: Discuss same-name objects and background isolation next session
+Dylan reports that two items with the same name can leave neither recognized. Current competing-name abstention and name-keyed object points need a deliberate identity policy before change.
+Discuss a consenting labeler's ownership and whether two objects taught under the same name by that owner represent one shared logical object. Keep owner isolation, ambiguity, reteaching, and deletion semantics explicit; the proposal is undecided.
+Current cut() retains all background inside the detector rectangle. Reference cfc0dd2 masks those pixels grey before embedding. Background isolation could improve recognition, but its quality and Jetson cost remain unmeasured. Both items are parked; no runtime or schema change this session.
+Evidence: research/edge-cases.md; robot/focus.py associations(); robot/things.py name()/cut(); reference robot/brain/detect.py padded_crop().

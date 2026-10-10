@@ -1,0 +1,92 @@
+{
+  "task": "D147",
+  "date": "2026-10-10",
+  "scope": "Unknown focus box styling; user accepts the other current live behavior.",
+  "accepted_live_release": "6781adbb7189",
+  "candidate_release": "7f67670fa91e",
+  "revision": "47f6eff plus reviewed working changes",
+  "machine": "Jetson Orin Nano Super 8 GB and Mac development host",
+  "final_delta_against_accepted_live": {
+    "runtime_conditions_changed": 1,
+    "description": "Keep selected source-admitted unknown focus style when current raw confidence temporarily falls below teaching eligibility.",
+    "unchanged": [
+      "known-name policy",
+      "face and voice code",
+      "detector model and thresholds",
+      "raw action and crop eligibility",
+      "three-second selection interval",
+      "source admission and departure guards",
+      "Ignore and checking guards"
+    ]
+  },
+  "source_sha256": {
+    "robot/focus.py": "fa2e9f3ff548996e6223e5907b94eacf487858b0df5fb9f7125e6d4014fb7e77",
+    "robot/main.py": "e086da9710d2ba9b0838b4b12aa8f9a00dac09f6ff5de23ea7bb8e045198f4e7",
+    "robot/test_focus.py": "552391e566a2bf0075355b60c0df656824d3e13ecac2c0aa1c835a21a5edf226",
+    "robot/test_things.py": "0a6c39090c0cfa06853a863813de7cf5aac024160d6622cc85c66754ade48b20"
+  },
+  "validation": {
+    "mac_focus": {
+      "command": "VIRTUAL_ENV=/Users/dylanc/Documents/GitHub/qdrant-robot/.venv uv run --active --no-project python -m pytest -q robot/test_focus.py",
+      "passed": 54,
+      "pytest_elapsed_s": 0.08,
+      "native_exit": 0
+    },
+    "jetson_focus": {
+      "command": "python3 tools/jetson.py run d147-final-unknown-style --wait -- -m pytest -q robot/test_focus.py",
+      "unit": "qr-d147-final-unknown-style",
+      "invocation": "3f4a507eb79245d59c9739cea1d3d38e",
+      "passed": 54,
+      "pytest_elapsed_s": 0.46,
+      "service_elapsed_s": 1.334,
+      "native_exit": 0,
+      "tegrastats": "d147-final-unknown-style-20261010-093934.tegrastats"
+    },
+    "peer_review": "PASS; source/test scope and action guards verified",
+    "formal_review": "PASS; reviews/20261010-093839-99667-review.md, 247.30s/native0",
+    "required_commit_hook": "Pending",
+    "physical_user_verification": "Accepted by Dylan: Good enough.",
+    "opus_hygiene_review": {
+      "verdict": "needs-attention",
+      "report": "reviews/20261010-opus-session-hygiene.md",
+      "comparison_baseline": "30639f5",
+      "runtime_blocker": false,
+      "findings": "Documentation repairs and required full-suite hook receipt are being resolved."
+    }
+  },
+  "prior_measured_first_step": {
+    "phone_artificial_drawing_step_px": {
+      "baseline": 102.753,
+      "candidate": 36
+    },
+    "recorded_baseline_native_exit": 1,
+    "recorded_candidate_native_exit": 1,
+    "baseline_checks_passed": 10,
+    "candidate_checks_passed": 11,
+    "checks_total": 12,
+    "limitation": "Original failed checks and source-provenance boundaries remain recorded; no whole-flow PASS claim."
+  },
+  "rejected_experiments": [
+    "median-three smoothing",
+    "stock Kalman coordinates",
+    "gated Kalman coordinates",
+    "Lucas-Kanade drawing prototype"
+  ],
+  "limits": [
+    "Actual missed detections can still hide the outline briefly.",
+    "No new perfect-smoothness, broad recognition accuracy, sustained 15fps, or no-paging claim.",
+    "Private recordings and recognition memories remain ignored; production memories were preserved."
+  ],
+  "delta_against_git_head": {
+    "baseline": "47f6eff",
+    "description": "D147 includes consecutive-raw-position snap correction, source-admitted HIGH/LOW drawing continuity, bounded current-source face-outline smoothing, and Focus/Things regressions. These precede the final one-condition style change against accepted live 6781adbb7189.",
+    "face_identity_and_voice": "No new identity carry or voice policy; face drawing geometry does change against Git HEAD."
+  },
+  "parked_next_session": {
+    "decision": "D148",
+    "guide": "research/edge-cases.md",
+    "same_name": "User reports two items with one name can cause both labels to disappear. Discuss consenting labeler ownership and shared logical objects before changing policy.",
+    "background": "Rectangular crops retain inside-box background. Reference cfc0dd2 uses a supplied segmentation mask and grey fill; current Jetson quality/cost and stored-vector compatibility remain unmeasured.",
+    "implementation": "None; accepted runtime stays frozen."
+  }
+}

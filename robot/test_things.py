@@ -1196,7 +1196,7 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     r.crop_times.extend([time.monotonic()] * (3 - len(r.crop_times)))
     before = r.memory.sightings(time.time() + 1)
     r._track(r.view[0], [], source + .05)
-    assert any(b[4] == "Dylan's smartphone" for b in r.focus.boxes([], [], source + .05))
+    assert not r.focus.boxes([], [], source + .05), "departed pixels cannot retain an outline"
     monkeypatch.setattr(main.time, "time", lambda: source + .10)
     moved = tuple(v + (20 if i % 2 == 0 else 0) for i, v in enumerate(CENTER))
     frame_of(r, box=moved)
@@ -1205,8 +1205,8 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     monkeypatch.setattr(main.time, "time", lambda: source + .15)
     frame_of(r, box=moved)
     assert r.focus.name(track) == "Dylan's smartphone"
-    assert r.focus.seen[track].shown != moved, "pending checks preserve box smoothing"
-    assert any(b[4] == "Dylan's smartphone" for b in r._shown()[1].boxes)
+    assert r.focus.seen[track].shown == moved, "a real gap starts new drawing history"
+    assert not r._shown()[1].boxes, "returning Ignore checks cannot borrow old admission"
     assert not r._shown(False)[1].control["targets"], "cached display cannot authorize actions"
     assert r.memory.sightings(source + 1) == before, "no query means no new sighting writes"
     preview(r)
@@ -1214,7 +1214,7 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     assert r.focus.names() == {track: ("Dylan's smartphone", True)}
 
 
-def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeypatch):
+def test_named_confidence_dip_reverifies_and_admitted_unknown_stays_grey(robot, monkeypatch):
     r = robot
     show(r, [(GOLD, CENTER), (BLACK, LEFT)])
     hold(r, CENTER)
@@ -1234,7 +1234,7 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     assert r.focus.seen[chosen].shown != moved, "the confidence dip preserves smoothing"
     assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
     assert not r.focus.eligible(Track(*next(t for t in r.tracker.scored() if t[0] == other)))
-    assert [b[4] for b in r._shown()[1].boxes] == ["Dylan's smartphone"]
+    assert [b[4:] for b in r._shown()[1].boxes] == [("Dylan's smartphone", "known"), ("", "other")]
     r.crop_due.clear()
     preview(r)
     assert calls == ["Dylan's smartphone"], "a low-confidence chosen track still gets a crop query"
@@ -1244,7 +1244,7 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     preview(r)
     assert calls[-2:] == ["Dylan's smartphone", None]
     assert not r.focus.names(), "two weak current signals hide the retained association"
-    assert not r._shown()[1].boxes
+    assert all(b[4:] == ("", "other") for b in r._shown()[1].boxes)
     assert not r._shown(False)[1].control["targets"], \
         "retained labels cannot authorize low-confidence actions"
     preview(r)
@@ -1270,7 +1270,8 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
     frame_of(r, label="book", box=(540, 300, 659, 600))
     assert next(iter(r.view[1])) == track
     assert r.focus.name(track) == "chosen item"
-    assert not r._shown()[1].boxes and not r._shown(False)[1].control["targets"]
+    assert r._shown()[1].boxes[0][4:] == ("", "other")
+    assert not r._shown(False)[1].control["targets"]
     tracks = [Track(*t) for t in r.tracker.scored()]
     assert r.focus.target(tracks) is None
     selection = {"track": track, "epoch": r.focus.epoch(track),
@@ -1697,6 +1698,17 @@ def test_item_exclusion_stale_preview_does_not_consume_a_miss(robot, invalid):
     assert r.focus.excluded and r.focus.seen[track].exclude_misses == 1
 
 
+def test_tracker_merge_starts_with_new_raw_drawing_geometry(robot):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    assert r.focus.seen[track].shown == CENTER
+    smaller = (580, 390, 700, 510)
+    frame_of(r, BLACK, box=smaller)
+    assert track in r.tracker.merged and next(iter(r.view[1])) == track
+    assert r.focus.seen[track].shown == smaller, "merged IDs cannot retain the old object's outline"
+
+
 def test_item_exclusion_tracker_merge_has_no_counter_or_preference_transfer(robot):
     r = robot
     frame_of(r)
@@ -1712,6 +1724,122 @@ def test_item_exclusion_tracker_merge_has_no_counter_or_preference_transfer(robo
     frame_of(r, BLACK, box=(580, 390, 700, 510))
     assert track in r.tracker.merged and next(iter(r.view[1])) == track
     assert not r.focus.excluded and r.focus.seen[track].exclude_misses == 0
+    assert r.focus.seen[track].shown == (580, 390, 700, 510)
+    assert track not in r.focus.geometry([Track(*t) for t in r.tracker.scored()])
     preview(r)
     assert not r.focus.excluded and r.focus.seen[track].exclude_misses == 0
+    frame_of(r, BLACK, box=(580, 390, 700, 510))
+    preview(r)
     assert r._shown()[1].boxes, 'a distinct merged object needs its own strong Ignore match'
+
+
+@pytest.mark.parametrize('known', [False, True])
+def test_face_drawing_filters_exact_source_without_identity_carry(robot, monkeypatch, known):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll('Ana', [vector, vector], time.time())
+    origin = time.time()
+    clock = [origin]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    raw = [(500, 100, 600, 200)]
+    received = []
+    descriptor = [vector if known else np.eye(FACE_DIM, dtype=np.float32)[1]]
+    def locate(faces, frame):
+        received.append(frame)
+        return descriptor[0], 100, raw[0]
+    monkeypatch.setattr(main, 'located_face', locate)
+    first = frame_of(r, people=True)
+    preview(r)
+    before = r.verified[3][1]
+    clock[0] += .067
+    raw[0] = (498, 98, 608, 208)
+    second = frame_of(r, BLACK, people=True)
+    clock[0] += .15
+    assert not r._completed_valid(r.verified), "old geometry is expired for publication"
+    preview(r)
+    outline = r.verified[3][1]
+    assert outline[:4] == pytest.approx(tuple(a + main.SMOOTH * (b - a)
+                                             for a, b in zip(before[:4], raw[0], strict=True)))
+    assert outline[4:] == (('Ana', 'known') if known else ('', 'other'))
+    assert r.verified[3][2] == raw[0], 'source matching keeps the raw face rectangle'
+    assert received == [first, second], 'face inference receives the original source pixels'
+    frame, screen = r._shown()
+    assert frame is second and outline in screen.boxes and screen.valid()
+    # A changed identity uses this source's geometry and cannot borrow a prior green name.
+    clock[0] += .067
+    descriptor[0] = np.eye(FACE_DIM, dtype=np.float32)[1] if known else vector
+    raw[0] = (510, 105, 630, 225)
+    frame_of(r, people=True)
+    preview(r)
+    assert r.verified[3][1][:4] == raw[0]
+    assert r.verified[3][1][4:] == (('', 'other') if known else ('Ana', 'known'))
+    # A fresh negative completion clears the filter, including anonymous history.
+    clock[0] += .067
+    monkeypatch.setattr(main, 'located_face', lambda *a: None)
+    frame_of(r, people=True)
+    preview(r)
+    assert r.verified[3][1:] == (None, None)
+    clock[0] += .067
+    monkeypatch.setattr(main, 'located_face', locate)
+    raw[0] = (490, 90, 620, 220)
+    frame_of(r, people=True)
+    preview(r)
+    assert r.verified[3][1][:4] == raw[0]
+
+
+def test_completed_object_geometry_keeps_source_admission_without_size_leak(robot, monkeypatch):
+    r = robot
+    origin = time.time()
+    clock = [origin]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    source = frame_of(r, label='book')
+    preview(r)
+    track = next(iter(r.view[1]))
+    old = r.verified
+    clock[0] += .05
+    frame_of(r, label='book', box=(540, 300, 659, 600))
+    frame, screen = r._shown()
+    assert frame is source and screen.boxes[0][:4] == CENTER and screen.valid()
+    assert not r._shown(False)[1].control['targets'], 'old draw admission grants no current action'
+    preview(r)
+    assert r.verified is not old and r._shown()[1].boxes[0][4:] == ('', 'other')
+    clock[0] += .16
+    frame_of(r, label='book', box=(540, 300, 659, 600))
+    preview(r)
+    assert not r._shown()[1].boxes, 'repeated small raw sources exhaust bounded size grace'
+    clock[0] += .01
+    frame_of(r, label='book')
+    assert not r._shown()[1].boxes, 'regrowth cannot invent drawing on the older small source'
+    preview(r)
+    assert r._shown()[1].boxes
+    r._track(r.view[0], [], clock[0] + .01)
+    assert not r.focus.boxes([], []) and not r._shown()[1].boxes
+    assert r.focus.seen[track].admitted is None
+
+
+@pytest.mark.parametrize('reset', ['gallery', 'session', 'gap', 'large-motion'])
+def test_face_drawing_history_resets_on_changed_source_authority(robot, monkeypatch, reset):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll('Ana', [vector, vector], time.time())
+    clock = [time.time()]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    raw = [(500, 100, 600, 200)]
+    monkeypatch.setattr(main, 'located_face', lambda *a: (vector, 100, raw[0]))
+    frame_of(r, people=True)
+    preview(r)
+    assert r.verified[3][1][4:] == ('Ana', 'known')
+    clock[0] += .067
+    if reset == 'gallery':
+        r.recognition.epoch += 1
+    elif reset == 'session':
+        r.session_id = 'different-session'
+    elif reset == 'gap':
+        r._track(r.view[0], [], clock[0])
+        clock[0] += .01
+    raw[0] = (620, 100, 720, 200) if reset == 'large-motion' else (498, 98, 608, 208)
+    source = frame_of(r, people=True)
+    preview(r)
+    frame, screen = r._shown()
+    assert frame is source and screen.valid()
+    assert r.verified[3][1] == (*raw[0], 'Ana', 'known')

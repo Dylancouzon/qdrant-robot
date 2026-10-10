@@ -1,42 +1,286 @@
 {
   "machine": "WSL RTX3080",
   "measurement_label": "E",
-  "capture_time_utc": "2026-10-10T03:32:57+00:00",
+  "capture_time_utc": "2026-10-10T10:07:49.389660+00:00",
   "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+  "observed_boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
   "unit": "p2-trt-quantize-native-retry.service",
   "invocation": "b9ec1e261ba04407938c9be35eec3f1d",
-  "python_pid": 128544,
-  "active_state": "active/running",
-  "private_raw_path": "Read-only agent selected counter sample, not the earlier lead60batch raw file",
-  "raw_sha256": null,
-  "selected_counters": {
-    "valid_batches": "67",
-    "skipped_nan_batches": "0"
+  "historical_python_pid": 128544,
+  "historical_flock_pid": 128539,
+  "active_state": "inactive/dead; transient unit collected",
+  "load_state": "not-found",
+  "current_invocation": "",
+  "identity_evidence": "Historical manager USER_UNIT/USER_INVOCATION_ID and process _SYSTEMD_USER_UNIT/_SYSTEMD_INVOCATION_ID match the recorded boot, unit, and invocation. No identity discrepancy.",
+  "outcome": "terminal_checkpoint_saved_native_exit_unavailable",
+  "native_result": "unavailable",
+  "exec_main_code": "unavailable",
+  "exec_main_status": "unavailable",
+  "job_final_exit": "unavailable",
+  "native_end_timestamp": "unavailable",
+  "terminal_event_time_utc": "2026-10-10T09:57:52.220730+00:00",
+  "terminal_event_realtime_us": 1791626272220730,
+  "terminal_event_basis": "Exact historical invocation systemd resource-accounting event; this is the terminal event time, not an available ExecMainExitTimestamp.",
+  "checkpoint_saved_time_utc": "2026-10-10T09:55:39.849602+00:00",
+  "native_status_evidence": "Collected systemctl show reports default Result=success/ExecMainStatus=0/ExecMainCode=0, with empty InvocationID and exit timestamp. These defaults do not preserve the native outcome. Boot/unit, process invocation, and USER_INVOCATION_ID journals contain no RESULT, EXIT_CODE, EXIT_STATUS, or native exit message. Do not report native zero or qualified success.",
+  "calibration": {
+    "dataset": "MMMU",
+    "batch_count": 128,
+    "activation_completed_batches": 128,
+    "search_completed_batches": 128,
+    "skipped_nan_batches": 0,
+    "count_basis": "Source-derived completion: recorded 128-entry calibration list, exhaustive _calibrate_multimodal loop, returned quantization, and exact-invocation Saved to footer. No final local counter was captured.",
+    "skip_basis": "Source prints a warning whenever skipped_nan_batches > 0. The full invocation has zero such warnings in either calibration pass. Zero skips is source-derived, not a final locals measurement.",
+    "last_direct_counter": {
+      "valid_batches": "67",
+      "skipped_nan_batches": "0"
+    },
+    "last_direct_counter_time_utc": "2026-10-10T03:32:57+00:00",
+    "logged_nan_skip_warnings": 0,
+    "logged_nonfinite_errors": 0,
+    "logged_awq_disabled_or_neutral_scale_warnings": 0,
+    "other_warning": "One Skipping requantize_resmooth_fused_llm_layers for this model (ModelOpt bug workaround) warning; this is not a skipped calibration batch.",
+    "quantization_elapsed_seconds": 45536.7,
+    "checkpoint_saved_total_seconds": 47318.0,
+    "integrity": "U: saved tensor finiteness, loading, inference, downstream export, and Jetson qualification are unmeasured. Log warning absence and hashes do not prove tensor integrity."
   },
-  "checkpoint": "absent at this check",
-  "handoff_scope": "User requests findings/artifact inventory only when preparation finishes; defer export/engine/qualification work to another session. No mutation.",
-  "diagnostic_native_exit": 0,
-  "job_final_exit": null,
-  "unit_status_followup": "same active/running invocation; no checkpoint files; unit ExecMainStatus0 is provisional while active",
-  "counter_evidence": "Read-only trt_continue selected py-spy report; raw locals remain private",
-  "unit_memory_bytes": 8546209792,
-  "unit_swap_bytes": 0,
+  "source": {
+    "revision": "95515c2f87fba8982db5a519f9022277667b3cc9",
+    "remote_git_status": "clean",
+    "quantize_source_mtime": "2026-10-09T13:30:48.584589260-04:00",
+    "model_calib_source_mtime": "2026-10-09T13:31:48.584852961-04:00",
+    "count_lines": "quantize.py 834-866; model_calib.py 1250-1315; saved footer quantize.py 1365"
+  },
+  "checkpoint": {
+    "capture_time_utc": "2026-10-10T10:04:24.034254+00:00",
+    "remote_path": "/home/dylan/qdrant-robot-box/experiments/p2-trt-edge/checkpoints/int4-awq-native-retry",
+    "present": true,
+    "files": [
+      {
+        "path": "chat_template.jinja",
+        "bytes": 18569,
+        "sha256": "0a2c8073c878ab1da004bee933a998606537bbb62016310352c7285c3f01c5b5",
+        "mtime_ns": 1791567167005111958,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "config.json",
+        "bytes": 8294,
+        "sha256": "c39a94486e4793d6040bf22a85f4d1fdefa043575ff128065b095933da9fc589",
+        "mtime_ns": 1791626078508288981,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 204,
+        "sha256": "b3b67b69c99550f50f7c2493f94eb9a5edb8c83bb7d90f1c059b8a742c7f9166",
+        "mtime_ns": 1791624361788391716,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "hf_quant_config.json",
+        "bytes": 2566,
+        "sha256": "2e0321d8b68580aec9e8d4bb94dd1f3cd9759dcbc8a65ae8b6fe15561fa54dd4",
+        "mtime_ns": 1791624361760391588,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 8215397598,
+        "sha256": "e8f3d7a40d07df8dc278bd0af7c022b072570fb7874464761468e5535a7b66d4",
+        "mtime_ns": 1791626074348269770,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "processor_config.json",
+        "bytes": 1689,
+        "sha256": "32bdf45d2ad4cc29a0822ddd157a182de76644f0419a6228d151495256e9813c",
+        "mtime_ns": 1791567166905111507,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 32169780,
+        "sha256": "a2619fe11b50dbed06ac443c51d757b354d0b62d64baa514404d4e84e6713519",
+        "mtime_ns": 1791626137416558614,
+        "stable_during_hash": true,
+        "symlink": false
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 3728,
+        "sha256": "b8045a4576903e86903291d5cbdd4adfc8859e9ce3c98621bdbd957f73ed394b",
+        "mtime_ns": 1791626091824350319,
+        "stable_during_hash": true,
+        "symlink": false
+      }
+    ],
+    "total_bytes": 8247602428,
+    "method": "Streaming SHA256, 8 MiB chunks; stdlib only; no model load",
+    "integrity": "U: tensor finiteness, checkpoint loading, export, and inference unmeasured"
+  },
+  "terminal_resources": {
+    "memory_peak_bytes": 19361898496,
+    "memory_swap_peak_bytes": 107425792,
+    "cpu_usage_ns": 50613085383000,
+    "wall_clock_seconds": 47462.877,
+    "scope": "Historical systemd unit lifetime on WSL; no Jetson fit or no-paging claim."
+  },
+  "private_evidence": [
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/journal-unit-boot.jsonl",
+      "bytes": 2949140,
+      "sha256": "59ec01a4c422deac05667a7e8525ccadde186ba993c7c8ffd1b4434b126c9829"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/journal-exact-invocation.jsonl",
+      "bytes": 2945987,
+      "sha256": "1ed109afc67363846d361bffb1d0615a774748fb31653e9fa8c784cd1ef1062a"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/journal-user-invocation.jsonl",
+      "bytes": 3153,
+      "sha256": "2fe9bd516384945b705b56897e67411e06d4e0d379d99c28cf822f63bee88559"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/journal-terminal-manager.jsonl",
+      "bytes": 1493,
+      "sha256": "3b2bf9406240ee1e88a1e167e60f1bead65a39e192fc5a99293fe60d60400f3f"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/quantize-native-retry.log",
+      "bytes": 2558,
+      "sha256": "1e2cc554a10448b4d30b2998a500396053f4dead4024cd71548d4f9bde005c54"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/quantize-native-retry-unit.txt",
+      "bytes": 9482,
+      "sha256": "591301f12d21a182e8c7f8fccebe6dd6711ff382037c5590e5408324a84dd8db"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/quantize-native-retry-completed.private.log",
+      "bytes": 256780,
+      "sha256": "9161e140765638e01b4f1626739717431ea290ddb47ae5595f492d2185a372bc"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/unit-show.txt",
+      "bytes": 173,
+      "sha256": "07759af68e2d38e9d347497a0c928954b1c44dc486e8d89824a4891979f41b06"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/boot-id.txt",
+      "bytes": 37,
+      "sha256": "688d01ee7af9cb9531c62fe1fbc6c0a282392cd42692642b10f7a8f02f9c36a8"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/quantize-source.py",
+      "bytes": 62655,
+      "sha256": "47188d185ece681e36788d9a62ad759aec9fe721c29c667976dd2775d2c1bd24"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/model-calib-source.py",
+      "bytes": 78962,
+      "sha256": "d2f23163ffd81b0f2af70384d6a4d1558be65e6619ec3f37896e79a041e729ed"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/quantize-cli-source.py",
+      "bytes": 10409,
+      "sha256": "85fab2a4ff320f8df5836c263078af07f560175380ebdeddc8e676cac900c82a"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/checkpoint-inventory.json",
+      "bytes": 2411,
+      "sha256": "d2c5b95c886de8ee18d2992328c2d175ada8efe7d70dfab37e023e2fd24afa75"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/automation-before.json",
+      "bytes": 6624,
+      "sha256": "659717569e63c10bc48f0bb803c8e5491a39992bdae03853a70b13097e73a15d"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/automation-runs-before.json",
+      "bytes": 202917,
+      "sha256": "bcf21c0e0a296d351bc0a5bd3845eb9e698fbf9cfde2ab6fa748e305c06fea1d"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/automation-remove.json",
+      "bytes": 228,
+      "sha256": "b6b7326771890016fadf24b9e8f042a554a2e5bf8d7e7cfd0271814911438e6b"
+    },
+    {
+      "path": "build/p2/logs/wsl-completion-20261010/automation-runs-after.json",
+      "bytes": 226,
+      "sha256": "0451c516e50f0cbdb9318737b98897b5c11baf6ce1abd8c7dd91f664849be6cd"
+    }
+  ],
+  "private_original_log_note": "The original remote quantize-native-retry.log is a stale 2558-byte early snapshot. Preserve it unchanged; the full completed invocation journal and derived private log supply final evidence.",
+  "prior_active_snapshot": {
+    "machine": "WSL RTX3080",
+    "measurement_label": "E",
+    "capture_time_utc": "2026-10-10T03:32:57+00:00",
+    "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+    "unit": "p2-trt-quantize-native-retry.service",
+    "invocation": "b9ec1e261ba04407938c9be35eec3f1d",
+    "python_pid": 128544,
+    "active_state": "active/running",
+    "private_raw_path": "Read-only agent selected counter sample, not the earlier lead60batch raw file",
+    "raw_sha256": null,
+    "selected_counters": {
+      "valid_batches": "67",
+      "skipped_nan_batches": "0"
+    },
+    "checkpoint": "absent at this check",
+    "handoff_scope": "User requests findings/artifact inventory only when preparation finishes; defer export/engine/qualification work to another session. No mutation.",
+    "diagnostic_native_exit": 0,
+    "job_final_exit": null,
+    "unit_status_followup": "same active/running invocation; no checkpoint files; unit ExecMainStatus0 is provisional while active",
+    "counter_evidence": "Read-only trt_continue selected py-spy report; raw locals remain private",
+    "unit_memory_bytes": 8546209792,
+    "unit_swap_bytes": 0,
+    "completion_watcher": {
+      "automation_id": "8acb5818-1970-4f5f-9a6f-b3af454595e3",
+      "cadence_minutes": 15,
+      "precheck": "skip active; trigger terminal/collected exact owned job; reconcile historical journal before outcome claims",
+      "scheduled_active_skip_native_exit": 1,
+      "unit_transient": true,
+      "collect_mode": "inactive",
+      "private_operational_checks": 5,
+      "integrity": "Checkpoint/native completion remains unmeasured while job active"
+    },
+    "latest_scheduled_precheck": {
+      "run": 3,
+      "scheduled_utc": "2026-10-10T04:00:00Z",
+      "started_epoch_ms": 1791604851744,
+      "status": "skipped_precheck",
+      "native_exit": 1,
+      "agent_dispatched": false
+    }
+  },
+  "handoff_scope": "Records only. Dylan will start another session for subsequent export, engines, and Jetson qualification. No model load, restart, stop, export, engine build, dependency/settings change, inference, tests, deployment, product change, or main change.",
   "completion_watcher": {
     "automation_id": "8acb5818-1970-4f5f-9a6f-b3af454595e3",
-    "cadence_minutes": 15,
-    "precheck": "skip active; trigger terminal/collected exact owned job; reconcile historical journal before outcome claims",
-    "scheduled_active_skip_native_exit": 1,
-    "unit_transient": true,
-    "collect_mode": "inactive",
-    "private_operational_checks": 5,
-    "integrity": "Checkpoint/native completion remains unmeasured while job active"
+    "status": "removed",
+    "history": "Before-removal run-history snapshot preserved privately. Orca runs query returns automation-not-found after removal; do not claim live history access.",
+    "precheck": "job_final_exit is unavailable rather than null, so the existing precheck skips future dispatch.",
+    "removal_native_exit": 0,
+    "history_preserved": true,
+    "history_run_count": 27,
+    "history_query_after_removal_native_exit": 1,
+    "history_access_after_removal": false
   },
-  "latest_scheduled_precheck": {
-    "run": 3,
-    "scheduled_utc": "2026-10-10T04:00:00Z",
-    "started_epoch_ms": 1791604851744,
-    "status": "skipped_precheck",
-    "native_exit": 1,
-    "agent_dispatched": false
-  }
+  "caffeinate": {
+    "pid": 65618,
+    "ownership_match": true,
+    "observed_lstart_argv": "Fri Oct  9 22:03:26 2026     caffeinate -dimsu",
+    "action": "preserve",
+    "reason": "Protected UI STATE records ongoing D144 work and retains this caffeinate. The WSL watcher is not its sole remaining purpose."
+  },
+  "protected_sync": "Narrow WSL status/lesson changes only; overlapping UI STATE and lessons remain unstaged. No protected product edits or commits by this task.",
+  "private_evidence_root": "/Users/dylanc/Documents/GitHub/qdrant-robot"
 }

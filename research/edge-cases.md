@@ -1,4 +1,17 @@
-# Edge cases (logged, not fixed, until v1 is tested end to end)
+# Known gaps and parked proposals
+
+## Next-session object recognition discussion
+
+Dylan accepted the D147 live checkpoint on 2026-10-10. These two items are parked under D148; current code and memory schemas stay unchanged.
+
+| Gap | Current evidence | Discussion for the next session |
+| --- | --- | --- |
+| Two items with the same name can leave neither recognized. | Dylan's live report; `Focus.associations()` abstains when multiple tracks claim one name. `Things.name()` keys each object point by name. | Decide whether the consenting person who labels an object owns it. Decide whether one owner's two objects with the same name form one shared logical object. Preserve ambiguity and consent/deletion safety. |
+| Recognition crops retain background pixels inside the detection rectangle. | `robot/things.py` uses a rectangular `cut()` followed by square padding; it performs no segmentation masking. | Compare background isolation with the current crop on varied objects, hands, backgrounds, and negative examples. Its recognition benefit and Jetson cost remain unmeasured. |
+
+The [reference crop implementation](https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/robot/brain/detect.py) pads the box by 12%, dilates a supplied mask, and fills outside-mask pixels grey. Its pinned read-only local checkout verifies this behavior. A missing mask retains the rectangular background. Changing crop preprocessing also changes stored vectors; compatibility and any required reteaching need explicit measurement.
+
+## Earlier recorded backlog
 
 As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot first, in case the architecture changes. Each entry: trigger, risk, candidate fix, and source. D77 also permits revisiting verified limitations with a concrete intervention and paired validation. Foundational retrieval and conversation questions are in research/grounding.md, object perception in research/booth-ux.md, and memory candidates in research/stack.md.
 
@@ -11,7 +24,7 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Swap grows at in-process replay restarts; Dylan reports live conversation swap | Paging may limit sustained conversation; live cause unknown | Separate restart churn from live active-turn paging; measure before a context increase | D66, D76; research/stack.md |
 | Identical prompts give different answers | Noisy comparisons | Paired runs, the judge cache, more turns | D56 |
 | Ignored statements filtered after retrieval | Relevant statements missed when the top hits are all ignored | Filter during retrieval | reviews/20261008-195032-46869-review.md |
-| Detector mislabels or misses phones; trials stayed at nano 384x640 | No box means no focus or teaching, even with label-free matching | Compare detector/resolution on labeled real objects; a threshold-only change has orange and false-bottle counterexamples at 0.10 | D43, D64, D77; research/booth-ux.md |
+| Detector or crop matching misses objects across motion or changed viewpoints | No box means no focus or teaching, even with label-free matching | D146 now defaults to 26s at 384x640. Keep detector proposals separate from descriptor matching; measure broader object coverage before another change | D43, D64, D77, D146; research/booth-ux.md |
 | Two of nine synthetic "Hey Edgy" lines missed ("Eti", "A ag") | The visitor repeats | Real booth voices before more aliases; arm B if needed | reviews/20261008-230525-97862-review.md |
 | Background speech within 20 s of an answer becomes a follow-up | The robot answers another speaker | Check on the live day; tie follow-ups to the facing person | same |
 | The follow-up clock uses queued WAV length, no speaker | The window boundary differs from playback | Measure with the speaker | same |

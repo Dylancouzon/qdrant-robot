@@ -187,7 +187,7 @@ def test_small_target_and_fresh_scores() -> None:
 
 
 @pytest.mark.parametrize("box", [(500, 200, 619, 500), (500, 200, 800, 319)])
-def test_size_only_dip_hides_but_retains_accepted_name(monkeypatch, box):
+def test_size_only_dip_keeps_grey_geometry_but_retains_accepted_name(monkeypatch, box):
     monkeypatch.setattr(F, "MIN_SIDE", 120)
     f = Focus(W, H)
     large = Track(1, (500, 200, 800, 500), "book", .9)
@@ -197,7 +197,7 @@ def test_size_only_dip_hides_but_retains_accepted_name(monkeypatch, box):
     before = f.named[1], f.epoch(1)
     f.update(100.05, [small], [])
     assert f.name(1) == "Visitor's item"
-    assert not f.names() and not f.boxes([small], [])
+    assert not f.names() and f.boxes([small], [])[0][4:] == ("", "other")
     assert not f.eligible(small) and f.target([small]) is None
     f.update(100.1, [large], [])
     assert (f.named[1], f.epoch(1)) == before
@@ -302,6 +302,52 @@ def test_drawing_smoothing_raw_authority_motion_and_gap():
     assert r.boxes([original], [])[0][:4] == original.box, "new session has no drawing history"
 
 
+@pytest.mark.parametrize("named, selected", [(True, False), (False, True), (False, False)])
+def test_continuous_raw_motion_never_snaps_from_drawing_lag(named, selected):
+    f = Focus(W, H)
+    previous = None
+    for k in range(20):
+        raw = phone((100 + 40 * k, 200, 280 + 40 * k, 380))
+        f.update(10 + k * DT, [raw], [])
+        if k == 0 and named:
+            f.bind(raw.id, "My phone")
+        if selected:
+            f.focus = raw.id
+        [box] = f.boxes([raw], [])
+        assert box[5] == ("known" if named else "focus" if selected else "other")
+        if previous:
+            step = (box[0] + box[2] - previous[0] - previous[2]) / 2
+            assert 0 < step <= 40, "steady raw motion cannot cause a larger drawing jump"
+        assert raw.box == (100 + 40 * k, 200, 280 + 40 * k, 380)
+        previous = box
+    assert raw.box[0] - previous[0] <= 40 * (1 - F.SMOOTH) / F.SMOOTH + 1
+    abrupt = phone((20, 200, 200, 380))
+    f.update(12, [abrupt], [])
+    assert f.geometry([abrupt])[1] == abrupt.box, "real discontinuities still snap"
+
+
+@pytest.mark.parametrize("dip", [phone((510, 210, 570, 270)), phone(score=0.12)])
+def test_eligibility_dip_keeps_grey_drawing_history(dip):
+    f = Focus(W, H)
+    original = phone()
+    f.update(10, [original], [])
+    f.focus = original.id
+    f.update(10 + DT, [dip], [])
+    assert f.seen[1].shown is not None
+    assert f.boxes([dip], [])[0][5] == "other" and not f.eligible(dip)
+    assert f.target([dip]) is None, "retained geometry cannot authorize naming"
+    hidden = f.geometry([dip])[1]
+    recovered = phone((520, 200, 620, 360))
+    f.update(10 + 2 * DT, [recovered], [])
+    shown = f.boxes([recovered], [])[0][:4]
+    assert shown != recovered.box, "recovery continues the existing filter"
+    assert all(abs(b - a) <= F.SMOOTH * abs(c - a) + 1
+               for a, b, c in zip(hidden, shown, recovered.box, strict=True))
+    assert recovered.box == (520, 200, 620, 360)
+    f.update(10.5, [], [])
+    assert f.seen[1].shown is None, "a real absence clears retained geometry"
+
+
 def test_challenger_requires_continuous_priority():
     f = Focus(W, H)
     a = phone()
@@ -359,7 +405,8 @@ def test_mixed_known_unknown_short_occlusion_and_config(monkeypatch):
     epoch = f.epoch(1)
     f.update(14.5, [unknown], [PERSON])
     assert f.epoch(1) > epoch and f.name(1) == "Chosen name"
-    assert any(b[4] == "Chosen name" for b in f.boxes([unknown], [], 14.55))
+    assert all(b[4] != "Chosen name" for b in f.boxes([unknown], [], 14.55)), \
+        "a departed track cannot draw on another source"
     f.update(14.6, [known, unknown], [PERSON], recognized={1: ("Wrong", .99)},
              recognized_at=14.4)
     assert f.name(1) == "Chosen name", "a short-gap cached display grants no source authority"
@@ -464,7 +511,7 @@ def test_display_requires_one_current_positive_signal(detector, descriptor, disp
     t = phone(t.box, score=detector)
     f.update(10.1, [t], [], recognized={t.id: ('Chosen', descriptor)})
     assert bool(f.names()) is displayed
-    assert bool(f.boxes([t], [])) is displayed
+    assert f.boxes([t], [])[0][4:] == (("Chosen", "known") if displayed else ("", "other"))
     assert f.name(t.id) == 'Chosen', 'display rejection retains the preference for re-query'
     assert f.named[t.id].score == descriptor, 'retained display confidence never replaces evidence'
     assert f.named[t.id].confidence == 1
@@ -509,7 +556,9 @@ def test_item_exclusion_requires_match_and_counts_only_actual_misses():
         assert f.seen[t.id].exclude_misses == miss, 'skipped queries cannot consume continuity'
     f.exclude(t.id, None)
     assert not f.excluded and f.seen[t.id].exclude_misses == 0
-    assert f.boxes([t], []), 'third actual miss releases a different object on the same track'
+    assert not f.excluded, 'third actual miss releases a different object on the same track'
+    f.update(10.3, [t], [])
+    assert f.boxes([t], []), 'the next matched source admits its own outline'
 
 
 def test_item_match_and_explicit_replacement_reset_exclusion_misses():
@@ -541,3 +590,114 @@ def test_item_gap_clears_exclusion_and_counter_before_new_match():
     f.exclude(t.id, 'new')
     f.exclude(t.id, None)
     assert f.excluded == {t.id: 'new'} and f.seen[t.id].exclude_misses == 1
+
+
+def test_low_drawing_needs_raw_admission_and_never_grants_focus_or_actions():
+    f = Focus(W, H)
+    low = phone(score=F.DETECT_LOW)
+    f.update(10, [low], [])
+    assert f.seen[1].shown and not f.boxes([low], []), 'filter history is not admission'
+    high = phone(score=F.DISPLAY_CONFIDENCE)
+    f.update(10.1, [high], [])
+    assert f.boxes([high], [])
+    f.focus = low.id
+    for step in range(1, 31):
+        f.update(10.1 + step / 15, [low], [])
+        expected = ('???', 'focus') if f.focus == low.id else ('', 'other')
+        assert f.boxes([low], [])[0][4:] == expected
+        assert not f.eligible(low) and f.target([low]) is None and not f._fit(low)
+        assert f.seen[1].admitted == f.now, 'full-size LOW continuity renews size grace only'
+    below = phone(score=F.DETECT_LOW - .0001)
+    f.update(12.2, [below], [])
+    assert not f.boxes([below], [])
+    f.update(12.3, [], [])
+    assert not f.boxes([low], []) and f.seen[1].admitted is None
+    f.update(12.4, [low], [])
+    assert not f.boxes([low], []), 'a returning weak track needs a new raw admission'
+
+
+def test_selected_unknown_style_survives_alternating_high_low_source_confidence():
+    f = Focus(W, H)
+    high = phone(score=F.DISPLAY_CONFIDENCE)
+    _, taken = run(f, 10, 1.2, [high], people=())
+    assert f.focus == high.id
+    changed = f.changed
+    for step in range(60):
+        low = step % 2 == 0
+        current = phone(score=F.DETECT_LOW if low else F.DISPLAY_CONFIDENCE)
+        f.update(taken + step * DT, [current], [])
+        source = f.geometry([current])
+        assert f.boxes([current], [], geometry=source)[0][4:] == ('???', 'focus')
+        assert f.focus == current.id and f.changed == changed
+        assert f.eligible(current) is not low
+        assert f.target([current]) == (None if low else current.id)
+        assert f._fit(current) is not low
+    f.checking.add(current.id)
+    assert not f.boxes([current], [], geometry=source)
+    f.checking.clear()
+    f.exclude(current.id, 'preference')
+    assert not f.boxes([current], [], geometry=source)
+    f.restore('preference')
+    f.ignored.add(current.label)
+    assert not f.boxes([current], [], geometry=source)
+    f.ignored.clear()
+    f.update(f.now + DT, [], [])
+    assert not f.boxes([current], [], geometry=source), 'departed source stays hidden'
+
+
+def test_size_grace_expires_without_weak_observation_renewal(monkeypatch):
+    monkeypatch.setattr(F, 'MIN_SIDE', 120)
+    f = Focus(W, H)
+    high = phone((500, 200, 700, 500))
+    small = phone((500, 200, 619, 500), score=.21)
+    f.update(10, [high], [])
+    for offset in (.05, .15, .199):
+        f.update(10 + offset, [small], [])
+        assert f.boxes([small], [])[0][4:] == ('', 'other')
+        assert not f.eligible(small) and f.target([small]) is None
+        assert f.seen[1].admitted == 10
+    f.update(10.201, [small], [])
+    assert not f.boxes([small], [])
+    f.update(10.25, [high], [])
+    assert f.boxes([high], []) and f.seen[1].admitted == 10.25
+    f.exclude(1, 'ignored-item')
+    assert not f.boxes([high], []) and f.seen[1].admitted is None
+    f.restore('ignored-item')
+    assert not f.boxes([high], []), 'Restore alone invents no source admission'
+    f.update(10.3, [high], [])
+    assert f.boxes([high], [])
+
+
+def test_size_grace_follows_admitted_low_full_size_sources(monkeypatch):
+    monkeypatch.setattr(F, 'MIN_SIDE', 120)
+    f = Focus(W, H)
+    high = phone((500, 200, 700, 500))
+    low = phone(high.box, score=F.DETECT_LOW)
+    small = phone((500, 200, 619, 500), score=F.DETECT_LOW)
+    f.update(10, [high], [])
+    run(f, 10.1, 1.2, [low], people=())
+    admitted = f.seen[1].admitted
+    assert admitted > 11 and not f.eligible(low)
+    f.update(admitted + .067, [small], [])
+    assert f.boxes([small], [])[0][4:] == ('', 'other')
+    f.update(admitted + .199, [small], [])
+    assert f.boxes([small], []) and f.seen[1].admitted == admitted
+    f.update(admitted + .201, [small], [])
+    assert not f.boxes([small], [])
+
+
+def test_source_geometry_admission_is_frozen_but_current_safety_can_remove_it(monkeypatch):
+    monkeypatch.setattr(F, 'MIN_SIDE', 120)
+    f = Focus(W, H)
+    high = phone((500, 200, 700, 500))
+    f.update(10, [high], [])
+    source = f.geometry([high])
+    small = phone((500, 200, 619, 500), score=.21)
+    f.update(10.25, [small], [])
+    assert not f.boxes([small], []), 'the newer source has exhausted size grace'
+    assert f.boxes([small], [], geometry=source) == [(*high.box, '', 'other')]
+    f.ignored.add('phone')
+    assert not f.boxes([small], [], geometry=source)
+    f.ignored.clear()
+    f.update(10.3, [], [])
+    assert not f.boxes([high], [], geometry=source), 'departed pixels cannot be drawn'

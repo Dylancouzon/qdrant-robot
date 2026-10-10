@@ -28,7 +28,7 @@ from robot.asr import Ears, Scribe, woken
 from robot.config import SHARED
 from robot.detect import CONFIRM, Detector, Sighting, Tracker, region
 from robot.recognition import Recognition
-from robot.focus import BODY, SURE, Focus, Track, inside
+from robot.focus import BODY, OCCLUSION_S, SMOOTH, SNAP, SURE, Focus, Track, inside
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     Memory,
@@ -353,6 +353,8 @@ class Robot:
                     self.focus.excluded.pop(i, None)
                     if i in self.focus.seen:
                         self.focus.seen[i].exclude_misses = 0
+                        self.focus.seen[i].shown = None
+                        self.focus.seen[i].admitted = None
                         self.focus.seen[i].epoch += 1
                         self.focus.seen[i].continuous = self.view_taken
             if not self.views or self.view_taken - self.views[-1][0] >= VIEW_S:
@@ -399,7 +401,7 @@ class Robot:
         record = self.verified if self._completed_valid(self.verified) and \
             self.verified[0] >= self.shown_taken else None
         if record:
-            taken, frame, _, (source, face), _, _ = record
+            taken, frame, _, (source, face, _), _, _ = record
             shown_tracks = [t for t in tracks if t.id in source and
                             self.focus.accepts(t.id, taken) and
                             self.focus.epoch(t.id) == source[t.id][1]]
@@ -560,11 +562,32 @@ class Robot:
         candidates = [t for t in people if face and inside(face[2], t.box) >= 0.8]
         matched = person if len(candidates) == 1 and self.focus.eligible(candidates[0]) else None
         source = {t.id: (geometry[t.id], self.focus.epoch(t.id)) for t in tracks
-                  if t.id in valid and (t.id in members or self.focus.eligible(t, pending=True))}
-        outline = (*face[2], matched or "", "known" if matched else "other") if face else None
+                  if t.id in valid and t.id in geometry}
+        outline = self._face_outline(face, matched, members if len(candidates) == 1 else (), taken)
         if self.verified is None or taken >= self.verified[0]:
-            self.verified = taken, frame, gallery, (source, outline), members, self.session_id
+            raw_face = face[2] if face and len(candidates) == len(members) == 1 else None
+            self.verified = taken, frame, gallery, (source, outline, raw_face), \
+                members, self.session_id
             self.delivery.notify_all()
+
+    def _face_outline(self, face, matched, members, taken):
+        """Filter drawing on adjacent verified sources; identity always comes from this face."""
+        if not face:
+            return None
+        box, previous = face[2], self.verified
+        if previous and previous[2] == self.recognition.epoch and \
+                previous[5] == self.session_id and len(members) == 1 and \
+                members == previous[4] and \
+                all(self.focus.accepts(i, previous[0]) and
+                    self.focus.epoch(i) == previous[3][0][i][1] for i in members) and \
+                previous[3][1] and previous[3][2] and previous[3][1][4] == (matched or "") and \
+                0 <= taken - previous[0] <= OCCLUSION_S:
+            old = previous[3][2]
+            delta = np.subtract(np.add(box[:2], box[2:]), np.add(old[:2], old[2:])) / 2
+            if np.linalg.norm(delta) <= SNAP * self.focus.width:
+                box = previous[3][1][:4] if taken == previous[0] else tuple(
+                    a + SMOOTH * (b - a) for a, b in zip(previous[3][1][:4], box, strict=True))
+        return (*box, matched or "", "known" if matched else "other")
 
     def _query_objects(self, frame, tracks, preferences):
         """Oldest-due eligible crop, reusing one vector for identity and item preference."""

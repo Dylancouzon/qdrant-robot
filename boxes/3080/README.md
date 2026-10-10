@@ -1,10 +1,12 @@
 # The 3080 box: how the robot's lead and this machine work together
 
-Superseded 2026-10-09: the lead reaches the box directly with `ssh dylan@192.168.1.74` (STATE.md, research/lessons.md, Machines), and the `box/3080` mailbox branch is deleted. The protocol below is kept only for a Claude session running on the box itself.
+Superseded 2026-10-09: the lead reaches the box directly with `ssh dylan@192.168.1.74`, and the `box/3080` mailbox branch is deleted. Read [STATE.md](../../STATE.md) and [machine-access notes](../../research/lessons.md#machine-and-environment-pitfalls) before work. The protocol below is historical.
 
-This folder is the mailbox between the lead (a Claude session on Dylan's Mac, which owns the robot project) and a Claude session on Dylan's Windows PC with an RTX 3080, running in WSL2. The two sessions cannot message each other, so they talk through this branch.
+The WSL2 project is `/home/dylan/qdrant-robot-box`. GPU jobs must use `/home/dylan/qdrant-robot-box/gpu.lock`. Preserve other owners' jobs and Docker/Ollama services; the lock coordinates only participants that use it.
 
-## Protocol
+This folder records the former mailbox between the Mac lead and a Claude session on Dylan's Windows PC with an RTX 3080. Those sessions exchanged tasks and results through the branch.
+
+## Archived protocol
 
 - Branch: `box/3080`. Pull it before starting work, and push after every finished step. Never push to `main` or any other branch.
 - The lead writes tasks in `boxes/3080/BRIEF.md`. Do not edit that file.
