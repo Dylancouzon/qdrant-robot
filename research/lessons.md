@@ -97,6 +97,8 @@ Keep main's executable tree identical to accepted 011f522. The ours-strategy his
 
 Before removing worktrees, move ignored evidence into canonical build/reconciliation-20261010 and verify each file hash and symlink target. Preserve the canonical environment, secret file, reference clones, remote releases, production stores, and closed backups. Pause the owned preview gracefully. Keep the canonical checkout and ignored evidence. Archive completed experiment heads before retiring their branches, then leave the checkout on main.
 
+Verify annotated archive tags remotely using their referenced commit IDs. Their tag object IDs differ from those commits; preserve a failed verification before correcting the comparison.
+
 ## Gemma budget clarification, 2026-10-10
 
 The original handoff is intent parsing and tool calling optimization in research/answer-evidence.md. Dylan rejects the invented Qwen TensorRT comparison as its replacement. He separately authorizes Gemma experiments with CPU Kokoro, accepts 24 tok/s if answer quality improves substantially, and asks to use WSL whenever compatible. This session covers only the Gemma experiment. Intent/tool work remains the next step for a later session. No quality gain or target change is established.
