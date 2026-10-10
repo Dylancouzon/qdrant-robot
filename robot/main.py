@@ -1005,12 +1005,22 @@ class Robot:
 
     def _name(self, turn: Turn, name: str, labels: list[str]) -> str:
         """Bind `name` to the object the focus gives (D67, Focus.target): the focus object,
-        else the most salient object held up. Otherwise ask for it held up."""
-        old = self.things.named(name, labels)
+        else a held object, else the one fresh, visible association for this exact name."""
+        old = self.things.named(name, [])
         if {*labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         with self.detecting:
-            found = self.focus and self.focus.target([Track(*t) for t in self.tracker.scored()])
+            tracks = [Track(*t) for t in self.tracker.scored()]
+            found = self.focus and self.focus.target(tracks)
+            if found is None and old and self.focus:
+                names = self.focus.names()
+                candidates = [t.id for t in tracks if t.id in self.focus.visible and
+                              self.focus.eligible(t) and
+                              names.get(t.id) == (old["name"], True) and
+                              self.focus.named[t.id].score >= MATCH and
+                              0 <= time.time() - self.focus.named[t.id].refreshed <= PREVIEW_TTL]
+                if len(candidates) == 1:
+                    found = candidates[0]
         if found is None:
             return f"I don't see {article(name)} held up. Hold it up and say it again."
         return self._bind(turn, name, labels, found)
@@ -1021,11 +1031,12 @@ class Robot:
             views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
                      if track in v[2] and self.focus.accepts(track, v[0])]
             epoch = self.focus.epoch(track)
+            gallery, session = self.recognition.epoch, self.session_id
         if not views:
             return "Sorry, I lost sight of it. Hold it up and say it again."
         taken, frame, view = views[0]
         label, box = view[track]
-        old = self.things.named(name, labels)
+        old = self.things.named(name, [])
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         seen = self._whois(frame)
@@ -1038,6 +1049,7 @@ class Robot:
         def bind(faces, crops):
             with self.detecting:
                 if not self.focus.accepts(track, taken) or self.focus.epoch(track) != epoch or \
+                        self.recognition.epoch != gallery + 1 or self.session_id != session or \
                         time.time() - taken > PREVIEW_TTL:
                     return None
                 return self.things.name(name, sorted({*labels, label}), vectors)

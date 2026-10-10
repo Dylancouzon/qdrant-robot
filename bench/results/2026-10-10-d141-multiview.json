@@ -1,0 +1,588 @@
+{
+  "first_infrastructure_failure": {
+    "native_exit": 1,
+    "completed": false,
+    "release": "eb6da2f9f1fd",
+    "invocation": "6e039f0f9c494c388576bdba6dc1c8ec",
+    "adapter_sha256": "6a5590452f700146280433852b857de9a73195285bd42b98c1c3a268d72baaea",
+    "failure": "Metadata requested onnxruntime distribution; onnxruntime-gpu installed. Failed before inference. Retry changed only runtime version read.",
+    "private_evidence": "build/d140/d141-descriptor-first-journal.jsonl; probe-first-failed.py; original tegrastats"
+  },
+  "descriptor_retry": {
+    "completed": true,
+    "native_exit": 1,
+    "classification": "Descriptor development experiment. Direct Things.name/Edge probes are not ordinary Robot teaching or runtime acceptance. External cup is unused-video evaluation with three explicit teaching windows; participant/physical-object independence unavailable. Negative fixtures reuse prior development/probe data. No threshold or model tuning.",
+    "ordinary_robot_learning": false,
+    "runtime_ignore_qualification": false,
+    "production_memory_writes": false,
+    "protocol_sha256": "740a05d780f658ea9be88dc634dd75323dc2c8af24b15d89ed70738917c939f5",
+    "adapter_sha256": "cdc617ef809322e00e9a7c1ad37a5bb458bf036c0b853d4bf1c97f553db289da",
+    "machine": "qdrant-robot",
+    "model": "/home/qdrant/qdrant-robot/shared/models/detector/yoloe-26s-booth-384x640.onnx",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "descriptor_sha256": "f22797eabf810a75e41de68d378541ebea372122b25c4ce3ef25ff618250c20a",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "release": "eb6da2f9f1fd",
+    "tegrastats": "d141-descriptor-s-retry-20261010-030548.tegrastats",
+    "command": [
+      "/home/qdrant/qdrant-robot/shared/sessions/d141-probe/multiview_probe.py",
+      "--model",
+      "s",
+      "--output",
+      "/home/qdrant/qdrant-robot/shared/sessions/d141-descriptor-s-retry"
+    ],
+    "match_threshold": 0.822,
+    "runtime_min_side_at_1280": 120,
+    "runtime_admission_confidence": 0.25,
+    "versions": {
+      "onnxruntime": "1.24.0",
+      "qdrant-edge-py": "0.8.0"
+    },
+    "paging_before": {
+      "pswpin": 1245289,
+      "pswpout": 9361750,
+      "MemAvailable_kb": 6144932
+    },
+    "precision": {
+      "detector": "TensorRT FP16",
+      "descriptor": "ONNX FP32"
+    },
+    "variants_note": "C is D140 unconditional three-shot replacement. A/B also add current-only safe replacement on an exact-name mismatch, independently of gallery diversity.",
+    "binding_note": "Detector boxes selected by annotation/manual IoU >= .3. Selected box QA must be inspected before interpreting descriptor results.",
+    "descriptor_providers": [
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "warmup_s": 0.9144147240149323,
+    "inference_s": 14.647988105978584,
+    "arms": {
+      "cup": {
+        "current-replacement": {
+          "planned_queries": 142,
+          "available": 140,
+          "fresh_matches": 92,
+          "excluded": 92,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 149,
+          "edge_exclude_count": 149,
+          "edge_query_ms": {
+            "p50": 0.334673,
+            "p95": 0.41214259999999997,
+            "p99": 0.5197061600000015
+          },
+          "edge_exclude_ms": {
+            "p50": 0.226668,
+            "p95": 0.2897622,
+            "p99": 0.3878314800000014
+          }
+        },
+        "six-diverse": {
+          "planned_queries": 142,
+          "available": 140,
+          "fresh_matches": 92,
+          "excluded": 92,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 149,
+          "edge_exclude_count": 149,
+          "edge_query_ms": {
+            "p50": 0.336146,
+            "p95": 0.4422236,
+            "p99": 0.5155081200000001
+          },
+          "edge_exclude_ms": {
+            "p50": 0.225292,
+            "p95": 0.29801859999999997,
+            "p99": 0.32885284000000004
+          }
+        },
+        "three-diverse": {
+          "planned_queries": 142,
+          "available": 140,
+          "fresh_matches": 92,
+          "excluded": 92,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 149,
+          "edge_exclude_count": 149,
+          "edge_query_ms": {
+            "p50": 0.34245,
+            "p95": 0.42434199999999994,
+            "p99": 0.49848184000000023
+          },
+          "edge_exclude_ms": {
+            "p50": 0.215627,
+            "p95": 0.27747320000000003,
+            "p99": 0.29525852
+          }
+        }
+      },
+      "phone": {
+        "current-replacement": {
+          "planned_queries": 15,
+          "available": 13,
+          "fresh_matches": 7,
+          "excluded": 7,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 22,
+          "edge_exclude_count": 22,
+          "edge_query_ms": {
+            "p50": 0.4229175,
+            "p95": 0.47787935,
+            "p99": 0.55256335
+          },
+          "edge_exclude_ms": {
+            "p50": 0.27052600000000004,
+            "p95": 0.3229072,
+            "p99": 0.33665086
+          }
+        },
+        "six-diverse": {
+          "planned_queries": 15,
+          "available": 13,
+          "fresh_matches": 11,
+          "excluded": 11,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 22,
+          "edge_exclude_count": 22,
+          "edge_query_ms": {
+            "p50": 0.412661,
+            "p95": 0.56764315,
+            "p99": 0.5949070599999999
+          },
+          "edge_exclude_ms": {
+            "p50": 0.289487,
+            "p95": 0.33506915000000004,
+            "p99": 0.4574657699999999
+          }
+        },
+        "three-diverse": {
+          "planned_queries": 15,
+          "available": 13,
+          "fresh_matches": 10,
+          "excluded": 10,
+          "missing_negatives": 3,
+          "false_same_kind_matches": 0,
+          "false_cross_kind_matches": 0,
+          "false_exclusions": 0,
+          "edge_query_count": 22,
+          "edge_exclude_count": 22,
+          "edge_query_ms": {
+            "p50": 0.4027885,
+            "p95": 0.5947298999999999,
+            "p99": 0.61260587
+          },
+          "edge_exclude_ms": {
+            "p50": 0.268798,
+            "p95": 0.29908219999999996,
+            "p99": 0.31457578999999997
+          }
+        }
+      }
+    },
+    "sample_status": {
+      "cup": {
+        "eligible": 149,
+        "detector-miss": 0,
+        "body": 0,
+        "floor": 0,
+        "confidence": 2
+      },
+      "phone": {
+        "eligible": 20,
+        "detector-miss": 0,
+        "body": 0,
+        "floor": 3,
+        "confidence": 1
+      }
+    },
+    "required": {
+      "every_teaching_window_admitted": true,
+      "every_negative_crop_present": false,
+      "zero_measured_false_claims": true,
+      "joint_fresh_match_90_percent": false
+    },
+    "checkpoints": [
+      {
+        "kind": "cup",
+        "stage": 1,
+        "frame": 20,
+        "planned_frames": [
+          0,
+          10,
+          20
+        ],
+        "admitted": 3,
+        "current_frame": 20,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          20,
+          10,
+          0
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          },
+          "six-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          }
+        }
+      },
+      {
+        "kind": "cup",
+        "stage": 2,
+        "frame": 110,
+        "planned_frames": [
+          90,
+          100,
+          110
+        ],
+        "admitted": 3,
+        "current_frame": 110,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          110,
+          100,
+          90
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802024
+          },
+          "six-diverse": {
+            "vectors": 6,
+            "vector_bytes": 18432,
+            "gallery_disk_bytes": 339802024
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802024
+          }
+        }
+      },
+      {
+        "kind": "cup",
+        "stage": 3,
+        "frame": 200,
+        "planned_frames": [
+          180,
+          190,
+          200
+        ],
+        "admitted": 3,
+        "current_frame": 200,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          200,
+          190,
+          180
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802070
+          },
+          "six-diverse": {
+            "vectors": 6,
+            "vector_bytes": 18432,
+            "gallery_disk_bytes": 339802070
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802070
+          }
+        }
+      },
+      {
+        "kind": "phone",
+        "stage": 1,
+        "frame": 25,
+        "planned_frames": [
+          15,
+          20,
+          25
+        ],
+        "admitted": 3,
+        "current_frame": 25,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          25,
+          20,
+          15
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          },
+          "six-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339801978
+          }
+        }
+      },
+      {
+        "kind": "phone",
+        "stage": 2,
+        "frame": 85,
+        "planned_frames": [
+          75,
+          80,
+          85
+        ],
+        "admitted": 2,
+        "current_frame": 85,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          85,
+          75
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 2,
+            "vector_bytes": 6144,
+            "gallery_disk_bytes": 339802024
+          },
+          "six-diverse": {
+            "vectors": 5,
+            "vector_bytes": 15360,
+            "gallery_disk_bytes": 339802024
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802024
+          }
+        }
+      },
+      {
+        "kind": "phone",
+        "stage": 3,
+        "frame": 145,
+        "planned_frames": [
+          135,
+          140,
+          145
+        ],
+        "admitted": 2,
+        "current_frame": 145,
+        "last_planned_frame_absent": false,
+        "incoming_order": [
+          145,
+          140
+        ],
+        "arms": {
+          "current-replacement": {
+            "vectors": 2,
+            "vector_bytes": 6144,
+            "gallery_disk_bytes": 339802070
+          },
+          "six-diverse": {
+            "vectors": 6,
+            "vector_bytes": 18432,
+            "gallery_disk_bytes": 339802070
+          },
+          "three-diverse": {
+            "vectors": 3,
+            "vector_bytes": 9216,
+            "gallery_disk_bytes": 339802070
+          }
+        }
+      }
+    ],
+    "phase": "complete",
+    "elapsed_s": 17.533974729012698,
+    "paging_after": {
+      "pswpin": 1245289,
+      "pswpout": 9361750,
+      "MemAvailable_kb": 4945324
+    },
+    "source_sha256": {
+      "focus.py": "5d392bb488c9b1affd920772c80c65e103e758ea83689b9ab10740f4db5fd964",
+      "main.py": "e82cda7750e63ebaf2ecaf885f3b2e23d57329579169aa68be99075a6393e814",
+      "recognition.py": "06b671b7968257de0641109a7f7f9193cff6c652f7a7f3778366de51183b65d8",
+      "things.py": "834565de0f8bedab892807d421335f0546a7a87af7f8aa28c3810d41c0b531b5",
+      "view.py": "75f8dd8a34779fb786dadd5fc5f1f0a35258ca276c2d713b9345c9873b91cac0"
+    },
+    "negative_truth_audit": {
+      "confirmed_same_kind_phone_negatives_admitted": 0,
+      "distinct_negative_images_admitted": 3,
+      "distinct_negative_images_planned": 4,
+      "missing": "m2-phone-gold detector confidence0.2012 below0.25; missing_negatives=3 repeats one absent fixture across three checkpoints",
+      "m2-phone-black": "Audio recorder; cross-kind phone negative, despite fixture filename",
+      "confirmed_same_kind_cup_negatives_admitted": 2,
+      "qualification": "No phone false-positive safety claim. Observed zeros cover admitted fixtures only."
+    },
+    "known_swap": {
+      "classification": "Synthetic same-IoU known-B query-route diagnostic, not physical swap acceptance.",
+      "global_match": [
+        "B",
+        0.9999999403953552
+      ],
+      "limitation": "Chosen A remains the exact-name query preference in the guess band; B scores 1.0 globally but is not acquired by this route.",
+      "queries": 100
+    },
+    "cap_choice": "Select three diverse retained views: phone10/15 versus7/15 replacement; six11/15 earns one additional frame with incomplete same-kind safety. Cup92/142 all variants.",
+    "private_evidence": "build/d140/descriptor-s/{summary,details}.json and crop-qa-*.jpg; selected detector crops visually verified.",
+    "cold_start_note": "warmup_s measures constructors, not offline cold boot; descriptor-only resources do not establish integrated headroom.",
+    "resources": {
+      "tegrastats_samples": 18,
+      "peak_ram_used_mb": 2515,
+      "min_ram_capacity_minus_used_mb": 4970,
+      "active_swap_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0
+      },
+      "headroom_note": "RAM capacity minus used is a tegrastats aggregate, not MemAvailable or all-component headroom."
+    },
+    "invocation": "9cc2c1a85b6a491298c3f961787c5442",
+    "binding_audit": "Frames342/344 have valid cup confidence0.8804/0.8677. Frozen maximum-IoU selects a slightly-higher-IoU whole-image chair belowadmission, causing two unavailable crops. Preserve planned denominator and original receipt. Remaining48 descriptor misses concentrate top-down255..301/303."
+  },
+  "runtime": {
+    "release": "eb6da2f9f1fd",
+    "tegrastats": "d141-runtime-s-20261010-030957.tegrastats",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "natural_learning": true,
+    "physical_phone_binding": true,
+    "native_exit": 0,
+    "completed": true,
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": false,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": false,
+      "ignored_descriptor": false,
+      "restore_accepted": false,
+      "restore_display": false
+    },
+    "paging_before": {
+      "pswpin": 1245300,
+      "pswpout": 9361750,
+      "MemAvailable_kB": 6121384
+    },
+    "paging_after": {
+      "pswpin": 1245301,
+      "pswpout": 9361777,
+      "MemAvailable_kB": 2990752
+    },
+    "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 10.07742096455083,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.13388681411743164,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.96109420121777,
+      "render_ms_p50": 13.735008993535303,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 7.883575865532398,
+      "unique_named_face_sources": 120,
+      "face_named_fraction": 0.6421052631578947,
+      "source_age_p95": 0.16924211978912354,
+      "longest_repeated_source_s": 0.10405635833740234,
+      "detect_fps": 14.973503153997775,
+      "render_ms_p50": 12.758304495946504,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 9.999922671657277,
+      "unique_named_face_sources": 50,
+      "face_named_fraction": 0.38461538461538464,
+      "source_age_p95": 0.16710305213928223,
+      "longest_repeated_source_s": 0.09949374198913574,
+      "detect_fps": 14.961124617285694,
+      "render_ms_p50": 12.97325300402008,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 94,
+      "unique_source_fps": 10.078767709694072,
+      "unique_named_face_sources": 83,
+      "face_named_fraction": 0.8936170212765957,
+      "source_age_p95": 0.19440577030181885,
+      "longest_repeated_source_s": 0.010724306106567383,
+      "detect_fps": 14.955590795029913,
+      "render_ms_p50": 13.374192494666204,
+      "phone_named_fraction": 0.0
+    },
+    "phone_named_movement": {
+      "samples": 150,
+      "unique_source_fps": 7.583876065108676,
+      "unique_named_face_sources": 59,
+      "face_named_fraction": 0.3933333333333333,
+      "source_age_p95": 0.18523794412612904,
+      "longest_repeated_source_s": 0.1222527027130127,
+      "detect_fps": 14.697954497865487,
+      "render_ms_p50": 14.510747001622804,
+      "phone_named_fraction": 0.94
+    },
+    "phone_ignored_return_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "phone_ignored_reset_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "quality_pass": false,
+    "completion_audit": "Incomplete action sequence: missing named Ignore target raises StopIteration with empty text. Native0/completedTrue are erroneous adapter bookkeeping. Required action checks false; no Ignore/Restore acceptance.",
+    "private_evidence": "build/d140/runtime-d141/{summary,samples,events}.json; preserved original adapterf3657c5",
+    "command": "tools/jetson.py run d141-runtime-s -- /home/qdrant/qdrant-robot/shared/sessions/d139_runtime_check.py --model s --learning",
+    "cap_qualification": "Release cap6, only initial3-view teaching exercised. Final3cap choice does not change this exercised gallery."
+  }
+}

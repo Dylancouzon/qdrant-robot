@@ -20,7 +20,7 @@ from robot.main import Robot, Turn
 from robot.memory import CountRequest, Memory, ScrollRequest
 from robot.people import DIM as FACE_DIM, People
 from robot.text_embed import DIM as TEXT_DIM
-from robot.things import DIM, SHOTS, Things, command
+from robot.things import DIM, SHOTS, VIEWS, Things, command, diverse
 
 GOLD, BLACK = 200, 30  # the pixel value of each phone: the stub tells them apart by it
 LEFT, CENTER, RIGHT = (100, 300, 300, 600), (540, 300, 740, 600), (1000, 300, 1200, 600)
@@ -530,6 +530,188 @@ def test_case_only_reteach_and_forget_all_evidence(robot):
     assert ask(r, "Forget my DYLAN'S SMARTPHONE")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0
     assert not r.focus.names() and not list(r.memory.frames.iterdir())
+
+
+def test_diverse_reteaching_exact_name_replacement_links_and_ignore(tmp_path):
+    basis = np.eye(DIM, dtype=np.float32)
+    original = basis[:3]
+    current = np.asarray([.9 * basis[0] + np.sqrt(1 - .9**2) * basis[3], basis[4], basis[5]],
+                         dtype=np.float32)
+    things = Things(tmp_path)
+    things.name("Chosen", ["phone"], original)
+    things.link("chosen", 17)
+    things.name("CHOSEN", ["wallet"], current)
+    things.link("chosen", 19)
+    saved = things.descriptors("Chosen")
+    assert len(saved) == VIEWS
+    np.testing.assert_array_equal(saved[:2], [original[0], current[0]])
+    assert things.named("chosen", []) == {
+        "name": "Chosen", "labels": ["phone", "wallet"], "turns": [17, 19]}
+    # Equal cosine distances choose the first remaining input deterministically.
+    np.testing.assert_array_equal(diverse(basis[:8], 6), basis[[0, 6, 1]])
+    next_views = basis[[0, 6, 7]]
+    expected = diverse(np.concatenate([saved, next_views]), len(saved))
+    things.name("chosen", ["phone"], next_views)
+    np.testing.assert_array_equal(things.descriptors("Chosen"), expected)
+    assert len(expected) == VIEWS
+    things.name("Separate", ["phone"], basis[[12, 12, 12]])
+    assert len(things.descriptors("Separate")) == 1
+    np.testing.assert_array_equal(things.descriptors("Chosen"), expected)
+    things.shard.close()
+    things = Things(tmp_path)
+    np.testing.assert_array_equal(things.descriptors("chosen"), expected)
+    ident = things.ignore_item("Chosen", expected)
+    assert all(things.excluded(vector) == ident for vector in expected)
+    assert things.excluded(basis[30]) is None and things.score(basis[12])[0] == "Separate"
+    things.shard.close()
+    things = Things(tmp_path)
+    assert all(things.excluded(vector) == ident for vector in expected)
+    assert things.restore_item(ident) and all(things.excluded(v) is None for v in expected)
+    # A mismatching current crop rejects both the old gallery and buffered old-looking crops.
+    replacement = basis[[30, 0, 31]]
+    things.name("CHOSEN", ["bag"], replacement)
+    np.testing.assert_array_equal(things.descriptors("Chosen"), replacement[:1])
+    assert things.score(basis[0], "Chosen")[1] < main.MATCH
+    assert things.named("chosen", [])["labels"] == ["bag", "phone", "wallet"]
+    assert things.forget("chosen") == [17, 19] and things.named("chosen", []) is None
+    assert things.named("Separate", []) and not things.preferences()
+    things.shard.close()
+
+
+@pytest.mark.parametrize("blocked", [None, "duplicate", "pending", "stale", "category", "weak",
+                                     "small", "ignored"])
+def test_exact_name_reteach_without_held_or_unknown_focus(robot, blocked):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is Dylan's smartphone")[0].startswith("Got it")
+    frame_of(r)
+    r.focus.focus = None
+    track = next(iter(r.view[1]))
+    if blocked == "duplicate":
+        show(r, [(GOLD, CENTER), (GOLD, LEFT)])
+        r.focus.bind(next(t for t in r.focus.visible if t != track), "Dylan's smartphone")
+        r.focus.focus = None
+    elif blocked == "pending":
+        r.focus.checking.add(track)
+    elif blocked == "stale":
+        r.focus.named[track].refreshed -= main.PREVIEW_TTL + 1
+    elif blocked == "weak":
+        tracks = [Track(*t) for t in r.tracker.scored()]
+        r.focus.update(r.view_taken, tracks, [], recognized={track: ("Dylan's smartphone", .797)})
+        assert r.focus.names()[track][1], "display continuity is still green"
+    elif blocked == "small":
+        frame_of(r, box=(540, 300, 620, 600))
+        r.focus.focus = None
+    elif blocked == "ignored":
+        r.ignored = r.focus.ignored = {"phone"}
+    name = "Spare smartphone" if blocked == "category" else "DYLAN'S SMARTPHONE"
+    answer, turn = ask(r, f"This is my {name}")
+    if blocked:
+        assert answer.startswith("I am ignoring" if blocked == "ignored" else "I don't see")
+        assert not turn.named
+    else:
+        assert answer.startswith("Got it") and turn.named == "Dylan's smartphone"
+        assert len(r.things.named(name, [])["turns"]) == 2
+
+
+def test_same_track_guess_replacement_never_writes_or_claims_after_bound(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my phone")[0].startswith("Got it")
+    before = r.memory.shard.count(CountRequest())
+    base = np.eye(DIM, dtype=np.float32)
+    vector = .797 * base[GOLD] + np.sqrt(1 - .797**2) * base[BLACK]
+    r.recognition.crops = lambda crops: np.asarray([vector for _ in crops])
+    track = next(iter(r.view[1]))
+    for i in range(100):
+        frame_of(r, BLACK)
+        preview(r)
+        assert r.focus.name(track) == "phone"
+        if i >= 2:
+            assert all(b[5] != "known" for b in r._shown()[1].boxes)
+    assert r.memory.shard.count(CountRequest()) == before
+    assert ask(r, "Where is my phone?")[0] == "I see a phone, but I am not sure it is yours."
+
+
+def test_robot_reteach_replacement_discards_buffered_previous_physical_object(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my phone")[0].startswith("Got it")
+    track, taken = next(iter(r.view[1])), r.view_taken
+    # Initial buffer predates confirmation. Record a later source with real track geometry.
+    monkeypatch.setattr(main.time, "time", lambda: taken + main.VIEW_S + .05)
+    frame_of(r)
+    assert any(track in view and np.isclose(f[300:600, 540:740].mean(), GOLD)
+               for _, f, view in r.views)
+    monkeypatch.setattr(main.time, "time", lambda: taken + main.VIEW_S + .15)
+    frame_of(r, BLACK)
+    assert next(iter(r.view[1])) == track
+    embedded = []
+    r.recognition.crops = lambda crops: embedded.append([float(c.mean()) for c in crops]) or \
+        stub_crops(crops)
+    hold(r, CENTER)
+    assert ask(r, "This is my phone")[0].startswith("Got it")
+    assert embedded == [[BLACK, GOLD]], "the real teaching route passes the current and old crops"
+    np.testing.assert_array_equal(r.things.descriptors("phone"), stub_crops([
+        np.full((4, 4, 3), BLACK)]))
+    assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0], "phone")[1] < main.MATCH
+    assert len(r.things.named("phone", [])["turns"]) == 2
+    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert r.memory.shard.count(CountRequest()) == 0 and not list(r.memory.frames.iterdir())
+
+
+def test_robot_ignore_copies_all_verified_gallery_views_and_forget_deletes_links(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my phone")[0].startswith("Got it")
+    basis = np.eye(DIM, dtype=np.float32)
+    for indices in ([GOLD, 11, 12], [GOLD, 13, 14], [GOLD, 15, 16]):
+        r.recognition.call(lambda f, c, indices=indices: r.things.name("phone", ["phone"],
+                                                                    basis[indices]),
+                           mutate=True)
+    saved = r.things.descriptors("phone")
+    assert len(saved) == VIEWS
+    preview(r)
+    state = r._shown(False)[1].control
+    [target] = state["targets"]
+    assert r._item_control("ignore", {**state, **target}).startswith("Okay")
+    assert all(r.things.excluded(v) for v in saved), "actual current-crop action copies every view"
+    [preference] = r.things.preferences()
+    assert r._item_control("restore", {"id": preference["id"], "session": r.session_id,
+                                       "gallery": r.recognition.epoch}).startswith("I will notice")
+    assert all(r.things.excluded(v) is None for v in saved)
+    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert r.memory.shard.count(CountRequest()) == 0 and not list(r.memory.frames.iterdir())
+
+
+@pytest.mark.parametrize("change", ["gallery", "session", "gap", "source"])
+def test_naming_crop_work_rejects_changed_authority(robot, monkeypatch, change):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    owner_call = r.recognition.call
+    taken = r.view_taken
+    def call(action, mutate=False):
+        result = owner_call(action, mutate)
+        if not mutate:
+            if change == "gallery":
+                r.recognition.epoch += 1
+            elif change == "session":
+                r.session_id = "replacement-session"
+            elif change == "gap":
+                r.focus.update(taken + .01, [], [])
+            else:
+                monkeypatch.setattr(main.time, "time", lambda: taken + main.PREVIEW_TTL + 1)
+        return result
+    r.recognition.call = call
+    answer, turn = ask(r, "This is my phone")
+    assert answer.startswith("Sorry, I lost sight") and not turn.named
+    assert r.things.named("phone", []) is None and r.memory.shard.count(CountRequest()) == 0
+    assert not list(r.memory.frames.iterdir())
 
 
 def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, monkeypatch):

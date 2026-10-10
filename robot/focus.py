@@ -59,7 +59,7 @@ class _Seen:
 @dataclass
 class _Name:
     """A track's name with hysteresis: set after SET_N agreeing queries at GUESS or more,
-    cleared after CLEAR_N queries under GUESS in a row."""
+    green confidence fades after CLEAR_N below-SURE queries; below-GUESS also clears the name."""
     name: str | None = None
     score: float = 0.0  # latest query, never retained to authorize a write
     confidence: float = 0.0  # accepted display confidence through bounded weak queries
@@ -71,18 +71,18 @@ class _Name:
         """Count one recognition result; True when the shown name changed."""
         old = self.name
         self.score = score
+        self.misses = self.misses + 1 if name is None or score < SURE else 0
         if name is None or score < GUESS:
-            self.run, self.misses = (None, 0), self.misses + 1
+            self.run = None, 0
             if self.misses >= CLEAR_N:
                 self.name, self.confidence = None, 0.0
             return self.name != old
-        self.misses = 0
         self.run = (name, self.run[1] + 1 if self.run[0] == name else 1)
         if name != self.name:
             self.name, self.confidence = None, 0.0  # Conflicting positives abstain immediately.
         if name == old or self.run[1] >= SET_N:
             self.name = name
-            self.confidence = max(self.confidence, score)
+            self.confidence = score if self.misses >= CLEAR_N else max(self.confidence, score)
         self.refreshed = taken
         return self.name != old
 

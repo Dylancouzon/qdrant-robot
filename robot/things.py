@@ -34,6 +34,7 @@ from robot.memory import is_question, kind_of, kinds
 MODEL = MODELS / "dinov2-small/model.onnx"
 DIM = 768  # DINOv2-small CLS and mean patch token, each unit length, concatenated
 SHOTS = 3  # crops of the named track, a third of a second apart
+VIEWS = 3  # maximum diverse crops retained across verified explicit reteaching turns
 # The highest score of another object, of any kind, on half the bake-off instances; on the
 # other half: zero false matches in 625 same-kind and 1,400 other-kind crops, true matches
 # 15/22 phones, 15/35 teddy bears (bench/reid.py,
@@ -77,6 +78,25 @@ def cut(frame: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarray:
     return frame[y1:y2, x1:x2]
 
 
+def diverse(crops: np.ndarray, current: int, limit: int = VIEWS) -> np.ndarray:
+    """Keep distinct original/current anchors, then the farthest remaining cosine views."""
+    unique, anchors = [], []
+    for i, vector in enumerate(crops):
+        at = next((j for j, old in enumerate(unique) if np.array_equal(old, vector)), None)
+        if at is None:
+            at = len(unique)
+            unique.append(vector)
+        if i in (0, current) and at not in anchors:
+            anchors.append(at)
+    vectors = np.asarray(unique, dtype=np.float32)
+    unit = _unit(vectors)
+    chosen = anchors[:limit]
+    while len(chosen) < min(limit, len(vectors)):
+        remaining = [i for i in range(len(vectors)) if i not in chosen]
+        chosen.append(max(remaining, key=lambda i: float((1 - unit[i] @ unit[chosen].T).min())))
+    return vectors[chosen]
+
+
 class Things:
     def __init__(self, root: Path = SHARED / "memory"):
         path = root / "things"
@@ -91,13 +111,24 @@ class Things:
             filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))[0]
 
     def name(self, name: str, labels: list[str], crops: np.ndarray) -> str:
-        """Store `name` (one point per name: naming it again replaces the crops) for an object
-        with detector `labels`, from its crop vectors. Keep the first display casing and links;
-        return the stored name."""
-        existing = self.shard.retrieve([_id(name)], ["name"], False)
-        name = existing[0].payload["name"] if existing else name
+        """Keep diverse explicitly taught views when the current crop verifies the exact name.
+        Otherwise replace it with the current crop, excluding possibly older physical objects.
+        Preserve the first casing, aliases, and deletion links."""
+        existing = self.shard.retrieve([_id(name)], True, True)
+        current = 0
+        if existing:
+            old = existing[0]
+            name = old.payload["name"]
+            labels = sorted({*labels, *old.payload["labels"]})
+            hit = self.score(crops[0], name)
+            if hit and hit[1] >= MATCH:
+                previous = np.asarray(old.vector["crops"], dtype=np.float32)
+                current = len(previous)
+                crops = np.concatenate([previous, crops[:SHOTS]])
+            else:
+                crops = crops[:1]
         self.shard.update(UpdateOperation.upsert_points([Point(
-            _id(name), {"crops": crops[:SHOTS].tolist()},
+            _id(name), {"crops": diverse(crops if current else crops[:SHOTS], current).tolist()},
             {"name": name, "labels": labels, "turns": self._turns(name)})]))
         self.shard.flush()
         return name
@@ -200,7 +231,7 @@ class Things:
                     if np.max(crops @ np.asarray(r.vector["crops"]).T) >= MATCH]
         ident = str(uuid.uuid4())
         self.shard.update(UpdateOperation.upsert_points([Point(ident,
-            {"crops": crops[:SHOTS].tolist()},
+            {"crops": diverse(crops, 0).tolist()},
             {"type": "item_ignore", "title": title, "excludes": excludes})]))
         self.shard.flush()
         self.items = self.shard.retrieve([*[r.id for r in self.items], ident], True, False)

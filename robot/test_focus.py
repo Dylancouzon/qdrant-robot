@@ -108,12 +108,33 @@ def test_name_band_and_hysteresis() -> None:
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: ("Dylan's phone", 0.79)})
     assert f.names() == {1: ("Dylan's phone", True)}
     assert f.boxes([phone()], [])[0][5] == "known", "an accepted label survives a weaker view"
+    _, t = run(f, t, DT, [phone()], recognized=sure)  # fresh evidence resets weak-query count
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: (None, 0.0)})
     assert f.names() == {1: ("Dylan's phone", True)}, "two weak queries retain the display"
     events, t = run(f, t, DT, [phone()], recognized={1: ("Dylan's phone", 0.7)})
     assert ("name", 1, None) in events and f.names() == {}, "the third miss clears it"
     run(f, t, 4, [phone()])
     assert f.focus == 1, "unnamed again after the selection interval"
+
+
+def test_repeated_guess_queries_bound_green_but_keep_verification_preference():
+    f = Focus(W, H)
+    for now in (10, 10.1):
+        f.update(now, [phone()], [], recognized={1: ("Chosen", .9)})
+    for now in (10.2, 10.3):
+        f.update(now, [phone()], [], recognized={1: ("Chosen", .797)})
+        assert f.names() == {1: ("Chosen", True)}
+    for i in range(100):
+        f.update(10.4 + i / 10, [phone()], [], recognized={1: ("Chosen", .797)})
+        assert f.names() == {1: ("Chosen", False)} and f.name(1) == "Chosen"
+        assert all(b[5] != "known" for b in f.boxes([phone()], []))
+    f.update(21, [phone()], [], recognized={1: ("Chosen", .9)})
+    assert f.names() == {1: ("Chosen", True)}
+    for i in range(100):
+        f.update(21.1 + i / 10, [phone()], [])
+    assert f.names() == {1: ("Chosen", True)}, "skipped queries do not consume hysteresis"
+    f.update(32, [phone()], [], recognized={1: ("Different", .9)})
+    assert not f.names() and f.name(1) is None, "a competing strong claim abstains immediately"
 
 
 def test_guess_never_takes_focus_and_one_box_per_name() -> None:
