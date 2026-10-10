@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-10",
+  "main_source": "011f52207596098afd2b2cd38e1a16c613f605fa",
+  "histories": [
+    {
+      "branch": "main",
+      "commit": "eb746fe78fd60f9c8d1c34adc6566c6d8894904f",
+      "archive_tag": "archive/2026-10-10/main-before",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    },
+    {
+      "branch": "spike/answer-evidence-testing",
+      "commit": "26fed400129842f6a6408f8973af00b545ec4995",
+      "archive_tag": "archive/2026-10-10/answer-evidence-testing",
+      "accepted_runtime": true,
+      "disposition": "accepted source and plan"
+    },
+    {
+      "branch": "spike/jetson-trt-testing",
+      "commit": "352d29c624eccd9afd206ef6aaac43db9ce98146",
+      "archive_tag": "archive/2026-10-10/jetson-trt-testing",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    },
+    {
+      "branch": "spike/mac-audio-interface",
+      "commit": "011f52207596098afd2b2cd38e1a16c613f605fa",
+      "archive_tag": "archive/2026-10-10/mac-audio-interface",
+      "accepted_runtime": true,
+      "disposition": "accepted source and plan"
+    },
+    {
+      "branch": "spike/overnight-2026-10-09",
+      "commit": "43622a9142e2dcb1c1078679be29c34c743bfbe8",
+      "archive_tag": "archive/2026-10-10/overnight-2026-10-09",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    },
+    {
+      "branch": "spike/p2-conversation",
+      "commit": "4d73264061e640f1474da0f7b84057e6190c60e7",
+      "archive_tag": "archive/2026-10-10/p2-conversation",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    },
+    {
+      "branch": "spike/p2-observer-dialogue",
+      "commit": "4f6b9202caabf33725fe3906af9e4c0b691d2cb1",
+      "archive_tag": "archive/2026-10-10/p2-observer-dialogue",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    },
+    {
+      "branch": "spike/p2-trt-edge",
+      "commit": "0e5a4846ba5f612d08e28f1f55c5794ff555cea3",
+      "archive_tag": "archive/2026-10-10/p2-trt-edge",
+      "accepted_runtime": false,
+      "disposition": "historical only"
+    }
+  ],
+  "private_archive": "build/reconciliation-20261010",
+  "recovery": "git show <archive_tag>:<original_path>"
+}

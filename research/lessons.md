@@ -1,6 +1,6 @@
 # Lessons and evidence index
 
-Updated 2026-10-10 after Dylan accepted the D147 live preview as good enough. Read [STATE.md](../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](archive/lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
+Updated 2026-10-10 after accepted-source consolidation into main. Use the [experiment index](experiments.md) for outcomes and archived evidence. Read [STATE.md](../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](archive/lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
 
 ## Find the current behavior
 
@@ -39,7 +39,7 @@ Updated 2026-10-10 after Dylan accepted the D147 live preview as good enough. Re
 - Reuse the current crop vector when a weak preferred match needs one global query. D142 adds no embedding and at most one query. Descriptor and detector confidence jointly guard retained names in D144; saved confidence never authorizes a fresh memory write.
 - Item Ignore already uses negative example multivectors in Edge. D145 counts actual queried misses, retaining a matched preference through two and releasing on the third. Skipped queries do not advance this count. Restore runs through the existing serial owner with current mutation guards.
 
-Known gap: Dylan observes that two items with the same name can both lose recognition. Discuss next session whether the consenting person who labels an item should be its owner, and whether that owner giving two physical objects the same name means one shared logical object. This is a proposal, not an adopted schema or implementation.
+Dylan selects Owner from the named introducer and UI-set Location for the next build. Two same-name objects within one owner can still lose recognition. D148's shared-object grouping policy remains undecided. The selected payload requirements remain unimplemented; see the [session plan](answer-evidence.md).
 
 ## Routes to avoid repeating
 
@@ -74,7 +74,7 @@ Media, consenting-face data, recognition vectors, transcripts, private adapters,
 
 ## Separate WSL checkpoint preparation
 
-The other session completed AWQ checkpoint validation and packaging. Preserve [its status receipt](../bench/results/2026-10-09-wsl-d136-status.json). The [validation JSON](/Users/dylanc/Documents/GitHub/qdrant-robot/bench/results/2026-10-10-wsl-checkpoint-validation.json) exists only in the root worktree at that absolute path; do not copy it into this branch. The original quantizer native exit remains unavailable; later validation and packaging preserve native 0. The verified 8,437,452,800-byte archive has SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697` (E). Model loading, answers, and Jetson fit remain U.
+The other session completed AWQ checkpoint validation and packaging. Preserve [its status receipt](../bench/results/2026-10-09-wsl-d136-status.json). The [validation JSON](/Users/dylanc/Documents/GitHub/qdrant-robot/bench/results/2026-10-10-wsl-checkpoint-validation.json) exists only in the root worktree at that absolute path; do not copy it into this branch. The original quantizer native exit remains unavailable; later validation and packaging preserve native 0. The verified 8,437,452,800-byte archive has SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697` (E). Native Jetson engines later build with exit 0, but initialization exits 1 for CUDA allocation failure before answers. Read [native findings](jetson-trt.md). Successful inference and integrated fit remain unqualified.
 
 The completed-job watcher was removed after its private history was saved. Direct checkpoint input is supported by D117; another ONNX export or repeated quantization is unnecessary. Keep WSL export/engine qualification separate from the accepted detection checkpoint. Full machine and recovery notes remain in the historical archive and STATE.md.
 
@@ -89,3 +89,9 @@ The current category router returns one label, but separate sighting rules alrea
 Named sightings store frame thirds and time, without semantic place. A parser cannot supply a missing place or fix current-match precedence by itself. Future isolated tests must override shared knowledge and brain log defaults as well as the robot memory root. The replay convenience wrapper deploys implicitly, so it cannot run this isolated comparison unchanged. The planning decision below authorizes no runtime, fixture, schema, or deployment change.
 
 Dylan now requires Location and Owner payloads, with UI location entry and owner-aware chat wording. Capture location with each observation; bind owner to the named introducer. Your phone requires a current-speaker match. A different speaker hears Ana's phone. Current name-only object keys must change before two owners can each retain a phone. Preserve unowned records and D148 ambiguity limits. This is a planning requirement; implementation remains deferred.
+
+## Repository consolidation
+
+Keep main's executable tree identical to accepted 011f522. The ours-strategy history merge retains rejected experiment parents without adopting their code. Archive tags and a verified full Git bundle preserve all original heads. The compact experiment index replaces branch-by-branch context loading. Exact sanitized receipts remain in main; larger historical snapshots remain in Git.
+
+Before removing worktrees, move ignored evidence into canonical build/reconciliation-20261010 and verify each file hash and symlink target. Preserve the canonical environment, secret file, reference clones, remote releases, production stores, and closed backups. Pause the owned preview gracefully. Keep this active session checkout until handback; retire its experimental branch after detaching at main.

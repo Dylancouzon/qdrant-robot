@@ -913,3 +913,21 @@ Sol 6.1 passes the planning-only source audit and seven-session/30-turn plan, na
 Record duplicate-name and same-owner ambiguity in research/edge-cases.md. Keep named-owner and verified anonymous-session references separate. Qualify payload/storage changes separately from parser gains.
 No runtime, UI, fixture, model, deployment, or adoption change occurs. Commit/push the isolated planning branch; later implementation requires design review and fresh machine reconciliation.
 Evidence: reviews/20261010-123638-91510-review.md; research/answer-evidence.md; STATE.md; lessons.
+
+## D117 native result 2026-10-10: Preserve the compiled route and its memory blocker
+The reused WSL archive verifies; official checkpoint-backed base/MTP/visual engines build native 0 in 751.99 s (J). Native initialization then exits 1 with cudaMalloc out of memory, before any answer; quality, cold/warm answer latency, and decode remain unmeasured.
+Source/native-config arithmetic requires 7,674.35 MiB base weights against 7,485.45 MiB physical total; PLE uses 4,480 MiB, and scaled embeddings cannot share unscaled LM-head storage. Preserve engines and exact failed receipts; a material weight-placement change is required before retrying this route.
+Reject unchanged load retries, smaller-KV fit claims, prompt tuning, repeated quantization, another ONNX export, and product adoption. Preserve protected UI/current 7f67670fa91e/previous 6781adbb7189, memories, backups, and main. Runtime paths also require engines/ rather than the historical adapter's engines/llm assumption.
+Evidence: bench/results/2026-10-10-jetson-gemma-awq-native.json and .jsonl; research/jetson-trt.md; ignored build/p2/logs/native-20261010. Failed RLIMIT extraction native 1 and corrected verification native 0 remain separate.
+
+## Main reconciliation 2026-10-10: Consolidate accepted source and archived evidence
+Dylan authorizes main consolidation, live-server pause, and branch/worktree cleanup. Fast-forward accepted UI/plan, then retain rejected history with an ours-strategy merge; executable source stays identical to 011f522.
+Archive eight heads and a complete verified Git bundle. Move six checkouts' ignored evidence to canonical build storage; verify 1,600 files/3,526,866,794 bytes (E). Preserve native exits and private data.
+Full checks pass native 0 in 93.58 s (E). Publish the compact experiment index and sanitized receipts; task review, real commit hook, main/tag push, and retirement remain pending. No deployment or model adoption.
+Evidence: research/experiments.md; research/archive/experiment-heads-20261010.json; bench/results/2026-10-10-repository-reconciliation.json; ignored build/reconciliation-20261010.
+
+## Main reconciliation review 2026-10-10: Approve preservation and retirement order
+Sol 6.1 PASS, native 0 in 184.63 s (E), independently verifies accepted source, eight reachable heads/tags, complete bundle, exact sanitized receipts, and all private archive hashes/counts.
+Keep runtime and deployment unchanged. Commit through the real hook and push main/tags before retiring completed branches and five inactive worktrees. The active checkout remains detached at main for handback.
+Canonical private aliases preserve native and D147 evidence paths. Root environment, secrets, references, remote releases, memories, and backups remain untouched.
+Evidence: reviews/20261010-130113-18820-review.md; bench/results/2026-10-10-repository-reconciliation.json; research/experiments.md.

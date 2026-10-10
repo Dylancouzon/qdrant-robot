@@ -2,11 +2,11 @@
 
 ## Next-session object recognition discussion
 
-Dylan accepted the D147 live checkpoint on 2026-10-10. These two items are parked under D148; current code and memory schemas stay unchanged.
+Dylan accepted the D147 live checkpoint on 2026-10-10. Owner from the named introducer and UI-set Location are selected future requirements. Current code and memory schemas stay unchanged; same-owner grouping and background isolation remain parked under D148.
 
 | Gap | Current evidence | Discussion for the next session |
 | --- | --- | --- |
-| Two items with the same name can leave neither recognized. | Dylan's live report; `Focus.associations()` abstains when multiple tracks claim one name. `Things.name()` keys each object point by name. | Decide whether the consenting person who labels an object owns it. Decide whether one owner's two objects with the same name form one shared logical object. Preserve ambiguity and consent/deletion safety. |
+| Two items with the same name can leave neither recognized. | Dylan's live report; `Focus.associations()` abstains when multiple tracks claim one name. `Things.name()` keys each object point by name. | Implement the selected named-owner binding through a reviewed design. Decide whether one owner's two same-name objects form one shared logical object. Preserve ambiguity and consent/deletion safety. |
 | Recognition crops retain background pixels inside the detection rectangle. | `robot/things.py` uses a rectangular `cut()` followed by square padding; it performs no segmentation masking. | Compare background isolation with the current crop on varied objects, hands, backgrounds, and negative examples. Its recognition benefit and Jetson cost remain unmeasured. |
 
 The [reference crop implementation](https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/robot/brain/detect.py) pads the box by 12%, dilates a supplied mask, and fills outside-mask pixels grey. Its pinned read-only local checkout verifies this behavior. A missing mask retains the rectangular background. Changing crop preprocessing also changes stored vectors; compatibility and any required reteaching need explicit measurement.

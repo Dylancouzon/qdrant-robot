@@ -2,7 +2,7 @@
 
 A robot that sees, listens, talks, and remembers on one Jetson Orin Nano Super 8 GB. Qdrant Edge stores and retrieves its observed evidence inside the robot process. The goal is stronger perception, sustained conversation, useful memory, and fluid interaction; targets are a floor (D76).
 
-Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and [research/lessons.md](research/lessons.md). Read the linked decisions before repeating an experiment. Current runtime choices and rejected alternatives are in those files; the reference architectures describe the starting point.
+Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [experiment index](research/experiments.md). Use [lessons](research/lessons.md) for pitfalls. Open only the linked evidence needed for the next decision.
 
 Current controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md); measured scope is in the [D147 audit](bench/results/2026-10-10-d147-box-continuity.json).
 
