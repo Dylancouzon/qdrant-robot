@@ -54,7 +54,9 @@
             "decoder_layer": "<Gemma4TextDecoderLayer at 0x72f0cff79b50>"
           }
         }
-      ]
+      ],
+      "search_batches_completed": 31,
+      "skipped_nan_batches": 0
     },
     {
       "capture_time_utc": "2026-10-10T00:10:34.878784+00:00",
@@ -88,10 +90,24 @@
             "decoder_layer": "<Gemma4TextDecoderLayer at 0x72f0dc920d40>"
           }
         }
-      ]
+      ],
+      "search_batches_completed": 32,
+      "skipped_nan_batches": 0
     }
   ],
-  "finding": "Fresh read-only samples show different QuantLinear and Gemma4TextDecoderLayer instances and alpha settings; the search advances inside its first sample. No observed deadlock or diagnosed search failure. Export/inference remain pending.",
+  "finding": "Saved read-only stack locals establish completed search batches31,32 and zero skipped NaN batches. Changing layers/alpha show work inside successive batches; the initial0/128 journal entry is stale. Same job advances; no export or qualified ETA.",
   "mutations": "none; no stop, restart, checkpoint change, or other-project mutation",
-  "eta": "unknown"
+  "eta": "unknown",
+  "counter_correction": {
+    "current_diagnosis": "2026-10-09-wsl-awq-counter-status.json",
+    "actual_completed_batches_in_saved_samples": [
+      31,
+      32
+    ],
+    "skipped_nan_batches": [
+      0,
+      0
+    ],
+    "stale_field": "search_samples_reported was the initial journal entry, not current runtime progress"
+  }
 }

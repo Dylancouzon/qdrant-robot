@@ -90,7 +90,9 @@
             "self": "<Gemma4ForConditionalGeneration at 0x72f0db772c60>"
           }
         }
-      ]
+      ],
+      "search_batches_completed": 43,
+      "skipped_nan_batches": 0
     },
     {
       "capture_time_utc": "2026-10-10T01:18:14.532418+00:00",
@@ -140,10 +142,24 @@
             "self": "<Gemma4ForConditionalGeneration at 0x72f0db772c60>"
           }
         }
-      ]
+      ],
+      "search_batches_completed": 43,
+      "skipped_nan_batches": 0
     }
   ],
-  "finding": "Two fresh read-only samples32.3 seconds apart show different QuantLinear and Gemma decoder layer instances, with AWQ alpha0.4 versus1.0. The same job continues layer/parameter search; no observed deadlock, completed outer sample, export, or ETA. CPU time increases.",
+  "finding": "Saved read-only stack locals establish completed search batches43,43 and zero skipped NaN batches. Changing layers/alpha show work inside successive batches; the initial0/128 journal entry is stale. Same job advances; no export or qualified ETA.",
   "mutations": "none; same boot/unit/invocation; no stop/restart or other-project mutation",
-  "eta": "unknown"
+  "eta": "unknown",
+  "counter_correction": {
+    "current_diagnosis": "2026-10-09-wsl-awq-counter-status.json",
+    "actual_completed_batches_in_saved_samples": [
+      43,
+      43
+    ],
+    "skipped_nan_batches": [
+      0,
+      0
+    ],
+    "stale_field": "search_samples_reported was the initial journal entry, not current runtime progress"
+  }
 }
