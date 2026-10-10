@@ -883,3 +883,15 @@ Dylan reports that two items with the same name can leave neither recognized. Cu
 Discuss a consenting labeler's ownership and whether two objects taught under the same name by that owner represent one shared logical object. Keep owner isolation, ambiguity, reteaching, and deletion semantics explicit; the proposal is undecided.
 Current cut() retains all background inside the detector rectangle. Reference cfc0dd2 masks those pixels grey before embedding. Background isolation could improve recognition, but its quality and Jetson cost remain unmeasured. Both items are parked; no runtime or schema change this session.
 Evidence: research/edge-cases.md; robot/focus.py associations(); robot/things.py name()/cut(); reference robot/brain/detect.py padded_crop().
+
+## D147 hook receipt 2026-10-10: Complete full-suite checks on the accepted source
+Commit 69e01013848f18a0427de52c807aaf7d2e8dcb11 succeeds through the real tools/githooks/pre-commit hook, native exit 0. Checks take 90.77 s; the complete pytest stage, including Focus and Things regressions, takes 88.44 s (E).
+Ruff, Vulture, module assertions, and both workflow self-checks pass. The review-stamp reminder is nonblocking; only CLAUDE.md, README.md, and boxes/3080/README.md differ from the Sol-reviewed code tree. All four recorded source hashes, two runtime and two test files, stay identical.
+Opus documentation findings are repaired; retain its original needs-attention verdict and request final verification. User-requested D148 ownership and masked-crop discussions remain parked without code or schema changes.
+Evidence: bench/results/2026-10-10-d147-box-continuity.json; reviews/20261010-opus-session-hygiene.md; private build/d147/final-commit-hook.log.
+
+## D147 final Opus verification 2026-10-10: Approve the clean accepted checkpoint
+Claude Code Opus approves the full session comparison with 30639f5, native exit 0. It verifies all five initial hygiene findings are repaired and finds no runtime, secret, or scope blocker.
+Record final status and clarify the source-hash count. Preserve historical decision bytes and use the readable outcome index. Accepted release 7f67670fa91e and rollback 6781adbb7189 remain unchanged.
+Finish with a bookkeeping-only commit through the real hook and push the branch. D148 ownership, same-name object policy, and background isolation remain next-session discussions; no implementation or wider milestone acceptance is claimed.
+Evidence: reviews/20261010-opus-session-hygiene-final.md; bench/results/2026-10-10-d147-box-continuity.json; STATE.md; research/edge-cases.md.

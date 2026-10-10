@@ -1,12 +1,12 @@
 # State
 
-Updated 2026-10-10. Dylan accepted the final D147 live preview as "Good enough". Detection work stops at this checkpoint. The remaining task is repository hygiene and the requested Claude Code Opus review; do not resume detector, filter, or model experiments.
+Updated 2026-10-10. Dylan accepted the final D147 live preview as "Good enough". Detection work stops at this checkpoint. Repository hygiene and the requested Claude Code Opus review are complete. Keep the accepted runtime; detector, filter, and model proposals remain parked.
 
 ## Start here
 
 Worktree: `/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface`, branch `spike/mac-audio-interface`. The root worktree holds private recordings and the shared Python environment. Read [CLAUDE.md](CLAUDE.md), [current lessons](research/lessons.md), and [Mac interface behavior](research/mac-audio-interface.md). Historical details remain in [DECISIONS.md](DECISIONS.md) and the [lessons archive](research/archive/lessons-2026-10-10.md).
 
-The overnight detection session starts after reviewed D139 handoff `30639f5` (2026-10-10 01:47 EDT). Opus must compare that base with the final tree, including D140-D147. D147's final one-condition change also has an exact accepted-live baseline in ignored `build/d147/accepted-live-baseline/robot`.
+The overnight detection session starts after reviewed D139 handoff `30639f5` (2026-10-10 01:47 EDT). Opus compares that base with the final tree, including D140-D147. D147's final one-condition change also has an exact accepted-live baseline in ignored `build/d147/accepted-live-baseline/robot`.
 
 ## Accepted runtime
 
@@ -43,15 +43,17 @@ The other session completed checkpoint validation and packaging. [WSL status](be
 
 Root-worktree-only evidence: `/Users/dylanc/Documents/GitHub/qdrant-robot/bench/results/2026-10-10-wsl-checkpoint-validation.json`. Private validation logs and the transfer archive remain under that root worktree's ignored `build/p2`. Archive size is 8,437,452,800 bytes (E); SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697`. D117 accepts direct checkpoints; another ONNX export or repeated quantization is unnecessary. The completed-job watcher was removed after preserving 27 historical records. Leave Docker/Ollama and other GPU locks untouched.
 
-## Git and final cleanup
+## Git and review checkpoint
 
-HEAD `47f6eff` already contains D140-D146 commits. Final D147 product changes are Focus/main/test_focus/test_things; documentation cleanup covers README, CLAUDE, STATE, lessons/archive, Mac interface, booth guide, decisions, audits, and reviews. Preserve all WSL owner content and include its validated whole-file metadata so the worktree can finish clean.
+Accepted product and cleanup commit `69e0101` follows the D140-D146 commits through `47f6eff`. Final D147 product changes are Focus/main/test_focus/test_things; documentation cleanup covers README, CLAUDE, STATE, lessons/archive, Mac interface, booth guide, decisions, audits, and reviews. Preserve all WSL owner content and include its validated whole-file metadata so the worktree can finish clean.
 
 Repo standing approval permits commit and push after review and the real `tools/githooks` pre-commit hook. No main merge. Stage whole reconciled files; partial staging breaks gate index cleanup.
 
-[Opus full-session review](reviews/20261010-opus-session-hygiene.md) finished with needs-attention and no runtime blocker. Repair spacing, restore machine navigation, clarify the Git/live baselines, and record full-suite evidence before closing. The Sol runtime review passed. The commit hook is pending.
+[Initial Opus review](reviews/20261010-opus-session-hygiene.md) and [final Opus verification](reviews/20261010-opus-session-hygiene-final.md) preserve both verdicts. Final verdict: approve, native exit 0. Opus verified all five findings were repaired, with no runtime, secret, or scope blocker. Historical decision spacing remains preserved; use the readable lessons index.
 
-Next command: `git diff --check`, from this worktree. Finish the documented Opus findings, stage the complete files, and commit with the real hook. Record the hook receipt, request Opus verification of the repairs, and push the accepted checkpoint. Keep the accepted live release unchanged.
+The real commit hook passed on `69e0101`: 90.77 s checks, including the full pytest suite in 88.44 s, native exit 0. The receipt is in the D147 audit; private log is `build/d147/final-commit-hook.log`. Its nonblocking stamp reminder reflects only README, CLAUDE, and 3080 README changes since the Sol review. All four recorded source hashes, two runtime and two test files, match the reviewed and deployed source.
+
+No review or experiment remains active. Final bookkeeping records the approval and parked proposals; current Git history identifies that documentation commit. Next session command: `git status --short --branch`, from this worktree. Read D148 before discussing the parked object gaps; keep live `7f67670fa91e` and rollback `6781adbb7189` unchanged.
 
 ## Parked for the next session
 

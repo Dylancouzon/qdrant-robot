@@ -4,7 +4,7 @@
   "scope": "Unknown focus box styling; user accepts the other current live behavior.",
   "accepted_live_release": "6781adbb7189",
   "candidate_release": "7f67670fa91e",
-  "revision": "47f6eff plus reviewed working changes",
+  "revision": "69e01013848f18a0427de52c807aaf7d2e8dcb11",
   "machine": "Jetson Orin Nano Super 8 GB and Mac development host",
   "final_delta_against_accepted_live": {
     "runtime_conditions_changed": 1,
@@ -44,14 +44,37 @@
     },
     "peer_review": "PASS; source/test scope and action guards verified",
     "formal_review": "PASS; reviews/20261010-093839-99667-review.md, 247.30s/native0",
-    "required_commit_hook": "Pending",
+    "required_commit_hook": {
+      "command": "git commit with tools/githooks/pre-commit",
+      "native_exit": 0,
+      "elapsed_s": 91.453,
+      "log": "build/d147/final-commit-hook.log",
+      "hook_bypassed": false,
+      "core_hooks_path": "tools/githooks",
+      "commit": "69e01013848f18a0427de52c807aaf7d2e8dcb11",
+      "checks_elapsed_s": 90.77,
+      "pytest_stage_elapsed_s": 88.44,
+      "coverage": "Full repository pytest suite, including robot/test_focus.py and robot/test_things.py; Ruff, Vulture, existing module assertions, Jetson and gate self-checks.",
+      "review_stamp_reminder": {
+        "stamped_runtime_review": "reviews/20261010-093839-99667-review.md",
+        "changed_paths_since_runtime_review": [
+          "CLAUDE.md",
+          "README.md",
+          "boxes/3080/README.md"
+        ],
+        "explanation": "The nonblocking stamp reminder reflects only three documentation files changed since the Sol-reviewed tree. All four recorded source hashes, two runtime and two test files, match; Opus approved the full final session snapshot."
+      }
+    },
     "physical_user_verification": "Accepted by Dylan: Good enough.",
     "opus_hygiene_review": {
-      "verdict": "needs-attention",
-      "report": "reviews/20261010-opus-session-hygiene.md",
+      "verdict": "approve",
+      "report": "reviews/20261010-opus-session-hygiene-final.md",
       "comparison_baseline": "30639f5",
       "runtime_blocker": false,
-      "findings": "Documentation repairs and required full-suite hook receipt are being resolved."
+      "findings": "All five original findings repaired and verified. No runtime, secret, or scope blocker. Final bookkeeping records the result; historical spacing stays preserved and D148 remains parked.",
+      "initial_verdict": "needs-attention",
+      "initial_report": "reviews/20261010-opus-session-hygiene.md",
+      "native_exit": 0
     }
   },
   "prior_measured_first_step": {
