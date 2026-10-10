@@ -76,41 +76,27 @@ def test_live_state_preserves_stream_and_real_text():
         view.close()
 
 
-def test_source_face_inset_draw_and_expiry():
-    import cv2
-    from robot.view import draw
-    frame = np.zeros((240, 320, 3), np.uint8)
-    crop = np.full((80, 60, 3), 180, np.uint8)
-    screen = Screen(face_match=(10, crop, "Ana", (10, 30, 70, 110), 1))
-    fresh = cv2.imdecode(np.frombuffer(draw(frame, screen, 320, 11), np.uint8), cv2.IMREAD_COLOR)
-    expired = cv2.imdecode(np.frombuffer(draw(frame, screen, 320, 12.01), np.uint8),
-                           cv2.IMREAD_COLOR)
-    assert fresh[40:90, 100:130].mean() > 100
-    assert expired.max() == 0 and frame.max() == 0, "source image remains untouched"
-
-
-def test_source_card_position_edges_and_anonymous_body():
-    import cv2
-    from robot.view import draw
-    frame = np.zeros((240, 320, 3), np.uint8)
-    crop = np.full((80, 60, 3), 180, np.uint8)
-    for source_box in ((0, 0, 60, 80), (260, 160, 320, 240)):
-        screen = Screen(boxes=[(100, 10, 220, 230, "", "person")],
-                        face_match=(10, crop, "Ana", source_box, 1))
-        image = cv2.imdecode(np.frombuffer(draw(frame, screen, 320, 11), np.uint8),
-                             cv2.IMREAD_COLOR)
-        # Evidence is beside its source location, and the current body's outline stays anonymous.
-        if source_box[0] == 0:
-            assert image[40:70, 80:100].mean() > 100
-        else:
-            assert image[90:120, 135:165].mean() > 100
-        assert screen.boxes[0][4:] == ("", "person") and frame.max() == 0
-
-
-def test_source_card_suppressed_without_room():
-    import cv2
-    from robot.view import draw
-    frame = np.zeros((60, 100, 3), np.uint8)
-    screen = Screen(face_match=(10, np.full((80, 60, 3), 180, np.uint8), "Ana", (0, 0, 60, 80), 1))
-    image = cv2.imdecode(np.frombuffer(draw(frame, screen, 100, 11), np.uint8), cv2.IMREAD_COLOR)
-    assert image.max() == 0
+def test_authenticated_item_actions_and_state_publication():
+    import json
+    calls, displays = [], []
+    screen = Screen(control={"session": "test"}, ignored_items=[{"id": "p", "title": "Cup"}])
+    view = View(lambda: (displays.append(1), screen), 0, TOKEN,
+                action=lambda action, data: calls.append((action, data)) or data.get("valid"),
+                state=lambda: (None, screen))
+    conn = http.client.HTTPConnection("127.0.0.1", view.port, timeout=2)
+    try:
+        conn.request("GET", f"/state?token={TOKEN}")
+        state = json.loads(conn.getresponse().read())
+        assert not displays and state["ignored_items"][0]["title"] == "Cup"
+        for token, origin, code in (("wrong", f"http://127.0.0.1:{view.port}", 403),
+                                    (TOKEN, "https://evil.test", 403),
+                                    (TOKEN, f"http://127.0.0.1:{view.port}", 202)):
+            conn.request("POST", f"/ignore?token={token}", json.dumps({"valid": True}),
+                         {"Origin": origin})
+            response = conn.getresponse()
+            assert response.status == code
+            response.read()
+        assert calls == [("ignore", {"valid": True})]
+    finally:
+        conn.close()
+        view.close()

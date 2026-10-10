@@ -16,8 +16,6 @@ import numpy as np
 
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, other, or person
 Box = tuple[int, int, int, int, str, str]
-FaceMatch = tuple[float, np.ndarray, str, tuple[int, int, int, int], int]
-# Source capture time, exact crop, name, source face box, source person ID (gap rejection only).
 BOUNDARY = b"frame"
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."
@@ -37,7 +35,8 @@ class Screen:
     memory: dict | None = None
     transcript: list[dict] = field(default_factory=list)  # transient, bounded by the Robot
     evidence: dict = field(default_factory=dict)  # supplied to the current answer
-    face_match: FaceMatch | None = None
+    control: dict = field(default_factory=dict)
+    ignored_items: list[dict] = field(default_factory=list)
 
 
 Source = Callable[[], tuple[np.ndarray | None, Screen]]
@@ -85,30 +84,6 @@ def draw(frame: np.ndarray, screen: Screen, width: int, now: float) -> bytes:
     img = cv2.resize(frame, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     for box in screen.boxes:
         _box(img, box, scale)
-    if screen.face_match and 0 <= now - screen.face_match[0] <= 2 and \
-            img.shape[0] > 72 and img.shape[1] > 16:
-        taken, crop, name, source_box, _ = screen.face_match
-        # Every word stays inside this source-evidence card, never on a current body.
-        age = f"Matched {now - taken:.1f}s ago"
-        factor = min(112 / crop.shape[1], 112 / crop.shape[0],
-                     (img.shape[1] - 16) / crop.shape[1],
-                     (img.shape[0] - 72) / crop.shape[0])
-        face = cv2.resize(crop, (max(1, round(crop.shape[1] * factor)),
-                                 max(1, round(crop.shape[0] * factor))))
-        fh, fw = face.shape[:2]
-        tw = max(cv2.getTextSize(t, FONT, SMALL, 1)[0][0] for t in (name, age))
-        w, h = min(img.shape[1], max(fw, tw) + 16), fh + 56
-        x = round(source_box[2] * scale) + 12
-        if x + w > img.shape[1]:
-            x = round(source_box[0] * scale) - w - 12
-        x = max(0, min(x, img.shape[1] - w))
-        y = max(0, min(round(source_box[1] * scale), img.shape[0] - h))
-        cv2.rectangle(img, (x, y), (x + w - 1, y + h - 1), (20, 35, 25), -1)
-        img[y + 8:y + 8 + fh, x + 8:x + 8 + fw] = face
-        cv2.rectangle(img, (x, y), (x + w - 1, y + h - 1), STYLE["known"][0], 1)
-        for row, text in enumerate((name, age)):
-            cv2.putText(img, text, (x + 8, y + fh + 27 + 18 * row),
-                        FONT, SMALL, WHITE, 1, cv2.LINE_AA)
     events = [text for t, text in screen.events if now - t < EVENT_S][-2:]
     strip = "   ".join([screen.status, *events]).strip()
     if strip:
@@ -129,9 +104,11 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_error(403)
             return
         if urlparse(self.path).path == "/state":
-            _, screen = view.source()
+            _, screen = view.state()
             data = json.dumps({"status": screen.status, "transcript": screen.transcript,
-                               "evidence": screen.evidence, "memory": screen.memory}).encode()
+                               "evidence": screen.evidence, "memory": screen.memory,
+                               "control": screen.control,
+                               "ignored_items": screen.ignored_items}).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Cache-Control", "no-store")
@@ -159,6 +136,29 @@ class _Handler(BaseHTTPRequestHandler):
             due = max(due + 1 / view.fps, time.monotonic())
             view.stopped.wait(due - time.monotonic())
 
+    def do_POST(self) -> None:  # noqa: N802
+        view = self.server.view
+        parsed = urlparse(self.path)
+        token = parse_qs(parsed.query).get("token", [""])[0]
+        origin = f"http://127.0.0.1:{view.port}"
+        if not hmac.compare_digest(token.encode(), view.token) or \
+                self.headers.get("Host") != origin.removeprefix("http://") or \
+                self.headers.get("Origin") != origin:
+            self.send_error(403)
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= 4096 or parsed.path not in ("/ignore", "/restore"):
+                raise ValueError
+            data = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            self.send_error(400)
+            return
+        accepted = view.action and view.action(parsed.path[1:], data)
+        self.send_response(202 if accepted else 409)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def log_message(self, *args) -> None:
         pass  # the request line carries the token: never log it
 
@@ -173,9 +173,11 @@ class View:
     `source` returns the newest frame and what to draw over it."""
 
     def __init__(self, source: Source, port: int, token: str, host: str = "127.0.0.1",
-                 fps: float = 10, width: int = 960):
+                 fps: float = 10, width: int = 960, action=None, state=None):
         if not token:
             raise ValueError("the view needs a token")
+        self.action = action
+        self.state = state or source
         self.source, self.token, self.fps, self.width = source, token.encode(), fps, width
         self.lock, self.viewer, self.stopped = threading.Lock(), 0, threading.Event()
         self.server = _Server((host, port), _Handler)

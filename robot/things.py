@@ -17,6 +17,7 @@ from qdrant_edge import (
     FieldCondition,
     Filter,
     MatchAny,
+    MatchValue,
     HasIdCondition,
     MultiVectorComparator,
     MultiVectorConfig,
@@ -86,6 +87,8 @@ class Things:
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={"crops": EdgeVectorParams(
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
+        self.items = self.shard.scroll(ScrollRequest(limit=1000, with_payload=True,
+            filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))[0]
 
     def name(self, name: str, labels: list[str], crops: np.ndarray) -> str:
         """Store `name` (one point per name: naming it again replaces the crops) for an object
@@ -110,13 +113,19 @@ class Things:
                 [_id(name)], {"turns": self._turns(name) + [turn]}))
             self.shard.flush()
 
-    def named(self, name: str, labels: Collection[str]) -> dict | None:
+    def named(self, name: str, labels: Collection[str],
+              include_ignored: bool = False) -> dict | None:
         """The payload of the object called `name`, else of one named with one of `labels`
         ("my watch" finds the watch the visitor called "my grandmother's")."""
         found = self.shard.retrieve([_id(name)], True, False)
         if not found and labels:
             found = self.shard.scroll(ScrollRequest(limit=1, with_payload=True, filter=Filter(
-                must=[FieldCondition(key="labels", match=MatchAny(list(labels)))])))[0]
+                must=[FieldCondition(key="name", is_empty=False),
+                      FieldCondition(key="labels", match=MatchAny(list(labels)))],
+                must_not=[HasIdCondition({_id(n) for n in self.hidden_names()})]
+                if self.hidden_names() and not include_ignored else None)))[0]
+        if found and not include_ignored and found[0].payload["name"] in self.hidden_names():
+            return None
         return found[0].payload if found else None
 
     def labels(self) -> set[str]:
@@ -131,15 +140,18 @@ class Things:
             must=[FieldCondition(key="name", is_empty=False)],
             must_not=[FieldCondition(key="labels", match=MatchAny(list(skip)))]
             if skip else None)))[0]
-        return {r.payload["name"]: r.payload.get("turns", []) for r in rows}
+        return {r.payload["name"]: r.payload.get("turns", []) for r in rows
+                if r.payload["name"] not in self.hidden_names()}
 
     def score(self, crop: np.ndarray, name: str | None = None) -> tuple[str, float] | None:
         """(name, MaxSim score) of the named object nearest `crop` (or of `name`), whatever
         its label: the detector's labels are hints (D61), one object can get several."""
         hits = self.shard.query(QueryRequest(
             limit=1, query=Query.Nearest([crop.tolist()], using="crops"), with_payload=["name"],
-            filter=Filter(must=[HasIdCondition({_id(name)})])
-            if name else None))
+            filter=Filter(must=[FieldCondition(key="name", is_empty=False),
+                               *([HasIdCondition({_id(name)})] if name else [])],
+                          must_not=[HasIdCondition({_id(n) for n in self.hidden_names()})]
+                          if self.hidden_names() else None)))
         return (hits[0].payload["name"], hits[0].score) if hits else None
 
     def forget(self, name: str) -> list:
@@ -161,6 +173,46 @@ class Things:
         found = self.shard.scroll(ScrollRequest(limit=1000, with_payload=["ignore"], filter=Filter(
             must=[FieldCondition(key="ignore", is_empty=False)])))[0]
         return {r.payload["ignore"] for r in found}
+
+    def preferences(self) -> list[dict]:
+        return [{"id": str(r.id), "title": r.payload["title"]} for r in self.items]
+
+    def hidden_names(self) -> set[str]:
+        return {n for r in self.items for n in r.payload.get("excludes", [])}
+
+    def descriptors(self, name: str) -> np.ndarray:
+        rows = self.shard.retrieve([_id(name)], False, True)
+        return np.asarray(rows[0].vector["crops"], dtype=np.float32)
+
+    def excluded(self, crop: np.ndarray) -> str | None:
+        if not self.items:
+            return None
+        hits = self.shard.query(QueryRequest(limit=1,
+            query=Query.Nearest([crop.tolist()], using="crops"), with_payload=False,
+            filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))
+        return str(hits[0].id) if hits and hits[0].score >= MATCH else None
+
+    def ignore_item(self, title: str, crops: np.ndarray) -> str:
+        """Persist descriptors only, separately from names, media, and category rules."""
+        rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=["name"],
+            with_vector=True, filter=Filter(must=[FieldCondition(key="name", is_empty=False)])))[0]
+        excludes = [r.payload["name"] for r in rows
+                    if np.max(crops @ np.asarray(r.vector["crops"]).T) >= MATCH]
+        ident = str(uuid.uuid4())
+        self.shard.update(UpdateOperation.upsert_points([Point(ident,
+            {"crops": crops[:SHOTS].tolist()},
+            {"type": "item_ignore", "title": title, "excludes": excludes})]))
+        self.shard.flush()
+        self.items = self.shard.retrieve([*[r.id for r in self.items], ident], True, False)
+        return ident
+
+    def restore_item(self, ident: str) -> bool:
+        if ident not in {str(r.id) for r in self.items}:
+            return False
+        self.shard.update(UpdateOperation.delete_points([ident]))
+        self.shard.flush()
+        self.items = [r for r in self.items if str(r.id) != ident]
+        return True
 
 
 def _id(key: str) -> str:

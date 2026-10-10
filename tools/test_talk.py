@@ -372,3 +372,75 @@ def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
     args, kw = run_calls[0]
     assert "test-only-secret" in kw["input"]
     assert all("test-only-secret" not in arg for arg in args)
+
+
+def test_item_proxy_requires_cookie_and_forwards_bounded_body():
+    from email.message import Message
+    handler = talk.Handler.__new__(talk.Handler)
+    handler.origin, handler.token = "http://127.0.0.1:8765", "secret"
+    handler.path = "/ignore"
+    handler.headers = Message()
+    for key, value in {"Host": "127.0.0.1:8765", "Origin": handler.origin,
+                       "X-Session-Token": "secret", "Content-Length": "2"}.items():
+        handler.headers[key] = value
+    handler.rfile = io.BytesIO(b"{}")
+    replies, forwarded = [], []
+    handler.reply = lambda *args: replies.append(args)
+    handler.session = types.SimpleNamespace(open_view=lambda path, body: (
+        types.SimpleNamespace(close=lambda: None),
+        types.SimpleNamespace(status=202)))
+    handler.do_POST()
+    assert replies[-1][0] == 403
+    handler.headers["Cookie"] = "edgy=secret"
+    handler.session.open_view = lambda path, body: (forwarded.append((path, body)) or
+        types.SimpleNamespace(close=lambda: None), types.SimpleNamespace(status=202))
+    handler.do_POST()
+    assert replies[-1][0] == 202 and forwarded == [("/ignore", b"{}")]
+
+
+def test_recorded_camera_never_opens_inputstream(monkeypatch):
+    conn, peer = socket.socketpair()
+    streams = []
+    class Out:
+        latency = 0
+        def __init__(self, **kwargs):
+            streams.append(self)
+        def start(self):
+            pass
+        def abort(self):
+            pass
+        def close(self):
+            pass
+        def write(self, data):
+            pass
+    sd = types.SimpleNamespace(query_devices=lambda: [{"name": talk.OUTPUT,
+        "max_output_channels": 2}], check_output_settings=lambda **kwargs: None,
+        OutputStream=Out, InputStream=lambda **kwargs: pytest.fail("opened unattended microphone"),
+        PortAudioError=RuntimeError)
+    monkeypatch.setitem(sys.modules, "sounddevice", sd)
+    monkeypatch.setattr(signal, "signal", lambda *_: None)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
+    audio = talk.NativeAudio(conn.detach(), microphone=False)
+    monkeypatch.setattr(audio, "emit", lambda **kwargs: None)
+    thread = threading.Thread(target=audio.run)
+    thread.start()
+    peer.settimeout(2)
+    assert peer.recv(talk.CHUNK * 2) == bytes(talk.CHUNK * 2)
+    audio.halt()
+    thread.join(2)
+    peer.close()
+    assert len(streams) == 1 and not thread.is_alive()
+
+
+def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
+    instance = talk.Session("release", "/existing/private/fixture.avi")
+    commands = []
+    monkeypatch.setattr(talk, "remote", lambda script: f"{talk.BASE}/releases/release")
+    monkeypatch.setattr(talk, "command", lambda args, env=None: commands.append(args))
+    monkeypatch.setattr(talk.subprocess, "Popen", lambda *args, **kwargs: (
+        (_ for _ in ()).throw(RuntimeError("fake tunnel end"))))
+    monkeypatch.setattr(instance, "cleanup_remote", lambda: "")
+    instance.run()
+    assert commands[0][-2:] == ["--camera-file", "/existing/private/fixture.avi"]
+    assert "--no-microphone" not in commands[0], "native capture flag stays local"
+    assert instance.snapshot()["microphone"] is False

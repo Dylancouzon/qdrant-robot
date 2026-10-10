@@ -37,10 +37,13 @@ class Faces:
 
     def detect(self, bgr: np.ndarray) -> np.ndarray:
         """One row per face, largest first: x, y, w, h, five landmarks as (x, y), score."""
-        self.detector.setInputSize((bgr.shape[1], bgr.shape[0]))
-        faces = self.detector.detect(bgr)[1]
+        scale = min(1.0, 640 / bgr.shape[1])
+        image = cv2.resize(bgr, None, fx=scale, fy=scale) if scale < 1 else bgr
+        self.detector.setInputSize((image.shape[1], image.shape[0]))
+        faces = self.detector.detect(image)[1]
         if faces is None:
             return np.zeros((0, 15), np.float32)
+        faces[:, :14] /= scale  # source bounds and landmarks; alignment uses full-resolution pixels
         return faces[np.argsort(-faces[:, 2] * faces[:, 3])]
 
     def embed(self, crops: list[np.ndarray]) -> np.ndarray:

@@ -33,12 +33,23 @@ def stub_crops(crops: list[np.ndarray]) -> np.ndarray:
 def open_robot(root: Path) -> Robot:
     robot = Robot.__new__(Robot)  # no models: real shards, tracker, and a stub crop embedder
     robot.memory, robot.things, robot.people = Memory(root), Things(root), People(root)
-    robot.crops, robot.faces = stub_crops, None
+    class Owner:
+        faces, crops, epoch = None, staticmethod(stub_crops), 0
+        def call(self, action, mutate=False):
+            self.epoch += bool(mutate)
+            return action(self.faces, self.crops)
+        def submit(self, frame):
+            pass
+    robot.recognition = Owner()
     robot.named, robot.ignored = robot.things.labels(), robot.things.ignored()
     robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
     robot.view, robot.views = (None, {}), deque(maxlen=SHOTS)
-    robot.view_at, robot.view_taken, robot.face_match = 0, 0, None
-    robot.preview_cursor, robot.crop_times = 0, deque()
+    robot.view_at, robot.view_taken, robot.verified = 0, 0, None
+    robot.preview_due = 0
+    robot.camera_source = "Live camera"
+    robot.shown_taken, robot.session_id, robot.control_message = 0, "test-session", ""
+    robot.crop_due, robot.crop_times, robot.matches_pending = {}, deque(), False
+    robot.item_checked = {}
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
@@ -70,8 +81,9 @@ def show(robot: Robot, objects: list[tuple[int, tuple]], frames: int = CONFIRM) 
     for _ in range(frames):
         if found := robot._track(frame, dets):
             robot._sight(found)
-    if robot.named:
-        preview(robot)
+    if robot.named or robot.things.items:
+        for _ in range(max(1, len(robot.view[1]))):
+            preview(robot)
 
 
 def hold(robot: Robot, box: tuple) -> None:
@@ -151,13 +163,14 @@ def test_things(monkeypatch) -> None:
         dets = [Detection("bag", 0.9, CENTER), Detection("chair", 0.9, LEFT)]
         for _ in range(CONFIRM):  # a cup the detector calls a bag, by a chair
             robot._track(frame, dets)
-        assert robot._shown()[0] is frame and {b[4:] for b in robot._shown()[1].boxes} == {
-            ("", "other")}, "the view draws the tracked frame's objects"
+        assert robot._shown()[0] is frame and robot._shown()[1].boxes == [], \
+            "only the unknown teaching focus receives a box"
         hold(robot, CENTER)
         assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the focus, any label"
         robot.focus.thaw()
         assert robot.things.named("cup", ["cup"])["labels"] == ["bag", "cup", "mug"]
-        robot.tracker, robot.points = Tracker(), {}  # as Robot.reset: track ids start over
+        # Robot.reset also clears the old associations.
+        robot.tracker, robot.points, robot.focus = Tracker(), {}, None
         frame[300:600, 540:740] = GOLD
         for _ in range(CONFIRM):  # the gold phone, now called a bag
             if found := robot._track(frame, [Detection("bag", 0.9, CENTER)]):
@@ -244,9 +257,13 @@ def frame_of(r, color=GOLD, label="phone", box=CENTER, people=False):
     return frame
 
 
-def preview(r):
-    r.crop_times.clear()  # each call represents a later idle interval
-    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
+def preview(r, clear=True):
+    if clear:
+        r.crop_times.clear()  # each call represents a later idle interval
+    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
+               {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
+               list(r.screen[1].boxes), r.recognition.epoch)
+    drain_matches(r)
 
 
 def test_text_only_retrieval_and_person_deletion(robot, monkeypatch):
@@ -292,7 +309,7 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     assert r.focus.named[next(iter(r.view[1]))].refreshed == r.view_taken
     assert r.jobs.queue[0][0] == "caption"
     assert ask(r, "Forget my wallet")[0].startswith("Done")
-    assert not list(r.memory.frames.iterdir()) and r.face_match is None and not r.focus.names()
+    assert not list(r.memory.frames.iterdir()) and r.verified is None and not r.focus.names()
     assert r.memory.shard.count(CountRequest()) == 0
     r.brain = SimpleNamespace(caption=lambda *args: pytest.fail("deleted crop was captioned"))
     r.jobs.put(None)
@@ -308,13 +325,19 @@ def test_fresh_recognition_sightings_and_miss(robot):
     r.named = r.things.labels()
     frame_of(r)
     calls = []
-    r.crops = lambda crops: calls.append(1) or stub_crops(crops)
+    r.recognition.crops = lambda crops: calls.append(1) or stub_crops(crops)
     for _ in range(3):
-        r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
+        r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
+               {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
+               list(r.screen[1].boxes), r.recognition.epoch)
+    drain_matches(r)
     assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
     [seen] = r.memory.sightings(time.time() + 1)
     newest = frame_of(r)
-    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
+    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
+               {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
+               list(r.screen[1].boxes), r.recognition.epoch)
+    drain_matches(r)
     assert r._shown()[0] is newest
     assert len(calls) == 3, "idle crop queries are bounded to three per second"
     assert r._shown()[1].boxes[0][4:] == ("wallet", "known"), "skipped query preserves display only"
@@ -381,41 +404,23 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     close_robot(fresh)
 
 
-def test_source_face_inset_and_current_video(robot, monkeypatch):
+def test_verified_face_frame_and_anonymous_replacement(robot, monkeypatch):
     r = robot
     v = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [v, v], time.time())
     source = frame_of(r, people=True)
-    source[100:200, 500:600] = 180
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
     preview(r)
     newer = frame_of(r, BLACK, people=True)
-    r._track(newer, [Detection("phone", 0.9, CENTER),
-                     Detection("person", 0.9, (350, 0, 1050, 720))])
     frame, screen = r._shown()
-    assert frame is newer and all(not b[4] for b in screen.boxes if b[5] == "person")
-    taken, crop, name, source_box, source_id = screen.face_match
-    assert name == "Ana" and taken < r.view_taken
-    assert source_box == (500, 100, 600, 200), "new person motion cannot move source coordinates"
-    assert np.array_equal(crop, source[100:200, 500:600])
-    r.ui_thinking = True
-    assert r._shown()[0] is newer
-    r.ui_thinking = False
-    r.face_match = taken - 3, crop, name, source_box, source_id
-    assert r._shown()[1].face_match is None
-    # A replacement face on the same person track clears the source match.
+    assert frame is source and (500, 100, 600, 200, "Ana", "known") in screen.boxes
+    assert all(not b[4] for b in r.screen[1].boxes if b[5] == "person")
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
                                                                   (500, 100, 600, 200)))
     preview(r)
-    assert r.face_match is None
-    # Two overlapping person boxes make the source association ambiguous.
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
-    tracks = [Track(*t) for t in r.tracker.scored()]
-    r._preview(r.view[0], r.view_taken, tracks + [Track(999, (400, 0, 900, 720), "person", 0.9)])
-    assert r.face_match is None
-    preview(r)
-    assert r.face_match is not None
-    assert r._forget(None, "Ana", v) and r.face_match is None
+    assert r.verified is None and r._shown()[0] is newer
+    assert all(not b[4] for b in r._shown()[1].boxes if b[5] == "person")
+    assert r._forget(None, "Ana", v) and r.verified is None
 
 
 def test_spoken_names_categories_case_and_restart(tmp_path):
@@ -475,24 +480,6 @@ def test_case_only_reteach_and_forget_all_evidence(robot):
     assert not r.focus.names() and not list(r.memory.frames.iterdir())
 
 
-def test_source_face_crop_clamps_edges_and_suppresses_empty(robot, monkeypatch):
-    r = robot
-    v = np.eye(FACE_DIM, dtype=np.float32)[0]
-    r.people.enroll("Ana", [v, v], time.time())
-    frame = frame_of(r)
-    frame[100:200, :80] = 170
-    for _ in range(CONFIRM):
-        r._track(frame, [Detection("phone", 0.9, CENTER),
-                         Detection("person", 0.9, (-100, 0, 1280, 720))])
-    tracks = [Track(*t) for t in r.tracker.scored()]
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (-10, 100, 80, 200)))
-    r._preview(frame, r.view_taken, tracks)
-    assert r.face_match[1].shape == (100, 80, 3) and r.face_match[1].mean() == 170
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (-50, 100, -10, 200)))
-    r._preview(frame, r.view_taken, tracks)
-    assert r.face_match is None, "an out-of-frame match cannot publish an empty crop"
-
-
 def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, monkeypatch):
     r = robot
     frame_of(r)
@@ -500,7 +487,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     r.focus.freeze(track)
     ask(r, "This is my phone")
     ask(r, "Track this as my Dylan's smartphone")
-    crop = r.crops([main.cut(r.view[0], r.view[1][track][1])])[0]
+    crop = r.recognition.crops([main.cut(r.view[0], r.view[1][track][1])])[0]
     assert r.things.score(crop)[0] == "phone", "the old identical alias wins unrestricted search"
     calls = []
     score = r.things.score
@@ -511,7 +498,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     original = time.time()
     monkeypatch.setattr(main.time, "time", lambda: original + 3)
     newest = frame_of(r)
-    assert r._shown()[0] is newest and not r.focus.names(), "display expires during skipped work"
+    assert r._shown()[0] is newest and r.focus.names(), "continuous names survive skipped work"
     assert r.focus.name(track) == "Dylan's smartphone", "continuous track keeps a query preference"
     preview(r)
     assert r.focus.names() == {track: ("Dylan's smartphone", True)}
@@ -519,7 +506,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     # A different instance on an uninterrupted ID must escape the preference after real misses.
     frame_of(r, BLACK)
     preview(r)
-    assert r.focus.names() == {track: ("Dylan's smartphone", False)}
+    assert r.focus.names() == {}
     preview(r)
     preview(r)
     assert r.focus.name(track) is None
@@ -527,7 +514,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     assert calls[-4:] == ["Dylan's smartphone"] * 3 + [None]
     # A gap clears the accepted preference even when the tracker later reuses the ID.
     r.focus.bind(track, "Dylan's smartphone", r.view_taken)
-    r._track(r.view[0], [], r.view_taken)
+    r._track(r.view[0], [], r.view_taken + .21)
     assert r.focus.name(track) is None
     frame_of(r)
     preview(r)
@@ -543,16 +530,184 @@ def test_face_gap_during_generation_rejects_old_preview(robot, monkeypatch):
     v = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [v, v], time.time())
     source = frame_of(r, people=True)
-    source_time = r.view_taken
-    source_tracks = [Track(*t) for t in r.tracker.scored()]
+    source_time, epoch = r.view_taken, r.recognition.epoch
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    epochs = {i: r.focus.epoch(i) for i in r.focus.visible}
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
     preview(r)
-    assert r.face_match is not None
     r.ui_thinking = True
     frame_of(r, people=False)
-    assert r.face_match is None, "absence clears evidence before any renderer request"
-    assert r._shown()[1].face_match is None, "absence clears evidence during generation"
-    r.ui_thinking = False
     frame_of(r, people=True)
-    r._preview(source, source_time, source_tracks)
-    assert r.face_match is None, "in-flight source before a gap cannot restore the card"
+    r.verified = None
+    r._preview(source, source_time, tracks, epochs, r.session_id, [], epoch)
+    assert r.verified is None, "in-flight source cannot publish across a detected gap"
+
+
+def drain_matches(r):
+    retained = []
+    while not r.jobs.empty():
+        job = r.jobs.get_nowait()
+        if job[0] == "matches":
+            _, frame, taken, tracks, hits, person, epochs, session, gallery = job
+            r.matches_pending = False
+            r._remember_matches(frame, taken, tracks, hits, person)
+        else:
+            retained.append(job)
+        r.jobs.task_done()
+    for job in retained:
+        r.jobs.put(job)
+
+
+def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "SETTLE_S", 0)
+    monkeypatch.setattr(main, "face", lambda f, image: None)
+    monkeypatch.setattr(main, "located_face", lambda f, image: None)
+    r = open_robot(tmp_path)
+    try:
+        frame_of(r)
+        track = next(iter(r.view[1]))
+        r.focus.freeze(track)
+        ask(r, "This is my phone")
+        ask(r, "Track this as my Dylan's smartphone")
+        data = r._shown(False)[1].control
+        selected = next(t for t in data["targets"] if t["track"] == track)
+        before = len(list(r.memory.frames.iterdir()))
+        assert r._item_control("ignore", {**data, **selected}).startswith("Okay")
+        assert len(list(r.memory.frames.iterdir())) == before, "preference stores descriptors only"
+        assert r.things.hidden_names() == {"phone", "Dylan's smartphone"}
+        assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0]) is None
+        assert r.things.visual_links() == {} and not r._shown()[1].boxes
+        # Same detector kind, a genuinely different descriptor remains eligible.
+        show(r, [(GOLD, LEFT), (BLACK, RIGHT)])
+        for _ in range(4):
+            preview(r)
+        gold = next(i for i, (_, b) in r.view[1].items() if b == LEFT)
+        black = next(i for i, (_, b) in r.view[1].items() if b == RIGHT)
+        assert gold in r.focus.excluded and black not in r.focus.excluded
+        assert r.things.excluded(stub_crops([np.full((4, 4, 3), BLACK)])[0]) is None
+        assert ask(r, "Forget my Dylan's smartphone")[0].startswith("Done")
+        assert r.things.preferences(), "named deletion preserves independent item preference"
+    finally:
+        close_robot(r)
+    fresh = open_robot(tmp_path)
+    try:
+        frame_of(fresh)
+        assert not fresh._shown()[1].boxes, "return waits for persisted preference qualification"
+        assert fresh.focus.checking and not fresh.focus.excluded
+        assert fresh._sighted(Turn(question="Where is the phone?",
+                                  speech_start=time.time() + 1)) is None
+        preview(fresh)
+        assert fresh.focus.excluded and not fresh._shown()[1].boxes
+        ident = fresh.things.preferences()[0]["id"]
+        assert fresh._item_control("restore", {"session": fresh.session_id,
+            "gallery": fresh.recognition.epoch, "id": ident}).startswith("I will notice")
+        assert fresh.things.preferences() == [] and not fresh.focus.excluded
+    finally:
+        close_robot(fresh)
+
+
+def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.freeze(track)
+    data = r._shown(False)[1].control
+    selected = next(t for t in data["targets"] if t["track"] == track)
+    data = {**data, **selected}
+    assert r._control("ignore", {**data, "session": "old"}) is False
+    assert r._control("ignore", data)
+    r._track(r.view[0], [], r.view_taken + .01)
+    assert r._item_control("ignore", data).startswith("That selection expired")
+    assert not r.things.preferences()
+    frame_of(r)
+    r.focus.freeze(track)
+    state = r._shown(False)[1].control
+    data = {**state, **state["targets"][0]}
+    assert r._item_control("ignore", data).startswith("Okay")
+    assert r.things.labels() == set() and r.things.preferences()
+    frame_of(r, BLACK)
+    preview(r)
+    assert not r.focus.excluded, "empty named gallery still runs preference matching"
+
+
+def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.freeze(track)
+    ask(r, "This is my phone")
+    ask(r, "Track this as my Dylan's smartphone")
+    r.things.ignore_item("Other phone", stub_crops([np.full((4, 4, 3), BLACK)]))
+    preview(r)
+    assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0])[0] == "phone"
+    old_epoch, source = r.focus.epoch(track), r.view_taken
+    r.crop_times.extend([time.monotonic()] * (3 - len(r.crop_times)))
+    before = r.memory.sightings(time.time() + 1)
+    r._track(r.view[0], [], source + .05)
+    assert any(b[4] == "Dylan's smartphone" for b in r.focus.boxes([], [], source + .05))
+    monkeypatch.setattr(main.time, "time", lambda: source + .10)
+    moved = tuple(v + (20 if i % 2 == 0 else 0) for i, v in enumerate(CENTER))
+    frame_of(r, box=moved)
+    assert track in r.focus.checking and r.focus.epoch(track) > old_epoch
+    preview(r, clear=False)
+    monkeypatch.setattr(main.time, "time", lambda: source + .15)
+    frame_of(r, box=moved)
+    assert r.focus.name(track) == "Dylan's smartphone"
+    assert r.focus.seen[track].shown != moved, "pending checks preserve box smoothing"
+    assert any(b[4] == "Dylan's smartphone" for b in r._shown()[1].boxes)
+    assert not r._shown(False)[1].control["targets"], "cached display cannot authorize actions"
+    assert r.memory.sightings(source + 1) == before, "no query means no new sighting writes"
+    preview(r)
+    assert track not in r.focus.checking
+    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+
+
+def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeypatch):
+    r = robot
+    show(r, [(GOLD, CENTER), (BLACK, LEFT)])
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    ask(r, "Track this as my Dylan's smartphone")
+    chosen = next(i for i, (_, b) in r.view[1].items() if b == CENTER)
+    other = next(i for i in r.view[1] if i != chosen)
+    calls, original = [], r.things.score
+    monkeypatch.setattr(r.things, "score",
+                        lambda v, name=None: calls.append(name) or original(v, name))
+    moved = (560, 300, 760, 600)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    frame[300:600, 560:760], frame[300:600, 100:300] = GOLD, BLACK
+    dets = [Detection("phone", .21, moved), Detection("phone", .21, LEFT)]
+    r._track(frame, dets)
+    assert r.focus.name(chosen) == "Dylan's smartphone"
+    assert r.focus.seen[chosen].shown != moved, "the confidence dip preserves smoothing"
+    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
+    assert not r.focus.eligible(Track(*next(t for t in r.tracker.scored() if t[0] == other)))
+    assert [b[4] for b in r._shown()[1].boxes] == ["Dylan's smartphone"]
+    r.crop_due.clear()
+    preview(r)
+    assert calls == ["Dylan's smartphone"], "a low-confidence chosen track still gets a crop query"
+    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
+    frame[300:600, 560:760] = BLACK
+    r._track(frame, dets)
+    preview(r)
+    assert calls[-1] == "Dylan's smartphone"
+    assert not r.focus.names() and not r._shown()[1].boxes, "a crop miss downgrades immediately"
+    preview(r)
+    preview(r)
+    assert r.focus.name(chosen) is None, "three fresh misses clear the low-confidence preference"
+
+
+def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypatch):
+    r = robot
+    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.named = r.things.labels()
+    r.ui_thinking = True
+    show(r, [(GOLD, LEFT), (BLACK, CENTER), (90, RIGHT)])
+    queries = []
+    original = r.recognition.crops
+    r.recognition.crops = lambda crops: queries.append(round(crops[0].mean())) or original(crops)
+    r.crop_due.clear()
+    for _ in range(3):
+        preview(r)
+    assert set(queries) == {GOLD, BLACK, 90}, "oldest due visits each track during generation"
+    assert any(b[4] == "Chosen" for b in r._shown()[1].boxes)

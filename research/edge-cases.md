@@ -70,4 +70,6 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - D129-D131 review87875: after a tracking gap or restart, equal crop scores can recover an older alias. Historical rename/alias migration is outside this task. A possessive "What about Ana's smartphone?" parses the name without a reply mode; carry until observed.
 
-- D134 preview: a continuous person ID can change label away and back without resetting source continuity. A delayed exact-source card can return within two seconds; no name labels current body pixels. If observed, invalidate sources before that person-label interruption. Card clamping can overlap the source face when neither side has room; use fixed-corner fallback if human testing finds it obstructive. Sol45876 PASS carries both under D71.
+- D136 review20183: a new turn can arrive during scripted Robot.reset after job drain and before recognition owner replacement. Existing external replay callers serialize reset and turns. Coordinate turn admission if this overlap becomes supported or observed; no admission redesign in the common booth continuity repair. Item-check departed-track retention was fixed through existing Focus lifecycle pruning.
+
+- D136 review30274 PASS: uninterrupted object replacement before fresh verification can make Ignore use the accepted previous name's stored descriptors. If observed, verify the selected current crop before preference persistence. Final D136 moves inventory reads into admitted crop queries without a cache.

@@ -49,16 +49,20 @@ def level(pcm: np.ndarray) -> float:
     return float(np.max(np.abs(pcm.astype(np.float32)), initial=0) / 32768)
 
 
-def devices(sd) -> tuple[int, int]:
+def devices(sd, microphone=True) -> tuple[int | None, int]:
     found = sd.query_devices()
     chosen = []
     for name, direction in ((INPUT, "input"), (OUTPUT, "output")):
+        if direction == "input" and not microphone:
+            chosen.append(None)
+            continue
         matches = [i for i, d in enumerate(found)
                    if d["name"] == name and d[f"max_{direction}_channels"] > 0]
         if len(matches) != 1:
             raise RuntimeError(f"Expected one {name}; found {len(matches)}")
         chosen.append(matches[0])
-    sd.check_input_settings(device=chosen[0], channels=1, dtype="int16", samplerate=RATE_IN)
+    if microphone:
+        sd.check_input_settings(device=chosen[0], channels=1, dtype="int16", samplerate=RATE_IN)
     sd.check_output_settings(device=chosen[1], channels=1, dtype="int16", samplerate=RATE_OUT)
     return tuple(chosen)
 
@@ -66,9 +70,10 @@ def devices(sd) -> tuple[int, int]:
 class NativeAudio:
     """Capture and play one connected stream; the parent can reap native stalls."""
 
-    def __init__(self, fd):
+    def __init__(self, fd, microphone=True):
         import sounddevice as sd
         self.sd = sd
+        self.microphone = microphone
         self.conn = socket.socket(fileno=fd)
         self.stopped = threading.Event()
         self.manual = threading.Event()
@@ -121,26 +126,35 @@ class NativeAudio:
         if self.failure:
             raise RuntimeError(self.failure)
 
+    def silence(self):
+        while not self.stopped.wait(CHUNK / RATE_IN):
+            self.conn.sendall(bytes(CHUNK * 2))
+        if self.failure:
+            raise RuntimeError(self.failure)
+
     def run(self):
         signal.signal(signal.SIGTERM, self.halt)
         threading.Thread(target=self.controls, daemon=True).start()
         try:
             self.emit(phase="Opening MacBook audio")
-            incoming, outgoing = devices(self.sd)
+            incoming, outgoing = devices(self.sd, self.microphone)
             if self.stopped.is_set():
                 return
             out = self.sd.OutputStream(device=outgoing, samplerate=RATE_OUT,
                                        channels=1, dtype="int16")
             self.streams.append(out)
-            mic = self.sd.InputStream(device=incoming, samplerate=RATE_IN, channels=1,
-                                     dtype="int16", blocksize=CHUNK)
-            self.streams.append(mic)
             out.start()
-            mic.start()
+            if self.microphone:
+                mic = self.sd.InputStream(device=incoming, samplerate=RATE_IN, channels=1,
+                                         dtype="int16", blocksize=CHUNK)
+                self.streams.append(mic)
+                mic.start()
+            else:
+                self.emit(muted=True)
             self.emit(phase="Listening")
             self.receiver = threading.Thread(target=self.answers, daemon=True)
             self.receiver.start()
-            self.capture(mic)
+            self.capture(mic) if self.microphone else self.silence()
         finally:
             self.halt()
             for stream in reversed(self.streams):
@@ -180,8 +194,9 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Own one remote session and tunnel, and keep the page reusable after cleanup."""
 
-    def __init__(self, release: str):
+    def __init__(self, release: str, camera_file: str | None = None):
         self.release = release
+        self.camera_file = camera_file
         self.view_port = self.view_token = None
         self.lock = threading.Lock()
         self.stopped = threading.Event()
@@ -189,7 +204,7 @@ class Session:
         self.child = self.reader = self.unit = None
         self.state = dict(phase="Idle", active=False, muted=False, error="",
                           input=INPUT, output=OUTPUT, input_level=0, output_level=0,
-                          view_ready=False)
+                          view_ready=False, microphone=not bool(camera_file))
 
     def update(self, **state):
         with self.lock:
@@ -204,7 +219,8 @@ class Session:
             if self.state["active"] or (self.worker and self.worker.is_alive()):
                 return
             self.stopped.clear()
-            self.state.update(phase="Connecting", active=True, muted=False, error="")
+            self.state.update(phase="Connecting", active=True,
+                              muted=bool(self.camera_file), error="")
             self.worker = threading.Thread(target=self.run, daemon=True)
             self.worker.start()
 
@@ -219,6 +235,8 @@ class Session:
             self.worker.start()
 
     def mute(self):
+        if self.camera_file:
+            return  # recorded-view qualification never enables microphone capture
         with self.lock:
             child = self.child
             if child and child.poll() is None:
@@ -260,7 +278,9 @@ class Session:
             return
         self.update(view_ready=True)
         child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
-                                  "--audio-fd", str(conn.fileno())], pass_fds=(conn.fileno(),),
+                                  "--audio-fd", str(conn.fileno()),
+                                  *(["--no-microphone"] if self.camera_file else [])],
+                                 pass_fds=(conn.fileno(),),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, text=True)
         with self.lock:
@@ -277,16 +297,20 @@ class Session:
                 message = child.stderr.read().strip()[-1500:]
                 raise RuntimeError(message or "Robot audio disconnected")
 
-    def open_view(self, path):
+    def open_view(self, path, body=None):
         with self.lock:
             if self.stopped.is_set() or not self.state["view_ready"]:
                 raise RuntimeError("Camera session is idle")
             port, token = self.view_port, self.view_token
         connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
         try:
-            connection.request("GET", f"{path}?token={token}")
+            connection.request("POST" if body is not None else "GET",
+                               f"{path}?token={token}", body=body,
+                               headers={"Host": "127.0.0.1:8090",
+                                        "Origin": "http://127.0.0.1:8090",
+                                        "Content-Type": "application/json"})
             response = connection.getresponse()
-            if response.status != 200:
+            if response.status not in (200, 202, 409):
                 raise RuntimeError("Jetson view is unavailable")
             return connection, response
         except Exception:
@@ -342,7 +366,8 @@ class Session:
             self.unit = f"qr-{name}.service"
             self.view_token = secrets.token_hex(32)
             command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
-                     "--", "-m", "robot.main", "--listen", "7070"],
+                     "--", "-m", "robot.main", "--listen", "7070",
+                     *(["--camera-file", self.camera_file] if self.camera_file else [])],
                     env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
             with socket.socket() as reserve, socket.socket() as video_reserve:
                 reserve.bind(("127.0.0.1", 0))
@@ -430,6 +455,25 @@ class Handler(BaseHTTPRequestHandler):
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
+        if self.path in ("/ignore", "/restore"):
+            cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
+            if cookie is None or not secrets.compare_digest(cookie.value, self.token):
+                self.reply(403, b"Forbidden")
+                return
+            connection = None
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                if not 0 < length <= 4096:
+                    self.reply(400, b"Invalid action")
+                    return
+                connection, response = self.session.open_view(self.path, self.rfile.read(length))
+                self.reply(response.status, b"{}")
+            except (ValueError, OSError, RuntimeError, http.client.HTTPException):
+                self.reply(503, b"View unavailable")
+            finally:
+                if connection:
+                    connection.close()
+            return
         if self.path not in ("/start", "/mute", "/stop"):
             self.reply(404, b"Not found")
             return
@@ -442,8 +486,8 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int, release: str) -> None:
-    session = Session(release)
+def serve(port: int, release: str, camera_file: str | None = None) -> None:
+    session = Session(release, camera_file)
     token = secrets.token_urlsafe(32)
     Handler.session = session
     Handler.token = token
@@ -466,10 +510,12 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
     parser.add_argument("--release", help="exact Jetson release printed by tools/jetson.py deploy")
     parser.add_argument("--audio-fd", type=int, help=argparse.SUPPRESS)
+    parser.add_argument("--no-microphone", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--camera-file", help="existing Jetson recorded camera fixture path")
     args = parser.parse_args()
     if args.audio_fd is not None:
-        NativeAudio(args.audio_fd).run()
+        NativeAudio(args.audio_fd, not args.no_microphone).run()
     else:
         if not args.release:
             parser.error("--release is required for the deployed interface release")
-        serve(args.port, args.release)
+        serve(args.port, args.release, args.camera_file)

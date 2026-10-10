@@ -1,0 +1,24 @@
+{
+  "machine": "WSL RTX3080",
+  "measurement_label": "E",
+  "capture_time_utc": "2026-10-10T03:32:57+00:00",
+  "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+  "unit": "p2-trt-quantize-native-retry.service",
+  "invocation": "b9ec1e261ba04407938c9be35eec3f1d",
+  "python_pid": 128544,
+  "active_state": "active/running",
+  "private_raw_path": "Read-only agent selected counter sample, not the earlier lead60batch raw file",
+  "raw_sha256": null,
+  "selected_counters": {
+    "valid_batches": "67",
+    "skipped_nan_batches": "0"
+  },
+  "checkpoint": "absent at this check",
+  "handoff_scope": "User requests findings/artifact inventory only when preparation finishes; defer export/engine/qualification work to another session. No mutation.",
+  "diagnostic_native_exit": 0,
+  "job_final_exit": null,
+  "unit_status_followup": "same active/running invocation; no checkpoint files; unit ExecMainStatus0 is provisional while active",
+  "counter_evidence": "Read-only trt_continue selected py-spy report; raw locals remain private",
+  "unit_memory_bytes": 8546209792,
+  "unit_swap_bytes": 0
+}

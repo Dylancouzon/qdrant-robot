@@ -14,11 +14,11 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from robot.config import MODELS, ROOT
+from robot.config import DETECT_HIGH, DETECT_LOW, MODELS, ROOT
 
 MODEL = MODELS / "detector/yoloe-26n-booth-384x640.onnx"  # recipe: research/detector.md
 INPUT = (384, 640)  # height, width: the 16:9 camera frame letterboxed with little padding
-LOW, HIGH = 0.1, 0.25  # every detection above LOW continues a track; only HIGH starts one
+LOW, HIGH = DETECT_LOW, DETECT_HIGH
 MATCH_IOU = 0.3
 SAME = 0.7  # IoU above which two detections in one frame are one object
 CONFIRM = 3  # frames a track needs before it is reported, so one-frame blips never are
@@ -198,6 +198,7 @@ class Tracker:
     def __init__(self):
         self.tracks: list[_Track] = []
         self.ids = itertools.count(1)
+        self.merged: set[int] = set()
 
     @staticmethod
     def _match(tracks: list[_Track], dets: list[Detection]) -> list[tuple[_Track, Detection]]:
@@ -218,6 +219,7 @@ class Tracker:
         """Feed one frame's detections at time `now`; returns the sightings to remember: a
         track confirmed, moved to another region, relabeled by its majority, gone (unmatched
         for MAX_MISSED frames), or ended (lost for LOST frames with no new track continuing it)."""
+        self.merged.clear()
         dets = distinct(dets)
         high = [d for d in dets if d.conf >= HIGH]
         live = [t for t in self.tracks if t.missed <= MAX_MISSED]
@@ -248,6 +250,7 @@ class Tracker:
                 and dist[id(t)] <= MERGE * width]
         if near:
             old = min(near, key=lambda t: dist[id(t)])
+            self.merged.add(old.id)
             old.det, old.region, old.seen, old.missed = new.det, new.region, new.seen, 0
             old.hits += new.hits
             old.votes.update(new.votes)
@@ -264,7 +267,7 @@ class Tracker:
 
     def scored(self) -> list[tuple[int, tuple[int, int, int, int], str, float]]:
         """(id, box, majority label, its share of the detector score) of the tracks in view()."""
-        return [(t.id, t.det.box, t.label, t.votes[t.label] / t.hits)
+        return [(t.id, t.det.box, t.label, t.det.conf)
                 for t in self.tracks if t.missed == 0 and t.reported]
 
     @staticmethod
