@@ -7,9 +7,10 @@ Main contains the accepted Qwen/UI runtime from `011f522` and the reviewed plann
 | Topic | Outcome | Read next |
 | --- | --- | --- |
 | Accepted robot and UI | D147 preview accepted as good enough. Main preserves its source byte-for-byte. | [UI guide](mac-audio-interface.md), [D147 audit](../bench/results/2026-10-10-d147-box-continuity.json). |
+| Gemma and full-stack compute | Three full-stack arms complete 167 questions each (J). Gemma/CPU fits with 1,026 MiB reserve, but scores 31/47 versus Qwen 39/47 and adds speech latency. Keep current Qwen/CUDA. | [Fit comparison](gemma-fit.md), [complete numeric audit](../bench/results/2026-10-10-gemma-full-stack.json). |
 | Intent, Location, and Owner | Planning only. Seven development sessions contain 30 spoken turns. Owner comes from the named introducer; location comes from the UI. | [Complete plan](answer-evidence.md). |
 | Same-owner duplicate objects and crop backgrounds | D148 grouping policy and background masking remain undecided. Named-owner requirements are selected for a future build. | [Known gaps](edge-cases.md#next-session-object-recognition-discussion). |
-| Acceptance | Physical audio, held-out quality, sustained detection, headroom, no paging, and M4 remain unqualified. | [Current status](../STATE.md). |
+| Acceptance | Every arm misses measured zero-turn paging and detects below 15 fps during synthesis; the sampled model-stack reserve passes. Physical audio, held-out quality, sustained detection, and M4 remain unqualified. | [Current status](../STATE.md). |
 
 ## Completed avenues
 

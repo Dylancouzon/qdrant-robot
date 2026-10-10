@@ -967,3 +967,51 @@ Sol 6.1 task review passes native zero in 220.67 s (E), with no blockers. It ver
 Required source checks pass native zero in 92.39 s (E). Commit and push the records-only spike checkpoint; retain accepted Qwen and all unqualified fit/speech/safety targets.
 Intent parsing and tool execution optimization remain the next session's task. No further Gemma route or integrated replay starts after the frozen quality miss.
 Evidence: reviews/20261010-134937-83780-review.md; bench/results/2026-10-10-gemma-litert-screen.json; research/gemma-fit.md.
+
+
+## Gemma continuation 2026-10-10: Measure full-stack fit despite the preliminary miss
+Dylan explicitly overrides the screen stopping rule and requests complete headroom and speed numbers for Gemma and Qwen before deciding. Preserve the two-net-win result and frozen judgments; adoption remains unqualified.
+Measure accepted Qwen/CUDA Kokoro, Qwen/CPU Kokoro control, and Gemma LiteRT/CPU Kokoro on Jetson with every component resident and exercised. Use unchanged product limits, recorded voice, bounded repeated turns, isolated stores/releases, and native telemetry.
+Do not relax final memory/paging/detection targets, alter source/action routing, shrink other models, or change production links. Intent/tool optimization remains the next session's task. Design review precedes the private runtime adapter.
+Evidence: Dylan's current instruction; research/gemma-fit.md authorized continuation; STATE.md.
+
+
+## Gemma full-stack design 2026-10-10: Measure current deployment first
+Sol 6.1 returns GO WITH CHANGES/native three in 136.25 s (E). Resolve fresh fixture timestamps/real embeddings, descendant PSS/faults/I/O and phase timing, explicit CPU/cancellation/one-session stress, and startup/cache/isolation before implementation.
+The primary comparison is unchanged accepted Qwen/CUDA Kokoro versus Gemma/CPU Kokoro. Qwen/CPU Kokoro remains the placement control and runs last. Use private narrow adapters and existing replay functions; no production runtime or global swap change.
+Evidence: reviews/20261010-140209-99264-design.md; research/gemma-fit.md authorized continuation; STATE.md.
+
+## Full-stack scope 2026-10-10: Log incidental product bugs
+Dylan directs that main-runtime bugs discovered during this comparison stay unchanged. Record them with the known gaps instead of repairing them in this session.
+Keep changes limited to private fit/speed instrumentation and evidence records. Intent/tool work remains next session.
+Evidence: Dylan's current instruction; STATE.md; research/edge-cases.md.
+
+## Review selection 2026-10-10: Use Claude Code Opus 5.5
+Dylan selects Claude Code Opus 5.5 as reviewer whenever needed for the rest of this session. It replaces the default Sol task review for this continuation.
+Use the cc:review workflow for the completed comparison. Keep frozen three-vote gpt-6-sol answer scoring unchanged across arms.
+Evidence: Dylan's current instruction; STATE.md.
+
+## Gemma full-stack result 2026-10-10: Retain current Qwen/CUDA
+All three arms finish 167 questions (J). Gemma/CPU fits with 1,026.28 MiB headroom, but scores 31/47 recorded answers versus Qwen 39/47; first synthesized audio is 4.902/7.557 s versus 1.587/2.088 s p50/p95.
+Qwen/CPU records 992.20 MiB reserve and unchanged 39/47 quality, but latency rises to 3.377/4.998 s. Both CPU arms show zero process-tree swap; small system paging remains.
+Reject Gemma adoption under these frozen limits and retain current Qwen/CUDA. Keep unmet acceptance targets, main bugs, and next-session intent/tool work visible. No deployment or runtime fix follows this experiment.
+Evidence: bench/results/2026-10-10-gemma-full-stack.json; research/gemma-fit.md; private build/gemma-fit-20261010/full-stack/jetson-evidence.
+
+
+## Full-stack review resolution 2026-10-10: Expose measured paging misses
+Claude Code Opus 5.5 returns PASS WITH CHANGES. Every arm misses zero-turn paging: recorded windows 36/48, nine/48, 10/48; stress 23/120, five/120, five/120 (current Qwen, Gemma, CPU Qwen; J).
+Qwen/CPU sharply reduces paging but adds 1.790 s p50 speech latency. Its unchanged quality applies only to recorded questions; stress loses four net judged answers and five net joint passes, with unverified cause.
+Correct the review denominators from 47 questions to 48 actual turns and its joint net loss from six to five (six losses, one win). Preserve the verbatim report; clarify missing Qwen generation fps and the aggregate JSON exception.
+Evidence: reviews/20261010-opus55-full-stack-review.md; bench/results/2026-10-10-gemma-full-stack.json; research/gemma-fit.md. Retain current Qwen/CUDA and all unmet targets; rerun review after these material record corrections.
+
+
+## Full-stack review follow-up 2026-10-10: Reconcile the experiment index
+The second Opus review verifies all numeric corrections but finds the stale acceptance row. Replace it with sampled reserve passes and measured paging misses. Mark synthesis detection below 15 fps for all arms; sustained physical detection remains unqualified.
+Keep earlier decision entries unchanged under the repository append-only rule, rejecting the reviewer's proposed direct edit. The linked resolutions qualify recorded-only quality and report stress losses and paging misses; retain existing historical spacing.
+Evidence: reviews/20261010-opus55-full-stack-recheck-review.md; research/experiments.md; research/gemma-fit.md; bench/results/2026-10-10-gemma-full-stack.json.
+
+
+## Full-stack final review 2026-10-10: Close the measured comparison
+Claude Code Opus 5.5 returns PASS with no blockers. Its final text nits shorten the topic review paragraph, expose synthesis detection shortfalls in the index, and use the existing detection-target wording.
+Retain current Qwen/CUDA, preserve measured paging and detection misses, and commit/push the records-only spike. Intent parsing and tool execution optimization remain next session; main-runtime bugs stay logged without fixes.
+Evidence: reviews/20261010-opus55-full-stack-final-review.md; bench/results/2026-10-10-gemma-full-stack.json; research/gemma-fit.md; STATE.md.

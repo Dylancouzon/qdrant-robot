@@ -2337,3 +2337,95 @@
 {"key": "b07306c9cd9a4b35", "pass": false, "why": "Does not say he looks like he is having fun.", "votes": [false, false, false]}
 {"key": "8a22aaf08ac77ab4", "pass": false, "why": "Does not mention the green apples.", "votes": [false, false, false]}
 {"key": "fd16678d100203f9", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}
+{"key": "cb3f7eae34a78f42", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "bc10af65d92f3329", "pass": false, "why": "Calls it surfing and leaves drowning uncertain.", "votes": [false, false, false]}
+{"key": "5b2a234f085e9721", "pass": false, "why": "Does not recall the stop sign.", "votes": [false, false, false]}
+{"key": "32220f96ec0ee2ab", "pass": false, "why": "Does not recall the motorcycle.", "votes": [false, false, false]}
+{"key": "1939e5e0c17c5c5c", "pass": true, "why": "Correctly says Qdrant is written in Rust.", "votes": [true, true, true]}
+{"key": "10e82114c40bbfae", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "df27306539f16805", "pass": true, "why": "Correctly recalls espresso.", "votes": [true, true, true]}
+{"key": "b124c9d8e070a139", "pass": true, "why": "Correctly says the bus is red.", "votes": [true, true, true]}
+{"key": "c6609c0d8edd3819", "pass": true, "why": "Correctly reads route 15.", "votes": [true, true, true]}
+{"key": "f580454d28629e1b", "pass": true, "why": "Correctly reads Metrocentre and via Bens.", "votes": [true, true, true]}
+{"key": "81475458dd9f7e93", "pass": true, "why": "Identifies the red double-decker bus.", "votes": [true, true, true]}
+{"key": "1b45faf3c50d3263", "pass": true, "why": "Says the apple was shown first.", "votes": [true, true, true]}
+{"key": "e8b7838b3cd64325", "pass": true, "why": "Says the bus came after the fruit.", "votes": [true, true, true]}
+{"key": "450b692eb073cf05", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}
+{"key": "7d130db34e568a58", "pass": true, "why": "Places Qdrant Edge memory on the robot's disk.", "votes": [true, true, true]}
+{"key": "6501d834949bc18c", "pass": true, "why": "Suggests the person is enjoying the wave.", "votes": [true, true, true]}
+{"key": "e21000734c19ece6", "pass": false, "why": "Does not recall the teddy bears.", "votes": [false, false, false]}
+{"key": "db23ffc56fa27cc0", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
+{"key": "979ea131b1ffb0c9", "pass": false, "why": "Omits the teddy bears and earlier apples.", "votes": [false, false, false]}
+{"key": "224b542351c014e0", "pass": true, "why": "Warmly greets Anna by name.", "votes": [true, true, true]}
+{"key": "e1190a4cb83c95a7", "pass": false, "why": "Does not say how its day is going.", "votes": [false, false, false]}
+{"key": "a2b2bf5879dbd0c5", "pass": true, "why": "Correctly recalls Anna's name.", "votes": [true, true, true]}
+{"key": "44a2067e57e18526", "pass": false, "why": "Omits the rack and microphone; adds an unsupported door.", "votes": [false, false, false]}
+{"key": "55d735b29f5a888d", "pass": false, "why": "Does not respond to the visitor liking green.", "votes": [false, false, false]}
+{"key": "ed519d5c0f7cdb7c", "pass": true, "why": "Tells a short joke.", "votes": [false, true, true]}
+{"key": "ab7d55897e1d2025", "pass": true, "why": "Correctly recalls green.", "votes": [true, true, true]}
+{"key": "d50f8942815ac96d", "pass": true, "why": "Tells a short joke.", "votes": [false, true, true]}
+{"key": "4992a72cb3a5f56a", "pass": true, "why": "Correctly recalls green.", "votes": [true, true, true]}
+{"key": "5aba76b41c744e50", "pass": true, "why": "Acknowledges the visitor's favorite color.", "votes": [true, true, true]}
+{"key": "901dd61434fd5a50", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "0105d7de5ed0c126", "pass": true, "why": "Says five.", "votes": [true, true, true]}
+{"key": "32f919810d1da785", "pass": false, "why": "Omits the clothes rack and microphone.", "votes": [false, false, true]}
+{"key": "f51f3725e9dd9fd1", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "1b2e87393c0f70f9", "pass": true, "why": "Says eight.", "votes": [true, true, true]}
+{"key": "b767a97c2bf56b9c", "pass": true, "why": "Describes the chair, microphone, and clothes rack.", "votes": [true, true, true]}
+{"key": "ec00aa07347c3897", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "10c8a1e7fa18235d", "pass": true, "why": "Says eight.", "votes": [true, true, true]}
+{"key": "6f0a6a88b9e804c5", "pass": true, "why": "Says five.", "votes": [true, true, true]}
+{"key": "1f126597f12201f9", "pass": true, "why": "Describes the chair, clothes rack, and microphone.", "votes": [true, true, true]}
+{"key": "bb8b71d8a02953af", "pass": true, "why": "Identifies the stop sign.", "votes": [true, true, true]}
+{"key": "8e3a0f34674c5c5d", "pass": false, "why": "Does not remember the stop sign.", "votes": [false, false, false]}
+{"key": "8639e3119d3826e6", "pass": false, "why": "Calls the motorcycle a bicycle.", "votes": [false, false, false]}
+{"key": "24bcf1a71512fbdd", "pass": false, "why": "Does not remember the motorcycle.", "votes": [false, false, false]}
+{"key": "4cfe1b9e2e838b10", "pass": true, "why": "Identifies the cat.", "votes": [true, true, true]}
+{"key": "8bca7d84b89eb481", "pass": true, "why": "Describes the clothes rack and chairs.", "votes": [true, true, true]}
+{"key": "c5dbfb194e8bb9f5", "pass": true, "why": "Does not invent a memory from yesterday.", "votes": [true, true, true]}
+{"key": "20bc5ce3bf280788", "pass": false, "why": "Misses the stop sign and invents a window.", "votes": [false, false, false]}
+{"key": "0d3c40a283220730", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "f135f3829debf3c8", "pass": true, "why": "Remembers espresso.", "votes": [true, true, true]}
+{"key": "36a384253d3c742d", "pass": true, "why": "Says red.", "votes": [true, true, true]}
+{"key": "edc6a44a3abe65bc", "pass": false, "why": "Gives the wrong route number.", "votes": [false, false, false]}
+{"key": "4de50acfbc3ec8ff", "pass": true, "why": "Names Ventura, Hollywood Boulevard, and Sunset Boulevard.", "votes": [true, true, true]}
+{"key": "05208f89e49d71d6", "pass": true, "why": "Counts two planes.", "votes": [true, true, true]}
+{"key": "b3cfe44733f1298d", "pass": false, "why": "Names New York instead of Sydney.", "votes": [false, false, false]}
+{"key": "3984a682ba3c00d7", "pass": true, "why": "Identifies an apple.", "votes": [true, true, true]}
+{"key": "a7a5199bc66f0b0a", "pass": false, "why": "Does not identify the bus.", "votes": [false, false, false]}
+{"key": "90096ea01fcbe04d", "pass": false, "why": "Does not remember the apples came first.", "votes": [false, false, false]}
+{"key": "2d246fb13eee59ec", "pass": false, "why": "Does not remember the bus came second.", "votes": [false, false, false]}
+{"key": "1684537ac937c939", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "885c6b1db1b82fb3", "pass": true, "why": "Identifies a zebra.", "votes": [true, true, true]}
+{"key": "687538f27843fc27", "pass": false, "why": "Calls stand-up paddleboarding surfing.", "votes": [false, false, false]}
+{"key": "422dae5a21688ee9", "pass": true, "why": "Identifies the phone.", "votes": [true, true, true]}
+{"key": "ca3e0f34e9c1fcbd", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}
+{"key": "2164541a8bf944d1", "pass": false, "why": "Does not identify an Apple computer.", "votes": [false, false, false]}
+{"key": "73407c6339d62df7", "pass": false, "why": "Calls the cake a bowl of berries.", "votes": [false, false, false]}
+{"key": "d2061f2785388c93", "pass": true, "why": "Confirms the bookshelf.", "votes": [true, true, true]}
+{"key": "5e33e804239a102e", "pass": true, "why": "Places Qdrant Edge shards on the robot's disk.", "votes": [true, true, true]}
+{"key": "e7b4475098cef3e8", "pass": true, "why": "Responds to the visitor being from Berlin.", "votes": [true, true, true]}
+{"key": "ecacf9c3fbe6b95e", "pass": true, "why": "Names Paris.", "votes": [true, true, true]}
+{"key": "f3290d8002975c47", "pass": true, "why": "Remembers Berlin.", "votes": [true, true, true]}
+{"key": "8537a53ee4fa5202", "pass": true, "why": "Tells a short, understandable joke.", "votes": [true, true, true]}
+{"key": "a70053b5b5c011f2", "pass": true, "why": "Says he looks happy in the waves.", "votes": [true, true, true]}
+{"key": "5183a986176dcba1", "pass": true, "why": "Reacts to the teddy bears.", "votes": [true, true, true]}
+{"key": "76114c6ed9138c9d", "pass": false, "why": "Does not remember the teddy bears.", "votes": [false, false, false]}
+{"key": "3d4c8cbfc17914f0", "pass": false, "why": "Does not say the teddy bears are gone.", "votes": [false, false, false]}
+{"key": "8d4acb1e19194029", "pass": false, "why": "Says nothing about the green apples.", "votes": [false, false, false]}
+{"key": "c9abddd436a908cb", "pass": false, "why": "Does not distinguish teddy bears from apples.", "votes": [false, false, false]}
+{"key": "10234b34420c4799", "pass": true, "why": "Greets the visitor warmly by name.", "votes": [true, true, true]}
+{"key": "29b52a037aa0ffd1", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "054e52dd520a2bf0", "pass": true, "why": "Responds to the visitor liking green.", "votes": [true, true, true]}
+{"key": "97182483c19dab45", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "205c952887cfe0f9", "pass": true, "why": "Says eight.", "votes": [true, true, true]}
+{"key": "aa1f93f89f5b28a7", "pass": false, "why": "Omits the microphone from the room description.", "votes": [true, false, false]}
+{"key": "130ef2fbdccce236", "pass": true, "why": "Acknowledges the visitor likes green.", "votes": [true, true, true]}
+{"key": "58ac627015bebd7a", "pass": true, "why": "Tells a short joke.", "votes": [true, true, true]}
+{"key": "4dd8f1345978d8fc", "pass": false, "why": "Does not say eight.", "votes": [false, false, false]}
+{"key": "b9141d8315f2c903", "pass": false, "why": "Omits the microphone from the room description.", "votes": [true, false, false]}
+{"key": "ed976d4a7e839383", "pass": false, "why": "Does not say eight.", "votes": [false, false, false]}
+{"key": "0e602b83f6cc7f30", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "d0b2ffb2027b7980", "pass": true, "why": "Says espresso.", "votes": [true, true, true]}
+{"key": "7c44482cb99ca211", "pass": true, "why": "Says Hello Kitty.", "votes": [true, true, true]}
+{"key": "fd5a49ae1ca62671", "pass": true, "why": "Says Berlin.", "votes": [true, true, true]}
