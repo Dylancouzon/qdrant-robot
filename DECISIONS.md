@@ -1015,3 +1015,16 @@ Evidence: reviews/20261010-opus55-full-stack-recheck-review.md; research/experim
 Claude Code Opus 5.5 returns PASS with no blockers. Its final text nits shorten the topic review paragraph, expose synthesis detection shortfalls in the index, and use the existing detection-target wording.
 Retain current Qwen/CUDA, preserve measured paging and detection misses, and commit/push the records-only spike. Intent parsing and tool execution optimization remain next session; main-runtime bugs stay logged without fixes.
 Evidence: reviews/20261010-opus55-full-stack-final-review.md; bench/results/2026-10-10-gemma-full-stack.json; research/gemma-fit.md; STATE.md.
+
+
+## Session reconciliation 2026-10-10: Merge findings and preserve the current architecture
+Dylan closes the session and authorizes merging into main after reconciliation. Main 5041aa9 is an ancestor of the reviewed experiment; robot/tools/eval/config remain byte-identical. Use a fast-forward, preserving every measurement and review.
+Expose the final model result and next-session plan in README.md and the experiment index. Archive checkpoint 18d46e8, retain private evidence, and retire the completed spike branch after main and the tag verify remotely.
+Keep Qwen/CUDA and code-owned actions. Intent/tool optimization starts next session with a fixed Qwen baseline; incidental main bugs remain logged without fixes.
+Evidence: research/gemma-fit.md; research/answer-evidence.md; research/archive/experiment-heads-20261010.json; STATE.md; closure review pending.
+
+
+## Closure review receipt 2026-10-10: Reconcile status after the merge
+Claude Code Opus 5.5 approves the records-only reconciliation. Resolve its status findings through this receipt and a final STATE.md rewrite on main before the push; no further review is required for that bookkeeping.
+Lead checks verify all nine local tag targets, including 18d46e8, 42 retained private evidence hashes, complete replays, local links, and Git connectivity. Preserve the archive remotely before retiring the spike branch.
+Evidence: reviews/20261010-opus55-session-closure-review.md; build/gemma-fit-20261010/closure/verification.json; research/archive/experiment-heads-20261010.json; STATE.md.

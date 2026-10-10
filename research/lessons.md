@@ -1,6 +1,6 @@
 # Lessons and evidence index
 
-Updated 2026-10-10 after accepted-source consolidation into main. Use the [experiment index](experiments.md) for outcomes and archived evidence. Read [STATE.md](../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](archive/lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
+Updated 2026-10-10 after accepted-source consolidation and the completed Gemma full-stack comparison. Use the [experiment index](experiments.md) for outcomes and archived evidence. Read [STATE.md](../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](archive/lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
 
 ## Find the current behavior
 
@@ -11,6 +11,7 @@ Updated 2026-10-10 after accepted-source consolidation into main. Use the [exper
 | Detector and TensorRT export | [Detector](detector.md) | D139, D146; [default qualification](../bench/results/2026-10-10-d146-detector-default.json) |
 | Source evidence and answers | [Intent and session plan](answer-evidence.md), [Grounding](grounding.md) | D75, D87-D110; archived controlled comparisons |
 | Faces, consent, and deletion | [Faces](faces.md), [identity design](m3-design.md) | D45, D56, D143 |
+| Model choice and complete-stack fit | [Gemma/Qwen comparison](gemma-fit.md) | Retain Qwen/CUDA; [numeric audit](../bench/results/2026-10-10-gemma-full-stack.json) |
 | Speech, wake word, and model memory | [Runtime stack](stack.md), [wake word](wakeword.md) | D24, D65-D76 |
 | Deployment and recovery | [Project instructions](../CLAUDE.md), [STATE.md](../STATE.md) | `tools/jetson.py` and named units |
 | Known unqualified behavior | [Edge cases](edge-cases.md), [STATE.md](../STATE.md) | Keep limits separate from measured passes |
@@ -94,7 +95,7 @@ Dylan now requires Location and Owner payloads, with UI location entry and owner
 
 Keep main's executable tree identical to accepted 011f522. The ours-strategy history merge retains rejected experiment parents without adopting their code. Archive tags and a verified full Git bundle preserve all original heads. The compact experiment index replaces branch-by-branch context loading. Exact sanitized receipts remain in main; larger historical snapshots remain in Git.
 
-Before removing worktrees, move ignored evidence into canonical build/reconciliation-20261010 and verify each file hash and symlink target. Preserve the canonical environment, secret file, reference clones, remote releases, production stores, and closed backups. Pause the owned preview gracefully. Keep this active session checkout until handback; retire its experimental branch after detaching at main.
+Before removing worktrees, move ignored evidence into canonical build/reconciliation-20261010 and verify each file hash and symlink target. Preserve the canonical environment, secret file, reference clones, remote releases, production stores, and closed backups. Pause the owned preview gracefully. Keep the canonical checkout and ignored evidence. Archive completed experiment heads before retiring their branches, then leave the checkout on main.
 
 ## Gemma budget clarification, 2026-10-10
 
@@ -115,6 +116,8 @@ The pinned full multimodal LiteRT 0.18.0 bundle runs on our Jetson NVIDIA Vulkan
 
 The preliminary task stopped at the frozen quality rule. Dylan then explicitly authorized full-stack fit/speed measurements despite the two-net-win result. Preserve the original rule and judgments, record the override, and measure current Qwen/CUDA against Gemma/CPU. Qwen/CPU is the separate placement control. Stranger safeguards and long-duration paging safety remain unqualified. Standalone Jetson jobs each wrote two system swap pages, including during generation; system counters establish activity but not process attribution. See the Gemma LiteRT result decision, [topic report](gemma-fit.md), and [sanitized audit](../bench/results/2026-10-10-gemma-litert-screen.json).
 
+## Gemma full-stack measurement lessons, 2026-10-10
+
 The private CPU path must keep native generation active during synthesis and drain cancellation callbacks before conversation deletion. The native adapter smoke verifies caption abort, subsequent replies, image blobs, history, CPU provider/thread settings, and speech in one process. Fresh recurring fixture timestamps prevent recognition from expiring while detection still runs. LiteRT uses fixed 70/140/280 vision adapters; its public API has no exact 256-image-token control. Preserve input pixels and record that difference.
 
 Jetson kernel omits /proc/PID/task/TID/children. Traverse PPid relationships from /proc/*/stat to include llama-server descendants. The first full-stack baseline stopped before replay answers; preserve its native interruption and use one diagnosed infrastructure retry.
@@ -124,6 +127,8 @@ Edge experiment stores contain sparse files. Plain rsync -a expands their holes 
 Dylan limits this session to model fit/speed comparison. Log incidental main-runtime issues with the known gaps; change only private measurement instrumentation when needed. Intent/tool work stays next session. Gemma minimum headroom falls from 2,373 MiB during component exercise to 1,406 MiB during first text diagnostics and 1,045 MiB during recorded vision turns (J). Use complete activation for fit conclusions; do not attribute all growth to vision.
 
 Report measurement overhead with integrated results. Process-tree smaps collection takes about 79 ms median per 250 ms baseline interval (J). Those instrumented speeds do not prove equal uninstrumented performance. Keep collector policy fixed across arms and preserve its sample durations. Joint correctness is the intersection of judged answers, speech matches, and unsplit input; neither marginal score substitutes for that count.
+
+## Gemma full-stack result, 2026-10-10
 
 The complete three-arm comparison finishes 167 questions per arm (J). Gemma/CPU fits with 1,026.28 MiB minimum headroom and zero tree VmSwap, but scores 31/47 recorded answers versus Qwen 39/47. First synthesized audio is 4.902/7.557 s p50/p95 versus current Qwen/CUDA 1.587/2.088 s. Qwen/CPU preserves recorded quality and saves headroom, but adds 1.790/2.910 s latency. Keep current Qwen/CUDA; CPU policy includes uninterrupted generation, so its comparison covers both placement and pause removal.
 

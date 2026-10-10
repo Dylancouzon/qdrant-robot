@@ -57,6 +57,14 @@
       "archive_tag": "archive/2026-10-10/p2-trt-edge",
       "accepted_runtime": false,
       "disposition": "historical only"
+    },
+    {
+      "branch": "spike/llm-experiments",
+      "commit": "18d46e8504f692905ff3e35888ea8ae58c9da63c",
+      "archive_tag": "archive/2026-10-10/llm-experiments",
+      "accepted_runtime": false,
+      "disposition": "accepted comparison records; retain Qwen/CUDA; Gemma runtime remains unadopted",
+      "private_evidence": "build/gemma-fit-20261010"
     }
   ],
   "private_archive": "build/reconciliation-20261010",
