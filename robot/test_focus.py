@@ -106,10 +106,10 @@ def test_name_band_and_hysteresis() -> None:
     events, t = run(f, t, DT, [phone()], recognized=sure)
     assert ("name", 1, "Dylan's phone") in events and f.names() == {1: ("Dylan's phone", True)}
     assert f.focus is None, "a named object never holds the focus"
-    assert f.boxes([phone()], [], sure)[0][4:] == ("Dylan's phone", "known")
+    assert f.boxes([phone()], [])[0][4:] == ("Dylan's phone", "known")
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: ("Dylan's phone", 0.79)})
     assert f.names() == {1: ("Dylan's phone", False)}
-    assert f.boxes([phone()], [], {1: ("Dylan's phone", 0.79)})[0][4:] == (
+    assert f.boxes([phone()], [])[0][4:] == (
         "Dylan's phone?", "guess")
     _, t = run(f, t, 2 * DT, [phone()], recognized={1: (None, 0.0)})
     assert f.names(), "two misses keep it"
@@ -126,7 +126,7 @@ def test_guess_never_takes_focus_and_one_box_per_name() -> None:
     run(f, 0, 2 * DT, two, recognized=guess)
     run(f, 1, 1, two)
     assert f.focus is None and f.names() == {2: ("Dylan's phone", False)}
-    kinds = [b[5] for b in f.boxes(two, [], guess)]
+    kinds = [b[5] for b in f.boxes(two, [])]
     assert kinds == ["other", "guess"], kinds
 
 
@@ -160,8 +160,47 @@ def test_small_target_and_fresh_scores() -> None:
     f.freeze(small.id)
     assert f.target([small]) is None and f.boxes([small], []) == []
     f.bind(small.id, "wallet")
-    assert f.boxes([small], [], {small.id: ("wallet", 1)})[0][4:] == ("wallet", "known")
-    assert f.boxes([small], [])[0][4:] == ("", "other")
-    f.update(3, [small], [], recognized={small.id: (None, 0)})
+    assert f.boxes([small], [])[0][4:] == ("wallet", "known")
+    assert f.boxes([small], [], now=4.1) == [], "display expires without a new query"
+    f.update(2.1, [small], [], recognized={small.id: (None, 0)})
     assert f.name(small.id) == "wallet" and not f.names()[small.id][1]
-    assert all(b[5] != "known" for b in f.boxes([small], [], {small.id: (None, 0)}))
+    assert all(b[5] != "known" for b in f.boxes([small], []))
+
+
+def test_display_age_conflicts_gaps_and_delayed_results():
+    f = Focus(W, H)
+    a = phone()
+    f.update(10, [a], [])
+    f.bind(1, "Wallet", 10)
+    f.update(11, [a], [])  # skipped query keeps confidence and source age
+    assert f.boxes([a], [])[0][4:] == ("Wallet", "known")
+    assert f.named[1].refreshed == 10
+    assert not f.names(12.01)
+    f.update(11.1, [a], [], recognized={1: ("Phone", 0.99)})
+    assert not f.names(), "a conflicting positive cannot color the old name"
+    f.update(11.2, [a], [], recognized={1: ("Phone", 0.99)})
+    assert f.names() == {1: ("Phone", True)}
+    f.update(11.3, [a], [], recognized={1: (None, 0)})
+    assert f.names() == {1: ("Phone", False)}, "a genuine miss downgrades immediately"
+    f.update(11.4, [], [])
+    assert not f.names(), "a single detection gap clears the association"
+    f.update(11.5, [a], [], recognized={1: ("Phone", 0.99)}, recognized_at=11.2)
+    assert not f.named, "delayed results cannot survive an ID reused after a gap"
+    f.bind(1, "Phone", 11.2)
+    assert not f.named, "binding source age also respects the gap"
+    f.bind(1, "Phone", 11.5)
+    f.ignored = {"phone"}
+    f.update(11.6, [a], [])
+    assert not f.names(), "ignore clears live associations"
+    f.ignored.clear()
+    f.update(11.7, [a], [], recognized={1: ("Pending", 0.99)})
+    f.forget("Pending")
+    assert not f.named, "forget also clears a pending name"
+
+
+def test_epoch_two_query_acquisition():
+    f = Focus(W, H)
+    for t in (1791570000.0, 1791570000.5):
+        f.update(t, [phone()], [], recognized={1: ("Wallet", 0.9)})
+    assert f.names() == {1: ("Wallet", True)}
+    assert f.named[1].refreshed == 1791570000.5

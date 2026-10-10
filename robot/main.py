@@ -8,7 +8,6 @@ Every turn logs its stage times and saves its answer audio.
 """
 import argparse
 import contextlib
-import copy
 import json
 import os
 import queue
@@ -175,7 +174,7 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = self.view_taken = 0.0  # detection time, source capture time
-        self.labeled: tuple[float, np.ndarray, Screen] | None = None
+        self.face_match: tuple[float, np.ndarray, str] | None = None
         self.preview_due, self.preview_queued, self.preview_cursor = 0.0, False, 0
         self.crop_times: deque[float] = deque()  # at most three idle crop queries per second
         self.focus: Focus | None = None  # the focus object and shown names (D63), per frame
@@ -259,7 +258,7 @@ class Robot:
             self.view = (None, {})
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
-            self.labeled, self.preview_queued = None, False
+            self.face_match, self.preview_queued = None, False
             self.crop_times.clear()
             self.ui_turns.clear()
             self.ui_turn, self.ui_thinking, self.ui_play_until = None, False, 0.0
@@ -347,16 +346,20 @@ class Robot:
         people = [t.box for t in tracks if t.label == "person"]
         self.focus = self.focus or Focus(frame.shape[1], frame.shape[0])
         self.focus.ignored = self.ignored
-        self.focus.update(self.view_at, tracks, people)
+        self.focus.update(self.view_taken, tracks, people)
         self.screen = frame, Screen(self.focus.boxes(tracks, people), memory=self.panel)
 
     def _shown(self) -> tuple[np.ndarray | None, Screen]:
         """The view's source: the newest tracked frame and its boxes."""
         with self.detecting:
             frame, screen = self.screen
-            if self.labeled and not self.speaking and not self.ui_thinking and \
-                    time.time() - self.labeled[0] <= PREVIEW_TTL:
-                _, frame, screen = self.labeled
+            if self.focus:
+                tracks = [Track(*t) for t in self.tracker.scored()]
+                screen = replace(screen, boxes=self.focus.boxes(
+                    tracks, [t.box for t in tracks if t.label == "person"], time.time()))
+            if self.face_match and time.time() - self.face_match[0] > 2:
+                self.face_match = None
+            screen = replace(screen, face_match=self.face_match)
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
                       "Speaking" if time.time() < self.ui_play_until else
                       "Thinking" if self.ui_thinking else "Listening")
@@ -390,11 +393,11 @@ class Robot:
                 self.away.discard(s.track)
 
     def _preview(self, frame: np.ndarray, taken: float, tracks: list[Track]) -> None:
-        """Publish recognition with its exact source, never a label on a newer frame."""
+        """Refresh bounded object display and an exact source-linked face crop."""
         if self.speaking or self.ui_thinking or time.time() - taken > PREVIEW_TTL:
             return
         with self.detecting:
-            focus = copy.deepcopy(self.focus)
+            focus = self.focus
         people = [t.box for t in tracks if t.label == "person"]
         found_face = located_face(self.faces, frame)
         scores = self.people.scores(found_face[0]) if found_face else []
@@ -411,7 +414,7 @@ class Robot:
             if len(self.crop_times) >= 3 or self.speaking or self.ui_thinking:
                 break
             self.crop_times.append(time.monotonic())
-            hit = self.things.score(self.crops([cut(frame, t.box)])[0])
+            hit = self.things.score(self.crops([cut(frame, t.box)])[0], focus.name(t.id))
             # An ignored stored class stays ignored even if the current detector calls it otherwise.
             if hit and hit[0] not in eligible:
                 hit = None
@@ -419,16 +422,22 @@ class Robot:
             self.preview_cursor = (candidates.index(t) + 1) % len(candidates)
         if self.speaking or self.ui_thinking or time.time() - taken > PREVIEW_TTL:
             return
-        focus.update(max(focus.now, taken), tracks, people, recognized=recognized)
-        boxes = focus.boxes(tracks, people, recognized)
-        if person and len(person_boxes) == 1:
-            boxes = [(*b[:4], person, "known") if b[:4] == person_boxes[0] and b[5] == "person"
-                     else b for b in boxes]
         with self.detecting:
-            self.labeled = taken, frame, Screen(boxes)
-            # Keep object hysteresis, but drawing and writes always use source-frame results.
-            live = self.tracker.in_view()
-            self.focus.named.update({i: n for i, n in focus.named.items() if i in live})
+            recognized = {i: hit for i, hit in recognized.items() if self.focus.accepts(i, taken)}
+            self.focus.named = {i: n for i, n in self.focus.named.items()
+                                if (n.name or n.run[0]) in eligible}
+            current = [Track(*t) for t in self.tracker.scored()]
+            self.focus.update(self.view_taken, current,
+                              [t.box for t in current if t.label == "person"],
+                              recognized=recognized, recognized_at=taken)
+            self.face_match = None
+            if person and len(person_boxes) == 1:
+                h, w = frame.shape[:2]
+                box = tuple(max(0, min(v, limit)) for v, limit in
+                            zip(found_face[2], (w, h, w, h), strict=True))
+                crop = cut(frame, box)
+                if crop.size:
+                    self.face_match = taken, crop.copy(), person
         self._remember_matches(frame, taken, tracks, recognized,
                                person if len(person_boxes) == 1 else None)
 
@@ -758,7 +767,7 @@ class Robot:
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding, self.told = (face_, time.time()), None
-        self.labeled = None
+        self.face_match = None
         return True
 
     def _things(self, turn: Turn) -> str | None:
@@ -774,7 +783,12 @@ class Robot:
                 return self._forget_thing(name, labels)
             self.things.ignore(labels, kind == "ignore")
             self.ignored = self.things.ignored()
-            self.labeled = None
+            eligible = self.things.visual_links(self.ignored)
+            with self.detecting:
+                if self.focus:
+                    self.focus.ignored = self.ignored
+                    self.focus.named = {i: n for i, n in self.focus.named.items()
+                                        if (n.name or n.run[0]) in eligible}
             return (f"Okay, I will ignore {plural(name)}." if kind == "ignore" else
                     f"Okay, I will notice {plural(name)} again.")
         if (asked := question(turn.question, self.vocab)) is None:
@@ -822,7 +836,6 @@ class Robot:
             return "Sorry, I lost sight of it. Hold it up and say it again."
         taken, frame, view = views[0]
         label, box = view[track]
-        tracks = [Track(t, b, label, 0.0) for t, (label, b) in view.items()]
         old = self.things.named(name, labels)
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
@@ -830,7 +843,7 @@ class Robot:
         if self._hidden(seen, self._visitor()):
             return "I cannot remember this while the forgotten visitor is in view."
         shots = [cut(f, v[track][1]) for _, f, v in views[:SHOTS]]
-        self.things.name(name, sorted({*labels, label}), self.crops(shots))
+        name = self.things.name(name, sorted({*labels, label}), self.crops(shots))
         self.named = self.things.labels()
         pid = self.memory.add(shots[0], turn.question, ts=taken, named=name, label=label,
                               box=list(box), source_size=[frame.shape[1], frame.shape[0]])
@@ -841,10 +854,7 @@ class Robot:
             self.people.link(seen[1], [pid, sighting])
         turn.memories, turn.named = [pid], name
         with self.detecting:
-            self.focus.bind(track, name)
-            people = [t.box for t in tracks if t.label == "person"]
-            self.labeled = taken, frame, Screen(
-                self.focus.boxes(tracks, people, {track: (name, 1.0)}))
+            self.focus.bind(track, name, taken)
         self.jobs.put(("caption", pid, brain.jpeg(shots[0])))
         self._retain(time.time())
         return f"Got it, that is your {name}. I will remember it."
@@ -859,7 +869,7 @@ class Robot:
         with self.detecting:
             if self.focus:
                 self.focus.forget(named["name"])
-            self.labeled = None
+            self.face_match = None
         self.named = self.things.labels()
         return f"Done. I have forgotten your {named['name']}."
 

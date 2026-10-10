@@ -1,5 +1,5 @@
 """Booth video view: an MJPEG stream of the camera behind a token, with the focus object, named
-objects, consented person names, a status strip with memory events, and a memory panel. It
+objects, source-linked face matches, a status strip with memory events, and a memory panel. It
 never writes a frame to disk.
 """
 import hmac
@@ -35,6 +35,7 @@ class Screen:
     memory: dict | None = None
     transcript: list[dict] = field(default_factory=list)  # transient, bounded by the Robot
     evidence: dict = field(default_factory=dict)  # supplied to the current answer
+    face_match: tuple[float, np.ndarray, str] | None = None  # source time, exact crop, name
 
 
 Source = Callable[[], tuple[np.ndarray | None, Screen]]
@@ -43,6 +44,7 @@ Source = Callable[[], tuple[np.ndarray | None, Screen]]
 def _label(img: np.ndarray, text: str, x: int, y: int, color: tuple, scale: float = 0.6) -> None:
     """`text` on a filled tag of `color` with its bottom-left corner at (x, y)."""
     (tw, th), _ = cv2.getTextSize(text, FONT, scale, 1)
+    x = max(0, min(x, img.shape[1] - tw - 8))
     y = max(y, th + 8)
     cv2.rectangle(img, (x, y - th - 8), (x + tw + 8, y), color, -1)
     cv2.putText(img, text, (x + 4, y - 5), FONT, scale, BLACK, 1, cv2.LINE_AA)
@@ -81,6 +83,16 @@ def draw(frame: np.ndarray, screen: Screen, width: int, now: float) -> bytes:
     img = cv2.resize(frame, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     for box in screen.boxes:
         _box(img, box, scale)
+    if screen.face_match and 0 <= now - screen.face_match[0] <= 2:
+        taken, crop, name = screen.face_match
+        factor = min(160 / crop.shape[1], 140 / crop.shape[0],
+                     img.shape[1] / crop.shape[1], (img.shape[0] - 32) / crop.shape[0])
+        face = cv2.resize(crop, None, fx=factor, fy=factor)
+        h, w = face.shape[:2]
+        x, y = img.shape[1] - w, img.shape[0] - h
+        img[y:y + h, x:x + w] = face
+        cv2.rectangle(img, (x, y), (x + w - 1, y + h - 1), STYLE["known"][0], 2)
+        _label(img, f"{name}: matched {now - taken:.1f}s ago", x, y, STYLE["known"][0], SMALL)
     events = [text for t, text in screen.events if now - t < EVENT_S][-2:]
     strip = "   ".join([screen.status, *events]).strip()
     if strip:

@@ -37,7 +37,7 @@ def open_robot(root: Path) -> Robot:
     robot.named, robot.ignored = robot.things.labels(), robot.things.ignored()
     robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
     robot.view, robot.views = (None, {}), deque(maxlen=SHOTS)
-    robot.view_at, robot.view_taken, robot.labeled = 0, 0, None
+    robot.view_at, robot.view_taken, robot.face_match = 0, 0, None
     robot.preview_cursor, robot.crop_times = 0, deque()
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
@@ -286,11 +286,12 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     assert saved.shape == (300, 200, 3) and abs(saved.mean() - GOLD) < 1
     assert point["ts"] == pytest.approx(r.view_taken, rel=0, abs=1e-6)
     assert point["box"] == list(CENTER)
-    assert point["named"] == "wallet" and r.labeled[1] is frame
-    assert r.labeled[2].boxes[0][4:] == ("wallet", "known")
+    assert point["named"] == "wallet" and r._shown()[0] is frame
+    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert r.focus.named[next(iter(r.view[1]))].refreshed == r.view_taken
     assert r.jobs.queue[0][0] == "caption"
     assert ask(r, "Forget my wallet")[0].startswith("Done")
-    assert not list(r.memory.frames.iterdir()) and r.labeled is None and not r.focus.names()
+    assert not list(r.memory.frames.iterdir()) and r.face_match is None and not r.focus.names()
     assert r.memory.shard.count(CountRequest()) == 0
     r.brain = SimpleNamespace(caption=lambda *args: pytest.fail("deleted crop was captioned"))
     r.jobs.put(None)
@@ -310,10 +311,14 @@ def test_fresh_recognition_sightings_and_miss(robot):
     for _ in range(3):
         r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
     assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
-    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
-    assert len(calls) == 3, "idle crop queries are bounded to three per second"
-    assert all(b[5] != "known" for b in r._shown()[1].boxes), "no new query: anonymous source"
     [seen] = r.memory.sightings(time.time() + 1)
+    newest = frame_of(r)
+    r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()])
+    assert r._shown()[0] is newest
+    assert len(calls) == 3, "idle crop queries are bounded to three per second"
+    assert r._shown()[1].boxes[0][4:] == ("wallet", "known"), "skipped query preserves display only"
+    assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"], \
+        "cached display does not authorize a new sighting"
     assert seen["named"] == "wallet"
     frame_of(r, BLACK)
     preview(r)
@@ -356,9 +361,11 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     assert ask(r, "This is my phone")[0].startswith("Got it")
     count = r.memory.shard.count(CountRequest())
     assert ask(r, "Ignore phones")[0].startswith("Okay")
+    assert not r.focus.names(), "ignore clears stored-class display immediately"
     frame_of(r, label="bag")  # relabeling cannot bypass the stored object's ignored kind
     preview(r)
     assert r.memory.shard.count(CountRequest()) == count
+    assert not r.focus.names(), "detector relabeling cannot restore an ignored name"
     assert ask(r, "This is my phone")[0].startswith("I am ignoring")
     assert ask(r, "Where is my phone?")[0].startswith("I am ignoring")
     assert ask(r, "Forget my phone")[0].startswith("Done")
@@ -373,30 +380,153 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     close_robot(fresh)
 
 
-def test_face_label_stays_on_exact_frame_and_expires(robot, monkeypatch):
+def test_source_face_inset_and_current_video(robot, monkeypatch):
     r = robot
     v = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [v, v], time.time())
     source = frame_of(r, people=True)
+    source[100:200, 500:600] = 180
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
     preview(r)
     newer = frame_of(r, BLACK, people=True)
     frame, screen = r._shown()
-    assert frame is source and ("Ana", "known") in {b[4:] for b in screen.boxes}
+    assert frame is newer and all(not b[4] for b in screen.boxes if b[5] == "person")
+    taken, crop, name = screen.face_match
+    assert name == "Ana" and taken < r.view_taken
+    assert np.array_equal(crop, source[100:200, 500:600])
     r.ui_thinking = True
-    assert r._shown()[0] is newer and all(b[4] != "Ana" for b in r._shown()[1].boxes)
+    assert r._shown()[0] is newer
     r.ui_thinking = False
-    taken, frame, screen = r.labeled
-    r.labeled = taken - main.PREVIEW_TTL - 1, frame, screen
-    assert r._shown()[0] is newer and all(b[4] != "Ana" for b in r._shown()[1].boxes)
-    # A replacement face on the same person track cannot inherit the old name.
+    r.face_match = taken - 3, crop, name
+    assert r._shown()[1].face_match is None
+    # A replacement face on the same person track clears the source match.
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
                                                                   (500, 100, 600, 200)))
     preview(r)
-    assert all(b[4] != "Ana" for b in r._shown()[1].boxes)
-    # Two overlapping person boxes make the face association ambiguous.
+    assert r.face_match is None
+    # Two overlapping person boxes make the source association ambiguous.
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
     tracks = [Track(*t) for t in r.tracker.scored()]
     r._preview(r.view[0], r.view_taken, tracks + [Track(999, (400, 0, 900, 720), "person", 0.9)])
-    assert all(b[4] != "Ana" for b in r._shown()[1].boxes)
-    assert r._forget(None, "Ana", v) and r.labeled is None
+    assert r.face_match is None
+    preview(r)
+    assert r.face_match is not None
+    assert r._forget(None, "Ana", v) and r.face_match is None
+
+
+def test_spoken_names_categories_case_and_restart(tmp_path):
+    vocab = {"phone", "cup", "mug", "face", "person", "name"}
+    assert command("Track this as my Dylan's smartphone", vocab) == (
+        "name", "Dylan's smartphone", ["phone"])
+    assert command("This is Dylan's smartphone", vocab) == (
+        "name", "Dylan's smartphone", ["phone"])
+    assert command("This is my red coffee mug", vocab) == (
+        "name", "red coffee mug", ["cup", "mug"])
+    assert command("This is Ana", vocab) is None
+    assert command("This is my face", vocab) is None
+    assert command("This is my name", vocab) is None
+    assert command("Dylan's smartphone is charging", vocab) is None
+    assert command("Ignore smartphones", vocab) == ("ignore", "phone", ["phone"])
+    assert command("Forget my Dylan's smartphone", vocab)[:2] == ("forget", "Dylan's smartphone")
+    assert command("Delete my red coffee mug from your memory", vocab)[:2] == (
+        "forget", "red coffee mug")
+    from robot.things import Things, question
+    assert question("Where is my Dylan's smartphone?", vocab)[:2] == ("where", "Dylan's smartphone")
+    assert question("Where is Dylan's smartphone?", vocab)[:2] == ("where", "Dylan's smartphone")
+    assert question("What's my cat's name?", vocab) is None
+    things = Things(tmp_path)
+    vectors = stub_crops([np.full((10, 10, 3), GOLD)])
+    things.name("Dylan's smartphone", ["phone"], vectors)
+    things.link("DYLAN'S SMARTPHONE", 17)
+    things.name("red coffee mug", ["cup", "mug"], vectors)
+    things.name("Ana's smartphone", ["phone"], vectors)
+    asked = question("Where is Dylan's smartphone?", vocab)
+    assert things.named(asked[1], asked[2])["name"] == "Dylan's smartphone"
+    assert things.named("phone", ["phone"])["name"] == "Dylan's smartphone"
+    assert things.named("RED COFFEE MUG", [])["name"] == "red coffee mug"
+    assert things.score(vectors[0], "DYLAN'S SMARTPHONE")[0] == "Dylan's smartphone"
+    things.shard.close()
+    things = Things(tmp_path)
+    assert things.named("dylan's smartphone", [])["turns"] == [17]
+    things.name("Dylan's Smartphone", ["phone"], vectors)
+    assert things.named("DYLAN'S SMARTPHONE", [])["name"] == "Dylan's smartphone"
+    assert things.forget("dylan's smartphone") == [17]
+    assert things.named("dylan's smartphone", []) is None
+    assert things.named("phone", ["phone"])["name"] == "Ana's smartphone"
+    assert things.named("red coffee mug", [])["name"] == "red coffee mug"
+    things.shard.close()
+
+
+def test_case_only_reteach_and_forget_all_evidence(robot):
+    r = robot
+    frame_of(r)
+    r.focus.freeze(next(iter(r.view[1])))
+    assert ask(r, "This is Dylan's smartphone")[0].startswith("Got it")
+    answer, turn = ask(r, "Track this as my DYLAN'S SMARTPHONE")
+    assert "Dylan's smartphone" in answer and turn.named == "Dylan's smartphone"
+    assert r.focus.names() == {next(iter(r.view[1])): ("Dylan's smartphone", True)}
+    assert r.memory.points(turn.memories)[0]["named"] == "Dylan's smartphone"
+    assert ask(r, "Forget my DYLAN'S SMARTPHONE")[0].startswith("Done")
+    assert r.memory.shard.count(CountRequest()) == 0
+    assert not r.focus.names() and not list(r.memory.frames.iterdir())
+
+
+def test_source_face_crop_clamps_edges_and_suppresses_empty(robot, monkeypatch):
+    r = robot
+    v = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [v, v], time.time())
+    frame = frame_of(r)
+    frame[100:200, :80] = 170
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    tracks += [Track(999, (-100, 0, 1280, 720), "person", 0.9)]
+    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (-10, 100, 80, 200)))
+    r._preview(frame, r.view_taken, tracks)
+    assert r.face_match[1].shape == (100, 80, 3) and r.face_match[1].mean() == 170
+    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (-50, 100, -10, 200)))
+    r._preview(frame, r.view_taken, tracks)
+    assert r.face_match is None, "an out-of-frame match cannot publish an empty crop"
+
+
+def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.freeze(track)
+    ask(r, "This is my phone")
+    ask(r, "Track this as my Dylan's smartphone")
+    crop = r.crops([main.cut(r.view[0], r.view[1][track][1])])[0]
+    assert r.things.score(crop)[0] == "phone", "the old identical alias wins unrestricted search"
+    calls = []
+    score = r.things.score
+    monkeypatch.setattr(r.things, "score",
+                        lambda v, name=None: calls.append(name) or score(v, name))
+    preview(r)
+    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+    original = time.time()
+    monkeypatch.setattr(main.time, "time", lambda: original + 3)
+    newest = frame_of(r)
+    assert r._shown()[0] is newest and not r.focus.names(), "display expires during skipped work"
+    assert r.focus.name(track) == "Dylan's smartphone", "continuous track keeps a query preference"
+    preview(r)
+    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+    assert calls == ["Dylan's smartphone", "Dylan's smartphone"]
+    # A different instance on an uninterrupted ID must escape the preference after real misses.
+    frame_of(r, BLACK)
+    preview(r)
+    assert r.focus.names() == {track: ("Dylan's smartphone", False)}
+    preview(r)
+    preview(r)
+    assert r.focus.name(track) is None
+    preview(r)
+    assert calls[-4:] == ["Dylan's smartphone"] * 3 + [None]
+    # A gap clears the accepted preference even when the tracker later reuses the ID.
+    r.focus.bind(track, "Dylan's smartphone", r.view_taken)
+    r._track(r.view[0], [], r.view_taken)
+    assert r.focus.name(track) is None
+    frame_of(r)
+    preview(r)
+    assert calls[-1] is None
+    r.focus.bind(next(iter(r.view[1])), "Dylan's smartphone", r.view_taken)
+    ask(r, "Forget my Dylan's smartphone")
+    assert not r.focus.names()
+    assert all(n.name != "Dylan's smartphone" for n in r.focus.named.values())

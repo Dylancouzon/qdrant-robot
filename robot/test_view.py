@@ -74,3 +74,16 @@ def test_live_state_preserves_stream_and_real_text():
         stream.close()
     finally:
         view.close()
+
+
+def test_source_face_inset_draw_and_expiry():
+    import cv2
+    from robot.view import draw
+    frame = np.zeros((240, 320, 3), np.uint8)
+    crop = np.full((80, 60, 3), 180, np.uint8)
+    screen = Screen(face_match=(10, crop, "Ana"))
+    fresh = cv2.imdecode(np.frombuffer(draw(frame, screen, 320, 11), np.uint8), cv2.IMREAD_COLOR)
+    expired = cv2.imdecode(np.frombuffer(draw(frame, screen, 320, 12.01), np.uint8),
+                           cv2.IMREAD_COLOR)
+    assert fresh[-30:, -30:].mean() > 100
+    assert expired.max() == 0 and frame.max() == 0, "source image remains untouched"

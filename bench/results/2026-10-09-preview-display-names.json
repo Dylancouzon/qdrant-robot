@@ -1,0 +1,102 @@
+{
+  "task": "D129-D131 current video, bounded display, explicit names and by-name re-verification",
+  "measurement_label": "E",
+  "source_base": "7a7f3db93e1117e7830f25fa7b1f23d5b566351d",
+  "source_branch": "spike/mac-audio-interface",
+  "source_directory": "/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface",
+  "diff_sha256": "f1efa37e6348151db6fabde624cc7eca1e13e152d991ffd12edb4f2867213784",
+  "changed_file_sha256": {
+    "robot/main.py": "205786e2b1328211cc7735e3232d9da6f2d8e9ddd9152387573a34acafec1d58",
+    "robot/focus.py": "fbb8ef973c4ddd32820b341a57bf3c9c5fe44403b5fcdb09537af00403905487",
+    "robot/things.py": "2412c12200682a5951a5612f79db454d3642b78ea9be3d35e25280d3c74b1195",
+    "robot/view.py": "d7b84a09e9af7df000620c76bec85274f861fd43e9a4d8e2b38d2080176c031e",
+    "robot/test_focus.py": "ac355b02f2df0638b88d5e5836d02df553d5e1d40e419657649b664325fa40dc",
+    "robot/test_things.py": "926570a6bbd141be1936ff0509e024727bc03118433b6bc0a3565571629506c7",
+    "robot/test_view.py": "e76419f563436fb69a8e5a3f983ce101081db949931ad45b768764fa8a426f38",
+    "tools/talk.html": "1bccadacf0e0d873e3d13e79dbd9a2744edcbdd6df693d86982e40f283a49abc"
+  },
+  "design": {
+    "path": "reviews/20261009-204107-60808-design.md",
+    "verdict": "GO WITH CHANGES",
+    "elapsed_seconds": 75.04,
+    "native_exit": 3,
+    "conditions": "Implemented finite positive-source age, gap/conflict/ignore/deletion clearing, delayed-gap rejection, source face inset, fresh-only writes."
+  },
+  "builder_checks": {
+    "focused_command": "ORT_DISABLE_TELEMETRY=1 PYTHONPATH=/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/lib/python3.12/site-packages:. uv run --no-project --python 3.12 --with pytest pytest -q robot/test_focus.py robot/test_things.py robot/test_view.py::test_source_face_inset_draw_and_expiry robot/test_view.py::test_view",
+    "result": "29 passed",
+    "elapsed_seconds": 9.93,
+    "native_exit": 0,
+    "changed_path_ruff": "pass",
+    "syntax": "pass",
+    "diff_check": "pass"
+  },
+  "qualification": "Temporary local Edge shards, synthetic frames, stub perception, and fake MJPEG only. No full suite, module selfchecks, replay, live camera/microphone/model test, or production memory access. Dylan owns physical smoothness and recognition qualification.",
+  "lead_diff_review": "Complete product/test diff read; initial timestamp acquisition, positional Screen calls, owned query parsing, face crop bounds, and case-only deletion issues resolved.",
+  "review": {
+    "verdict": "PASS",
+    "model": "gpt-6.1-sol",
+    "path": "reviews/20261009-210119-87875-review.md",
+    "elapsed_seconds": 110.93,
+    "native_exit": 0,
+    "code_tree": "3b40fbdd6ec7322f8ad480e4ad8524147d23bc7e",
+    "blocking_findings": []
+  },
+  "deployment": {
+    "status": "pending user restart readiness after review",
+    "current_release": "c182f8518376",
+    "active_user_unit": "qr-live-mac-7ab53f128dba.service"
+  },
+  "carried_edges": [
+    "Continuous object replacement without a detectable tracking gap can retain the prior display association for at most two seconds; it cannot authorize writes.",
+    "Existing category-based lookup selects one matching object; explicit preserved names distinguish same-category objects.",
+    "After a gap or restart, equal stored crop scores can recover an older alias; distinct historical aliases are not migrated.",
+    "Possessive What about follow-ups parse a name without selecting a reply mode; carry until observed."
+  ],
+  "alias_diagnostic": {
+    "mode": "temporary real Edge shards and stub Robot, E",
+    "sequence": [
+      "Name phone",
+      "Name Dylan's smartphone on identical synthetic crop",
+      "Run idle previews"
+    ],
+    "global_score": [
+      "phone",
+      1.0
+    ],
+    "requested_name_score": [
+      "Dylan's smartphone",
+      1.0
+    ],
+    "outcome": "First preview hides explicit name; second and third show phone.",
+    "source_changed": false,
+    "correction": "Existing accepted continuous name is reverified with same crop embedding and one by-name query. Display still expires at two seconds; three true misses clear the preference and restore global search.",
+    "regression": "Temporary real Edge/stub Robot confirms new explicit name survives competing alias and three-second display expiry; wrong-instance misses, gap, and forget clear it."
+  },
+  "prior_review": {
+    "status": "interrupted before material alias correction",
+    "path": "reviews/20261009-205129-74012-review.md.log (ignored)",
+    "native_exit": 130,
+    "verdict": null
+  },
+  "interrupted_reviews": [
+    {
+      "status": "interrupted before material alias correction",
+      "path": "reviews/20261009-205129-74012-review.md.log (ignored)",
+      "native_exit": 130,
+      "verdict": null
+    },
+    {
+      "path": "reviews/20261009-205550-79758-review.md.log (ignored)",
+      "native_exit": 130,
+      "verdict": null,
+      "reason": "Dylan adds responsive layout and conversation auto-scroll before review completes."
+    }
+  ],
+  "ui_followup": {
+    "scope": "Viewport-bounded conversation with internal scrolling; narrow/short-window spacing and wrapped controls; next-animation-frame scrolling for streamed text and resize.",
+    "javascript_syntax": "Node new Function(script) passed",
+    "diff_check": "pass",
+    "physical_qualification": "Dylan-owned; no active-session browser inspection or live test."
+  }
+}

@@ -17,7 +17,7 @@ from qdrant_edge import (
     FieldCondition,
     Filter,
     MatchAny,
-    MatchValue,
+    HasIdCondition,
     MultiVectorComparator,
     MultiVectorConfig,
     Point,
@@ -87,13 +87,17 @@ class Things:
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
 
-    def name(self, name: str, labels: list[str], crops: np.ndarray) -> None:
+    def name(self, name: str, labels: list[str], crops: np.ndarray) -> str:
         """Store `name` (one point per name: naming it again replaces the crops) for an object
-        with detector `labels`, from its crop vectors; the turns that named it are kept."""
+        with detector `labels`, from its crop vectors. Keep the first display casing and links;
+        return the stored name."""
+        existing = self.shard.retrieve([_id(name)], ["name"], False)
+        name = existing[0].payload["name"] if existing else name
         self.shard.update(UpdateOperation.upsert_points([Point(
             _id(name), {"crops": crops[:SHOTS].tolist()},
             {"name": name, "labels": labels, "turns": self._turns(name)})]))
         self.shard.flush()
+        return name
 
     def _turns(self, name: str) -> list:
         found = self.shard.retrieve([_id(name)], ["turns"], False)
@@ -134,7 +138,7 @@ class Things:
         its label: the detector's labels are hints (D61), one object can get several."""
         hits = self.shard.query(QueryRequest(
             limit=1, query=Query.Nearest([crop.tolist()], using="crops"), with_payload=["name"],
-            filter=Filter(must=[FieldCondition(key="name", match=MatchValue(name))])
+            filter=Filter(must=[HasIdCondition({_id(name)})])
             if name else None))
         return (hits[0].payload["name"], hits[0].score) if hits else None
 
@@ -160,23 +164,33 @@ class Things:
 
 
 def _id(key: str) -> str:
+    key = " ".join(key.replace("’", "'").casefold().split())
     return str(uuid.uuid5(uuid.NAMESPACE_URL, f"thing:{key}"))
 
 
-# Commands and questions about the visitor's things. A thing is one or two words after "my"
-# (or before "is mine"); a detector kind ("mug" names cup and mug) or any other word.
-_THING = r"(?P<thing>[a-z][a-z-]*(?: [a-z][a-z-]*)?)"
+# Display names preserve explicit wording; detector categories remain separate aliases.
+_WORD = r"[a-z][a-z'-]*"
+_THING = rf"(?P<thing>{_WORD}(?: {_WORD})*)"
+_STOP = r"(?:from|now|again|here|is|are|was|were|has|have|do|does|did|please)\b"
+_REFERENCE = rf"(?P<thing>{_WORD}(?: (?!{_STOP}){_WORD})*)"
+_OWNED = rf"(?P<thing>{_WORD}(?: {_WORD})*'s (?:{_WORD})(?: {_WORD})*)"
 _NAMING = [re.compile(p, re.I) for p in (
     rf"^\W*(?:and |so |ok(?:ay)?,? )?(?:this|that|here)(?: one)?(?:'s| is)\s+my\s+{_THING}\W*$",
     rf"^\W*(?:and )?(?:this|that)\s+{_THING}\s+(?:is mine|belongs to me)\W*$",
     rf"\b(?:remember|track)\s+(?:this|that)(?:\s+[a-z-]+)?\s+as\s+my\s+{_THING}\W*$")]
-_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\b(?:\s+about)?\s+my\s+{_THING}", re.I)
+_OWNED_NAMING = re.compile(rf"^\W*(?:this|that)(?:'s| is)\s+{_OWNED}\W*$", re.I)
+_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\b(?:\s+about)?\s+my\s+{_REFERENCE}", re.I)
+_OWNED_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\s+{_OWNED}\W*$", re.I)
 _UNIGNORE = re.compile(r"\b(?:stop|quit|no longer|don'?t|do not)\s+ignor\w*|\bunignore\b|"
                        r"\bnotice\b.*\bagain\b", re.I)
 _IGNORE = re.compile(r"\b(?:ignore|stop (?:remembering|noticing|tracking|storing)|"
                      r"(?:don'?t|do not) (?:remember|notice|track|store))\b", re.I)
 _IGNORING = re.compile(r"\bignoring\b", re.I)
-_MY = re.compile(rf"\bmy\s+{_THING}\b(?!')", re.I)  # not "my dog's name"
+_MY = re.compile(rf"\bmy\s+{_REFERENCE}\b", re.I)
+_OWNED_QUERY = re.compile(
+    rf"^\W*(?:where (?:is|are)|(?:have|did) you (?:see|seen)|"
+    rf"do you (?:still )?(?:remember|know|recall)|(?:is|are) (?:this|that)|"
+    rf"and|what about)\s+{_OWNED}\W*$", re.I)
 _MINE = re.compile(rf"\b(?:this|that|it)(?:\s+{_THING})?\s+(?:is\s+)?mine\b", re.I)
 _THIS = re.compile(r"\b(?:is|are)\s+(?:this|that|it|these|those)\b", re.I)
 _WHERE = re.compile(r"\b(?:where|which)\b", re.I)
@@ -186,12 +200,12 @@ _REMEMBER = re.compile(r"\b(?:remember|know|recall)\b|"
 
 
 def _thing(text: str, vocab: Collection[str]) -> tuple[str, list[str]]:
-    """(name, detector labels) of a thing's words: a detector kind is named by its first word
-    ("mug" -> "cup"); other words are their own name, with no labels."""
-    labels = kinds(text, vocab)
-    if labels:
-        return kind_of(sorted(labels)[0]), sorted(labels)
-    return text.lower(), []
+    """The spoken display name and its detector-category aliases."""
+    return " ".join(text.split()), sorted(kinds(text, vocab))
+
+
+def _identity(text: str) -> bool:
+    return bool(re.search(r"\b(?:face|name)\b", text, re.I))
 
 
 def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:
@@ -199,9 +213,12 @@ def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | N
     visitor's things, else None."""
     text = text.replace("’", "'")
     if m := next((x for p in _NAMING if (x := p.search(text))), None):
+        return None if _identity(m["thing"]) else ("name", *_thing(m["thing"], vocab))
+    if (m := _OWNED_NAMING.search(text)) and not _identity(m["thing"]) and \
+            kinds(m["thing"], vocab):
         return "name", *_thing(m["thing"], vocab)
-    if m := _FORGET.search(text):
-        if m["thing"].split()[0].lower() in ("face", "name"):
+    if m := _FORGET.search(text) or _OWNED_FORGET.search(text):
+        if _identity(m["thing"]):
             return None  # "forget my face" is an identity request (robot/people.py)
         return "forget", *_thing(m["thing"], vocab)
     if is_question(text) or re.search(r"\bmy\b", text, re.I):
@@ -223,7 +240,7 @@ def question(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | 
     if (m := _MINE.search(text)) and m["thing"]:
         found = _thing(m["thing"], vocab)
         return ("this", *found) if found[1] else None
-    if not (m := _MY.search(text)):
+    if not (m := _MY.search(text) or _OWNED_QUERY.search(text)) or _identity(m["thing"]):
         return None
     name, labels = _thing(m["thing"], vocab)
     for mode, pattern in (("this", _THIS), ("where", _WHERE), ("seen", _SEEN),
@@ -271,9 +288,9 @@ def _selftest() -> None:
     c = lambda t: command(t, vocab)  # noqa: E731
     assert c("This is my phone.") == ("name", "phone", ["phone"])
     assert c("And this is my laptop.") == ("name", "laptop", ["laptop"])
-    assert c("Here's my mug!") == ("name", "cup", ["cup", "mug"])
-    assert c("This teddy is mine.")[:2] == ("name", "teddy bear")
-    assert c("Please remember this cup as my coffee cup.")[:2] == ("name", "cup")
+    assert c("Here's my mug!") == ("name", "mug", ["cup", "mug"])
+    assert c("This teddy is mine.")[:2] == ("name", "teddy")
+    assert c("Please remember this cup as my coffee cup.")[:2] == ("name", "coffee cup")
     assert c("This is my lucky charm.") == ("name", "lucky charm", []), \
         "an unknown thing names any object in view"
     assert c("Please forget my laptop.") == ("forget", "laptop", ["laptop"])
