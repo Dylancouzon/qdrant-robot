@@ -513,6 +513,10 @@ class Robot:
             vector = self.recognition.crops([cut(frame, t.box)])[0]
             excluded[t.id] = self.things.excluded(vector)
             hit = self.things.score(vector, preferences[t.id])
+            if preferences[t.id] and (not hit or hit[1] < MATCH):
+                other = self.things.score(vector)
+                if other and other[1] >= MATCH and other[0] in eligible:
+                    hit = other
             recognized[t.id] = hit if hit and hit[0] in eligible else (None, 0.0)
         return recognized, excluded
 

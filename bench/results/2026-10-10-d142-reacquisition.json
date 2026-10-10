@@ -1,0 +1,176 @@
+{
+  "task": "D142 bounded global object reacquisition",
+  "source_release": "67330062799b",
+  "source_sha256": {
+    "robot/recognition.py": "06b671b7968257de0641109a7f7f9193cff6c652f7a7f3778366de51183b65d8",
+    "robot/test_people.py": "f7dfad6ee7db5b9607c1303454d90b60b016b2c52194f68a60e45c842fd7df44",
+    "robot/things.py": "3a07854a6f52863feea650076c1544185090ef52a3d603ee57578e55d437a46e",
+    "robot/config.py": "3050149511ff8de937a8a0a216ecdca3835b69b05813e8da1daa4eb0e228bb72",
+    "robot/faces.py": "98a7faa9d72214741c7eca718d4a6d12bed03feb46c6bca6f00f752b1126539c",
+    "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+    "robot/test_recognition.py": "7b4b03e375bd81c22786505aa5e8a71bd801566beab9e23fc430191bfac9e103",
+    "robot/route.py": "5cbbd9722f53e9d8b26f599414a2b7adc994724b637db94165eae356a3e60dc6",
+    "robot/tts.py": "6bbe3c3620bea5901c1e0995e0d91e2cd75db628d77fff563c512d4817070240",
+    "robot/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "robot/test_focus.py": "45f766611ef1832db25a0594ccb287405f1a607a464fc194ccf1d9013076dd9a",
+    "robot/asr.py": "0d6c8147e7541eb4f2fa4aac75f56f2fc6acbcaa2e9d2f46e85ede08b14f991d",
+    "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+    "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+    "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63",
+    "robot/test_things.py": "d0264b083f6fd66e56eec4c99a2253bed146a70f1d97029d5f0210a1cfebbce1",
+    "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+    "robot/test_speak.py": "2b88f58837278fcfe75bcd964fc769a0accb1e23fac243b780a7ab2952680e3a",
+    "robot/view.py": "75f8dd8a34779fb786dadd5fc5f1f0a35258ca276c2d713b9345c9873b91cac0",
+    "robot/test_view.py": "dd599a13a1a10bf6d885e2c8d39c405ce365d3b800407c7d25d563a1f6addd5f",
+    "robot/audio.py": "069da726df2ba548e7257e4da4149324201471e9316208e88758423421e9855e",
+    "robot/main.py": "15fbe6d47359064128214df658727c937fc633199e3ac0e70e30501fcb275c15",
+    "robot/test_sightings.py": "f107bc65cb03502961a58792c846d230061b3256a4b07ccae87223809488e532",
+    "robot/knowledge.py": "27c5d9931fc90ef53fd1cd5c18fd566e4e667ab4ec60e052af2dbff927ce06c5",
+    "robot/detect.py": "e6fc8a8a7c65beeccb6a5f05f62209104f59df43e85bd051a01ed7491be8ec6d",
+    "robot/focus.py": "5d392bb488c9b1affd920772c80c65e103e758ea83689b9ab10740f4db5fd964"
+  },
+  "local_query_route": {
+    "classification": "E synthetic real Edge and Robot._query_objects route; no physical swap acceptance",
+    "old_preferred_score": 0.797,
+    "global_B_score": 0.9999999403953552,
+    "planned_queries": 100,
+    "first_B_confirmed_query": 2,
+    "first_conflict_abstains": true,
+    "confirmed_B_queries": 99,
+    "baseline": "D141 retainsApreference through100queries despite globalB1.0",
+    "elapsed_s": 0.15226454206276685,
+    "native_exit": 0,
+    "production_memory_writes": false,
+    "private_evidence": "build/d140/d142-known-swap.json; existingmultiview_probe.known_swap() reused without model loads; obsolete static limitation removed from this newreceipt"
+  },
+  "local_validation": {
+    "worker_passed": 86,
+    "worker_elapsed_s": 30.67,
+    "peer_passed": 86,
+    "peer_elapsed_s": 30.85,
+    "native_exit": 0,
+    "ruff": "PASS",
+    "whitespace": "PASS"
+  },
+  "runtime": {
+    "release": "67330062799b",
+    "tegrastats": "d142-runtime-s-20261010-032327.tegrastats",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "adapter_sha256": "d88a13aec2d1049c858c6c0d748d14835fe0cc9085d2d81a8b7bbdbc035e6f26",
+    "native_exit": 1,
+    "completed": false,
+    "failure": "RuntimeError: No named phone target during phone_ignore_selection",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": false,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": false,
+      "ignored_descriptor": false,
+      "restore_accepted": false,
+      "restore_display": false
+    },
+    "paging_before": {
+      "pswpin": 1248227,
+      "pswpout": 9361777,
+      "MemAvailable_kB": 6117296
+    },
+    "paging_after": {
+      "pswpin": 1248232,
+      "pswpout": 9361946,
+      "MemAvailable_kB": 2964928
+    },
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "natural_learning": true,
+    "physical_phone_binding": true,
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 10.07754500836722,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.10058753490447998,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.96127835857595,
+      "render_ms_p50": 15.686711500165984,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 9.999991876114274,
+      "unique_named_face_sources": 107,
+      "face_named_fraction": 0.5631578947368421,
+      "source_age_p95": 0.16769670248031615,
+      "longest_repeated_source_s": 0.09819793701171875,
+      "detect_fps": 15.026442819134678,
+      "render_ms_p50": 14.04465599625837,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 9.147225047340092,
+      "unique_named_face_sources": 65,
+      "face_named_fraction": 0.5,
+      "source_age_p95": 0.1675843119621277,
+      "longest_repeated_source_s": 0.10071372985839844,
+      "detect_fps": 15.038658128677778,
+      "render_ms_p50": 15.069859015056863,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 89,
+      "unique_source_fps": 7.796152889760872,
+      "unique_named_face_sources": 54,
+      "face_named_fraction": 0.6966292134831461,
+      "source_age_p95": 0.1890873432159424,
+      "longest_repeated_source_s": 0.10392403602600098,
+      "detect_fps": 15.019059243509917,
+      "render_ms_p50": 12.917285988805816,
+      "phone_named_fraction": 0.0
+    },
+    "phone_named_movement": {
+      "samples": 150,
+      "unique_source_fps": 7.1137336466538805,
+      "unique_named_face_sources": 73,
+      "face_named_fraction": 0.4866666666666667,
+      "source_age_p95": 0.16745541095733643,
+      "longest_repeated_source_s": 0.10288715362548828,
+      "detect_fps": 14.96568493588505,
+      "render_ms_p50": 14.365815499331802,
+      "phone_named_fraction": 0.9266666666666666
+    },
+    "phone_ignored_return_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "phone_ignored_reset_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "status": "terminal",
+    "unit": "qr-d142-runtime-s",
+    "invocation": "ca0b8b1faa5249da898f6616192f71ef",
+    "quality_pass": false,
+    "command": "tools/jetson.py run d142-runtime-s -- /home/qdrant/qdrant-robot/shared/sessions/d141_runtime_check.py --model s --learning",
+    "private_evidence": "build/d140/runtime-d142/{summary,samples,events}.json, journal.jsonl, tegrastats",
+    "software": "release ENV.txt and pinned pyproject/uv.lock",
+    "precision": "TensorRT FP16 detector; DINOv2-small ONNX FP32",
+    "warmup": "Cold constructors not separately timed; no offlinecoldstart claim.",
+    "paging_delta": {
+      "pswpin": 5,
+      "pswpout": 169
+    }
+  }
+}

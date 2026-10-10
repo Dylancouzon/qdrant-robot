@@ -635,6 +635,94 @@ def test_same_track_guess_replacement_never_writes_or_claims_after_bound(robot):
     assert ask(r, "Where is my phone?")[0] == "I see a phone, but I am not sure it is yours."
 
 
+@pytest.mark.parametrize("competitor", ["strong", "weak", "hidden", "ignored-kind"])
+def test_weak_preference_rechecks_global_once_with_same_crop(robot, monkeypatch, competitor):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my A")[0].startswith("Got it")
+    track = next(iter(r.view[1]))
+    basis = np.eye(DIM, dtype=np.float32)
+    vector = .797 * basis[GOLD] + np.sqrt(1 - .797**2) * basis[BLACK]
+    other = vector if competitor != "weak" else basis[BLACK]
+    r.things.name("B", ["wallet" if competitor == "ignored-kind" else "phone"], other[None])
+    if competitor == "hidden":
+        r.things.ignore_item("B", other[None])
+    elif competitor == "ignored-kind":
+        r.ignored = r.focus.ignored = {"wallet"}
+    r.named = r.things.labels()
+    calls, crops = [], []
+    score = r.things.score
+    monkeypatch.setattr(r.things, "score",
+                        lambda v, name=None: calls.append(name) or score(v, name))
+    r.recognition.crops = lambda images: crops.append(len(images)) or vector[None]
+    frame_of(r, BLACK)
+    assert next(iter(r.view[1])) == track, "the replacement retains the original IoU track"
+    before = r.memory.shard.count(CountRequest())
+    preview(r)
+    assert calls == ["A", None] and crops == [1]
+    if competitor == "strong":
+        assert not r.focus.names(), "the first conflicting strong result abstains"
+        assert not r._shown(False)[1].control["targets"], "no accepted named action during conflict"
+    elif competitor == "hidden":
+        assert track in r.focus.excluded and not r.focus.names()
+    else:
+        assert r.focus.names() == {track: ("A", True)}, "ineligible hits keep weak continuity"
+    preview(r, clear=False)
+    if competitor == "strong":
+        assert r.focus.names() == {track: ("B", True)}, "the second agreeing query confirms B"
+    preview(r, clear=False)
+    assert crops == [1, 1, 1] and len(r.crop_times) == 3
+    expected = {"strong": ["A", None, None, "B"], "hidden": ["A", None, None, None]}
+    assert calls == expected.get(competitor, ["A", None] * 3)
+    previous_calls = list(calls)
+    preview(r, clear=False)
+    assert calls == previous_calls and crops == [1, 1, 1], "the crop budget bounds fallback queries"
+    if competitor == "strong":
+        assert r.focus.names() == {track: ("B", True)}
+        assert r.memory.sightings(time.time() + 1)[0]["named"] == "B"
+    else:
+        assert r.memory.shard.count(CountRequest()) == before, "weak/excluded evidence cannot write"
+        assert all(b[5] != "known" for b in r._shown()[1].boxes)
+
+
+@pytest.mark.parametrize("invalid", ["source", "gallery", "session", "gap"])
+def test_global_reacquisition_rejects_invalidated_source(robot, monkeypatch, invalid):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my A")[0].startswith("Got it")
+    track = next(iter(r.view[1]))
+    basis = np.eye(DIM, dtype=np.float32)
+    vector = .797 * basis[GOLD] + np.sqrt(1 - .797**2) * basis[BLACK]
+    r.things.name("B", ["phone"], vector[None])
+    r.named = r.things.labels()
+    frame_of(r, BLACK)
+    taken = r.view_taken
+    r.recognition.crops = lambda images: vector[None]
+    calls, score = [], r.things.score
+    def changed(v, name=None):
+        calls.append(name)
+        result = score(v, name)
+        if name is None:
+            if invalid == "source":
+                monkeypatch.setattr(main.time, "time", lambda: taken + main.PREVIEW_TTL + 1)
+            elif invalid == "gallery":
+                r.recognition.epoch += 1
+            elif invalid == "session":
+                r.session_id = "new-session"
+            else:
+                r.focus.update(taken + .01, [], [])
+        return result
+    monkeypatch.setattr(r.things, "score", changed)
+    before = r.memory.shard.count(CountRequest())
+    preview(r)
+    assert calls == ["A", None]
+    assert r.focus.name(track) != "B" and not r.matches_pending
+    assert r.memory.shard.count(CountRequest()) == before
+    assert all(row.get("named") != "B" for row in r.memory.sightings(time.time() + 1))
+
+
 def test_robot_reteach_replacement_discards_buffered_previous_physical_object(robot, monkeypatch):
     r = robot
     frame_of(r)
@@ -745,7 +833,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     preview(r)
     assert r.focus.name(track) is None
     preview(r)
-    assert calls[-4:] == ["Dylan's smartphone"] * 3 + [None]
+    assert calls[-7:] == ["Dylan's smartphone", None] * 3 + [None]
     # A gap clears the accepted preference even when the tracker later reuses the ID.
     r.focus.bind(track, "Dylan's smartphone", r.view_taken)
     r._track(r.view[0], [], r.view_taken + .21)
@@ -924,7 +1012,7 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     frame[300:600, 560:760] = BLACK
     r._track(frame, dets)
     preview(r)
-    assert calls[-1] == "Dylan's smartphone"
+    assert calls[-2:] == ["Dylan's smartphone", None]
     assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
     assert [b[4] for b in r._shown()[1].boxes] == ["Dylan's smartphone"]
     assert not r._shown(False)[1].control["targets"], \
