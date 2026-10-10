@@ -176,13 +176,14 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = self.view_taken = 0.0  # detection time, source capture time
-        self.verified = None  # exact verified frame, source time, gallery epoch, source overlays
+        self.verified = None  # completed positive/negative face result on exact source pixels
         self.shown_taken = 0.0
+        self.shown_frame, self.shown_record = 0, 0
+        self.shown_known = False
         self.session_id = secrets.token_hex(16)
         self.control_message = ""
         self.crop_due = {}
         self.item_checked = {}
-        self.preview_due = 0.0
         self.matches_pending = False
         self.crop_times: deque[float] = deque()  # at most three background crop queries per second
         self.focus: Focus | None = None  # the focus object and shown names (D63), per frame
@@ -223,6 +224,7 @@ class Robot:
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
         self.closing = threading.Event()
         self.detecting = threading.Lock()       # held while a frame is detected and tracked
+        self.delivery = threading.Condition(self.detecting)
         self.threads = [threading.Thread(target=t, name=t.__name__, daemon=True)
                         for t in (self._watch, self._detect, self._transcribe, self._work)]
         self.recognition = Recognition(self._preview)
@@ -232,7 +234,7 @@ class Robot:
         token = os.environ.get("ROBOT_VIEW_TOKEN")  # the booth video view (D59), off without one
         self.video = View(self._shown, int(os.environ.get("ROBOT_VIEW_PORT", "8090")), token,
                           os.environ.get("ROBOT_VIEW_HOST", "127.0.0.1"), action=self._control,
-                          state=lambda: self._shown(False)) if token else None
+                          state=lambda: self._shown(False), wake=self._wake_view) if token else None
 
     def hear(self, chunk: np.ndarray) -> None:
         self.ears.feed(chunk)
@@ -270,11 +272,14 @@ class Robot:
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
             self.verified, self.shown_taken, self.crop_due, self.item_checked = None, 0.0, {}, {}
+            self.shown_frame, self.shown_record = 0, 0
+            self.shown_known = False
             self.session_id = secrets.token_hex(16)
             self.crop_times.clear()
-            self.matches_pending, self.control_message, self.preview_due = False, "", 0.0
+            self.matches_pending, self.control_message = False, ""
             self.ui_turns.clear()
             self.ui_turn, self.ui_thinking, self.ui_play_until = None, False, 0.0
+            self.delivery.notify_all()
         self.recognition = Recognition(
             self._preview, self.recognition.faces, self.recognition.crops)
 
@@ -352,13 +357,12 @@ class Robot:
             if not self.views or self.view_taken - self.views[-1][0] >= VIEW_S:
                 self.views.append((self.view_taken, *self.view))
             self._refocus(frame)
-            if time.monotonic() >= self.preview_due:
-                self.preview_due = max(self.preview_due + 0.1, time.monotonic())
-                tracks = [Track(*t) for t in self.tracker.scored()]
-                self.recognition.submit((frame, self.view_taken,
-                    tracks,
-                    {i: self.focus.epoch(i) for i in self.focus.visible}, self.session_id,
-                    self.focus.geometry(tracks)))
+            tracks = [Track(*t) for t in self.tracker.scored()]
+            self.recognition.submit((frame, self.view_taken,
+                tracks,
+                {i: self.focus.epoch(i) for i in self.focus.visible}, self.session_id,
+                self.focus.geometry(tracks)))
+            self.delivery.notify_all()
         return found
 
     def _refocus(self, frame: np.ndarray) -> None:
@@ -373,31 +377,89 @@ class Robot:
                              if i in self.focus.seen}
         self.focus.checking = {t.id for t in tracks if self.things.items and t.label not in BODY
                                and self.item_checked.get(t.id) != self.focus.epoch(t.id)}
-        if self.verified and not self.focus.accepts(self.verified[4], self.verified[0]):
+        if self.verified and (self.verified[2] != self.recognition.epoch or
+                any(not self.focus.accepts(i, self.verified[0]) for i in self.verified[4])):
             self.verified = None
         self.screen = frame, Screen(self.focus.boxes(tracks, people), memory=self.panel)
 
-    def _shown(self, display=True) -> tuple[np.ndarray | None, Screen]:
-        """The view's source: the newest tracked frame and its boxes."""
-        with self.detecting:
-            frame, screen = self.screen
+    def _wake_view(self) -> None:
+        with self.delivery:
+            self.delivery.notify_all()
+
+    def _completed_valid(self, record) -> bool:
+        return bool(record and record[2] == self.recognition.epoch and
+                    record[5] == self.session_id and 0 <= time.time() - record[0] <= .2 and
+                    all(self.focus.accepts(i, record[0]) and
+                        self.focus.epoch(i) == record[3][0][i][1] for i in record[4]))
+
+    def _display_source(self, tracks):
+        frame, taken = self.screen[0], self.view_taken
+        shown_tracks, geometry, faces = tracks, None, []
+        record = self.verified if self._completed_valid(self.verified) and \
+            self.verified[0] >= self.shown_taken else None
+        if record:
+            taken, frame, _, (source, face), _, _ = record
+            shown_tracks = [t for t in tracks if t.id in source and
+                            self.focus.accepts(t.id, taken) and
+                            self.focus.epoch(t.id) == source[t.id][1]]
+            geometry = {i: box for i, (box, _) in source.items()}
+            faces = [face] if face else []
+        else:
+            with self.recognition.condition:
+                pending = next((p for p in (self.recognition.active, self.recognition.latest)
+                    if p and p[4] == self.session_id and p[6] == self.recognition.epoch and
+                    0 <= time.time() - p[1] <= .2), None)
+                if pending:
+                    frame, taken, shown_tracks, epochs, _, geometry, _ = pending
+                    shown_tracks = [t for t in shown_tracks if self.focus.accepts(t.id, taken)
+                                    and self.focus.epoch(t.id) == epochs[t.id]]
+        return frame, taken, shown_tracks, geometry, faces, record
+
+    def _publication_valid(self, frame, taken, record, session, gallery, epochs, cancel):
+        with self.delivery:
+            if cancel() or session != self.session_id or gallery != self.recognition.epoch or \
+                    not 0 <= time.time() - taken <= .2 or taken < self.shown_taken:
+                return False
+            if record and (self.verified is not record or not self._completed_valid(record)):
+                return False
+            if any(not self.focus or not self.focus.accepts(i, taken) or
+                   self.focus.epoch(i) != epoch for i, epoch in epochs.items()):
+                return False
+            if not record and self._completed_valid(self.verified) and self.verified[0] >= taken:
+                return False
+            if taken == self.shown_taken and id(frame) != self.shown_frame:
+                return False
+            if taken == self.shown_taken and self.shown_known and id(record) != self.shown_record:
+                return False
+            self.shown_taken, self.shown_frame = taken, id(frame)
+            self.shown_record = id(record) if record else 0
+            self.shown_known = bool(record and record[3][1] and record[3][1][5] == "known")
+            return True
+
+    def _shown(self, display=True, deadline=None, cancel=lambda: False
+               ) -> tuple[np.ndarray | None, Screen]:
+        """Deliver completed sources; a timeout keeps fresh in-flight pixels anonymous."""
+        with self.delivery:
+            if display and deadline is not None:
+                self.delivery.wait_for(lambda: cancel() or
+                    (self._completed_valid(self.verified) and
+                     (self.verified[0] > self.shown_taken or
+                      (self.verified[0] == self.shown_taken and
+                       id(self.verified[1]) == self.shown_frame and
+                       not self.shown_known and
+                       id(self.verified) != self.shown_record))),
+                    timeout=max(0, deadline - time.monotonic()))
+            screen = self.screen[1]
             tracks = [Track(*t) for t in self.tracker.scored()] if self.focus else []
-            shown_tracks, geometry, faces = tracks, None, []
-            taken = self.view_taken
-            if self.verified and self.verified[0] >= self.shown_taken and \
-                    time.time() - self.verified[0] <= 0.2 and \
-                    self.verified[2] == self.recognition.epoch:
-                taken, frame, _, (source, face), _ = self.verified
-                shown_tracks = [t for t in tracks if t.id in source and
-                                self.focus.accepts(t.id, taken) and
-                                self.focus.epoch(t.id) == source[t.id][1]]
-                geometry = {i: box for i, (box, _) in source.items()}
-                faces = [face]
+            frame, taken, shown_tracks, geometry, faces, record = self._display_source(tracks)
             if self.focus:
                 screen = replace(screen, boxes=self.focus.boxes(
                     shown_tracks, [], time.time(), geometry=geometry) + faces)
-            if display:
-                self.shown_taken = max(self.shown_taken, taken)
+            session, gallery = self.session_id, self.recognition.epoch
+            epochs = {t.id: self.focus.epoch(t.id) for t in shown_tracks}
+            screen = replace(screen, valid=(lambda: self._publication_valid(
+                frame, taken, record, session, gallery, epochs, cancel)) if display else None,
+                source=(taken, id(frame), id(record)))
             targets = []
             if self.focus:
                 labels = self.focus.names()
@@ -453,6 +515,11 @@ class Robot:
         with self.detecting:
             focus = self.focus
             preferences = {i: focus.name(i) for i in epochs}
+            if session == self.session_id and gallery == self.recognition.epoch:
+                valid = {i for i in epochs if focus.accepts(i, taken) and
+                         focus.epoch(i) == epochs[i]}
+                self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry,
+                                     gallery)
         recognized, excluded = self._query_objects(frame, tracks, preferences)
         if time.time() - taken > PREVIEW_TTL:
             return
@@ -475,7 +542,6 @@ class Robot:
             self.focus.update(self.view_taken, current,
                               [t.box for t in current if t.label == "person"],
                               recognized=recognized, recognized_at=taken)
-            self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry, gallery)
             # Persist in the conversation worker, with a second source/epoch check.
             if recognized and not self.matches_pending:
                 self.matches_pending = True
@@ -483,17 +549,22 @@ class Robot:
                                epochs, session, gallery))
 
     def _verified_frame(self, frame, taken, tracks, valid, face, person, geometry, gallery):
-        """A name stays on its exact matched image; current anonymous video is the fallback."""
-        people = [t for t in tracks if t.label == "person" and face and
-                  self.focus.eligible(t) and inside(face[2], t.box) >= 0.8]
-        if person and len(people) == 1 and people[0].id in valid:
-            source = {t.id: (geometry[t.id], self.focus.epoch(t.id)) for t in tracks
-                      if t.id in valid and self.focus.eligible(t, pending=True)}
-            overlays = source, (*face[2], person, "known")
-            if self.verified is None or taken > self.verified[0]:
-                self.verified = taken, frame, gallery, overlays, people[0].id
-        elif self.verified and taken >= self.verified[0]:
-            self.verified = None
+        """Publish each completed face result before crop work, including anonymous negatives."""
+        people = [t for t in tracks if t.label == "person"]
+        members = tuple(t.id for t in people)
+        if any(i not in valid for i in members):
+            if self.verified and taken >= self.verified[0]:
+                self.verified = None
+                self.delivery.notify_all()
+            return  # Departed source people cannot publish even anonymous face outlines.
+        candidates = [t for t in people if face and inside(face[2], t.box) >= 0.8]
+        matched = person if len(candidates) == 1 and self.focus.eligible(candidates[0]) else None
+        source = {t.id: (geometry[t.id], self.focus.epoch(t.id)) for t in tracks
+                  if t.id in valid and (t.id in members or self.focus.eligible(t, pending=True))}
+        outline = (*face[2], matched or "", "known" if matched else "other") if face else None
+        if self.verified is None or taken >= self.verified[0]:
+            self.verified = taken, frame, gallery, (source, outline), members, self.session_id
+            self.delivery.notify_all()
 
     def _query_objects(self, frame, tracks, preferences):
         """Oldest-due eligible crop, reusing one vector for identity and item preference."""
@@ -860,7 +931,9 @@ class Robot:
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding, self.told = (face_, time.time()), None
-        self.verified = None
+        with self.delivery:
+            self.verified = None
+            self.delivery.notify_all()
         return True
 
     def _things(self, turn: Turn) -> str | None:
@@ -964,6 +1037,7 @@ class Robot:
                         self.focus.excluded = {i: p for i, p in self.focus.excluded.items()
                                                if p != data["id"]}
                     self.verified = None
+                    self.delivery.notify_all()
             return "I will notice that item again." if restored else "That selection expired."
         with self.detecting:
             if not self._valid_item(data):
@@ -995,6 +1069,7 @@ class Robot:
                     self.focus.focus, self.focus.changed = None, time.time()
                     self.focus.challenger = None, 0.0
                 self.verified = None
+                self.delivery.notify_all()
                 return ident
         ident = self.recognition.call(persist, mutate=True)
         return "Okay, I will ignore only that item." if ident else "That selection expired."
@@ -1088,6 +1163,7 @@ class Robot:
             if self.focus:
                 self.focus.forget(named["name"])
             self.verified = None
+            self.delivery.notify_all()
         self.named = self.things.labels()
         return f"Done. I have forgotten your {named['name']}."
 

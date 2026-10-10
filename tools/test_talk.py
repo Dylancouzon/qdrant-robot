@@ -324,7 +324,8 @@ def test_view_proxy_keeps_remote_token_server_side():
     import http.client
     from http.server import ThreadingHTTPServer
     from robot.view import Screen, View
-    view = View(lambda: (None, Screen(status="Thinking", transcript=[{"answer": "A real reply"}])),
+    view = View(lambda **kw: (None, Screen(status="Thinking",
+                                          transcript=[{"answer": "A real reply"}])),
                 0, "test-only-view-token")
     session = talk.Session("test-release")
     session.view_port, session.view_token = view.port, "test-only-view-token"

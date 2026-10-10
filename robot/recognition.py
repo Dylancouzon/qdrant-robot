@@ -14,6 +14,7 @@ class Recognition:
         self.crops = crops if crops is not None else Crops()
         self.condition = threading.Condition()
         self.requests, self.latest = deque(), None
+        self.active = None  # the existing source currently being verified, for display ordering
         self.epoch, self.stopped, self.background = 0, False, True
         self.thread = threading.Thread(target=self._run, name="recognition", daemon=True)
         self.thread.start()
@@ -48,6 +49,7 @@ class Recognition:
                 latest = None if request else self.latest
                 if latest:
                     self.latest = None
+                    self.active = latest
             if request:
                 action, future = request
                 try:
@@ -60,6 +62,9 @@ class Recognition:
                 except Exception:
                     import traceback
                     traceback.print_exc()
+                finally:
+                    with self.condition:
+                        self.active = None
 
     def close(self):
         with self.condition:

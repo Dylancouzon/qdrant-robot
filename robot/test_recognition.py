@@ -21,6 +21,7 @@ def test_priority_latest_slot_and_pause_drains_producer():
     try:
         owner.submit((1,))
         assert entered.wait(2)
+        assert owner.active == (1, 0), "the owner exposes only its in-flight source"
         owner.submit((2,))
         owner.submit((3,))
         caller = threading.Thread(target=lambda: owner.call(lambda f, c: seen.append("priority")))
@@ -31,6 +32,7 @@ def test_priority_latest_slot_and_pause_drains_producer():
         release.set()
         caller.join(2)
         owner.pause()
+        assert owner.active is None and owner.latest is None
         assert seen[:2] == [1, "priority"] and 2 not in seen
         before = list(seen)
         owner.submit((4,))

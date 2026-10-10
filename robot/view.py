@@ -37,9 +37,11 @@ class Screen:
     evidence: dict = field(default_factory=dict)  # supplied to the current answer
     control: dict = field(default_factory=dict)
     ignored_items: list[dict] = field(default_factory=list)
+    valid: Callable[[], bool] | None = field(default=None, repr=False, compare=False)
+    source: tuple = field(default=(), repr=False, compare=False)  # exact selection for retries
 
 
-Source = Callable[[], tuple[np.ndarray | None, Screen]]
+Source = Callable[..., tuple[np.ndarray | None, Screen]]
 
 
 def _label(img: np.ndarray, text: str, x: int, y: int, color: tuple, scale: float = 0.6) -> None:
@@ -116,6 +118,9 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        self._stream(view)
+
+    def _stream(self, view):
         self.send_response(200)
         self.send_header("Content-Type", f"multipart/x-mixed-replace; boundary={BOUNDARY.decode()}")
         self.send_header("Cache-Control", "no-store")
@@ -123,18 +128,34 @@ class _Handler(BaseHTTPRequestHandler):
         with view.lock:  # a new viewer replaces the last one
             view.viewer += 1
             me = view.viewer
+        view.wake()
+        def cancelled():
+            return view.stopped.is_set() or view.viewer != me
         due = time.monotonic()
-        while not view.stopped.is_set() and view.viewer == me:
-            frame, screen = view.source()
-            if frame is not None:
+        while not cancelled():
+            due = max(due, time.monotonic()) + 1 / view.fps
+            previous = None
+            while not cancelled():
+                frame, screen = view.source(deadline=due, cancel=cancelled)
+                selected = screen.source or (id(frame),)
+                if cancelled() or frame is None or selected == previous:
+                    break
+                previous = selected
                 jpg = draw(frame, screen, view.width, time.time())
-                try:
-                    self.wfile.write(b"--%s\r\nContent-Type: image/jpeg\r\nContent-Length: %d"
-                                     b"\r\n\r\n%s\r\n" % (BOUNDARY, len(jpg), jpg))
-                except OSError:  # the viewer left
-                    return
-            due = max(due + 1 / view.fps, time.monotonic())
-            view.stopped.wait(due - time.monotonic())
+                with view.lock:  # viewer ownership and the source commit are checked together
+                    valid = not cancelled() and (not screen.valid or screen.valid())
+                if valid and not cancelled():
+                    try:
+                        self.wfile.write(b"--%s\r\nContent-Type: image/jpeg\r\nContent-Length: %d"
+                                         b"\r\n\r\n%s\r\n" % (BOUNDARY, len(jpg), jpg))
+                    except OSError:  # the viewer left
+                        return
+                    break
+                if time.monotonic() >= due:
+                    break
+            if cancelled():
+                break
+            view.stopped.wait(max(0, due - time.monotonic()))
 
     def do_POST(self) -> None:  # noqa: N802
         view = self.server.view
@@ -173,11 +194,12 @@ class View:
     `source` returns the newest frame and what to draw over it."""
 
     def __init__(self, source: Source, port: int, token: str, host: str = "127.0.0.1",
-                 fps: float = 10, width: int = 960, action=None, state=None):
+                 fps: float = 15, width: int = 960, action=None, state=None, wake=lambda: None):
         if not token:
             raise ValueError("the view needs a token")
         self.action = action
         self.state = state or source
+        self.wake = wake
         self.source, self.token, self.fps, self.width = source, token.encode(), fps, width
         self.lock, self.viewer, self.stopped = threading.Lock(), 0, threading.Event()
         self.server = _Server((host, port), _Handler)
@@ -187,7 +209,9 @@ class View:
         self.thread.start()
 
     def close(self) -> None:
-        self.stopped.set()  # ends the stream within one frame
+        with self.lock:
+            self.stopped.set()  # ends the stream within one frame
+        self.wake()
         self.server.shutdown()
         self.server.server_close()
         self.thread.join()

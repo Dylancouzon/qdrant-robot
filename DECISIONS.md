@@ -675,3 +675,66 @@ Evidence: bench/results/2026-10-10-d141-multiview.json; Sol24860 PASS185.78s/tre
 Keep currentstrong chosen-name matches preferred. If that exact query is weak/missing, query the same cropvector globally and adopt only a MATCH+eligible result. Existing firstconflict abstention/twoagreeing display and source/write/action guards remain; atmostone extraEdgequery and threecropperssecond.
 Why: D141 knownA.797 suppresses globalB1.0 through100queries. Reject clearing allpreferences (breakschosenaliases), extraembeddings, cache/state/options, and thresholdtuning. An ineligible topglobalhit safelyretainsweakprior insteadofsearchinglowerresults.
 Evidence: bench/results/2026-10-10-d142-reacquisition.json; worker86pass30.67s/peer86pass30.85s; Sol37425 PASS218.58s/treee9d733c5. Jetsonmovement92.67%, duplicateIgnoretargetmissing/native1; paging+5in/+169out. Overallbooth/controls/face remainunqualified.
+
+## D143 2026-10-10: Deliver face results when recognition completes
+Select one completed source record and bounded renderer wake through the existing lock; publish positive/negative face results before cropwork. Preserve exactpixels/name/geometry/age, session/gallery/gap guards, oneowner/latestslot, admission/cropbudget, consent/deletion, and boundedshutdown. No identity tracking cache.
+Why: threeD139 publicationtimer/cache prototypes fail90% cadence; rawdisplay races ahead of fresh matched completion. Compare completion-drivenMJPEG with nonwaiting completedsource selection and currentD138fallback on identicalN recordings/joke/actualMJPEG delivery. Existingpollingadapter cannot measure eventwake.
+Evidence: ignored build/d140/source-driven-face-brief.txt; D139publicreceipts/Astra79508; D142564b612 fullhook59.45s/native0, source67330062799b retained. Astra44892 GO WITH CHANGES129.72s/native3: accepted fallbackordering/equal-sourceanonymouspixelupgrade, onepacingdeadline, finalpostJPEGauthority/age/viewer recheck, cancelclose/replacement. No furtherplanninggate; smallestsourcebuildnext.
+
+## D143 checkpoint 2026-10-10: Retry rejected encoding within one deadline
+Firstactualstream prototypeb993d216b4c0 improves conversation names82.22% to95.24% and passes97-113% cadence/under198ms source age, but fails179vs180person names and228/260/334ms held intervals. Rejectadoption and rollback6733.
+Why: finalguard correctlydiscards15encodings while newcompleted sources arrive, then remainingperiodwait creates gaps. Select bounded selection/encoding retry within SAMEdeadline; stop on success, None, expiry, or cancel. Keep oneowner, finalauthority, models, budgets, and successfulfpscap.
+Rejectunchangedqualityretry, anotheradmissiontimer, sourceageallowance, and identitycache. Samefrozenactualstreamadapter/protocol/6733baseline compare the material View correction.
+Evidence: bench/results/2026-10-10-d143-face-delivery.json; ignored stream-{baseline,candidate}-n, d143-v1-runtime.patch/code-sha; worker32tests12.42s/native0.
+
+## D143 counsel 2026-10-10: Remove redundant completion waits
+V2 preserves99-116% cadence and under194.1ms ages, but person180=180baseline and held200.64/211.78/227.28ms failfixedadoption. Rejectd62a1dc8c07d, preserve exactsource/receipts, rollback6733.
+Astra2286 GO WITH CHANGES119.83s selects nonwaiting completed-source selection and one View pacingdeadline. Preserve owner10Hz/crop3/s/active-order, exactsource, finalauthority, and receiptcompleteness; delete completionCondition/wake/obsoleteargs and unchangedsource retries.
+Blocking: phaseoffset/rejection/empty/viewer native tests must demonstrate schedulingmargin beforedeployment. Alternatives15fpspresentation withsameowner and6733/profiledservice fallback remain. No softened200ms/90%/morethan180criteria.
+Evidence: reviews/20261010-042258-2286-design.md; bench/results/2026-10-10-d143-face-delivery.json; private stream-retry-n/d143-v2-runtime.patch/code-sha and full125secondvmstat.
+
+## D143 scheduling 2026-10-10: Add presentation margin without extra inference
+Clean nonwaiting native authenticatedHTTP phases show100ms polling holds201.88–216.82ms with133ms completions, offsets8/41/75ms, and5/7ms encoding(E). Fifteenfps gives149.91–154.81ms,45.19–50.09ms measured margin.
+Select15fps default on the simpler nonwaiting route; owner10Hz/crop3/s/models/thresholds remain. Delete completed-source Condition/wake/waits/obsoleteargs; preserve pending ordering and finalauthority. Retry only changed source metadata.
+Reject deploying known-zero-margin10fps or restoring waiting plumbing. This resolves Astra2286 scheduling blocker through its accepted presentation-cadence alternative; unchanged Jetson protocol and fixed criteria still decide adoption.
+Evidence: reviews/20261010-042258-2286-design.md; ignored build/d140/d143-nonwaiting-tests.log. Current scopedtest run has one failure under diagnosis; no acceptance or deployment claim.
+
+## D143 alternative 2026-10-10: Retain completion waiting with presentation margin
+Nonwaiting15 source7193d83ea33c completes869successfulsends/receives/native1 and REJECT. Person171<180, conversation67/7.09namedfps/54.61%, backgroundheld212.87ms andconversation receive200.486ms failfixedcriteria(J). Rollback6733; preserve V3source/evidence.
+Select Astra2286 approved alternativeA: V2completionwaiting with15fpspresentation,10Hzowner/crop3s unchanged. Carry atomicviewercommit/close and retryonlychangedsource metadata. No newarchitecture planning gate or softenedacceptance.
+Fullchecks V3 fails only badroute10Hzwallclocklowerbound:199.600ms. Remove demand that a rejectedroute fails on every host run; deterministicrealRobot202ms proof andselected15Hz/Jetsonstrictchecks remain.
+Evidence: bench/results/2026-10-10-d143-face-delivery.json; ignored stream-nonwaiting-n/v3runtime.patch/hash/fullcheckslog; peerindependentREJECT. V3paging4in/23out, sampledRAM6114/7485MB,58.125C.
+
+## D143 waiting outcome 2026-10-10: Preserve improvements without adopting failed delivery
+V4d76a1c08d45b waiting15 delivers689successfulsends/receives/native1. Person181>180 andconversation86/9.57namedfps improve; allpairedcadence passes. Personheld202.91ms/received200.118ms andconversationheld305.76ms failfixedlimits(J). Rollback6733.
+Keep fullchecks native0/80.98s, worker112+41checks, peer112/sourcePASS and0.353ms cancellation proof separate from qualityREJECT. Source/receipts/frozenadapter hashes remain; productionmemory untouched.
+Two newfailedroutes after Astra2286 require counsel before another prototype. Challenge currentrecord-pointer rejection against exactcapturedsource validity and pendingfallback ordering; largerowneradmission requires changed evidence fromD139, not an unchanged retry.
+Evidence: bench/results/2026-10-10-d143-face-delivery.json; private stream-waiting-n/v4patch/26hashes/fullchecks/vmstat. Worstconversationhold has onlyonepublication at260.74ms and333mscapturegap, so recordcollision alone is not established as solecause.
+
+## D143 diagnostic 2026-10-10: Trace actual source delivery before another fix
+Astra42741 GO WITH CHANGES97.56s selects conditional bounded numerical wrapper around immutableadapter/frozenV4. Correlate camera decode/detector/admission/submission/owner/publication/selection/encoding/discards/finalpredicate/receipt, including skipped work and active/latest/shownorder.
+Why: 305.76ms hold contains onepublication,193.33ms-oldcompletion and111.81ms unclassifieddelay afterpriorityfinish. Currentreceipts cannot separate admission from ownerdelay. Guard runs exactlyonce; observational locks/results/exceptions stayunchanged, dropped events explicit, overhead/equivalence verified.
+Reject speculative currentrecordguard removal and15Hzowner until supported; preserve strictoriginaladapter adoption, nativefailures, temporaryconsentingmemory, hashes/resources and6733restoration. No furtherplanninggate before smallest supported fix.
+Evidence: reviews/20261010-045944-42741-design.md; bench/results/2026-10-10-d143-face-delivery.json; private d143-second-counsel-brief.txt/stream-waiting-n. Diagnostic notadoption.
+
+## D143 measured correction 2026-10-10: Admit detector frames without a second timer
+Complete diagnosticf0126ff0/e512 onfrozenV4 has2.757MB/zero drops/errors,687sends=received/exactguardjoin; native1quality preserved,6733restored. SelectedB submits each existing15Hz detectedframe to same serialowner/latestreplacement; delete preview_due timer/init/reset. Crop3/s, priority, models andsourceauthority unchanged.
+Why: warmownerbusy52.4%person/49.7%conversation with65.18/59.51ms p95service and0.5ms medianqueue. Worstphone212.293mshold skips fresh7.24ms-oldframe at98.01ms afterownerfinished89.32ms, thenadmits166.29ms. Second15Hztimer could stillskip fromphase/jitter; detector alreadysets cadence.
+RejectA: onlyone pointerreject onanonymousbackground andzero monotonicrejects; no measuredknownbenefit. D13915Hz failed under supersededpublication; completionwaiting15/exactactualstream nowchangedbasis. Service233.48/81.17ms tails andprior305msgap remainunresolved. Originalfrozenadoption decides newcandidate, no additionalplanninggate.
+Evidence: reviews/20261010-045944-42741-design.md; private stream-trace-n/lead-causal-summary.json andfullsourcechain; public D143audit. Diagnosticnotadoption.
+
+## D143 accepted delivery 2026-10-10: Keep completion-driven detector-paced recognition
+Candidatea7bb11203aa9 passes all23frozen actualMJPEGdevelopment checks/native0:259personnames versus180,95.57%fraction; conversation133/14.32namedfps/96.38%; allpairedcadence and200ms limits pass(J). All853sends received/noerrors; immutablee512/protocol5972/media/model/consentingmanifest/sourcehashes verified. Keep completedsourcewaiting15, finalexactauthority, serialowner/latestslot anddetector-paced admission.
+Worker88native55.19s, peer10native4.47s/sourcePASS andactualqualificationPASS; fullchecks native0/81.01s. Oldtimerrestoration fails meaningful12source latest/priority/crop3s regression. Reject allfour earliercandidates; preserve patches/receipts and6733rollback. FinalSoltaskreview pendingbeforecommit.
+Bounds: shortrecordings/joke andbackgroundwithoutpeople establish no generalstranger/phone/longconversation/M4/no-paging result. SampleRAM6156/7485MB/58.5C; startup-run paging40in606out, conversationphase8KiBin4out over10wholeone-second systemwideintervals. Detection14.92–14.98fps remainsbelow sustained15target.
+Evidence: bench/results/2026-10-10-d143-face-delivery.json; private stream-detector-n/QA/journal/tegra/v5hash/fullchecks; reviews/20261010-045944-42741-design.md andfinaltaskreviewnext.
+
+## D143 source review 2026-10-10: Accept the scoped face delivery repair
+Sol87044 PASS163.17s/native0/tree00cc65bcdc23e50402c986fff31e8b8ea8cac0fd finds no blockers. It verifies serial/latest/priority/cropbudget/sourceidentity/consent/deletion, unlockedJPEG/socket, all23actualchecks/provenance/853receipts/259+133unique captures/all12QAhashes.
+Its HTTPchecks hit sandboxPermissionError, while recordednativefullchecks remainpassing. Optional standalonebench fps_cap10 metadata contradicts Viewdefault15; correct field fromactualconstructed View beforefinalcommit, without runtime/phase reorder. Runtime staysfrozen; no repeatedJetsonqualityrun justifiedby metadataonly.
+Keep allphone/generalstranger/longconversation/physical/M4/no-paging gaps open. Evidence: reviews/20261010-054037-87044-review.md; public D143audit; finalmetadata stamp follows.
+
+## D143 final review 2026-10-10: Record actual benchmark configuration
+Sol94180 PASS120.76s/native0/treea841e046c80ad84fbcaffe3de6c02ef05c0f6523 accepts actual constructed View.fps metadata. All26runtime/test hashes remain identical to acceptedB; no reordered phases or inference changes.
+Reject repeating Jetson quality for nonexecuted standalone benchmark metadata. Preserve original accepted a7bb delivery qualification, all prior rejections, no-paging and sustained15fps limits.
+Evidence: reviews/20261010-054647-94180-review.md; bench/results/2026-10-10-d143-face-delivery.json. Required staged hook and commit next.

@@ -35,6 +35,7 @@ def open_robot(root: Path) -> Robot:
     robot.memory, robot.things, robot.people = Memory(root), Things(root), People(root)
     class Owner:
         faces, crops, epoch = None, staticmethod(stub_crops), 0
+        condition, active, latest = threading.Condition(), None, None
         def call(self, action, mutate=False):
             self.epoch += bool(mutate)
             return action(self.faces, self.crops)
@@ -45,12 +46,14 @@ def open_robot(root: Path) -> Robot:
     robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
     robot.view, robot.views = (None, {}), deque(maxlen=SHOTS)
     robot.view_at, robot.view_taken, robot.verified = 0, 0, None
-    robot.preview_due = 0
     robot.camera_source = "Live camera"
     robot.shown_taken, robot.session_id, robot.control_message = 0, "test-session", ""
+    robot.shown_frame, robot.shown_record = 0, 0
+    robot.shown_known = False
     robot.crop_due, robot.crop_times, robot.matches_pending = {}, deque(), False
     robot.item_checked = {}
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
+    robot.delivery = threading.Condition(robot.detecting)
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
     robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
@@ -423,9 +426,218 @@ def test_verified_face_frame_and_anonymous_replacement(robot, monkeypatch):
     monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
                                                                   (500, 100, 600, 200)))
     preview(r)
-    assert r.verified is None and r._shown()[0] is newer
+    assert r.verified[1] is newer and r._shown()[0] is newer
+    assert r.verified[3][1][4:] == ("", "other"), "unidentified face stays anonymous"
     assert not any(b[5] == "person" for b in r._shown()[1].boxes)
     assert r._forget(None, "Ana", v) and r.verified is None
+
+
+def delivery_job(r, frame, taken):
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    return (frame, taken, tracks, {t.id: r.focus.epoch(t.id) for t in tracks}, r.session_id,
+            r.focus.geometry(tracks), r.recognition.epoch)
+
+
+@pytest.mark.parametrize("late", [False, True])
+def test_completed_face_wakes_delivery_before_crops_and_after_timeout(robot, monkeypatch, late):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [vector, vector], time.time())
+    source = frame_of(r, people=True)
+    job = delivery_job(r, source, r.view_taken)
+    r.recognition.active = job
+    newer = frame_of(r, BLACK, people=True)
+    r.recognition.latest = delivery_job(r, newer, r.view_taken)
+    entered, release, crop_entered, crop_release = (threading.Event() for _ in range(4))
+    def located(*args):
+        entered.set()
+        assert release.wait(2)
+        return vector, 100, (500, 100, 600, 200)
+    def crop(*args):
+        crop_entered.set()
+        assert crop_release.wait(2)
+        return {}, {}
+    monkeypatch.setattr(main, "located_face", located)
+    monkeypatch.setattr(r, "_query_objects", crop)
+    worker = threading.Thread(target=lambda: r._preview(*job))
+    worker.start()
+    try:
+        assert entered.wait(1)
+        if late:
+            for _ in range(2):
+                frame, screen = r._shown(deadline=time.monotonic()+.005)
+                assert frame is source and not any(b[5] == "known" for b in screen.boxes)
+                assert screen.valid(), "anonymous active pixels cannot advance to newer raw pixels"
+            release.set()
+        else:
+            threading.Timer(.005, release.set).start()
+        frame, screen = r._shown(deadline=time.monotonic()+.1)
+        assert crop_entered.wait(1)
+        assert frame is source and (500, 100, 600, 200, "Ana", "known") in screen.boxes
+        assert screen.valid(), "identical anonymous pixels may gain their completed identity"
+        assert not r.jobs.queue, "face publication does not wait for crop work"
+        shown = r.shown_taken
+        r._shown(False)
+        assert r.shown_taken == shown, "state polling does not consume display sequence"
+    finally:
+        release.set()
+        crop_release.set()
+        worker.join(2)
+    assert not worker.is_alive()
+
+
+@pytest.mark.parametrize("invalid", ["expired", "gallery"])
+def test_stale_active_uses_fresh_latest_without_overtaking(robot, invalid):
+    r = robot
+    source = frame_of(r, people=True)
+    active = delivery_job(r, source, r.view_taken)
+    r.recognition.active = (active[0], active[1] - 1, *active[2:]) if invalid == "expired" else \
+        (*active[:6], active[6] - 1)
+    pending = frame_of(r, BLACK, people=True)
+    r.recognition.latest = delivery_job(r, pending, r.view_taken)
+    newest = frame_of(r, 90, people=True)
+    frame, screen = r._shown()
+    assert frame is pending and frame is not newest
+    assert screen.valid() and r.shown_taken == r.recognition.latest[1]
+
+
+@pytest.mark.parametrize("fps", [10, 15])
+def test_nonwaiting_completed_source_phase_and_encoding_margin(robot, monkeypatch, fps):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [vector, vector], time.time())
+    origin = time.time()
+    clock = [origin+.035]
+    monkeypatch.setattr(main.time, "time", lambda: clock[0])
+    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    first = frame_of(r, people=True)
+    clock[0] = origin+.075
+    preview(r)
+    first_poll = .1 if fps == 10 else 2/15
+    clock[0] = origin+first_poll
+    frame, screen = r._shown()
+    assert frame is first and any(b[4] == "Ana" for b in screen.boxes)
+    clock[0] += .005
+    assert screen.valid()
+    first_emit = clock[0]
+    clock[0] = origin+.168
+    second = frame_of(r, BLACK, people=True)
+    r.recognition.active = delivery_job(r, second, r.view_taken)
+    clock[0] = origin+.2
+    frame, screen = r._shown()
+    assert frame is first and any(b[4] == "Ana" for b in screen.boxes)
+    clock[0] = origin+.208
+    preview(r)
+    clock[0] = origin+(.3 if fps == 10 else 4/15)
+    frame, screen = r._shown()
+    assert frame is second and any(b[4] == "Ana" for b in screen.boxes)
+    clock[0] += .007
+    assert screen.valid()
+    hold = clock[0]-first_emit
+    assert hold == pytest.approx(.202 if fps == 10 else 2/15+.002, abs=1e-6)
+
+
+@pytest.mark.parametrize("invalid", ["negative", "gallery", "session", "gap", "expired"])
+def test_final_jpeg_validation_rejects_changed_face_authority(robot, monkeypatch, invalid):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [vector, vector], time.time())
+    source = frame_of(r, people=True)
+    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    preview(r)
+    frame, screen = r._shown()
+    assert frame is source and any(b[4] == "Ana" for b in screen.boxes)
+    if invalid == "negative":
+        frame_of(r, BLACK, people=True)
+        monkeypatch.setattr(main, "located_face", lambda *a: None)
+        preview(r)
+    elif invalid == "gallery":
+        r.recognition.epoch += 1
+    elif invalid == "session":
+        r.session_id = "replacement"
+    elif invalid == "gap":
+        frame_of(r, people=False)
+    else:
+        monkeypatch.setattr(main.time, "time", lambda: r.view_taken + .201)
+    assert not screen.valid() and r.shown_taken == 0, "invalid encoding never consumes a source"
+
+
+@pytest.mark.parametrize("detected", [False, True])
+def test_unidentified_weak_person_gap_cannot_publish_face(robot, monkeypatch, detected):
+    r = robot
+    source = frame_of(r, people=True)
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    weak = [Track(t.id, t.box, t.label, .21 if t.label == "person" else t.score) for t in tracks]
+    job = delivery_job(r, source, r.view_taken)
+    monkeypatch.setattr(main, "located_face", lambda *a: (np.eye(FACE_DIM)[0], 100,
+                       (500, 100, 600, 200)) if detected else None)
+    frame_of(r, people=False)
+    r._preview(source, job[1], weak, *job[3:])
+    assert r.verified is None
+
+
+def test_fresh_two_person_ambiguity_replaces_known_completion(robot, monkeypatch):
+    r = robot
+    vector = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [vector, vector], time.time())
+    source = frame_of(r, people=True)
+    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    preview(r)
+    assert r.verified[3][1][4] == "Ana"
+    dets = [Detection("person", .9, (200, 50, 610, 700)),
+            Detection("person", .9, (490, 50, 900, 700))]
+    for _ in range(CONFIRM):
+        r._track(source.copy(), dets)
+    assert sum(t[2] == "person" for t in r.tracker.scored()) == 2
+    preview(r)
+    assert r.verified[1] is r.view[0] and r.verified[3][1][4:] == ("", "other")
+    assert len(r.verified[4]) == 2
+    _, screen = r._shown()
+    assert screen.valid() and not any(b[5] == "known" for b in screen.boxes)
+
+
+def test_no_face_completion_loses_departed_person_authority_but_background_delivers(robot):
+    r = robot
+    source = frame_of(r, people=True)
+    preview(r)
+    assert r.verified[1] is source and r.verified[3][1] is None and r.verified[4]
+    _, screen = r._shown()
+    background = frame_of(r, people=False)
+    assert r.verified is None and not screen.valid()
+    preview(r)
+    frame, screen = r._shown()
+    assert frame is background and not r.verified[4] and screen.valid()
+
+
+@pytest.mark.parametrize("invalid", ["gap", "different_pixels"])
+def test_final_publication_preserves_track_and_equal_source_authority(robot, invalid):
+    r = robot
+    source = frame_of(r)
+    frame, screen = r._shown()
+    if invalid == "gap":
+        frame_of(r, box=LEFT)
+    else:
+        assert screen.valid()
+        r.screen = (source.copy(), r.screen[1])
+        frame, screen = r._shown()
+    assert not screen.valid()
+
+
+def test_same_source_known_identity_cannot_change_after_publication(robot, monkeypatch):
+    r = robot
+    vectors = np.eye(FACE_DIM, dtype=np.float32)
+    for index, name in enumerate(("Ana", "Bob")):
+        r.people.enroll(name, [vectors[index], vectors[index]], time.time())
+    source = frame_of(r, people=True)
+    monkeypatch.setattr(main, "located_face", lambda *a: (vectors[0], 100, (500, 100, 600, 200)))
+    preview(r)
+    _, screen = r._shown()
+    assert screen.valid() and r.shown_known
+    monkeypatch.setattr(main, "located_face", lambda *a: (vectors[1], 100, (500, 100, 600, 200)))
+    preview(r)
+    frame, screen = r._shown()
+    assert frame is source and any(b[4] == "Bob" for b in screen.boxes)
+    assert not screen.valid(), "only anonymous identical pixels may receive an equal-source upgrade"
 
 
 def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monkeypatch):
@@ -1029,6 +1241,8 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
     r.focus.focus = track
     ask(r, "Track this as my chosen item")
     preview(r)
+    preview(r, clear=False)
+    preview(r, clear=False)  # Spend the existing crop budget before the size dip.
     source = r.view_taken
     before = r.memory.sightings(source + 1)
     points = r.memory.shard.count(CountRequest())
@@ -1045,15 +1259,77 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
                  "session": r.session_id, "gallery": r.recognition.epoch,
                  "source": r.view_taken}
     assert not r._control("ignore", selection)
-    preview(r)
+    preview(r, clear=False)
     assert not calls and r.memory.sightings(source + 1) == before
     assert r.memory.shard.count(CountRequest()) == points
     monkeypatch.setattr(main.time, "time", lambda: source + .1)
     frame_of(r, label="book")
     assert r.focus.names() == {track: ("chosen item", True)}
+    preview(r, clear=False)  # Complete regrown face/source geometry without a spare crop query.
     assert r._shown()[1].boxes[0][4:] == ("chosen item", "known")
     assert not calls, "regrowth restores display without a fresh query or write"
     assert r.memory.sightings(source + 1) == before
+
+
+def test_detector_frames_admit_without_second_timer_and_preserve_bounded_owner(robot, monkeypatch):
+    from robot.recognition import Recognition
+    r = robot
+    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.named = r.things.labels()
+    entered, release, completed = threading.Event(), threading.Event(), threading.Event()
+    observed, crops, submitted = [], [], []
+    def priority(faces, embed):
+        observed.append("priority")
+        entered.set()
+        assert release.wait(2)
+    def background(*job):
+        observed.append(job[1])
+        r._preview(*job)
+        completed.set()
+    owner = Recognition(background, faces=object(),
+        crops=lambda shots: crops.append(len(shots)) or stub_crops(shots))
+    r.recognition = owner
+    original_submit = owner.submit
+    def submit(job):
+        submitted.append(job)
+        return original_submit(job)
+    monkeypatch.setattr(owner, "submit", submit)
+    base, clock = time.time(), {"offset": 0}
+    monkeypatch.setattr(main.time, "time", lambda: base + clock["offset"])
+    monkeypatch.setattr(main.time, "monotonic", lambda: 1000 + clock["offset"])
+    caller = threading.Thread(target=lambda: owner.call(priority))
+    caller.start()
+    try:
+        assert entered.wait(2)
+        jitter = (.003, -.002, .006, 0)
+        for index in range(12):
+            clock["offset"] = index / 15 + jitter[index % len(jitter)]
+            frame = np.zeros((720, 1280, 3), np.uint8)
+            frame[300:600, 540:740] = GOLD
+            taken = base + clock["offset"]
+            r._track(frame, [Detection("phone", .9, CENTER)], taken)
+            assert submitted[-1][0] is frame and submitted[-1][1] == taken
+            with owner.condition:
+                assert owner.latest[0] is frame and owner.latest[1] == taken
+                assert not owner.requests, "background frames occupy one latest slot"
+        assert len({job[1] for job in submitted}) == 12, "every unique 15 Hz source is admitted"
+        assert observed == ["priority"] and not crops, "priority owns the models first"
+        latest = submitted[-1]
+        assert latest[4] == r.session_id
+        assert latest[3] == {i: r.focus.epoch(i) for i in r.focus.visible}
+        release.set()
+        caller.join(2)
+        assert not caller.is_alive() and completed.wait(2)
+        assert observed == ["priority", latest[1]], "only the newest waiting source executes"
+    finally:
+        release.set()
+        caller.join(2)
+        owner.close()
+    assert r.verified[1] is latest[0] and r.verified[0] == latest[1]
+    assert r.verified[2] == owner.epoch and r.verified[5] == r.session_id
+    for _ in range(8):
+        preview(r, clear=False)
+    assert crops == [1, 1, 1], "more face admission preserves the three-per-second crop budget"
 
 
 def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypatch):

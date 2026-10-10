@@ -62,7 +62,7 @@ class Robotish:
                 self.shown = frame, Screen(boxes)
             self.frames += 1
 
-    def source(self) -> tuple:
+    def source(self, **kwargs) -> tuple:
         self.view_cpu.append((time.monotonic(), time.thread_time()))
         with self.lock:
             return self.shown
@@ -119,13 +119,14 @@ def main() -> None:
            "tegrastats": os.environ.get("ROBOT_TEGRASTATS"),
            "power": subprocess.run(["nvpmodel", "-q"], capture_output=True,
                                    text=True).stdout.split("\n")[0],
-           "opencv": cv2.__version__, "view": {"fps_cap": 10, "width": 960, "jpeg_quality": 80},
+           "opencv": cv2.__version__, "view": {"width": 960, "jpeg_quality": 80},
            "light": round(float(camera.latest()[0].mean()), 1)}
     ms = encode_ms(bot)
     row |= {"encode_ms_p50": round(float(np.percentile(ms, 50)), 2),
             "encode_ms_p99": round(float(np.percentile(ms, 99)), 2)}
     row["without_view"] = phase(bot, a.seconds, None)
     view = View(bot.source, 8099, TOKEN)
+    row["view"]["fps_cap"] = view.fps
     row["with_view"] = phase(bot, a.seconds, f"http://127.0.0.1:8099/?token={TOKEN}")
     view.close()
     bot.stop.set()
