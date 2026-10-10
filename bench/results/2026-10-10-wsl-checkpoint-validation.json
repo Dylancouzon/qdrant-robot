@@ -1,0 +1,388 @@
+{
+  "task": "WSL checkpoint byte validation and native-input packaging",
+  "capture_time_utc": "2026-10-10T13:04:49.424952+00:00",
+  "machine": "WSL RTX3080; CPU-only file processing",
+  "measurement_label": "E",
+  "source_revision": "95515c2f87fba8982db5a519f9022277667b3cc9",
+  "code_revision_before_records": "53be440489358b09d6756b9f00a8798b9a005787",
+  "model_revisions": {
+    "base": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "assistant": "2d874ef7d29f9a30599a1e4b3c1cbc9595f005df"
+  },
+  "software": {
+    "numpy": "2.2.6",
+    "safetensors": "0.8.0",
+    "nvidia-modelopt": "0.45.0",
+    "transformers": "5.14.1",
+    "tensorrt-edgellm": "0.11.0"
+  },
+  "python": "3.12.14",
+  "validation_unit": {
+    "unit": "p2-trt-checkpoint-validate-20261010.service",
+    "native_result": "success",
+    "exec_main_code": 1,
+    "job_final_exit": 0,
+    "invocation": "a60d821e3fef4f5aba2447170413b77d",
+    "start_timestamp": "Sat 2026-10-10 08:51:02 EDT",
+    "end_timestamp": "Sat 2026-10-10 08:51:28 EDT",
+    "state": "active/exited",
+    "memory_peak_bytes": 2147483648,
+    "memory_swap_peak_bytes": 0,
+    "cpu_usage_ns": 25463476000
+  },
+  "packaging_unit": {
+    "unit": "p2-trt-checkpoint-package-20261010.service",
+    "native_result": "success",
+    "exec_main_code": 1,
+    "job_final_exit": 0,
+    "invocation": "21a1d74fb37f4a0b888deefdc7604217",
+    "start_timestamp": "Sat 2026-10-10 08:55:17 EDT",
+    "end_timestamp": "Sat 2026-10-10 08:57:00 EDT",
+    "state": "active/exited",
+    "memory_peak_bytes": 2147749888,
+    "memory_swap_peak_bytes": 0,
+    "cpu_usage_ns": 66714446000
+  },
+  "validation": {
+    "started_epoch": 1791636662.7183642,
+    "machine": "WSL RTX3080",
+    "measurement_label": "E",
+    "checkpoint_scan": {
+      "base": {
+        "files": {
+          "chat_template.jinja": {
+            "bytes": 18569,
+            "sha256": "0a2c8073c878ab1da004bee933a998606537bbb62016310352c7285c3f01c5b5"
+          },
+          "config.json": {
+            "bytes": 8294,
+            "sha256": "c39a94486e4793d6040bf22a85f4d1fdefa043575ff128065b095933da9fc589"
+          },
+          "generation_config.json": {
+            "bytes": 204,
+            "sha256": "b3b67b69c99550f50f7c2493f94eb9a5edb8c83bb7d90f1c059b8a742c7f9166"
+          },
+          "hf_quant_config.json": {
+            "bytes": 2566,
+            "sha256": "2e0321d8b68580aec9e8d4bb94dd1f3cd9759dcbc8a65ae8b6fe15561fa54dd4"
+          },
+          "model.safetensors": {
+            "bytes": 8215397598,
+            "sha256": "e8f3d7a40d07df8dc278bd0af7c022b072570fb7874464761468e5535a7b66d4",
+            "tensor_count": 2433,
+            "tensor_counts_by_dtype": {
+              "F32": 241,
+              "F16": 1951,
+              "U8": 241
+            },
+            "tensor_bytes_by_dtype": {
+              "F32": 42430464,
+              "F16": 7493762502,
+              "U8": 678887424
+            },
+            "elements_by_dtype": {
+              "F32": 10607616,
+              "F16": 3746881251,
+              "U8": 678887424
+            },
+            "nonfinite_float_elements": 0,
+            "packed_u8_awq_weights": 241,
+            "official_safetensors_header": "pass",
+            "stable_during_scan": true
+          },
+          "processor_config.json": {
+            "bytes": 1689,
+            "sha256": "32bdf45d2ad4cc29a0822ddd157a182de76644f0419a6228d151495256e9813c"
+          },
+          "tokenizer.json": {
+            "bytes": 32169780,
+            "sha256": "a2619fe11b50dbed06ac443c51d757b354d0b62d64baa514404d4e84e6713519"
+          },
+          "tokenizer_config.json": {
+            "bytes": 3728,
+            "sha256": "b8045a4576903e86903291d5cbdd4adfc8859e9ce3c98621bdbd957f73ed394b"
+          }
+        },
+        "total_bytes": 8247602428
+      },
+      "assistant": {
+        "files": {
+          ".gitattributes": {
+            "bytes": 1570,
+            "sha256": "34448b82c17d60fec9b65b1f093c115ddbaadc04beb1b0140b6bfed2e012a930"
+          },
+          "README.md": {
+            "bytes": 29768,
+            "sha256": "6d6e15f44732a1984951b0d6e258f84b0e97f3399707aada2c9b0b6c0b4ca3eb"
+          },
+          "config.json": {
+            "bytes": 2315,
+            "sha256": "7f42f559a6a69ffaeaf6b61a1ece3a562a2ed5ad00b8d30f16917ba5ab1bcbe9"
+          },
+          "generation_config.json": {
+            "bytes": 307,
+            "sha256": "8e58004dc0e2407b63410b190bb8470efbdcfeb71533f1770e09c20abe193a6f"
+          },
+          "model.safetensors": {
+            "bytes": 157565344,
+            "sha256": "93682eb1c97639d18f007704dc880bd74cbe530adaf7b1bb561213863fdad2a6",
+            "tensor_count": 50,
+            "tensor_counts_by_dtype": {
+              "I64": 1,
+              "BF16": 49
+            },
+            "tensor_bytes_by_dtype": {
+              "I64": 2097152,
+              "BF16": 155462664
+            },
+            "elements_by_dtype": {
+              "I64": 262144,
+              "BF16": 77731332
+            },
+            "nonfinite_float_elements": 0,
+            "packed_u8_awq_weights": 0,
+            "official_safetensors_header": "pass",
+            "stable_during_scan": true
+          },
+          "tokenizer.json": {
+            "bytes": 32169440,
+            "sha256": "75a6583c1a418e2bbd79c60d95d28e0f5bf549ad3f2990b5bdb5238c6c2bf70c"
+          },
+          "tokenizer_config.json": {
+            "bytes": 822,
+            "sha256": "089594a3924fcfd4cb1c596a7906fbf476193519e5198f780912eed02b177e42"
+          }
+        },
+        "total_bytes": 189769566
+      }
+    },
+    "paired_metadata_checks": {
+      "vocab_size": true,
+      "num_key_value_heads": true,
+      "head_dim": true,
+      "global_head_dim": true,
+      "token_to_id_map_equal": true,
+      "assistant_all_layers_share_kv": true,
+      "model_types": true,
+      "declared_int4_awq": true,
+      "packed_weights_present": true
+    },
+    "quantization_metadata": {
+      "quant_algo": "W4A16_AWQ",
+      "kv_cache_quant_algo": null,
+      "group_size": 128,
+      "has_zero_point": false,
+      "pre_quant_scale": true,
+      "exclude_modules": [
+        "lm_head",
+        "model.audio_tower*",
+        "model.embed_audio*",
+        "model.embed_vision*",
+        "model.language_model.layers.0.mlp.down_proj",
+        "model.language_model.layers.1.mlp.down_proj",
+        "model.language_model.layers.10.mlp.down_proj",
+        "model.language_model.layers.11.mlp.down_proj",
+        "model.language_model.layers.12.mlp.down_proj",
+        "model.language_model.layers.13.mlp.down_proj",
+        "model.language_model.layers.14.mlp.down_proj",
+        "model.language_model.layers.15.mlp.down_proj",
+        "model.language_model.layers.16.mlp.down_proj",
+        "model.language_model.layers.17.mlp.down_proj",
+        "model.language_model.layers.18.mlp.down_proj",
+        "model.language_model.layers.19.mlp.down_proj",
+        "model.language_model.layers.2.mlp.down_proj",
+        "model.language_model.layers.20.mlp.down_proj",
+        "model.language_model.layers.21.mlp.down_proj",
+        "model.language_model.layers.22.mlp.down_proj",
+        "model.language_model.layers.23.mlp.down_proj",
+        "model.language_model.layers.24.mlp.down_proj",
+        "model.language_model.layers.25.mlp.down_proj",
+        "model.language_model.layers.26.mlp.down_proj",
+        "model.language_model.layers.27.mlp.down_proj",
+        "model.language_model.layers.28.mlp.down_proj",
+        "model.language_model.layers.29.mlp.down_proj",
+        "model.language_model.layers.3.mlp.down_proj",
+        "model.language_model.layers.30.mlp.down_proj",
+        "model.language_model.layers.31.mlp.down_proj",
+        "model.language_model.layers.32.mlp.down_proj",
+        "model.language_model.layers.33.mlp.down_proj",
+        "model.language_model.layers.34.mlp.down_proj",
+        "model.language_model.layers.4.mlp.down_proj",
+        "model.language_model.layers.5.mlp.down_proj",
+        "model.language_model.layers.6.mlp.down_proj",
+        "model.language_model.layers.7.mlp.down_proj",
+        "model.language_model.layers.8.mlp.down_proj",
+        "model.language_model.layers.9.mlp.down_proj",
+        "model.vision_tower*"
+      ]
+    },
+    "method": "Installed safetensors header validation; streaming SHA256 and IEEE exponent-bit NaN/Inf scan, 64 MiB CPU chunks; no model load or GPU operation.",
+    "limits": "Numeric file integrity and preliminary paired metadata only. Native builder validation, tensor semantics, model loading, generation, answer quality, Jetson engines, and integrated fit remain unmeasured.",
+    "outcome": "pass",
+    "finished_epoch": 1791636688.7560825,
+    "elapsed_seconds": 26.037718534469604
+  },
+  "package": {
+    "archive": "/home/dylan/qdrant-robot-box/experiments/p2-trt-edge/handoff/gemma4-e2b-int4-awq-20261010.tar",
+    "bytes": 8437452800,
+    "sha256": "aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697",
+    "source_files": 16,
+    "tar_members": 17,
+    "member_byte_verification": "pass",
+    "original_checkpoints_changed": false,
+    "manifest_sha256": "8f1d05cf25a2fd7efea072a245f4ded543720413b1545e704d85aa4aa3b8509f",
+    "elapsed_seconds": 102.76200604438782,
+    "outcome": "pass"
+  },
+  "mac_transfer": {
+    "status": "complete",
+    "native_exit": 0,
+    "started_epoch": 1791637093.2998998,
+    "finished_epoch": 1791637396.0372858,
+    "local_path": "build/p2/inputs/trt-transfer/gemma4-e2b-int4-awq-20261010.tar",
+    "expected_sha256": "aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697",
+    "bytes": 8437452800,
+    "sha256": "aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697",
+    "verified": true,
+    "copy_seconds": 302.7373859882355
+  },
+  "quantization_repeated": false,
+  "onnx_export_needed_for_selected_route": false,
+  "route_evidence": "D117 and pinned direct-engine-builder.md: tensorrt-edgellm-build reads original HF-style prequantized checkpoints directly. Keep the selected wheel-native route.",
+  "jetson_accessed": false,
+  "engine_build": false,
+  "model_loaded": false,
+  "inference_executed": false,
+  "product_changed": false,
+  "private_evidence": [
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validate-checkpoint.py",
+      "bytes": 8634,
+      "sha256": "e4186be7db5dcf675075abb1b12e24f0ea0571c784e42cc466da428062c4c53f"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-checkpoint.py",
+      "bytes": 5157,
+      "sha256": "3b9830e18911ae5848fd4a616d778a9dd4cb3e427d72d530dc5ff6c7684e97e0"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation-expected.json",
+      "bytes": 2126,
+      "sha256": "4d9180a2c225634866a9a8d966605d6cd729a500bc17d6244d397717c1272e84"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation-run.sh",
+      "bytes": 315,
+      "sha256": "49146ff9125e1462717c57a3a24bac26816dba3a4041d9c522b93b7ce8a22ca7"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-run.sh",
+      "bytes": 302,
+      "sha256": "2a50a97a4c4195b61e43ee098e0caa1a1023eebfde72ee6873355717c6d13e9b"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/direct-engine-builder.md",
+      "bytes": 15938,
+      "sha256": "2dfa7c79a8d97a34393d521d9ea9822c385539771a35ea8aefd706bd47c259bb"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/gemma4-assistant-source.py",
+      "bytes": 26608,
+      "sha256": "7a7bf0b6653371e7a8de3e202e947cc975eea21cb563ffe0e28c11df18530d48"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation-result.json",
+      "bytes": 6719,
+      "sha256": "4c0905a5d7a998271911193accb88742710ca26d84cfe208e0e0108add71080f"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation-native-exit.json",
+      "bytes": 46,
+      "sha256": "812d33165926afe1f47be6daf5ec6c03678a2b3e16de175988efda89ac75c43a"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation-unit.txt",
+      "bytes": 293,
+      "sha256": "d42548af2996f564468b337892a6b7dbddb1b29024187b9b5c71f5f89a69979c"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/validation.log",
+      "bytes": 4120,
+      "sha256": "9735fdede12b73e7bbe2a76bfa7ebd91222844bda24482699d31cd73443bfa84"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-result.json",
+      "bytes": 489,
+      "sha256": "a3752d12b487de01a1a93607bea3c69af141698cba14a430621015cecf35af79"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-native-exit.json",
+      "bytes": 46,
+      "sha256": "9ca69b47b30d18192b6b31ce950e87984a4945f28e6eeb1f7da9a7a9aa570e2b"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-unit.txt",
+      "bytes": 293,
+      "sha256": "e05e9ac172abe6f7e95fa67f91f0e738cbac8d4f712432387391278c28d2ba93"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package.log",
+      "bytes": 2189,
+      "sha256": "11b351eb66a8e9363b2150c8e89900e7930e57d53f179c5c29d4c526078fddd8"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/package-manifest.json",
+      "bytes": 12607,
+      "sha256": "8f1d05cf25a2fd7efea072a245f4ded543720413b1545e704d85aa4aa3b8509f"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/transfer-owner.json",
+      "bytes": 637,
+      "sha256": "f437538abbd4b403fe2bd5fbb08e7824328f8bcabc5b0c5fcf50a13c238cb3ac"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/transfer-result.json",
+      "bytes": 395,
+      "sha256": "9cf8f57bb36482716906fb236e4608e8ec26b54f8abb06214473b71a8a1bc04e"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/transfer.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/p2/logs/wsl-validation-20261010/final-remote-state.json",
+      "bytes": 508,
+      "sha256": "19f8c6b16598ba8b7b1154d57bd27d328c12c50210788b0da33d4f5768c66783"
+    }
+  ],
+  "private_evidence_root": "/Users/dylanc/Documents/GitHub/qdrant-robot",
+  "resource_limits": "CPU file-validation/packaging cgroup peaks include file cache; zero unit swap does not qualify inference memory or Jetson headroom.",
+  "unmet": "Native model loading, exact model semantics, generation, cancellation during actual inference, answer quality, engine compatibility, latency, Jetson fit, and integrated targets remain unmeasured.",
+  "original_quantizer_exit": "unavailable; this new native-zero file check does not reconstruct that exit.",
+  "next_step": "Wait for Jetson availability, then use the already selected native direct builder and existing qualification workloads.",
+  "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+  "final_remote_state": {
+    "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+    "owned_units": {
+      "p2-trt-checkpoint-validate-20261010.service": {
+        "ActiveState": "active",
+        "SubState": "exited",
+        "InvocationID": "a60d821e3fef4f5aba2447170413b77d",
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      },
+      "p2-trt-checkpoint-package-20261010.service": {
+        "ActiveState": "active",
+        "SubState": "exited",
+        "InvocationID": "21a1d74fb37f4a0b888deefdc7604217",
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      }
+    },
+    "gpu_lock_holders": []
+  },
+  "record_checks": "JSON, whitespace, native receipts, byte inventories, and evidence hashes; no product tests or review gate."
+}
