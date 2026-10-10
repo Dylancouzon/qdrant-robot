@@ -43,9 +43,67 @@
     "blocking_findings": []
   },
   "deployment": {
-    "status": "reviewed update ready; awaiting Dylan restart readiness, preserve current live session",
-    "current_release": "c182f8518376",
-    "active_user_unit": "qr-live-mac-7ab53f128dba.service"
+    "status": "deployed; updated original preview reopened and fresh session started at explicit user request",
+    "release": "364d83474b31",
+    "previous": "c182f8518376",
+    "retained_protected_release": "cd60be65ee79",
+    "native_exit": 0,
+    "remote_file_sha256": {
+      "robot/main.py": "205786e2b1328211cc7735e3232d9da6f2d8e9ddd9152387573a34acafec1d58",
+      "robot/focus.py": "fbb8ef973c4ddd32820b341a57bf3c9c5fe44403b5fcdb09537af00403905487",
+      "robot/things.py": "2412c12200682a5951a5612f79db454d3642b78ea9be3d35e25280d3c74b1195",
+      "robot/view.py": "d7b84a09e9af7df000620c76bec85274f861fd43e9a4d8e2b38d2080176c031e",
+      "tools/talk.html": "1bccadacf0e0d873e3d13e79dbd9a2744edcbdd6df693d86982e40f283a49abc",
+      "robot/config.py": "d9fdb0d00a5035f08eef34a5b1360982f1dbde54dfe2e507962a599d28971d04",
+      "robot/faces.py": "53360716188bf1801d6c7a4017afbd8cac2f3334b9108891c7047fa72a088a6b",
+      "robot/route.py": "5cbbd9722f53e9d8b26f599414a2b7adc994724b637db94165eae356a3e60dc6",
+      "robot/tts.py": "6bbe3c3620bea5901c1e0995e0d91e2cd75db628d77fff563c512d4817070240",
+      "robot/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "robot/asr.py": "0d6c8147e7541eb4f2fa4aac75f56f2fc6acbcaa2e9d2f46e85ede08b14f991d",
+      "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+      "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+      "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63",
+      "robot/audio.py": "069da726df2ba548e7257e4da4149324201471e9316208e88758423421e9855e",
+      "robot/knowledge.py": "27c5d9931fc90ef53fd1cd5c18fd566e4e667ab4ec60e052af2dbff927ce06c5",
+      "robot/detect.py": "9f4dc961766b04a98785ae2f9b77c6e091995da32a35fc574b454a6e06ed5905",
+      "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+      "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+      "pyproject.toml": "7270bc927f1619ed709dafd0ad5de07b3c8ac0dfc93b44decb5b4748a021c6bf",
+      "uv.lock": "0bcf60a75fe0f6649d1ec6a9d504b2e74bcba85859d705da7fc3602d80a9aaef",
+      "models.json": "f1832149aa0a2604ff3e0dc3cd80a731f8205c92e583b2907765ef2ebfc54727",
+      "tools/talk.py": "b7806ee5ec5fc88731de7d327cc45c4f2e130308c83838abd18276280596e8eb",
+      "tools/jetson.py": "dc84440bae7b2b70899ec5f78064b4530c0563f8005128d6b66f8ac781ca3216"
+    },
+    "unchanged_protected_paths": [
+      "robot/config.py",
+      "robot/faces.py",
+      "robot/route.py",
+      "robot/tts.py",
+      "robot/__init__.py",
+      "robot/asr.py",
+      "robot/text_embed.py",
+      "robot/brain.py",
+      "robot/camera.py",
+      "robot/audio.py",
+      "robot/knowledge.py",
+      "robot/detect.py",
+      "robot/memory.py",
+      "robot/people.py",
+      "pyproject.toml",
+      "uv.lock",
+      "models.json",
+      "tools/talk.py",
+      "tools/jetson.py"
+    ],
+    "closed_shard_backup": "/home/qdrant/qdrant-robot/shared/backups/2026-10-09-before-preview-1b9496b.tar.gz",
+    "backup_sha256": "cf747f5fbbb653d265ad412283fe872157ab8940c8b337274fa4947fb3cf8c23",
+    "ended_owned_units": [
+      "qr-live-mac-7ab53f128dba.service",
+      "qr-live-mac-378dff71c742.service"
+    ],
+    "gpu_lock_after_stop": "free",
+    "server_pid": 9847,
+    "new_user_unit": "qr-live-mac-b6cae9c835d3.service"
   },
   "carried_edges": [
     "Continuous object replacement without a detectable tracking gap can retain the prior display association for at most two seconds; it cannot authorize writes.",
@@ -106,12 +164,13 @@
     "full_suite_hooks": "Skipped per command under explicit user restriction; normal hooks remain tools/githooks."
   },
   "handoff": {
-    "status": "reviewed product pushed; current user live session preserved until restart response",
+    "status": "updated session Listening; preserve Dylan live testing",
     "preview_url": "http://127.0.0.1:8765",
-    "server_pid": 48631,
+    "server_pid": 9847,
     "original_tab": "1202942045",
-    "owned_caffeinate": "2784 stopped after exact command verification",
-    "WSL": "unchanged; last confirmed advancing quantization remains independent",
+    "browser_verified": "Listening; Start disabled; Stop enabled; no transcript or live camera captured",
+    "qualification": "No agent replay or automated live test; user requested fresh session start only.",
+    "WSL": "same quantization job advancing; see 2026-10-09-wsl-awq-restart-status.json",
     "main": "eb746fe unchanged"
   }
 }
