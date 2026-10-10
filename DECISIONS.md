@@ -895,3 +895,21 @@ Claude Code Opus approves the full session comparison with 30639f5, native exit 
 Record final status and clarify the source-hash count. Preserve historical decision bytes and use the readable outcome index. Accepted release 7f67670fa91e and rollback 6781adbb7189 remain unchanged.
 Finish with a bookkeeping-only commit through the real hook and push the branch. D148 ownership, same-name object policy, and background isolation remain next-session discussions; no implementation or wider milestone acceptance is claimed.
 Evidence: reviews/20261010-opus-session-hygiene-final.md; bench/results/2026-10-10-d147-box-continuity.json; STATE.md; research/edge-cases.md.
+
+## Intent planning 2026-10-10: Compare source selection before another model call
+Dylan requests planning only and two Luna web researchers. Screen rules and independent cached BGE scores; reserve a linear multi-label head for failures. No parser is adopted.
+Preserve accepted Qwen/code authority, prompt, UI, production stores, and release links. The six-session development plan contains 26 spoken turns, including seeded knowledge and named-phone live/history contrasts.
+Defer separate encoders and LLM parsing because their benefit and Jetson cost remain U. Phone place provenance and isolated knowledge/log paths are prerequisites. Design review remains required before building.
+Evidence: research/answer-evidence.md; D21/D62/D87/D103/D108-D114; two Luna reports. Planning task review is pending.
+
+## Owner/location requirement 2026-10-10: Bind places and people to object evidence
+Dylan requires a UI-set Location and an Owner from the named introducer. Save location per sighting and owner on the named object and linked evidence. Implementation remains deferred.
+Chat resolves my phone against the named speaker, says your phone to the matching owner, and says Ana's phone to others. Owner plus object label must distinguish separate people's phones.
+Extend the development plan to seven sessions/30 spoken turns. Preserve historical locations, unknown owners, consent, scoped deletion, and D148 ambiguity. The earlier planning review was interrupted after this scope change, native 130.
+Evidence: research/answer-evidence.md; robot/people.py, things.py, and main.py; Dylan's explicit requests. Revised planning review is pending.
+
+## Intent planning review 2026-10-10: Preserve the reviewed future test contract
+Sol 6.1 passes the planning-only source audit and seven-session/30-turn plan, native exit 0 in 222.50 s (E). Local checks confirm the count, referenced assets, and unchanged runtime/fixtures.
+Record duplicate-name and same-owner ambiguity in research/edge-cases.md. Keep named-owner and verified anonymous-session references separate. Qualify payload/storage changes separately from parser gains.
+No runtime, UI, fixture, model, deployment, or adoption change occurs. Commit/push the isolated planning branch; later implementation requires design review and fresh machine reconciliation.
+Evidence: reviews/20261010-123638-91510-review.md; research/answer-evidence.md; STATE.md; lessons.

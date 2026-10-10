@@ -1,64 +1,33 @@
 # State
 
-Updated 2026-10-10. Dylan accepted the final D147 live preview as "Good enough". Detection work stops at this checkpoint. Repository hygiene and the requested Claude Code Opus review are complete. Keep the accepted runtime; detector, filter, and model proposals remain parked.
+Updated 2026-10-10. Planning only, at Dylan's explicit request. No runtime implementation, replay, training, model preparation, deployment, adoption, or main merge is authorized for this session.
 
-## Start here
+## Task and acceptance
 
-Worktree: `/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface`, branch `spike/mac-audio-interface`. The root worktree holds private recordings and the shared Python environment. Read [CLAUDE.md](CLAUDE.md), [current lessons](research/lessons.md), and [Mac interface behavior](research/mac-audio-interface.md). Historical details remain in [DECISIONS.md](DECISIONS.md) and the [lessons archive](research/archive/lessons-2026-10-10.md).
+Compare intent-parser alternatives against past routing tests, with two Luna web researchers. Plan natural live-picture, stored-memory, and combined questions. Expand the four shown complete sessions with seeded Qdrant facts, named-phone last-seen location/time, and owner-aware references. Dylan selects Location and Owner payload requirements. Location comes from the UI; Owner comes from the named introducer. Chat must distinguish your phone from Ana's phone. UI implementation remains deferred. Deliver a concise recommendation, full inspectable sessions, paired test sequence, overhead limits, and exact unresolved prerequisites.
 
-The overnight detection session starts after reviewed D139 handoff `30639f5` (2026-10-10 01:47 EDT). Opus compares that base with the final tree, including D140-D147. D147's final one-condition change also has an exact accepted-live baseline in ignored `build/d147/accepted-live-baseline/robot`.
+This isolated worktree is /Users/dylanc/orca/workspaces/qdrant-robot/answer-evidence-testing, branch spike/answer-evidence-testing, based on accepted UI source 011f522. Preserve parent /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface, its accepted product, and the completed spike/jetson-trt-testing native failure record. Rejected coordinator F1 source must never ship.
 
-## Accepted runtime
+## Source and decisions
 
-Jetson release `7f67670fa91e`; rollback `6781adbb7189` is retained. Default detector is YOLOE-26s, TensorRT FP16, 384x640, with the fixed 50-word vocabulary. Nano artifacts and release fallback remain. All models and Qdrant Edge 0.8 run on the Jetson.
+Read global/project CLAUDE, parent STATE/lessons, this STATE/lessons, D21/D62/D75/D87/D97-D114, research/grounding.md, research/answer-path.md at coordinator, and accepted robot/route.py, memory.py, things.py, main.py. D110 is a frozen historical evidence-assembly proposal, not a runtime implementation. Existing semantic prototypes lost recorded-audio scores; do not repeat them unchanged.
 
-Known object names retain bounded continuity. Object points hold at most three explicitly verified diverse vectors. Preferred weak matches reuse one crop vector for at most one global query. Item Ignore uses negative example multivectors; actual queried misses release a retained preference on the third. Restore uses the existing serial recognition owner. Source/session/gallery/track guards still protect actions, writes, identity, and deletion.
+Reference clone: coordinator refs/qdrant-edge-memory-robot, cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9. Read-only source demonstrates named-object recall from latest seen/taught records with stored place/time; it supplies no current-location guarantee. Reference UI remains out of scope.
 
-Drawing compares consecutive raw positions for large-motion resets and smooths face geometry only on adjacent verified sources. Final `???` styling keeps the selected source-admitted box through matched confidence dips. Raw geometry and eligibility still govern teaching, crops, and writes. Real detection loss and expired size grace can briefly hide a box; these are accepted limits.
+## Protected product and machines
 
-The broader undeployed D147 face/name step and rejected median, Kalman, gated-Kalman, and optical-flow experiments are retained privately under ignored `build/d147`. They add no runtime code. Do not reopen them unchanged.
+Last read-only Jetson reconciliation at 16:11 UTC: current 7f67670fa91e; previous 6781adbb7189; boot 09b4bb27-f975-441c-9d00-7af446ec7de6; no running qr system or user units; 5,952 MiB available; 68 MiB allocated swap; 85 GiB disk free. Subsequent lslocks and nonblocking flock probe confirm shared/gpu.lock free. No remote changes were made. Parent STATE's older live-unit entry is stale relative to this read-only check. Preserve unrelated Mac preview and caffeinate processes.
 
-## Validation and evidence
+No owned model/replay jobs run. The first scoped planning review PID 85579 was interrupted after Dylan added location/owner requirements, native exit 130. Its private log remains reviews/20261010-123135-85579-review.md.log. Revised-scope review PID 91510 and its Codex children exited. Sol 6.1 PASS, native exit 0, 222.50 s (E): reviews/20261010-123638-91510-review.md. Private log remains ignored. No owned jobs run. No Jetson job is starting. No runtime source or fixture changed. Named model jobs and the existing lock remain mandatory for a future execution session. Production memories, backups, accepted UI, current/previous links, private inputs, and native failed artifacts remain untouched.
 
-- [D147 final audit](bench/results/2026-10-10-d147-box-continuity.json): 54 Focus tests pass on Mac and Jetson; final physical preview accepted by Dylan. [Sol task review](reviews/20261010-093839-99667-review.md) PASS in 247.30 s, native exit 0. Main and face/voice code match live baseline `6781adbb7189`; the final unknown change is one display condition. Against Git HEAD `47f6eff`, D147 also includes face-outline smoothing, drawing admission, and tests.
-- First D147 received-video comparison reduces the artificial phone step from 102.753 px to 36 px (J). Baseline and candidate native exit 1 receipts remain failures, with 10/12 and 11/12 original checks. Private `build/d147/{baseline,candidate,live-candidate}` keeps actual JPEG bytes, offsets, hashes, and tegra.
-- [D143 face delivery](bench/results/2026-10-10-d143-face-delivery.json), [D144 false-claim guard](bench/results/2026-10-10-d144-phone-recovery.json), [D145 Ignore/Restore](bench/results/2026-10-10-d145-ignore-continuity.json), and [D146 detector default](bench/results/2026-10-10-d146-detector-default.json) keep their bounded outcomes and failures.
-- [External cup audit](bench/results/2026-10-10-d145-external-cup.json): changed viewpoints reached 121/164, or 73.78% (J), an open descriptor gap. This is development evidence, not held-out acceptance.
+## Planning work and review
 
-Final runtime SHA256: Focus `fa2e9f3ff548996e6223e5907b94eacf487858b0df5fb9f7125e6d4014fb7e77`; main `e086da9710d2ba9b0838b4b12aa8f9a00dac09f6ff5de23ea7bb8e045198f4e7`. Both match the deployed release. Final physical acceptance does not qualify perfect stability, broad false-positive safety, sustained 15 fps, or no paging.
+Changed paths: STATE.md, DECISIONS.md, research/answer-evidence.md, research/lessons.md, research/edge-cases.md, and the scoped review verdict. Both requested Luna researchers completed: /root/intent_rules_embeddings and /root/intent_small_models. They used primary web sources, reported no measured Jetson parser cost, and made no edits or inference calls. Firecrawl credits were exhausted; web search supplied the fallback. The plan compares rules, cached BGE scores, a linear multi-label head, SetFit, and constrained JSON. It contains seven complete development sessions with 30 spoken turns, including a four-turn owner-reference session.
 
-## Running output and machine ownership
+Standing project approval permits scoped commit/push after planning checks and task review. Hooks tools/githooks and Codex authentication verify. gpt-6-luna, gpt-6.1-sol, and gpt-6-astra are present in model cache. No tests or experiments are claimed as measured by this session.
 
-One live preview remains for Dylan: Mac PID 1311 (uv PID 1309), local execution session 78044, `tools/talk.py --release 7f67670fa91e --port 8765`, log `build/d147/final-preview.log`. Original Chrome tab 1202942045 is Listening with microphone capture active. Stop in that page releases its owned session; Ctrl-C stops the local server.
+Unresolved prerequisites: verified phone enrollment, UI location capture/provenance, owner-aware object keys and speaker binding, combined code-answer delivery, temporal binding, and isolated knowledge/log paths. These are explicit future blockers, not completed work. Overhead limits remain U. Planning checks pass: seven sessions/30 spoken turns, existing source assets present, git diff --check clean, runtime and fixtures unchanged. Scoped task review PASS; a design gate is required before any later architecture/schema build. Final physical latency, per-capability quality, decode, detector, Edge-query, headroom, paging, and sustained targets remain unqualified.
 
-Jetson live unit `qr-live-mac-0c66822ccc30`, PID 429443, invocation `5bb152dc80264e70a4501371d305301f`, start 09:40:03 EDT. Its command runs `robot.main --listen 7070` through the existing GPU lock and tegra workflow. Do not open a second MJPEG subscriber. Screenshot `build/d147/final-preview-ready.jpg` proves readiness only.
+Git: the reviewed planning checkpoint is ready for the real bookkeeping-only hook and scoped commit/push under standing approval. Native testing branch and accepted UI branch are clean and untouched. No main merge or adoption.
 
-Jetson alias `robot`, boot `09b4bb27-f975-441c-9d00-7af446ec7de6`. Last checked disk headroom 101 GB (J). Owned `caffeinate -dimsu` PID 65618 remains for the live preview; unrelated PID 36781 stays untouched. Previous sessions, models, memories, and closed backup `shared/backups/2026-10-10-before-d140.tar.gz` remain. Backup SHA256 `bf4ff898131cad2ae1ac0b5af1fc2a40061d3f07ece8f40c42f91a3bc0b267f1`.
-
-All D147 diagnostic/test units have ended. The final Jetson Focus unit exited 0 (54 tests in 0.46 s); its tegra is collected. The clean 202-frame camera fixture and all 348,211,638 bytes verify locally, but PNG encoding gave 6.73 fps (J) and establishes no integrated performance result. No new runtime inference job is needed for documentation cleanup.
-
-## Separate WSL work
-
-The other session completed checkpoint validation and packaging. [WSL status](bench/results/2026-10-09-wsl-d136-status.json) preserves original quantizer native exit as unavailable. Its 17 private evidence files are independently checked against recorded sizes/hashes. Later validation and packaging preserve native exit 0; loading, answers, and Jetson fit remain unverified.
-
-Root-worktree-only evidence: `/Users/dylanc/Documents/GitHub/qdrant-robot/bench/results/2026-10-10-wsl-checkpoint-validation.json`. Private validation logs and the transfer archive remain under that root worktree's ignored `build/p2`. Archive size is 8,437,452,800 bytes (E); SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697`. D117 accepts direct checkpoints; another ONNX export or repeated quantization is unnecessary. The completed-job watcher was removed after preserving 27 historical records. Leave Docker/Ollama and other GPU locks untouched.
-
-## Git and review checkpoint
-
-Accepted product and cleanup commit `69e0101` follows the D140-D146 commits through `47f6eff`. Final D147 product changes are Focus/main/test_focus/test_things; documentation cleanup covers README, CLAUDE, STATE, lessons/archive, Mac interface, booth guide, decisions, audits, and reviews. Preserve all WSL owner content and include its validated whole-file metadata so the worktree can finish clean.
-
-Repo standing approval permits commit and push after review and the real `tools/githooks` pre-commit hook. No main merge. Stage whole reconciled files; partial staging breaks gate index cleanup.
-
-[Initial Opus review](reviews/20261010-opus-session-hygiene.md) and [final Opus verification](reviews/20261010-opus-session-hygiene-final.md) preserve both verdicts. Final verdict: approve, native exit 0. Opus verified all five findings were repaired, with no runtime, secret, or scope blocker. Historical decision spacing remains preserved; use the readable lessons index.
-
-The real commit hook passed on `69e0101`: 90.77 s checks, including the full pytest suite in 88.44 s, native exit 0. The receipt is in the D147 audit; private log is `build/d147/final-commit-hook.log`. Its nonblocking stamp reminder reflects only README, CLAUDE, and 3080 README changes since the Sol review. All four recorded source hashes, two runtime and two test files, match the reviewed and deployed source.
-
-No review or experiment remains active. Final bookkeeping records the approval and parked proposals; current Git history identifies that documentation commit. Next session command: `git status --short --branch`, from this worktree. Read D148 before discussing the parked object gaps; keep live `7f67670fa91e` and rollback `6781adbb7189` unchanged.
-
-## Parked for the next session
-
-[Known object gaps](research/edge-cases.md#next-session-object-recognition-discussion), D148: two same-name items can lose both labels, and rectangular recognition crops retain background. Discuss labeler ownership, shared names within one owner, and measured background isolation next time. These proposals authorize no implementation during this accepted checkpoint.
-
-## Targets that remain open
-
-Physical audible 1.2 s p50/2.0 s p95, 90% per capability with zero stranger identity claims, 30 tok/s decode, sustained 15 fps while talking, Edge 10 ms p99 at acceptance scale, minimum 500 MB headroom, and no turn paging remain unqualified. M4 also needs offline cold start, restart/deletion, held-out acceptance, and an eight-hour active run. The user chose this detection stopping point; these targets do not authorize more work in this session.
+Exact next command: git status --short --branch. In a later execution session, read the plan, reconcile remote jobs/boot/release/lock, and run the design gate before implementing Location, Owner, or a parser. No model/replay job or runtime change is authorized this session.

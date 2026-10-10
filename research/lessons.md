@@ -9,7 +9,7 @@ Updated 2026-10-10 after Dylan accepted the D147 live preview as good enough. Re
 | Live camera, audio, labels, and controls | [Mac interface](mac-audio-interface.md) | D124-D147; [final box checkpoint](../bench/results/2026-10-10-d147-box-continuity.json) |
 | Object selection and visual memory | [Booth behavior](booth-ux.md) | D140-D142, D144-D147 |
 | Detector and TensorRT export | [Detector](detector.md) | D139, D146; [default qualification](../bench/results/2026-10-10-d146-detector-default.json) |
-| Source evidence and answers | [Grounding](grounding.md) | D75, D87-D110; archived controlled comparisons |
+| Source evidence and answers | [Intent and session plan](answer-evidence.md), [Grounding](grounding.md) | D75, D87-D110; archived controlled comparisons |
 | Faces, consent, and deletion | [Faces](faces.md), [identity design](m3-design.md) | D45, D56, D143 |
 | Speech, wake word, and model memory | [Runtime stack](stack.md), [wake word](wakeword.md) | D24, D65-D76 |
 | Deployment and recovery | [Project instructions](../CLAUDE.md), [STATE.md](../STATE.md) | `tools/jetson.py` and named units |
@@ -79,3 +79,13 @@ The other session completed AWQ checkpoint validation and packaging. Preserve [i
 The completed-job watcher was removed after its private history was saved. Direct checkpoint input is supported by D117; another ONNX export or repeated quantization is unnecessary. Keep WSL export/engine qualification separate from the accepted detection checkpoint. Full machine and recovery notes remain in the historical archive and STATE.md.
 
 Background inside rectangular recognition crops remains present. The reference uses segmentation masking before embedding. This is a parked recognition proposal under D148; read [known gaps](edge-cases.md#next-session-object-recognition-discussion) before changing preprocessing or stored vectors.
+
+## Intent and evidence planning, 2026-10-10
+
+Both requested Luna reports recommend reusing the existing BGE question embedding. Compare explicit rules and independent similarity scores first. A linear multi-label head is a fallback after unseen-paraphrase failures. All parser overhead and quality gains remain U. Keep actions and ownership checks in code. Read the [complete seven-session plan](answer-evidence.md) before implementation.
+
+The current category router returns one label, but separate sighting rules already handle some combined questions. Audit all executed answer paths before blaming one component. Prior controlled evidence gains did not survive recorded-audio qualification; D108 rejects that integration. D21 raw Gemma tool fields contain zero calls in four memory questions; its one/four figure is the keyword pass count. Preserve the decision history and distinguish these fields.
+
+Named sightings store frame thirds and time, without semantic place. A parser cannot supply a missing place or fix current-match precedence by itself. Future isolated tests must override shared knowledge and brain log defaults as well as the robot memory root. The replay convenience wrapper deploys implicitly, so it cannot run this isolated comparison unchanged. The planning decision below authorizes no runtime, fixture, schema, or deployment change.
+
+Dylan now requires Location and Owner payloads, with UI location entry and owner-aware chat wording. Capture location with each observation; bind owner to the named introducer. Your phone requires a current-speaker match. A different speaker hears Ana's phone. Current name-only object keys must change before two owners can each retain a phone. Preserve unowned records and D148 ambiguity limits. This is a planning requirement; implementation remains deferred.
