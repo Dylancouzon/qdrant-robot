@@ -8449,5 +8449,16 @@
     "elapsed_s": 120.76,
     "runtime_test_hashes_unchanged": 26,
     "bench_sha256": "477584ac1865bfec9ed6b12ad1878258336f621c6df285d99613ebd8c8dd72aa"
+  },
+  "final_checkpoint": {
+    "commit": "8ca8b75",
+    "pushed": "origin/spike/mac-audio-interface",
+    "required_hook_native_exit": 0,
+    "required_hook_elapsed_s": 80.79,
+    "deployed_release": "151f83de20f5",
+    "accepted_runtime_release": "a7bb11203aa9",
+    "runtime_test_hashes_unchanged": 26,
+    "metadata_only_delta": "bench/view_bench.py records constructed View.fps",
+    "verification": "build/d140/d143-final-deployed-sha.txt"
   }
 }

@@ -1225,8 +1225,8 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     r._track(frame, dets)
     preview(r)
     assert calls[-2:] == ["Dylan's smartphone", None]
-    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
-    assert [b[4] for b in r._shown()[1].boxes] == ["Dylan's smartphone"]
+    assert not r.focus.names(), "two weak current signals hide the retained association"
+    assert not r._shown()[1].boxes
     assert not r._shown(False)[1].control["targets"], \
         "retained labels cannot authorize low-confidence actions"
     preview(r)

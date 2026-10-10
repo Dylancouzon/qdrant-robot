@@ -280,7 +280,8 @@ class Focus:
         now = self.now if now is None else now
         for i, n in self.named.items():
             seen = self.seen.get(i)
-            if seen and seen.track and self.eligible(seen.track, pending=True) and \
+            if seen and seen.track and self.confident(seen.track) and \
+                    self.eligible(seen.track, pending=True) and \
                     (i in self.visible or now - seen.last <= OCCLUSION_S) and \
                     n.name and n.confidence >= GUESS:
                 grouped.setdefault(n.name, []).append((i, n.confidence))

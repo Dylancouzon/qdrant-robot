@@ -445,3 +445,50 @@ def test_duplicate_name_abstains_even_when_one_match_becomes_weak():
     f.update(10.1, [a, b], [], recognized={1: (None, 0)})
     assert not f.names(), "a weak view must not release the competing accepted claim"
     assert all(box[5] != "known" for box in f.boxes([a, b], []))
+
+
+@pytest.mark.parametrize(('detector', 'descriptor', 'displayed'), [
+    (.143188, .7754759788513184, False),  # Recorded face crop: both current signals weak.
+    (.143188, F.GUESS, False),
+    (.143188, F.SURE - .0001, False),
+    (.143188, F.SURE, True),
+    (.143188, 1, True),
+    (F.DISPLAY_CONFIDENCE, .7754759788513184, True),
+    (.9, .2544, True),
+])
+def test_display_requires_one_current_positive_signal(detector, descriptor, displayed):
+    f = Focus(W, H)
+    t = phone((518, 142, 697, 386), score=.9)
+    f.update(10, [t], [])
+    f.bind(t.id, 'Chosen')
+    t = phone(t.box, score=detector)
+    f.update(10.1, [t], [], recognized={t.id: ('Chosen', descriptor)})
+    assert bool(f.names()) is displayed
+    assert bool(f.boxes([t], [])) is displayed
+    assert f.name(t.id) == 'Chosen', 'display rejection retains the preference for re-query'
+    assert f.named[t.id].score == descriptor, 'retained display confidence never replaces evidence'
+    assert f.named[t.id].confidence == 1
+    assert f.eligible(t, pending=True), 'the crop remains eligible for fresh re-verification'
+    f.update(10.2, [t], [])
+    assert bool(f.names()) is displayed, 'skipped queries do not change either signal'
+    assert f.named[t.id].misses == int(descriptor < F.SURE)
+
+
+def test_two_weak_signals_hide_until_detector_or_descriptor_recovers():
+    f = Focus(W, H)
+    t = phone((518, 142, 697, 386), score=.143188)
+    f.update(10, [t], [])
+    f.bind(t.id, 'Chosen')
+    f.update(10.1, [t], [], recognized={t.id: ('Chosen', .7754759788513184)})
+    assert not f.names() and not f.eligible(t)
+    refreshed = f.named[t.id].refreshed
+    strong_detector = phone(t.box, score=.9)
+    f.update(10.2, [strong_detector], [])
+    assert f.names() == {t.id: ('Chosen', True)}
+    assert f.named[t.id].refreshed == refreshed, 'detector recovery invents no crop authority'
+    assert f.named[t.id].score < F.SURE
+    f.update(10.3, [t], [])
+    assert not f.names(), 'the retained association cannot override two weak signals'
+    f.update(10.4, [t], [], recognized={t.id: ('Chosen', F.SURE)})
+    assert f.names() == {t.id: ('Chosen', True)} and f.eligible(t)
+    assert f.named[t.id].score == F.SURE and f.named[t.id].refreshed == 10.4

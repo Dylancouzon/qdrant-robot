@@ -738,3 +738,35 @@ Keep allphone/generalstranger/longconversation/physical/M4/no-paging gaps open. 
 Sol94180 PASS120.76s/native0/treea841e046c80ad84fbcaffe3de6c02ef05c0f6523 accepts actual constructed View.fps metadata. All26runtime/test hashes remain identical to acceptedB; no reordered phases or inference changes.
 Reject repeating Jetson quality for nonexecuted standalone benchmark metadata. Preserve original accepted a7bb delivery qualification, all prior rejections, no-paging and sustained15fps limits.
 Evidence: reviews/20261010-054647-94180-review.md; bench/results/2026-10-10-d143-face-delivery.json. Required staged hook and commit next.
+
+## D144 2026-10-10: Resolve contradicted duplicate object associations
+Select reversible Focus correction after local reproduction and paired S fullRobot baseline. A currently strong phone score1.0 competes with oldtrack face score0.2544; retained display confidence suppresses the valid target.
+Only a unique currentSURE match with actual below-GUESS competitors may win; preserve abstention for two strong/unqueried claims and exact-current action/write checks. Alternatives unchanged eventualthree-miss clearing and wider detector/tracker replacement remain measurable fallbacks.
+D1438ca8b75 accepted after final94180PASS andhook80.79s/native0; no modeladoption. Existingprivate commonflow adapter needs current post-render validation/source metadata to measure D143 correctly.
+Evidence: build/d140/runtime-d142/{summary,samples}.json, D141/D142 receipts, D143finalreview. Paired phone movement90%/Ignore/Restore/deletion/binding and resource checks stay fixed.
+
+## D144 baseline 2026-10-10: Reject an obsolete action fix and measure actual delivery
+Current151f83 S baseline completesfullflow/native1: fixedIgnore, Restore, and reopening pass. Groupingprototype onlyhelpsfinalduplicateframe;14solewrongfaceclaims precedenewpositive. Preserveprivateprototype andrestorecommittedsource; do not adoptoldD142 artifactfix.
+Concrete limitation: direct10Hz _shown/draw lacks productionView waiting/retry anddiscards273/1280attempts; movement78% versus94.35%valid, Restore68.46% versus83.61%. Discardscannot provevisibleblink. Reuse existingD143actualMJPEGtransport inside existingphonecommonflowadapter tomeasureactualgeometry/recovery; no newplanninggate or thresholdchange.
+Keep onevalidneutralphoneoverlap atreturn9.933s, sparse/unavailabletruth limits, andstartup-runpaging203in3103outpages visible. ProductmodelN default/S unadopted remain.
+Evidence: build/d144/baseline-s andfrozenadapter03701f5; independentpeerbaselineaudit, D143actualsubscriber precedent.
+
+## D144 actual stream 2026-10-10: Correct false claims before detector adoption
+ActualS baseline151f83 completes allflow/native1,11/12checks PASS: movement92.49%, Restore90.61%, naturalbinding/fixedIgnore/persistence/reopen pass; ignored return fails. Six early phone labels sit onface with latestscore0.775476 and detector0.143-0.157. Below-GUESS joint filter removeszero and is rejected; consider existingSURE plus normaldetector admission without changing thresholds.
+All1826sends received; unique named movement195/Restore191, receipts197/193. Three neutraloverlaps nearoriginal10s plusone unqualified boundary remain; current excludedNone hides numeric queryscore, so observe originalreturn before choosing Ignore change. Preserve strictD143 phone/conversation freshness failures, paging153in9990out, and unadoptedS.
+Evidence: build/d144/stream-baseline-s; immutable4d54/protocolb1db; independentpeer provenance/28QA/geometry audit; focus-rule-proposal.json and rejected-grouping-prototype.patch. Next smallest product step follows local reproduction and affected-geometry check, without another planning gate.
+
+## D144 correction 2026-10-10: Reuse normal confidence when the current descriptor is weak
+Select smallest Focus.names correction through existing confident(track), preserving pending re-verification elsewhere. Latest below-SURE plus below-display detector confidence abstains; either a strong crop or normal detector retains existing hysteresis. No thresholds/state/model changes; actual90% paired coverage remains required.
+The six stream wrongfaceclaims areguessband, so below-GUESS rule cannot help. Four movement/twoRestore positive receipts could alsohide; preserve that cost and reject if pairedquality fails. Existing Ignore leak is derived6.933-7.067s, therefore original3.933-4.067s, correcting priorlead arithmetic; observer baseline measures actual originalquery scores before Ignore changes.
+Evidence: build/d144/focus-rule-proposal.json, stream-baseline-s andpeer audit; frozen originalexcluded observer72d59/adapter4d54 with localexact-once/exception/profiler PASS. Workeronlyfocus/test_focus; noarchitecturegate for smallreversible change.
+
+## D144 paired result 2026-10-10: Keep the small false-claim correction for review
+Candidate de6ee03aa41c removes six measured earlyreturnwrongphone overlays, retaining movement196/21790.32% andRestore178/19093.68% above unchanged90%(J). Fullflow remainsnative1/11of12PASS from oneunqualified ignoredreturnboundary; zero qualifiedoverlaps here do not establish Ignore repair. Sourceconfidence correction is selected for scopedreview, modelS remainsunadopted.
+Worker113native39.62s, peer12native1.92s plusoldpredicate mutation, fullchecks82.11native0(E). All1823sends received/zeropending/errors; peak6230/7485MB/65.156C, paging850in43737outpages. Movementmarginnarrow and truepositiveloss acceptedtradeoff; strictfreshness/no-paging/generalFPR remain open. Endpeoplepayload/WAL differs fromrunlinks; vectorstorage equal, initialpayload equality unproven.
+Evidence: bench/results/2026-10-10-d144-phone-recovery.json; build/d144/stream-two-signal-s, stream-excluded-s, threepathpatch/tests/deployedhashes; taskreview69395 next. Observer proves real weakguessband Ignore leaks onoriginalruntime; nextincrementafterreview/commit.
+
+## D144 review 2026-10-10: Accept the scoped confidence correction
+Sol49849 PASS246.31s/native0/treefe2fe64c450e3651a336e163ce7dbbaf433fc5c7 finds noblockers; verifies source41checks/113recorded/fullchecks/provenance/28QA andfixed90%fractions. Carry truepositiveloss, sourcephaseboundary, weakexclusion, Sfreshness/cadence/no-paging limits. DefaultN frozene512 regressionnative0/16strictchecks; exactsevenpairedexpressionsofflinePASS, notnative23.
+Default267personunique/96.04%, conversation134/14.12namedfps/95.71%, all200msage/holdPASS;854sends received. Allcadences92.75-101.81%acceptedD143, convonamedfps98.64%(J). Retain currentdefault andsmallpredicate; no S adoption or repairedIgnore claim.
+Evidence: reviews/20261010-063302-49849-review.md; publicD144audit; build/d144/two-signal-face-n/offline-pair.json. Requiredhook/commitcheckpointnext; continue measuredIgnore gap afterward.
