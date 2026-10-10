@@ -1,6 +1,4 @@
-"""Object detection and tracking: YOLOE-26n with a fixed booth vocabulary (end-to-end, no NMS) on
-TensorRT, and an IoU tracker that reports when a track is confirmed, moves region, changes its
-majority label, or leaves.
+"""YOLOE-26s booth detection on TensorRT, with IoU tracking and label voting.
 
     python -m robot.detect     self-check (the tracker; the detector too when its model exists)
 """
@@ -16,7 +14,7 @@ import numpy as np
 
 from robot.config import DETECT_HIGH, DETECT_LOW, MODELS, ROOT
 
-MODEL = MODELS / "detector/yoloe-26n-booth-384x640.onnx"  # recipe: research/detector.md
+MODEL = MODELS / "detector/yoloe-26s-booth-384x640.onnx"  # recipe: research/detector.md
 INPUT = (384, 640)  # height, width: the 16:9 camera frame letterboxed with little padding
 LOW, HIGH = DETECT_LOW, DETECT_HIGH
 MATCH_IOU = 0.3

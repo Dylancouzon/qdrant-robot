@@ -1,10 +1,11 @@
 # Detector and tracker (M2.D spike)
 
-As of 2026-10-08, on our robot (MAXN_SUPER where marked, otherwise 15W; TensorRT 10.16.2, onnxruntime-gpu 1.24.0). Labels: J measured here, E measured elsewhere, U unverified. Raw results: `bench/results/2026-10-08-detect-*.jsonl` and `detect-*.tegrastats`.
+Development default updated 2026-10-10 (D146). Historical tables below were measured on 2026-10-08 with nano models (MAXN_SUPER where marked, otherwise 15W; TensorRT 10.16.2, onnxruntime-gpu 1.24.0). Labels: J measured here, E measured elsewhere, U unverified. Raw historical results: `bench/results/2026-10-08-detect-*.jsonl` and `detect-*.tegrastats`.
 
 ## Summary
 
-- Recommendation: YOLOE-26n with a fixed 50-word booth vocabulary, exported end-to-end (no NMS) at 384x640, run as a TensorRT FP16 engine through the TensorRT Python API (`robot/detect.py`). It finds the booth objects that COCO-80 lacks (plush toy, badge, sticker, phone, mug are in the vocabulary) at nearly the cost of YOLO26n. (J)
+- Default: YOLOE-26s with the same fixed 50-word booth vocabulary, end-to-end export at 384x640, and TensorRT FP16 backend (`robot/detect.py`). It supplies the proposal needed to teach the held phone, which nano misses. D145 reaches 91.51% named phone movement and 92.46% Restore coverage. (J) Keep YOLOE-26n as the fallback.
+- Scope: [D146's phone replay](../bench/results/2026-10-10-d146-detector-default.json) passes all 12 checks, with 91.43% named movement coverage and 91.47% Restore coverage. Conversation face naming is 88.10%, with a 453.8 ms held-source interval; smoothness and paging remain open. The external cup reaches 73.78% across changed viewpoints, with zero wrong cup overlays. These development results establish no general detection or distinct-instance false-positive acceptance. (J)
 - Backend: raw TensorRT (A) over onnxruntime with the TensorRT provider (B). Same speed, 340 MB less RAM, and no six-minute engine build inside the robot process. (J)
 - MAXN_SUPER: at 15 fps with llama-server decoding, the detector keeps 15.0 fps and LLM decode drops from 34.6 to 31.7 tok/s (8%), above the 30 tok/s target. At 15W the drop was 23.2 to 20.6 (11%). Unthrottled at 15W, decode halved (23.3 to 11.9). Run detection at camera rate, never flat out. (J)
 - YOLOE prompt-free (4,585 built-in tags) is rejected: scene tags ("laundry room", "biology laboratory") outrank the objects, it misses the teddy bears and apples in our closet frames, and it costs 18.6 ms of GPU per frame. (J)
@@ -50,7 +51,56 @@ On the 25 COCO frames, YOLO26n and YOLOE booth agree on people, cars, apples, ca
 
 Gotcha: an FP16 engine rounds the class index for vocabularies over 2,048 classes (prompt-free returned "humidifier" for person). Keep `/model.23/Cast` and `/model.23/Concat_5` in FP32 (`--precisionConstraints=obey --layerPrecisions=... --layerOutputTypes=...`) if a large vocabulary ever returns. The first prompt-free result file (`...yoloe-pf-tensorrt-1791461221`) has this bug. (J)
 
-## Export recipe (Mac; the Jetson has no sm_87 torch)
+## Default export recipe (Mac; the Jetson has no sm_87 torch)
+
+Use the pinned S checkpoint from `models.json`. Run `python -m tools.models detector/yoloe-26s-seg.pt` before export. Its source is [Ultralytics assets v8.4.0](https://github.com/ultralytics/assets/releases/download/v8.4.0/yoloe-26s-seg.pt). The Mac-only text encoder `mobileclip2_b.ts` comes from the same release; its checksum is recorded below. Put both files in a scratch directory.
+
+The recorded D139 export used Python 3.12.13, Ultralytics 8.4.174, torch 2.14.1, torchvision 0.29.1, ONNX 1.23.2, onnxslim 0.1.98, and opset 18. CLIP resolved to commit `7ffa84b3bfa40c42ecc1c77147a855e69cb2dd40`. Pin these export dependencies:
+
+```sh
+uv run --no-project --python 3.12.13 \
+  --with ultralytics==8.4.174 --with torch==2.14.1 --with torchvision==0.29.1 \
+  --with onnx==1.23.2 --with onnxslim==0.1.98 \
+  --with 'clip @ git+https://github.com/ultralytics/CLIP.git@7ffa84b3bfa40c42ecc1c77147a855e69cb2dd40' \
+  python export.py
+```
+
+In `export.py`, use the ordered VOCAB from the historical recipe below:
+
+```python
+from pathlib import Path
+from ultralytics import YOLO
+
+VOCAB = "person,face,badge,lanyard,sticker,plush toy,teddy bear,mug,cup,bottle,phone,laptop,keyboard,computer mouse,headphones,backpack,bag,hat,glasses,book,pen,t-shirt,chair,apple,banana,orange,cat,dog,motorcycle,bicycle,car,stop sign,monitor,camera,microphone,box,potted plant,toy,ball,umbrella,watch,keys,wallet,scissors,remote control,clock,lamp,photo,poster,sign".split(",")
+model = YOLO("yoloe-26s-seg.pt")
+model.set_classes(VOCAB)
+exported = Path(model.export(format="onnx", imgsz=(384, 640), simplify=True,
+                             end2end=True, opset=18))
+exported.rename("yoloe-26s-booth-384x640.onnx")
+```
+
+`set_classes` runs the text encoder once on the Mac. The exported ONNX contains the vocabulary embeddings. Input is RGB float32 divided by 255, shaped `(1, 3, 384, 640)`, with linear resize and letterbox padding 114. Outputs are `(1, 300, 38)` and `(1, 32, 96, 160)`. The runtime reads box coordinates, confidence, and class from the first six detection columns; it ignores segmentation outputs. Preprocessing, tracking, thresholds, and the crop-size floor remain unchanged.
+
+Copy the ONNX to `shared/models/detector/`. Build its engine on the Jetson while holding the existing GPU lock:
+
+```sh
+trtexec --onnx=yoloe-26s-booth-384x640.onnx --saveEngine=yoloe-26s-booth-384x640.fp16.engine --fp16 --memPoolSize=workspace:1024
+```
+
+Recorded D139 artifacts:
+
+| File | SHA256 |
+| --- | --- |
+| `yoloe-26s-seg.pt` | `48f24206bc8680d60cbbfa296b0140da849669b9515058b72f5a945142df0654` |
+| `mobileclip2_b.ts` | `35d7f213e4d75f38514e4656ad3cb91158bd33e3805d8ac349f23b186f66982f` |
+| `yoloe-26s-booth-384x640.onnx` | `edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4` |
+| `yoloe-26s-booth-384x640.fp16.engine` | `52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086` |
+
+The export embeds a date, so a fresh export has another checksum. Record and qualify its ONNX and engine hashes. The hashes above identify the existing measured artifacts, rather than byte-identical output from every installation. License: AGPL-3.0, approved for the detector.
+
+For nano fallback, use `Detector(MODELS / "detector/yoloe-26n-booth-384x640.onnx")` or restore the retained N release. Preserve its ONNX and FP16 engine. The historical recipe and calibration below remain specific to N.
+
+## Historical nano export recipe
 
 1. In a scratch directory: `uv run --python 3.12 --with ultralytics==8.4.174 --with onnx --with onnxslim python`, then `m = YOLO("yoloe-26n-seg.pt"); m.set_classes(VOCAB); m.export(format="onnx", imgsz=(384, 640), simplify=True, end2end=True)`. `set_classes` runs the MobileCLIP2 text encoder once on the Mac; the ONNX keeps only the vocabulary embeddings. YOLO26n: `YOLO("yolo26n.pt").export(...)` with the same arguments.
 2. VOCAB (50): person, face, badge, lanyard, sticker, plush toy, teddy bear, mug, cup, bottle, phone, laptop, keyboard, computer mouse, headphones, backpack, bag, hat, glasses, book, pen, t-shirt, chair, apple, banana, orange, cat, dog, motorcycle, bicycle, car, stop sign, monitor, camera, microphone, box, potted plant, toy, ball, umbrella, watch, keys, wallet, scissors, remote control, clock, lamp, photo, poster, sign.

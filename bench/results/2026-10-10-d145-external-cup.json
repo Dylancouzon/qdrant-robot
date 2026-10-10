@@ -1,0 +1,187 @@
+{
+  "classification": "J development replay of an external video already used in D141 descriptor experiments; no unseen-object false-positive or generalization qualification",
+  "release": "a9299a617f4c",
+  "model": "yoloe-26s-booth-384x640.onnx",
+  "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+  "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+  "adapter_sha256": "51e2382f168f4b38759ff49abf3fec37ad878c5bc5e84f611f0dad7176fa8766",
+  "transport_origin_sha256": "4d54c248bf807a9a5206b6e075b5b51e267a894c64114bc4efaf878b6e934e8e",
+  "protocol_sha256": "f6be602ffd5682c2c6c873fc0401b9f0af3991e089c4306238108f40a4162b22",
+  "source_sha256": {
+    "robot/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "robot/asr.py": "0d6c8147e7541eb4f2fa4aac75f56f2fc6acbcaa2e9d2f46e85ede08b14f991d",
+    "robot/audio.py": "069da726df2ba548e7257e4da4149324201471e9316208e88758423421e9855e",
+    "robot/brain.py": "e154b10d42f5722f88a0c9d40e3a6e31528b3bbb5df1f97c687d0fcc47659519",
+    "robot/camera.py": "dd2585f4fb29968dcec7076db7ea839170de53d6cfc1b39ee7cad2f63daeeb63",
+    "robot/config.py": "3050149511ff8de937a8a0a216ecdca3835b69b05813e8da1daa4eb0e228bb72",
+    "robot/detect.py": "e6fc8a8a7c65beeccb6a5f05f62209104f59df43e85bd051a01ed7491be8ec6d",
+    "robot/faces.py": "98a7faa9d72214741c7eca718d4a6d12bed03feb46c6bca6f00f752b1126539c",
+    "robot/focus.py": "d57b0d0b33d04acd6ca691c2f5b65ba8eb5e5db5cbcb76f217c5a07e15b594ff",
+    "robot/knowledge.py": "27c5d9931fc90ef53fd1cd5c18fd566e4e667ab4ec60e052af2dbff927ce06c5",
+    "robot/main.py": "84c7845e63c8a14393133de1bc0d611e6a2766616a6e03d422d746adaed46a55",
+    "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+    "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+    "robot/recognition.py": "c272471b25fc11f8416e06366982e4501d7b10793ddf97f888d84547e7c4d90d",
+    "robot/route.py": "5cbbd9722f53e9d8b26f599414a2b7adc994724b637db94165eae356a3e60dc6",
+    "robot/test_focus.py": "89eb22fb55b8429f5be610fdf284cb19c41991ef122a537e122d17abc719ae1f",
+    "robot/test_people.py": "f7dfad6ee7db5b9607c1303454d90b60b016b2c52194f68a60e45c842fd7df44",
+    "robot/test_recognition.py": "216deb8ca1b9688ec825768b1ee2609ff7f6bbd890fa6ef6a480a9c3f68541c0",
+    "robot/test_sightings.py": "f107bc65cb03502961a58792c846d230061b3256a4b07ccae87223809488e532",
+    "robot/test_speak.py": "2b88f58837278fcfe75bcd964fc769a0accb1e23fac243b780a7ab2952680e3a",
+    "robot/test_things.py": "1d21c3392559ba81770cc74a50b738134e3cd7f8c956fb666d2b30729a8dda88",
+    "robot/test_view.py": "ae8444ff61f0bdb0c7e0d3ee86ab4d012ed7393a7a3a7963abdf11cfb2284dd3",
+    "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+    "robot/things.py": "3a07854a6f52863feea650076c1544185090ef52a3d603ee57578e55d437a46e",
+    "robot/tts.py": "6bbe3c3620bea5901c1e0995e0d91e2cd75db628d77fff563c512d4817070240",
+    "robot/view.py": "706eb81cb0c1ca204146bb7544331e8a1f147f47613b396e05bba52c692b1cdc"
+  },
+  "production_memory_writes": false,
+  "completed": true,
+  "native_exit": 1,
+  "failure": null,
+  "cleanup_failure": null,
+  "turn": {
+    "answer": "Got it, that is your cup. I will remember it.",
+    "named": "cup"
+  },
+  "gallery_vectors": 1,
+  "accounting": {
+    "callbacks": 228,
+    "draws": 226,
+    "sent": 221,
+    "received": 221,
+    "pending": 0,
+    "discarded": 5,
+    "errors": [],
+    "quality_denominator": "all actual received bodies after fixed phase-start warm exclusion; invalid provenance is a miss"
+  },
+  "required_checks": {
+    "natural_physical_binding": true,
+    "bounded_gallery": true,
+    "continuous_video_complete": true,
+    "subscriber_complete": true,
+    "cup_coverage": false,
+    "no_wrong_cup_overlay": true,
+    "unknown_switches": true
+  },
+  "protocol": {
+    "classification": "J development replay of an external video already used in D141 descriptor experiments; no unseen-object false-positive or generalization qualification",
+    "original_video_id": "Google Objectron cup/batch-5/3",
+    "raw_sha256": "49748f1c5065c91665d64585723fc44e24ce35dfe2b4c688708a8a7a2cb19d74",
+    "cup_media": "d141-external/cup-batch-5-3.avi",
+    "cup_sha256": "f5cfd0249df4e1d8bc96d8148178f53e308173c444dd416e7a6d740a1f76e17a",
+    "frames": 360,
+    "fps": 30,
+    "size": [
+      1280,
+      720
+    ],
+    "held_media": "d145-external/cup-frame0-held.avi",
+    "held_sha256": "2dc1871cc70ea3959bb575e55b84f614311dfbcc472b89459da515d9a5ee9759",
+    "held_frames": 1800,
+    "held_original_frame": 0,
+    "annotation_sha256": "4036f7c3f810e09434d37e78d7dc56967d9db709c38437f6b457be318fb90085",
+    "geometry": "Direct normalized upright coordinates x=370+540*x, y=720*y. Cuboid extent may exceed content pillarbox. No second rotation. Boxes score physical overlap, never become descriptor crops.",
+    "geometry_qa": "Five mapped overlays independently viewed by worker and lead, align around same metal cup.",
+    "model": "s",
+    "min_side": 120,
+    "physical_overlap_min": 0.3,
+    "known_fraction_min": 0.9,
+    "unknown_switch_min_s": 3,
+    "question": "This is my cup",
+    "teaching_wait_s": 1.6,
+    "turn_bound_s": 45,
+    "evaluation_s": 11.95,
+    "warm_exclusion_s": 1,
+    "control_poll_s": 0.1,
+    "qa_receive_offsets_s": [
+      2,
+      6,
+      10
+    ],
+    "qa_total_max_bytes": 8000000,
+    "delivery": "one actual constructor View authenticated MJPEG subscriber; successful socket writes paired to received bodies by FIFO and SHA",
+    "gallery": "one ordinary explicit naming turn, up to runtime three vectors; no descriptor-only teaching, no oracle crops",
+    "geometry_limit": "Mapped cuboid extents verified in five QA frames; conservative overlap measures do not establish fine segmentation or stranger-instance rejection"
+  },
+  "metrics": {
+    "cup_teaching": {
+      "received": 42,
+      "stable_received": 30,
+      "unique_sources": 28,
+      "observed_receipt_span_s": 2.1407785415649414,
+      "first_receipt_offset_s": 0.26274943351745605,
+      "unique_correct_named_source_fps": 6.5396769110763735,
+      "known_to_unnamed_transitions": 0,
+      "unexpected_known_labels": [],
+      "unique_source_fps": 13.079353822152747,
+      "detector_fps": 14.480713160240542,
+      "qualified_geometry": 30,
+      "correct_named": 16,
+      "correct_named_fraction": 0.5333333333333333,
+      "misses": 14,
+      "wrong_named_boxes": 0,
+      "receive_age_max": 0.16472554206848145,
+      "post_jpeg_age_max": 0.16413426399230957,
+      "unknown_changes": [
+        {
+          "track": 1,
+          "at": 1791631711.8203886,
+          "interval_s": null
+        }
+      ],
+      "unknown_unresolved": 0
+    },
+    "cup_video": {
+      "received": 179,
+      "stable_received": 164,
+      "unique_sources": 162,
+      "observed_receipt_span_s": 10.937277555465698,
+      "first_receipt_offset_s": -0.0008108615875244141,
+      "unique_correct_named_source_fps": 10.880221279611945,
+      "known_to_unnamed_transitions": 1,
+      "unexpected_known_labels": [],
+      "unique_source_fps": 14.811729809219623,
+      "detector_fps": 14.99459067106184,
+      "qualified_geometry": 164,
+      "correct_named": 121,
+      "correct_named_fraction": 0.7378048780487805,
+      "misses": 43,
+      "wrong_named_boxes": 0,
+      "receive_age_max": 0.19746947288513184,
+      "post_jpeg_age_max": 0.19386506080627441,
+      "unknown_changes": [
+        {
+          "track": 1,
+          "at": 1791631722.1708434,
+          "interval_s": null
+        }
+      ],
+      "unknown_unresolved": 0
+    }
+  },
+  "qa": {
+    "received_files": 4,
+    "all_received_jpeg_sha_match": true
+  },
+  "runtime": {
+    "machine": "Jetson Orin Nano Super8GB",
+    "unit": "qr-d145-external-cup-s",
+    "invocation_id": "ea9e44dc04294d33b7c1b0eda3b67e0a",
+    "start": "2026-10-10T07:28:12-04:00",
+    "command": "python3 tools/jetson.py run d145-external-cup-s --wait -- ../../shared/sessions/d145-external/external_cup_check.py --model s",
+    "elapsed_s": 41.586,
+    "wrapper_native_exit": 1,
+    "tegra_rows": 41,
+    "peak_ram_mb": 6213,
+    "peak_tj_c": 55.375,
+    "systemd_memory_swap_peak_bytes": 0
+  },
+  "limitations": [
+    "This video already served D141 descriptor development and is not held-out acceptance.",
+    "Unknown-switch check uses current control targets; it does not qualify exact-source loss/reassignment timing.",
+    "No distinct-instance false-positive qualification; zero wrong overlays applies only to this cup run.",
+    "One learned vector from a held frame; changed viewpoint gives43 misses on frames248-334.",
+    "No physical audible latency, sustained conversation, no-paging, or M4 claim."
+  ]
+}

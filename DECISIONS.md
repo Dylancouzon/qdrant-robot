@@ -795,3 +795,21 @@ Evidence: bench/results/2026-10-10-d145-ignore-continuity.json; build/d145/strea
 Sol7470PASS236.37s/native0/tree0a133d26b67625e0d9c89aeacb7e841b40929c01 approvesminimalsharedcontinuityandowner-timeRestoreauthority(E). Independentlyrecomputes91.51/92.46%, all67/66qualifiedhidden, fourproduct/28QAhashes and54.95msRestore(J).
 Preservefullflow10of12/native1/provenancefailures, replacementhiddenuntilthirdfreshmiss/skipslongerelapsed, sizefloor/FPR/no-paging/defaultS/M4limits. No optionalframeworkrequired. ThreeFocusassertionspass; reviewpytestunavailable, requiredhookfullsuitebeforecommit.
 Evidence: reviews/20261010-071604-7470-review.md/publicD145audit; realhookcheckpointnext. Continueusablephonedefault andindependentcupvideo; do not stop atcheckpoint.
+
+## D145 external video 2026-10-10: Preserve the changed-viewpoint cup failure
+ActualJetson naturalteaching bindsphysicalcup/gallery1; receivedvideo121/16473.78%/43misses/frame248-334/zero wrongcupoverlays/native1(J). All221sends received/fourQAhashesmatch; sidegreen/topdownunknown verified. Onegreen-to-unknowntransition, notrapidblink.
+Existingphoneadapter cannotmeasurecupmedia/geometry; ignoredminimalactualtransport adaptation51e2382f/protocolf6be602f passesworker/peerlocalHTTPchecks. No extraenrollment/oraclecrop/query, unchangedS/floor120/budgets/thresholds. Temporarymemoryonly; productionwritesFalse.
+Unknowninterval assertion isdiagnostic only becausecurrentcontroltargets do notproveexactrenderedsource loss/reassignment. Cupvideo alreadyD141development, noheldout/generalFPR/no-paging/M4claim. Nextdiagnose43missesbeforechoosingincrement.
+Evidence: bench/results/2026-10-10-d145-external-cup.json; build/d145/cup/jetson/{summary,samples,attempts,qa,turns,tegra}; qr-d145-external-cup-s/native1/41.586s.
+
+## D146 2026-10-10: Adopt the built small detector as the development default
+Select existingYOLOE-26s overnanoN: Nmissesqualifyingheldphone proposals/naturalteach; Sreaches91.51%movement/92.46%Restore(J). Sol30520GO152.86s supportsdefaultpath/modelpin/recipe only. Same50vocab/384x640/FP16/floor120/thresholds/crop3/s/Edge semantics; no newmodelbuild/options/cache.
+KeepNrelease/artifacts/closedbackup rollback. Fullphone native1/10of12/provenanceboundaries, ignoredhold~350ms/Restoreage>200ms, currentpeopleinitialequalityunproven, paging361in17307out/generalFPR/cup73.78%/sustained15/M4 remainopen. Developmentadoption doesnotqualifyfinaltargets.
+PT48f24206/ONNXedbad6fd/engine52d40436 alreadybuiltD139; metadatachangesonre-export, documentfreshderivedhash. Beforecompletion verifyunmodifiedDetector() selectsS andoriginalfixedphone replayonce afterdefaultchange; taskreview/realhookrequired.
+Evidence: reviews/20261010-073117-30520-design.md; build/d146/default-brief.txt; publicD139/D144/D145audits, D145externalcupreceipt. Workeronlyrobot/detect.py/research/detector.md; leadmodels.json/records/deploy/git.
+
+## D146 qualification 2026-10-10: Keep the usable phone default and carry timing limits
+UnmodifiedDetector() onb4de1cf59fee verifiesS/FP16/pinnedhashes/stop-sign.892/native0/1.190s(J). Originalphoneadapter4d54/protocolb1db replaynative0/12of12PASS/156.077s: movement192/21091.43%, Restore193/21191.47%, ignored72/72return/65/65reset. No priorfailure isrewritten.
+All1789sends received/28QAhashesmatch; person263unique/96.34%, butperson214.7ms/conversation453.8msholddiagnostics fail. Paging16in67out/systemwide, peakRAM6286MB/64.343C. No broad smoothness/sustained15/no-paging/FPR/M4claim. Cup73.78% remainsrecordedgap.
+Keepselecteddevelopmentdefault/path/pins/recipe; no scene tuning/modelbuild/options/runtimechanges. Nanoa929release/source/models/backupretained; rollbackavailable, actualrollbacknotrunthisincrement. Worker/peer source/AST/artifactchecksPASS; taskreview/realhooknext.
+Evidence: bench/results/2026-10-10-d146-detector-default.json; build/d146/{default-jetson.log,phone-jetson.log,phone}; currentb4de1cf59fee. Useroverfit/overengineeringsteering staysbinding.
