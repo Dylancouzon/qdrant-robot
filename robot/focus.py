@@ -54,6 +54,7 @@ class _Seen:
     shown: tuple | None = None  # smoothed drawing box; never used for crops or selection
     track: Track | None = None
     epoch: int = 0
+    exclude_misses: int = 0  # consecutive queried misses of a continuous item preference
 
 
 @dataclass
@@ -135,6 +136,7 @@ class Focus:
                 if now - s.last > OCCLUSION_S:
                     self.named.pop(i, None)
                     self.excluded.pop(i, None)
+                    s.exclude_misses = 0
                     s.shown = None
         # Size gates display and queries, but does not erase an accepted continuous name.
         self.named = {i: n for i, n in self.named.items()
@@ -169,6 +171,7 @@ class Focus:
             if self.now - s.last > OCCLUSION_S:
                 self.named.pop(t.id, None)
                 self.excluded.pop(t.id, None)
+                s.exclude_misses = 0
                 s.shown = None
         if not self.eligible(t, pending=True):
             s.shown = None
@@ -268,6 +271,27 @@ class Focus:
             self.changed = self.now
             self.focus = next_focus
             self.since = self.fit = self.now
+
+    def exclude(self, track: int, preference: str | None) -> None:
+        """Apply one fresh preference result; retain a matched item through two actual misses."""
+        seen = self.seen.get(track)
+        if seen is None:
+            return
+        if preference:
+            self.excluded[track] = preference
+            seen.exclude_misses = 0
+        elif track in self.excluded:
+            seen.exclude_misses += 1
+            if seen.exclude_misses >= CLEAR_N:
+                self.excluded.pop(track)
+                seen.exclude_misses = 0
+
+    def restore(self, preference: str) -> None:
+        """Clear display continuity for a restored item preference."""
+        for i in [i for i, p in self.excluded.items() if p == preference]:
+            self.excluded.pop(i)
+            if i in self.seen:
+                self.seen[i].exclude_misses = 0
 
     def name(self, track: int) -> str | None:
         """Accepted name for fresh re-verification; display age is separate."""

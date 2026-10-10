@@ -6,6 +6,7 @@ import tempfile
 import threading
 import time
 from collections import deque
+from concurrent.futures import Future
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -19,6 +20,7 @@ from robot.focus import Track
 from robot.main import Robot, Turn
 from robot.memory import CountRequest, Memory, ScrollRequest
 from robot.people import DIM as FACE_DIM, People
+from robot.recognition import Recognition
 from robot.text_embed import DIM as TEXT_DIM
 from robot.things import DIM, SHOTS, VIEWS, Things, command, diverse
 
@@ -1140,7 +1142,7 @@ def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, m
         close_robot(fresh)
 
 
-def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot):
+def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot, monkeypatch):
     r = robot
     frame_of(r)
     track = next(iter(r.view[1]))
@@ -1159,9 +1161,25 @@ def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot):
     data = {**state, **state["targets"][0]}
     assert r._item_control("ignore", data).startswith("Okay")
     assert r.things.labels() == set() and r.things.preferences()
+    embeddings, exclusions = [], []
+    excluded = r.things.excluded
+    monkeypatch.setattr(r.recognition, "crops",
+                        lambda shots: embeddings.append(len(shots)) or stub_crops(shots))
+    monkeypatch.setattr(r.things, "excluded", lambda v: exclusions.append(1) or excluded(v))
     frame_of(r, BLACK)
-    preview(r)
-    assert not r.focus.excluded, "empty named gallery still runs preference matching"
+    for miss in (1, 2, 3):
+        preview(r)
+        assert embeddings == [1] * miss and len(exclusions) == miss
+        assert (track in r.focus.excluded) is (miss < 3)
+        assert bool(r.focus.boxes([Track(*t) for t in r.tracker.scored()], [])) is (miss == 3)
+        if miss < 3:
+            assert not r._shown()[1].boxes
+    assert not r.focus.excluded, "third real miss releases a distinct same-track item"
+    # Completed geometry precedes crop results. The next source can draw the released item.
+    r.crop_times.extend([time.monotonic()] * 3)
+    frame_of(r, BLACK)
+    preview(r, clear=False)
+    assert r._shown()[1].boxes and embeddings == [1] * 3 and len(exclusions) == 3
 
 
 def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(robot, monkeypatch):
@@ -1456,15 +1474,16 @@ def test_persisted_preference_restores_before_first_focus_frame(tmp_path):
     try:
         assert r.focus is None and len(r.things.preferences()) == 1
         state = {"session": r.session_id, "gallery": r.recognition.epoch, "id": ident}
-        for stale in ({"session": "old"}, {"gallery": state["gallery"] + 1}):
+        for stale in ({"session": "old"}, {"gallery": state["gallery"] + 1}, {"id": "missing"}):
+            assert not r._control("restore", {**state, **stale})
+            assert r.jobs.empty() and not r.control_message
+            if "id" in stale:
+                continue
             assert r._item_control("restore", {**state, **stale}).startswith("That selection")
             assert len(r.things.preferences()) == 1 and r.recognition.epoch == state["gallery"]
         r.verified = object()  # A successful Restore must clear saved display state too.
         assert r._control("restore", state), "Restore admission does not require a camera frame"
-        job = r.jobs.get_nowait()
-        assert job[0] == "control"
-        assert r._item_control(*job[1:]).startswith("I will notice")
-        r.jobs.task_done()
+        assert r.jobs.empty() and r.control_message == "I will notice that item again."
         assert r.focus is None and not r.things.preferences() and r.verified is None
         assert r.recognition.epoch == state["gallery"] + 1
     finally:
@@ -1474,3 +1493,225 @@ def test_persisted_preference_restores_before_first_focus_frame(tmp_path):
         assert not reopened.preferences() and reopened.excluded(vectors[0]) is None
     finally:
         reopened.shard.close()
+
+
+def test_restore_bypasses_blocked_full_conversation_queue_on_real_owner(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    state = r._shown(False)[1].control
+    assert r._item_control("ignore", {**state, **state["targets"][0]}).startswith("Okay")
+    track, ident = next(iter(r.focus.excluded.items()))
+    r.focus.exclude(track, None)
+    r.verified = object()
+    started, release = threading.Event(), threading.Event()
+    def blocked_look(shot):
+        started.set()
+        assert release.wait(2)
+    monkeypatch.setattr(r, "_look", blocked_look)
+    def unexpected(*args):
+        pytest.fail("Restore must not embed a crop or query a vector")
+    owner = r.recognition = Recognition(r._preview, faces=object(), crops=unexpected)
+    monkeypatch.setattr(r.things, "excluded", unexpected)
+    monkeypatch.setattr(r.things, "score", unexpected)
+    worker = threading.Thread(target=r._work, daemon=True)
+    r.jobs.put(("look", None))
+    worker.start()
+    try:
+        assert started.wait(2)
+        for _ in range(8):
+            r.jobs.put(("look", None))
+        data = {"session": r.session_id, "gallery": owner.epoch, "id": ident}
+        assert r._control("restore", data)
+        assert r.jobs.qsize() == 8 and not release.is_set()
+        assert not r.things.preferences() and not r.focus.excluded and r.verified is None
+        assert r.focus.seen[track].exclude_misses == 0
+        assert r.control_message == "I will notice that item again."
+        r.focus.focus = track
+        state = r._shown(False)[1].control
+        selected = next(t for t in state["targets"] if t["track"] == track)
+        assert not r._control("ignore", {**state, **selected}), "Ignore stays queue-bounded"
+        r.jobs.get_nowait()
+        r.jobs.task_done()
+        assert r._control("ignore", {**state, **selected})
+        with r.jobs.mutex:
+            assert r.jobs.queue[-1] == ("control", "ignore", {**state, **selected})
+    finally:
+        while not r.jobs.empty():
+            r.jobs.get_nowait()
+            r.jobs.task_done()
+        r.jobs.put(None)
+        release.set()
+        worker.join(2)
+        owner.close()
+    assert not worker.is_alive()
+
+
+@pytest.mark.parametrize("change", ["session", "gallery", "id"])
+def test_direct_restore_revalidates_on_blocked_owner(robot, change):
+    r = robot
+    frame_of(r)
+    vectors = stub_crops([np.full((4, 4, 3), GOLD)])
+    ident = r.things.ignore_item("Phone", vectors)
+    track = next(iter(r.view[1]))
+    r.focus.exclude(track, ident)
+    r.focus.exclude(track, None)
+    record = r.verified = object()
+    started, release = threading.Event(), threading.Event()
+    owner = r.recognition = Recognition(r._preview, faces=object(), crops=stub_crops)
+    def blocked(faces, crops):
+        started.set()
+        assert release.wait(2)
+        if change == "id":
+            assert r.things.restore_item(ident)
+    blocker = threading.Thread(target=lambda: owner.call(blocked), daemon=True)
+    blocker.start()
+    result = []
+    data = {"session": r.session_id, "gallery": owner.epoch, "id": ident}
+    action = threading.Thread(target=lambda: result.append(r._control("restore", data)),
+                              daemon=True)
+    competitor = None
+    try:
+        assert started.wait(2)
+        action.start()
+        with owner.condition:
+            assert owner.condition.wait_for(lambda: len(owner.requests) == 1, timeout=2)
+        if change == "session":
+            with r.detecting:
+                r.session_id, r.control_message = "new session", "New session message"
+        elif change == "gallery":
+            competitor = threading.Thread(target=lambda: owner.call(lambda f, c: None,
+                                                                     mutate=True), daemon=True)
+            competitor.start()
+            with owner.condition:
+                assert owner.condition.wait_for(lambda: len(owner.requests) == 2, timeout=2)
+        release.set()
+        action.join(2)
+        assert result == [False]
+        assert r.focus.excluded[track] == ident and r.focus.seen[track].exclude_misses == 1
+        assert r.verified is record
+        assert bool(r.things.preferences()) == (change != "id")
+        assert r.control_message == ("New session message" if change == "session" else
+                                     "That selection expired.")
+    finally:
+        release.set()
+        blocker.join(2)
+        if action.ident:
+            action.join(2)
+        if competitor:
+            competitor.join(2)
+        owner.close()
+
+
+@pytest.mark.parametrize("unavailable", ["closed", "full"])
+def test_direct_restore_rejects_unavailable_owner(robot, unavailable):
+    r = robot
+    ident = r.things.ignore_item("Phone", stub_crops([np.full((4, 4, 3), GOLD)]))
+    owner = r.recognition = Recognition(r._preview, faces=object(), crops=stub_crops)
+    data = {"session": r.session_id, "gallery": owner.epoch, "id": ident}
+    started, release = threading.Event(), threading.Event()
+    def blocked(faces, crops):
+        started.set()
+        assert release.wait(2)
+    blocker = None
+    try:
+        if unavailable == "closed":
+            owner.close()
+        else:
+            blocker = threading.Thread(target=lambda: owner.call(blocked), daemon=True)
+            blocker.start()
+            assert started.wait(2)
+            with owner.condition:
+                owner.requests.extend((lambda f, c: None, Future()) for _ in range(8))
+        assert not r._control("restore", data)
+        assert r.things.preferences() and owner.epoch == data["gallery"]
+        assert r.control_message == "That selection expired. Select it again."
+        assert r.jobs.empty()
+    finally:
+        release.set()
+        if blocker:
+            blocker.join(2)
+        owner.close()
+
+
+def test_item_exclusion_match_skip_restore_and_explicit_ignore_reset_counter(robot):
+    r = robot
+    frame_of(r)
+    track = next(iter(r.view[1]))
+    hold(r, CENTER)
+    state = r._shown(False)[1].control
+    selected = next(t for t in state['targets'] if t['track'] == track)
+    assert r._item_control('ignore', {**state, **selected}).startswith('Okay')
+    ident = r.focus.excluded[track]
+    frame_of(r, BLACK)
+    preview(r)
+    preview(r)
+    assert r.focus.seen[track].exclude_misses == 2
+    r.crop_times.extend([time.monotonic()] * 3)
+    preview(r, clear=False)
+    assert r.focus.seen[track].exclude_misses == 2, 'budget skips do not consume a miss'
+    frame_of(r)
+    preview(r)
+    assert r.focus.excluded[track] == ident and r.focus.seen[track].exclude_misses == 0
+    frame_of(r, BLACK)
+    preview(r)
+    preview(r)
+    assert r.focus.seen[track].exclude_misses == 2
+    assert r._item_control('restore', {'session': r.session_id,
+        'gallery': r.recognition.epoch, 'id': ident}).startswith('I will notice')
+    assert not r.focus.excluded and r.focus.seen[track].exclude_misses == 0
+    preview(r)
+    hold(r, CENTER)
+    state = r._shown(False)[1].control
+    selected = next(t for t in state['targets'] if t['track'] == track)
+    assert r._item_control('ignore', {**state, **selected}).startswith('Okay')
+    assert r.focus.excluded[track] != ident and r.focus.seen[track].exclude_misses == 0
+    preview(r)
+    assert r.focus.seen[track].exclude_misses == 0, 'new explicitly ignored BLACK matches itself'
+
+
+@pytest.mark.parametrize('invalid', ['age', 'session', 'gallery', 'epoch'])
+def test_item_exclusion_stale_preview_does_not_consume_a_miss(robot, invalid):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    state = r._shown(False)[1].control
+    assert r._item_control('ignore', {**state, **state['targets'][0]}).startswith('Okay')
+    frame_of(r, BLACK)
+    preview(r)
+    track = next(iter(r.view[1]))
+    assert r.focus.seen[track].exclude_misses == 1
+    epochs = {i: r.focus.epoch(i) for i in r.focus.visible}
+    source, session, gallery = r.view_taken, r.session_id, r.recognition.epoch
+    if invalid == 'age':
+        source = time.time() - main.PREVIEW_TTL - .1
+    elif invalid == 'session':
+        session = 'old session'
+    elif invalid == 'gallery':
+        gallery -= 1
+    else:
+        epochs[track] -= 1
+    r.crop_times.clear()
+    r._preview(r.view[0], source, [Track(*t) for t in r.tracker.scored()], epochs,
+               session, r.focus.geometry([Track(*t) for t in r.tracker.scored()]), gallery)
+    assert r.focus.excluded and r.focus.seen[track].exclude_misses == 1
+
+
+def test_item_exclusion_tracker_merge_has_no_counter_or_preference_transfer(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    state = r._shown(False)[1].control
+    assert r._item_control('ignore', {**state, **state['targets'][0]}).startswith('Okay')
+    track = next(iter(r.view[1]))
+    frame_of(r, BLACK)
+    preview(r)
+    preview(r)
+    assert r.focus.seen[track].exclude_misses == 2
+    # A much smaller centered detection starts another track, then the real tracker merges it.
+    frame_of(r, BLACK, box=(580, 390, 700, 510))
+    assert track in r.tracker.merged and next(iter(r.view[1])) == track
+    assert not r.focus.excluded and r.focus.seen[track].exclude_misses == 0
+    preview(r)
+    assert not r.focus.excluded and r.focus.seen[track].exclude_misses == 0
+    assert r._shown()[1].boxes, 'a distinct merged object needs its own strong Ignore match'

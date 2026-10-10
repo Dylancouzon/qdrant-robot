@@ -352,6 +352,7 @@ class Robot:
                     self.focus.named.pop(i, None)
                     self.focus.excluded.pop(i, None)
                     if i in self.focus.seen:
+                        self.focus.seen[i].exclude_misses = 0
                         self.focus.seen[i].epoch += 1
                         self.focus.seen[i].continuous = self.view_taken
             if not self.views or self.view_taken - self.views[-1][0] >= VIEW_S:
@@ -532,9 +533,8 @@ class Robot:
                 if i in valid:
                     self.item_checked[i] = self.focus.epoch(i)
                     self.focus.checking.discard(i)
-                    self.focus.excluded.pop(i, None)
-                    if preference:
-                        self.focus.excluded[i] = preference
+                    self.focus.exclude(i, preference)
+                    if i in self.focus.excluded:
                         self.focus.named.pop(i, None)
             recognized = {i: hit for i, hit in recognized.items()
                           if i in valid and i not in self.focus.excluded}
@@ -997,7 +997,7 @@ class Robot:
                 self.focus.accepts(track, data["source"]))
 
     def _control(self, action, data):
-        """Queue a bounded authenticated UI action; inference stays off HTTP threads."""
+        """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
         if action not in ("ignore", "restore") or not isinstance(data, dict):
             return False
         with self.detecting:
@@ -1007,10 +1007,22 @@ class Robot:
                     data.get("gallery") != self.recognition.epoch or
                     data.get("id") not in {p["id"] for p in self.things.preferences()}):
                 return False
-            if self.jobs.qsize() >= 8:
+            if action == "ignore":
+                if self.jobs.qsize() >= 8:
+                    return False
+                self.jobs.put(("control", action, data))
+                return True
+        try:
+            message = self._item_control(action, data)
+        except RuntimeError as error:
+            if str(error) not in ("Recognition is closed", "Recognition requests are full"):
+                raise
+            message = "That selection expired. Select it again."
+        with self.detecting:
+            if data.get("session") != self.session_id:
                 return False
-            self.jobs.put(("control", action, data))
-        return True
+            self.control_message = message
+        return message == "I will notice that item again."
 
     def _ignore_vectors(self, crops, shot, chosen, gallery):
         """Borrow saved views only when the exact current crop verifies the chosen name."""
@@ -1024,20 +1036,25 @@ class Robot:
             return self.things.descriptors(chosen)
         return current
 
+    def _restore_item(self, data):
+        """Validate and restore on the recognition owner before clearing display state."""
+        with self.detecting:
+            if data.get("session") != self.session_id or \
+                    self.recognition.epoch != data["gallery"] + 1 or \
+                    not self.things.restore_item(data["id"]):
+                return False
+            if self.focus:
+                self.focus.restore(data["id"])
+            self.verified = None
+            self.delivery.notify_all()
+            return True
+
     def _item_control(self, action, data):
         if action == "restore":
             if data.get("session") != self.session_id or \
                     data.get("gallery") != self.recognition.epoch:
                 return "That selection expired. Select it again."
-            restored = self.recognition.call(
-                lambda f, c: self.things.restore_item(data["id"]), mutate=True)
-            if restored:
-                with self.detecting:
-                    if self.focus:
-                        self.focus.excluded = {i: p for i, p in self.focus.excluded.items()
-                                               if p != data["id"]}
-                    self.verified = None
-                    self.delivery.notify_all()
+            restored = self.recognition.call(lambda f, c: self._restore_item(data), mutate=True)
             return "I will notice that item again." if restored else "That selection expired."
         with self.detecting:
             if not self._valid_item(data):
@@ -1061,7 +1078,7 @@ class Robot:
                         not self.focus.accepts(track, taken):
                     return None
                 ident = self.things.ignore_item(title, vectors)
-                self.focus.excluded[track] = ident
+                self.focus.exclude(track, ident)
                 hidden = self.things.hidden_names()
                 self.focus.named = {i: n for i, n in self.focus.named.items()
                                     if n.name not in hidden}

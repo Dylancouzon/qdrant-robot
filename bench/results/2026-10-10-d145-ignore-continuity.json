@@ -1,0 +1,345 @@
+{
+  "task": "D145: Keep vector Ignore stable and remove Restore conversation queue delay",
+  "classification": "Jetson bounded development recordings, not general or held-out acceptance",
+  "reference": {
+    "url": "https://github.com/Dylancouzon/qdrant-edge-memory-robot",
+    "revision": "cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9",
+    "learning": "Persist ignored image vectors at normal matching threshold; retain live track blocks until Restore/reset. Existing robot already persists ignored multivectors; D145 adds bounded current-track continuity."
+  },
+  "baseline_d144": {
+    "release": "de6ee03aa41c",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "adapter_sha256": "4d54c248bf807a9a5206b6e075b5b51e267a894c64114bc4efaf878b6e934e8e",
+    "protocol_sha256": "b1dbe67b751efe3d26b491fe726eb3af7f574c846f1425a3759a601de0a17068",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false,
+    "native_exit": 1,
+    "failure": "Required common-flow checks failed: ignored_return",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": true,
+      "ignored_return": false,
+      "ignored_reset": true,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": true,
+      "restore_persists": true,
+      "subscriber_complete": true
+    },
+    "sample_accounting": {
+      "callbacks": 1958,
+      "draws": 1942,
+      "sent": 1823,
+      "received": 1823,
+      "pending": 0,
+      "errors": [],
+      "discarded_draws": 119,
+      "source": "actual callback screen.source[0]; successful multipart FIFO paired with received JPEG",
+      "quality_denominator": "all received JPEGs after original one-second warm exclusion; draw rejection counts separate"
+    },
+    "phases": {
+      "d136-person": {
+        "samples": 276,
+        "unique_source_fps": 14.530304610964622,
+        "unique_named_face_sources": 263,
+        "face_named_fraction": 0.9528985507246377,
+        "detect_fps": 14.957666511287112,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 138,
+        "unique_source_fps": 14.015701683477982,
+        "unique_named_face_sources": 132,
+        "face_named_fraction": 0.9565217391304348,
+        "detect_fps": 14.93644121012982,
+        "phone_named_fraction": 0.0
+      },
+      "phone_named_movement": {
+        "samples": 217,
+        "unique_source_fps": 14.422081308781799,
+        "unique_named_face_sources": 190,
+        "face_named_fraction": 0.8755760368663594,
+        "detect_fps": 14.95623246836631,
+        "phone_named_fraction": 0.9032258064516129
+      },
+      "phone_restored": {
+        "samples": 190,
+        "unique_source_fps": 12.2667942585971,
+        "unique_named_face_sources": 149,
+        "face_named_fraction": 0.7842105263157895,
+        "detect_fps": 14.992748538285346,
+        "phone_named_fraction": 0.9368421052631579
+      }
+    },
+    "ignored_geometry": {
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 72,
+        "hidden": 71,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 71,
+        "hidden": 71,
+        "pass": true
+      }
+    },
+    "paging_pages": {
+      "pswpin": 850,
+      "pswpout": 43737
+    }
+  },
+  "first_ignore_candidate": {
+    "release": "e236b0008019",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "adapter_sha256": "4d54c248bf807a9a5206b6e075b5b51e267a894c64114bc4efaf878b6e934e8e",
+    "protocol_sha256": "b1dbe67b751efe3d26b491fe726eb3af7f574c846f1425a3759a601de0a17068",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false,
+    "native_exit": 1,
+    "failure": "Required common-flow checks failed: ignored_return, restore_display",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": true,
+      "ignored_return": false,
+      "ignored_reset": true,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": false,
+      "restore_persists": true,
+      "subscriber_complete": true
+    },
+    "sample_accounting": {
+      "callbacks": 1946,
+      "draws": 1930,
+      "sent": 1849,
+      "received": 1849,
+      "pending": 0,
+      "errors": [],
+      "discarded_draws": 81,
+      "source": "actual callback screen.source[0]; successful multipart FIFO paired with received JPEG",
+      "quality_denominator": "all received JPEGs after original one-second warm exclusion; draw rejection counts separate"
+    },
+    "phases": {
+      "d136-person": {
+        "samples": 271,
+        "unique_source_fps": 14.41042514455381,
+        "unique_named_face_sources": 259,
+        "face_named_fraction": 0.955719557195572,
+        "detect_fps": 14.99751653933193,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 143,
+        "unique_source_fps": 13.894741340981868,
+        "unique_named_face_sources": 137,
+        "face_named_fraction": 0.958041958041958,
+        "detect_fps": 14.971094543452296,
+        "phone_named_fraction": 0.0
+      },
+      "phone_named_movement": {
+        "samples": 214,
+        "unique_source_fps": 14.123389715860984,
+        "unique_named_face_sources": 183,
+        "face_named_fraction": 0.8598130841121495,
+        "detect_fps": 15.001878071393007,
+        "phone_named_fraction": 0.9112149532710281
+      },
+      "phone_restored": {
+        "samples": 212,
+        "unique_source_fps": 14.125741419776121,
+        "unique_named_face_sources": 184,
+        "face_named_fraction": 0.8726415094339622,
+        "detect_fps": 15.000192079095596,
+        "phone_named_fraction": 0.8915094339622641
+      }
+    },
+    "ignored_geometry": {
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 72,
+        "hidden": 70,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 70,
+        "hidden": 70,
+        "pass": true
+      }
+    },
+    "paging_pages": {
+      "pswpin": 301,
+      "pswpout": 75
+    }
+  },
+  "first_candidate_limits": [
+    "Native1/fullflow10of12PASS remains. Both failedreturn receipts reuse one prior-phase source; all70qualified receipts hide.",
+    "All23 stable Restore misses have exclusions cleared; nine startup misses follow queued Restore0.815s and two-query confirmation. Thirteen later snapshots are undersized below120px; one justregrowing source uses preceding size geometry.",
+    "Pending querypriority was rejected without implementation: all startup queries already targetphone and remaining delay is rolling3/s budget."
+  ],
+  "source_validation": {
+    "worker_focused": "51 passed4.28s",
+    "reviewer_targeted": "10 passed3.94s; originalfirstmissclearing mutationfails",
+    "broad_final_runtime": "121 pass/one fixturefail42.11s, correctedfixtureincludedin focusedPASS; no later runtimechange untilRestore correction",
+    "ruff": "PASS",
+    "direct_restore": "18 focused checks9.77s/native0; peer frozen sourcePASS"
+  },
+  "next": "Scoped formal review, required hook checkpoint; then select usable phone development default and test independent video. All broad/M4 targets remain open.",
+  "direct_restore_candidate": {
+    "release": "a9299a617f4c",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "adapter_sha256": "4d54c248bf807a9a5206b6e075b5b51e267a894c64114bc4efaf878b6e934e8e",
+    "protocol_sha256": "b1dbe67b751efe3d26b491fe726eb3af7f574c846f1425a3759a601de0a17068",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false,
+    "native_exit": 1,
+    "failure": "Required common-flow checks failed: ignored_return, ignored_reset",
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": true,
+      "ignore_accepted": true,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": true,
+      "restore_persists": true,
+      "subscriber_complete": true
+    },
+    "sample_accounting": {
+      "callbacks": 1975,
+      "draws": 1960,
+      "sent": 1776,
+      "received": 1776,
+      "pending": 0,
+      "errors": [],
+      "discarded_draws": 184,
+      "source": "actual callback screen.source[0]; successful multipart FIFO paired with received JPEG",
+      "quality_denominator": "all received JPEGs after original one-second warm exclusion; draw rejection counts separate"
+    },
+    "phases": {
+      "d136-person": {
+        "samples": 271,
+        "unique_source_fps": 14.41820040395994,
+        "unique_named_face_sources": 261,
+        "face_named_fraction": 0.9630996309963099,
+        "detect_fps": 15.005608568565714,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 138,
+        "unique_source_fps": 14.252567749407252,
+        "unique_named_face_sources": 132,
+        "face_named_fraction": 0.9565217391304348,
+        "detect_fps": 14.980801138063098,
+        "phone_named_fraction": 0.0
+      },
+      "phone_named_movement": {
+        "samples": 212,
+        "unique_source_fps": 13.977437438921875,
+        "unique_named_face_sources": 182,
+        "face_named_fraction": 0.8584905660377359,
+        "detect_fps": 14.985425715767203,
+        "phone_named_fraction": 0.9150943396226415
+      },
+      "phone_restored": {
+        "samples": 199,
+        "unique_source_fps": 13.063041059597571,
+        "unique_named_face_sources": 166,
+        "face_named_fraction": 0.8341708542713567,
+        "detect_fps": 15.005749729999263,
+        "phone_named_fraction": 0.9246231155778895
+      }
+    },
+    "ignored_geometry": {
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 68,
+        "hidden": 67,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 67,
+        "hidden": 66,
+        "pass": false
+      }
+    },
+    "paging_pages": {
+      "pswpin": 361,
+      "pswpout": 17307
+    },
+    "restore_handler_ms": 54.947614669799805,
+    "frozen_product_sha256": {
+      "focus.py": "d57b0d0b33d04acd6ca691c2f5b65ba8eb5e5db5cbcb76f217c5a07e15b594ff",
+      "main.py": "84c7845e63c8a14393133de1bc0d611e6a2766616a6e03d422d746adaed46a55",
+      "test_focus.py": "89eb22fb55b8429f5be610fdf284cb19c41991ef122a537e122d17abc719ae1f",
+      "test_things.py": "1d21c3392559ba81770cc74a50b738134e3cd7f8c956fb666d2b30729a8dda88"
+    },
+    "fixed_phase_transport": {
+      "d136-person": {
+        "unique_named_face_source_fps": 13.937593723827941,
+        "unique_named_face_sources": 261,
+        "detect_fps": 15.005608568565714,
+        "fresh_receive_age_max": 0.19019603729248047,
+        "fresh_repeat_max_s": 0.19605636596679688
+      },
+      "person_conversation": {
+        "unique_named_face_source_fps": 13.732401043224506,
+        "unique_named_face_sources": 132,
+        "detect_fps": 14.980801138063098,
+        "fresh_receive_age_max": 0.1957244873046875,
+        "fresh_repeat_max_s": 0.14047956466674805
+      },
+      "d139-iphone-moving": {
+        "unique_named_face_source_fps": 11.869617352894403,
+        "unique_named_face_sources": 153,
+        "detect_fps": 14.972785288291632,
+        "fresh_receive_age_max": 0.16642022132873535,
+        "fresh_repeat_max_s": 0.13516664505004883
+      },
+      "d136-background": {
+        "unique_named_face_source_fps": 0.0,
+        "unique_named_face_sources": 0,
+        "detect_fps": 15.011746408952051,
+        "fresh_receive_age_max": 0.16788148880004883,
+        "fresh_repeat_max_s": 0.14074087142944336
+      }
+    },
+    "qualified_ignore_checks": {
+      "return_hidden": 67,
+      "return_total": 67,
+      "reset_hidden": 66,
+      "reset_total": 66,
+      "limits": "Two original failures preserved: prior-phase face-only capture, and negative clip-time empty frame. Qualified checks do not change original native1/fullflow10of12PASS."
+    },
+    "peer_qa": {
+      "actual_received_jpeg_hashes_matched": 28,
+      "ignore_reset_and_restore_viewed": true,
+      "qualification": "Sparse fixed visual checks, not broad false positive acceptance"
+    },
+    "resources": {
+      "tegrastats_rows": 158,
+      "peak_ram_mb": 6298,
+      "max_temperature_c": 64.406,
+      "paging_limits": "System-wide startup+run counters, no isolated-turn attribution. No-paging target remains unmet."
+    }
+  },
+  "journal_limit": "Collected invocation journal has no entries after transient unit collection; native1 comes from tools/jetson.py wait and adapter summary, not independent journal."
+}

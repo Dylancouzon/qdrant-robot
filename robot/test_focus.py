@@ -492,3 +492,52 @@ def test_two_weak_signals_hide_until_detector_or_descriptor_recovers():
     f.update(10.4, [t], [], recognized={t.id: ('Chosen', F.SURE)})
     assert f.names() == {t.id: ('Chosen', True)} and f.eligible(t)
     assert f.named[t.id].score == F.SURE and f.named[t.id].refreshed == 10.4
+
+
+def test_item_exclusion_requires_match_and_counts_only_actual_misses():
+    f = Focus(W, H)
+    t = phone()
+    f.update(10, [t], [])
+    f.exclude(t.id, None)
+    assert not f.excluded and f.seen[t.id].exclude_misses == 0
+    f.exclude(t.id, 'preference')
+    for miss in (1, 2):
+        f.exclude(t.id, None)
+        assert f.excluded == {t.id: 'preference'}
+        assert not f.boxes([t], []) and f.seen[t.id].exclude_misses == miss
+        f.update(10 + miss * .1, [t], [])
+        assert f.seen[t.id].exclude_misses == miss, 'skipped queries cannot consume continuity'
+    f.exclude(t.id, None)
+    assert not f.excluded and f.seen[t.id].exclude_misses == 0
+    assert f.boxes([t], []), 'third actual miss releases a different object on the same track'
+
+
+def test_item_match_and_explicit_replacement_reset_exclusion_misses():
+    f = Focus(W, H)
+    t = phone()
+    f.update(10, [t], [])
+    f.exclude(t.id, 'first')
+    for preference in ('first', 'new explicit item'):
+        f.exclude(t.id, None)
+        f.exclude(t.id, None)
+        f.exclude(t.id, preference)
+        assert f.excluded == {t.id: preference} and f.seen[t.id].exclude_misses == 0
+    f.exclude(t.id, None)
+    assert f.excluded == {t.id: 'new explicit item'} and f.seen[t.id].exclude_misses == 1
+
+
+def test_item_gap_clears_exclusion_and_counter_before_new_match():
+    f = Focus(W, H)
+    t = phone()
+    f.update(10, [t], [])
+    f.exclude(t.id, 'old')
+    f.exclude(t.id, None)
+    f.exclude(t.id, None)
+    f.update(10.3, [], [])
+    assert not f.excluded and f.seen[t.id].exclude_misses == 0
+    f.update(10.4, [t], [])
+    f.exclude(t.id, None)
+    assert not f.excluded, 'return has no inherited preference authority'
+    f.exclude(t.id, 'new')
+    f.exclude(t.id, None)
+    assert f.excluded == {t.id: 'new'} and f.seen[t.id].exclude_misses == 1

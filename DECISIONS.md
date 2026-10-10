@@ -770,3 +770,28 @@ Evidence: bench/results/2026-10-10-d144-phone-recovery.json; build/d144/stream-t
 Sol49849 PASS246.31s/native0/treefe2fe64c450e3651a336e163ce7dbbaf433fc5c7 finds noblockers; verifies source41checks/113recorded/fullchecks/provenance/28QA andfixed90%fractions. Carry truepositiveloss, sourcephaseboundary, weakexclusion, Sfreshness/cadence/no-paging limits. DefaultN frozene512 regressionnative0/16strictchecks; exactsevenpairedexpressionsofflinePASS, notnative23.
 Default267personunique/96.04%, conversation134/14.12namedfps/95.71%, all200msage/holdPASS;854sends received. Allcadences92.75-101.81%acceptedD143, convonamedfps98.64%(J). Retain currentdefault andsmallpredicate; no S adoption or repairedIgnore claim.
 Evidence: reviews/20261010-063302-49849-review.md; publicD144audit; build/d144/two-signal-face-n/offline-pair.json. Requiredhook/commitcheckpointnext; continue measuredIgnore gap afterward.
+
+## D145 2026-10-10: Bound Ignore recovery with the existing miss count
+Select smallest continuous-track correction: a strongmatched ignoreditem remains excluded through twoactual failedqueries; third releases. Reuse CLEAR_N3 and one _Seen counter/shared Focus.exclude route. Skips do not count; newtracks requirestrongmatch; existinggap/epoch/Restore/source/action guards remain. No extraquery/vector/threshold/helperframework.
+Why: originalreturn/reset observers reproduce truephone overlays after isolatedguessband failures; firstmissclearing flickers. Carry boundedfalsehide after same-track replacement, tested withdistinctvectors. Reject richer score/APIframework atthisstep toreduceoverhead; fixed90%phonecoverage andnoqualifiedignoredoverlays decide comparison.
+D1447b36dc6 committed/pushed afterSol49849PASS andrequiredhook81.16native0; source/defaultN regressiongood, S adoption/Ignore/sourceboundary/generalFPR/paging remainopen. Evidence: publicD144audit/stream-excluded-s; D145smallbuildnext withoutarchitecturegate.
+
+## D145 continuation 2026-10-10: Confirm strong pending names before routine crops
+The firstcandidate preserves allqualifiedignoredphone samples/reset butfullflowfailsRestore189/21289.15% andtwo unqualifiedreturnboundaries(J). All23Restoremisses haveexcludedFalse; nineheldframe startupmisses follow delayedfirst/secondmatches, whilemostothermisses are110-119pxphoneboxes below120floor. Sourcecounter cannotdirectlyhideclearedRestoretracks.
+Select smallestadditionalquerypriority forpendingfirst-SUREmatch toreach existingSET_N2, usingexisting3/sbudget/oldestduefallback andsourceguards. Keepthresholds/floor/confirmation/multivectors/actionauthority. Rejectadditionalquerybudget orspeculativescoreframework; comparedmaterialcandidate mustretainfixed90%coverage.
+Evidence: build/d145/stream-exclusion-s/native1/sourcechecks andworker exactRestoreaudit; referencecfc0dd2 confirmsvectornegativeexamples pluslivecontinuity. No newarchitecturegate forreversibleprioritycorrection.
+
+## D145 correction 2026-10-10: Remove Restore from the conversation queue
+Exactstartup cropjoins show everyqueryalreadytargetsphone; pendingpriority has nobenefit withoutviolating3/s. Withdrawthatunbuiltproposal. Restorecommitsat0.856s afterthreeignoredcropchecks; first/secondpositivechecks mustwaitbudgetuntil1.162/1.663s. D144Restorecommits0.029s/confirmsbefore1s(J).
+SelectvalidatedRestore directdispatchthrough existing_item_control andserialRecognition.call outside detectinglock. Itperforms Edge deletion/cleanup, noembedding/inference, and keepssession/gallery/idvalidation; Ignore remainsboundedqueuedwithfreshcropreverification. No additionalworker/queue/model/options/budget orschema. CarryHTTP completionwaitfortheexistingserialmutation.
+Evidence: build/d145/stream-exclusion-s/exactRestorejoins andworker sourceaudit. Requiredlocalfresh/stale/queueblocked/real-ownerchecks beforeonechangedcandidatephonecomparison; no speculativequeryprioritycode.
+
+## D145 final pair 2026-10-10: Keep vector Ignore continuity and prompt Restore
+Finala9299a617f4c movement194/21291.51% andRestore184/19992.46% meetunchanged90%(J); Restoreowner54.95ms replaces0.815sconversationwait. All67qualifiedreturn/66reset bodieshide. Preserve original67/68,66/67/10of12/native1: oldphaseface-onlyframe andnegativecliptimeemptyframe remainprovenancefailures, notphoneleaks.
+All1776send=receive/28QAhashesmatch; sparsepeerimagesconfirmphysicalphoneRestore/hiddenIgnore. Fixedfourfacephase age/holdmaxima under200ms inthisrun. Paging361in17307out andsizefloor/held-outFPR/generalM4 remainopen. Worker51+18scopedchecks/peer10mutation andsourcePASS; formalreview/requiredhooknext.
+Evidence: bench/results/2026-10-10-d145-ignore-continuity.json; build/d145/stream-direct-restore-s. Do not citeemptycollectedjournalasindependentnativeexit; wrapperwait/summarynative1 retained. Sdefaultselection remainsnexttask.
+
+## D145 review 2026-10-10: Accept the bounded Ignore and direct Restore checkpoint
+Sol7470PASS236.37s/native0/tree0a133d26b67625e0d9c89aeacb7e841b40929c01 approvesminimalsharedcontinuityandowner-timeRestoreauthority(E). Independentlyrecomputes91.51/92.46%, all67/66qualifiedhidden, fourproduct/28QAhashes and54.95msRestore(J).
+Preservefullflow10of12/native1/provenancefailures, replacementhiddenuntilthirdfreshmiss/skipslongerelapsed, sizefloor/FPR/no-paging/defaultS/M4limits. No optionalframeworkrequired. ThreeFocusassertionspass; reviewpytestunavailable, requiredhookfullsuitebeforecommit.
+Evidence: reviews/20261010-071604-7470-review.md/publicD145audit; realhookcheckpointnext. Continueusablephonedefault andindependentcupvideo; do not stop atcheckpoint.
