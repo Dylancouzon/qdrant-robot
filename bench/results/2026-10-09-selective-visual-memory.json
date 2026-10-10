@@ -36,7 +36,22 @@
     "code_tree": "b2b89b3a2dafa0a9f841195e9978195d2053128d"
   },
   "deployment": {
-    "status": "pending; preserve active user session on b2b36d9718da"
+    "status": "deployed",
+    "release": "c182f8518376",
+    "previous": "b2b36d9718da",
+    "retained_protected_release": "cd60be65ee79",
+    "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python /Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface/tools/jetson.py deploy",
+    "native_exit": 0,
+    "remote_file_sha256": {
+      "robot/main.py": "edb809a41ed10bdd4cd6c540f67823722d89e331c7428f4d556555399a4dd987",
+      "robot/view.py": "de6764f9516874d12b08eb6e5781088f2dd82f24860dc6b055655bdc2a491d86",
+      "robot/focus.py": "4db0ea2c4b53c8934ae4f617f69515504912810e38f155f00a70d88fef5fbe1d",
+      "robot/people.py": "ef3567a69a6818a8608a0a206cdb635e41d87f79e55b22c5d2c7d955cede6b68",
+      "robot/memory.py": "c5562ad4df7adf5ef072e41be158eedd44b58e91d5db0d229dd6f7a74946cb5e",
+      "robot/things.py": "8bcded33a2e6ff45ba7bd67669199b989860bf199c29543789ee06ed20d7846b"
+    },
+    "old_user_unit": "qr-live-mac-f25e12d13bbc.service stopped after explicit upgrade readiness",
+    "new_user_unit": "qr-live-mac-1c5eb3448bee.service started by Dylan, later replaced by qr-live-mac-7ab53f128dba.service"
   },
   "unchanged_protected_runtime_integrity": {
     "robot/config.py": true,
@@ -58,5 +73,22 @@
   "carried_edges": [
     "A named object returning on a new undersized track can be hidden before recognition.",
     "Interrupted teaching crop captions can lose descriptions; named vector recall survives."
-  ]
+  ],
+  "source_commit": "7a7f3db93e1117e7830f25fa7b1f23d5b566351d",
+  "source_pushed": "origin/spike/mac-audio-interface",
+  "preview": {
+    "server_pid": 48631,
+    "url": "http://127.0.0.1:8765",
+    "tab_id": "1202942045",
+    "idle_reopen": "DOM verified Idle, Start enabled, Mute/Stop disabled, camera placeholder; no agent Start",
+    "subsequent_user_start": "Dylan started new session; latest Listening/active/view_ready true",
+    "live_qualification": "Dylan testing; no agent camera/microphone/replay/model test",
+    "duplicate_tab_recovery": {
+      "closed_tab": "1202942054",
+      "cause": "A new MJPEG viewer replaces the old one.",
+      "result": "Dylan confirms feed is moving after duplicate closure and original reload.",
+      "session_restart": false
+    },
+    "subsequent_feedback": "Dylan reports choppy video and recognized objects blinking; follow-up remains pending."
+  }
 }

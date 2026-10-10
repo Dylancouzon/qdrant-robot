@@ -43,7 +43,7 @@
     "blocking_findings": []
   },
   "deployment": {
-    "status": "pending user restart readiness after review",
+    "status": "reviewed update ready; awaiting Dylan restart readiness, preserve current live session",
     "current_release": "c182f8518376",
     "active_user_unit": "qr-live-mac-7ab53f128dba.service"
   },
@@ -98,5 +98,20 @@
     "javascript_syntax": "Node new Function(script) passed",
     "diff_check": "pass",
     "physical_qualification": "Dylan-owned; no active-session browser inspection or live test."
+  },
+  "source_commit": "1b9496b382c5fa67212ff3c45de4506f8d257814",
+  "checkpoint": {
+    "product": "committed and pushed on protected spike/mac-audio-interface",
+    "reviewed_tree": "3b40fbdd6ec7322f8ad480e4ad8524147d23bc7e",
+    "full_suite_hooks": "Skipped per command under explicit user restriction; normal hooks remain tools/githooks."
+  },
+  "handoff": {
+    "status": "reviewed product pushed; current user live session preserved until restart response",
+    "preview_url": "http://127.0.0.1:8765",
+    "server_pid": 48631,
+    "original_tab": "1202942045",
+    "owned_caffeinate": "2784 stopped after exact command verification",
+    "WSL": "unchanged; last confirmed advancing quantization remains independent",
+    "main": "eb746fe unchanged"
   }
 }
