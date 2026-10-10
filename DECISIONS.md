@@ -595,3 +595,8 @@ Evidence: Dylan live feedback; protected7a7f3db robot/things.py _THING/_thing/co
 A temporary real-Edge/stub-Robot sequence reproduces phone overriding a new "Dylan's smartphone" binding: both score1.0, and unrestricted nearest retrieval returns phone. This breaks the current naming flow.
 Use the existing by-name query for a continuously tracked accepted name with the same crop embedding/query budget. Retain that RAM verification preference beyond display expiry; green display still expires after two seconds, and fresh scores alone authorize writes. Gaps, misses, conflicts, ignore, and deletion clear preference through existing Focus state.
 Reject historical alias migration or extra inference/cache machinery; global matching resumes once the association clears. Evidence: research/mac-audio-interface.md and bench/results/2026-10-09-preview-display-names.json. Stop unfinished review74012/native130 before the material fix; review the corrected tree once.
+
+## D132 2026-10-09: Ship the reviewed live-feedback update
+D129-D131 and responsive/auto-scroll source1b9496b pass29 scoped checks and Sol87875 PASS. Dylan authorizes restart; deploy protected364d83474b31, previousc182, retainingcd60 and a closed-shard backup. Five changed runtime/UI hashes and19 protected unchanged paths match.
+Reload original preview only and start one fresh session at Dylan's request. System unit qr-live-mac-b6cae9c835d3 is Listening; Dylan owns physical qualification. No full suite or automated live tests.
+Evidence: bench/results/2026-10-09-preview-display-names.json; WSL same-job fresh progress in 2026-10-09-wsl-awq-restart-status.json. No architecture/model adoption or final-target claim.
