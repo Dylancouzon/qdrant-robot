@@ -1,0 +1,1830 @@
+{
+  "task": "D139",
+  "status": "D139 reviewed checkpoint609b425 shipped and handoff ready; broader booth standard unmet; work paused at user request",
+  "phase_one": {
+    "tree": "1a3c88dea5fa072b09f5791e04b1062c2bf94a8e",
+    "checks": 24,
+    "elapsed_s": 3.94,
+    "native_exit": 0,
+    "independent_code_review": "PASS"
+  },
+  "face_diagnostic": {
+    "machine": "Mac E",
+    "source_ms": 0,
+    "anonymous_display_ms": 50,
+    "completed_valid_face_ms": 80,
+    "later_face_displayed": false,
+    "order": "face check, object query, face publication",
+    "limitation": "model-free delivery reproduction; no model latency claim"
+  },
+  "counsel": {
+    "path": "reviews/20261010-002543-27429-design.md",
+    "verdict": "GO WITH CHANGES",
+    "native_exit": 3,
+    "elapsed_s": 87.11
+  },
+  "recording": {
+    "path": "/home/qdrant/qdrant-robot/shared/sessions/d139-iphone-moving.avi",
+    "duration_s": 15,
+    "frames": 225,
+    "fps": 15,
+    "width": 1280,
+    "height": 720,
+    "audio": false,
+    "orientation": "upright Camera output",
+    "mean_brightness": 94.60262627636317,
+    "bytes": 38172046,
+    "sha256": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a"
+  },
+  "recording_runs": [
+    {
+      "unit": "qr-d139-iphone-capture",
+      "invocation": "032c8735c6b548809d525725421bc5ac",
+      "native_exit": 1,
+      "failure": "absolute script lacked robot import path; failed before capture"
+    },
+    {
+      "unit": "qr-d139-iphone-capture-retry",
+      "invocation": "0ed089639bb945149f3737996a30eccd",
+      "native_exit": 0,
+      "elapsed_s": 16.539,
+      "fix": "insert release cwd into sys.path"
+    }
+  ],
+  "detector_probe": {
+    "machine": "Mac E",
+    "precision": "ONNX FP32 CPU",
+    "native_exit": 0,
+    "reference_seconds": [
+      1,
+      4,
+      7,
+      10,
+      13,
+      14
+    ],
+    "minimum_side_px": 120,
+    "confidence": 0.25,
+    "minimum_iou": 0.3,
+    "yoloe_26n": {
+      "qualifying_box_frames": 4,
+      "phone_class_frames": 1
+    },
+    "yolo26n_coco": {
+      "qualifying_box_frames": 2,
+      "phone_class_frames": 2
+    },
+    "decision": "reject COCO nano switch; prototype YOLOE-26s with same vocabulary and preprocessing",
+    "limitation": "six development frames; no Jetson performance or acceptance claim",
+    "yoloe_26s": {
+      "qualifying_box_frames": 6,
+      "phone_class_frames": 0
+    }
+  },
+  "design": {
+    "path": "reviews/20261010-003400-36695-design.md",
+    "verdict": "GO",
+    "native_exit": 0,
+    "elapsed_s": 107.81
+  },
+  "detector_export": {
+    "model": "YOLOE-26s",
+    "vocabulary": [
+      "person",
+      "face",
+      "badge",
+      "lanyard",
+      "sticker",
+      "plush toy",
+      "teddy bear",
+      "mug",
+      "cup",
+      "bottle",
+      "phone",
+      "laptop",
+      "keyboard",
+      "computer mouse",
+      "headphones",
+      "backpack",
+      "bag",
+      "hat",
+      "glasses",
+      "book",
+      "pen",
+      "t-shirt",
+      "chair",
+      "apple",
+      "banana",
+      "orange",
+      "cat",
+      "dog",
+      "motorcycle",
+      "bicycle",
+      "car",
+      "stop sign",
+      "monitor",
+      "camera",
+      "microphone",
+      "box",
+      "potted plant",
+      "toy",
+      "ball",
+      "umbrella",
+      "watch",
+      "keys",
+      "wallet",
+      "scissors",
+      "remote control",
+      "clock",
+      "lamp",
+      "photo",
+      "poster",
+      "sign"
+    ],
+    "input": [
+      384,
+      640
+    ],
+    "format": "ONNX FP32",
+    "end2end": true,
+    "ultralytics": "8.4.174",
+    "machine": "Mac E",
+    "license": "AGPL-3.0",
+    "elapsed_s": 8.982997833983973,
+    "files": {
+      "yoloe-26s-seg.pt": {
+        "bytes": 31072171,
+        "sha256": "48f24206bc8680d60cbbfa296b0140da849669b9515058b72f5a945142df0654"
+      },
+      "mobileclip2_b.ts": {
+        "bytes": 253794476,
+        "sha256": "35d7f213e4d75f38514e4656ad3cb91158bd33e3805d8ac349f23b186f66982f"
+      },
+      "../yoloe-26s-booth-384x640.onnx": {
+        "bytes": 41799166,
+        "sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4"
+      }
+    }
+  },
+  "phase_two": {
+    "tree": "44ef09dab422fac37d4b2f631f62bffff2db3246",
+    "scoped_checks": 36,
+    "elapsed_s": 10.41,
+    "native_exit": 0,
+    "cleanup_checks": 9,
+    "cleanup_elapsed_s": 5.66,
+    "cleanup_native_exit": 0,
+    "ruff": "PASS",
+    "ast": "PASS",
+    "whitespace": "PASS",
+    "diagnostic_environment_failure": "plain venv missing pytest; uv --with pytest fixes; no product test failures",
+    "independent_code_review": "PASS",
+    "carried_limit": "equal-source first completion cannot upgrade anonymous fallback; next newer fresh completion recovers"
+  },
+  "general_detector_probe": {
+    "machine": "Mac E",
+    "images": 17,
+    "native_exit": 0,
+    "limitation": "development images only; raw category and geometry comparison, no judged general-accuracy score"
+  },
+  "detector_engine_build": {
+    "release": "08ff2193ddc7",
+    "command": [
+      "trtexec",
+      "--onnx=/home/qdrant/qdrant-robot/shared/models/detector/yoloe-26s-booth-384x640.onnx",
+      "--saveEngine=/home/qdrant/qdrant-robot/shared/models/detector/yoloe-26s-booth-384x640.fp16.engine",
+      "--fp16",
+      "--memPoolSize=workspace:1024"
+    ],
+    "native_exit": 0,
+    "elapsed_s": 443.21285646100296,
+    "tegrastats": "d139-detector-build-20261010-003737.tegrastats",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine": {
+      "bytes": 24701820,
+      "sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086"
+    }
+  },
+  "baseline_runtime": {
+    "release": "08ff2193ddc7",
+    "tegrastats": "d139-baseline-preview-20261010-004613.tegrastats",
+    "model": "yoloe-26n-booth-384x640.onnx",
+    "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+    "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 10.077543518333286,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.10034973621368408,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.961276146448649,
+      "render_ms_p50": 13.715936511289328,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 8.729866854865563,
+      "unique_named_face_sources": 155,
+      "face_named_fraction": 0.8631578947368421,
+      "source_age_p95": 0.16794530153274537,
+      "longest_repeated_source_s": 0.10210585594177246,
+      "detect_fps": 15.025952647162542,
+      "render_ms_p50": 13.610314490506425,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 10.000597486781256,
+      "unique_named_face_sources": 27,
+      "face_named_fraction": 0.2076923076923077,
+      "source_age_p95": 0.1345317006111145,
+      "longest_repeated_source_s": 0.10057377815246582,
+      "detect_fps": 15.039658235934603,
+      "render_ms_p50": 14.251444998080842,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 92,
+      "unique_source_fps": 9.857016106632242,
+      "unique_named_face_sources": 76,
+      "face_named_fraction": 0.8260869565217391,
+      "source_age_p95": 0.19532175064086915,
+      "longest_repeated_source_s": 0.09995603561401367,
+      "detect_fps": 14.951653644891604,
+      "render_ms_p50": 13.5680960083846,
+      "phone_named_fraction": 0.0
+    },
+    "paging_before": {
+      "pswpin": 1209830,
+      "pswpout": 9214685,
+      "MemAvailable_kB": 6137608
+    },
+    "paging_after": {
+      "pswpin": 1209839,
+      "pswpout": 9214699,
+      "MemAvailable_kB": 3102204
+    },
+    "turns": [
+      {
+        "question": "Tell me a short joke",
+        "named": "",
+        "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+        "first_synth_s": 2.0168349742889404,
+        "detect_fps": 14.926333015597189
+      }
+    ],
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": true,
+    "native_exit": 0
+  },
+  "prototype_release": "a9051a54a6e6",
+  "production_memory_backup": {
+    "files": 224,
+    "bytes": 5031861,
+    "sha256": "00d63934397ba61bce20a5f6039bdfcb814ee51a6e37444c75364c1c68416854"
+  },
+  "prototype_source_hashes_verified": 704,
+  "adapter_sha256": "869d98a921edee56fcacea7785180dc9b5b91fb4591746fd0a35480a6dfb7fe0",
+  "commands": [
+    "protected tools/jetson.py run d139-baseline-preview -- shared/sessions/d139_runtime_check.py --model n",
+    "protected tools/jetson.py run d139-candidate-nano -- shared/sessions/d139_runtime_check.py --model n --learning",
+    "protected tools/jetson.py run d139-candidate-small -- shared/sessions/d139_runtime_check.py --model s --learning"
+  ],
+  "candidate_nano_runtime": {
+    "release": "a9051a54a6e6",
+    "tegrastats": "d139-candidate-nano-20261010-004838.tegrastats",
+    "model": "yoloe-26n-booth-384x640.onnx",
+    "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+    "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "teaching_clip_derivation": {
+      "prefix_seconds": 4,
+      "prefix_original_seconds": 1,
+      "moving_original_frames": 225,
+      "sha256": "b55b739f1a4c73c8a4e620ca2134ad9318a538b5322bc0c52e1df8b7ef9d6179"
+    },
+    "before_target": null,
+    "binding": [],
+    "natural_learning": false,
+    "failure": "Natural phone learning did not bind requested name",
+    "native_exit": 1,
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 9.534722760374798,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.16715234518051147,
+      "longest_repeated_source_s": 0.10051822662353516,
+      "detect_fps": 14.960987745953952,
+      "render_ms_p50": 16.733641998143867,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 10.00001571799029,
+      "unique_named_face_sources": 158,
+      "face_named_fraction": 0.8315789473684211,
+      "source_age_p95": 0.1671230435371399,
+      "longest_repeated_source_s": 0.09976863861083984,
+      "detect_fps": 15.026478645022447,
+      "render_ms_p50": 13.765248499112204,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 9.689739203654499,
+      "unique_named_face_sources": 96,
+      "face_named_fraction": 0.7384615384615385,
+      "source_age_p95": 0.16704903841018676,
+      "longest_repeated_source_s": 0.0999302864074707,
+      "detect_fps": 14.960957330442547,
+      "render_ms_p50": 15.698843490099534,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 98,
+      "unique_source_fps": 7.584131908684715,
+      "unique_named_face_sources": 70,
+      "face_named_fraction": 0.9387755102040817,
+      "source_age_p95": 0.19229938983917236,
+      "longest_repeated_source_s": 0.1032719612121582,
+      "detect_fps": 14.960479381515055,
+      "render_ms_p50": 12.858905000030063,
+      "phone_named_fraction": 0.0
+    },
+    "phone_learning": {
+      "samples": 18,
+      "unique_source_fps": 9.32974354796509,
+      "unique_named_face_sources": 11,
+      "face_named_fraction": 0.6111111111111112,
+      "source_age_p95": 0.1920827865600585,
+      "longest_repeated_source_s": 0.1000673770904541,
+      "detect_fps": 13.994615321947638,
+      "render_ms_p50": 13.496482002665289,
+      "phone_named_fraction": 0.0
+    },
+    "phone_ignored_return_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "phone_ignored_reset_all_styles_hidden": {
+      "samples": 0,
+      "hidden": 0,
+      "pass": false
+    },
+    "required_checks": {
+      "natural_learning": false,
+      "physical_binding": false,
+      "stable_phone_movement": false,
+      "ignore_accepted": false,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": false,
+      "ignored_descriptor": false,
+      "restore_accepted": false,
+      "restore_display": false
+    },
+    "paging_before": {
+      "pswpin": 1209844,
+      "pswpout": 9214699,
+      "MemAvailable_kB": 6141712
+    },
+    "paging_after": {
+      "pswpin": 1211440,
+      "pswpout": 9229546,
+      "MemAvailable_kB": 3206684
+    },
+    "turns": [
+      {
+        "question": "Tell me a short joke",
+        "named": "",
+        "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+        "first_synth_s": 2.6307485103607178,
+        "detect_fps": 14.842847038943024
+      },
+      {
+        "question": "This is Dylan's smartphone",
+        "named": "",
+        "answer": "I don't see a Dylan's smartphone held up. Hold it up and say it again.",
+        "first_synth_s": 0.6352097988128662,
+        "detect_fps": 15.138031069435876
+      }
+    ],
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false
+  },
+  "pipeline_adoption": "REJECT all three completed-source prototypes; select counsel fallback",
+  "candidate_small_runtime": {
+    "release": "a9051a54a6e6",
+    "tegrastats": "d139-candidate-small-20261010-005233.tegrastats",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "teaching_clip_derivation": {
+      "prefix_seconds": 4,
+      "prefix_original_seconds": 1,
+      "moving_original_frames": 225,
+      "sha256": "b55b739f1a4c73c8a4e620ca2134ad9318a538b5322bc0c52e1df8b7ef9d6179"
+    },
+    "before_target": {
+      "track": 91,
+      "source": 1791608037.6454546,
+      "box": [
+        274,
+        374,
+        538,
+        516
+      ],
+      "epoch": 0
+    },
+    "binding": [
+      {
+        "id": 1791608038195334,
+        "ts": 1791608037.9121213,
+        "named": "Dylan's smartphone",
+        "label": "camera",
+        "box": [
+          274,
+          374,
+          538,
+          516
+        ],
+        "source_size": [
+          1280,
+          720
+        ]
+      }
+    ],
+    "natural_learning": true,
+    "binding_clip_seconds": 1.7333333492279053,
+    "physical_phone_binding": true,
+    "ignore_accepted": true,
+    "ignore_preferences": 0,
+    "ignored_descriptor": false,
+    "ignored_descriptor_after_reset": false,
+    "ignore_persists": false,
+    "failure": "list index out of range",
+    "native_exit": 1,
+    "d136-background": {
+      "samples": 129,
+      "unique_source_fps": 9.062409387876105,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.16714677810668946,
+      "longest_repeated_source_s": 0.10009288787841797,
+      "detect_fps": 14.921725802451173,
+      "render_ms_p50": 14.60123501601629,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 9.947143100680718,
+      "unique_named_face_sources": 118,
+      "face_named_fraction": 0.6210526315789474,
+      "source_age_p95": 0.16757298707962037,
+      "longest_repeated_source_s": 0.09780740737915039,
+      "detect_fps": 15.026535322304914,
+      "render_ms_p50": 14.23218849231489,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 6.8214606650349685,
+      "unique_named_face_sources": 31,
+      "face_named_fraction": 0.23846153846153847,
+      "source_age_p95": 0.16745802164077758,
+      "longest_repeated_source_s": 0.10023665428161621,
+      "detect_fps": 14.960703503997147,
+      "render_ms_p50": 15.211483507300727,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 89,
+      "unique_source_fps": 9.520650250294752,
+      "unique_named_face_sources": 25,
+      "face_named_fraction": 0.2808988764044944,
+      "source_age_p95": 0.2054374694824217,
+      "longest_repeated_source_s": 0.1001429557800293,
+      "detect_fps": 14.68244857876781,
+      "render_ms_p50": 11.99758201255463,
+      "phone_named_fraction": 0.0
+    },
+    "phone_ignored_reset": {
+      "samples": 150,
+      "unique_source_fps": 9.597224769952247,
+      "unique_named_face_sources": 63,
+      "face_named_fraction": 0.42,
+      "source_age_p95": 0.16824553012847898,
+      "longest_repeated_source_s": 0.19851970672607422,
+      "detect_fps": 14.966301564331125,
+      "render_ms_p50": 13.693722008611076,
+      "phone_named_fraction": 0.7466666666666667
+    },
+    "phone_ignored_return": {
+      "samples": 150,
+      "unique_source_fps": 9.328848850114852,
+      "unique_named_face_sources": 79,
+      "face_named_fraction": 0.5266666666666666,
+      "source_age_p95": 0.1679007887840271,
+      "longest_repeated_source_s": 0.10476970672607422,
+      "detect_fps": 15.03354059299084,
+      "render_ms_p50": 14.709560520714149,
+      "phone_named_fraction": 0.5933333333333334
+    },
+    "phone_learning": {
+      "samples": 24,
+      "unique_source_fps": 8.634875513121784,
+      "unique_named_face_sources": 8,
+      "face_named_fraction": 0.3333333333333333,
+      "source_age_p95": 0.2124332189559936,
+      "longest_repeated_source_s": 0.10007166862487793,
+      "detect_fps": 14.679288372307035,
+      "render_ms_p50": 11.896365496795624,
+      "phone_named_fraction": 0.5
+    },
+    "phone_named_movement": {
+      "samples": 151,
+      "unique_source_fps": 9.800144709498646,
+      "unique_named_face_sources": 42,
+      "face_named_fraction": 0.2781456953642384,
+      "source_age_p95": 0.16787457466125488,
+      "longest_repeated_source_s": 0.29998278617858887,
+      "detect_fps": 14.73355088979048,
+      "render_ms_p50": 12.812634988222271,
+      "phone_named_fraction": 0.8344370860927153
+    },
+    "phone_ignored_return_all_styles_hidden": {
+      "samples": 49,
+      "hidden": 1,
+      "pass": false
+    },
+    "phone_ignored_reset_all_styles_hidden": {
+      "samples": 49,
+      "hidden": 2,
+      "pass": false
+    },
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": false,
+      "ignore_accepted": false,
+      "ignored_return": false,
+      "ignored_reset": false,
+      "ignore_persists": false,
+      "ignored_descriptor": false,
+      "restore_accepted": false,
+      "restore_display": false
+    },
+    "paging_before": {
+      "pswpin": 1217613,
+      "pswpout": 9229546,
+      "MemAvailable_kB": 6142232
+    },
+    "paging_after": {
+      "pswpin": 1217917,
+      "pswpout": 9250527,
+      "MemAvailable_kB": 3029704
+    },
+    "turns": [
+      {
+        "question": "Tell me a short joke",
+        "named": "",
+        "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+        "first_synth_s": 1.8034441471099854,
+        "detect_fps": 15.056294449784836
+      },
+      {
+        "question": "This is Dylan's smartphone",
+        "named": "Dylan's smartphone",
+        "answer": "Got it, that is your Dylan's smartphone. I will remember it.",
+        "first_synth_s": 0.9197578430175781,
+        "detect_fps": 14.841148209497604
+      }
+    ],
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false
+  },
+  "cadence_diagnosis": {
+    "conversation_intervals": 97,
+    "no_publication_intervals": 25,
+    "two_publication_intervals": 24,
+    "repeated_sources": 25,
+    "named_repeats": 22,
+    "anonymous_repeats": 3,
+    "face_checks_published": 107,
+    "completion_age_ms_p50_p95": [
+      82.9,
+      95.4
+    ],
+    "selected_correction": "Move existing 100ms background admission from detector to Recognition owner; latest remains replaceable, priority bypasses timer, every background start sets next due=start+0.1; no catch-up."
+  },
+  "owner_timer": {
+    "tree": "9b3be7bb04f44c426d02b44cbb786c01fa2640a2",
+    "affected_tests": 14,
+    "elapsed_s": 4.65,
+    "native_exit": 0,
+    "owner_tests_after_cleanup": 7,
+    "owner_elapsed_s": 0.96,
+    "lint_ast_whitespace": "PASS",
+    "implementation": "existing Condition/local monotonic timer; newest slot each detection; priorities bypass; deadline from actual start; old preview_due removed",
+    "limitations": "actual paired adoption pending",
+    "peer_review": "PASS"
+  },
+  "size_gap_diagnosis": {
+    "machine": "Mac E CPU",
+    "native_exit": 0,
+    "original_clip_seconds": [
+      2.3,
+      5.5,
+      9.2
+    ],
+    "phone_short_sides_px": [
+      119,
+      112,
+      114
+    ],
+    "configured_minimum_px": 120,
+    "cause": "Focus.update prunes accepted association on size-only ineligibility; regrowing object needs two fresh crop agreements",
+    "limitation": "source probes explain some gaps; missing original runtime track state prevents all-gap attribution",
+    "selected_correction": "Preserve association through size-only ineligibility; drawing/action/crop/write floor and confidence/ignore/gap/merge/deletion/conflict rules unchanged"
+  },
+  "adapter_correction": {
+    "original_preserved": "build/p2/recordings/d139_runtime_check_pre_owner.py",
+    "sha256": "fd295ca8dd3686a40459ec985d175cf1d4ece19f2139bb0c773ce6c733c43859",
+    "changes": "Record tracking/source state, crop scores and completed control outcomes; select Ignore in held prefix then original movement/return/reset; explicit fail absent preferences",
+    "review": "PASS with current-state view_taken, returned per-track mappings, and completed-action receipt correction"
+  },
+  "size_continuity": {
+    "tree": "b25f494cae85dee2761734005e986301f02b4403",
+    "native_exit": 0,
+    "tests": 34,
+    "elapsed_s": 3.15,
+    "lint_ast_whitespace": "PASS",
+    "native_failures": [
+      {
+        "type": "before-fix regression",
+        "native_exit": 1,
+        "tests_failed": 2,
+        "elapsed_s": 0.04,
+        "reason": "width/height size-only dip erased established name"
+      },
+      {
+        "type": "first corrected tests",
+        "native_exit": 1,
+        "passed": 33,
+        "failed": 1,
+        "reason": "test expected current pixels while fresh anonymous publication still held prior source; corrected test uses real preview at regrowth with crop budget exhausted"
+      },
+      {
+        "type": "lint",
+        "native_exit": 1,
+        "reason": "E501 test parameter line; wrapped"
+      }
+    ],
+    "peer_review": "PASS",
+    "product_changes": "Only size-dependent association prune changes; all presentation/action/query/source-write floors unchanged"
+  },
+  "owner_prototype": {
+    "tree": "b25f494cae85dee2761734005e986301f02b4403",
+    "release": "3163dcded899",
+    "source_hashes_verified": 704,
+    "adoption": "pending",
+    "unit": "qr-d139-owner-cadence.service",
+    "adapter_sha256": "869d98a921edee56fcacea7785180dc9b5b91fb4591746fd0a35480a6dfb7fe0",
+    "pid": 363206,
+    "invocation": "be0c750b12384c88aab96d5307de5733"
+  },
+  "owner_cadence_runtime": {
+    "release": "3163dcded899",
+    "tegrastats": "d139-owner-cadence-20261010-010814.tegrastats",
+    "model": "yoloe-26n-booth-384x640.onnx",
+    "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+    "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 9.767517969323237,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.16706036329269408,
+      "longest_repeated_source_s": 0.10003399848937988,
+      "detect_fps": 15.038876873402444,
+      "render_ms_p50": 13.763123002718203,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 6.984106244755674,
+      "unique_named_face_sources": 66,
+      "face_named_fraction": 0.3473684210526316,
+      "source_age_p95": 0.1678536891937256,
+      "longest_repeated_source_s": 0.10297298431396484,
+      "detect_fps": 14.973500509589817,
+      "render_ms_p50": 13.763831011601724,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 130,
+      "unique_source_fps": 9.999934130370635,
+      "unique_named_face_sources": 104,
+      "face_named_fraction": 0.8,
+      "source_age_p95": 0.1704380989074707,
+      "longest_repeated_source_s": 0.09683918952941895,
+      "detect_fps": 14.961141760942112,
+      "render_ms_p50": 13.944155492936261,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 90,
+      "unique_source_fps": 6.565536825141572,
+      "unique_named_face_sources": 23,
+      "face_named_fraction": 0.26666666666666666,
+      "source_age_p95": 0.18182183504104615,
+      "longest_repeated_source_s": 0.10039639472961426,
+      "detect_fps": 15.055455133514295,
+      "render_ms_p50": 12.735969998175278,
+      "phone_named_fraction": 0.0
+    },
+    "paging_before": {
+      "pswpin": 1225093,
+      "pswpout": 9250527,
+      "MemAvailable_kB": 6130424
+    },
+    "paging_after": {
+      "pswpin": 1225094,
+      "pswpout": 9250543,
+      "MemAvailable_kB": 3139700
+    },
+    "turns": [
+      {
+        "question": "Tell me a short joke",
+        "named": "",
+        "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+        "first_synth_s": 2.0044305324554443,
+        "detect_fps": 15.069768778758274
+      }
+    ],
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": true,
+    "native_exit": 0
+  },
+  "small_continuity_run": {
+    "release": "3163dcded899",
+    "unit": "qr-d139-small-continuity.service",
+    "pid": 363805,
+    "invocation": "4388e36a360a4d41ad94dc8bf21692fe",
+    "adapter_sha256": "fd295ca8dd3686a40459ec985d175cf1d4ece19f2139bb0c773ce6c733c43859",
+    "status": "completed/native1 common-flow failures",
+    "purpose": "size-only association and actual Ignore completion diagnosis; face pipeline remains rejected"
+  },
+  "second_counsel": {
+    "path": "reviews/20261010-011157-79508-design.md",
+    "verdict": "GO WITH CHANGES",
+    "native_exit": 3,
+    "elapsed_s": 86.92,
+    "conditions": [
+      "Admission1/DETECT_FPS",
+      "Equal source only anonymous record/identical frame object; source guards unchanged",
+      "Actual record replacement attribution",
+      "Post-render source age and repeated duration through next change"
+    ],
+    "fallback": "D138 with phase1/size-only improvements if third route fails"
+  },
+  "small_continuity_runtime": {
+    "release": "3163dcded899",
+    "tegrastats": "d139-small-continuity-20261010-011215.tegrastats",
+    "model": "yoloe-26s-booth-384x640.onnx",
+    "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+    "production_memory_writes": false,
+    "classification": "J bounded development recordings; no held-out or physical acceptance",
+    "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+    "teaching_clip_derivation": {
+      "prefix_seconds": 4,
+      "prefix_original_seconds": 1,
+      "moving_original_frames": 225,
+      "sha256": "b55b739f1a4c73c8a4e620ca2134ad9318a538b5322bc0c52e1df8b7ef9d6179"
+    },
+    "before_target": {
+      "track": 96,
+      "source": 1791609219.5850127,
+      "box": [
+        274,
+        374,
+        538,
+        516
+      ],
+      "epoch": 0
+    },
+    "binding": [
+      {
+        "id": 1791609220071184,
+        "ts": 1791609219.851679,
+        "named": "Dylan's smartphone",
+        "label": "camera",
+        "box": [
+          274,
+          374,
+          538,
+          516
+        ],
+        "source_size": [
+          1280,
+          720
+        ]
+      }
+    ],
+    "natural_learning": true,
+    "binding_clip_seconds": 1.799999713897705,
+    "physical_phone_binding": true,
+    "ignore_accepted": true,
+    "ignore_preferences": 1,
+    "ignore_completed_message": "Okay, I will ignore only that item.",
+    "ignored_descriptor": true,
+    "ignored_descriptor_after_reset": true,
+    "ignore_persists": true,
+    "restore_accepted": true,
+    "d136-background": {
+      "samples": 130,
+      "unique_source_fps": 10.077457469621132,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.16717082262039185,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.961148397206756,
+      "render_ms_p50": 13.750437501585111,
+      "phone_named_fraction": 0.0
+    },
+    "d136-person": {
+      "samples": 190,
+      "unique_source_fps": 8.412736150562134,
+      "unique_named_face_sources": 35,
+      "face_named_fraction": 0.18421052631578946,
+      "source_age_p95": 0.1671772599220276,
+      "longest_repeated_source_s": 0.10194587707519531,
+      "detect_fps": 15.026522432450605,
+      "render_ms_p50": 14.084029491641559,
+      "phone_named_fraction": 0.0
+    },
+    "d139-iphone-moving": {
+      "samples": 129,
+      "unique_source_fps": 8.203122585837974,
+      "unique_named_face_sources": 65,
+      "face_named_fraction": 0.5038759689922481,
+      "source_age_p95": 0.16710367202758789,
+      "longest_repeated_source_s": 0.10008597373962402,
+      "detect_fps": 14.999995585532295,
+      "render_ms_p50": 13.503968017175794,
+      "phone_named_fraction": 0.0
+    },
+    "person_conversation": {
+      "samples": 98,
+      "unique_source_fps": 6.9254228519876095,
+      "unique_named_face_sources": 26,
+      "face_named_fraction": 0.2653061224489796,
+      "source_age_p95": 0.18161050081253052,
+      "longest_repeated_source_s": 0.10220718383789062,
+      "detect_fps": 14.884490905764414,
+      "render_ms_p50": 13.253451994387433,
+      "phone_named_fraction": 0.0
+    },
+    "phone_ignore_selection": {
+      "samples": 7,
+      "unique_source_fps": 11.665824844919905,
+      "unique_named_face_sources": 0,
+      "face_named_fraction": 0.0,
+      "source_age_p95": 0.13377699851989747,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.998917657754165,
+      "render_ms_p50": 10.763636993942782,
+      "phone_named_fraction": 1.0
+    },
+    "phone_ignored_reset": {
+      "samples": 150,
+      "unique_source_fps": 7.919350636377355,
+      "unique_named_face_sources": 70,
+      "face_named_fraction": 0.4666666666666667,
+      "source_age_p95": 0.16721271276473998,
+      "longest_repeated_source_s": 0.10071921348571777,
+      "detect_fps": 14.966230439933476,
+      "render_ms_p50": 13.225255504949018,
+      "phone_named_fraction": 0.0
+    },
+    "phone_ignored_return": {
+      "samples": 150,
+      "unique_source_fps": 10.06700529739556,
+      "unique_named_face_sources": 12,
+      "face_named_fraction": 0.08,
+      "source_age_p95": 0.1671100974082947,
+      "longest_repeated_source_s": 0,
+      "detect_fps": 14.966281208794735,
+      "render_ms_p50": 13.253203505882993,
+      "phone_named_fraction": 0.0
+    },
+    "phone_learning": {
+      "samples": 24,
+      "unique_source_fps": 6.032085170370223,
+      "unique_named_face_sources": 5,
+      "face_named_fraction": 0.25,
+      "source_age_p95": 0.1880711078643799,
+      "longest_repeated_source_s": 0.10025429725646973,
+      "detect_fps": 15.080212925925556,
+      "render_ms_p50": 11.036368508939631,
+      "phone_named_fraction": 0.5
+    },
+    "phone_named_movement": {
+      "samples": 150,
+      "unique_source_fps": 6.577106128482818,
+      "unique_named_face_sources": 29,
+      "face_named_fraction": 0.19333333333333333,
+      "source_age_p95": 0.16765012741088867,
+      "longest_repeated_source_s": 0.11229324340820312,
+      "detect_fps": 14.966272108690493,
+      "render_ms_p50": 14.049966004677117,
+      "phone_named_fraction": 0.88
+    },
+    "phone_restored": {
+      "samples": 150,
+      "unique_source_fps": 8.657720836078214,
+      "unique_named_face_sources": 84,
+      "face_named_fraction": 0.56,
+      "source_age_p95": 0.16951807737350463,
+      "longest_repeated_source_s": 0.10359549522399902,
+      "detect_fps": 14.966447646863891,
+      "render_ms_p50": 13.861772502423264,
+      "phone_named_fraction": 0.8733333333333333
+    },
+    "phone_ignored_return_all_styles_hidden": {
+      "samples": 50,
+      "hidden": 50,
+      "pass": true
+    },
+    "phone_ignored_reset_all_styles_hidden": {
+      "samples": 50,
+      "hidden": 44,
+      "pass": false
+    },
+    "required_checks": {
+      "natural_learning": true,
+      "physical_binding": true,
+      "stable_phone_movement": false,
+      "ignore_accepted": true,
+      "ignored_return": true,
+      "ignored_reset": false,
+      "ignore_persists": true,
+      "ignored_descriptor": true,
+      "restore_accepted": true,
+      "restore_display": false,
+      "restore_persists": true
+    },
+    "failure": "Required common-flow checks failed",
+    "paging_before": {
+      "pswpin": 1225105,
+      "pswpout": 9250543,
+      "MemAvailable_kB": 6124956
+    },
+    "paging_after": {
+      "pswpin": 1225154,
+      "pswpout": 9254643,
+      "MemAvailable_kB": 2976024
+    },
+    "restore_persists": true,
+    "turns": [
+      {
+        "question": "Tell me a short joke",
+        "named": "",
+        "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+        "first_synth_s": 2.648407220840454,
+        "detect_fps": 15.240044183477705
+      },
+      {
+        "question": "This is Dylan's smartphone",
+        "named": "Dylan's smartphone",
+        "answer": "Got it, that is your Dylan's smartphone. I will remember it.",
+        "first_synth_s": 0.8635568618774414,
+        "detect_fps": 14.95629279130994
+      }
+    ],
+    "actions": [
+      {
+        "action": "ignore",
+        "queued_source": 1791609238.8715665,
+        "started": 1791609239.1845636,
+        "finished": 1791609239.240973,
+        "message": "Okay, I will ignore only that item."
+      },
+      {
+        "action": "restore",
+        "queued_source": null,
+        "started": 1791609272.381845,
+        "finished": 1791609272.396083,
+        "message": "I will notice that item again."
+      }
+    ],
+    "adapter_sha256": "fd295ca8dd3686a40459ec985d175cf1d4ece19f2139bb0c773ce6c733c43859",
+    "adapter_changes": "Source tracking/crop scores and completed control receipts; Ignore selected during held prefix, then unchanged movement/return/reset checks; absent preferences fail explicitly.",
+    "media": {
+      "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+      "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+      "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+    },
+    "completed": false,
+    "native_exit": 1
+  },
+  "third_face_prototype": {
+    "tree": "342d36cd345425b65690c67977208cda16c7f968",
+    "scoped_tests": 22,
+    "elapsed_s": 8.44,
+    "native_exit": 0,
+    "owner_cleanup_tests": 8,
+    "owner_elapsed_s": 1.61,
+    "lint_ast_whitespace": "PASS",
+    "peer_review": "PASS",
+    "private_face_adapter_sha256": "bad59dc5830ad6bb9959fc283b79184bea224e1183ea22f19f8ec20f54bdc351",
+    "private_face_adapter_review": "PASS; unused copied learning branch deleted before freeze; right-censored final hold recorded"
+  },
+  "corrected_face_baseline_run": {
+    "release": "08ff2193ddc7",
+    "unit": "qr-d139-face-baseline",
+    "pid": 364808,
+    "invocation": "ecd4f3fe24be41078ceea5798da52868",
+    "adapter_sha256": "bad59dc5830ad6bb9959fc283b79184bea224e1183ea22f19f8ec20f54bdc351",
+    "status": "completed/native0; corrected comparator"
+  },
+  "corrected_face_baseline": {
+    "status": "completed",
+    "native_exit": 0,
+    "invocation": "ecd4f3fe24be41078ceea5798da52868",
+    "summary": {
+      "release": "08ff2193ddc7",
+      "tegrastats": "d139-face-baseline-20261010-012112.tegrastats",
+      "model": "yoloe-26n-booth-384x640.onnx",
+      "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+      "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+      "production_memory_writes": false,
+      "classification": "J bounded development recordings; no held-out or physical acceptance",
+      "adapter_origin": "D136 runtime adapter; original person/phone/background clips and one short joke; no object learning",
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 10.077210506803223,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.11430295705795288,
+        "longest_repeated_source_s": 0.10693788528442383,
+        "detect_fps": 14.960781752407861,
+        "render_ms_p50": 13.728588004596531,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 9.833331785072664,
+        "unique_named_face_sources": 36,
+        "face_named_fraction": 0.19473684210526315,
+        "source_age_p95": 0.1803827166557312,
+        "longest_repeated_source_s": 0.2137141227722168,
+        "detect_fps": 15.014334553551809,
+        "render_ms_p50": 13.620486497529782,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 9.91989600118949,
+        "unique_named_face_sources": 30,
+        "face_named_fraction": 0.23846153846153847,
+        "source_age_p95": 0.18088797330856324,
+        "longest_repeated_source_s": 0.20127654075622559,
+        "detect_fps": 14.95734318929353,
+        "render_ms_p50": 13.969482999527827,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 101,
+        "unique_source_fps": 9.626461210067088,
+        "unique_named_face_sources": 77,
+        "face_named_fraction": 0.7623762376237624,
+        "source_age_p95": 0.20212960243225098,
+        "longest_repeated_source_s": 0.20647358894348145,
+        "detect_fps": 14.94107000312496,
+        "render_ms_p50": 13.889485009713098,
+        "phone_named_fraction": 0.0
+      },
+      "paging_before": {
+        "pswpin": 1226185,
+        "pswpout": 9254643,
+        "MemAvailable_kB": 6145236
+      },
+      "paging_after": {
+        "pswpin": 1226186,
+        "pswpout": 9254706,
+        "MemAvailable_kB": 3101272
+      },
+      "turns": [
+        {
+          "question": "Tell me a short joke",
+          "named": "",
+          "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+          "first_synth_s": 2.9966533184051514,
+          "detect_fps": 14.935634602328381
+        }
+      ],
+      "adapter_sha256": "bad59dc5830ad6bb9959fc283b79184bea224e1183ea22f19f8ec20f54bdc351",
+      "final_held_interval": "right-censored at each phase end",
+      "measurement_corrections": "Actual record identity replacement under existing source lock; age after existing JPEG renderer; hold duration through next source change; latest detector capture for input freshness.",
+      "media": {
+        "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+        "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+      },
+      "completed": true,
+      "native_exit": 0
+    },
+    "private_path": "build/p2/recordings/d139-runtime-d139-face-baseline-20261010-012112"
+  },
+  "third_candidate_deployment": {
+    "release": "68114ad88ef5",
+    "source_tree": "342d36cd345425b65690c67977208cda16c7f968",
+    "verified_hashes": 704,
+    "status": "completed/native0 run; qualityREJECT; retained unadopted"
+  },
+  "continuous_teaching_adapter": {
+    "sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "held_frame": 15,
+    "continuation_start_frame": 15,
+    "prefix_frames": 60,
+    "moving_frames": 210,
+    "total_frames": 270,
+    "fps": 15,
+    "original_unchanged": true,
+    "prior_failed_runs_preserved": true
+  },
+  "corrected_face_candidate": {
+    "status": "completed",
+    "unit": "qr-d139-face-candidate.service",
+    "pid": 365553,
+    "invocation": "8ff49a5080d744fa879eb6598fbcd77f",
+    "release": "68114ad88ef5",
+    "adapter_sha256": "bad59dc5830ad6bb9959fc283b79184bea224e1183ea22f19f8ec20f54bdc351",
+    "native_exit": 0,
+    "summary": {
+      "release": "68114ad88ef5",
+      "tegrastats": "d139-face-candidate-20261010-012546.tegrastats",
+      "model": "yoloe-26n-booth-384x640.onnx",
+      "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+      "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+      "production_memory_writes": false,
+      "classification": "J bounded development recordings; no held-out or physical acceptance",
+      "adapter_origin": "D136 runtime adapter; original person/phone/background clips and one short joke; no object learning",
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 10.007999256426844,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.1808379054069519,
+        "longest_repeated_source_s": 0.19906258583068848,
+        "detect_fps": 15.05078957943262,
+        "render_ms_p50": 12.454904994228855,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 8.094893824801357,
+        "unique_named_face_sources": 145,
+        "face_named_fraction": 0.7631578947368421,
+        "source_age_p95": 0.1910953044891357,
+        "longest_repeated_source_s": 0.2033066749572754,
+        "detect_fps": 14.972908185743687,
+        "render_ms_p50": 11.257967504207045,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 10.077698297962385,
+        "unique_named_face_sources": 104,
+        "face_named_fraction": 0.8,
+        "source_age_p95": 0.17852994203567504,
+        "longest_repeated_source_s": 0.11741042137145996,
+        "detect_fps": 15.039026690805406,
+        "render_ms_p50": 11.33115150150843,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 102,
+        "unique_source_fps": 6.088468457834949,
+        "unique_named_face_sources": 52,
+        "face_named_fraction": 0.5098039215686274,
+        "source_age_p95": 0.19978152513504027,
+        "longest_repeated_source_s": 0.21172285079956055,
+        "detect_fps": 14.971643748774465,
+        "render_ms_p50": 9.774102014489472,
+        "phone_named_fraction": 0.0
+      },
+      "paging_before": {
+        "pswpin": 1226193,
+        "pswpout": 9254706,
+        "MemAvailable_kB": 6121460
+      },
+      "paging_after": {
+        "pswpin": 1226920,
+        "pswpout": 9259960,
+        "MemAvailable_kB": 3109416
+      },
+      "turns": [
+        {
+          "question": "Tell me a short joke",
+          "named": "",
+          "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+          "first_synth_s": 2.905982255935669,
+          "detect_fps": 14.890868566308082
+        }
+      ],
+      "adapter_sha256": "bad59dc5830ad6bb9959fc283b79184bea224e1183ea22f19f8ec20f54bdc351",
+      "final_held_interval": "right-censored at each phase end",
+      "measurement_corrections": "Actual record identity replacement under existing source lock; age after existing JPEG renderer; hold duration through next source change; latest detector capture for input freshness.",
+      "media": {
+        "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+        "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+      },
+      "completed": true,
+      "native_exit": 0
+    },
+    "quality": "REJECT"
+  },
+  "changed_path_lint": {
+    "paths": [
+      "robot/config.py",
+      "robot/focus.py",
+      "robot/main.py",
+      "robot/recognition.py",
+      "robot/test_focus.py",
+      "robot/test_recognition.py",
+      "robot/test_things.py"
+    ],
+    "native_exit": 0
+  },
+  "third_pair_comparison": {
+    "d136-person": {
+      "displayed_cadence_ratio": 0.823209671119781,
+      "detect_ratio": 0.9972408788641038,
+      "candidate_named": 145,
+      "baseline_named": 36
+    },
+    "d139-iphone-moving": {
+      "displayed_cadence_ratio": 1.015907656365951,
+      "detect_ratio": 1.0054610969660938,
+      "candidate_named": 104,
+      "baseline_named": 30
+    },
+    "d136-background": {
+      "displayed_cadence_ratio": 0.9931319038805776,
+      "detect_ratio": 1.0060162515912827,
+      "candidate_named": 0,
+      "baseline_named": 0
+    },
+    "person_conversation": {
+      "displayed_cadence_ratio": 0.6324721333180875,
+      "detect_ratio": 1.002046288896519,
+      "candidate_named": 52,
+      "baseline_named": 77
+    }
+  },
+  "selected_fallback": {
+    "source_tree": "cab939279ec24d52fc7a580c30a73c92c1d2a565",
+    "restored_exact_revision": "9082682",
+    "exact_restored_paths": [
+      "robot/config.py",
+      "robot/main.py",
+      "robot/recognition.py",
+      "robot/test_recognition.py"
+    ],
+    "changed_paths": [
+      "robot/focus.py",
+      "robot/test_focus.py",
+      "robot/test_things.py"
+    ],
+    "scoped_checks": 16,
+    "elapsed_seconds": 3.97,
+    "native_exit": 0,
+    "ruff_ast_whitespace_exact_restoration": 0,
+    "peer_review": "CODE PASS; only scoped grey/text/size changes; identity/source/write/ignore guards unchanged",
+    "release": "cc8b526812e5",
+    "verified_hashes": 704,
+    "status": "committed/pushed/deployed704hashes; peerCODEPASS; SolPASS; UI scoped lifecycle/layoutPASS; memory224hashes restored; normalIdle"
+  },
+  "continuous_phone_n": {
+    "status": "failed",
+    "unit": "qr-d139-phone-continuous-n.service",
+    "pid": 366528,
+    "invocation": "b222e01ccd634fb8951280427c86ebdd",
+    "release": "cc8b526812e5",
+    "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "native_exit": 1,
+    "summary": {
+      "release": "cc8b526812e5",
+      "tegrastats": "d139-phone-continuous-n-20261010-013105.tegrastats",
+      "model": "yoloe-26n-booth-384x640.onnx",
+      "model_sha256": "d827f596ae40ae2cb39c60dd7098180801c859a498b74fd5f6ae5c3c93b1c12f",
+      "engine_sha256": "1f211032e22c4af613a71116f9b31677bb06eeff22ebd6b793a1e4be5009aa7c",
+      "production_memory_writes": false,
+      "classification": "J bounded development recordings; no held-out or physical acceptance",
+      "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+      "teaching_clip_derivation": {
+        "prefix_seconds": 4,
+        "prefix_original_seconds": 1,
+        "moving_original_start_frame": 15,
+        "moving_original_start_seconds": 1,
+        "moving_original_frames": 210,
+        "total_frames": 270,
+        "fps": 15,
+        "original_sha256": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "sha256": "b6c519bc6c72bfd66254de5d137bb1f111cf93bf59c42fda103ba5286fa0eee8"
+      },
+      "before_target": null,
+      "binding": [],
+      "natural_learning": false,
+      "failure": "Natural phone learning did not bind requested name",
+      "native_exit": 1,
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 9.99996536473878,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.13398686647415162,
+        "longest_repeated_source_s": 0.10005664825439453,
+        "detect_fps": 15.03870760278545,
+        "render_ms_p50": 13.662321012816392,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 8.571452316038553,
+        "unique_named_face_sources": 151,
+        "face_named_fraction": 0.7947368421052632,
+        "source_age_p95": 0.16711232662200928,
+        "longest_repeated_source_s": 0.10002636909484863,
+        "detect_fps": 14.973586453326607,
+        "render_ms_p50": 14.251699991291389,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 9.147228935685499,
+        "unique_named_face_sources": 91,
+        "face_named_fraction": 0.7,
+        "source_age_p95": 0.16888916492462158,
+        "longest_repeated_source_s": 0.10431504249572754,
+        "detect_fps": 14.961145632095773,
+        "render_ms_p50": 13.31266900524497,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 90,
+        "unique_source_fps": 9.742170696612327,
+        "unique_named_face_sources": 66,
+        "face_named_fraction": 0.7333333333333333,
+        "source_age_p95": 0.19457273483276366,
+        "longest_repeated_source_s": 0.10003066062927246,
+        "detect_fps": 14.953099208753803,
+        "render_ms_p50": 13.706418001675047,
+        "phone_named_fraction": 0.0
+      },
+      "phone_learning": {
+        "samples": 18,
+        "unique_source_fps": 9.314381879466167,
+        "unique_named_face_sources": 9,
+        "face_named_fraction": 0.5,
+        "source_age_p95": 0.1848473072052002,
+        "longest_repeated_source_s": 0.10006213188171387,
+        "detect_fps": 15.13587055413252,
+        "render_ms_p50": 10.71258500451222,
+        "phone_named_fraction": 0.0
+      },
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 0,
+        "hidden": 0,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 0,
+        "hidden": 0,
+        "pass": false
+      },
+      "required_checks": {
+        "natural_learning": false,
+        "physical_binding": false,
+        "stable_phone_movement": false,
+        "ignore_accepted": false,
+        "ignored_return": false,
+        "ignored_reset": false,
+        "ignore_persists": false,
+        "ignored_descriptor": false,
+        "restore_accepted": false,
+        "restore_display": false
+      },
+      "paging_before": {
+        "pswpin": 1230799,
+        "pswpout": 9259960,
+        "MemAvailable_kB": 6137988
+      },
+      "paging_after": {
+        "pswpin": 1230803,
+        "pswpout": 9259968,
+        "MemAvailable_kB": 3144704
+      },
+      "turns": [
+        {
+          "question": "Tell me a short joke",
+          "named": "",
+          "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+          "first_synth_s": 1.9274728298187256,
+          "detect_fps": 14.38173234052244
+        },
+        {
+          "question": "This is Dylan's smartphone",
+          "named": "",
+          "answer": "I don't see a Dylan's smartphone held up. Hold it up and say it again.",
+          "first_synth_s": 0.720238208770752,
+          "detect_fps": 15.409135193283332
+        }
+      ],
+      "actions": [],
+      "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+      "adapter_changes": "Source tracking/crop scores and completed control receipts; Ignore selected during held prefix, then continuous original-frame15 movement/return/reset checks; original time=derived-4+1; absent preferences fail explicitly.",
+      "media": {
+        "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+        "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+      },
+      "completed": false
+    },
+    "unit_native_exit_from_journal": 1,
+    "quality": "REJECT natural phone learning"
+  },
+  "continuous_phone_s": {
+    "status": "failed",
+    "unit": "qr-d139-phone-continuous-s.service",
+    "pid": 367118,
+    "invocation": "f190b828baa3484e8c4de5025e69ae53",
+    "release": "cc8b526812e5",
+    "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+    "native_exit": 1,
+    "summary": {
+      "release": "cc8b526812e5",
+      "tegrastats": "d139-phone-continuous-s-20261010-013250.tegrastats",
+      "model": "yoloe-26s-booth-384x640.onnx",
+      "model_sha256": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+      "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086",
+      "production_memory_writes": false,
+      "classification": "J bounded development recordings; no held-out or physical acceptance",
+      "adapter_origin": "D136 runtime adapter; one ordinary named phone; no synthetic extra names",
+      "teaching_clip_derivation": {
+        "prefix_seconds": 4,
+        "prefix_original_seconds": 1,
+        "moving_original_start_frame": 15,
+        "moving_original_start_seconds": 1,
+        "moving_original_frames": 210,
+        "total_frames": 270,
+        "fps": 15,
+        "original_sha256": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "sha256": "b6c519bc6c72bfd66254de5d137bb1f111cf93bf59c42fda103ba5286fa0eee8"
+      },
+      "before_target": {
+        "track": 90,
+        "source": 1791610454.2353969,
+        "box": [
+          274,
+          374,
+          538,
+          516
+        ],
+        "epoch": 0
+      },
+      "binding": [
+        {
+          "id": 1791610454770927,
+          "ts": 1791610454.5020635,
+          "named": "Dylan's smartphone",
+          "label": "camera",
+          "box": [
+            274,
+            374,
+            538,
+            516
+          ],
+          "source_size": [
+            1280,
+            720
+          ]
+        }
+      ],
+      "natural_learning": true,
+      "binding_clip_seconds": 1.7333333492279053,
+      "physical_phone_binding": true,
+      "ignore_accepted": true,
+      "ignore_preferences": 1,
+      "ignore_completed_message": "Okay, I will ignore only that item.",
+      "ignored_descriptor": true,
+      "ignored_descriptor_after_reset": true,
+      "ignore_persists": true,
+      "restore_accepted": true,
+      "d136-background": {
+        "samples": 130,
+        "unique_source_fps": 9.920393664913556,
+        "unique_named_face_sources": 0,
+        "face_named_fraction": 0.0,
+        "source_age_p95": 0.16718604564666747,
+        "longest_repeated_source_s": 0.0998067855834961,
+        "detect_fps": 15.035596648384608,
+        "render_ms_p50": 13.700548006454483,
+        "phone_named_fraction": 0.0
+      },
+      "d136-person": {
+        "samples": 190,
+        "unique_source_fps": 6.825495033158636,
+        "unique_named_face_sources": 94,
+        "face_named_fraction": 0.49473684210526314,
+        "source_age_p95": 0.16720612049102784,
+        "longest_repeated_source_s": 0.10202288627624512,
+        "detect_fps": 14.973760421580574,
+        "render_ms_p50": 14.190583999152295,
+        "phone_named_fraction": 0.0
+      },
+      "d139-iphone-moving": {
+        "samples": 130,
+        "unique_source_fps": 7.906995537477429,
+        "unique_named_face_sources": 56,
+        "face_named_fraction": 0.43846153846153846,
+        "source_age_p95": 0.16706773042678832,
+        "longest_repeated_source_s": 0.10009598731994629,
+        "detect_fps": 14.961275869932782,
+        "render_ms_p50": 13.12327898631338,
+        "phone_named_fraction": 0.0
+      },
+      "person_conversation": {
+        "samples": 89,
+        "unique_source_fps": 9.153276369192925,
+        "unique_named_face_sources": 61,
+        "face_named_fraction": 0.6966292134831461,
+        "source_age_p95": 0.18258075714111327,
+        "longest_repeated_source_s": 0.12515592575073242,
+        "detect_fps": 14.988490054553415,
+        "render_ms_p50": 13.827061018673703,
+        "phone_named_fraction": 0.0
+      },
+      "phone_ignore_selection": {
+        "samples": 7,
+        "unique_source_fps": 11.665625532668972,
+        "unique_named_face_sources": 7,
+        "face_named_fraction": 1.0,
+        "source_age_p95": 0.13381333351135255,
+        "longest_repeated_source_s": 0,
+        "detect_fps": 14.998661399145822,
+        "render_ms_p50": 14.308985992101952,
+        "phone_named_fraction": 0.8571428571428571
+      },
+      "phone_ignored_reset": {
+        "samples": 150,
+        "unique_source_fps": 8.322114573016904,
+        "unique_named_face_sources": 67,
+        "face_named_fraction": 0.44666666666666666,
+        "source_age_p95": 0.16713905334472656,
+        "longest_repeated_source_s": 0.10074949264526367,
+        "detect_fps": 14.966383465990077,
+        "render_ms_p50": 13.291090494021773,
+        "phone_named_fraction": 0.0
+      },
+      "phone_ignored_return": {
+        "samples": 150,
+        "unique_source_fps": 7.852245285314866,
+        "unique_named_face_sources": 71,
+        "face_named_fraction": 0.47333333333333333,
+        "source_age_p95": 0.16719735860824586,
+        "longest_repeated_source_s": 0.10007762908935547,
+        "detect_fps": 14.966245287395001,
+        "render_ms_p50": 12.330937490332872,
+        "phone_named_fraction": 0.0
+      },
+      "phone_learning": {
+        "samples": 24,
+        "unique_source_fps": 8.986725965739787,
+        "unique_named_face_sources": 7,
+        "face_named_fraction": 0.2916666666666667,
+        "source_age_p95": 0.2564248800277709,
+        "longest_repeated_source_s": 0.10926485061645508,
+        "detect_fps": 13.694058614460628,
+        "render_ms_p50": 13.402706012129784,
+        "phone_named_fraction": 0.5
+      },
+      "phone_named_movement": {
+        "samples": 150,
+        "unique_source_fps": 9.999937371511791,
+        "unique_named_face_sources": 61,
+        "face_named_fraction": 0.4066666666666667,
+        "source_age_p95": 0.133795428276062,
+        "longest_repeated_source_s": 0.09990262985229492,
+        "detect_fps": 14.966349220450534,
+        "render_ms_p50": 13.467186989146285,
+        "phone_named_fraction": 0.7666666666666667
+      },
+      "phone_restored": {
+        "samples": 150,
+        "unique_source_fps": 8.993341058247038,
+        "unique_named_face_sources": 60,
+        "face_named_fraction": 0.4,
+        "source_age_p95": 0.16713299751281738,
+        "longest_repeated_source_s": 0.10228919982910156,
+        "detect_fps": 14.89941578306599,
+        "render_ms_p50": 13.12876949668862,
+        "phone_named_fraction": 0.84
+      },
+      "phone_ignored_return_all_styles_hidden": {
+        "samples": 49,
+        "hidden": 48,
+        "pass": false
+      },
+      "phone_ignored_reset_all_styles_hidden": {
+        "samples": 49,
+        "hidden": 48,
+        "pass": false
+      },
+      "required_checks": {
+        "natural_learning": true,
+        "physical_binding": true,
+        "stable_phone_movement": false,
+        "ignore_accepted": true,
+        "ignored_return": false,
+        "ignored_reset": false,
+        "ignore_persists": true,
+        "ignored_descriptor": true,
+        "restore_accepted": true,
+        "restore_display": false,
+        "restore_persists": true
+      },
+      "failure": "Required common-flow checks failed",
+      "paging_before": {
+        "pswpin": 1230804,
+        "pswpout": 9259968,
+        "MemAvailable_kB": 6142816
+      },
+      "paging_after": {
+        "pswpin": 1231091,
+        "pswpout": 9344816,
+        "MemAvailable_kB": 3228136
+      },
+      "restore_persists": true,
+      "turns": [
+        {
+          "question": "Tell me a short joke",
+          "named": "",
+          "answer": "Why don't scientists trust each other? Because they're all too sure of themselves.",
+          "first_synth_s": 1.788750410079956,
+          "detect_fps": 15.092135905736246
+        },
+        {
+          "question": "This is Dylan's smartphone",
+          "named": "Dylan's smartphone",
+          "answer": "Got it, that is your Dylan's smartphone. I will remember it.",
+          "first_synth_s": 0.9214398860931396,
+          "detect_fps": 13.421721669631735
+        }
+      ],
+      "actions": [
+        {
+          "action": "ignore",
+          "queued_source": 1791610473.6946306,
+          "started": 1791610474.0910735,
+          "finished": 1791610474.156906,
+          "message": "Okay, I will ignore only that item."
+        },
+        {
+          "action": "restore",
+          "queued_source": null,
+          "started": 1791610506.855611,
+          "finished": 1791610506.9090645,
+          "message": "I will notice that item again."
+        }
+      ],
+      "adapter_sha256": "f3657c5445f2c89c52657a43e94f87095cb3e749987e757081900b04e8157c7b",
+      "adapter_changes": "Source tracking/crop scores and completed control receipts; Ignore selected during held prefix, then continuous original-frame15 movement/return/reset checks; original time=derived-4+1; absent preferences fail explicitly.",
+      "media": {
+        "d136-person": "e189c14e3194a70b80acfef6ba1d62a1f2ef4611bdcaabf8a40f5e3de0b34489",
+        "d139-iphone-moving": "d420d3c2cc71fb046ba1169215b58ed6de5fc1a8ebb646c23ee160c39151529a",
+        "d136-background": "f06e6ab2b9297f71d5a18d170b438f340df72af389115cfb57191912ae749cc1"
+      },
+      "completed": false,
+      "native_exit": 1
+    },
+    "quality": "REJECT common-flow movement/ignore/restore",
+    "measurement_context": "A closed production-memory backup of224files/5MB ran during temporary-memory check; no model reload or second stack. Cold totals do not establish turn paging."
+  },
+  "rollback_release": "08ff2193ddc7",
+  "pre_ui_current_backup": {
+    "archive": "/home/qdrant/qdrant-robot/shared/backups/2026-10-10-before-d139-ui-013437.tar.gz",
+    "files": 224,
+    "bytes": 5031760,
+    "sha256": "9a13faa6c4618bb3d9438413c2b2d0e3111023022bde1bfd617710a8bfb6fa21",
+    "manifest": "/home/qdrant/qdrant-robot/shared/backups/2026-10-10-before-d139-ui-013437.tar.manifest.json"
+  },
+  "detector_adoption": "REJECT S; keep N; phone detector/descriptor gap remains unmet",
+  "independent_continuous_phone_review": {
+    "verdict": "REJECT both native1 quality failures",
+    "S_movement_misses": 35,
+    "S_movement_samples": 150,
+    "S_movement_undersized": 10,
+    "S_movement_below_SURE": 25,
+    "S_restore_misses": 24,
+    "S_restore_samples": 150,
+    "S_restore_undersized": 9,
+    "S_restore_below_SURE": 15,
+    "S_exposure_each_exclusion_phase": 1,
+    "S_exclusion_reference_samples_each": 49,
+    "exposure_original_second": 6.933,
+    "pose_gap": true,
+    "tracking_and_displayed_sources_distinct": true,
+    "splice_takeover_removed": true,
+    "physical_binding_and_persistence": "PASS",
+    "overengineering_hacks_scope": "No additional product workaround or relaxed criterion justified"
+  },
+  "recorded_ui_review": {
+    "status": "Scoped UI lifecycle/layout PASS only",
+    "server_pid": 7795,
+    "unit": "qr-live-mac-359ec8b615c1.service",
+    "microphone": false,
+    "original_tab": 1202942045,
+    "backup": "2026-10-10-before-d139-ui-013437.tar.gz",
+    "receipt": "reviews/20261010-d139-recorded-browser-review.md",
+    "no_duplicate": true,
+    "final_Idle_muted": true,
+    "qualification_limits": [
+      "face name placement",
+      "neutral coexistence",
+      "continuousjitter/cadence/200ms"
+    ]
+  },
+  "final_task_review": {
+    "path": "reviews/20261010-013644-7760-review.md",
+    "model": "gpt-6.1-sol",
+    "tree": "cab939279ec24d52fc7a580c30a73c92c1d2a565",
+    "verdict": "PASS scoped checkpoint only; overallD139/boothstandard unmet",
+    "elapsed_seconds": 190.35,
+    "native_exit": 0,
+    "reviewer_validation_limit": "Reviewer direct pytest invocation failed No module named pytest; builder exact uv --with pytest scoped16 pass is authority; reviewer behavioral assertions/whitespace pass",
+    "blocking_findings": []
+  },
+  "ui_memory_postcheck": {
+    "files": 224,
+    "changed": 29,
+    "matches": false
+  },
+  "product_commit": "609b425",
+  "ui_memory_restore": {
+    "retained_replay_memory": "shared/backups/d139-ui-retained-20261010-014153",
+    "archive": "shared/backups/2026-10-10-before-d139-ui-013437.tar.gz",
+    "verified_files": 224,
+    "manifest_matches": true
+  },
+  "normal_preview": {
+    "pid": 15522,
+    "release": "cc8b526812e5",
+    "command": "protected tools/talk.py --release cc8b526812e5",
+    "log": "/Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/logs/interface-server-stable.log",
+    "phase": "Idle verified originalChrome1202942045",
+    "mic_capture": false,
+    "camera_capture": false
+  },
+  "collected_raw_artifacts": {
+    "count": 128,
+    "private_directory": "root build/p2/collected-results/20261010-d139",
+    "manifest": "collection-manifest.json",
+    "tracked": false
+  },
+  "product_push": "609b425 pushed origin/spike/mac-audio-interface"
+}
