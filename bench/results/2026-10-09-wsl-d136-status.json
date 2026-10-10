@@ -20,5 +20,15 @@
   "unit_status_followup": "same active/running invocation; no checkpoint files; unit ExecMainStatus0 is provisional while active",
   "counter_evidence": "Read-only trt_continue selected py-spy report; raw locals remain private",
   "unit_memory_bytes": 8546209792,
-  "unit_swap_bytes": 0
+  "unit_swap_bytes": 0,
+  "completion_watcher": {
+    "automation_id": "8acb5818-1970-4f5f-9a6f-b3af454595e3",
+    "cadence_minutes": 15,
+    "precheck": "skip active; trigger terminal/collected exact owned job; reconcile historical journal before outcome claims",
+    "scheduled_active_skip_native_exit": 1,
+    "unit_transient": true,
+    "collect_mode": "inactive",
+    "private_operational_checks": 5,
+    "integrity": "Checkpoint/native completion remains unmeasured while job active"
+  }
 }

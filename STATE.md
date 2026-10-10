@@ -1,6 +1,6 @@
 # State
 
-Updated2026-10-09 at23:43EDT by the lead. D136/D137 common preview repair is reviewed and deployed as623954f5cdb8. Pause requested by Dylan; no new architecture work in this session. WSL preparation continues under a completion-only watcher; Dylan will start another session for subsequent work.
+Updated2026-10-09 at23:46EDT by the lead. D136/D137 common preview repair is reviewed and deployed as623954f5cdb8. Pause requested by Dylan; no new architecture work in this session. WSL preparation continues under a completion-only watcher; Dylan will start another session for subsequent work.
 
 ## Product checkpoint
 
@@ -31,7 +31,7 @@ WSL dylan@192.168.1.74, boot5f4af7d6-879e-48eb-979a-45e715f1d626, userunit p2-tr
 
 Latest actual selected counter67/128 completed search batches, zeroNaN skips, at23:32:57EDT(E). Final cheap unit observation23:35:52 shows same active/running boot/invocation, MainPID128539; ExecMainStatus0 is provisional while active. Unit memory8546209792B/swap0. Activation128/128 completed12:16; search started17:05:56. Initial journal0/128 is stale(D133). No checkpoint/qualifiedETA/export/Jetsonfit result. Receipt bench/results/2026-10-09-wsl-d136-status.json; rawlocals remain ignored. Preserve healthy job without elapsed-time stops(D83).
 
-Enabled Orca automation8acb5818-1970-4f5f-9a6f-b3af454595e3, WSL AWQ completion handoff, checks every15min. Precheck build/p2/logs/wsl-completion-precheck.py uses root .venv/bin/python and SSH read-only unit state. Scheduled run2 skipped_precheck/native1 in346ms while healthy, with no agent. Manual Run bypasses precheck; its checker deferred/noedits. Owner metadata/prompt/runs are ignored build/p2/logs/wsl-completion-* files. Keep Mac awake and Orca running until completion.
+Enabled Orca automation8acb5818-1970-4f5f-9a6f-b3af454595e3, WSL AWQ completion handoff, checks every15min. Precheck build/p2/logs/wsl-completion-precheck.py uses root .venv/bin/python and SSH read-only unit state. The job is transient CollectMode=inactive, so a collected/not-found terminal unit also triggers historical journal reconciliation. Disappearance alone never establishes success; unavailable native status stays explicit. Five private watcher checks verify active skip, exact terminal trigger, actual collected-unit properties, wrong-invocation skip, and SSH-error skip. Scheduled run2 skipped_precheck/native1 in346ms while healthy, with no agent. Manual Run bypasses precheck; its checker deferred/noedits. Owner metadata/prompt/runs are ignored build/p2/logs/wsl-completion-* files. Keep Mac awake and Orca running until completion.
 
 When the exact job becomes terminal, the automation records native exit/endtime, actual counts/skips/integrity findings, and checkpoint bytes/SHA256 inventory in STATE and relevant receipt/topic/lessons files. It notifies Dylan and removes only this watcher. It never reloads a model to create integrity evidence, restarts the quantizer, exports, builds engines, deploys, or touches unrelated services. Another session owns export/engines/Jetson qualification. Concurrent edits must be preserved. Read-only next command: ssh dylan@192.168.1.74 'systemctl --user show p2-trt-quantize-native-retry.service -p ActiveState -p Result -p ExecMainStatus -p InvocationID -p MainPID -p MemoryCurrent -p MemorySwapCurrent'.
 
