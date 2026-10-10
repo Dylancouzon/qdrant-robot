@@ -1,5 +1,5 @@
 """Booth video view: an MJPEG stream of the camera behind a token, with the focus object, named
-objects, people boxes (never names), a status strip with memory events, and a memory panel. It
+objects, consented person names, a status strip with memory events, and a memory panel. It
 never writes a frame to disk.
 """
 import hmac
@@ -18,7 +18,7 @@ import numpy as np
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
 EVENT_S = 6.0  # how long a memory event stays on the strip
-HINT = "Say: this is my ..."
+HINT = "Say: Track this as my ..."
 FONT, SMALL = cv2.FONT_HERSHEY_SIMPLEX, 0.5
 WHITE, BLACK, ORANGE = (255, 255, 255), (0, 0, 0), (0, 140, 255)  # BGR
 STYLE = {"known": ((80, 200, 60), 2), "guess": (ORANGE, 1), "focus": (ORANGE, 4),

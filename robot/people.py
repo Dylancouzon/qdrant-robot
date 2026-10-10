@@ -109,7 +109,8 @@ def _id(name: str) -> str:
     return str(uuid.uuid5(uuid.NAMESPACE_URL, f"person:{name}"))
 
 
-def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
+def located_face(faces: Faces, frame: np.ndarray
+                 ) -> tuple[np.ndarray, int, tuple[int, int, int, int]] | None:
     """The face vector of the visitor in `frame` and its width in pixels: the largest face,
     or among faces nearly as large (SIMILAR), the one nearest the center. None when no face
     is MIN_FACE wide."""
@@ -118,7 +119,13 @@ def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
         return None
     big = found[found[:, 2] >= SIMILAR * found[0, 2]]
     f = big[np.argmin(np.abs(big[:, 0] + big[:, 2] / 2 - frame.shape[1] / 2))]
-    return faces.embed([align(frame, f[4:14].reshape(5, 2))])[0], int(f[2])
+    box = tuple(int(v) for v in (f[0], f[1], f[0] + f[2], f[1] + f[3]))
+    return faces.embed([align(frame, f[4:14].reshape(5, 2))])[0], int(f[2]), box
+
+
+def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
+    found = located_face(faces, frame)
+    return found[:2] if found else None
 
 
 # Identity requests. A name given with "remember me" makes it an enrollment request.

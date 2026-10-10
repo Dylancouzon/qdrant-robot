@@ -276,16 +276,16 @@ class Memory:
         self.frame_bytes += (self.frames / jpg).stat().st_size
         return jpg
 
-    def add(self, frame: np.ndarray, said: str, said_vec: np.ndarray | None = None,
-            ts: float | None = None) -> int:
-        """Store one turn: a frame captured at `ts` and what the visitor said while it was in
-        view, with `said_vec` when it is a statement worth finding later. Each turn gets its
-        own id, even for the same captured frame."""
+    def add(self, frame: np.ndarray | None, said: str, said_vec: np.ndarray | None = None,
+            ts: float | None = None, **fields) -> int:
+        """Store text and an optional source crop, with a statement vector when supplied."""
         ts = ts or time.time()
-        jpg, pid = self.save(frame), self._id()
+        visual = {} if frame is None else {"frame": self.save(frame),
+                                          "thumb": thumb(frame).tobytes().hex()}
+        pid = self._id()
         vectors = {} if said_vec is None else {"said": said_vec.tolist()}
         self.shard.update(UpdateOperation.upsert_points([Point(pid, vectors, {
-            "ts": ts, "frame": jpg, "said": said, "thumb": thumb(frame).tobytes().hex()})]))
+            "ts": ts, "said": said, **visual, **fields})]))
         self.shard.flush()
         return pid
 
@@ -350,8 +350,9 @@ class Memory:
     @staticmethod
     def _row(hit) -> dict:
         row = {"id": hit.id, **hit.payload}
-        grey = np.frombuffer(bytes.fromhex(row["thumb"]), np.uint8).reshape(THUMB[::-1])
-        row["thumb"] = grey.astype(np.float32)
+        if "thumb" in row:
+            grey = np.frombuffer(bytes.fromhex(row["thumb"]), np.uint8).reshape(THUMB[::-1])
+            row["thumb"] = grey.astype(np.float32)
         return row
 
     def told(self, query: np.ndarray, before: float, n: int = 2) -> list[dict]:
@@ -362,13 +363,24 @@ class Memory:
             filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before))])))
         return [{**self._row(h), "score": h.score} for h in hits]
 
-    def recent(self, before: float, n: int = 3) -> list[dict]:
+    def recent(self, before: float, n: int = 3,
+               selected: dict[str, list[int]] | None = None, skip: Collection[str] = ()
+               ) -> list[dict]:
         """Payloads (id, ts, frame, said, caption, thumb) of the newest captioned frames before
         `before`, newest first."""
+        must = [FieldCondition(key="ts", range=RangeFloat(lt=before)),
+                FieldCondition(key="frame", is_empty=False),
+                FieldCondition(key="caption", is_empty=False)]
+        if selected is not None:
+            if not selected:
+                return []
+            ids = {i for linked in selected.values() for i in linked}
+            must.append(Filter(should=[FieldCondition(key="named", match=MatchAny(list(selected))),
+                                       *([HasIdCondition(ids)] if ids else [])]))
         hits = self.shard.query(QueryRequest(
             limit=n, query=OrderBy("ts", Direction.Desc), with_payload=True,
-            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
-                                FieldCondition(key="caption", is_empty=False)])))
+            filter=Filter(must=must, must_not=[
+                FieldCondition(key="label", match=MatchAny(list(skip)))] if skip else None)))
         return [self._row(h) for h in hits]
 
     def sightings(self, before: float, n: int = 4, hide: Collection[int] = (),
@@ -377,6 +389,8 @@ class Memory:
         seen before `before`, newest first, except the points in `hide` and the labels in
         `skip` (ignored kinds); `match` keeps those whose field has one of the given values
         (label=["cup", "mug"])."""
+        if any(not values for values in match.values()):
+            return []
         hits = self.shard.query(QueryRequest(
             limit=n, query=OrderBy("last_seen", Direction.Desc), with_payload=True,
             filter=Filter(must=[FieldCondition(key="last_seen", range=RangeFloat(lt=before)),
@@ -387,11 +401,11 @@ class Memory:
                           ] * bool(skip) or None)))
         return [{"id": h.id, **h.payload} for h in hits]
 
-    def untag(self, name: str) -> None:
-        """Remove the visitor's object `name` from every sighting that matched it."""
-        self.shard.update(UpdateOperation.delete_payload_by_filter(
-            Filter(must=[FieldCondition(key="named", match=MatchValue(name))]), ["named"]))
-        self.shard.flush()
+    def forget_named(self, name: str) -> None:
+        """Delete selected crops and sightings, including records outside current track links."""
+        while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
+                must=[FieldCondition(key="named", match=MatchValue(name))])))[0]:
+            self.forget([r.id for r in rows])
 
     def points(self, ids: Collection[int]) -> list[dict]:
         """Payloads of the points `ids` (the sightings in view now)."""
@@ -509,8 +523,8 @@ if __name__ == "__main__":
         mine = seen.sighting("cup", "right", 336.0, named="cup")
         assert [s["id"] for s in seen.sightings(400.0, named=["cup"])] == [mine]
         assert [s["label"] for s in seen.sightings(400.0, skip=["cup"])] == ["bag"]
-        seen.untag("cup")
-        assert seen.sightings(400.0, named=["cup"]) == [] and seen.points([mine])
+        seen.forget_named("cup")
+        assert seen.sightings(400.0, named=["cup"]) == [] and not seen.points([mine])
         seen.forget([mine])
         assert [s["label"] for s in seen.sightings(before=400.0, n=1, hide={
             seen.sightings(before=400.0)[0]["id"]})] == ["cup"], "hidden points leave room"

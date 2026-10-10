@@ -1,6 +1,6 @@
-"""The robot: hears a line, looks, recalls, answers aloud, and remembers what its detector
-tracks. One process; the LLM runs in a supervised llama-server child. Every turn logs its stage
-times and saves its answer audio.
+"""The robot: hears a line, looks, recalls, answers aloud, and remembers named objects
+and conversation. One process; the LLM runs in a supervised llama-server child.
+Every turn logs its stage times and saves its answer audio.
 
     python -m robot.main                       camera, camera microphone, no speaker
     python -m robot.main --speaker plughw:1,0  ... and an ALSA speaker
@@ -8,6 +8,7 @@ times and saves its answer audio.
 """
 import argparse
 import contextlib
+import copy
 import json
 import os
 import queue
@@ -25,9 +26,9 @@ import numpy as np
 from robot import audio, brain
 from robot.asr import Ears, Scribe, woken
 from robot.config import SHARED
-from robot.detect import CONFIRM, Detector, Sighting, Tracker
+from robot.detect import CONFIRM, Detector, Sighting, Tracker, region
 from robot.faces import Faces
-from robot.focus import Focus, Track
+from robot.focus import BODY, SURE, Focus, Track, inside
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     Memory,
@@ -49,6 +50,7 @@ from robot.people import (
     consent,
     done,
     face,
+    located_face,
     name_in,
     reply,
     request,
@@ -87,6 +89,7 @@ FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I
 CONVERSATION_S = 20  # a line this soon after the last answer continues the conversation (D65)
 CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 VIEW_S = 0.33  # spacing of the recent views a named object's crops come from
+PREVIEW_S, PREVIEW_TTL = 0.5, 0.75  # bounded idle recognition and source-frame expiry
 SETTLE_S = 0.5  # how long a "my phone" turn waits for tracks confirmed after its speech start
 
 
@@ -127,7 +130,7 @@ class Turn:
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
-    frame_id: int = 0             # the frame this turn saw, stored as a memory
+    frame_id: int = 0             # this turn's text memory point
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
     line: float = 0.0             # the VAD ended the line
@@ -171,11 +174,13 @@ class Robot:
         # (frame, Tracker.view()) of the last detected frame, and of up to SHOTS frames VIEW_S
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
-        self.view_at = 0.0  # when self.view was detected
+        self.view_at = self.view_taken = 0.0  # detection time, source capture time
+        self.labeled: tuple[float, np.ndarray, Screen] | None = None
+        self.preview_due, self.preview_queued, self.preview_cursor = 0.0, False, 0
+        self.crop_times: deque[float] = deque()  # at most three idle crop queries per second
         self.focus: Focus | None = None  # the focus object and shown names (D63), per frame
         self.screen: tuple[np.ndarray | None, Screen] = (None, Screen())  # what the view draws
         self.views: deque[tuple[float, np.ndarray, dict]] = deque(maxlen=SHOTS)
-        self.mine: dict[int, str] = {}  # track id -> the visitor's object it was named as
         # (name, times asked, [face] of the request): consent asked, the face held only until
         # the answer
         self.asking: tuple[str, int, list] | None = None
@@ -209,7 +214,6 @@ class Robot:
         self.speaking = False                   # a visitor is mid-line: background work yields
         self.speech_start = 0.0
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
-        self.uncaptioned: list[tuple[int, dict]] = []  # (frame id, encoded frame)
         self.closing = threading.Event()
         self.detecting = threading.Lock()       # held while a frame is detected and tracked
         self.threads = [threading.Thread(target=t, name=t.__name__, daemon=True)
@@ -252,9 +256,11 @@ class Robot:
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
             self.since, self.panel = time.time_ns() // 1000, None
-            self.view, self.mine = (None, {}), {}
+            self.view = (None, {})
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
+            self.labeled, self.preview_queued = None, False
+            self.crop_times.clear()
             self.ui_turns.clear()
             self.ui_turn, self.ui_thinking, self.ui_play_until = None, False, 0.0
 
@@ -281,10 +287,19 @@ class Robot:
             self.lines.task_done()
 
     def _watch(self) -> None:
-        # Keep a recent frame prefilled while nobody speaks, so a turn rarely waits for one.
+        # The same worker does bounded idle recognition and prefill; speech takes priority.
         while not self.closing.wait(WATCH_S):
+            if self.speaking or self.ui_thinking or not self.jobs.empty():
+                continue
+            with self.detecting:
+                frame, _ = self.view
+                if frame is not None and not self.preview_queued and \
+                        time.time() >= self.preview_due:
+                    self.preview_queued, self.preview_due = True, time.time() + PREVIEW_S
+                    self.jobs.put(("preview", frame, self.view_taken,
+                                   [Track(*t) for t in self.tracker.scored()]))
             shot = self.camera.latest()
-            if not self.speaking and self.jobs.empty() and self._stale(shot[0]):
+            if self._stale(shot[0]):
                 self.jobs.put(("look", shot))
 
     def _detect(self) -> None:
@@ -293,12 +308,12 @@ class Robot:
         due, failures = time.time(), 0
         while not self.closing.wait(max(0.0, due - time.time())):
             due = max(due + 1 / DETECT_FPS, time.time())
-            frame, _ = self.camera.latest()
+            frame, taken = self.camera.latest()
             if frame is None:
                 continue
             try:
                 self.detect = self.detect or Detector()
-                found = self._track(frame, self.detect(frame))
+                found = self._track(frame, self.detect(frame), taken)
             except Exception as e:
                 failures += 1
                 print(f"detection failed ({failures} of {DETECT_RESTARTS + 1}):", flush=True)
@@ -312,15 +327,16 @@ class Robot:
                 continue
             self.detections += 1
             if found:
-                self.jobs.put(("sight", found, frame))
+                self.jobs.put(("sight", found))
 
-    def _track(self, frame: np.ndarray, dets: list) -> list[Sighting]:
+    def _track(self, frame: np.ndarray, dets: list, taken: float | None = None) -> list[Sighting]:
         """Track one detected frame; keep its boxes with the frame they are in, for crops."""
         with self.detecting:
             found = self.tracker.update(dets, frame.shape[1], time.time())
             self.view, self.view_at = (frame, self.tracker.view()), time.time()
-            if not self.views or time.time() - self.views[-1][0] >= VIEW_S:
-                self.views.append((time.time(), *self.view))
+            self.view_taken = self.view_at if taken is None else taken
+            if not self.views or self.view_taken - self.views[-1][0] >= VIEW_S:
+                self.views.append((self.view_taken, *self.view))
             self._refocus(frame)
         return found
 
@@ -338,6 +354,9 @@ class Robot:
         """The view's source: the newest tracked frame and its boxes."""
         with self.detecting:
             frame, screen = self.screen
+            if self.labeled and not self.speaking and not self.ui_thinking and \
+                    time.time() - self.labeled[0] <= PREVIEW_TTL:
+                _, frame, screen = self.labeled
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
                       "Speaking" if time.time() < self.ui_play_until else
                       "Thinking" if self.ui_thinking else "Listening")
@@ -360,36 +379,88 @@ class Robot:
             return frame, replace(screen, status=status, transcript=transcript,
                                   evidence=evidence, memory=self.panel)
 
-    def _sight(self, found: list[Sighting], frame: np.ndarray) -> None:
-        """One point per track (label, region, times; no frame: answers use labels, and a
-        stored frame could hold a visitor's face): stored when confirmed, updated when its
-        region or majority label changes and when it leaves; each write bounds the evidence
-        to the retention window and caps (Memory.retain), never evicting a track that is not
-        gone (in view, or missed for less than MAX_MISSED frames). An ignored kind's new track
-        is not stored; a new track of a named kind is matched against the visitor's objects."""
+    def _sight(self, found: list[Sighting]) -> None:
+        """Unknown tracks live only in RAM. Only fresh recognition writes selected sightings."""
         for s in found:
-            pid = self.points.get(s.track)
             if s.ended:
                 self._end(s.track)
             elif s.gone:
                 self.away.add(s.track)
-                if pid:
-                    self.memory.set(pid, label=s.label, last_seen=s.seen)
             else:
                 self.away.discard(s.track)
+
+    def _preview(self, frame: np.ndarray, taken: float, tracks: list[Track]) -> None:
+        """Publish recognition with its exact source, never a label on a newer frame."""
+        if self.speaking or self.ui_thinking or time.time() - taken > PREVIEW_TTL:
+            return
+        with self.detecting:
+            focus = copy.deepcopy(self.focus)
+        people = [t.box for t in tracks if t.label == "person"]
+        found_face = located_face(self.faces, frame)
+        scores = self.people.scores(found_face[0]) if found_face else []
+        person = scores[0][0] if scores and scores[0][2] >= THRESHOLD else None
+        person_boxes = [b for b in people if found_face and inside(found_face[2], b) >= 0.8]
+        recognized = {}
+        eligible = self.things.visual_links(self.ignored)
+        candidates = [t for t in tracks if eligible and t.label not in BODY
+                      and t.label not in self.ignored
+                      and (focus.sized(t) or focus.name(t.id))]
+        while self.crop_times and time.monotonic() - self.crop_times[0] >= 1:
+            self.crop_times.popleft()
+        for t in (candidates[self.preview_cursor:] + candidates[:self.preview_cursor]):
+            if len(self.crop_times) >= 3 or self.speaking or self.ui_thinking:
+                break
+            self.crop_times.append(time.monotonic())
+            hit = self.things.score(self.crops([cut(frame, t.box)])[0])
+            # An ignored stored class stays ignored even if the current detector calls it otherwise.
+            if hit and hit[0] not in eligible:
+                hit = None
+            recognized[t.id] = hit or (None, 0.0)
+            self.preview_cursor = (candidates.index(t) + 1) % len(candidates)
+        if self.speaking or self.ui_thinking or time.time() - taken > PREVIEW_TTL:
+            return
+        focus.update(max(focus.now, taken), tracks, people, recognized=recognized)
+        boxes = focus.boxes(tracks, people, recognized)
+        if person and len(person_boxes) == 1:
+            boxes = [(*b[:4], person, "known") if b[:4] == person_boxes[0] and b[5] == "person"
+                     else b for b in boxes]
+        with self.detecting:
+            self.labeled = taken, frame, Screen(boxes)
+            # Keep object hysteresis, but drawing and writes always use source-frame results.
+            live = self.tracker.in_view()
+            self.focus.named.update({i: n for i, n in focus.named.items() if i in live})
+        self._remember_matches(frame, taken, tracks, recognized,
+                               person if len(person_boxes) == 1 else None)
+
+    def _remember_matches(self, frame: np.ndarray, taken: float, tracks: list[Track],
+                          recognized: dict, person: str | None) -> None:
+        """Only this snapshot's sure matches may create or advance visual sightings."""
+        if self.hiding or self.speaking or self.ui_thinking or \
+                time.time() - taken > PREVIEW_TTL:
+            return
+        for t in tracks:
+            name, score = recognized.get(t.id, (None, 0.0))
+            if name and score >= SURE and t.label not in self.ignored:
+                pid = self.points.get(t.id)
+                row = self.memory.points([pid]) if pid else []
+                if not row or row[0].get("named") != name:
+                    pid = None
                 if pid:
-                    self.memory.set(pid, label=s.label, region=s.region, last_seen=s.seen)
-                elif s.label not in self.ignored:
-                    self.points[s.track] = self.memory.sighting(
-                        s.label, s.region, s.seen, self.mine.get(s.track) or self._match(frame, s))
-        self._retain(max(s.seen for s in found))
+                    self.memory.set(pid, label=t.label, region=region(t.box, frame.shape[1]),
+                                    last_seen=taken)
+                else:
+                    pid = self.points[t.id] = self.memory.sighting(
+                        t.label, region(t.box, frame.shape[1]), taken, name)
+                if person:
+                    self.people.link(person, [pid])
+        if recognized:
+            self._retain(time.time())
 
     def _end(self, track: int) -> None:
         """A track no new track can continue: forget its id."""
         self.points.pop(track, None)  # its last_seen was written when it went out of view
         self.away.discard(track)
         self.visitors.pop(track, None)
-        self.mine.pop(track, None)
 
     def _whois(self, frame: np.ndarray, turn: Turn | None = None
                ) -> tuple[np.ndarray, str | None] | None:
@@ -404,14 +475,6 @@ class Robot:
                              "face_ms": round(1000 * (time.time() - started), 1),
                              "scores": [[n, round(b, 3), round(s, 3)] for n, b, s in scores]}
         return (found[0], name) if found else None
-
-    def _match(self, frame: np.ndarray, s: Sighting) -> str | None:
-        """The visitor's object a new track's crop matches, whatever its label, or None (no
-        named object or a person: no embedding runs; or the score is under MATCH)."""
-        if not self.named or s.label == "person":
-            return None
-        hit = self.things.score(self.crops([cut(frame, s.box)])[0])
-        return hit[0] if hit and hit[1] >= MATCH else None
 
     def _retain(self, now: float) -> None:
         """Bound memory to the retention window and caps (Memory.retain) after each write,
@@ -434,9 +497,15 @@ class Robot:
                 self._turn(*job[1:])
             elif job[0] == "sight":
                 self._sight(*job[1:])
-            elif (caption := self.brain.caption(job[2], lambda: self.speaking)) is None:
-                self.uncaptioned.append(job[1:])  # a visitor spoke: retry after their turn
-            else:
+            elif job[0] == "preview":
+                try:
+                    self._preview(*job[1:])
+                finally:
+                    self.preview_queued = False
+            elif (rows := self.memory.points([job[1]])) and \
+                    rows[0].get("label") not in self.ignored and \
+                    rows[0].get("named") in self.things.visual_links(self.ignored) and \
+                    (caption := self.brain.caption(job[2], lambda: self.speaking)) is not None:
                 self.memory.set(job[1], caption=caption)
             self.jobs.task_done()
 
@@ -533,8 +602,7 @@ class Robot:
         # ownership (things.py holds what was named).
         statement = None if is_question(turn.question) or command(
             turn.question, self.vocab) else question
-        self._store(turn, (now, taken, look.image if now is look.frame else brain.jpeg(now)),
-                    statement, track)
+        self._store(turn, (now, taken), statement, track)
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
@@ -556,29 +624,25 @@ class Robot:
                 if not mentions(m["said"], self.ignored) and (
                     not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
 
-    def _store(self, turn: Turn, shot: tuple[np.ndarray, float, dict],
+    def _store(self, turn: Turn, shot: tuple[np.ndarray, float],
                statement: np.ndarray | None, track: int | None) -> None:
-        """Remember the turn after its answer was spoken: `shot` (the frame at speech start,
-        its capture time, its image for the caption), what was said, a caption later, linked
-        to the enrolled person whose face it shows. Nothing while a forgotten visitor may be
+        """Remember conversation text, linked to the enrolled person in the speech-start frame.
+        Nothing while a forgotten visitor may be
         in view (`hiding`), for a person track that asked to be forgotten, or for a turn that
         deleted an object ("forget my phone" would be a new statement about it)."""
         if not turn.keep:
             return
-        frame, taken, image = shot
+        frame, taken = shot
         seen = self._whois(frame)
         if self._hidden(seen, track):
             return
         self._hear_name(turn, seen)
-        pid = turn.frame_id = self.memory.add(frame, turn.question, statement, taken)
+        pid = turn.frame_id = self.memory.add(None, turn.question, statement, taken)
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it
         if seen and seen[1]:
             self.people.link(seen[1], [pid])  # "forget me" deletes it if still kept
         self._retain(time.time())
-        for job in [*self.uncaptioned, (pid, image)]:
-            self.jobs.put(("caption", *job))
-        self.uncaptioned = []
 
     def _hidden(self, seen: tuple[np.ndarray, str | None] | None, track: int | None) -> bool:
         """Whether a turn with face `seen` must not be stored after a "forget me": the same
@@ -694,6 +758,7 @@ class Robot:
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding, self.told = (face_, time.time()), None
+        self.labeled = None
         return True
 
     def _things(self, turn: Turn) -> str | None:
@@ -709,6 +774,7 @@ class Robot:
                 return self._forget_thing(name, labels)
             self.things.ignore(labels, kind == "ignore")
             self.ignored = self.things.ignored()
+            self.labeled = None
             return (f"Okay, I will ignore {plural(name)}." if kind == "ignore" else
                     f"Okay, I will notice {plural(name)} again.")
         if (asked := question(turn.question, self.vocab)) is None:
@@ -723,6 +789,8 @@ class Robot:
             # keys: the sightings or the brain answer.
             return None if mode == "seen" or not labels else (
                 "No, I" if mode == "remember" else "I") + f" don't know which {name} is yours."
+        if set(named["labels"]) & self.ignored:
+            return f"I am ignoring {plural(name)}, so I do not remember any."
         return self._mine(turn, mode, named)
 
     def _settle(self, since: float) -> None:
@@ -736,6 +804,9 @@ class Robot:
     def _name(self, turn: Turn, name: str, labels: list[str]) -> str:
         """Bind `name` to the object the focus gives (D67, Focus.target): the focus object,
         else the most salient object held up. Otherwise ask for it held up."""
+        old = self.things.named(name, labels)
+        if {*labels, *(old["labels"] if old else [])} & self.ignored:
+            return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         with self.detecting:
             found = self.focus and self.focus.target([Track(*t) for t in self.tracker.scored()])
         if found is None:
@@ -743,31 +814,52 @@ class Robot:
         return self._bind(turn, name, labels, found)
 
     def _bind(self, turn: Turn, name: str, labels: list[str], track: int) -> str:
-        """Store `name` with crops of `track` from the recent views, and tag its sighting."""
+        """Remember the actual binding crop, its source box/time, and deletion links."""
         with self.detecting:
-            views = [v for v in [self.view, *(x[1:] for x in self.views)] if track in v[1]]
+            views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
+                     if track in v[2]]
         if not views:
             return "Sorry, I lost sight of it. Hold it up and say it again."
-        shots = [cut(frame, v[track][1]) for frame, v in views[:SHOTS]]
-        label = views[0][1][track][0]  # its own label too: "bag" when a phone looks like one
+        taken, frame, view = views[0]
+        label, box = view[track]
+        tracks = [Track(t, b, label, 0.0) for t, (label, b) in view.items()]
+        old = self.things.named(name, labels)
+        if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
+            return f"I am ignoring {plural(name)}. Ask me to notice it again first."
+        seen = self._whois(frame)
+        if self._hidden(seen, self._visitor()):
+            return "I cannot remember this while the forgotten visitor is in view."
+        shots = [cut(f, v[track][1]) for _, f, v in views[:SHOTS]]
         self.things.name(name, sorted({*labels, label}), self.crops(shots))
         self.named = self.things.labels()
-        self.mine[track] = name  # its sighting may still be queued behind this turn
-        if pid := self.points.get(track):
-            self.memory.set(pid, named=name)
-            turn.memories = [pid]
-        turn.named = name
+        pid = self.memory.add(shots[0], turn.question, ts=taken, named=name, label=label,
+                              box=list(box), source_size=[frame.shape[1], frame.shape[0]])
+        self.things.link(name, pid)
+        sighting = self.points[track] = self.memory.sighting(
+            label, region(box, frame.shape[1]), taken, name)
+        if seen and seen[1]:
+            self.people.link(seen[1], [pid, sighting])
+        turn.memories, turn.named = [pid], name
+        with self.detecting:
+            self.focus.bind(track, name)
+            people = [t.box for t in tracks if t.label == "person"]
+            self.labeled = taken, frame, Screen(
+                self.focus.boxes(tracks, people, {track: (name, 1.0)}))
+        self.jobs.put(("caption", pid, brain.jpeg(shots[0])))
+        self._retain(time.time())
         return f"Got it, that is your {name}. I will remember it."
 
     def _forget_thing(self, name: str, labels: list[str]) -> str:
-        """Delete the named object, the turns that named it (frame and statement), and its
-        tag on every sighting; it survives no restart."""
+        """Delete named crops, linked turns, and selected sightings; ignore rules survive."""
         if (named := self.things.named(name, labels)) is None:
             return f"I don't know your {name}, so there is nothing to forget."
         self.memory.forget(self.things.forget(named["name"]))
-        self.memory.untag(named["name"])
-        # A sighting still queued for a bound track must not bring the tag back.
-        self.mine = {t: n for t, n in self.mine.items() if n != named["name"]}
+        self.memory.forget_named(named["name"])
+        self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
+        with self.detecting:
+            if self.focus:
+                self.focus.forget(named["name"])
+            self.labeled = None
         self.named = self.things.labels()
         return f"Done. I have forgotten your {named['name']}."
 
@@ -780,10 +872,13 @@ class Robot:
         seconds ago"). Every object in view is scored, whatever its label; `this`: only the
         one nearest the center. Sets turn.memories to the evidence ids."""
         name = named["name"]
+        if set(named["labels"]) & self.ignored:
+            return [], None, 0, ""
         with self.detecting:
             frame, view = self.view
             here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
-        found = {t: box for t, (label, box) in view.items() if label != "person"}  # any label
+        found = {t: box for t, (label, box) in view.items()
+                 if label != "person" and label not in self.ignored}
         if this:
             found = {t: found[t] for t in [_central(found, frame.shape[1])] if t}
         scores = {t: self._score(named, v) for t, v in zip(
@@ -829,13 +924,18 @@ class Robot:
         """Captioned frames (newest first) and the Memories lines, oldest first, one short line
         each with its age: each distinct caption, and the newest sighting of each kind out of
         view (no sides, D61). What is in view now is the present, not something seen before."""
+        selected = self.things.visual_links(self.ignored)
         recalled = [{**m, "caption": unmention(m["caption"], self.ignored)}  # shown() reads lines
-                    for m in self.memory.recent(before=turn.speech_start)
-                    if np.abs(m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
+                    for m in self.memory.recent(before=turn.speech_start,
+                                                selected=selected,
+                                                skip=self.ignored)
+                    if "box" in m or np.abs(
+                        m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
         with self.detecting:  # a consistent snapshot of the tracks
             in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
         newest: dict[str, dict] = {}  # kind -> its newest sighting: one line per object
-        for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored):
+        for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored,
+                                       named=selected):
             newest.setdefault(kind_of(s["label"]), s)
         sights = list(newest.values())[:LINES]
         turn.memories = [m["id"] for m in recalled + sights]
@@ -862,11 +962,16 @@ class Robot:
             here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
         # Enough tracks to group by kind and region before the answer limit (ponytail: a
         # window, not a group-by; Edge 0.8 has none. Facet on label if one kind floods it).
-        past = self.memory.sightings(turn.speech_start, SIGHTINGS, here, self.ignored, **query[1])
-        now = [p for p in self.memory.points(here) if p["label"] not in self.ignored]
+        past = self.memory.sightings(turn.speech_start, SIGHTINGS, here, self.ignored,
+                                     named=self.things.visual_links(self.ignored), **query[1])
+        with self.detecting:
+            now = [{"id": -t, "label": label, "region": region(box, self.view[0].shape[1]),
+                    "last_seen": self.view_taken} for t, (label, box) in self.view[1].items()
+                   if label not in self.ignored]
         if found := sighting_answer(*query, past, now,
                                     lambda ts: brain.age(turn.speech_start - ts)):
-            answer, turn.memories = found
+            answer, ids = found
+            turn.memories = [i for i in ids if i > 0]
             return answer
         return None
 

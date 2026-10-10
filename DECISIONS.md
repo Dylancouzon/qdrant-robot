@@ -568,3 +568,14 @@ One Sol6.1/high builder adds live camera overlays, streaming real replies, bound
 Deploy the protected builder branch directly as b2b36d9718da, previouscd60 for rollback. Preserve rejected root F1 source with its matching tests instead of partial restoration. Post-deploy main/view/camera hashes match, and no qr unit runs. The page opens Idle with microphone off.
 Dylan performs Start/Mute/Stop and capability testing. Camera reconnect and overlapping-turn display are optional carried gaps; evidence supplied does not prove generated grounding. No model adoption, physical latency, quality, or acceptance claim follows this preview.
 Evidence: bench/results/2026-10-09-robot-interface-prototype.json; reviews/20261009-195203-77868-review.md; research/mac-audio-interface.md and edge-cases.md; spike/mac-audio-interface; local URL http://127.0.0.1:8765.
+
+## D127 2026-10-09: Select visual memory explicitly and show verified names
+Dylan confirms hiding tiny background detections and persisting only objects named or explicitly tracked. Show green object/person names after explicit object binding or fresh enrolled face matches, superseding D59 anonymous-only display. Consent and real deletion remain fixed.
+Keep live perception temporary; reject unknown sighting and ordinary-turn image/caption writes. Keep conversation text and consented faces. Named visual crops retain provenance and deletion links; legacy unnamed history remains intact and outside automatic visual recall. No historical purge.
+Use bounded idle work in the existing worker to publish labeled source frames, with anonymous live fallback during generation/staleness. Never carry person names by track ID. Reject tighter automatic history and stale name caching; no new model, module, runtime, or broad evaluation.
+Evidence: Dylan live feedback and two explicit answers; research/mac-audio-interface.md; research/booth-ux.md verified missing Focus recognition wiring; protecteda7eeae3/currentb2b36d9718da. One design gate, scoped Sol6.1/high build, targeted checks/review, then human live test.
+
+## D128 2026-10-09: Persist ignore rules separately from visual observations
+Dylan clarifies that ignored kinds need persistent memory so Edgy remembers what to ignore. Retain existing Things ignore/unignore rule points across restart. These rules describe user preferences; ignored detections create no new visual evidence.
+Object deletion removes the named object and linked visual evidence, while the independent class ignore rule remains until unignore. This clarification preserves the existing rule path and adds no schema, model, or architecture.
+Evidence: Dylan explicit clarification; robot/things.py ignore/ignored on protected preview branch; D127 and research/mac-audio-interface.md. Include rule restart and no-visual-write checks in the scoped implementation.

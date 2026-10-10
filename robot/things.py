@@ -121,6 +121,14 @@ class Things:
             must=[FieldCondition(key="name", is_empty=False)])))[0]
         return {label for r in found for label in r.payload["labels"]}
 
+    def visual_links(self, skip: Collection[str] = ()) -> dict[str, list[int]]:
+        """Named evidence, including legacy links, excluding ignored object classes."""
+        rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=True, filter=Filter(
+            must=[FieldCondition(key="name", is_empty=False)],
+            must_not=[FieldCondition(key="labels", match=MatchAny(list(skip)))]
+            if skip else None)))[0]
+        return {r.payload["name"]: r.payload.get("turns", []) for r in rows}
+
     def score(self, crop: np.ndarray, name: str | None = None) -> tuple[str, float] | None:
         """(name, MaxSim score) of the named object nearest `crop` (or of `name`), whatever
         its label: the detector's labels are hints (D61), one object can get several."""
@@ -161,7 +169,7 @@ _THING = r"(?P<thing>[a-z][a-z-]*(?: [a-z][a-z-]*)?)"
 _NAMING = [re.compile(p, re.I) for p in (
     rf"^\W*(?:and |so |ok(?:ay)?,? )?(?:this|that|here)(?: one)?(?:'s| is)\s+my\s+{_THING}\W*$",
     rf"^\W*(?:and )?(?:this|that)\s+{_THING}\s+(?:is mine|belongs to me)\W*$",
-    rf"\bremember\s+(?:this|that)(?:\s+[a-z-]+)?\s+as\s+my\s+{_THING}\W*$")]
+    rf"\b(?:remember|track)\s+(?:this|that)(?:\s+[a-z-]+)?\s+as\s+my\s+{_THING}\W*$")]
 _FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\b(?:\s+about)?\s+my\s+{_THING}", re.I)
 _UNIGNORE = re.compile(r"\b(?:stop|quit|no longer|don'?t|do not)\s+ignor\w*|\bunignore\b|"
                        r"\bnotice\b.*\bagain\b", re.I)

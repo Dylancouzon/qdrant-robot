@@ -165,7 +165,7 @@ def test_robot_identity(monkeypatch) -> None:
             for _ in range(n):  # the robot's detection loop, without the detector
                 dets = [Detection("person", 0.9, box)] if k else []
                 if found := robot.tracker.update(dets, 1280, float(next(clock))):
-                    robot._sight(found, None)
+                    robot._sight(found)
             return frame
 
         def ask(text: str, frame: np.ndarray) -> str | None:
@@ -298,3 +298,18 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("Where am I from?", frames(5, 1)) is None and turns[-1].told == []
         assert ask("Where am I from?", cy) is None and turns[-1].told == [], \
             "nor does Cy after that new conversation"
+
+
+def test_face_position_matches_selected_detection(monkeypatch):
+    from types import SimpleNamespace
+    from robot import people
+
+    rows = np.zeros((2, 15), np.float32)
+    rows[0, :4], rows[1, :4] = (0, 100, 160, 160), (565, 120, 150, 155)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    faces = SimpleNamespace(detect=lambda frame: rows, embed=lambda crops: [vector])
+    monkeypatch.setattr(people, "align", lambda frame, landmarks: frame[:112, :112])
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    found, width, box = people.located_face(faces, frame)
+    assert found is vector and width == 150 and box == (565, 120, 715, 275)
+    assert face(faces, frame)[0] is vector

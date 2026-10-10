@@ -9,7 +9,7 @@ Box = tuple[int, int, int, int]  # x1, y1, x2, y2 in frame pixels
 
 # Worn or part of a person: never the focus (the hoodie strings read "lanyard" in the live clip).
 BODY = frozenset({"person", "face", "t-shirt", "lanyard", "badge", "hat", "glasses"})
-MIN_SIDE = 48  # px: the shortest box side a focus may have
+MIN_SIDE = 64  # shortest side at a 1280 px source width, scaled with the frame
 STEADY = 0.10  # of the frame width: how far a candidate's center may move in STEADY_S
 STEADY_S = 1.0
 MOVED = 0.03  # of the frame width: a center shift that counts as moved (static box jitter ~1%)
@@ -59,6 +59,7 @@ class _Name:
     def heard(self, name: str | None, score: float) -> bool:
         """Count one recognition result; True when the shown name changed."""
         old = self.name
+        self.score = score  # Hysteresis keeps a name, never the confidence of an older frame.
         if name is None or score < GUESS:
             self.run, self.misses = (None, 0), self.misses + 1
             if self.misses >= CLEAR_N:
@@ -139,8 +140,17 @@ class Focus:
         x1, y1, x2, y2 = ZONE
         zone = (x1 * self.width, y1 * self.height, x2 * self.width, y2 * self.height)
         return (t.label not in BODY and t.label not in self.ignored and not self.name(t.id)
-                and t.id not in self.scenery and min(t.box[2] - t.box[0], t.box[3] - t.box[1])
-                >= MIN_SIDE and (self._held(t, held) or inside(t.box, zone) == 1))
+                and t.id not in self.scenery and self.sized(t)
+                and (self._held(t, held) or inside(t.box, zone) == 1))
+
+    def sized(self, t: Track) -> bool:
+        return min(t.box[2] - t.box[0], t.box[3] - t.box[1]) >= MIN_SIDE * self.width / 1280
+
+    def bind(self, track: int, name: str) -> None:
+        self.named[track] = _Name(name=name, score=1.0, run=(name, SET_N))
+
+    def forget(self, name: str) -> None:
+        self.named = {i: n for i, n in self.named.items() if n.name != name}
 
     def _held(self, t: Track, held: float = HELD) -> bool:
         return any(inside(t.box, b) >= held for b in self.held)
@@ -201,6 +211,7 @@ class Focus:
     def target(self, tracks: list[Track]) -> int | None:
         """The object a naming turn binds to: the focus, else the most salient object held up,
         named or not (a visitor can always teach what they hold)."""
+        tracks = [t for t in tracks if self.sized(t) and t.label not in self.ignored]
         live = {t.id for t in tracks}
         if self.focus in live:  # a focus that just left the frame is not bound
             return self.focus
@@ -208,17 +219,24 @@ class Focus:
         best = max(held, key=self.salience, default=None)
         return best and best.id
 
-    def boxes(self, tracks: list[Track], people: list[Box]) -> list[tuple]:
+    def boxes(self, tracks: list[Track], people: list[Box],
+              recognized: dict[int, tuple[str | None, float]] | None = None) -> list[tuple]:
         """The view's boxes (robot/view.py Box): named objects, the focus, other objects,
         and people without names; worn items are not drawn."""
-        names, out = self.names(), [(*b, "", "person") for b in people]
+        best: dict[str, tuple[int, float]] = {}
+        for i, (name, score) in (recognized or {}).items():
+            if name and self.name(i) == name and score >= GUESS and \
+                    score > best.get(name, (0, -1.0))[1]:
+                best[name] = i, score
+        names = {i: (name, score >= SURE) for name, (i, score) in best.items()}
+        out = [(*b, "", "person") for b in people]
         for t in tracks:
             if t.id in names:
                 name, sure = names[t.id]
                 out.append((*t.box, name if sure else name + "?", "known" if sure else "guess"))
-            elif t.id == self.focus:
+            elif t.id == self.focus and self.sized(t):
                 out.append((*t.box, t.label.capitalize() + "?" if t.score >= KIND_SCORE
                             else "???", "focus"))
-            elif t.label not in BODY:
+            elif t.label not in BODY and (self.sized(t) or self.name(t.id)):
                 out.append((*t.box, "", "other"))
         return out
