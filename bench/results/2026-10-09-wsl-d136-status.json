@@ -30,5 +30,13 @@
     "collect_mode": "inactive",
     "private_operational_checks": 5,
     "integrity": "Checkpoint/native completion remains unmeasured while job active"
+  },
+  "latest_scheduled_precheck": {
+    "run": 3,
+    "scheduled_utc": "2026-10-10T04:00:00Z",
+    "started_epoch_ms": 1791604851744,
+    "status": "skipped_precheck",
+    "native_exit": 1,
+    "agent_dispatched": false
   }
 }
