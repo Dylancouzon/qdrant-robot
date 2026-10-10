@@ -611,3 +611,9 @@ Dylan reports jumpy boxes, rapid unknown-focus changes, and a disconnected corne
 Move exact face crop/name/source age into one bounded card beside immutable source face coordinates. Current person outlines stay anonymous; no identity follows a track. Clear on absence even when busy, and reject old in-flight sources after a gap.
 Reject cached named live-body outlines and frozen matched full frames. Fixed-corner source card remains fallback. Models, budgets, thresholds, memory policy, consent, and deletion stay fixed; Dylan owns physical qualification.
 Evidence: research/mac-audio-interface.md; peer overlay_reviewer; design34450 GO WITH CHANGES/native3, accepted conditions. No tree stamp because authorized smoothing landed during design; final task review must stamp complete frozen code.
+
+## D135 2026-10-09: Ship the reviewed stable preview update
+D134 sourcef2f3496 passes36 scoped checks11.20s/native0, peerreview PASS, and Sol45876 PASS177.34s/native0/tree23fa8244. Deploy protected1384f8a50c52 and verify27 source files plus19 unchanged protected paths; previous364d and retainedcd60 remain.
+Stop only the owned prior session/server, back up closed shards, reload original Chrome1202942045, and restore Listening on qr-live-mac-b2b159dbd549.service with Macserver53156. No duplicate viewer, WSL mutation, full suite, or automated live acceptance test.
+Physical smoothness/recognition remains Dylan-owned. Source-card placement and label-only continuity edges remain carried; no architecture/model adoption or final-target claim.
+Evidence: bench/results/2026-10-09-preview-stable-boxes.json; reviews/20261009-214603-45876-review.md; research/mac-audio-interface.md and research/lessons.md.
