@@ -1,33 +1,35 @@
 # State
 
-Updated 2026-10-10. Dylan authorizes repository consolidation, branch/worktree retirement, and pausing the live preview. Canonical checkout: /Users/dylanc/Documents/GitHub/qdrant-robot, main. No deployment or model adoption.
+Updated 2026-10-10. Repository consolidation is complete. Canonical checkout: /Users/dylanc/Documents/GitHub/qdrant-robot, main. Live preview is paused. No deployment or model adoption.
 
-## Active task and checks
+## Start here
 
-Consolidate accepted UI 011f522 and reviewed planning 26fed40 into main. Preserve other histories with an ours-strategy merge, archive tags, and a verified complete local Git bundle. Add a compact experiment index and exact sanitized receipts. Verify accepted runtime/fixtures/tools byte-for-byte, native exits, history reachability, private archive contents, full source checks, and task review. Push main/tags before retiring obsolete branches. Preserve production memories, backups, releases, models, and unrelated tasks.
+Read research/experiments.md for compact outcomes and archive retrieval commands. Read research/lessons.md for pitfalls. Main's runtime, fixtures, tools, and configuration remain byte-identical to accepted 011f522. README and records now point to the compact index. Rejected F1, Granite/Smol, and native Gemma adapters remain historical parents only.
 
-## Current product and future plan
+## Completed cleanup
 
-Accepted runtime: Qwen3-VL-2B on llama.cpp; YOLOE-26S default with nano fallback; code-owned actions and identity. UI accepted by Dylan as good enough under D147. Main's executable source matches accepted 011f522. Rejected F1, split Granite/Smol, and Gemma TensorRT adapters remain archived histories only.
+Accepted UI and planning checkpoint 26fed40 are consolidated. Ours-strategy merging retains rejected histories without their runtime trees. All eight prior heads have pushed archive/2026-10-10 tags; all remain reachable. The complete 23-ref recovery bundle verifies. Seven local spike branches and six remote spike branches are deleted. Main is the sole local/remote branch.
 
-Planning: research/answer-evidence.md contains seven development sessions/30 spoken turns, parser options, UI-set Location and named-introducer Owner requirements, and your phone versus Ana's phone references. These are unimplemented. Location provenance, owner-aware keys/speaker binding, and isolated knowledge/log paths need design review before a later build. D148 same-owner ambiguity and crop-background proposals remain parked.
+Five inactive Orca worktrees are removed. Canonical root remains on main. This active session checkout at /Users/dylanc/orca/workspaces/qdrant-robot/jetson-trt-testing is retained temporarily at detached main for handback. It owns no experiment branch. Orca's default base is origin/main. No other project's worktree or terminal was changed.
 
-## Machine reconciliation and jobs
+Private evidence from all six linked checkouts is preserved under ignored build/reconciliation-20261010/worktrees/<original-name>. SHA256 and symlink checks verify 1,600 entries/3,526,866,794 bytes (E). All archived symlinks resolve. Manifests, original inventories, hook/review logs, and history.bundle remain ignored. Canonical build aliases preserve native and D147 paths. Root .env, .venv, inputs, and refs stay in place.
 
-Jetson 16:49 UTC: boot 09b4bb27-f975-441c-9d00-7af446ec7de6; current 7f67670fa91e; previous 6781adbb7189. No running qr system/user units; GPU lock free, probe 0. The Mac preview PID 1311 exited after graceful SIGINT; port 8765 is closed. Production memory and release links remain unchanged. Unrelated caffeinate/helpers stay untouched.
+## Verification
 
-No model jobs run. Scoped cleanup review PASS, native exit 0, 184.63 s (E): reviews/20261010-130113-18820-review.md. Reviewer independently verifies accepted source, eight reachable tags, complete bundle, archive hashes/counts, exact sanitized receipts, native failures, and retirement order. Review PID 18820 and children have exited. Full checks completed locally in canonical root, native exit 0, 93.58 s (E), log build/reconciliation-20261010/full-checks.log. Ruff, Vulture, complete pytest, module assertions, and workflow self-checks pass. No check job remains. Private archival job completed, native 0: all six linked checkouts' ignored files were moved and byte-hash/symlink verified. Logs/manifests are under build/reconciliation-20261010. The move uses the same volume and duplicates no media/model data; manifests are the only new disk requirement. Six linked worktrees plus primary root were clean before cleanup. Five inactive worktrees will retire after private archive verification. This active native-testing session checkout remains temporarily available for handback, then holds a detached main snapshot with no experimental branch.
+Full source checks pass native 0 in 93.58 s (E). Sol 6.1 cleanup review PASS/native 0 in 184.63 s: reviews/20261010-130113-18820-review.md. The real commit hook passes native 0 in 90.49 s; consolidation c8b1112 and eight tags are pushed. Local links, historical result retrieval, source equality, history reachability, archive hashes, and Git connectivity pass. Final bookkeeping receives the same real hook.
 
-## Records and recovery
+Audit: bench/results/2026-10-10-repository-reconciliation.json. No owned gate, check, preview, or model jobs run. Unrelated helpers remain untouched.
 
-Changed paths: STATE, DECISIONS, experiment index/archive-head metadata, lessons, README, and exact sanitized native/WSL/rejected-comparison receipts. Git merge metadata retains rejected branches without importing their runtime trees. Recovery bundle: build/reconciliation-20261010/history.bundle, verified native 0 with all 23 refs and complete history. Archive tags preserve all eight previous local heads, including main-before.
+## Jetson and recovery
 
-Private inventories and retired-worktree artifacts stay under ignored build/reconciliation-20261010. Canonical root .env, .venv, build inputs, and refs remain in place. All archive manifests verify: 1,600 files, 3,526,866,794 bytes (E), across six linked checkouts. Source-tree and history reachability checks pass. Worktree removal remains pending review and push. Jetson native artifacts stay at shared/experiments/p2-trt-edge/native-20261010. Original quantizer exit remains unavailable; native build exits 0, initialization exits 1 before answers. See research/jetson-trt.md.
+Boot 09b4bb27-f975-441c-9d00-7af446ec7de6; current 7f67670fa91e; previous 6781adbb7189. Final read-only checks show no qr system/user units and free shared/gpu.lock, probe 0. Mac preview port 8765 is closed. Main/focus/brain hashes match the deployed accepted release. Production memories and models are unchanged. Closed backup shared/backups/2026-10-10-before-d140.tar.gz still matches SHA256 bf4ff898131cad2ae1ac0b5af1fc2a40061d3f07ece8f40c42f91a3bc0b267f1.
 
-## Git and remaining targets
+Native Gemma build exits 0; initialization exits 1 before answers. WSL three-prompt BF16 screen stays 7/12 each. Original quantizer exit remains unavailable. Read research/jetson-trt.md and the index before reopening either avenue; no repeated quantization or export.
 
-Reviewed consolidation is ready for the real commit hook. Main/tag push and retirement follow that hook. User explicitly authorizes this main consolidation and branch/worktree deletion. Normal tools/githooks and scoped task review apply; no hook bypass. Codex auth/model pins verify; usage remaining is unavailable. Push main and archive tags only after checks/review, then delete completed spike refs and retire idle Orca worktrees.
+## Next task and unmet targets
 
-All final targets remain unqualified: physical audible 1.2 s p50/2.0 s p95, 90% per capability, zero stranger identity claims, decode 30 tok/s, sustained detector 15 fps, Edge 10 ms p99, 500 MB headroom, and no turn paging. M4 also needs offline cold start, restart/deletion, held-out acceptance, and an eight-hour active run. Cleanup establishes repository integrity, not those capabilities.
+research/answer-evidence.md preserves seven sessions/30 spoken turns and the selected Location/Owner requirements. Implementation remains deferred. Location capture, owner-aware keys/speaker binding, combined answers, and isolated knowledge/log paths require a design gate before building. Same-owner grouping and background isolation remain parked under D148.
 
-Exact next command: stage the complete reconciled records and README, commit through tools/githooks, then atomically push main and eight archive tags. Retire five inactive Orca worktrees and all seven spike branches only after push verifies. Keep the active detached checkout for handback. Do not resume model experiments or deploy during cleanup.
+Physical audible 1.2 s p50/2.0 s p95, 90% per capability, zero stranger identity claims, 30 tok/s decode, sustained 15 fps detection, Edge 10 ms p99, 500 MB headroom, and no turn paging remain unqualified. M4 also needs held-out acceptance, offline cold start, restart/deletion, and eight active hours. Cleanup establishes repository integrity only.
+
+Exact next command: git -C /Users/dylanc/Documents/GitHub/qdrant-robot status --short --branch. Start future work from canonical main, read the index, and reconcile remote jobs/boot/release/lock before changes. The live server stays paused until a later task requires it.

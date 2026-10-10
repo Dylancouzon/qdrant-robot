@@ -32,8 +32,36 @@
     "elapsed_s": 184.63,
     "path": "reviews/20261010-130113-18820-review.md"
   },
-  "branch_retirement": "pending",
-  "worktree_retirement": "pending",
+  "branch_retirement": {
+    "local_removed": 7,
+    "remote_removed": 6,
+    "remaining_local": [
+      "main"
+    ],
+    "remaining_remote": [
+      "origin/main"
+    ]
+  },
+  "worktree_retirement": {
+    "removed": 5,
+    "remaining": 2,
+    "canonical": "/Users/dylanc/Documents/GitHub/qdrant-robot",
+    "temporary_active": "/Users/dylanc/orca/workspaces/qdrant-robot/jetson-trt-testing",
+    "active_mode": "detached main snapshot; retained for this session"
+  },
   "model_adoption": false,
-  "deployment": false
+  "deployment": false,
+  "commit_hook": {
+    "native_exit": 0,
+    "checks_elapsed_s": 90.49,
+    "commit": "c8b1112",
+    "private_log": "build/reconciliation-20261010/commit-hook.log"
+  },
+  "backup": {
+    "path": "shared/backups/2026-10-10-before-d140.tar.gz",
+    "sha256": "bf4ff898131cad2ae1ac0b5af1fc2a40061d3f07ece8f40c42f91a3bc0b267f1",
+    "unchanged": true
+  },
+  "git_connectivity_native_exit": 0,
+  "archive_symlink_targets_resolve": 1
 }

@@ -931,3 +931,9 @@ Sol 6.1 PASS, native 0 in 184.63 s (E), independently verifies accepted source, 
 Keep runtime and deployment unchanged. Commit through the real hook and push main/tags before retiring completed branches and five inactive worktrees. The active checkout remains detached at main for handback.
 Canonical private aliases preserve native and D147 evidence paths. Root environment, secrets, references, remote releases, memories, and backups remain untouched.
 Evidence: reviews/20261010-130113-18820-review.md; bench/results/2026-10-10-repository-reconciliation.json; research/experiments.md.
+
+## Main cleanup completion 2026-10-10: Retire experiments after verified preservation
+Main c8b1112 and eight archive tags push atomically. Seven local/six remote spike branches retire; five idle worktrees are removed. Keep canonical main and this temporary detached session checkout.
+The real commit hook passes native 0 in 90.49 s (E). Archive links, Git connectivity, accepted source, paused preview, unchanged release links, and closed backup checksum verify. No runtime or production-data change.
+All 1,600 private entries/3,526,866,794 bytes remain verified in ignored canonical storage. Main's compact index retrieves exact history without loading old worktree states.
+Evidence: bench/results/2026-10-10-repository-reconciliation.json; research/experiments.md; ignored build/reconciliation-20261010 receipts and manifests.
