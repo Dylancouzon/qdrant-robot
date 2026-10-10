@@ -2302,3 +2302,38 @@
 {"key": "0121e632f845353b", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
 {"key": "242b0c56a783749c", "pass": false, "why": "Omits teddy bears now and apples before.", "votes": [false, false, false]}
 {"key": "c8f53192a070cf43", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "d760ddfd514a13a4", "pass": false, "why": "Calls the stop sign a piece of paper.", "votes": [false, false, false]}
+{"key": "efec154e899620f2", "pass": true, "why": "Says the visitor showed a stop sign.", "votes": [true, true, true]}
+{"key": "cb22e2916f61f68c", "pass": false, "why": "Places the cat on a chair instead of a blanket.", "votes": [false, false, false]}
+{"key": "b53db12b44d34784", "pass": false, "why": "Omits the microphone from the room description.", "votes": [false, false, false]}
+{"key": "eeffc544ef21987b", "pass": true, "why": "Says it does not remember yesterday.", "votes": [true, true, true]}
+{"key": "24481dbef73baf42", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "77124641197b1266", "pass": true, "why": "Recalls espresso.", "votes": [true, true, true]}
+{"key": "60a2656b7570271f", "pass": false, "why": "Does not say the bus is red.", "votes": [false, false, false]}
+{"key": "f103204b7e9c41a7", "pass": true, "why": "Responds naturally to the visitor being from Berlin.", "votes": [true, true, true]}
+{"key": "007d742920bb53e1", "pass": false, "why": "Does not say he appears to be having fun.", "votes": [false, false, false]}
+{"key": "37e340e001e92976", "pass": false, "why": "Says nothing about the green apples.", "votes": [false, false, false]}
+{"key": "a7a7625d7f48b0e2", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}
+{"key": "58728fba16f8c6cd", "pass": true, "why": "Identifies the stop sign.", "votes": [true, true, true]}
+{"key": "69c69c57e81e3b1e", "pass": true, "why": "Says the visitor showed a stop sign.", "votes": [true, true, true]}
+{"key": "599b6861336e7fad", "pass": false, "why": "Places the cat on a chair instead of a blanket.", "votes": [false, false, false]}
+{"key": "ef0bd022a22d82d8", "pass": true, "why": "Describes the current room without claiming the cat remains.", "votes": [true, true, true]}
+{"key": "928506b449e3ad41", "pass": true, "why": "Says it does not remember.", "votes": [true, true, true]}
+{"key": "5cc8c08b1971ee0b", "pass": false, "why": "Invents a past visit to a coffee shop.", "votes": [false, false, false]}
+{"key": "8ed19c23fb25306b", "pass": true, "why": "Says Dylan likes espresso.", "votes": [true, true, true]}
+{"key": "bfbe9a6dfa9085bb", "pass": false, "why": "Invents a memory of Berlin.", "votes": [false, false, false]}
+{"key": "1b9e2653f940ec1c", "pass": false, "why": "Claims the person is surfing instead of bodyboarding or swimming.", "votes": [false, false, false]}
+{"key": "36a96facb163c3ba", "pass": false, "why": "Does not mention the green apples.", "votes": [false, false, false]}
+{"key": "7dfcaa476401fbfb", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}
+{"key": "da2a31e288761ce0", "pass": true, "why": "Identifies the stop sign.", "votes": [true, true, true]}
+{"key": "dd368fd7bbd64d03", "pass": true, "why": "Recalls that the visitor showed a stop sign.", "votes": [true, true, true]}
+{"key": "930b8825eba5c6df", "pass": false, "why": "Says pink chair instead of pink blanket.", "votes": [false, false, false]}
+{"key": "9f1a047e56425c49", "pass": true, "why": "Describes the room without claiming the cat remains.", "votes": [true, true, false]}
+{"key": "aa699e5b288b3e9d", "pass": true, "why": "Says it does not remember yesterday.", "votes": [true, true, true]}
+{"key": "eb5b072c662abf9e", "pass": true, "why": "Greets Dylan and responds to his interest in espresso.", "votes": [true, true, true]}
+{"key": "379e2f26bbc22e89", "pass": true, "why": "Recalls espresso.", "votes": [true, true, true]}
+{"key": "008564611e3572bc", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "54cee00ea2d96333", "pass": true, "why": "Responds naturally to the visitor being from Berlin.", "votes": [true, true, true]}
+{"key": "b07306c9cd9a4b35", "pass": false, "why": "Does not say he looks like he is having fun.", "votes": [false, false, false]}
+{"key": "8a22aaf08ac77ab4", "pass": false, "why": "Does not mention the green apples.", "votes": [false, false, false]}
+{"key": "fd16678d100203f9", "pass": true, "why": "Greets Ana by name.", "votes": [true, true, true]}

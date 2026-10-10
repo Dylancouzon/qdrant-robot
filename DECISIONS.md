@@ -937,3 +937,33 @@ Main c8b1112 and eight archive tags push atomically. Seven local/six remote spik
 The real commit hook passes native 0 in 90.49 s (E). Archive links, Git connectivity, accepted source, paused preview, unchanged release links, and closed backup checksum verify. No runtime or production-data change.
 All 1,600 private entries/3,526,866,794 bytes remain verified in ignored canonical storage. Main's compact index retrieves exact history without loading old worktree states.
 Evidence: bench/results/2026-10-10-repository-reconciliation.json; research/experiments.md; ignored build/reconciliation-20261010 receipts and manifests.
+
+## Experiment order 2026-10-10: Test Gemma fit before intent and tool optimization
+Dylan authorizes Gemma experiments with CPU Kokoro and accepts 24 tok/s if answer quality is substantially better. Use WSL whenever compatible for preparation and prompt screening; Jetson-specific builds and integrated acceptance stay on the Jetson. No runtime adoption or final target change is established.
+The original intent/tool optimization handoff remains research/answer-evidence.md and follows the Gemma checkpoint. Compare rules and existing BGE source scores first, preserve code-owned actions, and separate owner/location gains from parser gains. Freeze one model across parser arms.
+Reject the lead's invented Qwen TensorRT comparison as a replacement for the original handoff. Require design review before implementation, judged quality improvement, complete-stack memory/paging and speech measurements, and task review before adoption.
+Evidence: Dylan's current instructions; research/answer-evidence.md; research/jetson-trt.md; research/stack.md; STATE.md.
+
+## Session scope 2026-10-10: Complete only the Gemma experiment
+Dylan limits this session to Gemma with CPU Kokoro, using WSL where compatible and Jetson full-stack measurements for acceptance.
+Intent parsing and tool execution optimization stay recorded as the next step in STATE.md, linked to research/answer-evidence.md; start them in a later session.
+Evidence: Dylan's explicit current-turn scope instruction. No runtime or deployment change occurs in this status update.
+
+## Gemma fit design 2026-10-10: Use official LiteRT before native adaptation
+Sol 6.1 design returns GO WITH CHANGES/native 3 in 135.80 s. Freeze default 12-packet net-win screening, product-limit confirmation, existing identity/ownership fixtures, full-stack quality/latency/detection/paging rules, CPU Kokoro, native cancellation, and isolated paths before answers.
+Select pinned LiteRT 0.18.0 full Gemma bundle first; existing GGUF/CPU Kokoro is a conditional fallback, and accepted Qwen/CPU Kokoro is the paired control. No custom allocator, unchanged native AWQ retry, or intent work.
+Evidence: research/gemma-fit.md; reviews/20261010-133237-60293-design.md; build/gemma-fit-20261010/freeze.json. Runtime/replies/fit remain unverified.
+
+
+## Gemma LiteRT result 2026-10-10: Reject adoption at the frozen quality screen
+Pinned LiteRT 0.18.0 full Gemma runs on Jetson NVIDIA Vulkan, native zero; 12 short replies decode at 29.69 tok/s median (J). Jetson GPU scores nine/12 (J), fresh WSL Qwen seven/12 (E), and WSL CPU Gemma six/12 (E), with complete three-vote judgments.
+Two net wins and zero losses miss the frozen three-win threshold. Stop before product-limit confirmation, CPU Kokoro adaptation, or integrated replay. Preserve runnable LiteRT and exact failures; reject unchanged retries, threshold relaxation, and unnecessary GGUF fallback.
+Complete-stack fit, spoken latency, detection, identity/ownership, and zero-turn paging remain unqualified. Each standalone Jetson run records two system swap-out pages. Accepted production and rollback stay unchanged; intent/tool optimization follows in a later session with fixed Qwen.
+Evidence: research/gemma-fit.md; bench/results/2026-10-10-gemma-litert-screen.json; private build/gemma-fit-20261010; task review pending.
+
+
+## Gemma checkpoint review 2026-10-10: Preserve the failed adoption rule
+Sol 6.1 task review passes native zero in 220.67 s (E), with no blockers. It verifies unchanged packets, pre-answer thresholds, exact-answer judgments, private provenance, and production isolation.
+Required source checks pass native zero in 92.39 s (E). Commit and push the records-only spike checkpoint; retain accepted Qwen and all unqualified fit/speech/safety targets.
+Intent parsing and tool execution optimization remain the next session's task. No further Gemma route or integrated replay starts after the frozen quality miss.
+Evidence: reviews/20261010-134937-83780-review.md; bench/results/2026-10-10-gemma-litert-screen.json; research/gemma-fit.md.

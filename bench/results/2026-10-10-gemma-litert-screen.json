@@ -1,0 +1,1141 @@
+{
+  "date": "2026-10-10",
+  "task": "Gemma fit preliminary screen",
+  "base_revision": "5041aa9",
+  "branch": "spike/llm-experiments",
+  "freeze": {
+    "runtime": "litert-lm-api",
+    "version": "0.18.0",
+    "model_repo": "litert-community/gemma-4-E2B-it-litert-lm",
+    "model_revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+    "model_filename": "gemma-4-E2B-it.litertlm",
+    "model_bytes": 2588147712,
+    "model_sha256": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+    "cases_sha256": "2e62ade166a8c52eb37f09281763d1cc022172d251a0917d75a7f4df0062f588",
+    "case_ids": [
+      "recall-stop-1",
+      "recall-stop-2",
+      "scene-change-1",
+      "scene-change-2",
+      "absent-1",
+      "conversation-1",
+      "conversation-2",
+      "bus-red-1",
+      "small-talk-1",
+      "long-question-1",
+      "same-apples-1",
+      "intro-1"
+    ],
+    "generation": {
+      "max_new_tokens": 128,
+      "do_sample": false,
+      "enable_thinking": false,
+      "context_limit": 2048
+    },
+    "quality_rule": {
+      "net_wins_min": 3,
+      "n": 12,
+      "absence_identity_ownership_regressions_allowed": 0
+    },
+    "inputs": "default variant only, original system/history/evidence, text-only source packets",
+    "smoke": "separate clock image from original native test, not mixed into packet quality score",
+    "disk_budget_gb_each": 8,
+    "limits": "All preparation on WSL is E. Integrated acceptance remains on Jetson."
+  },
+  "freeze_sha256": "1e3b979e2009301714d9f45fec6b772f7ca5a1f066e24af7ab12192ba2d7fee4",
+  "preparation": {
+    "wsl": {
+      "sdk_version": "0.18.0",
+      "wheel": "litert_lm_api-0.18.0-py3-none-manylinux_2_27_x86_64.whl",
+      "wheel_sha256": "b64e2cf6d7dcb90ff094b74af595cc5d53faa07e0889f967d15df8d3e696b53c",
+      "model_revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "model_sha256": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+      "model_bytes": 2588147712,
+      "finished_epoch": 1791653875.4852376
+    },
+    "jetson": {
+      "sdk_version": "0.18.0",
+      "wheel": "litert_lm_api-0.18.0-py3-none-manylinux_2_27_aarch64.whl",
+      "wheel_sha256": "d066db0c2bcd832b2b9cf8532b5fff385f7cff8562a1b482f8da0b51f810c47c",
+      "model_revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "model_sha256": "181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c",
+      "model_bytes": 2588147712,
+      "finished_epoch": 1791654114.7172177
+    }
+  },
+  "runs": [
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "packets-cpu",
+      "command": [
+        "venv/bin/python",
+        "infer.py",
+        "packets",
+        "--backend",
+        "cpu",
+        "--tokens",
+        "128",
+        "--output",
+        "packets-cpu.jsonl"
+      ],
+      "start_epoch": 1791654247.3243814,
+      "pid": 567710,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 567715,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654281.0114658,
+      "seconds": 33.687084674835205,
+      "receipt_sha256": "93775c42056e986ff1f22740e690838dd8ad99dfc905c8d94b9b9a5cd049e9cb",
+      "memory_sha256": "4cb35ccabff443988b522d0c9f8f49dce2c4e970ea037ded03c16d0980e2d336",
+      "log_sha256": "d5cd91a0a46ede1d34957168da335749fb4a7d1af3cc399c83fe0dfa992349c1",
+      "memory_samples": 135,
+      "minimum_system_memavailable_mib": 22705.58203125,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 3201
+      },
+      "answer_file_sha256": "3b80b0db37377081cb8f072e49a0c807b902e18b522d494209c5a713334ed8ce",
+      "answers": 12,
+      "footer_complete": true,
+      "empty_answers": 0,
+      "decode_tokens_per_second_p50": 14.813828814929485,
+      "first_token_s_p50": 1.2624936175125185,
+      "per_case": [
+        {
+          "id": "recall-stop-1",
+          "answer_sha256": "6d598d1ae96617b4a639938e66263b4176ddb7e467ec54e24265dd363ec419bb",
+          "decode_tokens": 18,
+          "decode_tokens_per_second": 14.26284887877233,
+          "first_token_s": 1.759439751971513,
+          "seconds": 2.8436773599823937
+        },
+        {
+          "id": "recall-stop-2",
+          "answer_sha256": "52c7944fd3e7a194cf74746f62c821abeb072e99e536e05b17b4c05a1a606705",
+          "decode_tokens": 29,
+          "decode_tokens_per_second": 14.83306695105782,
+          "first_token_s": 1.3512582909897901,
+          "seconds": 3.143532599962782
+        },
+        {
+          "id": "scene-change-1",
+          "answer_sha256": "c11083ae06216972f981779c387eff9678f2a3d772e4c6e4a6a62de367f32a54",
+          "decode_tokens": 31,
+          "decode_tokens_per_second": 14.530455726693457,
+          "first_token_s": 1.2951561210211366,
+          "seconds": 3.2694683040026575
+        },
+        {
+          "id": "scene-change-2",
+          "answer_sha256": "7b70c3e56b496c62cd71437149464aa9561754eb74ff3e5f6643ed7375f405d4",
+          "decode_tokens": 17,
+          "decode_tokens_per_second": 14.671855755676582,
+          "first_token_s": 1.2884416889864951,
+          "seconds": 2.3174129310064018
+        },
+        {
+          "id": "absent-1",
+          "answer_sha256": "6179dc68ec5d3237b3e05729b90556bc5011d75a40db56279bff61909ecf88c6",
+          "decode_tokens": 30,
+          "decode_tokens_per_second": 14.818089971259653,
+          "first_token_s": 0.9846295299939811,
+          "seconds": 2.8757100150105543
+        },
+        {
+          "id": "conversation-1",
+          "answer_sha256": "3391534da6bef7a88e64b0ce5c10f47fd4a6ab578aa1972b282206b22664210b",
+          "decode_tokens": 26,
+          "decode_tokens_per_second": 14.85796720263406,
+          "first_token_s": 0.9880750459851697,
+          "seconds": 2.607401726010721
+        },
+        {
+          "id": "conversation-2",
+          "answer_sha256": "6682fe2e777ec0770b0735e4e2cf1507e0267ab352061acb9f010e7754f61c80",
+          "decode_tokens": 18,
+          "decode_tokens_per_second": 14.436545363888325,
+          "first_token_s": 1.3201543430332094,
+          "seconds": 2.418282417987939
+        },
+        {
+          "id": "bus-red-1",
+          "answer_sha256": "40088cb7f4d0127984bbe1c3c74161f4aee11f17e537093c638ecfc7b0d695d9",
+          "decode_tokens": 20,
+          "decode_tokens_per_second": 14.900865081046938,
+          "first_token_s": 1.2496804050169885,
+          "seconds": 2.4635165390209295
+        },
+        {
+          "id": "small-talk-1",
+          "answer_sha256": "93a22900621522f1e8dae509ac027d63277f94a06f101e8f556d4036b5f707d6",
+          "decode_tokens": 23,
+          "decode_tokens_per_second": 14.809567658599317,
+          "first_token_s": 0.9977837959886529,
+          "seconds": 2.4055641629965976
+        },
+        {
+          "id": "long-question-1",
+          "answer_sha256": "abe45b3b6ca10b12b925e6e48e8b6821967f69368b1149f7332ad67e41388a1b",
+          "decode_tokens": 37,
+          "decode_tokens_per_second": 15.174343652835756,
+          "first_token_s": 1.2753068300080486,
+          "seconds": 3.5844680290319957
+        },
+        {
+          "id": "same-apples-1",
+          "answer_sha256": "541aee1aa3b9b1397eb12c3cad1311406ae3bf2b16ac4060bddf7bd1d8b7b9fb",
+          "decode_tokens": 20,
+          "decode_tokens_per_second": 14.587904860567068,
+          "first_token_s": 1.238326857041102,
+          "seconds": 2.4816454380052164
+        },
+        {
+          "id": "intro-1",
+          "answer_sha256": "1d982ef8c57191d8e47ab9ee392c5e639a12c9f0dc825b2811e621ebe5f62772",
+          "decode_tokens": 29,
+          "decode_tokens_per_second": 14.978148838333977,
+          "first_token_s": 0.9797983139869757,
+          "seconds": 2.748889423965011
+        }
+      ],
+      "system_swapout_during_answer_pages": 0,
+      "judged_sha256": "e9c83599a0b32011fd0eb0f5a234c0067a271e0555d21ac1800e4a12d506d677",
+      "judged_n": 12,
+      "judged_pass": 6,
+      "judge": "gpt-6-sol",
+      "votes": 3,
+      "judgments": [
+        {
+          "id": "recall-stop-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "recall-stop-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "scene-change-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "scene-change-2",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "absent-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "conversation-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "conversation-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "bus-red-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "small-talk-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "long-question-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "same-apples-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "intro-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "prepare",
+      "command": [
+        "/home/dylan/qdrant-robot-box/venv/bin/python",
+        "prepare.py"
+      ],
+      "start_epoch": 1791653831.14669,
+      "pid": 564504,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 564515,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791653875.4968905,
+      "seconds": 44.35020065307617,
+      "receipt_sha256": "30d6a42ebbd2f3a5bb75a69d881a1debc4f1c2bf88ab931a173172eb68a29282",
+      "memory_sha256": "fa456c019a3fb515f6193382e3e75b20e81a563d876615f6e9ccb5296b5ad478",
+      "log_sha256": "8d5974c8c53faabfd3f081d6785d9dba9689a2dbcba003f787ec22bcbc800303",
+      "memory_samples": 177,
+      "minimum_system_memavailable_mib": 22997.43359375,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 2230
+      }
+    },
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "qwen-control",
+      "command": [
+        "/home/dylan/qdrant-robot-box/venv/bin/python",
+        "qwen-control.py"
+      ],
+      "start_epoch": 1791654308.5406706,
+      "pid": 568332,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 568338,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654317.3811333,
+      "seconds": 8.840462684631348,
+      "receipt_sha256": "4016e43424af5978787fceb5fda4e685ab3611c00d5655f15a147f2e2b7ac5e3",
+      "memory_sha256": "73130585d9cafe8b323d792d84192c75ce7c07e897ec1cc2f0cd627527ea7a12",
+      "log_sha256": "c13ef9ff1adedcdda72366251e4be36f222409ff06a33ff25d072a169763b875",
+      "memory_samples": 36,
+      "minimum_system_memavailable_mib": 22668.5546875,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 2134
+      },
+      "answer_file_sha256": "bad78a2e81fe11a4738f471b3494cf977a27269ea425ed3f47919942be4fe90a",
+      "answers": 12,
+      "footer_complete": true,
+      "empty_answers": 0,
+      "runtime_provenance": {
+        "type": "metadata",
+        "machine": "Str0keWtf",
+        "measurement_label": "E",
+        "model": "qwen3vl-2b",
+        "runtime": "llama.cpp",
+        "llama_cpp": "9c2e0e491a822adae1f0b1c831adb4160057d24f",
+        "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+        "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82",
+        "script_sha256": "fcb05544b580cbe159e4f7410d82d4d9e1ac6ea92d72ab0dd09d669333584dc9",
+        "cases_sha256": "2e62ade166a8c52eb37f09281763d1cc022172d251a0917d75a7f4df0062f588",
+        "cases": "frozen-default12",
+        "context": 2048,
+        "max_tokens": 128,
+        "variants": [
+          "default"
+        ],
+        "temperature": 0,
+        "top_k": 1,
+        "repeat_penalty": 1.0,
+        "command": [
+          "/home/dylan/qdrant-robot-box/llama-server-orin",
+          "-m",
+          "/home/dylan/qdrant-robot-box/models/gguf/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+          "-mm",
+          "/home/dylan/qdrant-robot-box/models/gguf/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+          "-ngl",
+          "99",
+          "-fa",
+          "on",
+          "-c",
+          "2048",
+          "-ub",
+          "256",
+          "--cache-ram",
+          "0",
+          "-np",
+          "1",
+          "--jinja",
+          "--image-max-tokens",
+          "256",
+          "--reasoning",
+          "off",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "18089"
+        ],
+        "cache_prompt": false,
+        "thinking": false,
+        "load_s": 2.02920421899762
+      },
+      "judged_sha256": "15c195eee1338dd76b1b383d4ac167e3897590f9b1a303fced6f085e81db03b3",
+      "judged_n": 12,
+      "judged_pass": 7,
+      "judge": "gpt-6-sol",
+      "votes": 3,
+      "judgments": [
+        {
+          "id": "recall-stop-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "recall-stop-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "scene-change-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "scene-change-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "absent-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "conversation-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "conversation-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "bus-red-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "small-talk-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "long-question-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "same-apples-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "intro-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "smoke-cpu",
+      "command": [
+        "timeout",
+        "300s",
+        "venv/bin/python",
+        "infer.py",
+        "smoke",
+        "--backend",
+        "cpu",
+        "--tokens",
+        "48",
+        "--output",
+        "smoke-cpu.jsonl"
+      ],
+      "start_epoch": 1791654070.3652143,
+      "pid": 566516,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 566521,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654086.0921834,
+      "seconds": 15.726969480514526,
+      "receipt_sha256": "fa917832d5a1e2b97317634f095146c01b9b86e991a3011c6a265e998d20ac6b",
+      "memory_sha256": "338a2a7a6c5691a3d1ffa45d985c0f64728d49d0cbdd3f0b2eac506d981a6f92",
+      "log_sha256": "a124581e49e1e188a46a0a89e303e4118f718b34d0fd0b11a80c37164e411900",
+      "memory_samples": 63,
+      "minimum_system_memavailable_mib": 21904.2265625,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 3612
+      },
+      "answer_file_sha256": "50f8deb05f9b9a9734e99f2d8d42a34aa6bbc8d8c64d04083d6f82520073d38b",
+      "answers": 2,
+      "footer_complete": false,
+      "empty_answers": 0,
+      "decode_tokens_per_second_p50": 11.032215260793038,
+      "first_token_s_p50": 3.577226232504472,
+      "per_case": [
+        {
+          "id": "text-smoke",
+          "answer_sha256": "6ab523c52d1407cc4de015423091d1a76995f01d32d6c4b36616df23da744a0e",
+          "decode_tokens": 2,
+          "decode_tokens_per_second": 9.142035885041476,
+          "first_token_s": 1.3535872970242053,
+          "seconds": 1.3537781980121508
+        },
+        {
+          "id": "image-smoke",
+          "answer_sha256": "afd88e6a3cce2f5437f96fa597564a4d960e61edff99d3cd1f37597131f0accf",
+          "decode_tokens": 48,
+          "decode_tokens_per_second": 12.922394636544599,
+          "first_token_s": 5.800865167984739,
+          "seconds": 9.377271028992254
+        }
+      ],
+      "system_swapout_during_answer_pages": 0
+    },
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "smoke-gpu",
+      "command": [
+        "timeout",
+        "300s",
+        "venv/bin/python",
+        "infer.py",
+        "smoke",
+        "--backend",
+        "gpu",
+        "--tokens",
+        "48",
+        "--output",
+        "smoke-gpu.jsonl"
+      ],
+      "start_epoch": 1791653949.7010853,
+      "pid": 565498,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 565503,
+      "native_exit": 1,
+      "native_signal": null,
+      "end_epoch": 1791653950.3109634,
+      "seconds": 0.6098783016204834,
+      "receipt_sha256": "4745aa122db597a31d105f1b8595397fcf8c527d54cd12dc5d0e13445370c80a",
+      "memory_sha256": "a728636f80fb13c3e3ce1acbebb2af2eb26d063ff201245b23e232afaed67df8",
+      "log_sha256": "4d8323e174871fbe78726471ca9e1ddbb8ada7aac8f76121e9caf7a5640f2b15",
+      "memory_samples": 3,
+      "minimum_system_memavailable_mib": 22983.9453125,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 767
+      },
+      "answer_file_sha256": "1200ae9d86a7a2172984ab9692d9150246e0a0552f86fa170ff078c483d88845",
+      "answers": 0,
+      "footer_complete": false,
+      "empty_answers": 0
+    },
+    {
+      "host": "wsl",
+      "measurement_label": "E",
+      "stage": "smoke-gpu-retry",
+      "command": [
+        "timeout",
+        "300s",
+        "venv/bin/python",
+        "infer.py",
+        "smoke",
+        "--backend",
+        "gpu",
+        "--tokens",
+        "48",
+        "--output",
+        "smoke-gpu-retry.jsonl"
+      ],
+      "start_epoch": 1791653977.578926,
+      "pid": 565800,
+      "boot_id": "5f4af7d6-879e-48eb-979a-45e715f1d626",
+      "cwd": "/home/dylan/qdrant-robot-box/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/dylan/qdrant-robot-box/gpu.lock",
+      "child_pid": 565805,
+      "native_exit": -11,
+      "native_signal": 11,
+      "end_epoch": 1791653988.1557348,
+      "seconds": 10.57680869102478,
+      "receipt_sha256": "7c05bb638eca39f8b7e0316ac4073053f7679b8313dbdfceaefed32561a8de93",
+      "memory_sha256": "be5887b95c8336505de6853263234ca33ffb2da8866c591775e449ab249117e9",
+      "log_sha256": "10040b5691bce3bac4d29e8db556e73bebddd9466d04d580725a5ce1ec149fdc",
+      "memory_samples": 43,
+      "minimum_system_memavailable_mib": 20887.05859375,
+      "system_counter_delta": {
+        "pswpin": 1,
+        "pswpout": 0,
+        "pgmajfault": 2244
+      },
+      "answer_file_sha256": "e33f365be8780e70461e16a00e372ec0b3812f7b3ab38d11bd0f817b10b70560",
+      "answers": 0,
+      "footer_complete": false,
+      "empty_answers": 0
+    },
+    {
+      "host": "jetson",
+      "measurement_label": "J",
+      "stage": "model",
+      "command": [
+        "/usr/bin/python3.12",
+        "prepare.py"
+      ],
+      "start_epoch": 1791654071.6417308,
+      "pid": 443976,
+      "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6",
+      "cwd": "/home/qdrant/qdrant-robot/shared/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/qdrant/qdrant-robot/shared/gpu.lock",
+      "child_pid": 443982,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654114.752868,
+      "seconds": 43.11113882064819,
+      "receipt_sha256": "19c64cc1c8f3259ff867567946d610ace4a83e2386f22e1edd32c709c9cfdc23",
+      "memory_sha256": "d9a4c6def8404573954534774955ff22bcc06e42164cf8e0b2878b839a6b1dcd",
+      "log_sha256": "c198bd9d8ff043fafaa21e7e7ccbe71e0112f1c19d24477caa64cbefc5cd0e72",
+      "memory_samples": 172,
+      "minimum_system_memavailable_mib": 5871.03125,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 4
+      }
+    },
+    {
+      "host": "jetson",
+      "measurement_label": "J",
+      "stage": "packets-gpu",
+      "command": [
+        "venv/bin/python",
+        "infer.py",
+        "packets",
+        "--backend",
+        "gpu",
+        "--tokens",
+        "128",
+        "--output",
+        "packets-gpu.jsonl"
+      ],
+      "start_epoch": 1791654308.8944294,
+      "pid": 444408,
+      "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6",
+      "cwd": "/home/qdrant/qdrant-robot/shared/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/qdrant/qdrant-robot/shared/gpu.lock",
+      "child_pid": 444414,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654328.2949522,
+      "seconds": 19.400524854660034,
+      "receipt_sha256": "01129db5779a4e014363490e8fa621496f785e28bd6a49154f1eacdfe8c401b4",
+      "memory_sha256": "85a7fdd4fc2111140a118e4ea86405fc58b846c09281a325ce96b2c2c6f55c20",
+      "log_sha256": "7d8a153bbec3b3737ad441bca50259c11ddd330ae1312684e50ccb041351c37a",
+      "memory_samples": 78,
+      "minimum_system_memavailable_mib": 4581.09375,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 2,
+        "pgmajfault": 1288
+      },
+      "answer_file_sha256": "2f9938aeeeca07e8b4e77ec10a56dbecbbf0b1c54672c2284f531e8dc54eb8e0",
+      "answers": 12,
+      "footer_complete": true,
+      "empty_answers": 0,
+      "decode_tokens_per_second_p50": 29.69441667576279,
+      "first_token_s_p50": 0.4533912710030563,
+      "per_case": [
+        {
+          "id": "recall-stop-1",
+          "answer_sha256": "d450b4ae704416ab639f259d87f49c252157f67a6c113b64b2d8a95933cfbf15",
+          "decode_tokens": 18,
+          "decode_tokens_per_second": 24.31290415897754,
+          "first_token_s": 1.817946620984003,
+          "seconds": 2.36672435697983
+        },
+        {
+          "id": "recall-stop-2",
+          "answer_sha256": "f0712e2578dac92e1d5ef921377c58bb5578474ea0bb2b24a43a7f51c243f457",
+          "decode_tokens": 29,
+          "decode_tokens_per_second": 29.737666457933884,
+          "first_token_s": 0.4599153299932368,
+          "seconds": 1.3516952010104433
+        },
+        {
+          "id": "scene-change-1",
+          "answer_sha256": "55ac96a1902e7884039826a2e35ace50ea8a8690a3c70588f6dc61ebace1eec3",
+          "decode_tokens": 16,
+          "decode_tokens_per_second": 29.323015741901557,
+          "first_token_s": 0.4557986480067484,
+          "seconds": 0.9195930210116785
+        },
+        {
+          "id": "scene-change-2",
+          "answer_sha256": "db7409f50550bcc5becde4d71d592d4157ed447951e3b79a4023ea452db61aba",
+          "decode_tokens": 39,
+          "decode_tokens_per_second": 30.033043463330728,
+          "first_token_s": 0.45475935700233094,
+          "seconds": 1.672542718006298
+        },
+        {
+          "id": "absent-1",
+          "answer_sha256": "610ace14deaa82e7bcbae983537850d6b2c0bb7e2319b06486953c7a390d1281",
+          "decode_tokens": 27,
+          "decode_tokens_per_second": 30.02129674098109,
+          "first_token_s": 0.3670333110203501,
+          "seconds": 1.1854413360124454
+        },
+        {
+          "id": "conversation-1",
+          "answer_sha256": "5f5babcadc98a6f2c1143372928e4a54d9e7e8bd0b4a3b6976826eaa5bc02c5d",
+          "decode_tokens": 26,
+          "decode_tokens_per_second": 29.640304868319753,
+          "first_token_s": 0.36623627500375733,
+          "seconds": 1.162582927994663
+        },
+        {
+          "id": "conversation-2",
+          "answer_sha256": "6f1c6d2ce5a9888c587e216efef13a8c586186e76fc71ae145e63a4572c062e1",
+          "decode_tokens": 19,
+          "decode_tokens_per_second": 29.292596573570666,
+          "first_token_s": 0.4551275039848406,
+          "seconds": 1.0223436089872848
+        },
+        {
+          "id": "bus-red-1",
+          "answer_sha256": "a36545761484caf251fce412c4f5d4a3baccd9265aafbf679ce1e8891a326d78",
+          "decode_tokens": 17,
+          "decode_tokens_per_second": 29.651166893591697,
+          "first_token_s": 0.4520231850037817,
+          "seconds": 0.9463471350027248
+        },
+        {
+          "id": "small-talk-1",
+          "answer_sha256": "76134c5c9c4840a320b5ac8cd9cb8953196fe1b918cd37d39bc40809d5e15dd3",
+          "decode_tokens": 27,
+          "decode_tokens_per_second": 29.832257623925404,
+          "first_token_s": 0.37110919700353406,
+          "seconds": 1.1901631479850039
+        },
+        {
+          "id": "long-question-1",
+          "answer_sha256": "767198489d1a3f2b65b1b3980d13f86e9b0b8973c03c12d5ec0277198bfcab08",
+          "decode_tokens": 40,
+          "decode_tokens_per_second": 30.12690798811034,
+          "first_token_s": 0.4555964709725231,
+          "seconds": 1.7020088249992114
+        },
+        {
+          "id": "same-apples-1",
+          "answer_sha256": "ebc71b7a0e0c6807b934e7bac240fba8ac5d2476539739d5f7feeb5829c3a4f2",
+          "decode_tokens": 24,
+          "decode_tokens_per_second": 29.491735014991388,
+          "first_token_s": 0.45131614699494094,
+          "seconds": 1.1871092979854438
+        },
+        {
+          "id": "intro-1",
+          "answer_sha256": "ace9f0d4f187c04a1850f36a4a299a4341a0f9be50a596ed91b2869754afe099",
+          "decode_tokens": 30,
+          "decode_tokens_per_second": 30.047565867672276,
+          "first_token_s": 0.3667088380025234,
+          "seconds": 1.2846240570070222
+        }
+      ],
+      "system_swapout_during_answer_pages": 2,
+      "judged_sha256": "29ec6c214779751847a90d9a8509507d2ced0b1b74b87912b54f2b3a5845aa96",
+      "judged_n": 12,
+      "judged_pass": 9,
+      "judge": "gpt-6-sol",
+      "votes": 3,
+      "judgments": [
+        {
+          "id": "recall-stop-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "recall-stop-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "scene-change-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "scene-change-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "id": "absent-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "conversation-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "conversation-2",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "bus-red-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "small-talk-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "long-question-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "same-apples-1",
+          "pass": false,
+          "votes": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "intro-1",
+          "pass": true,
+          "votes": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "host": "jetson",
+      "measurement_label": "J",
+      "stage": "sdk",
+      "command": [
+        "/usr/bin/python3.12",
+        "prepare.py",
+        "sdk-only"
+      ],
+      "start_epoch": 1791653954.7077954,
+      "pid": 443788,
+      "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6",
+      "cwd": "/home/qdrant/qdrant-robot/shared/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/qdrant/qdrant-robot/shared/gpu.lock",
+      "child_pid": 443794,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791653956.2590456,
+      "seconds": 1.5512521266937256,
+      "receipt_sha256": "9529d3dbfec851d387440b8e872ef7033f30521c3b0bca991590369e6b775cb7",
+      "memory_sha256": "2db982b8ca877053c0cf01df092fa04fc1890407a15d93e4d4d3f2d23657a508",
+      "log_sha256": "79162a86d8070a15f637a8d997f2b0a71ab33b73a757cce051b9d41667bd5a66",
+      "memory_samples": 7,
+      "minimum_system_memavailable_mib": 5767.87890625,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 0,
+        "pgmajfault": 273
+      }
+    },
+    {
+      "host": "jetson",
+      "measurement_label": "J",
+      "stage": "smoke-gpu",
+      "command": [
+        "timeout",
+        "300s",
+        "venv/bin/python",
+        "infer.py",
+        "smoke",
+        "--backend",
+        "gpu",
+        "--tokens",
+        "48",
+        "--output",
+        "smoke-gpu.jsonl"
+      ],
+      "start_epoch": 1791654247.850316,
+      "pid": 444198,
+      "boot_id": "09b4bb27-f975-441c-9d00-7af446ec7de6",
+      "cwd": "/home/qdrant/qdrant-robot/shared/experiments/gemma-fit-20261010",
+      "gpu_lock": "/home/qdrant/qdrant-robot/shared/gpu.lock",
+      "child_pid": 444204,
+      "native_exit": 0,
+      "native_signal": null,
+      "end_epoch": 1791654269.2754712,
+      "seconds": 21.425156593322754,
+      "receipt_sha256": "f27d869b7426cfb12684b2653edfa8ad4ff72e20010611042f99263cfa7363e3",
+      "memory_sha256": "41c674a284fa099d42e0cc37c664e530414f289ee2bb30b167f40cc1885d4e7c",
+      "log_sha256": "b3454346e3c053e1b0a49451224d3c85d6a643b0275f456a5cf26d68904e61d6",
+      "memory_samples": 86,
+      "minimum_system_memavailable_mib": 4444.3515625,
+      "system_counter_delta": {
+        "pswpin": 0,
+        "pswpout": 2,
+        "pgmajfault": 1940
+      },
+      "answer_file_sha256": "c0e50284fac48c9cb721576e6984a66ec97ec9ba90c3cf3b7675c1094210677e",
+      "answers": 2,
+      "footer_complete": true,
+      "empty_answers": 0,
+      "decode_tokens_per_second_p50": 15.6027183140421,
+      "first_token_s_p50": 4.362588751493604,
+      "per_case": [
+        {
+          "id": "text-smoke",
+          "answer_sha256": "6ab523c52d1407cc4de015423091d1a76995f01d32d6c4b36616df23da744a0e",
+          "decode_tokens": 2,
+          "decode_tokens_per_second": 3.308524522116263,
+          "first_token_s": 5.403587393986527,
+          "seconds": 5.403971792984521
+        },
+        {
+          "id": "image-smoke",
+          "answer_sha256": "8192b4ec83bf8cccf7fa45ecc0370550544a52f72f9bf220559714a314c088ed",
+          "decode_tokens": 48,
+          "decode_tokens_per_second": 27.89691210596794,
+          "first_token_s": 3.321590109000681,
+          "seconds": 4.9630079490016215
+        }
+      ],
+      "system_swapout_during_answer_pages": 1
+    }
+  ],
+  "comparisons": [
+    {
+      "candidate": "wsl/packets-cpu",
+      "control": "wsl/qwen-control",
+      "fixture": "default12 text-only observed-evidence development packets",
+      "wins": [
+        "conversation-1",
+        "small-talk-1"
+      ],
+      "losses": [
+        "recall-stop-1",
+        "scene-change-2",
+        "bus-red-1"
+      ],
+      "net_wins": -1,
+      "net_wins_required": 3,
+      "quality_threshold_pass": false,
+      "absence_regression": false
+    },
+    {
+      "candidate": "jetson/packets-gpu",
+      "control": "wsl/qwen-control",
+      "fixture": "default12 text-only observed-evidence development packets",
+      "wins": [
+        "conversation-1",
+        "small-talk-1"
+      ],
+      "losses": [],
+      "net_wins": 2,
+      "net_wins_required": 3,
+      "quality_threshold_pass": false,
+      "absence_regression": false
+    }
+  ],
+  "decision": "Reject adoption after the frozen preliminary quality threshold fails. Preserve the runnable Jetson LiteRT route.",
+  "production": {
+    "current": "7f67670fa91e",
+    "previous": "6781adbb7189",
+    "runtime_changed": false,
+    "release_links_changed": false,
+    "stores_changed": false,
+    "preview": "paused"
+  },
+  "limitations": [
+    "The fresh Qwen control ran on WSL; this is development screening, not Jetson integrated acceptance.",
+    "WSL CPU and Jetson GPU Gemma answers differ; backend results remain separate.",
+    "Standalone 128-token replies do not establish 64-token one-sentence product quality.",
+    "CPU Kokoro and the complete robot were not exercised together; full-stack fit, sustained detection, speech latency, and paging remain unqualified.",
+    "Two system swap-out pages occurred in each Jetson run; activity overlaps generation and is not attributed to the inference process. Zero-turn paging cannot be claimed.",
+    "Smoke answers demonstrate text/image execution only; the generic image reply is truncated at the configured 48-token limit.",
+    "Stranger identity, consent, ownership, deletion, restart, held-out per-capability quality, and eight-hour M4 remain untested for this candidate."
+  ],
+  "private_evidence_root": "build/gemma-fit-20261010",
+  "next_session": "Intent parsing and tool execution optimization from research/answer-evidence.md, with accepted Qwen fixed across parser arms.",
+  "validation": {
+    "review": "reviews/20261010-134937-83780-review.md",
+    "verdict": "PASS",
+    "native_exit": 0,
+    "review_seconds": 220.67,
+    "checks_native_exit": 0,
+    "checks_seconds": 92.39,
+    "checks_log": "build/gemma-fit-20261010/checks.log"
+  }
+}

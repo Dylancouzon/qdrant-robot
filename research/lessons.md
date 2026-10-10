@@ -95,3 +95,22 @@ Dylan now requires Location and Owner payloads, with UI location entry and owner
 Keep main's executable tree identical to accepted 011f522. The ours-strategy history merge retains rejected experiment parents without adopting their code. Archive tags and a verified full Git bundle preserve all original heads. The compact experiment index replaces branch-by-branch context loading. Exact sanitized receipts remain in main; larger historical snapshots remain in Git.
 
 Before removing worktrees, move ignored evidence into canonical build/reconciliation-20261010 and verify each file hash and symlink target. Preserve the canonical environment, secret file, reference clones, remote releases, production stores, and closed backups. Pause the owned preview gracefully. Keep this active session checkout until handback; retire its experimental branch after detaching at main.
+
+## Gemma budget clarification, 2026-10-10
+
+The original handoff is intent parsing and tool calling optimization in research/answer-evidence.md. Dylan rejects the invented Qwen TensorRT comparison as its replacement. He separately authorizes Gemma experiments with CPU Kokoro, accepts 24 tok/s if answer quality improves substantially, and asks to use WSL whenever compatible. This session covers only the Gemma experiment. Intent/tool work remains the next step for a later session. No quality gain or target change is established.
+
+Budget Gemma together with detection, face and object encoders, retrieval, Edge, ASR, VAD, TTS, camera, history, and the 500 MB reserve. CPU/GPU placement alone does not reduce unified RAM. Native D117 weights already exceed physical memory; unchanged retries remain rejected. Historical replacement-brain allowance is roughly 2.3-2.5 GB (estimate from older component exercises, not current 26S acceptance).
+
+The current Google-linked [LiteRT model card](https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm) reports 24.2 tok/s and 2,739 MB process CPU memory on Orin (E, another board). It describes 0.8 GB text working weights plus 1.12 GB mapped embeddings and on-demand modality encoders. Those weights and process RSS do not establish total active unified-memory use. Mapped pages still occupy RAM or require storage reads; measure cold/warm and sustained multimodal turns with every robot component active. Current JetPack compatibility remains unverified here.
+
+LiteRT 0.18.0 requires its configured cache directory to exist before Engine construction. The first WSL smoke exited one before generation; create that isolated directory before the one infrastructure retry. Preserve the original receipt separately.
+
+The WSL LiteRT GPU request selected Mesa llvmpipe software Vulkan rather than RTX 3080. Corrected GPU smoke initialized then exited signal 11 before answers. CUDA availability does not establish LiteRT WebGPU acceleration on WSL. Keep the native failure and use CPU for compatible WSL screening; Jetson has an actual NVIDIA Vulkan ICD.
+
+
+## Gemma LiteRT preliminary result, 2026-10-10
+
+The pinned full multimodal LiteRT 0.18.0 bundle runs on our Jetson NVIDIA Vulkan device. Standalone short-reply median is 29.69 tok/s (J). The frozen Jetson GPU screen scores nine of 12, versus fresh WSL Qwen seven of 12 (E): two net wins miss the frozen three-win rule. WSL CPU Gemma scores six of 12 (E), with different replies. Keep backend results separate; compatible CPU screening cannot predict GPU answers exactly.
+
+Stop before adaptation or integrated replay when the preliminary quality rule fails. Preserve the executable candidate and failure receipts instead of lowering the rule or tuning the frozen prompt. CPU Kokoro/full-stack fit, speech latency, stranger safeguards, and sustained paging remain unqualified. Standalone Jetson jobs each wrote two system swap pages, including during generation; system counters establish activity but not process attribution. See the Gemma LiteRT result decision, [topic report](gemma-fit.md), and [sanitized audit](../bench/results/2026-10-10-gemma-litert-screen.json).
