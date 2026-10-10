@@ -1,39 +1,52 @@
 # State
 
-Updated 2026-10-10. Dylan made the Jetson available and requested a separate testing branch. Branch creation and read-only reconciliation are complete. Engine building and inference have not started.
+Updated 2026-10-10. Native Gemma AWQ engines build successfully on the Jetson. Runtime initialization fails with CUDA out of memory before any answer. Preserve this exact blocker and the failed extraction attempt. No further prompt tuning, quantization, export, deployment, adoption, or main merge occurs.
 
-## Active task and Git
+## Active task and acceptance
 
-Worktree: `/Users/dylanc/orca/workspaces/qdrant-robot/jetson-trt-testing`. Branch: `spike/jetson-trt-testing`, based on reviewed native adapter `0e5a4846ba5f612d08e28f1f55c5794ff555cea3` from `spike/p2-trt-edge`. The local and remote base hashes match. Orca records this worktree as its child. Setup hooks were skipped, and no agent was launched.
+Lead worktree: `/Users/dylanc/orca/workspaces/qdrant-robot/jetson-trt-testing`, branch `spike/jetson-trt-testing`, source base `f86d463` with reviewed adapter `0e5a484`. Native testing follows coordinator D117, D115-D119/D133, and `research/p2-briefs/trt-edge.md` at `/Users/dylanc/Documents/GitHub/qdrant-robot`. The coordinator's root F1 source remains rejected.
 
-Acceptance for this setup: a separate checkout, exact reviewed base, preserved WSL receipts, and verified current Jetson ownership. These checks pass. Only records change. Standing project approval permits scoped commit and push. Use per-command `git -c core.hooksPath=/dev/null` for this records-only task; retain the configured `tools/githooks` setting. No code, full-suite, or review gate is needed for these records.
+Acceptance: reuse and verify the completed WSL archive; build official checkpoint-backed native engines; run text/image checks and unchanged frozen packets; record exact exits, quality, cold/warm latency, decode, memory, paging, and tegrastats. Transfer/verification/build pass. Initialization fails native exit 1; all answer checks and successful inference metrics are blocked. This is a testing checkpoint, not successful qualification.
 
-Changed paths: STATE.md, research/lessons.md, and four copied WSL receipts under bench/results. Main and existing worktrees retain their source and tasks. This historical prototype branch is not an approved full Robot deployment. Never deploy the rejected F1 root branch.
+Changed paths: STATE.md, DECISIONS.md, research/lessons.md, research/jetson-trt.md, and sanitized native receipts in bench/results. Scripts, inputs, native logs, telemetry, configs, and failed artifacts remain ignored under build/p2/logs/native-20261010. No product code changes.
 
-## Preserved product
+## Preserved product and Git
 
-Protected UI: `/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface`, branch `spike/mac-audio-interface`, clean at `011f52207596098afd2b2cd38e1a16c613f605fa`. Its STATE remains authoritative for D147 acceptance, completed hygiene, and parked D148 recognition proposals.
+Protected UI worktree: `/Users/dylanc/orca/workspaces/qdrant-robot/mac-audio-interface`, branch `spike/mac-audio-interface`, clean at `011f522`. Its STATE owns D147 acceptance and D148 proposals. Deployed release `7f67670fa91e`, previous `6781adbb7189`, production memories, backups, and preview remain preserved. Main and other worktrees remain unchanged.
 
-Current Jetson release is `7f67670fa91e`; previous release is `6781adbb7189`. Preserve both releases, production memories, backups, settings, and the Mac preview. The testing branch introduces no product adoption or main merge.
+Standing project approval permits scoped commit/push after records checks and task review. Configured hooks remain `tools/githooks`. Records-only commit does not require product/full-suite tests. Records checks and Sol 6.1 task review PASS (159.79 s/native 0). Review: reviews/20261010-110537-96895-review.md. The gate approves only this testing checkpoint and exact blocker. Authentication is valid; remaining usage is unavailable through auth commands. Existing caffeinate processes belong to other sessions and remain running.
 
-## WSL evidence
+## WSL preparation and frozen comparison
 
-Read [lessons](research/lessons.md) and the coordinator's D116-D119, D117, D133, and D136 before engine work. The current coordinator is `/Users/dylanc/Documents/GitHub/qdrant-robot`. Its selected brief is `research/p2-briefs/trt-edge.md`; its reviewed native runtime receipts are under bench/results.
+[Checkpoint validation](bench/results/2026-10-10-wsl-checkpoint-validation.json) verifies 2,433 base and 50 assistant tensors with finite float values (E). The original quantizer native exit remains unavailable. Preparation and ONNX export were not repeated.
 
-[Original completion](bench/results/2026-10-10-wsl-d136-completion.md) and [native status](bench/results/2026-10-09-wsl-d136-status.json) preserve the collected quantizer's native exit as unavailable. Later [byte validation and packaging](bench/results/2026-10-10-wsl-checkpoint-validation.json) each exit 0 (E). All 2,433 base tensors and 50 assistant tensors have finite float elements. Quantization does not need repetition.
+Archive: `/Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/inputs/trt-transfer/gemma4-e2b-int4-awq-20261010.tar`, 8,437,452,800 bytes, SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697`. Transfer exits 0; Jetson archive and all 16 manifest files verify exactly.
 
-Verified archive: `/Users/dylanc/Documents/GitHub/qdrant-robot/build/p2/inputs/trt-transfer/gemma4-e2b-int4-awq-20261010.tar`. Size is 8,437,452,800 bytes; SHA256 is `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697`. Private logs, raw answers, inputs, and judge votes remain under the coordinator's ignored build/p2 directories.
+[WSL prompt screen](bench/results/2026-10-10-wsl-gemma-prompt-screen.json): three prompts tie at 7/12 on BF16 Transformers (E). Native inputs retain the unchanged default 12 packets, 128 output tokens, 2,048-token context, and clock image. The original cases hash is `2e62ade166a8c52eb37f09281763d1cc022172d251a0917d75a7f4df0062f588`. Native answers: zero; answer quality and paired differences remain U.
 
-[WSL prompt screening](bench/results/2026-10-10-wsl-gemma-prompt-screen.json) completes 36/36 answers, native exit 0 (E). Each of three prompts scores 7/12 with the same five failures. Keep the unchanged prompt. Text smoke passes; the clock-image answer invents objects and fails. This BF16 Transformers reference establishes no AWQ/native quality, Jetson speed, or memory fit.
+## Native results and blocker
 
-## Jetson reconciliation and next work
+See [native receipt](bench/results/2026-10-10-jetson-gemma-awq-native.json), [measurements](bench/results/2026-10-10-jetson-gemma-awq-native.jsonl), [findings](research/jetson-trt.md), and [lessons](research/lessons.md).
 
-Read-only check at 2026-10-10T14:25:12Z: alias `robot`, boot `09b4bb27-f975-441c-9d00-7af446ec7de6`. No running qr unit appeared in system or user inventories. No GPU lock holder appeared. The protected STATE's former live unit `qr-live-mac-0c66822ccc30` is now collected: LoadState=not-found, inactive/dead, MainPID=0, and empty InvocationID. Its historical native exit is unavailable from this probe; default zero fields prove no success.
+Installed official Edge-LLM 0.11.0 wheel selects Orin JP7.2/CUDA13/SM87; TensorRT is 10.16.2.10. D117 profile: batch one, input 2,048, KV 4,096, draft/verify four, image total/per-image 512. Default checkpoint-backed placement remains unchanged. LLM/MTP/visual engines build native exit 0 in 751.99 s (J).
 
-Disk has 101 GiB free (J). RAM has 6,040 MiB available, and 68 MiB swap is allocated (J). These idle snapshots establish no turn headroom or paging result. Existing isolated environment and checkpoint directories remain at `/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge`. No owned test unit or transfer runs.
+Engine bytes: base 89,958,500; draft 5,644,932; visual 38,628,444. LLM configs/plans live directly under engines/, while the historical product adapter expects engines/llm. Standalone testing uses the real layout. Adapter integration remains unqualified and requires that path correction before adoption.
 
-Next scope: stage and verify the existing archive in the isolated experiment directory, then build native engines on the Jetson. Follow D117's official checkpoint-backed placement and existing wheel. Run text, image, and frozen packet checks before measuring speed, memory, and paging. Use named units, the existing GPU lock, and tegrastats. Preserve native exits and logs. Use temporary memories and the existing tools/jetson.py workflow for any subsequent Robot integration.
+Native constructor fails during allocation: `RuntimeError: CUDA runtime error in cudaMalloc(&data, memoryCapacity): out of memory`. Native process exits 1 after 1.04 s (J); no smoke or development answer starts. The failed run provides no cold/warm answer latency, decode rate, or integrated memory result.
 
-Exact next command from this worktree: `git status --short --branch`. Then read the coordinator's `build/p2/logs/wsl-validation-20261010/direct-engine-builder.md` and inspect the installed builder before launching any transfer or build.
+Config/source arithmetic requires 8,047,141,376 bytes (7,674.35 MiB) for base checkpoint bindings, including 4,697,620,480 bytes of PLE. The board reports 7,485.45 MiB total (J). No base storage aliases exist; scaled embedding and unscaled LM head have different recipes. These requirements explain the allocation failure; the allocator did not log its requested byte count. Unchanged retries or smaller KV cannot recover this weight-only deficit.
 
-Unresolved: native AWQ engine building, faithful vision, answer quality, cancellation, context accounting, speed, integrated headroom, and active paging (U). All CLAUDE targets remain open at acceptance scale. This setup produces no new model performance result.
+Build telemetry: minimum available 2,740.83 MiB; child VmHWM 4,570.43 MiB; sampled child VmSwap zero, but system paging 349 in/333 out pages and unit swap peak 1,212,416 bytes (J). These build measurements prove neither inference fit nor absent paging. Failed initialization has five samples and 5 in/0 out pages; attribution remains unknown. Kernel probe reports no entries in the captured failure window.
+
+## Jobs and recovery
+
+Robot alias `robot`; boot `09b4bb27-f975-441c-9d00-7af446ec7de6`. Isolated directory: `/home/qdrant/qdrant-robot/shared/experiments/p2-trt-edge/native-20261010`. All children are terminal; GPU lock is free. Retained named user units have no restart and keep exact outcomes:
+
+- `qr-trt-native-verify-20261010`: invocation `786b305cd5c04a6ead24c48aa67be294`, PID 436596 reaped, native 1. Log-size RLIMIT also limited extraction to 64 MiB. Its partial inputs remain inputs-verify-failed/.
+- `qr-trt-native-verify-retry-20261010`: invocation `a773ef3518f14217a689d4e0992af016`, PID 436920 reaped, native 0. Bounded pipe capture replaces the process-wide file limit; archive/member verification passes.
+- `qr-trt-native-build-20261010`: invocation `5cff9cee0dae41f487c23e61d5095fbb`, PID 437120 reaped, native 0. Official `tensorrt-edgellm-build --components llm,visual --spec-type gemma4_mtp` with D117 settings and original paired checkpoints.
+- `qr-trt-native-infer-20261010`: invocation `a3b89398c80e4adc93b971282505f3d8`, PID 441139 reaped, native 1. Command: isolated `venv/bin/python native-20261010/infer.py`; native constructor fails before generation.
+
+Each stage preserves manifest, native.log, native-exit.json, memory.jsonl, and tegrastats.log. Collected files are under ignored build/p2/logs/native-20261010/collected. The original archive, all successful engines, failed inputs, and private source receipts remain preserved. Initial budget was 32 GB within 101 GiB free; no shared cache or model cleanup occurred.
+
+Gate PID 96895 and its Codex children have exited; no owned jobs run. The reviewed native checkpoint is retained on this testing branch under standing commit/push approval. Exact next command: `git status --short --branch`; then inspect this branch before any new work. Native stage receipts use their own JSON/JSONL schema and need direct checks; tools/results.py handles the existing replay/bakeoff history. The next model/runtime intervention needs a changed weight-placement hypothesis; current native quality, sustained conversation, cancellation, integrated fit, and every final acceptance target remain open.
