@@ -37,8 +37,8 @@ def test_takes_held_object_and_labels_it() -> None:
     events, _ = run(f, t, 0.2, [phone()])
     assert f.focus == 1 and ("focus", 1) in events
     [focus] = [b for b in f.boxes([phone()], [PERSON]) if b[5] == "focus"]
-    assert focus[4] == "Phone?"
-    assert f.boxes([phone(score=0.3)], [])[0][4] == "???", "a weak kind shows ???"
+    assert focus[4] == "???"
+    assert f.boxes([phone(score=0.3)], [])[0][4] == "???", "detector confidence never names it"
 
 
 def test_worn_small_objects_hidden_and_outside_zone_fallback() -> None:
@@ -134,7 +134,7 @@ def test_guess_never_takes_focus_and_one_box_per_name() -> None:
     run(f, 0, 2 * DT, two, recognized=guess)
     run(f, 1, 1, two)
     assert f.focus in (1, 2) and f.names() == {}, "competing claims abstain; one unknown may focus"
-    assert len(f.boxes(two, [])) == 1
+    assert sorted(b[5] for b in f.boxes(two, [])) == ["focus", "other"]
 
 
 def test_target_is_the_held_object_even_when_named() -> None:
@@ -174,6 +174,58 @@ def test_small_target_and_fresh_scores() -> None:
     f.update(2.2, [large], [], recognized={large.id: (None, 0)})
     assert f.name(large.id) == "wallet" and not f.names()
     assert all(b[5] != "known" for b in f.boxes([large], []))
+
+
+@pytest.mark.parametrize("box", [(500, 200, 619, 500), (500, 200, 800, 319)])
+def test_size_only_dip_hides_but_retains_accepted_name(monkeypatch, box):
+    monkeypatch.setattr(F, "MIN_SIDE", 120)
+    f = Focus(W, H)
+    large = Track(1, (500, 200, 800, 500), "book", .9)
+    small = Track(1, box, "book", .9)
+    f.update(100, [large], [])
+    f.bind(1, "Visitor's item")
+    before = f.named[1], f.epoch(1)
+    f.update(100.05, [small], [])
+    assert f.name(1) == "Visitor's item"
+    assert not f.names() and not f.boxes([small], [])
+    assert not f.eligible(small) and f.target([small]) is None
+    f.update(100.1, [large], [])
+    assert (f.named[1], f.epoch(1)) == before
+    assert f.names() == {1: ("Visitor's item", True)}
+    assert f.boxes([large], [])[0][4:] == ("Visitor's item", "known")
+    assert f.named[1].refreshed == 100, "retention creates no new recognition authority"
+
+
+@pytest.mark.parametrize("reason", [
+    "confidence", "ignore", "exclude", "conflict", "gap", "forget", "miss"])
+def test_size_dip_does_not_override_name_invalidation(monkeypatch, reason):
+    monkeypatch.setattr(F, "MIN_SIDE", 120)
+    f = Focus(W, H)
+    large = Track(1, (500, 200, 800, 500), "book", .9)
+    small = Track(1, (500, 200, 619, 500), "book", .9)
+    f.update(100, [large], [])
+    f.bind(1, "Chosen")
+    f.update(100.05, [small], [])
+    if reason == "confidence":
+        f.update(100.1, [Track(1, small.box, "book", F.DETECT_LOW / 2)], [])
+    elif reason == "ignore":
+        f.ignored.add("book")
+        f.update(100.1, [small], [])
+    elif reason == "exclude":
+        f.excluded[1] = "preference"
+        f.update(100.1, [small], [])
+    elif reason == "conflict":
+        f.update(100.1, [large], [], recognized={1: ("Other", .99)})
+    elif reason == "gap":
+        f.update(100.3, [], [])
+    elif reason == "forget":
+        f.forget("Chosen")
+    else:
+        for now in (100.1, 100.15, 100.2):
+            f.update(now, [large], [], recognized={1: (None, 0)})
+            assert not f.names(), "a real query miss downgrades immediately"
+    f.update(100.4, [large], [])
+    assert f.name(1) is None and not f.names()
 
 
 def test_display_age_conflicts_gaps_and_delayed_results():
@@ -317,3 +369,28 @@ def test_teaching_zone_is_priority_cue_with_general_fallback():
     assert f.focus == 1, "a sole eligible stable object can be taught anywhere"
     run(f, 1.2, 6.5, [outside, zone], people=())
     assert f.focus == 2, "teaching-zone cue wins after the ordinary sustained challenger"
+
+
+def test_known_unknown_and_neutral_outlines_keep_source_geometry_and_filtering(monkeypatch):
+    from robot.config import OBJECT_MIN_SIDE
+    monkeypatch.setattr(F, "MIN_SIDE", OBJECT_MIN_SIDE)
+    f = Focus(W, H, ignored={"bottle"})
+    known = phone((100, 300, 300, 600))
+    unknown = phone((540, 300, 740, 600), 2)
+    other = phone((1000, 300, 1200, 600), 3)
+    body = phone(PERSON, 4, "person")
+    tiny = phone((0, 0, 119, 250), 5)
+    ignored = phone((100, 50, 300, 250), 6, "bottle")
+    tracks = [known, unknown, other, body, tiny, ignored]
+    _, t = run(f, 10, 1.2, tracks)
+    f.bind(known.id, "Visitor's chosen name")
+    source = f.geometry(tracks)
+    for k, (label, score) in enumerate((("wallet", .9), ("bag", .3), ("phone", .7)) * 2):
+        varied = phone((540 + k, 300, 740 + k, 600), 2, label, score)
+        latest = [known, varied, other, body, tiny, ignored]
+        f.update(t + k * DT, latest, [PERSON])
+        assert f.focus == unknown.id
+        boxes = f.boxes(latest, [PERSON], geometry=source)
+        assert boxes == [(*known.box, "Visitor's chosen name", "known"),
+                         (*unknown.box, "???", "focus"), (*other.box, "", "other")]
+    assert varied.box != source[varied.id] and f.geometry(latest)[varied.id] != source[varied.id]

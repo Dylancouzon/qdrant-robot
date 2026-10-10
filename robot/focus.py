@@ -31,7 +31,6 @@ ZONE = (0.25, 0.5, 0.75, 1.0)
 SURE, GUESS = 0.822, 0.772  # things.MATCH, and the bottom of the guess band ("Dylan's phone?")
 SET_N, CLEAR_N = 2, 3  # agreeing queries that set a name; queries under GUESS that clear it
 OCCLUSION_S = 0.2  # drawing only; a gap invalidates every older recognition result
-KIND_SCORE = 0.4  # majority label score from which the focus shows the kind ("Phone?")
 
 
 @dataclass
@@ -134,8 +133,11 @@ class Focus:
                     self.named.pop(i, None)
                     self.excluded.pop(i, None)
                     s.shown = None
+        # Size gates display and queries, but does not erase an accepted continuous name.
         self.named = {i: n for i, n in self.named.items()
-                      if i not in live or self.eligible(live[i], pending=True)}
+                      if i not in live or (self.confident(live[i], pending=True) and
+                      live[i].label not in self.ignored and i not in self.excluded and
+                      (n.name or self.sized(live[i])))}
         for t in tracks:
             self._see(t)
         self.visible = set(live)
@@ -318,8 +320,9 @@ class Focus:
                 name, sure = names[t.id]
                 out.append((*box, name, "known"))
             elif t.id == self.focus and self.sized(t):
-                out.append((*box, t.label.capitalize() + "?" if t.score >= KIND_SCORE
-                            else "???", "focus"))
+                out.append((*box, "???", "focus"))
+            else:
+                out.append((*box, "", "other"))
         return out
 
     def geometry(self, tracks: list[Track]) -> dict[int, Box]:

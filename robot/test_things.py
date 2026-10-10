@@ -163,8 +163,9 @@ def test_things(monkeypatch) -> None:
         dets = [Detection("bag", 0.9, CENTER), Detection("chair", 0.9, LEFT)]
         for _ in range(CONFIRM):  # a cup the detector calls a bag, by a chair
             robot._track(frame, dets)
-        assert robot._shown()[0] is frame and robot._shown()[1].boxes == [], \
-            "only the unknown teaching focus receives a box"
+        assert robot._shown()[0] is frame and len(robot._shown()[1].boxes) == 2 and \
+            all(b[5] == "other" for b in robot._shown()[1].boxes), \
+            "eligible objects have neutral outlines before teaching focus settles"
         hold(robot, CENTER)
         assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the focus, any label"
         robot.focus.thaw()
@@ -744,6 +745,40 @@ def test_named_confidence_dip_reverifies_but_unknown_stays_hidden(robot, monkeyp
     preview(r)
     preview(r)
     assert r.focus.name(chosen) is None, "three fresh misses clear the low-confidence preference"
+
+
+def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, monkeypatch):
+    r = robot
+    frame_of(r, label="book")
+    track = next(iter(r.view[1]))
+    r.focus.freeze(track)
+    ask(r, "Track this as my chosen item")
+    preview(r)
+    source = r.view_taken
+    before = r.memory.sightings(source + 1)
+    points = r.memory.shard.count(CountRequest())
+    calls = []
+    r.recognition.crops = lambda crops: calls.append(1) or stub_crops(crops)
+    monkeypatch.setattr(main.time, "time", lambda: source + .05)
+    frame_of(r, label="book", box=(540, 300, 659, 600))
+    assert next(iter(r.view[1])) == track
+    assert r.focus.name(track) == "chosen item"
+    assert not r._shown()[1].boxes and not r._shown(False)[1].control["targets"]
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    assert r.focus.target(tracks) is None
+    selection = {"track": track, "epoch": r.focus.epoch(track),
+                 "session": r.session_id, "gallery": r.recognition.epoch,
+                 "source": r.view_taken}
+    assert not r._control("ignore", selection)
+    preview(r)
+    assert not calls and r.memory.sightings(source + 1) == before
+    assert r.memory.shard.count(CountRequest()) == points
+    monkeypatch.setattr(main.time, "time", lambda: source + .1)
+    frame_of(r, label="book")
+    assert r.focus.names() == {track: ("chosen item", True)}
+    assert r._shown()[1].boxes[0][4:] == ("chosen item", "known")
+    assert not calls, "regrowth restores display without a fresh query or write"
+    assert r.memory.sightings(source + 1) == before
 
 
 def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypatch):
