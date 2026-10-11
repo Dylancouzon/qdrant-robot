@@ -18,6 +18,7 @@ import tempfile
 import time
 from collections.abc import Callable
 from pathlib import Path
+from typing import NamedTuple
 
 import numpy as np
 
@@ -66,24 +67,37 @@ def idle(robot: Robot, seconds: float, oracle: bool) -> None:
             robot.hear(chunk)
 
 
-def score(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> dict:
+class Shown(NamedTuple):
+    """What a step left behind for later evidence checks."""
+    ids: set[int]       # memory points stored there (or sightings, for a wait step)
+    said: str | None    # the statement it made, for a statement step
+    looked: float       # capture time of the frame the step's turn looked at (0: none)
+
+
+def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> dict:
     """The step's row: a split step is BAD, and its last turn (the question's end) is scored.
     Evidence: a named step's statement must be among the recalled statements (the robot stores
     statements, robot/main.py); a named question step's frame, or one of a named wait step's
-    sightings, among the recalled memories."""
+    sightings, among the recalled memories, or the frame that step's turn looked at being the
+    retained frame this turn was answered from (kept in RAM only; an unchanged view names the
+    earlier look of the present view)."""
     if not turns:  # the VAD or the transcript dropped the question
         return {"id": step["id"], "ok": False, "split": 0, "heard": "", "answer": "",
                 "evidence_ok": None, **dict.fromkeys(STAGES)}
     turn = turns[-1]
-    frames[step["id"]] = ({turn.frame_id}, None if is_question(turn.question) else turn.question)
-    want = [frames.get(k, (set(), None)) for k in step.get("evidence", [])]
+    frames[step["id"]] = Shown({turn.frame_id},
+                               None if is_question(turn.question) else turn.question, turn.looked)
+    want = [frames.get(k, Shown(set(), None, 0.0)) for k in step.get("evidence", [])]
     row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
            "heard": " | ".join(t.question for t in turns), "split": len(turns),
-           "evidence_ok": all(said in turn.told if said else bool(ids & set(turn.memories))
-                               for ids, said in want)
+           "evidence_ok": all(said in turn.told if said else
+                               bool(ids & set(turn.memories)) or
+                               (looked and turn.supplied == looked)
+                               for ids, said, looked in want)
                            if want else None,
            "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
-           "kind": turn.kind, "verbatim": turn.verbatim, "told": turn.told,
+           "supplied": turn.supplied, "kind": turn.kind, "verbatim": turn.verbatim,
+           "told": turn.told,
            "prompt": turn.prompt,
            "line_s": turn.line - turn.speech_end,
            "asr_s": turn.transcribed - turn.speech_end,
@@ -98,7 +112,7 @@ def score(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> di
     return row
 
 
-def reported(step: dict, turns: list, frames: dict[str, tuple], oracle: bool) -> dict:
+def reported(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> dict:
     row = score(step, turns, frames, oracle)
     mark = {True: " +ev", False: " -EV", None: ""}[row["evidence_ok"]]
     mark += f" split: {len(turns)}" if len(turns) > 1 else ""
@@ -128,7 +142,7 @@ def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracl
             robot = start(memory)
         else:
             robot.reset(memory)
-        frames: dict[str, tuple] = {}  # step id -> (memory ids stored there, statement or None)
+        frames: dict[str, Shown] = {}
         shown = time.time()  # when the frame in view was shown
         for step in s["steps"]:
             if "show" in step:
@@ -141,8 +155,8 @@ def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracl
                     found = robot.memory.sightings(before=time.time(), n=50)
                     with robot.detecting:
                         in_view = {robot.points.get(t) for t in robot.tracker.in_view()}
-                    frames[step["id"]] = (sighted(found, (shown, time.time()), step, in_view),
-                                          None)
+                    frames[step["id"]] = Shown(
+                        sighted(found, (shown, time.time()), step, in_view), None, 0.0)
             elif "restart" in step:
                 t = time.time()
                 robot.close()

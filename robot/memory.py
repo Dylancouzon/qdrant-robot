@@ -70,8 +70,13 @@ _SHOWN = re.compile(r"\b(show|showed|shown|hold|holding|held|in my hands?|bring|
 _FIRST = re.compile(r"\bfirst\b", re.I)
 # Anything that narrows which memory is meant (a time, a place, a comparison) goes to the
 # brain with the memories instead: the code path only knows "newest" and "first".
-_NARROWED = re.compile(r"\b(same|different|like|similar|compare|yesterday|today|morning|"
-                       r"hour|hours|minutes?|ago|week|left|right|center|middle)\b", re.I)
+_COMPARING = "same|different|like|similar|compare"
+_WHEN_WHERE = "yesterday|today|morning|hours?|minutes?|week|left|right|center|middle"
+_COMPARE = re.compile(rf"\b({_COMPARING})\b", re.I)
+_WHEN = re.compile(rf"\b({_WHEN_WHERE})\b", re.I)  # "a moment ago" is not here: RAM answers it
+_NARROWED = re.compile(rf"\b({_COMPARING}|{_WHEN_WHERE}|ago)\b", re.I)
+_ORDINAL = re.compile(r"\b(first|second(?!\s+ago)|third|fourth|last|latest)\b", re.I)
+_NTH = {"first": 0, "second": 1, "third": 2, "fourth": 3}  # any other ordinal: the newest
 _MAIN = re.compile(r"Main object:\s*([^.\n]+)")
 
 
@@ -90,6 +95,31 @@ def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> st
         return None
     m, thing = named[-1] if _FIRST.search(question) else named[0]
     return f"You showed me {thing}, {age(m)}."
+
+
+def earlier_view(question: str, looks: list, now, differs: Callable) -> object | None:
+    """The one retained look (oldest first) that a past question about something shown means,
+    for a visitor who shows things and then changes the view. None: another kind of question
+    (a present one, a comparison, a time or place the window cannot hold: stored memories answer
+    those), or no look to pick, so nothing changes. When no look `differs` from `now`, the newest
+    look shows the present view, and the caller sends the present image. Otherwise the
+    candidates are the looks that differ, runs of the same view counted once and represented by
+    their newest; "first", "second", and "third" count from the oldest, anything else is the
+    newest."""
+    if not (about_past(question) and _SHOWN.search(question)) or about_now(question) \
+            or _COMPARE.search(question) or _WHEN.search(question) or not looks:
+        return None
+    apart: list = []
+    for look in looks:
+        if differs(look, now):
+            if apart and not differs(apart[-1], look):
+                apart[-1] = look
+            else:
+                apart.append(look)
+    if not apart:
+        return looks[-1]
+    n = _NTH.get(m.group(1).lower(), -1) if (m := _ORDINAL.search(question)) else -1
+    return apart[n] if n < len(apart) else None
 
 
 # Sighting questions ("what was on your left?", "is the cup still there?", "what is gone?"),
@@ -425,6 +455,30 @@ class Memory:
         return [{"id": r.id, **r.payload}
                 for r in self.shard.retrieve(list(ids), True, False)] if ids else []
 
+def _earlier_selftest() -> None:
+    """Views are numbers: a view differs from another by more than 1."""
+    differs = lambda a, b: abs(a - b) > 1  # noqa: E731
+    pick = lambda q, looks, now=0: earlier_view(q, looks, now, differs)  # noqa: E731
+    looks = [10, 10.5, 20, 0.5]  # clock twice, laptop, then the present view again
+    assert pick("What did I just show you?", looks) == 20, "the newest differing view"
+    assert pick("What was the first thing I showed you?", looks) == 10.5, "a run counts once"
+    assert pick("And the second thing I showed you?", looks) == 20
+    assert pick("What was the third thing I showed you?", looks) is None, "no third"
+    assert pick("What did I show you a second ago?", looks) == 20, "a time, not an ordinal"
+    assert pick("What did I show you after that?", looks) == 20
+    assert pick("Which thing did I hold up a moment ago?", looks) == 20
+    assert pick("Remind me what I brought earlier.", looks) == 20
+    assert pick("What did I just show you?", [0.2, 0.9]) == 0.9, "unchanged: the same view"
+    for when in ("yesterday", "this morning", "two hours ago", "on the left"):
+        assert pick(f"What did I show you {when}?", looks) is None, when
+    assert pick("What did I just show you?", []) is None, "no earlier exchange"
+    assert pick("What am I holding now?", looks) is None, "a present question"
+    assert pick("What is this?", looks) is None
+    assert pick("Is this the same thing I showed you?", looks) is None, "combined: not here"
+    assert pick("Was it the same as what I showed you before?", looks) is None
+    assert pick("What did we talk about before?", looks) is None, "not about something shown"
+
+
 def _sighting_selftest() -> None:
     vocab = {"cup", "mug", "bag", "backpack", "keys", "umbrella", "potted plant", "lamp", "clock"}
     q = lambda text, *context: sighting_query(text, list(context), vocab)  # noqa: E731
@@ -572,6 +626,7 @@ if __name__ == "__main__":
     assert shown("What did we talk about?", mems, ago) is None
     assert shown("What did I show you yesterday?", mems, ago) is None
     assert shown("What did I show you on the left?", mems, ago) is None
+    _earlier_selftest()
     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
     _sighting_selftest()
     print("selftest ok")

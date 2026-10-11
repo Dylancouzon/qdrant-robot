@@ -34,6 +34,7 @@ from robot.memory import (
     Memory,
     about_now,
     about_past,
+    earlier_view,
     article,
     is_question,
     kind_of,
@@ -131,6 +132,10 @@ class Turn:
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
     frame_id: int = 0             # this turn's text memory point
+    looked: float = 0.0           # capture time of the frame this turn looked at
+    supplied: float = 0.0         # capture time of the retained frame that answers a past
+    #                               question about something shown (0: none); an unchanged view
+    #                               sends the present image, and this names its earlier look
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
     line: float = 0.0             # the VAD ended the line
@@ -212,6 +217,10 @@ class Robot:
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
         self.history: list[dict] = []
+        # What each exchange of `history` looked at, in RAM only: a past question about something
+        # shown gets one of these frames (earlier_view). Cleared wherever the history is, and by
+        # a deletion, because a frame can show what was deleted.
+        self.looked: list[Look] = []
         self.exchanges = 0                      # counts every exchange; history is capped
         self.last_frame: np.ndarray | None = None  # the frame of the previous turn
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
@@ -263,7 +272,7 @@ class Robot:
             self.memory = Memory(memory)
             self.things = Things(memory)
             self.named, self.ignored = self.things.labels(), self.things.ignored()
-            self.history, self.exchanges, self.ready = [], 0, None
+            self.history, self.looked, self.exchanges, self.ready = [], [], 0, None
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
@@ -747,7 +756,7 @@ class Robot:
         if self.history and self._converse(turn, self._whois(now)):
             self.ui_turns.clear()
             self.ui_turns.append(turn)
-            self.history = []
+            self.history, self.looked = [], []
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
         statements = self._told(question, turn)
@@ -762,14 +771,20 @@ class Robot:
             turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
         ) or self._sighted(turn)
         turn.retrieved = time.time()
-        self.last_frame = look.frame
+        self.last_frame, turn.looked = look.frame, look.taken
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
-        sees = about_now(turn.question) or (turn.kind == "sight" and not past)
-        image = look.image if sees else None
-        msgs = brain.messages(look.history, image, memories, turn.facts,
-                              turn.question, look.changed, past, told)
+        # A past question about something shown gets the frame the robot saw then, labeled with
+        # its age; when that view is the present one, the present image answers.
+        differs = lambda a, b: scene_change(a.frame, b.frame) > SCENE_CHANGE  # noqa: E731
+        view = earlier_view(turn.question, self.looked, look, differs)
+        old = view if view and differs(view, look) else None
+        sees = about_now(turn.question) or (turn.kind == "sight" and not past) or view is not None
+        image = (old or look).image if sees else None
+        msgs = brain.messages(look.history, image, memories, turn.facts, turn.question,
+                              look.changed, past, told,
+                              brain.age(turn.speech_start - old.taken) if old else None)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
                        if isinstance(m["content"], list) else m
@@ -780,6 +795,7 @@ class Robot:
         elif turn.verbatim:
             tokens = self._said(turn.facts[0], turn)
         else:
+            turn.supplied = view.taken if view else 0.0  # only a frame the brain saw
             tokens = self._tokens(msgs, turn)
         audio_parts = self._speak(tokens, turn)
         turn.done = time.time()
@@ -796,7 +812,8 @@ class Robot:
         # ownership (things.py holds what was named).
         statement = None if is_question(turn.question) or command(
             turn.question, self.vocab) else question
-        self._store(turn, (now, taken), statement, track)
+        if self._store(turn, (now, taken), statement, track):  # one privacy decision for both
+            self.looked = (self.looked + [look])[-HISTORY_TURNS:]
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
@@ -819,17 +836,18 @@ class Robot:
                     not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
 
     def _store(self, turn: Turn, shot: tuple[np.ndarray, float],
-               statement: np.ndarray | None, track: int | None) -> None:
+               statement: np.ndarray | None, track: int | None) -> bool:
         """Remember conversation text, linked to the enrolled person in the speech-start frame.
-        Nothing while a forgotten visitor may be
-        in view (`hiding`), for a person track that asked to be forgotten, or for a turn that
-        deleted an object ("forget my phone" would be a new statement about it)."""
+        Nothing while a forgotten visitor may be in view (`hiding`), for a person track that
+        asked to be forgotten, or for a turn that deleted an object ("forget my phone" would be
+        a new statement about it). Returns whether the turn may be kept: the caller keeps the
+        turn's frame in RAM only then."""
         if not turn.keep:
-            return
+            return False
         frame, taken = shot
         seen = self._whois(frame)
         if self._hidden(seen, track):
-            return
+            return False
         self._hear_name(turn, seen)
         pid = turn.frame_id = self.memory.add(None, turn.question, statement, taken)
         if turn.named:
@@ -837,6 +855,7 @@ class Robot:
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid]))
         self._retain(time.time())
+        return True
 
     def _hidden(self, seen: tuple[np.ndarray, str | None] | None, track: int | None) -> bool:
         """Whether a turn with face `seen` must not be stored after a "forget me": the same
@@ -953,7 +972,7 @@ class Robot:
             return False
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
-        self.hiding, self.told = (face_, time.time()), None
+        self.hiding, self.told, self.looked = (face_, time.time()), None, []
         with self.delivery:
             self.verified = None
             self.delivery.notify_all()
@@ -1204,7 +1223,7 @@ class Robot:
                 self.focus.forget(named["name"])
             self.verified = None
             self.delivery.notify_all()
-        self.named = self.things.labels()
+        self.named, self.looked = self.things.labels(), []
         return f"Done. I have forgotten your {named['name']}."
 
     def named_evidence(self, turn: Turn, named: dict, this: bool = False

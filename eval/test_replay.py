@@ -52,7 +52,7 @@ def test_steps(monkeypatch) -> None:
 
 
 def test_statement_evidence() -> None:
-    frames: dict[str, tuple] = {}
+    frames: dict[str, replay.Shown] = {}
     said = Turn(question="My name is Priya.", answer="Hi Priya!", frame_id=1)
     replay.score({"id": "a", "expect_any": [""]}, [said], frames, oracle=True)
     asked = Turn(question="What is my name?", answer="Priya.", frame_id=2,
@@ -64,6 +64,21 @@ def test_statement_evidence() -> None:
     shown = {"id": "c", "expect_any": [""], "evidence": ["b"]}  # a question step: its frame
     recall = Turn(question="What did I ask?", answer="Your name.", frame_id=3, memories=[2])
     assert replay.score(shown, [recall], frames, oracle=True)["evidence_ok"] is True
+
+
+def test_earlier_frame_evidence() -> None:
+    """A question step's evidence is also met when the turn was answered from the frame the
+    named step looked at; another frame, or none, is not."""
+    frames: dict[str, replay.Shown] = {}
+    first = Turn(question="What is this?", answer="A clock.", frame_id=1, looked=10.0)
+    replay.score({"id": "a", "expect_any": [""]}, [first], frames, oracle=True)
+    step = {"id": "b", "expect_any": [""], "evidence": ["a"]}
+    asked = Turn(question="What did I show you?", answer="A clock.", frame_id=2, supplied=10.0)
+    assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is True
+    asked.supplied = 20.0
+    assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is False
+    asked.supplied = 0.0  # no retained frame answered
+    assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is False
 
 
 def test_wait_evidence(monkeypatch) -> None:

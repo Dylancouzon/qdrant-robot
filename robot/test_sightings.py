@@ -149,3 +149,82 @@ def test_detector_failure(monkeypatch) -> None:
     assert len(loads) == 1 + main.DETECT_RESTARTS, "the first load plus one per restart"
     turn = main.Turn(question="What was on your left?")
     assert robot._sighted(turn) is None, "no sighting answer once detection has stopped"
+
+
+def test_earlier_frame(monkeypatch, tmp_path) -> None:
+    """Robot._turn on real Edge with a stub brain: a past question about something shown gets
+    the frame the robot looked at then, labeled as earlier; a present question never does;
+    the retained frames follow the conversation window and every deletion."""
+    import queue
+    import time
+    from types import SimpleNamespace as Stub
+
+    from robot import brain
+    from robot.text_embed import DIM as TEXT_DIM
+
+    monkeypatch.setattr(main, "face", lambda faces, frame: None)
+    robot = open_robot(tmp_path)
+    robot.asking, robot.stream, robot.wake_word, robot.turns = None, None, False, queue.Queue()
+    robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0
+    robot.out = tmp_path / "out"
+    robot.out.mkdir()
+    robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
+    robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "sight"
+    sent: list = []
+    def answer(msgs, **kwargs):
+        sent.append(msgs)
+        yield "Ok."
+
+    robot.brain = Stub(prefill=lambda m: None, answer=answer)
+    robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
+    robot.speaker = Stub(play=lambda pcm: None)
+    shot = lambda k: np.full((720, 1280, 3), k, np.uint8)  # noqa: E731
+    clock = iter(range(int(time.time()), int(time.time()) + 10_000))
+
+    def ask(text: str, view: int) -> dict:
+        """The turn and the content of the last user message the brain got."""
+        t = float(next(clock))
+        turn = main.Turn(question=text, speech_start=t, line=t, speech_end=t)
+        robot._turn(turn, (shot(view), t))
+        last = sent[-1][-1]["content"]
+        return turn, last
+
+    def image(content, view: int) -> bool:
+        return content[0] == brain.jpeg(shot(view))
+
+    stop, clock_view, night = 200, 100, 0
+    turn, content = ask("What is this?", stop)
+    assert image(content, stop) and turn.supplied == 0.0, "a present question: the present frame"
+    first = turn.looked
+    ask("And what is this?", clock_view)
+    turn, content = ask("What did I just show you?", night)
+    assert image(content, clock_view) and turn.supplied > 0
+    assert "not the present" in content[-1]["text"]
+    assert turn.supplied != first, "the newest differing frame, not the first"
+    turn, content = ask("What was the first thing I showed you?", night)
+    assert image(content, stop) and turn.supplied == first
+    turn, content = ask("What am I holding now?", clock_view)
+    assert image(content, clock_view) and turn.supplied == 0.0 and "not the present" not in \
+        content[-1]["text"], "never an earlier frame for the present"
+    assert len(robot.looked) == main.HISTORY_TURNS, "the window of the conversation"
+    robot.looked = [robot.looked[-1]]  # only the present view remains: nothing differs
+    turn, content = ask("What did I show you?", clock_view)
+    assert image(content, clock_view) and turn.supplied == robot.looked[0].taken, \
+        "an unchanged view: the present image, scored against the earlier look of that view"
+    assert "not the present" not in content[-1]["text"]
+    turn, content = ask("What did I show you yesterday?", night)
+    assert len(content) == 1 and turn.supplied == 0.0, "a time the window cannot hold"
+    robot.history, robot.looked = [], []
+    turn, content = ask("What did I just show you?", night)
+    assert len(content) == 1 and turn.supplied == 0.0, "no earlier exchange: no image"
+    ask("What is this?", stop)
+    assert len(robot.looked) == 2
+    assert robot._forget(None, "Ana", np.zeros(DIM, np.float32))
+    assert robot.looked == [], "'forget me': the frames may show the visitor"
+    ask("What is this?", stop)
+    assert robot.looked == [], "nothing is kept while the forgotten visitor may be in view"
+    # The hiding times out with no usable face, but the track stays forgotten: still no frame.
+    robot.hiding = (np.zeros(DIM, np.float32), time.time() - main.CLEAR_S - 1)
+    robot._visitor, robot.visitors = lambda: 7, {7: main.Visitor(forgotten=True)}
+    ask("What is this?", stop)
+    assert robot.hiding is None and robot.looked == [], "one privacy decision for text and frames"

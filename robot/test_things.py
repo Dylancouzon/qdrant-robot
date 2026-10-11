@@ -55,6 +55,7 @@ def open_robot(root: Path) -> Robot:
     robot.crop_due, robot.crop_times, robot.matches_pending = {}, deque(), False
     robot.item_checked = {}
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
+    robot.looked = []
     robot.delivery = threading.Condition(robot.detecting)
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
