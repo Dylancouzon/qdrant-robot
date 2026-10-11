@@ -83,7 +83,9 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Concept A with body speaker and owned STS3215 | Tapered white shell uses a 22 mm base roll; 24 mm clips the expanded port reservation. Direct inset loft fixes invalid panel booleans from the offset cavity. CAD bounds must exclude cached triangulation. All 46 P1S projects slice (E). Physical retention, powered coupling, cables, and thermal behavior remain U | Current unpowered fit prototype | H2; `hardware/concept-a/README.md` |
+| Concept A with body speaker and owned STS3215 | Tapered white shell uses a 22 mm base roll; 24 mm clips the expanded port reservation. Direct inset loft fixes invalid panel booleans from the offset cavity. CAD bounds must exclude cached triangulation. Bambu archive relationships need an unprefixed default namespace; validate the final archive after thumbnail rewriting. All 57 P1S projects slice and pass final geometry import (E). Physical retention, powered coupling, cables, and thermal behavior remain U | Current unpowered fit prototype | H2; `hardware/concept-a/README.md` |
+
+| Removable speaker and audio keys | Speaker capture and service pass 64 targeted checks; audio capture, tool access, and module service pass 118 (E). Upright audio and separate vertical key removal failed clearance. Flatter audio removes as one module after the speaker key. The complete casing passes 665 checks (E); physical contacts and flex remain U | Reviewed CAD prototype; physical tests pending | H3; `hardware/concept-a/RETENTION_BRIEF.md` |
 
 ## System and memory
 

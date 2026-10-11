@@ -1,10 +1,10 @@
 # Concept A mechanical prototype
 
-Complete robot bounds are 148.6 × 127.2 × 236 mm. The 152 × 130 mm figures used by the generator are raw construction section limits.
+Speaker and audio retention pass 182 targeted CAD checks; the casing passes 665 checks. Editable CAD and checked meshes are regenerated. The final viewer and all 57 P1S projects are current. Jetson and camera retainers remain dependent on contact measurements.
 
 The tapered revision follows the requested rounded reference, with a neutral white body, black visor and raised removable black speaker grille. The finished body measures 148.6 × 127.2 × 160 mm and narrows toward 128 × 110 mm shoulder construction sections. The base roll is 22 mm and shoulder roll 20 mm. The capsule head measures 116 × 80 × 56 mm. Overall height is 236 mm (E). Complete component and cable reservations remain modeled. Physical retention and powered coupling require measurements.
 
-The casing has 18 structural, cover and cradle pieces. Separate rear and port covers give simpler service paths than one combined cover. The visor includes its camera light baffle and blind second-eye recess, without separate decorative parts. Four detachable cradles retain provisional interfaces so safe contact lands can be verified before populated electronics are installed.
+The casing has 20 structural, cover, cradle, and retaining-key pieces. Separate rear and port covers give simpler service paths than one combined cover. The visor includes its camera light baffle and blind second-eye recess, without separate decorative parts. Four detachable cradles retain provisional interfaces so safe contact lands can be verified before populated electronics are installed.
 
 ![Actual robot casing and manual joint, shown from the front and rear](output/assembly/robot-preview.png)
 
@@ -16,13 +16,15 @@ Use [the complete assembled STEP](output/assembly/robot-assembled.step) in a CAD
 
 ## Print files and assembly
 
-[Bambu P1S projects](output/bambu/) contain casing, joint, cradle, gauge, and coupon parts. Each project uses PLA, the 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All 46 current projects slice successfully with no warnings; source and project hashes match the final meshes. Inspect supports and their removal paths before printing. Start with the small gauges and spare keys. Physical fits remain U.
+Use [the organized STL files](output/Print-files/README.md): Required first, then Optional, with White and Black folders. The 38 required pieces and 19 optional tests preserve their checked print orientations. All 57 STL files and repaired native P1S projects pass Bambu geometry import checks.
+
+[Bambu P1S projects](output/bambu/) contain casing, joint, cradle, gauge, and coupon parts. Each project uses PLA, the 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All 57 projects slice without warnings and pass native geometry import. Source and project hashes match the delivered files. Inspect supports and their removal paths before printing. Start with the small gauges and spare keys. Physical fits remain U.
 
 The separate [casing meshes](output/casing/) and [joint meshes](output/joint/) use millimeter units and checked print orientations. These generic 3MF files contain geometry. Select printer settings when importing them directly. The P1S projects include settings and sliced previews. No print was sent.
 
 Read [casing assembly](CASING_ASSEMBLY.md) and [joint assembly](JOINT_ASSEMBLY.md) before printing. The roof uses a removable bridge. Lift the preassembled joint 5.2 mm, slide it through the rear roof channel, and lower its flange onto the roof posts. Install the bridge and its retained pins afterward. Install the camera frame before the camera.
 
-Four detachable cradles define the proposed Jetson, speaker, audio-case, and camera positions. They include mounting posts and reference clearance. Verify safe contact lands and component retention with gauges before installing populated electronics. Keep the owned servo separate until its installed retention is defined. The manual drive gear is a loose tooth-meshing coupon.
+Four detachable cradles define the proposed Jetson, speaker, audio-case, and camera positions. Speaker and audio have removable keys with passing bounded CAD capture and service checks. Jetson and camera remain location gauges pending safe contact measurements. Verify housing contacts, release, and holding strength with the [retention coupons and guide](RETENTION_BRIEF.md) before installing populated electronics. Keep the owned servo separate until its installed retention is defined. The manual drive gear is a loose tooth-meshing coupon.
 
 ## Joint specification
 
@@ -36,23 +38,19 @@ Use external camera routing for this manual prototype. Transverse retention keys
 
 ## Power, USB, and cooling
 
-Remove the complete right panel to connect and grip the Jetson plugs. Its edge-open service slot reserves later replaceable inserts. The final insert requires actual socket coordinates and complete installed USB connector shapes.
+Remove the right panel to grip and connect Jetson plugs. Its split service opening preserves access; final inserts require actual socket and connector measurements. The separate [power-exit trial](output/power-exit-trial-p1s.3mf) remains a hand-held gauge without casing attachment.
 
-The existing [power-exit trial](output/power-exit-trial-p1s.3mf) tests the reported 11 mm plug diameter, 11 mm straight reach, and 10 mm rotatable elbow. Its 13 mm upward-open channel sits nine mm from the provisional socket plane. The trial measures 22.85 × 60 × 33.5 mm. Its recess depth is 21.25 mm. It remains a separate hand-held gauge with no casing attachment.
-
-Connect the plug with the supply disconnected from mains. Point the elbow upward. Raise the trial around its open channel, then check the nine mm socket-to-face distance. Lower the trial for removal. Record interference and nearby USB clearance before designing its attachment.
-
-The rear intake and left outlet each provide 2268 mm² of clear projected CAD opening. Each counted opening reaches the actual cavity; the complete fan and outlet reservations remain clear. The speaker grille and microphone openings stay open. Actual fan orientation, microphone positions, cooling, echo, and motor noise require physical checks. Compare open and enclosed Jetson operation under the same workload before final thermal approval.
-
-A compatible USB TTL bus-servo adapter can control the STS3215 from the Jetson without a separately programmed Uno. Identify the owned SO-ARM100 adapter revision before specifying supply wiring. The 7.4 V servo requires compatible power and current capacity. Verify its horn holes, supplied retention hardware, adapter, and mounting lands before powered design.
+Keep the rear intake, left outlet, microphone holes, and speaker grille clear. Verify fan direction and compare open/enclosed cooling and acoustics under the same workload. Identify the bus adapter and supply before specifying servo wiring. Physical tests remain U.
 
 ## Checks and regeneration
 
 [Integrated checks](output/assembly/checks.json) cover actual casing/joint intersections, full yaw separation bounds, rear key access, and sampled joint/bridge admission. [Casing checks](output/casing/checks.json) cover panel and cradle separation, hardware reservations, component admission, and both reference lens lengths. [Joint checks](output/joint/checks.json) cover bearings, retained keys, stops, and real teeth. [Slicing checks](output/bambu/slice-checks.json) record each source hash, project hash, result, warning, and estimate.
 
-Use Python 3.12 with [requirements.lock](requirements.lock). Run `layout.py`, `power_exit.py`, `casing.py`, `joint.py`, `assembly.py`, and `bambu.py` in that order. Run `node hardware/concept-a/check-assembly-viewer.cjs` from the repository root. The CAD environment is `build/hardware-layout/venv/bin/python`. Bambu packaging uses the installed macOS application and the saved native P1S power-trial project as its settings template.
+Use Python 3.12 with [requirements.lock](requirements.lock). Run `layout.py`, `power_exit.py`, `casing.py`, `joint.py`, `check_retention.py`, `assembly.py`, and `bambu.py` in that order. Run `node hardware/concept-a/check-assembly-viewer.cjs` from the repository root. The CAD environment is `build/hardware-layout/venv/bin/python`. Bambu packaging uses the installed macOS application and the saved native P1S power-trial project as its settings template.
 
 The shared exporter welds indexed CAD face seams and checks every mesh edge twice. Generators check millimeter scale, closed volume, connected solids, and bed fit. Automatic slicing establishes printable paths. Physical coupon results, safe electronics support, material life, cable movement, powered motion, cooling, and acoustics remain U.
+
+Development history and rejected evidence are in [the build log](BUILD_LOG.md). Next-session constraints are in [the handoff](HANDOFF.md).
 
 ## Sources
 

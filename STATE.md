@@ -2,11 +2,11 @@
 
 Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Active task: Tapered enclosure prototype
+## Active task: Press-fit electronics retention
 
-The neutral-white enclosure uses a raised black grille and 22 mm base roll. Its finished bounds are 148.6 × 127.2 × 236 mm (E). All 1,200 CAD checks and 46 P1S slicing checks pass. The assembly viewer includes an offline assembly guide, hardware quantities and status, printed inventory, internal envelopes, and connection notes. Task review passed. Physical measurements and printed coupons are the next step.
+The unpowered enclosure and [organized print files](hardware/concept-a/output/Print-files/README.md) are current: 38 required pieces and 19 optional tests. CAD and native import checks pass. Read the short [handoff](hardware/concept-a/HANDOFF.md) for current constraints and next steps. The [build log](hardware/concept-a/BUILD_LOG.md) preserves development history and evidence.
 
-Physical retention, powered mounting, cable movement, cooling, and acoustics remain U. Before a full print, measure safe support lands, servo ears and horn hardware, bearing contacts, installed plugs, and camera cable bends. Confirm fan direction and microphone positions. Start with the panel-fit coupons. Read [requirements](hardware/DESIGN_REQUIREMENTS.md) and [handoff](hardware/concept-a/HANDOFF.md).
+Jetson and camera retainers await safe contact measurements. Physical fit, latch life, cables, cooling, acoustics, and powered motion remain U. No print or powered test occurred.
 
 ## Robot
 
@@ -30,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Review the offline assembly viewer and collect the physical measurements in the handoff before final retention and powered design.
+Confirm Jetson grip datum/usable length and camera contact lands before installed clips. Test printed dummy modules, release cycles, and enclosed cooling before powered use.

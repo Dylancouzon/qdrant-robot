@@ -1,10 +1,10 @@
 {
-  "status": "MECHANICAL PROTOTYPE; physical fit U",
+  "status": "Mechanical retention prototype; physical fit U",
   "checks": [
     {
       "name": "body-front solid",
       "passed": true,
-      "detail": "1 connected solids; 112271.606 mm\u00b3."
+      "detail": "1 connected solids; 116564.343 mm\u00b3."
     },
     {
       "name": "body-rear solid",
@@ -47,9 +47,19 @@
       "detail": "1 connected solids; 4495.649 mm\u00b3."
     },
     {
+      "name": "speaker-retaining-key solid",
+      "passed": true,
+      "detail": "1 connected solids; 2376.000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key solid",
+      "passed": true,
+      "detail": "1 connected solids; 1080.830 mm\u00b3."
+    },
+    {
       "name": "speaker-cradle solid",
       "passed": true,
-      "detail": "1 connected solids; 6194.208 mm\u00b3."
+      "detail": "1 connected solids; 6194.304 mm\u00b3."
     },
     {
       "name": "jetson-cradle solid",
@@ -59,7 +69,7 @@
     {
       "name": "audio-cradle solid",
       "passed": true,
-      "detail": "1 connected solids; 3843.673 mm\u00b3."
+      "detail": "1 connected solids; 3799.105 mm\u00b3."
     },
     {
       "name": "camera-cradle solid",
@@ -128,6 +138,16 @@
     },
     {
       "name": "body-front / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / audio-retaining-key",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
@@ -212,6 +232,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-rear / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-rear / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -287,6 +317,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-right / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-right / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -357,6 +397,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-roof / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-roof / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -422,6 +472,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-front / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-front / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -482,6 +542,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-rear / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-rear / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -537,6 +607,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-visor / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-visor / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -587,6 +667,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "speaker-grille / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "speaker-grille / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -632,6 +722,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "neck-cover / speaker-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "neck-cover / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -673,6 +773,101 @@
     },
     {
       "name": "neck-cover / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / audio-retaining-key",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-retaining-key / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-retaining-key / roof-bridge-keeper-1",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
@@ -1217,6 +1412,116 @@
       "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
     },
     {
+      "name": "speaker-retaining-key / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-retaining-key / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-retaining-key / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
       "name": "speaker-cradle / Jetson",
       "passed": true,
       "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
@@ -1677,9 +1982,9 @@
       "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
     },
     {
-      "name": "USB audio case rear insertion",
+      "name": "USB audio case outside module assembly",
       "passed": true,
-      "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+      "detail": "Continuous 120 mm vertical housing admission versus loose tray: 0.000000 mm\u00b3."
     },
     {
       "name": "STS3215 housing rear insertion",
@@ -1719,12 +2024,12 @@
     {
       "name": "audio beam -44 load sections",
       "passed": true,
-      "detail": "Actual minimum section area 14.400000 mm\u00b2 over8 sections; 2.4\u00d76 mm reference."
+      "detail": "Actual minimum section area 14.400000 mm\u00b2 over16 sections along the complete docking land; 2.4\u00d76 mm reference."
     },
     {
       "name": "audio beam -8 load sections",
       "passed": true,
-      "detail": "Actual minimum section area 14.400000 mm\u00b2 over8 sections; 2.4\u00d76 mm reference."
+      "detail": "Actual minimum section area 14.400000 mm\u00b2 over16 sections along the complete docking land; 2.4\u00d76 mm reference."
     },
     {
       "name": "roof beam -46/-36 load sections",
@@ -1822,6 +2127,16 @@
       "detail": "0.0"
     },
     {
+      "name": "Jetson / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "Jetson / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -1893,6 +2208,16 @@
     },
     {
       "name": "One speaker / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / audio-retaining-key",
       "passed": true,
       "detail": "0.0"
     },
@@ -1972,6 +2297,16 @@
       "detail": "0.0"
     },
     {
+      "name": "USB audio case / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "USB audio case / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -2043,6 +2378,16 @@
     },
     {
       "name": "Audio USB extension / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / audio-retaining-key",
       "passed": true,
       "detail": "0.0"
     },
@@ -2122,6 +2467,16 @@
       "detail": "0.0"
     },
     {
+      "name": "STS3215 housing / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "STS3215 housing / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -2193,6 +2548,16 @@
     },
     {
       "name": "Servo ears and leads / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / audio-retaining-key",
       "passed": true,
       "detail": "0.0"
     },
@@ -2272,6 +2637,16 @@
       "detail": "0.0"
     },
     {
+      "name": "Bus interface / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "Bus interface / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -2343,6 +2718,16 @@
     },
     {
       "name": "Servo regulator / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / audio-retaining-key",
       "passed": true,
       "detail": "0.0"
     },
@@ -2422,6 +2807,16 @@
       "detail": "0.0"
     },
     {
+      "name": "Jetson USB/power plugs / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "Jetson USB/power plugs / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -2497,6 +2892,16 @@
       "detail": "0.0"
     },
     {
+      "name": "Fan intake space / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / audio-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
       "name": "Fan intake space / speaker-cradle",
       "passed": true,
       "detail": "0.0"
@@ -2568,6 +2973,16 @@
     },
     {
       "name": "Outlet space / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / speaker-retaining-key",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / audio-retaining-key",
       "passed": true,
       "detail": "0.0"
     },
@@ -2684,7 +3099,7 @@
     {
       "name": "head minimum wall",
       "passed": true,
-      "detail": "2.999999999999973"
+      "detail": "2.999999999999975"
     },
     {
       "name": "head section 0 wall",
@@ -2799,7 +3214,7 @@
     {
       "name": "audio support -44 continuous core",
       "passed": true,
-      "detail": "{'core_mm3': 34.56000000000011, 'missing_mm3': 0.0}"
+      "detail": "{'core_mm3': 109.44000000000013, 'missing_mm3': 0.0}"
     },
     {
       "name": "audio support -44 shell load path",
@@ -2809,12 +3224,12 @@
     {
       "name": "audio support -8 support section",
       "passed": true,
-      "detail": "{'load_axis': 'y', 'section_mm': [2.4000000000000057, 6.0]}"
+      "detail": "{'load_axis': 'y', 'section_mm': [2.4000000000000004, 6.0]}"
     },
     {
       "name": "audio support -8 continuous core",
       "passed": true,
-      "detail": "{'core_mm3': 34.56000000000011, 'missing_mm3': 0.0}"
+      "detail": "{'core_mm3': 109.43999999999997, 'missing_mm3': 0.0}"
     },
     {
       "name": "audio support -8 shell load path",
@@ -2913,13 +3328,12 @@
     }
   ],
   "geometry_passed": true,
-  "contacts": "Only zero-volume printed boundary contacts. No electronics contact is authorized.",
+  "contacts": "Nominal dummy-housing capture only; real housing/PCB contact safety and printed holding strength unverified.",
   "unknowns": [
-    "Part contact lands and retention",
-    "Port datums and installed connector shapes",
-    "Camera cable movement",
-    "Cooling and acoustics",
-    "PLA creep",
-    "Bambu Studio slicing"
+    "Jetson plastic-land datum and usable length",
+    "Camera safe PCB contact lands",
+    "Speaker/audio safe housing contacts and release force",
+    "Printed creep and 20 assembly cycles",
+    "Powered coupling, cooling, and acoustics"
   ]
 }

@@ -7,6 +7,7 @@ from xml.etree import ElementTree as E
 from zipfile import ZipFile, ZIP_DEFLATED
 import hashlib
 import json
+import re
 import subprocess
 import trimesh
 
@@ -54,11 +55,22 @@ def current_thumbnail(project, work):
     for relationship in relationships:
         if relationship.get("Target", "").endswith(".png"):
             relationship.set("Target", "/Metadata/plate_1.png")
+    E.register_namespace("", "http://schemas.openxmlformats.org/package/2006/relationships")
     data["_rels/.rels"] = E.tostring(relationships, encoding="utf-8", xml_declaration=True)
     data["Metadata/plate_1.png"] = png
     with ZipFile(project, "w", ZIP_DEFLATED) as archive:
         for name, content in data.items():
             archive.writestr(name, content)
+    imported = subprocess.run(
+        [str(BINARY), "--info", str(project)], capture_output=True, text=True, timeout=180
+    )
+    assert imported.returncode == 0 and re.search(
+        r"number_of_facets\s*[:=]\s*[1-9][0-9]*\b", imported.stdout
+    ), (
+        project.name,
+        imported.stdout,
+        imported.stderr,
+    )
     return hashlib.sha256(png).hexdigest()
 
 
@@ -130,13 +142,32 @@ def package(source, dest):
     return mesh
 
 
+def source_groups():
+    """Include installed meshes and only explicitly listed retention coupons."""
+    groups = [
+        (group, sorted((ROOT / "output" / group).glob("*.3mf"))) for group in ("casing", "joint")
+    ]
+    retention = ROOT / "output" / "retention"
+    coupons = []
+    for manifest in ("coupon-manifest.json", "jetson-coupon-manifest.json"):
+        for row in json.loads((retention / manifest).read_text()):
+            name = row["name"]
+            assert Path(name).name == name and not name.endswith(".3mf"), name
+            source = retention / (name + ".3mf")
+            assert source.is_file(), source
+            assert source not in coupons, source
+            coupons.append(source)
+    groups.append(("retention", sorted(coupons)))
+    return groups
+
+
 def main():
     assert BINARY.is_file(), "This workflow needs the installed Bambu Studio macOS application."
     OUT.mkdir(parents=True, exist_ok=True)
     BUILD.mkdir(parents=True, exist_ok=True)
     rows = []
-    for group in ("casing", "joint"):
-        for source in sorted((ROOT / "output" / group).glob("*.3mf")):
+    for group, sources in source_groups():
+        for source in sources:
             name = group + "-" + source.stem
             work = BUILD / name
             work.mkdir(parents=True, exist_ok=True)

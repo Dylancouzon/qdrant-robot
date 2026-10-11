@@ -1,12 +1,14 @@
 # Concept A removable casing prototype
 
-Complete robot bounds are 148.6 × 127.2 × 236 mm. The 152 × 130 mm figures used by the generator are raw construction section limits.
+Complete robot bounds are 148.6 × 127.2 × 236 mm.
 
 The body tapers from 152 × 130 mm at its base to 128 × 110 mm at Z 160, with a 22 mm base roll and 20 mm shoulder roll. The 116 × 80 × 56 mm capsule head starts at Z 180 and ends at Z 236. White parts surround the black visor, integral light baffle and 40.4 mm camera opening. The raised black speaker grille centers at Z 48. All dimensions are millimeters.
 
 This is a mechanical measurement prototype. CAD checks run on the Mac (E). Physical fits, retention, connector geometry, cooling, acoustics, and material life remain U. Inspect and slice each part in Bambu Studio before printing. Keep the prototype unpowered until its interfaces pass physical checks.
 
 ## Files and printing
+
+Use [Required and Optional print files](output/Print-files/README.md), then select White or Black. The STL files preserve the checked orientation. Native P1S projects are in `output/bambu/`.
 
 Run `build/hardware-layout/venv/bin/python hardware/concept-a/casing.py` from the repository root. This rebuilds the checks, STEP assemblies, render, part manifest, and closed 3MF meshes under `output/casing/`. The manifest records each print orientation, bed size, flat contact area, and support requirement. The generator checks raw indexed mesh edges as well as imported mesh closure and millimeter dimensions.
 
@@ -22,12 +24,12 @@ Print the head front shell and visor with their front faces on the bed. Print th
 2. Remove the roof, rear cover, right panel, and loose cradles. Keep the panel catches accessible.
 3. Test the speaker and audio housings in the separate envelope gauges. Stop if a gauge loads a populated circuit board.
 4. Install the speaker tray over its two base posts. Slide the speaker through the open rear at its final height, before installing the Jetson. The tray has front and side guides; its open rear avoids lifting the speaker into the audio support beams.
-5. Fit the audio shelf over its two front support posts. Its front and left lips locate the reference housing. The right side stays open for the reserved USB extension.
+5. Assemble the flatter audio housing, tray, and retaining key outside the enclosure. Insert the complete module from the rear at 0.5 mm above its seated position, then lower it onto its shell ledges and release the docking feet into their pockets. Leave the USB reservation clear. Install the speaker key after the audio module: slide it inward from the open right side at its rear-released position, then forward 18 mm into its receivers. Test both release latches with dummy housings first.
 6. Check servo admission with a dummy reference envelope before placing the Jetson. Its rear path crosses the Jetson location. Keep the owned servo separate until an installed mount and safe contact lands are defined. Install the Jetson tray over its four base posts. Its left and front lips locate the envelope. Its rear and right sides preserve the fan and plug reservations.
 7. Use the joint instructions for the separate servo housing gauge and manual drive. Connect and grip plugs with the complete right panel removed.
 8. Follow the open roof channel sequence below. Refit the right panel and rear cover. Remove the rear cover first when servicing the right rear sockets. Pull panels directly along their insertion directions. Do not pry against a circuit board.
 
-The four component cradles are captured modules, rather than floating STEP parts. Body pedestals support the speaker and Jetson trays. Front-wall blocks support the audio shelf. The head floor supports the camera frame. Their nominal 0.4 mm envelope gaps permit gauge tests. They establish proposed locations; they do not certify housing contacts, PCB support lands, or final component retention. Verify safe contact lands before changing these gaps or adding contact shims.
+Speaker and audio keys now provide nominal positive capture of their reference housing and cradle interfaces. Jetson and camera cradles remain location gauges pending contact measurements. Body pedestals support the speaker and Jetson trays. Front-wall blocks support the audio shelf. The head floor supports the camera frame. Their nominal 0.4 mm envelope gaps permit gauge tests. They establish proposed locations; they do not certify housing contacts, PCB support lands, or final component retention. Verify safe contact lands before changing these gaps or adding contact shims.
 
 ## Head and joint interface
 
@@ -67,6 +69,14 @@ The checker tests every assembled casing and cradle pair, all source hardware an
 
 The STEP ghost assembly includes the source camera holder, board, heatsink, both rear connectors, and all source reservations. The exterior PNG uses triangles from these casing solids. Joint geometry is exported and checked separately by the integrating builder. Powered operation and physical print readiness require the remaining measurements and Bambu Studio inspection.
 
-The component trays currently establish locations for an unpowered fit prototype. They do not provide verified positive retention. Do not power or move the assembled robot until safe contact lands and retention prevent components entering fan, cable, or PCB regions. Rear and right covers have sampled CAD removal checks with the roof, head, joint, neck and bridge removed. Actual release forces and cables remain unverified.
+Speaker and audio have passing bounded CAD retention checks, but actual housing contact safety, holding strength, and release force remain unverified. Jetson and camera still lack completed positive retainers. Do not power or move the assembled robot until safe contact lands and retention prevent components entering fan, cable, or PCB regions. Rear and right covers have sampled CAD removal checks with the roof, head, joint, neck and bridge removed. Actual release forces and cables remain unverified.
 
 The installed robot STEP and viewer omit the loose hand-held drive gear coupon. Its separate joint export remains available for tooth-mesh tests; it has no installed pivot or powered horn coupling.
+
+## Electronics retention service
+
+Keep the prototype unpowered. Remove the head, joint, neck cover, roof, bridge, rear cover, and right panel before body service. Disconnect and remove Jetson/fan/tray and the bus interface; unplug the audio extension. Support the speaker housing and tray, release the speaker key with its blunt tool, slide it rearward 18 mm, then withdraw it through the right side 140 mm. The housing and tray remain seated.
+
+Enter below the audio shelf from the open rear with two 2 mm square blunt shafts at Z 74.5. Press both flexible beams 0.5 mm toward negative X. Hold the shafts while lifting the complete housing/tray/key module 0.5 mm and sliding it rearward 5.5 mm. Withdraw the shafts after the docks clear; complete its 200 mm rear withdrawal. Separate the key and housing outside the enclosure. Install in reverse order: audio module, speaker key, Jetson and bus, then covers and mechanism. Support loose housings during service; neither friction nor gravity certifies their safety.
+
+The routes use sampled actual CAD solids. Print receiver/key coupons and test 20 cycles before real electronics. Jetson plastic-strip placement/length and camera safe PCB lands remain missing; physical retention, cooling, acoustics, and powered coupling remain U. See [the retention brief](RETENTION_BRIEF.md).

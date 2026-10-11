@@ -1,7 +1,7 @@
 [
   {
     "name": "body-front",
-    "base_contact_area_mm2": 6812.35,
+    "base_contact_area_mm2": 6812.34,
     "file": "body-front.3mf",
     "color": "#f5f5f5",
     "print_size_mm": [
@@ -9,7 +9,7 @@
       143.613,
       122.841
     ],
-    "cad_volume_mm3": 112271.606,
+    "cad_volume_mm3": 116564.343,
     "support": "Front exterior face down. Support the short raised receiver blocks and roof catches locally.",
     "mesh_closed": true,
     "raw_index_edges_twice": true,
@@ -153,16 +153,50 @@
     "status": "Export checked; slice and physical coupon checks pending"
   },
   {
+    "name": "speaker-retaining-key",
+    "base_contact_area_mm2": 506.88,
+    "file": "speaker-retaining-key.3mf",
+    "color": "#f5f5f5",
+    "print_size_mm": [
+      112.8,
+      53.0,
+      24.4
+    ],
+    "cad_volume_mm3": 2376.0,
+    "support": "Rear frame face down. Support projecting feet and corner hooks locally. Test the release beam with a coupon before use.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "audio-retaining-key",
+    "base_contact_area_mm2": 45.3,
+    "file": "audio-retaining-key.3mf",
+    "color": "#f5f5f5",
+    "print_size_mm": [
+      59.3,
+      27.0,
+      7.05
+    ],
+    "cad_volume_mm3": 1080.83,
+    "support": "Rear housing-hook faces down; support the raised frame bar and docking legs. Test release beams with a coupon.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
     "name": "speaker-cradle",
-    "base_contact_area_mm2": 2207.92,
+    "base_contact_area_mm2": 2235.96,
     "file": "speaker-cradle.3mf",
     "color": "#f5f5f5",
     "print_size_mm": [
-      103.2,
-      24.2,
+      106.4,
+      23.5,
       7.4
     ],
-    "cad_volume_mm3": 6194.208,
+    "cad_volume_mm3": 6194.304,
     "support": "Flat tray/coupon base down. No major supports.",
     "mesh_closed": true,
     "raw_index_edges_twice": true,
@@ -188,15 +222,15 @@
   },
   {
     "name": "audio-cradle",
-    "base_contact_area_mm2": 1424.89,
+    "base_contact_area_mm2": 1394.34,
     "file": "audio-cradle.3mf",
     "color": "#f5f5f5",
     "print_size_mm": [
-      55.5,
-      26.2,
+      54.7,
+      31.075,
       7.4
     ],
-    "cad_volume_mm3": 3843.673,
+    "cad_volume_mm3": 3799.105,
     "support": "Flat tray/coupon base down. No major supports.",
     "mesh_closed": true,
     "raw_index_edges_twice": true,

@@ -30,20 +30,25 @@ nav{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0}a{color:#275c71}a:focus-v
 <p>This is an unpowered mechanical fit prototype. CAD checks are E (verified on the Mac). Physical fits and retention remain U (unverified).</p>
 <p>Test the panel coupons and spare keys first. Check safe support lands before installing populated electronics. Inspect every print in Bambu Studio.</p>
 <ol>
-<li><strong>Body and cradles.</strong> Remove the roof, rear cover, and right panel. Fit the speaker tray, audio shelf, and Jetson tray onto their supports.</li>
-<li><strong>Stationary components.</strong> Slide the speaker through the open rear at its final height. Fit the audio housing. Check servo admission with a dummy envelope before placing the Jetson. Keep the owned servo separate.</li>
+<li><strong>Body and cradles.</strong> Remove the roof, rear cover, and right panel. Fit the speaker tray onto its supports. Keep the audio module and Jetson tray separate.</li>
+<li><strong>Stationary components.</strong> Slide the speaker through the open rear at its final height. Preassemble the audio housing, cradle, and key outside the enclosure. Insert the complete audio module with the speaker key absent. Fit the speaker key afterward. Check servo admission with a dummy envelope, then fit the Jetson tray and Jetson. Fit the bus interface last. Keep the owned servo separate.</li>
 <li><strong>Body panels and roof.</strong> Connect and grip body plugs with the right panel removed. Fit the rear cover and right panel, then seat the roof on its four posts. Keep the rear roof channel open.</li>
 <li><strong>Manual joint.</strong> Slide the lower bearing, middle spacer, and upper bearing onto the gear shaft. Close both tower halves around them. Fit four cross pins and four keepers. Hold the joint 5.2 mm high, slide it through the rear roof channel, then lower it onto the posts. Fit both roof keys. Seat the detachable head flange on the D-flat and fit its transverse shaft key.</li>
 <li><strong>Bridge and neck cover.</strong> Slide the roof bridge forward beneath the seated flange. Fit two bridge pins and two keepers. Check their retention. Fit the neck cover before installing the head.</li>
 <li><strong>Head and camera.</strong> Lower the head onto the flange posts. Fit both head keys through the open rear. Insert the empty camera frame from the rear, 1.5 mm above its final height, then lower it onto its posts. Insert the complete camera through the frame after checking safe edge support.</li>
 <li><strong>Covers and connections.</strong> Connect the camera with the rear head cover open. Route its cable externally through the split rear exits. Fit the visor and rear head cover. Check cable slack through manual head travel before any powered design.</li>
 </ol>
+<p>The speaker key is a press-fit CAD prototype. Its receivers capture the frame and tray. Actual holding force, contact lands, release flex, and material life remain unverified. Jetson and camera retention still need contact measurements.</p>
 <h3>Connections</h3>
 <p>Connect the camera USB cable and USB audio module to the Jetson. Connect the speaker to the audio module after checking the owned connectors. Confirm microphone positions.</p>
 <p>The proposed powered path uses Jetson USB, a compatible TTL bus-servo adapter, and the STS3215. Adapter identity, supply wiring, grounding, horn retention, and installed servo mounting remain pending.</p>
 <h3>Service access</h3>
 <p>Remove the head, neck cover, roof bridge, joint, and roof before removing body panels. Remove the rear cover first for access to the right rear sockets. Pull each panel along its insertion direction.</p>
 <p>Remove the head before lifting the neck cover 60 mm over the retained mechanism. Release accessible key barbs before withdrawing keys. Keep cables clear during removal.</p>
+<p>For speaker-key service, also remove the bus interface. Press the release pad with a blunt 2 mm tool through the removed right panel. Slide the key 18 mm rearward, then withdraw it 140 mm through the right opening. Reverse this path for insertion.</p>
+<p>Before speaker or tray removal, unplug and remove the Jetson, fan, and Jetson tray. Slide the speaker rearward. Lift the empty speaker tray 3 mm, then withdraw it rearward. These sampled CAD paths require physical checks.</p>
+<p>For audio service, open body access and remove the bus interface. Release and remove the speaker key along its documented path. Support the speaker housing and tray while their key is removed.</p>
+<p>Unplug and remove the Jetson, fan, and Jetson tray. Disconnect audio USB. Insert two blunt 2 mm square shafts from the rear beneath the audio shelf at Z 74.5 mm. Press both flex beams 0.5 mm toward −X (left in the front view). Hold the tools during the 0.5 mm module lift and first 5.5 mm of rearward travel. Withdraw the tools, then continue to 200 mm total rearward travel. Unclip the key outside the enclosure. Reverse this route for installation. Physical support, release force, and connector clearance still require checks.</p>
 <p>Full references: <a href="../../CASING_ASSEMBLY.md">casing assembly</a> and <a href="../../JOINT_ASSEMBLY.md">joint assembly</a>. These files are included beside the offline preview directory.</p>
 </section>
 <section id="hardware-list" class="guide assembly-only" aria-labelledby="hardware-heading">
@@ -52,7 +57,7 @@ nav{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0}a{color:#275c71}a:focus-v
 <div class="table-wrap"><table><caption>Components, bearings, and cables</caption><thead><tr><th scope="col">Item</th><th scope="col">Quantity</th><th scope="col">Known reference</th><th scope="col">Status and required check</th></tr></thead><tbody>
 <tr><td>Jetson Orin Nano Super 8 GB</td><td>1</td><td>103 × 90.5 × 35 mm</td><td>Owned. Port coordinates, fan direction, support lands, and retention U.</td></tr>
 <tr><td>Arducam IMX291 USB camera</td><td>1</td><td>37 × 37 mm board; 26 mm holder; 26–27.5 mm lens length; 26 × 26 × 10 mm rear heatsink</td><td>Owned. Board thickness, focus travel, connectors, and safe edge support U.</td></tr>
-<tr><td>Waveshare USB TO AUDIO</td><td>1</td><td>53 × 23.5 × 14.6 mm case, excluding USB plug</td><td>Owned. Microphone openings, connectors, and acoustics U.</td></tr>
+<tr><td>Waveshare USB TO AUDIO</td><td>1</td><td>53 × 23.5 × 14.6 mm installed envelope (X × Y × Z), excluding USB plug. Original manufacturer case dimensions: 53 × 23.5 × 14.6 mm.</td><td>Owned. Flatter reference orientation. Actual microphone direction, connectors, contact lands, and acoustics U.</td></tr>
 <tr><td>Waveshare 8 Ω, 5 W speaker</td><td>1</td><td>100 × 45 × 21 mm reservation</td><td>Owned. Manufacturer image differs; measure the actual speaker.</td></tr>
 <tr><td>Closed joint bearings</td><td>2</td><td>15 mm bore × 24 mm outside diameter × 5 mm width</td><td>Prototype specification. Ownership, exact bearing model, race lands, and fit U.</td></tr>
 <tr><td>Jetson power plug and lead</td><td>1 connection</td><td>Reported 11 mm diameter; 11 mm straight section plus 10 mm right-angle section</td><td>Reported owned dimensions. Exact elbow shape, socket position, and exit fit U.</td></tr>
@@ -70,17 +75,8 @@ nav{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0}a{color:#275c71}a:focus-v
 </section>
 <section id="printed-parts" class="guide assembly-only" aria-labelledby="printed-heading">
 <h2 id="printed-heading">Printed parts</h2>
-<p>The installed preview contains 36 printed pieces: 18 casing pieces and 18 joint pieces. Bearings and reference hardware are separate.</p>
-<ul class="parts-list">
-<li>Body front, rear cover, right panel, and roof: one each.</li>
-<li>Head front, rear cover, and visor: one each.</li>
-<li>Speaker grille and neck cover: one each.</li>
-<li>Speaker, Jetson, audio, and camera cradles: one each.</li>
-<li>Roof bridge: one; bridge pins: two; bridge keepers: two.</li>
-<li>Gear shaft, inner spacer, head flange, and shaft key: one each.</li>
-<li>Tower halves: two; cross pins: four; cross-pin keepers: four.</li>
-<li>Head keys: two; roof keys: two.</li>
-</ul>
+<p>__PRINTED_SUMMARY__</p>
+<ul class="parts-list">__PRINTED_ROWS__</ul>
 <p>Separate gauges, panel coupons, adjustment shims, horn coupons, and the loose drive gear support fit tests. They are excluded from the installed preview.</p>
 <p><a href="../casing/">Casing print files</a> · <a href="../joint/">Joint print files</a> · <a href="../bambu/">P1S projects</a></p>
 </section>
@@ -104,7 +100,7 @@ const uniforms=Object.fromEntries(['angle','view','scale','color','offset'].map(
 for(const p of parts){p.count=p.vertices.length;for(const field of ['vertices','normals']){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(p[field].flat()),gl.STATIC_DRAW);p[field+'Buffer']=b;}delete p.vertices;delete p.normals;}
 let view='three',yaw=0,open=false,hardware=true,reservations=false,shell=false,explode=false,step=6,selected='';
 const stages=['Body and cradles','Stationary components','Body panels and open roof','Preassembled manual joint','Roof bridge and neck cover','Head and camera','Covers and connections'];
-const stageNotes=['Test coupon fits; remove panels before installing cradles.','Fit speaker and audio first. Check servo admission before placing the Jetson. Safe support lands remain U.','Connect accessible body plugs while panels are off. Fit rear and port panels, then the roof plate with the rear admission channel open. Keep bridge, pins, keepers, and head separate.','Preassemble bearings, spacer, tower, and flange. Introduce the joint 5.2 mm high through the rear roof channel. Lower onto the posts, then fit roof keys.','Slide the bridge forward beneath the seated flange. Fit bridge pins and keepers. Fit the removable neck cover before the head.','Lower the head onto flange posts and retain head keys. Install camera frame before camera through the open rear.','Connect the camera with its rear cover open, then fit head covers. Body panel service requires the head, neck cover, bridge, joint, and roof to be removed. Powered servo mounting remains incomplete.'];
+const stageNotes=['Test coupon fits; remove panels before installing cradles.','Fit speaker housing/tray, then the complete preassembled audio module with speaker key absent. Fit speaker key afterward, then Jetson and bus. Check servo admission before Jetson. Safe support lands remain U.','Connect accessible body plugs while panels are off. Fit rear and port panels, then the roof plate with the rear admission channel open. Keep bridge, pins, keepers, and head separate.','Preassemble bearings, spacer, tower, and flange. Introduce the joint 5.2 mm high through the rear roof channel. Lower onto the posts, then fit roof keys.','Slide the bridge forward beneath the seated flange. Fit bridge pins and keepers. Fit the removable neck cover before the head.','Lower the head onto flange posts and retain head keys. Install camera frame before camera through the open rear.','Connect the camera with its rear cover open, then fit head covers. Body panel service requires the head, neck cover, bridge, joint, and roof to be removed. Powered servo mounting remains incomplete.'];
 const selector=document.getElementById('part');
 for(const [i,p] of parts.entries()){const option=document.createElement('option');option.value=String(i);option.textContent=p.label+' · '+(p.reservation?'reserved space':p.hardware?'hardware':study?'candidate shell':'printed');selector.appendChild(option);}
 const views={three:[-25*Math.PI/180,16*Math.PI/180],front:[0,0],rear:[Math.PI,0],side:[-Math.PI/2,0]};

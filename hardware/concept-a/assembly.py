@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import math
+from html import escape
 from pathlib import Path
 
 import cadquery as cq
@@ -256,6 +257,21 @@ def exact_size(shape):
     return high_x - low_x, high_y - low_y, high_z - low_z
 
 
+def printed_inventory(shapes, meta):
+    """Build an offline inventory from the installed printed part metadata."""
+    joint_count = sum(meta[name]["kind"] == "joint" for name in shapes)
+    summary = (
+        f"The installed preview contains {len(shapes)} printed pieces: "
+        f"{len(shapes) - joint_count} casing pieces and {joint_count} joint pieces. "
+        "Bearings and reference hardware are separate."
+    )
+    rows = "".join(
+        f"<li>{escape(name.replace('-', ' ').replace('_', ' ').capitalize())}: one.</li>"
+        for name in shapes
+    )
+    return summary, rows
+
+
 def viewer(
     shapes, meta, hardware_entries=None, destination=None, study_name=None, model_envelopes=None
 ):
@@ -323,7 +339,7 @@ def viewer(
         elif moving:
             group, stage = "head", 5
         else:
-            group, stage = "body", 0
+            group, stage = "body", int(name.endswith("retaining-key") or name == "audio-cradle")
         if name == "body-roof":
             stage = 2
         if name.startswith("roof-bridge") or name == "neck-cover":
@@ -375,10 +391,13 @@ def viewer(
         f"body {dimensions(body)} mm · head {dimensions(head)} mm · "
         f"overall {round(overall[2], 1):g} mm."
     )
+    inventory_summary, inventory_rows = printed_inventory(shapes, meta)
     target = Path(destination) if destination else OUT / "robot-viewer.html"
     target.write_text(
         template.replace("__PART_DATA__", json.dumps(payload, separators=(",", ":")))
         .replace("__MODEL_INFO__", model_info)
+        .replace("__PRINTED_SUMMARY__", inventory_summary)
+        .replace("__PRINTED_ROWS__", inventory_rows)
         .replace("__STUDY_MODE__", "true" if study_name else "false")
         .replace(
             "__STUDY_NOTE__",

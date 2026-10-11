@@ -1,0 +1,14 @@
+[
+  {
+    "name": "jetson-edge-clearance-coupon",
+    "orientation": "Flat base down",
+    "status": "User-measured 11 mm thickness / 10 mm depth only; arbitrary 8 mm test length",
+    "limitation": "No installed location or real Jetson retention claim; force and flex unverified"
+  },
+  {
+    "name": "jetson-11mm-dummy",
+    "orientation": "Flat base down",
+    "status": "User-measured 11 mm thickness / 10 mm depth only; arbitrary 8 mm test length",
+    "limitation": "No installed location or real Jetson retention claim; force and flex unverified"
+  }
+]

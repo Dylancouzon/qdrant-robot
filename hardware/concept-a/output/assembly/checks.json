@@ -812,6 +812,186 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
+      "name": "speaker-retaining-key / gear_shaft",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / inner_spacer",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / head_key_-18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / head_key_18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / head_flange",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / shaft_key",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / roof_key_-21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / roof_key_21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_pin_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_pin_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / tower_left",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-retaining-key / tower_right",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / gear_shaft",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / inner_spacer",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / head_key_-18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / head_key_18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / head_flange",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / shaft_key",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / roof_key_-21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / roof_key_21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_pin_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_pin_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / tower_left",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "audio-retaining-key / tower_right",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
       "name": "speaker-cradle / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -1627,7 +1807,7 @@
       "detail": {
         "samples": 127,
         "proven_intervals": 64,
-        "radius_mm": 70.51248124693954,
+        "radius_mm": 70.5124811646846,
         "minimum_sample_gap_mm": 3.0,
         "method": "Exact midpoint solid distance exceeds maximum angular point travel through each interval.",
         "unresolved": []

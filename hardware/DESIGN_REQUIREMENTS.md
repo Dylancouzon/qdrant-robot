@@ -63,6 +63,10 @@ Dylan clarified the installed power plug on 2026-10-11. Its outside diameter is 
 
 The removable port-side panel now has prototype geometry and checked casing clearances (E). Actual USB plug insertion remains U. The 10 mm protrusion informs its installed pocket after the complete connector shape is measured.
 
+## Press-fit electronics retention
+
+Dylan requested press-fit retention for all electronics on 2026-10-11. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. These measurements describe the grip region, not the complete electronics and fan envelope. Use removable catches with accessible release. Preserve connector, fan, lens, and cable clearance. Printed fit and retention forces still require coupon tests.
+
 ## Component dimension references
 
 These dimensions come from reference designs or manufacturers (E). Fit against Dylan's parts remains unverified (U).

@@ -1,0 +1,581 @@
+[
+  {
+    "name": "speaker key connected",
+    "passed": true,
+    "detail": 2375.9999999999964
+  },
+  {
+    "name": "speaker key / body-front",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / body-rear",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / body-right",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / body-roof",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / head-front",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / head-rear",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / head-visor",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / speaker-grille",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / neck-cover",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / audio-retaining-key",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / speaker-cradle",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / jetson-cradle",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / audio-cradle",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / camera-cradle",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / roof-bridge",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / roof-bridge-pin--1",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / roof-bridge-keeper--1",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / roof-bridge-pin-1",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / roof-bridge-keeper-1",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Jetson",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / One speaker",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / USB audio case",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Audio USB extension",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / STS3215 housing",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Servo ears and leads",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Bus interface",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Servo regulator",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Jetson USB/power plugs",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Fan intake space",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Outlet space",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "speaker key / Camera rear cable space",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "receiver shell connected",
+    "passed": true,
+    "detail": "Actual owner solid"
+  },
+  {
+    "name": "initial speaker / cradle",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "initial cradle / owner",
+    "passed": true,
+    "detail": 0.0
+  },
+  {
+    "name": "housing finite escape X -1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        9.932000000000077,
+        53.83200000000007,
+        118.05200000000019,
+        318.4000000000008,
+        411.0720000000013
+      ]
+    }
+  },
+  {
+    "name": "housing finite escape X 1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        9.932000000000155,
+        53.832000000000164,
+        118.05200000000045,
+        318.4000000000006,
+        411.07200000000125
+      ]
+    }
+  },
+  {
+    "name": "housing finite escape Y -1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        46.00000000000067,
+        276.00000000000074,
+        552.0000000000015,
+        552.0000000000015,
+        552.0000000000015
+      ]
+    }
+  },
+  {
+    "name": "housing finite escape Y 1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        0.0,
+        0.0,
+        192.0000000000009,
+        576.0000000000005,
+        576.0000000000005
+      ]
+    }
+  },
+  {
+    "name": "housing finite escape Z -1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        208.59199999999555,
+        1251.551999999996,
+        3337.471999999995,
+        5006.207999999989,
+        5006.207999999989
+      ]
+    }
+  },
+  {
+    "name": "housing finite escape Z 1",
+    "passed": true,
+    "detail": {
+      "travel_mm": [
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10
+      ],
+      "overlap_mm3": [
+        0.0,
+        13.199999999999884,
+        35.199999999999875,
+        79.19999999999987,
+        105.59999999999809,
+        105.59999999999809
+      ]
+    }
+  },
+  {
+    "name": "cradle finite escape X -1",
+    "passed": true,
+    "detail": [
+      1.319999999999994,
+      12.768000000000276,
+      36.64800000000019,
+      84.40800000000019,
+      175.58399999999978,
+      229.06246445443355
+    ]
+  },
+  {
+    "name": "cradle finite escape X 1",
+    "passed": true,
+    "detail": [
+      1.320000000000006,
+      12.768000000000235,
+      36.64800000000008,
+      84.40800000000016,
+      176.33999999999978,
+      229.8719999999998
+    ]
+  },
+  {
+    "name": "cradle finite escape Y -1",
+    "passed": true,
+    "detail": [
+      2.0320000000000165,
+      8.127999999999965,
+      18.287999999999975,
+      38.60799999999999,
+      650.9799920848187,
+      817.1695691888442
+    ]
+  },
+  {
+    "name": "cradle finite escape Y 1",
+    "passed": true,
+    "detail": [
+      2.0320000000000626,
+      6.400000000000013,
+      15.120000000000068,
+      32.56,
+      68.1600000000001,
+      83.05600000000047
+    ]
+  },
+  {
+    "name": "cradle finite escape Z -1",
+    "passed": true,
+    "detail": [
+      15.424000000001195,
+      38.56000000000003,
+      77.12000000000002,
+      154.24000000000007,
+      353.8079999999993,
+      389.0080000000006
+    ]
+  },
+  {
+    "name": "cradle finite escape Z 1",
+    "passed": true,
+    "detail": [
+      0.0,
+      5.807999999999949,
+      15.487999999999959,
+      34.84800000000002,
+      63.36000000000052,
+      0.0
+    ]
+  },
+  {
+    "name": "housing lift/tilt (1, 0, 0) -1",
+    "passed": true,
+    "detail": [
+      7.323561952606825,
+      130.5528707730083,
+      225.58785369954944,
+      301.8190073392376,
+      321.08774191859254,
+      340.3792504552097,
+      394.500707275843,
+      516.9377357359556,
+      618.0060811695002,
+      684.778992029293
+    ]
+  },
+  {
+    "name": "housing lift/tilt (1, 0, 0) 1",
+    "passed": true,
+    "detail": [
+      17.805153891351743,
+      38.96064079507794,
+      54.857348741310716,
+      116.47601882302125,
+      133.4807047833359,
+      96.17067393018966,
+      41.55487049732378,
+      34.489670182912356,
+      27.937157911819803,
+      21.896146520432342
+    ]
+  },
+  {
+    "name": "housing lift/tilt (0, 1, 0) -1",
+    "passed": true,
+    "detail": [
+      23.852462307488075,
+      91.23941078771925,
+      141.52219845023365,
+      196.12292991999982,
+      258.3024079251338,
+      319.3331048022062,
+      378.5400164494026,
+      435.59064375577435,
+      486.23457416400873,
+      524.8274139659809
+    ]
+  },
+  {
+    "name": "housing lift/tilt (0, 1, 0) 1",
+    "passed": true,
+    "detail": [
+      23.852462307488544,
+      91.23941078781823,
+      141.52219845029654,
+      196.12292992003253,
+      258.3024079251378,
+      319.33310480222667,
+      378.5400164494221,
+      435.5906437557874,
+      486.2345741640048,
+      524.8274139659734
+    ]
+  },
+  {
+    "name": "housing lift/tilt (0, 0, 1) -1",
+    "passed": true,
+    "detail": [
+      39.19185428719555,
+      137.89751472208047,
+      230.8963848550743,
+      321.0795196537797,
+      390.9326648722228,
+      395.5996660028758,
+      367.50137086618116,
+      323.66252503940876,
+      269.4037576620452,
+      264.4736820157901
+    ]
+  },
+  {
+    "name": "housing lift/tilt (0, 0, 1) 1",
+    "passed": true,
+    "detail": [
+      39.19185428719503,
+      137.89751472208278,
+      230.89638485507288,
+      321.07951965378186,
+      390.9326648722298,
+      395.59966600287584,
+      367.50137086618,
+      323.6625250394108,
+      269.40375766204437,
+      264.47368201578973
+    ]
+  },
+  {
+    "name": "rigid key withdrawal stopped",
+    "passed": true,
+    "detail": {
+      "overlap_mm3": 0.8639999999999993,
+      "travel_mm": 2,
+      "nominal_detent_engagement_mm": 0.6
+    }
+  },
+  {
+    "name": "released key actual neighbor path",
+    "passed": true,
+    "detail": {
+      "travel_mm": 18,
+      "spacing_mm": 0.5,
+      "removed": [
+        "body-rear",
+        "body-right",
+        "body-roof",
+        "camera-cradle",
+        "head-front",
+        "head-rear",
+        "head-visor",
+        "neck-cover",
+        "speaker-retaining-key",
+        "joint",
+        "roof bridge and pins",
+        "Bus interface"
+      ],
+      "retained": "Speaker, audio, Jetson, servo/regulator, plugs and airflow reservations",
+      "collisions": [],
+      "limitation": "Rigid approximation of elastic release; printed flex and finger access U"
+    }
+  },
+  {
+    "name": "complete released key extraction",
+    "passed": true,
+    "detail": {
+      "segments": "18 mm rear at 0.5 mm, then 140 mm right at 2 mm",
+      "collisions": [],
+      "limitation": "Sampled actual solids, not continuous clearance proof"
+    }
+  },
+  {
+    "name": "reverse key insertion",
+    "passed": true,
+    "detail": {
+      "segments": "Same complete route reversed, detent held released",
+      "collisions": [],
+      "limitation": "Sampled actual solids, not continuous clearance proof"
+    }
+  },
+  {
+    "name": "key completely outside enclosure",
+    "passed": true,
+    "detail": "Actual complete key at final extraction pose"
+  },
+  {
+    "name": "speaker full rear removal",
+    "passed": true,
+    "detail": {
+      "additional_removals": [
+        "Jetson (unplugged, with fan and associated reservations)",
+        "jetson-cradle"
+      ],
+      "travel_mm": 200,
+      "collisions": [],
+      "limitation": "Sampled actual solids, not continuous clearance proof"
+    }
+  },
+  {
+    "name": "speaker cradle complete removal",
+    "passed": true,
+    "detail": {
+      "additional_removals": [
+        "Jetson (unplugged, with fan and associated reservations)",
+        "jetson-cradle",
+        "One speaker"
+      ],
+      "segments": "3 mm lift at 0.1 mm, then 200 mm rear at 2 mm",
+      "collisions": [],
+      "limitation": "Sampled actual solids, not continuous clearance proof"
+    }
+  },
+  {
+    "name": "release tool access",
+    "passed": true,
+    "detail": "2 mm blunt tip enters from removed right panel; printed release force remains U"
+  },
+  {
+    "name": "Speaker upper rear housing corner -47 projected upper stop",
+    "passed": true,
+    "detail": 17.599999999999937
+  },
+  {
+    "name": "Speaker upper rear housing corner 47 projected upper stop",
+    "passed": true,
+    "detail": 17.599999999999937
+  },
+  {
+    "name": "speaker key clear of every outlet ray",
+    "passed": true,
+    "detail": 0.0
+  }
+]

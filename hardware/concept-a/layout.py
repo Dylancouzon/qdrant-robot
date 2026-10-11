@@ -96,11 +96,14 @@ def hardware():
         ),
         item(
             "USB audio case",
-            (53, 14.6, 23.5),
+            (53, 23.5, 14.6),
             (-27, -40, 88),
             "#767a84",
             "hardware",
-            ("E: case only, without USB plug. Orient microphone end toward a front sound channel."),
+            (
+                "E: case only, without USB plug. Flatter reference orientation; "
+                "actual microphone and USB direction remain U."
+            ),
             "https://www.waveshare.com/usb-to-audio.htm",
         ),
         item(
@@ -205,6 +208,24 @@ def hardware():
                 "connector loading require measurement."
             ),
         ),
+    ]
+
+
+def speaker_contact_regions():
+    """Provisional rigid housing contact windows; verify the owned speaker frame first."""
+    return [
+        item(
+            "Speaker upper rear housing corner " + str(x),
+            (6, 4, 1),
+            (x, -37, 69.5),
+            "#ad76bc",
+            "contact region",
+            (
+                "User describes a rectangular housing. Frame/terminal contact is physical U; "
+                "use a dummy."
+            ),
+        )
+        for x in (-47, 47)
     ]
 
 

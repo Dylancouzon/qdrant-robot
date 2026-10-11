@@ -259,17 +259,49 @@ def _floor_cradles(front):
 
 
 def _audio_cradle(front):
-    # Forward shelf extension supports audio without consuming the raised speaker.
-    audio = B((54.8, 26.2, 2.4), (-27, -43.9, 74.65))
-    audio = audio.fuse(B((1.2, 18, 5), (-54.5, -40, 78.35)), B((54.8, 1.2, 5), (-27, -48.3, 78.35)))
+    # Flatter housing bottom80.7; shelf top80.3 preserves0.4mm nominal clearance.
+    audio = B((54.8, 30.1, 2.4), (-27, -43.9, 79.1))
+    audio = audio.fuse(
+        B((1.2, 25.9, 5), (-54.5, -40, 82.8)),
+        B((54.8, 1.2, 5), (-27, -52.75, 82.8)),
+        B((19, 2.4, 5), (-44, -26.85, 82.8)),
+    )
+    audio = audio.fuse(B((19, 5.15, 2.4), (-44, -28.225, 79.1)))
     for px in (-44, -8):
-        beam = B((6, 12, 6), (px, -60.9, 70.45))
-        beam = beam.cut(B((102, 23, 47), (0, -45.5, 47.5)))
-        front = front.fuse(beam, B((2, 2, 2), (px, -55.9, 74.45)))
-        audio = audio.cut(B((2.2, 2.2, 2.2), (px, -55.9, 74.45)))
-    audio = audio.cut(B((4, 30, 10), (1.6, -40, 82)))
+        beam = B((6, 12, 6), (px, -60.9, 74.9))
+        front = front.fuse(beam, B((2, 2, 2), (px, -55.9, 78.9)))
+        audio = audio.cut(B((2.2, 2.2, 2.2), (px, -55.9, 78.9)))
+    audio = audio.cut(B((4, 35, 20), (1.6, -40, 86.45)))
     audio = audio.intersect(body_envelopes(wall=3.4)[1])
     return front, audio.clean()
+
+
+def _audio_retention(front, cradle):
+    """Outside-assembled module key captures housing corners and docks the shelf."""
+    key = B((46.5, 2.4, 3), (-22.95, -54.3, 97))
+    for sign, x in ((-1, -54.9), (1, 0.9)):
+        key = key.fuse(B((2.4, 2.4, 13), (x, -52.25, 92)))
+        key = key.fuse(
+            B((9.1 if sign < 0 else 6, 4, 3), (-49.15 if sign < 0 else -3.3, -51.65, 97))
+        )
+    for x in (-44, -8):
+        # Short docking foot; the taller upright belongs to the housing frame.
+        receiver = B((11.4, 7.6, 8.8), (x, -54.5, 75.9))
+        ledge = B((16, 7.6, 2.4), (x, -54.5, 76.7))
+        front = front.fuse(receiver, ledge)
+        front = front.cut(B((4.4, 8, 24), (x, -52.9, 75.5)))
+        front = front.cut(B((1.1, 2.8, 0.8), (x + 2.75, -54.5, 72)))
+        cradle = cradle.cut(B((12, 9, 12), (x, -54.5, 79)))
+        cradle = cradle.cut(B((24.4, 9, 6), (x + 3, -54.5, 83.3)))
+        spine = B((2.4, 2.4, 24), (x, -54.5, 83.5))
+        spine = spine.cut(B((1.6, 3, 8), (x + 0.4, -54.5, 77)))
+        spine = spine.fuse(B((1.6, 2.4, 0.6), (x + 2, -54.5, 72)))
+        spine = spine.fuse(B((2.4, 3.4, 1), (x, -55, 79)))
+        key = key.fuse(spine)
+        key = key.fuse(B((16.4, 2.4, 2.4), (x + 3, -53.15, 81.7)))
+        key = key.fuse(B((2, 2, 2.2), (x + 7.5, -53.2, 79.4)))
+        cradle = cradle.cut(B((2.4, 2.4, 3), (x + 7.5, -53.2, 79.3)))
+    return front.clean(), cradle.clean(), key.clean()
 
 
 def _camera_cradle(head):
@@ -286,6 +318,32 @@ def _camera_cradle(head):
     return head, frame.clean()
 
 
+def _speaker_retention(front, cradle):
+    """One rear frame captures the dummy housing and locks its tray to floor receivers."""
+    key = B((103, 2.4, 2.4), (0, -32.6, 71.4)).fuse(B((103, 2.4, 2.4), (0, -32.6, 28.4)))
+    for x in (-54.6, 54.6):
+        receiver = B((7.6, 12, 21.4), (x, -45.2, 13.9))
+        receiver = receiver.cut(B((2.8, 14, 2.8), (x, -45.2, 20.8)))
+        if x > 0:
+            receiver = receiver.cut(B((2.8, 14, 1.6), (x, -45.2, 18.6)))
+        front = front.fuse(receiver)
+        # Side arms stay forward of the first outlet row; rear bars stay inside X54.
+        key = key.fuse(B((2.4, 2.4, 52.2), (x, -37.8, 46.5)))
+        key = key.fuse(B((2.4, 16, 2.4), (x, -44.6, 20.8)))
+        for z in (28.4, 71.4):
+            key = key.fuse(B((6.2, 2.4, 2.4), (np.sign(x) * 53.3, -37.8, z)))
+            key = key.fuse(B((2.4, 7.6, 2.4), (np.sign(x) * 51.6, -35.2, z)))
+        cradle = cradle.cut(B((6, 8, 6), (np.sign(x) * 51, -35, 27.6)))
+        cradle = cradle.fuse(B((4, 5, 2.4), (np.sign(x) * 51.2, -36.6, 23.4)))
+        key = key.fuse(B((4.8, 6, 2.4), (np.sign(x) * 53.4, -35.5, 26)))
+        key = key.fuse(B((6, 7, 2.4), (np.sign(x) * 47.5, -35.5, 71.4)))
+    # One accessible detent prevents withdrawal; rigid receiver roofs resist upward load.
+    key = key.cut(B((3, 8, 1.6), (54.6, -48.6, 21.2)))
+    key = key.fuse(B((2.4, 0.6, 2.4), (54.6, -52.3, 21.6)))
+    key = key.fuse(B((2.4, 4, 0.8), (54.6, -53.8, 20.0)))
+    return front.clean(), cradle.clean(), key.clean()
+
+
 def build_parts():
     """Assembly coordinates match layout.py. Panel fits have 0.1 mm per side."""
     front, rear, right = _body_panels()
@@ -296,6 +354,10 @@ def build_parts():
     front, mounts = _floor_cradles(front)
     front, mounts["audio-cradle"] = _audio_cradle(front)
     head, mounts["camera-cradle"] = _camera_cradle(head)
+    front, mounts["speaker-cradle"], speaker_key = _speaker_retention(
+        front, mounts["speaker-cradle"]
+    )
+    front, mounts["audio-cradle"], audio_key = _audio_retention(front, mounts["audio-cradle"])
     outer, _ = body_envelopes()
     front, rear, right = [p.intersect(outer) for p in (front, rear, right)]
     head_outer, head_inner = head_envelopes()
@@ -348,6 +410,8 @@ def build_parts():
             "head-visor": visor.clean(),
             "speaker-grille": grille.clean(),
             "neck-cover": neck.clean(),
+            "speaker-retaining-key": speaker_key,
+            "audio-retaining-key": audio_key,
         }
         | mounts
         | bridge_parts
@@ -373,6 +437,8 @@ def metadata():
             "speaker-grille",
             "neck-cover",
             "speaker-cradle",
+            "speaker-retaining-key",
+            "audio-retaining-key",
             "jetson-cradle",
             "audio-cradle",
             "camera-cradle",
@@ -420,7 +486,7 @@ def print_transform(name, shape):
         shape = shape.rotate((0, 0, 0), (1, 0, 0), 180)
     elif name == "body-rear":
         shape = shape.rotate((0, 0, 0), (1, 0, 0), -90 - math.degrees(math.atan(0.0625)))
-    elif name == "head-rear":
+    elif name in ("head-rear", "speaker-retaining-key", "audio-retaining-key"):
         shape = shape.rotate((0, 0, 0), (1, 0, 0), -90)
     elif name.startswith("roof-bridge-pin-"):
         sign = int(name.rsplit("-", 1)[1]) if "--" not in name else -1
@@ -525,8 +591,8 @@ def check(parts):  # noqa: C901 - one ordered CAD validation report
                     )
                 )
     for x in (-44, -8):
-        core = B((6, 2.4, 2.4), (x, -56.1, 72.225))
-        # The flat central wall keeps this entire specified support core rectangular.
+        core = B((2.4, 7.6, 6), (x + 4.5, -54.5, 76.5))
+        # The uncut outer docking land connects the receiver to the actual front wall.
         supports.append(
             (
                 f"audio support {x}",
@@ -552,13 +618,16 @@ def check(parts):  # noqa: C901 - one ordered CAD validation report
     # Actual section areas along declared load beams, not only their bounding boxes.
     for x in (-44, -8):
         areas = [
-            parts["body-front"].intersect(B((6, 0.1, 2.4), (x, y, 72.225))).Volume() / 0.1
-            for y in np.linspace(-56.1, -57.2, 8)
+            parts["body-front"].intersect(B((2.4, 0.1, 6), (x + 4.5, y, 76.5))).Volume() / 0.1
+            for y in np.linspace(-58.25, -50.75, 16)
         ]
         record(
             f"audio beam {x} load sections",
             min(areas) >= 14.4 - 1e-5,
-            f"Actual minimum section area {min(areas):.6f} mm² over8 sections; 2.4×6 mm reference.",
+            (
+                f"Actual minimum section area {min(areas):.6f} mm² over 16 sections "
+                "along the complete docking land; 2.4×6 mm reference."
+            ),
         )
     for x in (-46, 46):
         for y in (-36, 36):
@@ -705,6 +774,20 @@ def _check_admission(parts, hardware, record):
             continue
         sx, sy, sz = p["size"]
         x, y, z = p["center"]
+        if p["name"] == "USB audio case":
+            # Assemble the housing and key outside, then insert the complete module.
+            # The module route is checked by check_retention; no individual in-shell path.
+            sweep = B((sx, sy, sz + 120), (x, y, z + 60))
+            overlap = sweep.intersect(parts["audio-cradle"]).Volume()
+            record(
+                "USB audio case outside module assembly",
+                overlap < 1e-5,
+                (
+                    f"Continuous 120 mm vertical housing admission versus loose tray: "
+                    f"{overlap:.6f} mm³."
+                ),
+            )
+            continue
         lift = 0  # Rear-open speaker guide permits nominal-height slide below audio beams.
         sweep = B((sx, 200 + sy, sz), (x, y + 100, z + lift))
         settling = B((sx, sy, sz + lift), (x, y, z + lift / 2))
@@ -916,6 +999,14 @@ def export_parts(parts, coupons):
     """Export already validated geometry; main performs the full CAD checks first."""
     manifest = []
     support = {
+        "audio-retaining-key": (
+            "Rear housing-hook faces down; support the raised frame bar and docking legs. "
+            "Test release beams with a coupon."
+        ),
+        "speaker-retaining-key": (
+            "Rear frame face down. Support projecting feet and corner hooks locally. "
+            "Test the release beam with a coupon before use."
+        ),
         "speaker-grille": (
             "Rear down on two flat tongue tips. Support the raised curved panel locally; "
             "inspect holes and support removal."

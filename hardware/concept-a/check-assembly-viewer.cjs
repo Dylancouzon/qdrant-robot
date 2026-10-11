@@ -12,7 +12,7 @@ if (!process.argv[2]) {
   }
   assert(source.includes('15 mm bore × 24 mm outside diameter × 5 mm width'));
   assert(source.includes('Pending powered hardware'));
-  assert(source.includes('36 printed pieces'));
+
 }
 const isStudy = source.includes('const study=true;');
 const script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
@@ -61,6 +61,24 @@ const data = JSON.parse(source.match(/const parts=(.*);/)[1]);
 if(!isStudy){
 assert.equal(data.filter(p=>p.name.startsWith('bearing_')).length,2);
 assert(!data.some(p=>p.name==='manual_drive_gear'));
+const speakerKey = data.find(p=>p.name==='speaker-retaining-key');
+if(speakerKey){
+  assert.equal(speakerKey.stage,1);
+  assert.equal(speakerKey.exterior,false);
+  assert.equal(speakerKey.service_removed,false);
+  assert(source.includes('18 mm rearward'));
+  assert(source.includes('140 mm through'));
+}
+const audioKey=data.find(p=>p.name==='audio-retaining-key');
+if(audioKey){
+  assert.equal(audioKey.stage,1);
+  assert.equal(audioKey.exterior,false);
+  assert.equal(audioKey.service_removed,false);
+  assert.equal(data.find(p=>p.name==='audio-cradle').stage,1);
+  assert(source.includes('first 5.5 mm'));
+  assert(source.includes('two blunt 2 mm square shafts'));
+}
+assert(source.includes(`${data.filter(p=>!p.hardware).length} printed pieces`));
 assert(source.includes('overall 236 mm'));
 assert(source.includes('head 116 × 80 × 56 mm'));
 assert(data.find(p=>p.name==='body-roof').stage < data.find(p=>p.name==='tower_left').stage);
