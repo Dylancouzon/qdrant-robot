@@ -20,3 +20,9 @@ Observed in Bambu Studio on the Mac, 2026-10-11 (E). The imported trial measures
 The bearing and camera coupons were regenerated with welded indexed meshes. Both now import without open-edge warnings and slice successfully with the same settings. Bambu confirms 152 × 36 × 6 mm for the bearing coupon and 44 × 36 × 10 mm for the camera coupon. Their estimated total times are 27 minutes, two seconds, and 20 minutes, 14 seconds, respectively.
 
 Physical printing, installed plug fit, adjacent USB clearance, and final casing integration remain U. The trial is ready for a physical fit test. No print was sent.
+
+## Complete casing and joint prototype
+
+Bambu Studio 02.08.02.61 sliced all 44 individual casing, joint, cradle, and gauge projects through its official CLI (E). Each uses the saved native P1S profile, PLA, a 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All returned success with empty warning messages. Exported object bounds and triangle counts match their source meshes. No print was sent.
+
+[The slicing report](output/bambu/slice-checks.json) records each source hash, project hash, estimate, and result. [The P1S projects](output/bambu/) preserve the print orientations and saved settings. Inspect each project's supports before physical printing. Native UI inspection of these new projects remains incomplete because the app control returned `noWindowsAvailable` and `timeoutReached` after opening the front-shell project. CLI slicing does not establish safe support removal or physical retention.

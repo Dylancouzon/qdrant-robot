@@ -1,0 +1,20 @@
+{
+  "bearing-fit": {
+    "size_mm": [
+      152.0,
+      36.0,
+      6.01
+    ],
+    "watertight": true,
+    "purpose": "Fit coupon only. No servo mount or enclosure fit is certified."
+  },
+  "camera-thickness-fit": {
+    "size_mm": [
+      44.0,
+      36.0,
+      10.0
+    ],
+    "watertight": true,
+    "purpose": "Fit coupon only. No servo mount or enclosure fit is certified."
+  }
+}

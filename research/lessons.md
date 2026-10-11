@@ -83,7 +83,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Concept A with body speaker and owned STS3215 | Repacking reduces modeled height from 255 to 230 mm. The 391 packaging checks and 10 power-exit trial checks pass (E). Trial slicing passes on P1S. CAD face seams required welding before 3MF export. Physical fit, cable motion, and thermal behavior remain U | Power trial delivered; casing and joint next | H1; `hardware/concept-a/README.md` |
+| Concept A with body speaker and owned STS3215 | Repacking reduces modeled height from 255 to 230 mm. Actual casing and manual joint pass 883 CAD checks (E). All 44 P1S prototype projects slice. Indexed mesh seams require welding. A removable roof bridge avoids trapped joint assembly. Physical retention, powered coupling, cables, and thermal behavior remain U | Manual prototype delivered; physical gauges and powered interfaces next | H1; `hardware/concept-a/README.md` |
 
 ## System and memory
 

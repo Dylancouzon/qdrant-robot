@@ -1,0 +1,359 @@
+[
+  {
+    "name": "body-front",
+    "base_contact_area_mm2": 19560.73,
+    "file": "body-front.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      133.601,
+      159.801,
+      109.601
+    ],
+    "cad_volume_mm3": 122486.526,
+    "support": "Front exterior face down. Support the short raised receiver blocks and roof catches locally.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "body-rear",
+    "base_contact_area_mm2": 17785.2,
+    "file": "body-rear.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      131.0,
+      157.2,
+      14.5
+    ],
+    "cad_volume_mm3": 43625.664,
+    "support": "Rear exterior face down. Support the raised roof catch beams locally.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "body-right",
+    "base_contact_area_mm2": 13668.0,
+    "file": "body-right.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      154.0,
+      106.8,
+      7.8
+    ],
+    "cad_volume_mm3": 33241.6,
+    "support": "Right exterior face down. No major supports; inspect small receiver bridges.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "body-roof",
+    "base_contact_area_mm2": 12901.37,
+    "file": "body-roof.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      136.0,
+      112.0,
+      8.205
+    ],
+    "cad_volume_mm3": 40900.697,
+    "support": "Flat underside on bed, posts up. The 1.8 mm post slot roof is a short bridge; inspect or support locally.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "head-front",
+    "base_contact_area_mm2": 1325.44,
+    "file": "head-front.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      100.002,
+      50.003,
+      69.602
+    ],
+    "cad_volume_mm3": 49727.334,
+    "support": "Front exterior face down. Support local rear-cover socket bridges. Print the visor separately.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "head-rear",
+    "base_contact_area_mm2": 4258.04,
+    "file": "head-rear.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      95.2,
+      45.2,
+      6.4
+    ],
+    "cad_volume_mm3": 10251.296,
+    "support": "Rear exterior face down. No major supports; inspect four small tongues.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "head-visor",
+    "base_contact_area_mm2": 2056.48,
+    "file": "head-visor.3mf",
+    "color": "#222326",
+    "print_size_mm": [
+      92.0,
+      38.0,
+      5.005
+    ],
+    "cad_volume_mm3": 4759.881,
+    "support": "Black exterior face down. Decorative recess needs a local 0.6 mm support patch or remove it for a plain visor.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "speaker-cradle",
+    "base_contact_area_mm2": 2207.92,
+    "file": "speaker-cradle.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      103.2,
+      24.2,
+      7.4
+    ],
+    "cad_volume_mm3": 6799.008,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "jetson-cradle",
+    "base_contact_area_mm2": 3233.44,
+    "file": "jetson-cradle.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      91.7,
+      38.2,
+      7.4
+    ],
+    "cad_volume_mm3": 8532.456,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "audio-cradle",
+    "base_contact_area_mm2": 1239.76,
+    "file": "audio-cradle.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      55.5,
+      22.8,
+      7.4
+    ],
+    "cad_volume_mm3": 3408.432,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "camera-cradle",
+    "base_contact_area_mm2": 333.75,
+    "file": "camera-cradle.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      41.8,
+      43.5,
+      3.2
+    ],
+    "cad_volume_mm3": 1059.36,
+    "support": "Front frame face down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "roof-bridge",
+    "base_contact_area_mm2": 1376.99,
+    "file": "roof-bridge.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      32.01,
+      53.467,
+      3.21
+    ],
+    "cad_volume_mm3": 4374.113,
+    "support": "Flat underside on bed. Inspect the short pin-slot bridges.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "roof-bridge-pin--1",
+    "base_contact_area_mm2": 16.0,
+    "file": "roof-bridge-pin--1.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      3.2,
+      5.0,
+      55.6
+    ],
+    "cad_volume_mm3": 242.8,
+    "support": "Outer head face on bed, pin upright. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "roof-bridge-keeper--1",
+    "base_contact_area_mm2": 10.32,
+    "file": "roof-bridge-keeper--1.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      2.8,
+      6.0,
+      0.8
+    ],
+    "cad_volume_mm3": 8.256,
+    "support": "Broad face on bed. Verify the small flex barbs with PLA before use.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "roof-bridge-pin-1",
+    "base_contact_area_mm2": 16.0,
+    "file": "roof-bridge-pin-1.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      3.2,
+      5.0,
+      55.6
+    ],
+    "cad_volume_mm3": 242.8,
+    "support": "Outer head face on bed, pin upright. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "roof-bridge-keeper-1",
+    "base_contact_area_mm2": 10.32,
+    "file": "roof-bridge-keeper-1.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      2.8,
+      6.0,
+      0.8
+    ],
+    "cad_volume_mm3": 8.256,
+    "support": "Broad face on bed. Verify the small flex barbs with PLA before use.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "speaker-gauge",
+    "base_contact_area_mm2": 2808.96,
+    "file": "speaker-gauge.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      105.6,
+      26.6,
+      8.0
+    ],
+    "cad_volume_mm3": 8658.048,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "jetson-gauge",
+    "base_contact_area_mm2": 3901.66,
+    "file": "jetson-gauge.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      96.1,
+      40.6,
+      8.0
+    ],
+    "cad_volume_mm3": 11543.608,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "audio-case-gauge",
+    "base_contact_area_mm2": 1183.72,
+    "file": "audio-case-gauge.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      58.6,
+      20.2,
+      8.0
+    ],
+    "cad_volume_mm3": 4025.2,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "panel-socket-coupon",
+    "base_contact_area_mm2": 1690.0,
+    "file": "panel-socket-coupon.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      65.0,
+      26.0,
+      6.0
+    ],
+    "cad_volume_mm3": 9977.16,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  },
+  {
+    "name": "panel-tongue-coupon",
+    "base_contact_area_mm2": 600.0,
+    "file": "panel-tongue-coupon.3mf",
+    "color": "#e7dfcf",
+    "print_size_mm": [
+      30.0,
+      25.0,
+      5.0
+    ],
+    "cad_volume_mm3": 1260.0,
+    "support": "Flat tray/coupon base down. No major supports.",
+    "mesh_closed": true,
+    "raw_index_edges_twice": true,
+    "bed": "P1S 256\u00d7256 mm",
+    "status": "Export checked; slice and physical coupon checks pending"
+  }
+]

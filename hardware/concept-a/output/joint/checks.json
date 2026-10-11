@@ -1,0 +1,1435 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "gear_shaft CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "gear_shaft bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "inner_spacer CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "inner_spacer bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "adjustment_shim_0_2 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "adjustment_shim_0_2 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "adjustment_shim_0_4 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "adjustment_shim_0_4 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "head_key_-18 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "head_key_-18 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "head_key_18 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "head_key_18 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "head_flange CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "head_flange bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "shaft_key CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "shaft_key bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "roof_key_-21 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "roof_key_-21 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "roof_key_21 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "roof_key_21 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_pin_164_-19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_pin_164_-19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_keeper_164_-19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_keeper_164_-19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_pin_164_19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_pin_164_19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_keeper_164_19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_keeper_164_19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_pin_170_-19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_pin_170_-19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_keeper_170_-19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_keeper_170_-19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_pin_170_19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_pin_170_19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "closure_keeper_170_19 CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "closure_keeper_170_19 bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "tower_left CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "tower_left bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "tower_right CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "tower_right bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "manual_drive_gear CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "manual_drive_gear bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "horn_clearance_coupon CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "horn_clearance_coupon bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "servo_housing_gauge CAD",
+      "passed": true,
+      "detail": "One valid connected printed solid."
+    },
+    {
+      "name": "servo_housing_gauge bed",
+      "passed": true,
+      "detail": "Millimeter closed mesh; 256 mm bed."
+    },
+    {
+      "name": "gear_shaft / inner_spacer",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / head_key_-18",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / head_key_18",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / head_flange",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / shaft_key",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / head_key_-18",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / head_key_18",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / head_flange",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / shaft_key",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "inner_spacer / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / head_key_18",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / head_flange",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / shaft_key",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_-18 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / head_flange",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / shaft_key",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_key_18 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / shaft_key",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head_flange / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / roof_key_-21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "shaft_key / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / roof_key_21",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_-21 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "roof_key_21 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_-19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_pin_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_-19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_164_19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_164_19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_-19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_-19 / closure_pin_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_-19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_-19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_-19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_-19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_19 / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_pin_170_19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_19 / tower_left",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_19 / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "closure_keeper_170_19 / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "tower_left / tower_right",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "tower_left / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "tower_right / manual_drive_gear",
+      "passed": true,
+      "detail": "Undeclared printed overlap 0 mm\u00b3."
+    },
+    {
+      "name": "gear_shaft / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "gear_shaft / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "gear_shaft / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "inner_spacer / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "inner_spacer / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "inner_spacer / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_-18 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_-18 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_-18 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_18 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_18 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_key_18 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_flange / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_flange / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "head_flange / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "shaft_key / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "shaft_key / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "shaft_key / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_-21 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_-21 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_-21 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_21 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_21 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "roof_key_21 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_-19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_-19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_-19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_-19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_-19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_-19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_164_19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_164_19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_-19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_-19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_-19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_-19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_-19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_-19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_pin_170_19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_19 / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_19 / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "closure_keeper_170_19 / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_left / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_left / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_left / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_right / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_right / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "tower_right / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "manual_drive_gear / bearing_154",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "manual_drive_gear / bearing_170",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "manual_drive_gear / servo_housing",
+      "passed": true,
+      "detail": "Hardware overlap 0 mm\u00b3; nominal contact surfaces have zero volume."
+    },
+    {
+      "name": "stop -1",
+      "passed": true,
+      "detail": "First full-solid stop contact at -80.02087 degrees; supporting webs included."
+    },
+    {
+      "name": "stop 1",
+      "passed": true,
+      "detail": "First full-solid stop contact at 80.02087 degrees; supporting webs included."
+    },
+    {
+      "name": "actual involute gear mesh sweep",
+      "passed": true,
+      "detail": "81 positions at two-degree yaw spacing. Peak tooth solid overlap 0 mm\u00b3."
+    },
+    {
+      "name": "continuous CAD tooth clearance bound",
+      "passed": true,
+      "detail": "Minimum sampled solid distance 0.117730 mm over one tooth period, versus 0.030800 mm combined motion bound to nearest sample;109 samples. Distance evaluated inX+/-10,Y-20..-14; omitted tooth volumes have>=2 mm separation by18 mm disk bounds."
+    },
+    {
+      "name": "rotating assembly / complete tower sweep",
+      "passed": true,
+      "detail": "Peak overlap 0 mm\u00b3 through +/-80 degrees."
+    },
+    {
+      "name": "rotating assembly / stationary hardware sweep",
+      "passed": true,
+      "detail": "Peak overlap 0 mm\u00b3; all layout hardware and reservations."
+    },
+    {
+      "name": "closed bearing admission",
+      "passed": true,
+      "detail": "Both rings slide over open journal; peak overlap 0 mm\u00b3. Tower remains split."
+    },
+    {
+      "name": "shaft key / tower insertion",
+      "passed": true,
+      "detail": "Complete rigid shaft key translates along X through tower notch. Peak overlap 0 mm\u00b3."
+    },
+    {
+      "name": "head key / camera insertion",
+      "passed": true,
+      "detail": "Keys translate40 mm along Y with cover removed. Camera solid overlap 0 mm\u00b3. Barb compression at post requires a physical coupon."
+    },
+    {
+      "name": "rear insertion rigid key bodies and heads",
+      "passed": true,
+      "detail": "Full rigid bodies and enlarged heads enter receiver slots from positiveY. Peak overlap 0 mm\u00b3. Only protruding elastic barbs omitted; physical compression remains U."
+    },
+    {
+      "name": "axial freedom",
+      "passed": true,
+      "detail": "151.2 to172.8 mm collar span minus two5 mm bearings and11 mm spacer gives0.6 mm nominal axial freedom. Measure before adding shims."
+    },
+    {
+      "name": "race radial separation",
+      "passed": true,
+      "detail": "22 mm keeper ID versus 20 mm rotating spacer OD leaves one mm radial gap. Actual race contact lands remain U."
+    }
+  ]
+}

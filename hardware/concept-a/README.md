@@ -1,93 +1,59 @@
-# Concept A packaging study
+# Concept A mechanical prototype
 
-The visor concept keeps one speaker and the Jetson in a stationary body. The camera head rotates on a bearing-supported neck. This study reserves the hardware, plugs, cables, and airflow spaces. It does not contain a finished printable casing or component mounts.
+The removable casing and bearing-supported camera head now have actual printable parts. The body measures 136 × 112 × 160 mm. The head measures 100 × 72 × 50 mm. Overall height is 230 mm (E). The existing STS3215 fits its reserved body space. Its installed mount and powered coupling remain pending measurements.
 
-## Review the layout
+![Actual robot casing and manual joint, shown from the front and rear](output/assembly/robot-preview.png)
 
-Open `output/layout-viewer.html` in a browser. Select a component to see its dimensions and source. Change the view or head angle to inspect the layout. Joint outlines are simplified; STEP includes the spacer, collar, and keeper. Reserved spaces have translucent fills. The viewer works offline and uses no external libraries.
+## View the complete design
 
-The body envelope is 136 × 112 × 160 mm. The head envelope is 100 × 72 × 50 mm. Overall height is 230 mm. The rotating head sweeps a 123.22 mm diameter. These are calculated Mac dimensions (E), not a measured assembled robot. The final rounded casing may need more room.
+Open [the offline CAD viewer](output/assembly/robot-viewer.html) in a browser. Select front, rear, side, or 3D views. Turn the head through ±80°. Open the service covers and show component envelopes. The viewer draws the actual printed triangles. Hardware blocks represent reference envelopes and reserved spaces. Browser appearance remains U; the viewer control checks pass.
 
-`output/layout-study.step` contains the same component envelopes, shaft, bearings, flange, keeper, collar, and drive reservations. The drive circles reserve two module-one, 34-tooth gears at 34 mm center spacing. They do not contain gear teeth. Shell blocks deliberately overlap their contents because they describe the outside envelope. STEP viewing transparency depends on the receiving CAD application.
+Use [the complete assembled STEP](output/assembly/robot-assembled.step) in a CAD application. It contains 35 printed assembly parts, including the loose manual drive coupon. The [approved exterior concept](output/exterior-concept.png) provides the appearance target. The CAD preview shows the current mechanical prototype, with smaller corner radii and exposed service interfaces.
 
-`output/layout-dimensions.png` and `.svg` show front, side, and top projections. `output/checks.json` records the checks and unresolved physical requirements.
+## Print files and assembly
 
-## Print the fit coupons
+[Bambu P1S projects](output/bambu/) contain all 44 casing, joint, cradle, gauge, and coupon parts. Each project uses PLA, the 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. Every project sliced successfully on the Mac. Inspect supports and their removal paths before printing. Start with the small gauges and spare keys. Physical fits remain U.
 
-Use the Bambu Lab P1S, a 0.4 mm nozzle, PLA, 0.2 mm layers, and three walls. Keep scale at 100%. Place the flat base on the bed. Both coupons have open vertical holes or slots and need no supports. The 3MF files contain geometry and millimeter units; select the P1S and filament profile in Bambu Studio. They contain no saved slicing settings.
+The separate [casing meshes](output/casing/) and [joint meshes](output/joint/) use millimeter units and checked print orientations. These generic 3MF files contain geometry. Select printer settings when importing them directly. The P1S projects include settings and sliced previews. No print was sent.
 
-- `output/bearing-fit.3mf` has four through holes. From left to right, their modeled diameters are 23.9, 24.0, 24.1, and 24.2 mm. The coupon is 152 × 36 × 6 mm. Use a 24 mm bearing or measured gauge. Select a fit that seats without damaging the bearing. Retention still needs a shoulder and keeper.
-- `output/camera-thickness-fit.3mf` has three 38 mm-wide slots. From front to rear in CAD Y, their widths are 1.8, 1.9, and 2.0 mm. The coupon is 44 × 36 × 10 mm. Start with a measured scrap gauge, then test a bare camera-board edge without force. These slots establish clearance; a later removable clamp supplies retention.
+Read [casing assembly](CASING_ASSEMBLY.md) and [joint assembly](JOINT_ASSEMBLY.md) before printing. The roof uses a removable bridge. Lift the preassembled joint 5.2 mm, slide it through the rear roof channel, and lower its flange onto the roof posts. Install the bridge and its retained pins afterward. Install the camera frame before the camera.
 
-The camera board reference permits 1.4–1.8 mm thickness. A tight slot can damage a populated board. These coupons do not validate the Jetson cradle, servo cradle, complete neck, or casing.
+Four detachable cradles define the proposed Jetson, speaker, audio-case, and camera positions. They include mounting posts and reference clearance. Verify safe contact lands and component retention with gauges before installing populated electronics. Keep the owned servo separate until its installed retention is defined. The manual drive gear is a loose tooth-meshing coupon.
 
-## Check the power exit
+## Joint specification
 
-`output/power-exit-trial.3mf` is a hand-held removable recess trial. Its size is 22.85 × 60 × 33.5 mm. The 13 mm upward-open channel reserves the reported 11 mm plug. Its exterior face sits 9 mm from the provisional socket plane, before the reported 11 mm elbow transition. The recess depth to the proposed outer wall is 21.25 mm. The trial has no attachment to the casing.
+Two 15 × 24 × 5 mm bearings support a 14.8 mm journal. Their centers are Z154 and Z170. Split tower seats measure 24.2 mm. The tower has a 32 mm diameter within the 32.4 mm roof channel. Its 50 mm flange sits at Z160. The 44 mm rotating flange supports the head floor at Z180.
 
-Use `output/power-exit-trial-p1s.3mf` for the saved P1S settings. It uses PLA, a 0.4 mm nozzle, 0.2 mm layers, three walls, and no supports. Keep the continuous rectangular floor on the bed. The separate geometry-only 3MF contains no printer settings. Bambu may display its geometry-only import notice. Confirm the P1S profile before slicing.
+Stationary keeper openings measure 22 mm. Rotating spacers measure 20 mm. Their radial separation is one mm. The initial axial freedom is 0.6 mm. Optional 0.2 and 0.4 mm shims are separate gauge parts. Verify actual race contact lands before using these dimensions.
 
-1. Shut down the Jetson and disconnect its supply from mains power.
-2. Connect the plug and point its elbow upward. Grip the connector housing.
-3. Hold the insert below the plug, with its recessed wall toward the board.
-4. Move the insert upward so the plug enters through the open channel.
-5. Measure 9 mm from the socket plane to the recessed exterior face. Check clearance around the elbow.
-6. Move the insert downward to remove it. Check that neither movement pulls on the socket.
-7. Record contact points, the actual socket coordinates, and clearance to nearby USB plugs before casing integration.
+Both gears have 34 teeth, module one, a 20° pressure angle, and 34 mm center spacing. Combined nominal tangential backlash is 0.25 mm. Continuous CAD tooth clearance passes. Actual solid stops contact at ±80.02087°. The proposed normal software range remains ±70°. Stop strength and physical tooth behavior remain U.
 
-`output/power-exit-trial.step` includes the trial and an assumed plug envelope. `output/power-exit-trial.png` shows their arrangement. `output/power-exit-checks.json` records geometry checks. The elbow uses a conservative square envelope with additional end allowance. Physical shape and cable movement remain U.
+Use external camera routing for this manual prototype. Transverse retention keys occupy the proposed shaft passage. Complete connector admission through both closed bearing bores remains pending. Check cable slack, pinching, bend radius, and connector loading throughout physical movement.
 
-The exporter now welds shared mesh vertices before writing all three 3MF files. It checks the indexed triangle edges directly. This removes the open-edge warnings caused by the earlier CAD face seams. Independent mesh reload alone had concealed these seams.
+## Power, USB, and cooling
 
-## Revised arrangement
+Remove the complete right panel to connect and grip the Jetson plugs. Its edge-open service slot reserves later replaceable inserts. The final insert requires actual socket coordinates and complete installed USB connector shapes.
 
-Keep the owned STS3215 upright, with its output shaft vertical. Rotate its housing 90° around that axis and move it into the front upper body. Lower the bus-interface reservation by 6 mm. The resulting head envelope and neck reduce overall height by 25 mm, from 255 to 230 mm (E), without replacing the servo. The body envelope stays unchanged.
+The existing [power-exit trial](output/power-exit-trial-p1s.3mf) tests the reported 11 mm plug diameter, 11 mm straight reach, and 10 mm rotatable elbow. Its 13 mm upward-open channel sits nine mm from the provisional socket plane. The trial measures 22.85 × 60 × 33.5 mm. Its recess depth is 21.25 mm. It remains a separate hand-held gauge with no casing attachment.
 
-The drive now sits forward of the central shaft. Its addendum circle leaves 1.6 mm to the nominal inner front wall. The camera rear pocket leaves 1.1 mm vertically and 2.1 mm at the left inner wall. These are envelope clearances; final catches, rounded corners, and gear housing may require enlargement. Do not freeze these dimensions before modeling their mounts.
+Connect the plug with the supply disconnected from mains. Point the elbow upward. Raise the trial around its open channel, then check the nine mm socket-to-face distance. Lower the trial for removal. Record interference and nearby USB clearance before designing its attachment.
 
-Joint solid checks now include bearings, shaft, flange, upper spacer, collar, keeper, and gear reservations against stationary components and each other. The complete illustrative cable tube clears these joint solids across 81 yaw positions. A conservative distance check covers every straight segment; this verifies geometric separation, not physical bend behavior. The shaft gear bore is 15 mm to match the shaft envelope. Addendum-circle overlap at the intended tooth mesh is excluded; actual teeth and coupling remain unmodeled. Both 26 mm and 27.5 mm lens lengths pass the revised ideal aperture check.
+Rear vents preserve the fan intake reservation. Left vents preserve the outlet reservation. The speaker grille and microphone openings stay open. Actual fan orientation, microphone positions, cooling, echo, and motor noise require physical checks. Compare open and enclosed Jetson operation under the same workload before final thermal approval.
 
-The shorter illustrative lower cable loop occupies Z116–132 and contracts gradually to the shaft center. Its length still varies with rotation. A physical cable and its bend specification must establish whether this reduced space works.
+A compatible USB TTL bus-servo adapter can control the STS3215 from the Jetson without a separately programmed Uno. Identify the owned SO-ARM100 adapter revision before specifying supply wiring. The 7.4 V servo requires compatible power and current capacity. Verify its horn holes, supplied retention hardware, adapter, and mounting lands before powered design.
 
-## Connection proposal
+## Checks and regeneration
 
-Use the owned 7.4 V STS3215 as the actuator candidate. Its housing uses the manufacturer envelope. The linked drawing labels the part SCS215; verify the owned servo before building its cradle. The source horn offset puts its axis 10.11 mm from the end. The layout aligns that proposed axis with the offset drive reservation.
+[Integrated checks](output/assembly/checks.json) cover actual casing/joint intersections, full yaw separation bounds, rear key access, and sampled joint/bridge admission. [Casing checks](output/casing/checks.json) cover panel and cradle separation, hardware reservations, component admission, and both reference lens lengths. [Joint checks](output/joint/checks.json) cover bearings, retained keys, stops, and real teeth. [Slicing checks](output/bambu/slice-checks.json) record each source hash, project hash, result, warning, and estimate.
 
-The SO-ARM100 project lists a Waveshare USB-C motor control board. If Dylan owns a compatible board, connect a Jetson USB-A port to its USB-C port, then connect the servo to its TTL bus. The adapter handles the bus interface. This route needs no separately programmed Uno. The PCA9685 proposal applies to PWM servos and does not control the STS3215.
+Use Python 3.12 with [requirements.lock](requirements.lock). Run `layout.py`, `power_exit.py`, `casing.py`, `joint.py`, `assembly.py`, and `bambu.py` in that order. Run `node hardware/concept-a/check-assembly-viewer.cjs` from the repository root. The CAD environment is `build/hardware-layout/venv/bin/python`. Bambu packaging uses the installed macOS application and the saved native P1S power-trial project as its settings template.
 
-Identify the board version before selecting power. The current Waveshare adapter differs from older boards and includes regulated servo power. Match its input and servo output to the owned hardware. Reserve a separate power branch; check the adapter, supply rating, stall current, and common-ground connection before any powered test. The Jetson GPIO header does not power the servo.
-
-Two 15 × 24 × 5 mm bearings have centers at Z154 and Z170. The proposed shaft has a 15 mm outside diameter and 10 mm passage. Its flange, upper spacer, lower collar, and housing keeper reserve a load path independent of the servo. Bearing contact lands and positive shaft coupling need actual component drawings. A shaft split and side-loading head opening must admit complete camera connectors. Software travel targets ±70°, with mechanical stops beyond that at ±80°. Stop strength, horn coupling, gear backlash, and bearing fit remain U.
-
-## Component retention and access
-
-Keep component installation as press fits with removable positive catches. Support the camera on its board edges. Support the Jetson at verified carrier-board mounting regions. Hold the servo housing in a keyed cradle and retain it at supported case features. Keep release tabs accessible through the open body or head cover. Do not transfer the old rigid Jetson squeeze into this layout without a force test. The servo horn retains its supplied screw; a friction-only horn connection is not proposed.
-
-The packaging model does not yet include these mounts, snap catches, the split shaft, the bearing housing, physical stops, or cable strain relief. Assembly access remains a planned sequence in the viewer, not a tested insertion sweep.
-
-## Cable and cooling requirements
-
-Dylan owns JUXINICE 4-inch down-angle USB-A extensions. He reports 10 mm installed protrusion at the measured USB socket and flexible cables. Full plug width, height, socket coordinates, and insertion travel remain U. The model keeps its 24 mm combined USB/power reservation because the power plug and service geometry are still unverified.
-
-Dylan clarified the installed round power plug: 11 mm outside diameter, 11 mm straight outward reach, and a 10 mm right-angle section. Its described total added connector length is 21 mm. The elbow rotates in any direction. Use an upward exit through a removable recessed insert. The exact elbow shape and socket coordinates still need verification. Keep the current combined reservation until the installed assembly is checked.
-
-Use a removable port-side panel to admit plugs along their socket axes from outside the body. Connect the cables with the panel open, leave routing slack, then close the panel around edge-open cable exits. Grip connector housings during removal. The head rear cover and split shaft must admit the camera connectors separately. These are assembly requirements; the panel, strain relief, and insertion sweeps are not modeled yet.
-
-The orange cable curve samples a loop below the shaft and routing through the head. The coil is tested against expanded stationary boxes every 2° over ±80°. Its length changes across angles, so it does not simulate a constant-length physical cable. The upper route, minimum bend radius, connector insertion, strain relief at both ends, pinching, and fatigue still need physical verification. Its changing length is recorded in `checks.json`.
-
-The 22 mm inlet reservation must align with the actual fan inlet. A separate side outlet reserves exhaust space. The layout establishes space only. Shape the actual vent and airflow path after confirming the kit orientation. Compare open and enclosed Jetson temperature, fan speed, and throttling under the same robot workload. Test microphone noise and speaker playback as well. Check PLA retention and deformation under those temperatures; use PETG for affected mounts if the physical tests require it.
-
-## Reproduce the study
-
-Create a Python 3.12 environment outside the runtime environment. Install `requirements.lock` there. Run `layout.py`, `power_exit.py`, then `node check-viewer.cjs` from this directory. The generators check solids, packaging clearances, trial insertion, and ideal optical clearance. They verify indexed 3MF closure, millimeter units, independent closed volume, and exported scale. The Node check exercises viewer logic with a simulated canvas, not browser appearance.
-
-The generators and exports passed their Mac checks. Browser opening was blocked by the local-file URL policy. Bambu Studio now opens through its app identifier. The power trial imports with the correct dimensions and slices successfully. See [BAMBU_CHECK.md](BAMBU_CHECK.md) for the observed settings. Physical printing and fit remain unverified.
+The shared exporter welds indexed CAD face seams and checks every mesh edge twice. Generators check millimeter scale, closed volume, connected solids, and bed fit. Automatic slicing establishes printable paths. Physical coupon results, safe electronics support, material life, cable movement, powered motion, cooling, and acoustics remain U.
 
 ## Sources
 
-- [Original hardware design](https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/hardware/claude-design.html) supplies the Jetson and camera dimensions, including both rear connector envelopes.
-- [Waveshare USB audio](https://www.waveshare.com/usb-to-audio.htm) supplies the 53 × 23.5 × 14.6 mm case dimensions, excluding the USB plug.
-- [Waveshare speaker](https://www.waveshare.com/8ohm-5w-speaker.htm) specifies 100 × 45 × 21 mm, while its image labels 92 × 36 mm. The layout uses the larger envelope pending physical measurement.
-- [Waveshare servo documentation](https://www.waveshare.com/wiki/ST3215_Servo) links the 2D drawing. The source envelope is 45.22 × 24.72 × 35 mm; owned-hardware fit is U.
+- [Original hardware design](https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/hardware/claude-design.html) supplies the Jetson and complete camera reference dimensions.
+- [Waveshare USB audio](https://www.waveshare.com/usb-to-audio.htm) supplies the 53 × 23.5 × 14.6 mm case, excluding its USB plug.
+- [Waveshare speaker](https://www.waveshare.com/8ohm-5w-speaker.htm) specifies 100 × 45 × 21 mm. Its image gives smaller dimensions; measure the owned speaker.
+- [Waveshare servo documentation](https://www.waveshare.com/wiki/ST3215_Servo) supplies the proposed 45.22 × 24.72 × 35 mm housing envelope. Verify it against the owned STS3215.
 - [SO-ARM100 bill of materials](https://github.com/TheRobotStudio/SO-ARM100/blob/a758567c3978dfeefe282ede0500085a48fe8f78/README.md) lists the USB-C bus-servo board and 7.4 V servos.
-- [Waveshare Bus Servo Adapter A](https://www.waveshare.com/bus-servo-adapter-a.htm) supplies USB/UART modes and the current 42 × 33 mm PCB drawing. Thickness and owned-board identity remain U.

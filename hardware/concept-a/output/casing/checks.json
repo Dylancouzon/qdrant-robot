@@ -1,0 +1,1445 @@
+{
+  "status": "MECHANICAL PROTOTYPE; physical fit U",
+  "checks": [
+    {
+      "name": "body-front solid",
+      "passed": true,
+      "detail": "1 connected solids; 122486.526 mm\u00b3."
+    },
+    {
+      "name": "body-rear solid",
+      "passed": true,
+      "detail": "1 connected solids; 43625.664 mm\u00b3."
+    },
+    {
+      "name": "body-right solid",
+      "passed": true,
+      "detail": "1 connected solids; 33241.600 mm\u00b3."
+    },
+    {
+      "name": "body-roof solid",
+      "passed": true,
+      "detail": "1 connected solids; 40900.697 mm\u00b3."
+    },
+    {
+      "name": "head-front solid",
+      "passed": true,
+      "detail": "1 connected solids; 49727.334 mm\u00b3."
+    },
+    {
+      "name": "head-rear solid",
+      "passed": true,
+      "detail": "1 connected solids; 10251.296 mm\u00b3."
+    },
+    {
+      "name": "head-visor solid",
+      "passed": true,
+      "detail": "1 connected solids; 4759.881 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle solid",
+      "passed": true,
+      "detail": "1 connected solids; 6799.008 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle solid",
+      "passed": true,
+      "detail": "1 connected solids; 8532.456 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle solid",
+      "passed": true,
+      "detail": "1 connected solids; 3408.432 mm\u00b3."
+    },
+    {
+      "name": "camera-cradle solid",
+      "passed": true,
+      "detail": "1 connected solids; 1059.360 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge solid",
+      "passed": true,
+      "detail": "1 connected solids; 4374.113 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 solid",
+      "passed": true,
+      "detail": "1 connected solids; 242.800 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 solid",
+      "passed": true,
+      "detail": "1 connected solids; 8.256 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 solid",
+      "passed": true,
+      "detail": "1 connected solids; 242.800 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 solid",
+      "passed": true,
+      "detail": "1 connected solids; 8.256 mm\u00b3."
+    },
+    {
+      "name": "body-front / body-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / body-right",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / body-roof",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / head-front",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / head-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / body-right",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / body-roof",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / head-front",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / head-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / body-roof",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / head-front",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / head-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / head-front",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / head-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / head-rear",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-cradle / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "jetson-cradle / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "audio-cradle / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "camera-cradle / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "camera-cradle / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "camera-cradle / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "camera-cradle / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "camera-cradle / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-pin--1 / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-pin--1 / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-pin--1 / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "roof-bridge-pin-1 / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-front / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-rear / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-right / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "body-roof / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-front / Camera rear cable space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-front / full camera",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-rear / Camera rear cable space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-rear / full camera",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-visor / Camera rear cable space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "head-visor / full camera",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-cradle / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "jetson-cradle / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "audio-cradle / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "camera-cradle / Camera rear cable space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "camera-cradle / full camera",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin--1 / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper--1 / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-pin-1 / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "roof-bridge-keeper-1 / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "Jetson rear insertion",
+      "passed": true,
+      "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+    },
+    {
+      "name": "One speaker rear insertion",
+      "passed": true,
+      "detail": "Continuous 200 mm rear sweep and 6 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+    },
+    {
+      "name": "USB audio case rear insertion",
+      "passed": true,
+      "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+    },
+    {
+      "name": "STS3215 housing rear insertion",
+      "passed": true,
+      "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+    },
+    {
+      "name": "Camera rear insertion",
+      "passed": true,
+      "detail": "Continuous bounding-prism sweep 0.000000 mm\u00b3."
+    },
+    {
+      "name": "Camera cradle rear admission",
+      "passed": true,
+      "detail": "Continuous prism at1.5 mm lift 0.000000 mm\u00b3; lowering samples every0.1 mm 0.000000 mm\u00b3."
+    },
+    {
+      "name": "Roof bridge horizontal admission",
+      "passed": true,
+      "detail": "Continuous rear admission prism versus roof 0.000000 mm\u00b3; keeper and pins removed."
+    },
+    {
+      "name": "Lens opening / focus 26",
+      "passed": true,
+      "detail": "\u00d834 aperture; ideal 100\u00b0 diagonal cone radius 14.697 mm; actual framing U."
+    },
+    {
+      "name": "Lens opening / focus 27.5",
+      "passed": true,
+      "detail": "\u00d834 aperture; ideal 100\u00b0 diagonal cone radius 12.909 mm; actual framing U."
+    },
+    {
+      "name": "Roof flange footprint",
+      "passed": true,
+      "detail": "Only the two specified 3\u00d74\u00d75 mm posts enter the \u00d850 flange footprint above Z160."
+    }
+  ],
+  "geometry_passed": true,
+  "contacts": "Only zero-volume printed boundary contacts. No electronics contact is authorized.",
+  "unknowns": [
+    "Part contact lands and retention",
+    "Port datums and installed connector shapes",
+    "Camera cable movement",
+    "Cooling and acoustics",
+    "PLA creep",
+    "Bambu Studio slicing"
+  ]
+}

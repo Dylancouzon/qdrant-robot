@@ -20,6 +20,8 @@ Dylan authorized head rotation despite the older no-servo rule. Decision H1 reco
 
 Dylan liked Concept A, with a visor camera head and a stationary body. The current study places one speaker in the body to reduce moving bulk. Speaker eyes were considered, and Dylan accepts using one speaker because the speakers are bulky.
 
+Dylan approved the updated [exterior concept](concept-a/output/exterior-concept.png) on 2026-10-11. Preserve its cream shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
+
 Dylan identified servo height as a problem. Select a short servo with its output shaft pointing upward for head rotation. Restrict purchases to Amazon and favor inexpensive options. Dylan rejected the Hitec D145SW because of its cost and the direction of its thin dimension. Keep the owned STS3215 unless an alternative gives a substantial improvement. Dylan rejected replacing it for only 6 mm of height reduction. Prioritize rearranging the existing hardware; no replacement purchase has been authorized.
 
 ## Owned equipment
@@ -53,7 +55,7 @@ Dylan measured 10 mm installed USB cable protrusion on 2026-10-11 and reports th
 
 Dylan clarified the installed power plug on 2026-10-11. Its outside diameter is 11 mm. Its added connector length comprises an 11 mm straight section and a 10 mm right-angle section. The elbow rotates in any direction. Route the last section outside the case. Treat 21 mm as the described connector length, not a straight outward clearance requirement. Prototype an upward exit through an edge-open recessed insert. The wall position and exit dimensions remain U until the installed shape and socket position are checked.
 
-The removable port-side panel is an assembly requirement. Its geometry and insertion sweeps remain U. The 10 mm protrusion can inform the installed USB pocket once the complete connector shape is available.
+The removable port-side panel now has prototype geometry and checked casing clearances (E). Actual USB plug insertion remains U. The 10 mm protrusion informs its installed pocket after the complete connector shape is measured.
 
 ## Component dimension references
 
@@ -99,6 +101,10 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 
 ## Current delivery status
 
-The [Concept A study](concept-a/README.md) provides a dimensioned layout, STEP assembly, offline viewer, and two fit-coupon 3MF files. A removable power-exit trial now has generic and P1S-configured 3MF files. Geometry checks and power-trial slicing passed on the Mac (E). Physical fit, cable motion, cooling, and final casing remain U.
+The [Concept A mechanical prototype](concept-a/README.md) now includes an actual removable casing, four detachable gauge cradles, a split bearing tower, retained keys, manual gears, and solid stops. Its complete STEP and CAD-derived preview show the assembled design. An offline viewer uses actual triangles and provides head yaw and service-cover controls.
 
-The complete casing, component catches, final joint, stops, and strain relief still need design and physical validation. The coupons establish fit information for that work.
+There are 44 generic prototype 3MF files and 44 individually sliced P1S projects. Casing and joint checks each pass 286 checks (E). Integrated checks pass 311 checks (E). The shared mesh exporter checks welded indexed seams, millimeter scale, and closed volumes. Physical fit remains U.
+
+The roof uses a removable bridge to admit the assembled joint. The camera frame enters before the camera. The manual prototype uses an external camera cable loop. Both closed bearing bores must admit the complete connector before adopting a hidden cable route.
+
+Keep the servo separate until its contact lands, mounting ears, horn holes, and supplied retaining hardware are verified. Its housing gauge and drive gear are separate manual test pieces. The power-exit trial remains separate until socket positions and installed plug shapes are measured. Component retention, cable motion, strain relief, cooling, acoustics, and powered load tests remain U.
