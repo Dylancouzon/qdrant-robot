@@ -19,7 +19,7 @@ import onnxruntime as ort
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from robot.config import DETECT_LOW, OBJECT_MIN_SIDE  # noqa: E402
-from robot.detect import MODEL, iou, letterbox, mask  # noqa: E402
+from robot.detect import INPUT, MODEL, iou, letterbox  # noqa: E402
 from robot.settings import DEFAULTS, settings  # noqa: E402
 from robot.things import DIM, Crops, add_vectors, cut  # noqa: E402
 
@@ -60,6 +60,19 @@ def detect(session, frame):
     boxes = np.clip((rows[:, :4] - [left, top, left, top]) / scale,
                     0, [w, h, w, h]).round().astype(int)
     return rows, boxes, protos[0], (scale, left, top)
+
+
+def mask(coef, protos, box, scale, left, top, shape) -> np.ndarray:
+    """Return the dilated segmentation mask inside an original-frame box."""
+    logits = coef @ protos.reshape(32, -1)
+    probability = (1 / (1 + np.exp(-np.clip(logits, -80, 80)))).reshape(protos.shape[1:])
+    probability = cv2.resize(probability, (INPUT[1], INPUT[0]))
+    h, w = shape[:2]
+    probability = probability[top:top + round(h * scale), left:left + round(w * scale)]
+    probability = cv2.resize(probability, (w, h))
+    x1, y1, x2, y2 = box
+    inside = (probability[y1:y2, x1:x2] > 0.5).astype(np.uint8)
+    return cv2.dilate(inside, np.ones((7, 7), np.uint8)).astype(bool)
 
 
 def crops(frame, row, box, protos, geometry):
@@ -140,6 +153,22 @@ def score_negatives(frame, rows, boxes, protos, geometry, indices, source, sink,
             negative_sources[source.split(':')[0]] += 1
             sink.write(json.dumps({'type': 'negative', 'source': source,
                                    'box': boxes[i].tolist(), 'scores': values}) + '\n')
+
+
+def _mask_selftest():
+    """The mask splits a box at a known prototype edge."""
+    _, scale, left, top = letterbox(np.zeros((720, 1280, 3), np.uint8))
+    protos = np.zeros((32, 96, 160), np.float32)
+    protos[0] = -10
+    protos[0, :, 80:] = 10
+    coef = np.zeros(32, np.float32)
+    coef[0] = 1
+    known = mask(coef, protos, (600, 100, 680, 200), scale, left, top, (720, 1280))
+    expected = np.zeros((100, 80), bool)
+    expected[:, 37:] = True  # x=640 boundary, dilated three original pixels
+    assert known.dtype == bool and np.array_equal(known, expected)
+    assert not mask(-coef, np.abs(protos), (10, 10, 30, 30), scale, left, top,
+                    (720, 1280)).any()
 
 
 def main():
@@ -227,4 +256,5 @@ def main():
 
 
 if __name__ == '__main__':
+    _mask_selftest()
     main()

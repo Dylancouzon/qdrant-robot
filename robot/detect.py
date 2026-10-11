@@ -62,19 +62,6 @@ def letterbox(frame: np.ndarray) -> tuple[np.ndarray, float, int, int]:
     return blob, scale, left, top
 
 
-def mask(coef, protos, box, scale, left, top, shape) -> np.ndarray:
-    """Return the dilated segmentation mask inside an original-frame box."""
-    logits = coef @ protos.reshape(32, -1)
-    probability = (1 / (1 + np.exp(-np.clip(logits, -80, 80)))).reshape(protos.shape[1:])
-    probability = cv2.resize(probability, (INPUT[1], INPUT[0]))
-    h, w = shape[:2]
-    probability = probability[top:top + round(h * scale), left:left + round(w * scale)]
-    probability = cv2.resize(probability, (w, h))
-    x1, y1, x2, y2 = box
-    inside = (probability[y1:y2, x1:x2] > 0.5).astype(np.uint8)
-    return cv2.dilate(inside, np.ones((7, 7), np.uint8)).astype(bool)
-
-
 class _TensorRT:
     """A TensorRT engine with buffers from libcudart (JetPack 7 has no torch or cuda-python)."""
 
@@ -345,17 +332,6 @@ def _selftest() -> None:
         assert t.update([], w, 102) == [], "an unconfirmed track leaves without a sighting"
     blob, scale, left, top = letterbox(np.zeros((720, 1280, 3), np.uint8))
     assert blob.shape == (1, 3, *INPUT) and (scale, left, top) == (0.5, 0, 12)
-    protos = np.zeros((32, 96, 160), np.float32)
-    protos[0] = -10
-    protos[0, :, 80:] = 10
-    coef = np.zeros(32, np.float32)
-    coef[0] = 1
-    known = mask(coef, protos, (600, 100, 680, 200), scale, left, top, (720, 1280))
-    expected = np.zeros((100, 80), bool)
-    expected[:, 37:] = True  # x=640 boundary, dilated three original pixels
-    assert known.dtype == bool and np.array_equal(known, expected)
-    assert not mask(-coef, np.abs(protos), (10, 10, 30, 30), scale, left, top,
-                    (720, 1280)).any()
     if MODEL.exists():  # the Mac has no model unless it was exported there
         detect = Detector()
         dets = detect(cv2.imread(str(ROOT / "eval/dev/live/closet-stopsign-center.jpg")))

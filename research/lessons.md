@@ -76,6 +76,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Face blurring before storage | Each review found a new leak path | Rejected (Dylan); no frames in sightings | D53, D54 |
 | Background masking of crops (YOLOE-26s masks, grey fill) | D145 cup video, Mac CPU: masked 241/360 vs box 263/360, zero false matches in both; masks correct, misses are viewpoint changes; the video has no background change (E) | Not adopted; background change untested | D148; `bench/results/2026-10-11-crop-arms-1791693406.json` |
 | UI Ignore validated against the live track | Ignore failed with 409 within about 1 s of an item leaving view; the page rebuilt the list every poll | Replaced by held 30 s offers | D151 |
+| Camera at 15 fps to lower preview grain | Four paired captures: noise 7.34 at 15 fps vs 6.29 at 30 fps, same brightness; our preview encode adds no noise (J) | Rejected; add light instead | `research/objects.md` |
 | Hand detector or depth camera | Not tried; a reach can steal focus for about 3 s | Open | D67 |
 
 ## System and memory
