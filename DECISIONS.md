@@ -84,6 +84,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D155 2026-10-11: Named objects belong to a visitor.** One point per (visitor id, name); a visitor id is stable for a conversation and stored on an enrolled person, so promotion moves nothing. The same owner's reteach always appends (Dylan). Labels read "Ana's mouse"; "Ana's X" resolves only through an enrolled Ana. "Forget me" deletes evidence, then objects, then the person. The old things shard was backed up and replaced. Edge things.score p99 2.29 ms at 200 objects x 24 views (J). Supersedes D148's same-name half.
 
+**D156 2026-10-11: The robot asks about near matches by voice.** A current visitor's object that stays just under the threshold for `ask_delay_s` on the focused track gets "Is this your mouse?" only in a conversation blank (`ask_blank_s`), at most `ask_max` per conversation, 60 s apart, once per track. "Yes" adds the view as `confirmed`; anything else is a normal turn. Settings live on the page (Dylan).
+
 **D122–D126 2026-10-09: Mac interface.** `tools/talk.py` serves a loopback page with Start, Mute, and Stop over native audio and SSH. All models stay on the Jetson.
 
 ## Pending requirements

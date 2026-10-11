@@ -247,6 +247,10 @@ class Robot:
         self.told: tuple[str, bool] | None = None
         self.last_line = 0.0  # when the answer to the last answered line ended
         # (track, focus epoch) that "Track this" asked a name for
+        self.current_visitor = ""
+        self.candidate = self.confirming = None
+        self.confirm_count, self.confirm_last = 0, 0.0
+        self.confirm_tracks = set()
         self.teaching: tuple[int, int] | None = None
         self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
         self.ui_turn: Turn | None = None
@@ -325,6 +329,8 @@ class Robot:
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
             self.teaching, self.start_target = None, None
+            self.current_visitor = ""
+            self._clear_confirmation()
             self.since, self.panel = time.time_ns() // 1000, None
             self.view, self.offers = (None, {}), {}
             self.focus, self.screen = None, (None, Screen())
@@ -715,7 +721,7 @@ class Robot:
         own = self.things.score(vector, window["name"])
         # Added views preserve valid results and offers, so keep the gallery epoch.
         if own and own[1] >= settings.window_floor and \
-                self.things.add_view(window["name"], vector, crop):
+                self.things.add_view(window["name"], vector, crop, source="window"):
             window["admitted"] += 1
             with (self.out / "turns.jsonl").open("a") as stream:
                 stream.write(json.dumps({"event": "teaching_view", "name": own[0],
@@ -738,6 +744,10 @@ class Robot:
         self._window_status()
         window = self.window
         source = source or (self.view_taken, {t.id: self.focus.epoch(t.id) for t in tracks})
+        with self.detecting:
+            if self.candidate and (self.focus.focus != self.candidate["track"] or
+                    self.focus.epoch(self.candidate["track"]) != self.candidate["epoch"]):
+                self.candidate = None
         active = {t.id for t in candidates}
         self.crop_due = {i: due for i, due in self.crop_due.items() if i in active}
         while self.crop_times and time.monotonic() - self.crop_times[0] >= 1:
@@ -760,12 +770,122 @@ class Robot:
                 if not excluded[t.id] and not crowded:  # an overlapping lookalike: impure crop
                     self._admit_window(window, t, vector, source, cut(frame, t.box))
             hit = self.things.score(vector, preferences[t.id])
+            best = hit
             if preferences[t.id] and (not hit or hit[1] < settings.match):
                 other = self.things.score(vector)
+                best = other
                 if other and other[1] >= settings.match and other[0] in eligible:
                     hit = other
+            self._near_match(t, best if best and best[0] in eligible and
+                             not excluded[t.id] else None, vector, cut(frame, t.box), source)
             recognized[t.id] = hit if hit and hit[0] in eligible else (None, 0.0)
         return recognized, excluded
+
+    def _clear_confirmation(self):
+        self.candidate = self.confirming = None
+        self.confirm_count, self.confirm_last = 0, 0.0
+        self.confirm_tracks = set()
+
+    def _near_match(self, track, hit, vector, crop, source):
+        """Keep one copied near view until the focused track has persisted."""
+        now = time.time()
+        rows = self.things.shard.retrieve([hit[0]], True, False) if hit and hit[0] else []
+        with self.detecting:
+            epoch = source[1].get(track.id)
+            key = (track.id, epoch)
+            valid = (settings.ask_max > 0 and rows and
+                     rows[0].payload.get("owner") == self.current_visitor and
+                     settings.match - settings.guess_band <= hit[1] < settings.match and
+                     self.focus.focus == track.id and self.focus.epoch(track.id) == epoch and
+                     self.focus.accepts(track.id, source[0]) and
+                     now - source[0] <= PREVIEW_TTL)
+            candidate = self.candidate
+            if not valid or key in self.confirm_tracks:
+                if candidate and candidate["track"] == track.id:
+                    self.candidate = None
+                return
+            if candidate and (candidate["object"], candidate["track"], candidate["epoch"]) != (
+                    hit[0], track.id, epoch):
+                self.candidate = None
+                return
+            if candidate is None:
+                candidate = self.candidate = dict(object=hit[0], track=track.id, epoch=epoch,
+                    vector=vector.copy(), crop=crop.copy(), first=now, count=0,
+                    visitor=self.current_visitor, queued=False)
+            candidate["count"] += 1
+            if candidate["count"] >= 2 and now - candidate["first"] >= settings.ask_delay_s and \
+                    not candidate["queued"]:
+                candidate["queued"] = True
+                self.jobs.put(("confirm", candidate))
+
+    def _confirm(self, candidate):
+        """Ask once through the normal voice path, only in a conversation blank."""
+        now = time.time()
+        with self.detecting:
+            if self.candidate is not candidate:
+                return
+            self.candidate = None
+            if not (0 <= now - self.last_line <= CONVERSATION_S and
+                    now - self.last_line >= settings.ask_blank_s and
+                    not self.speaking and not self.ui_thinking and self.jobs.empty() and
+                    self.lines.unfinished_tasks == 0 and not self.speaker.playing() and
+                    not self.teaching and not self.asking and not self.confirming and
+                    self.confirm_count < settings.ask_max and
+                    now - self.confirm_last >= 60 and
+                    candidate["visitor"] == self.current_visitor and
+                    self.focus.focus == candidate["track"] and
+                    self.focus.epoch(candidate["track"]) == candidate["epoch"] and
+                    candidate["track"] in self.focus.visible and
+                    (candidate["track"], candidate["epoch"]) not in self.confirm_tracks):
+                return
+        rows = self.recognition.call(lambda f, c: self.things.shard.retrieve(
+            [candidate["object"]], True, False))
+        if not rows or rows[0].payload.get("owner") != self.current_visitor:
+            return
+        text = f"Is this your {rows[0].payload['name']}?"
+        self.ui_thinking = True
+        pcm = self.voice.say(text)
+        self.ui_thinking = False
+        if self.speaking or self.lines.unfinished_tasks:  # the visitor spoke during synthesis
+            return
+        turn = Turn(question="", line=now, answer=text)
+        self.ui_turn = turn
+        self.ui_turns.append(turn)
+        self.speaker.play(pcm)
+        self.last_line = time.time() + len(pcm) / RATE
+        self.confirm_count += 1
+        self.confirm_last = now
+        self.confirm_tracks.add((candidate["track"], candidate["epoch"]))
+        self.confirming = {**candidate, "expiry": time.time() + CONVERSATION_S}
+
+    def _confirmation_answer(self, turn):
+        pending, self.confirming = self.confirming, None
+        if not pending:
+            return None
+        reply = turn.question.lower().replace("’", "'")
+        yes = bool(re.match(r"\W*(yes|yeah|yep|yup|sure|correct|it is|that's (it|mine))\b", reply))
+        no = bool(re.match(r"\W*(no|nope|not mine|it isn't|it's not)\b", reply))
+        if not yes and not no:
+            return None
+        with self.detecting:
+            valid = (time.time() <= pending["expiry"] and
+                     turn.visitor == pending["visitor"] == self.current_visitor and
+                     self.focus and pending["track"] in self.focus.visible and
+                     self.focus.focus == pending["track"] and
+                     self.focus.epoch(pending["track"]) == pending["epoch"])
+        if not valid:
+            return None
+        def admit(f, c):
+            rows = self.things.shard.retrieve([pending["object"]], True, False)
+            if not rows or rows[0].payload.get("owner") != turn.visitor:
+                return False
+            if yes:
+                self.things.add_view(pending["object"], pending["vector"],
+                                     pending["crop"], source="confirmed")
+            return True
+        if not self.recognition.call(admit):
+            return None
+        return "Thanks, I will remember it from this side too." if yes else "Okay."
 
     def _remember_matches(self, frame: np.ndarray, taken: float, tracks: list[Track],
                           recognized: dict, person: str | None) -> None:
@@ -838,6 +958,8 @@ class Robot:
                 self._look(job[1])
             elif job[0] == "turn":
                 self._turn(*job[1:])
+            elif job[0] == "confirm":
+                self._confirm(job[1])
             elif job[0] == "sight":
                 self._sight(*job[1:])
             elif job[0] == "matches":
@@ -854,12 +976,16 @@ class Robot:
                 self.control_message = self._memory_job(*job[1:])
             elif job[0] == "describe":
                 self._describe_idle(job[1])
-            elif (rows := self.memory.points([job[1]])) and \
-                    rows[0].get("label") not in self.ignored and \
-                    rows[0].get("named") in self.things.visual_links(self.ignored) and \
-                    (caption := self.brain.caption(job[2], lambda: self.speaking)) is not None:
-                self.memory.set(job[1], caption=caption)
+            else:
+                self._caption_job(job)
             self.jobs.task_done()
+
+    def _caption_job(self, job):
+        if (rows := self.memory.points([job[1]])) and \
+                rows[0].get("label") not in self.ignored and \
+                rows[0].get("named") in self.things.visual_links(self.ignored) and \
+                (caption := self.brain.caption(job[2], lambda: self.speaking)) is not None:
+            self.memory.set(job[1], caption=caption)
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
         changed = self.last_frame is not None and scene_change(
@@ -920,6 +1046,8 @@ class Robot:
         the brain with its Memories line), then stored shown objects and sightings."""
         if not turn.visitor:
             self._resolve_visitor(turn, now)
+        if answer := self._confirmation_answer(turn):
+            return answer
         teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
         if answer := self._identity(turn, now, track) or self._things(turn, teaching):
             return answer
@@ -1147,6 +1275,7 @@ class Robot:
             linked = True
         self.conversation_started = True
         if not linked:
+            self._clear_confirmation()
             self.window = None
             self.told, self.since = None, time.time_ns() // 1000
             self.conversation_visitor = self.things.new_visitor()
@@ -1162,6 +1291,9 @@ class Robot:
         person = self.people.person(seen[1]) if seen and seen[1] else None
         self.turn_seen = seen
         turn.visitor = person["visitor"] if person else self.conversation_visitor
+        if turn.visitor != self.current_visitor:
+            self._clear_confirmation()
+        self.current_visitor = turn.visitor
         return new
 
     def _hear_name(self, turn: Turn) -> None:
@@ -1199,6 +1331,7 @@ class Robot:
                 visitor: str) -> bool:
         """Delete visitor evidence before removing the object and person references."""
         with self.detecting:
+            self._clear_confirmation()
             self.window = None  # no more views are learned for a visitor being forgotten
         try:
             rows = self.things.objects(visitor)
@@ -1255,6 +1388,7 @@ class Robot:
         if cmd := command(turn.question, self.vocab):
             kind, name, labels = cmd
             if kind == "teach":
+                self.candidate = self.confirming = None
                 self.window = None
                 self._settle(turn.speech_start)
                 if (track := self._target(turn)) is None:
@@ -1603,6 +1737,8 @@ class Robot:
 
     def _forget_object(self, named):
         """Shared serial-owner deletion for speech and the Memory tab."""
+        if any(p and p["object"] == named["id"] for p in (self.candidate, self.confirming)):
+            self.candidate = self.confirming = None
         self.memory.forget(named["turns"])
         self.memory.forget_named(named["id"])
         self.things.forget(named["id"])

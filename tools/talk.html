@@ -103,6 +103,9 @@ const recognitionFields=[
   ['window_gap_s','Admission gap (seconds)',0.2,5,0.1,'Wait this long between stored views.'],
   ['window_floor','Teaching match floor',0,0.99,0.01,'Require this match to the taught object before adding a view.'],
   ['duplicate','Duplicate threshold',0.8,1,0.01,'Skip a view this similar to any stored view.'],
+  ['ask_delay_s','Question delay (seconds)',1,20,1,'Require a stable near match for this long.'],
+  ['ask_blank_s','Conversation blank (seconds)',1,30,1,'Wait this long after an answer before asking.'],
+  ['ask_max','Maximum questions per conversation',0,10,1,'Zero turns near-match questions off.'],
   ['views_cap','Maximum views',3,64,1,'Keep the first view and the newest other views.']
 ];
 for(const [name,label,min,max,step,description] of recognitionFields){

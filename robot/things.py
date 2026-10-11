@@ -229,13 +229,14 @@ class Things:
                 (self.thumbs / old["thumbnail"]).unlink(missing_ok=True)
         return any(not any(np.array_equal(v, old) for old in previous) for v in updated)
 
-    def add_view(self, ident: str, vector: np.ndarray, crop: np.ndarray) -> bool:
+    def add_view(self, ident: str, vector: np.ndarray, crop: np.ndarray,
+                 source: str = "window") -> bool:
         rows = self.shard.retrieve([ident], True, True)
         if not rows:
             return False
         row = rows[0]
         return self._views(ident, row.payload, np.asarray(row.vector["crops"], dtype=np.float32),
-                           vector[None], [crop], "window")
+                           vector[None], [crop], source)
 
     def remove_view(self, ident: str, view: str) -> bool:
         """Remove the matching vector, metadata, and thumbnail, or forget the final view."""

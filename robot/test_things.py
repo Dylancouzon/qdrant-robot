@@ -52,6 +52,8 @@ def open_robot(root: Path) -> Robot:
     robot.things = Things(root, robot.people)
     robot.conversation_visitor = OWNER
     robot.conversation_started = True
+    robot.current_visitor = OWNER
+    robot._clear_confirmation()
     if robot.things.visitor(OWNER) is None:
         allocated = robot.things.new_visitor()
         robot.things.pending[OWNER] = robot.things.pending.pop(allocated)
@@ -2974,3 +2976,106 @@ def test_memory_controls_delete_evidence_like_speech(robot, action):
     assert not list(r.things.thumbs.glob("*.jpg"))
     assert r._control(action, {"object": ident, "view": view})
     assert worker() == "That memory no longer exists."
+
+
+@pytest.mark.parametrize('answer', ['yes', 'no', 'Where is my cup?', 'expired', 'visitor'])
+def test_near_confirmation_reply(robot, monkeypatch, answer):
+    r = robot
+    clock = [time.time()]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, 'This is my cup')
+    r.window = None
+    r.jobs = queue.Queue()  # naming queued a caption; these tests exercise idle confirmation
+    ident = object_id(r.things, OWNER, 'cup')
+    track = r.focus.focus
+    basis = np.eye(DIM, dtype=np.float32)
+    vector = .8 * basis[GOLD] + .6 * basis[17]
+    r.last_line = clock[0] - 5
+    played = []
+    r.voice = SimpleNamespace(say=lambda text: played.append(text) or np.zeros(1))
+    r.speaker.play = lambda pcm: None
+    def near(score=.8):
+        r._near_match(Track(track, CENTER, 'cup', .9), (ident, score), vector,
+                      r.view[0], (clock[0], {track: r.focus.epoch(track)}))
+    near()
+    assert r.jobs.empty()
+    clock[0] += 3
+    near()
+    job = r.jobs.get_nowait()
+    r._confirm(job[1])
+    assert played == ['Is this your cup?'] and r.confirming
+    near()
+    assert r.jobs.empty()
+    before = len(r.things.descriptors(ident))
+    text = answer
+    visitor = OWNER
+    if answer == 'expired':
+        clock[0] += main.CONVERSATION_S + 1
+        text = 'yes'
+    elif answer == 'visitor':
+        visitor, text = 'other', 'yes'
+    turn = Turn(question=text, visitor=visitor, speech_start=clock[0])
+    result = r._confirmation_answer(turn)
+    assert not r.confirming
+    assert len(r.things.descriptors(ident)) == before + (answer == 'yes')
+    if answer == 'yes':
+        assert result == 'Thanks, I will remember it from this side too.'
+        row = r.things.shard.retrieve([ident], True, False)[0]
+        assert row.payload['views'][-1]['source'] == 'confirmed'
+    elif answer == 'no':
+        assert result == 'Okay.'
+        near()
+        assert r.jobs.empty()
+    else:
+        assert result is None
+        if answer == 'Where is my cup?':
+            assert ask(r, text)[0], 'the unrelated question follows the normal object answer path'
+
+
+@pytest.mark.parametrize('block', ['match', 'turn', 'teaching', 'rate', 'max', 'off',
+                                   'blank', 'speech', 'identity', 'job'])
+def test_near_confirmation_cancellation_and_limits(robot, monkeypatch, block):
+    r = robot
+    clock = [time.time()]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, 'This is my cup')
+    r.window = None
+    r.jobs = queue.Queue()  # naming queued a caption; these tests exercise idle confirmation
+    ident = object_id(r.things, OWNER, 'cup')
+    track = r.focus.focus
+    def near(score=.8):
+        r._near_match(Track(track, CENTER, 'cup', .9), (ident, score),
+                      np.eye(DIM, dtype=np.float32)[GOLD], r.view[0],
+                      (clock[0], {track: r.focus.epoch(track)}))
+    r.last_line = clock[0] - 5
+    near()
+    if block == 'match':
+        clock[0] += 1
+        near(settings.match)
+        assert r.candidate is None and r.jobs.empty()
+        return
+    clock[0] += 3
+    if block == 'off':
+        monkeypatch.setitem(settings.values, 'ask_max', 0)
+    near()
+    if block == 'off':
+        assert r.jobs.empty()
+        return
+    changes = {'turn': ('ui_thinking', True),
+               'teaching': ('teaching', (track, r.focus.epoch(track))),
+               'rate': ('confirm_last', clock[0] - 59),
+               'max': ('confirm_count', settings.ask_max),
+               'blank': ('last_line', clock[0] - 1),
+               'speech': ('speaking', True), 'identity': ('asking', ('Ana', 1, []))}
+    if block in changes:
+        name, value = changes[block]
+        setattr(r, name, value)
+    job = r.jobs.get_nowait()
+    if block == 'job':
+        r.jobs.put(('look', None))
+    r._confirm(job[1])
+    assert r.confirming is None and r.candidate is None

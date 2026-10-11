@@ -11,8 +11,9 @@ Plan: [research/recognition-import.md](research/recognition-import.md) (design g
 3. Jetson regression replay of D154 (release `2e3975d8d8fc`): 41/47 judged, first audio 1.42 s p50, same as before (J).
 4. Done: owner contract (D155), release `f84e54f81e55` deployed (not started). Live things shard migrated; old one in `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
 5. Done: Memory tab (Live and Memory tabs; object cards by owner with view thumbnails, Forget, Remove view; edits queued on the conversation worker).
-6. Next, kept small: the voice near-match question, then emoji stripping before speech. Then a live check by Dylan.
-7. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
+6. Done: voice near-match question (D156).
+7. Next: emoji stripping before speech, deploy, then a live check by Dylan.
+8. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
 
 ## Human checks
 
