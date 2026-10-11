@@ -71,7 +71,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Face delivery: four timer and cache prototypes | Failed 90% cadence or 200 ms hold | Rejected; completion-driven accepted | D139–D143 |
 | Face embedders: EdgeFace-S, SFace, MaxSim alone, mean vector | False matches at 40 px or as the gallery grows | Rejected; w600k_r50 two-shot | D45 |
 | Face blurring before storage | Each review found a new leak path | Rejected (Dylan); no frames in sightings | D53, D54 |
-| Background masking of crops | The reference masks grey; unmeasured here | Parked | D148 |
+| Background masking of crops (YOLOE-26s masks, grey fill) | D145 cup video, Mac CPU: masked 241/360 vs box 263/360, zero false matches in both; masks correct, misses are viewpoint changes; the video has no background change (E) | Not adopted; background change untested | D148; `bench/results/2026-10-11-crop-arms-1791693406.json` |
 | UI Ignore validated against the live track | Ignore failed with 409 within about 1 s of an item leaving view; the page rebuilt the list every poll | Replaced by held 30 s offers | D151 |
 | Hand detector or depth camera | Not tried; a reach can steal focus for about 3 s | Open | D67 |
 

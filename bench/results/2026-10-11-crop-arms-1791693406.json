@@ -1,0 +1,127 @@
+{
+  "code_revision": "e4389327d1875e0a3cb54ba4c3b5dde8a6d4a07b",
+  "working_tree_diff": "diff --git a/robot/detect.py b/robot/detect.py\nindex c4dbdee..9c03f14 100644\n--- a/robot/detect.py\n+++ b/robot/detect.py\n@@ -62,6 +62,19 @@ def letterbox(frame: np.ndarray) -> tuple[np.ndarray, float, int, int]:\n     return blob, scale, left, top\n \n \n+def mask(coef, protos, box, scale, left, top, shape) -> np.ndarray:\n+    \"\"\"Return the dilated segmentation mask inside an original-frame box.\"\"\"\n+    logits = coef @ protos.reshape(32, -1)\n+    probability = (1 / (1 + np.exp(-np.clip(logits, -80, 80)))).reshape(protos.shape[1:])\n+    probability = cv2.resize(probability, (INPUT[1], INPUT[0]))\n+    h, w = shape[:2]\n+    probability = probability[top:top + round(h * scale), left:left + round(w * scale)]\n+    probability = cv2.resize(probability, (w, h))\n+    x1, y1, x2, y2 = box\n+    inside = (probability[y1:y2, x1:x2] > 0.5).astype(np.uint8)\n+    return cv2.dilate(inside, np.ones((7, 7), np.uint8)).astype(bool)\n+\n+\n class _TensorRT:\n     \"\"\"A TensorRT engine with buffers from libcudart (JetPack 7 has no torch or cuda-python).\"\"\"\n \n@@ -332,6 +345,17 @@ def _selftest() -> None:\n         assert t.update([], w, 102) == [], \"an unconfirmed track leaves without a sighting\"\n     blob, scale, left, top = letterbox(np.zeros((720, 1280, 3), np.uint8))\n     assert blob.shape == (1, 3, *INPUT) and (scale, left, top) == (0.5, 0, 12)\n+    protos = np.zeros((32, 96, 160), np.float32)\n+    protos[0] = -10\n+    protos[0, :, 80:] = 10\n+    coef = np.zeros(32, np.float32)\n+    coef[0] = 1\n+    known = mask(coef, protos, (600, 100, 680, 200), scale, left, top, (720, 1280))\n+    expected = np.zeros((100, 80), bool)\n+    expected[:, 37:] = True  # x=640 boundary, dilated three original pixels\n+    assert known.dtype == bool and np.array_equal(known, expected)\n+    assert not mask(-coef, np.abs(protos), (10, 10, 30, 30), scale, left, top,\n+                    (720, 1280)).any()\n     if MODEL.exists():  # the Mac has no model unless it was exported there\n         detect = Detector()\n         dets = detect(cv2.imread(str(ROOT / \"eval/dev/live/closet-stopsign-center.jpg\")))\n",
+  "source_sha256": {
+    "bench/crop_arms.py": "7a4292ba2e2a7d5b55f86230594a7ea3f92c350d93c2406206945a26941cc175",
+    "robot/detect.py": "92213b088673981640d8b971a74216fae5b85c0a1a24d18f691f3a104bc02102",
+    "robot/things.py": "1a0afd9f0ba80b4bd17f1f2e33187c0269ec8a6d076d2c7a8317aba7a91f70a5"
+  },
+  "model_sha256": {
+    "models/detector/yoloe-26s-booth-384x640.onnx": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "models/dinov2-small/model.onnx": "f22797eabf810a75e41de68d378541ebea372122b25c4ce3ef25ff618250c20a"
+  },
+  "machine": {
+    "label": "E",
+    "hostname": "dylans-macbook-pro.tail04131.ts.net",
+    "platform": "macOS-26.6.2-arm64-arm-64bit"
+  },
+  "versions": {
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.3.3",
+    "opencv": "5.0.0"
+  },
+  "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python bench/crop_arms.py",
+  "frames": 360,
+  "limits": {
+    "match": 0.822,
+    "detect_low": 0.1,
+    "min_side": 120,
+    "iou": 0.3,
+    "negative_iou": 0.1
+  },
+  "teaching": [
+    {
+      "frame": 0,
+      "box": [
+        471,
+        212,
+        684,
+        433
+      ],
+      "iou": 0.5053462157809929,
+      "mask_fill": 0.8887897520871837
+    },
+    {
+      "frame": 10,
+      "box": [
+        471,
+        212,
+        685,
+        433
+      ],
+      "iou": 0.5077187332259742,
+      "mask_fill": 0.8855245908571912
+    },
+    {
+      "frame": 20,
+      "box": [
+        471,
+        212,
+        685,
+        433
+      ],
+      "iou": 0.5077187332259742,
+      "mask_fill": 0.8855245908571912
+    }
+  ],
+  "negative_sources": {
+    "video": 107,
+    "image": 30
+  },
+  "rows": "build/crop-arms/1791693406.jsonl",
+  "arms": {
+    "box": {
+      "causes": {
+        "no_detection": 0,
+        "small": 0,
+        "under_threshold": 97,
+        "hit": 263
+      },
+      "hit_fraction_all": 0.7305555555555555,
+      "hit_fraction_detected": 0.7305555555555555,
+      "cup_scores": {
+        "p10": 0.6379737303392639,
+        "p50": 0.8743879577810907,
+        "p90": 0.9664115998200528
+      },
+      "negatives_scored": 137,
+      "false_matches": 0,
+      "negative_max": 0.6115244217591956,
+      "negative_scores": {
+        "p99": 0.5682905208755545
+      },
+      "examples": {
+        "hit": 4,
+        "miss": 4
+      },
+      "gallery_views": 2
+    },
+    "masked": {
+      "causes": {
+        "no_detection": 0,
+        "small": 0,
+        "under_threshold": 119,
+        "hit": 241
+      },
+      "hit_fraction_all": 0.6694444444444444,
+      "hit_fraction_detected": 0.6694444444444444,
+      "cup_scores": {
+        "p10": 0.6273821692034247,
+        "p50": 0.8518153837843241,
+        "p90": 0.9551093089053161
+      },
+      "negatives_scored": 137,
+      "false_matches": 0,
+      "negative_max": 0.5907980151484927,
+      "negative_scores": {
+        "p99": 0.5365066062896858
+      },
+      "examples": {
+        "hit": 4,
+        "miss": 4
+      },
+      "gallery_views": 2
+    }
+  }
+}
