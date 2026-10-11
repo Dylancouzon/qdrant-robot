@@ -10,7 +10,7 @@ The casing has 18 structural, cover and cradle pieces. Separate rear and port co
 
 ## View the complete design
 
-Open [the offline CAD viewer](output/assembly/robot-viewer.html) in a browser. Select front, rear, side, or 3D views. Turn the head through ±80°. Open the service covers and show component envelopes. The viewer draws the actual printed triangles. Hardware blocks represent reference envelopes and reserved spaces. Browser appearance remains U; the viewer control checks pass.
+Open [the offline CAD viewer](output/assembly/robot-viewer.html) in a browser. The page includes an offline assembly guide, hardware quantities and status, and the printed parts list. Select front, rear, side, or 3D views. Turn the head through ±80°. Open the service covers and show component envelopes. The viewer draws the actual printed triangles. Hardware blocks represent reference envelopes and reserved spaces. Browser appearance remains U; the viewer control checks pass.
 
 Use [the complete assembled STEP](output/assembly/robot-assembled.step) in a CAD application. The installed assembly includes casing, detachable cradles and retained joint parts. The loose hand-held drive gear is a separate mesh-test coupon; it has no installed pivot or powered coupling. The [approved exterior concept](output/exterior-concept.png) provides the appearance target. The CAD preview shows the current mechanical prototype, with a tapered body, compound shoulder/base rolls and a capsule head.
 

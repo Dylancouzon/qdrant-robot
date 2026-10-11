@@ -3,10 +3,13 @@
 <title>Concept A robot</title>
 <style>
 *{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#f4f2ec;color:#282b30;font:16px system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:24px}h1{font-size:26px;margin:0 0 8px}p{line-height:1.5;margin:8px 0}section{display:flex;gap:24px;margin-top:20px}canvas{width:100%;height:650px;display:block;border-radius:18px;background:#eeece5}.stage{flex:1;min-width:0}aside{width:310px}select{width:100%;padding:10px;border:1px solid #bbb8af;border-radius:8px;background:#fffdf7;color:inherit}summary{cursor:pointer}details{margin:16px 0}.detail{background:#fffdf7;border-radius:12px;padding:12px}.detail p{font-size:14px}canvas:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #477967;outline-offset:3px}button{border:1px solid #bbb8af;background:#fffdf7;border-radius:8px;padding:10px 14px;margin:0 6px 8px 0;color:inherit;cursor:pointer}button[aria-pressed=true]{background:#292b30;color:#fff}label{display:block;margin:18px 0}input[type=range]{width:100%;margin-top:12px}.note{font-size:14px;color:#5d6168}#error{color:#9d2727}#count{margin-top:20px;font-size:14px}@media(max-width:720px){main{padding:16px}section{display:block}aside{width:auto}canvas{height:460px}}
+
+nav{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0}a{color:#275c71}a:focus-visible{outline:3px solid #477967;outline-offset:3px}.guide{display:block;background:#fff;padding:24px;border-radius:14px;scroll-margin-top:16px}.guide h2{margin-top:0}.guide h3{margin-top:24px}.guide li{line-height:1.55;margin:10px 0}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid #ddd}th{background:#eef0f2}caption{text-align:left;margin-bottom:12px}.parts-list{columns:2;padding-left:24px}@media(max-width:720px){.guide{padding:16px}.parts-list{columns:1}}
 </style></head><body><main>
 <h1>Concept A robot</h1><p>__MODEL_INFO__</p>
 <p class="note">__STUDY_NOTE__</p>
-<section><div class="stage"><canvas tabindex="0" id="scene" aria-label="Interactive CAD view of the robot casing and yaw joint"></canvas><p id="error" role="alert"></p></div><aside>
+<nav aria-label="Page sections"><a href="#preview">3D preview</a><a class="assembly-only" href="#assembly-guide">Assembly guide</a><a class="assembly-only" href="#hardware-list">Hardware list</a><a class="assembly-only" href="#printed-parts">Printed parts</a></nav>
+<section id="preview"><div class="stage"><canvas tabindex="0" id="scene" aria-label="Interactive CAD view of the robot casing and yaw joint"></canvas><p id="error" role="alert"></p></div><aside>
 <p>Choose a view.</p><button data-view="three" aria-pressed="true">3D</button><button data-view="front" aria-pressed="false">Front</button><button data-view="rear" aria-pressed="false">Rear</button><button data-view="side" aria-pressed="false">Side</button>
 <label class="assembly-only" for="yaw">Turn the head: <output id="yaw-value">0°</output><input id="yaw" type="range" min="-80" max="80" value="0" step="1"></label>
 <label class="assembly-only" for="step">Assembly stage: <output id="step-value">Complete</output><input id="step" type="range" min="0" max="6" value="6" step="1"></label>
@@ -21,7 +24,67 @@
 <p class="note">Shell colors: printed parts. Green, gray, and blue: reference hardware. Reserved spaces appear only when enabled. All physical fits remain U (unverified).</p>
 <details class="assembly-only"><summary>Connections and open measurements</summary><p class="note">Camera USB → Jetson. Route externally through the split rear exits; slack and bend radius remain U.</p><p class="note">USB audio → Jetson. Speaker → audio module. Verify owned connectors and microphone positions.</p><p class="note">Jetson USB → compatible TTL bus adapter → STS3215. Adapter identity, power supply, horn retention, and installed servo mounting remain U.</p><p class="note">Measure support lands, plugs and sockets, servo ears and horn holes, bearing contacts, and cable bend radius. Verify fan direction, cooling, and acoustics.</p></details>
 <p class="note assembly-only">Stages show the documented assembly groups at their final positions. They do not animate insertion paths. Follow the <a href="../../CASING_ASSEMBLY.md">casing guide</a> and <a href="../../JOINT_ASSEMBLY.md">joint guide</a> for each operation.</p><p id="count"></p>
-</aside></section></main><script>
+</aside></section>
+<section id="assembly-guide" class="guide assembly-only" aria-labelledby="assembly-heading">
+<h2 id="assembly-heading">Assembly guide</h2>
+<p>This is an unpowered mechanical fit prototype. CAD checks are E (verified on the Mac). Physical fits and retention remain U (unverified).</p>
+<p>Test the panel coupons and spare keys first. Check safe support lands before installing populated electronics. Inspect every print in Bambu Studio.</p>
+<ol>
+<li><strong>Body and cradles.</strong> Remove the roof, rear cover, and right panel. Fit the speaker tray, audio shelf, and Jetson tray onto their supports.</li>
+<li><strong>Stationary components.</strong> Slide the speaker through the open rear at its final height. Fit the audio housing. Check servo admission with a dummy envelope before placing the Jetson. Keep the owned servo separate.</li>
+<li><strong>Body panels and roof.</strong> Connect and grip body plugs with the right panel removed. Fit the rear cover and right panel, then seat the roof on its four posts. Keep the rear roof channel open.</li>
+<li><strong>Manual joint.</strong> Slide the lower bearing, middle spacer, and upper bearing onto the gear shaft. Close both tower halves around them. Fit four cross pins and four keepers. Hold the joint 5.2 mm high, slide it through the rear roof channel, then lower it onto the posts. Fit both roof keys. Seat the detachable head flange on the D-flat and fit its transverse shaft key.</li>
+<li><strong>Bridge and neck cover.</strong> Slide the roof bridge forward beneath the seated flange. Fit two bridge pins and two keepers. Check their retention. Fit the neck cover before installing the head.</li>
+<li><strong>Head and camera.</strong> Lower the head onto the flange posts. Fit both head keys through the open rear. Insert the empty camera frame from the rear, 1.5 mm above its final height, then lower it onto its posts. Insert the complete camera through the frame after checking safe edge support.</li>
+<li><strong>Covers and connections.</strong> Connect the camera with the rear head cover open. Route its cable externally through the split rear exits. Fit the visor and rear head cover. Check cable slack through manual head travel before any powered design.</li>
+</ol>
+<h3>Connections</h3>
+<p>Connect the camera USB cable and USB audio module to the Jetson. Connect the speaker to the audio module after checking the owned connectors. Confirm microphone positions.</p>
+<p>The proposed powered path uses Jetson USB, a compatible TTL bus-servo adapter, and the STS3215. Adapter identity, supply wiring, grounding, horn retention, and installed servo mounting remain pending.</p>
+<h3>Service access</h3>
+<p>Remove the head, neck cover, roof bridge, joint, and roof before removing body panels. Remove the rear cover first for access to the right rear sockets. Pull each panel along its insertion direction.</p>
+<p>Remove the head before lifting the neck cover 60 mm over the retained mechanism. Release accessible key barbs before withdrawing keys. Keep cables clear during removal.</p>
+<p>Full references: <a href="../../CASING_ASSEMBLY.md">casing assembly</a> and <a href="../../JOINT_ASSEMBLY.md">joint assembly</a>. These files are included beside the offline preview directory.</p>
+</section>
+<section id="hardware-list" class="guide assembly-only" aria-labelledby="hardware-heading">
+<h2 id="hardware-heading">Hardware list</h2>
+<p>Quantities describe one prototype. “Owned” comes from the design requirements. Reference dimensions do not establish a physical fit.</p>
+<div class="table-wrap"><table><caption>Components, bearings, and cables</caption><thead><tr><th scope="col">Item</th><th scope="col">Quantity</th><th scope="col">Known reference</th><th scope="col">Status and required check</th></tr></thead><tbody>
+<tr><td>Jetson Orin Nano Super 8 GB</td><td>1</td><td>103 × 90.5 × 35 mm</td><td>Owned. Port coordinates, fan direction, support lands, and retention U.</td></tr>
+<tr><td>Arducam IMX291 USB camera</td><td>1</td><td>37 × 37 mm board; 26 mm holder; 26–27.5 mm lens length; 26 × 26 × 10 mm rear heatsink</td><td>Owned. Board thickness, focus travel, connectors, and safe edge support U.</td></tr>
+<tr><td>Waveshare USB TO AUDIO</td><td>1</td><td>53 × 23.5 × 14.6 mm case, excluding USB plug</td><td>Owned. Microphone openings, connectors, and acoustics U.</td></tr>
+<tr><td>Waveshare 8 Ω, 5 W speaker</td><td>1</td><td>100 × 45 × 21 mm reservation</td><td>Owned. Manufacturer image differs; measure the actual speaker.</td></tr>
+<tr><td>Closed joint bearings</td><td>2</td><td>15 mm bore × 24 mm outside diameter × 5 mm width</td><td>Prototype specification. Ownership, exact bearing model, race lands, and fit U.</td></tr>
+<tr><td>Jetson power plug and lead</td><td>1 connection</td><td>Reported 11 mm diameter; 11 mm straight section plus 10 mm right-angle section</td><td>Reported owned dimensions. Exact elbow shape, socket position, and exit fit U.</td></tr>
+<tr><td>JUXINICE USB 2.0 A male-to-female flat extensions</td><td>As needed; count U</td><td>4-inch, down-angle, 90°; reported 10 mm installed protrusion</td><td>Owned. Full connector width, height, socket positions, and insertion travel U.</td></tr>
+<tr><td>Camera USB cable and speaker connection</td><td>1 route each</td><td>External camera loop through split exits</td><td>Connector types, cable inventory, slack, bend radius, and strain relief U.</td></tr>
+</tbody></table></div>
+<h3>Pending powered hardware</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Item</th><th scope="col">Quantity</th><th scope="col">Status</th></tr></thead><tbody>
+<tr><td>STS3215, rated 7.4 V</td><td>1 proposed actuator</td><td>Servos owned. Reference housing 45.22 × 24.72 × 35 mm. Keep separate until mounting ears, support lands, horn holes, and retention are measured.</td></tr>
+<tr><td>Compatible USB TTL bus-servo adapter</td><td>1 proposed</td><td>SO-ARM100 adapter may be owned. Identify its board and revision before defining wiring.</td></tr>
+<tr><td>Servo supply, power leads, and horn retention hardware</td><td>Unspecified</td><td>Voltage compatibility, available current, grounding, supplied hardware, and screw sizes remain U. No purchase list is established.</td></tr>
+</tbody></table></div>
+<p>Printer: owned Bambu Lab P1S with a 0.4 mm nozzle. PLA is preferred; PETG is available. Coupon results and material suitability remain U.</p>
+<p>Source: <a href="../../../DESIGN_REQUIREMENTS.md">hardware design requirements</a>. Cooling, acoustics, powered loads, and repeated assembly remain unverified.</p>
+</section>
+<section id="printed-parts" class="guide assembly-only" aria-labelledby="printed-heading">
+<h2 id="printed-heading">Printed parts</h2>
+<p>The installed preview contains 36 printed pieces: 18 casing pieces and 18 joint pieces. Bearings and reference hardware are separate.</p>
+<ul class="parts-list">
+<li>Body front, rear cover, right panel, and roof: one each.</li>
+<li>Head front, rear cover, and visor: one each.</li>
+<li>Speaker grille and neck cover: one each.</li>
+<li>Speaker, Jetson, audio, and camera cradles: one each.</li>
+<li>Roof bridge: one; bridge pins: two; bridge keepers: two.</li>
+<li>Gear shaft, inner spacer, head flange, and shaft key: one each.</li>
+<li>Tower halves: two; cross pins: four; cross-pin keepers: four.</li>
+<li>Head keys: two; roof keys: two.</li>
+</ul>
+<p>Separate gauges, panel coupons, adjustment shims, horn coupons, and the loose drive gear support fit tests. They are excluded from the installed preview.</p>
+<p><a href="../casing/">Casing print files</a> · <a href="../joint/">Joint print files</a> · <a href="../bambu/">P1S projects</a></p>
+</section>
+</main><script>
 'use strict';
 const parts=__PART_DATA__;
 const study=__STUDY_MODE__;

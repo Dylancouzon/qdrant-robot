@@ -4,7 +4,7 @@ Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, 
 
 ## Active task: Tapered enclosure prototype
 
-The neutral-white enclosure uses a raised black grille and 22 mm base roll. Its finished bounds are 148.6 × 127.2 × 236 mm (E). All 1,200 CAD checks and 46 P1S slicing checks pass. The assembly viewer shows parts, internal envelopes, assembly groups, and connection notes. Task review passed. Physical measurements and printed coupons are the next step.
+The neutral-white enclosure uses a raised black grille and 22 mm base roll. Its finished bounds are 148.6 × 127.2 × 236 mm (E). All 1,200 CAD checks and 46 P1S slicing checks pass. The assembly viewer includes an offline assembly guide, hardware quantities and status, printed inventory, internal envelopes, and connection notes. Task review passed. Physical measurements and printed coupons are the next step.
 
 Physical retention, powered mounting, cable movement, cooling, and acoustics remain U. Before a full print, measure safe support lands, servo ears and horn hardware, bearing contacts, installed plugs, and camera cable bends. Confirm fan direction and microphone positions. Start with the panel-fit coupons. Read [requirements](hardware/DESIGN_REQUIREMENTS.md) and [handoff](hardware/concept-a/HANDOFF.md).
 

@@ -4,6 +4,16 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const source = fs.readFileSync(process.argv[2] || path.join(__dirname, 'output/assembly/robot-viewer.html'), 'utf8');
+// The guide and inventory remain readable when WebGL is unavailable.
+if (!process.argv[2]) {
+  for (const id of ['assembly-guide', 'hardware-list', 'printed-parts']) {
+    assert(source.includes(`id="${id}"`));
+    assert(source.includes(`href="#${id}"`));
+  }
+  assert(source.includes('15 mm bore × 24 mm outside diameter × 5 mm width'));
+  assert(source.includes('Pending powered hardware'));
+  assert(source.includes('36 printed pieces'));
+}
 const isStudy = source.includes('const study=true;');
 const script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
 const ids = Object.fromEntries([...source.matchAll(/id="([^"]+)"/g)].map(m => [m[1], {textContent: '',children:[],appendChild(child){this.children.push(child);}}]));
@@ -23,6 +33,8 @@ ids.scene.getBoundingClientRect = () => ({width, height});
 const views = ['three','front','rear','side'].map(view => ({dataset: {view}, setAttribute(name,value){this[name]=value;}}));
 const document = {createElement: () => ({}),getElementById: id => {assert(ids[id]);return ids[id];},querySelectorAll: selector => selector === '.assembly-only' ? [ids.step,ids.yaw,ids.open,ids.explode] : views};
 vm.runInNewContext(script, {document,devicePixelRatio:2,console,ResizeObserver:class{constructor(cb){this.cb=cb;}observe(){this.cb();}}}, {timeout:15000});
+vm.runInNewContext(script, {document:{...document,getElementById:id=>id==='scene'?{getContext:()=>null}:ids[id]}}, {timeout:15000});
+assert(ids.error.textContent.includes('cannot display WebGL'));
 for (const dimensions of [[320,460],[800,650],[1200,650]]) {
   [width,height] = dimensions;
   for (const view of views) {
