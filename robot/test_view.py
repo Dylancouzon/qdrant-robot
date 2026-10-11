@@ -361,3 +361,49 @@ def test_viewer_replacement_and_close_cancel_waiting_without_consuming():
     finally:
         if not view.stopped.is_set():
             view.close()
+
+
+def test_settings_endpoint_validates_and_publishes_live_settings(tmp_path, monkeypatch):
+    import io
+    import json
+    from email.message import Message
+    from types import SimpleNamespace
+    from robot.main import Robot
+    from robot import main
+    from robot.settings import DEFAULTS, Settings
+    from robot.view import _Handler
+    config = Settings(tmp_path / "settings.json")
+    monkeypatch.setattr(main, "settings", config)
+    robot = Robot.__new__(Robot)
+    view = SimpleNamespace(port=8090, token=TOKEN.encode(), action=robot._control,
+        state=lambda: (None, Screen(settings=config.snapshot(), window={"active": False})))
+    handler = _Handler.__new__(_Handler)
+    handler.server = SimpleNamespace(view=view)
+    replies = []
+    handler.send_response = replies.append
+    handler.send_error = replies.append
+    handler.send_header = lambda *args: None
+    handler.end_headers = lambda: None
+    def post(token, data, code):
+        body = json.dumps(data).encode()
+        handler.path = f"/settings?token={token}"
+        handler.headers = Message()
+        handler.headers["Origin"] = "http://127.0.0.1:8090"
+        handler.headers["Host"] = "127.0.0.1:8090"
+        handler.headers["Content-Length"] = str(len(body))
+        handler.rfile = io.BytesIO(body)
+        handler.do_POST()
+        assert replies[-1] == code
+    post("wrong", {"name": "match", "value": .9}, 403)
+    post(TOKEN, {"name": "match", "value": .9}, 202)
+    post(TOKEN, {"name": "match", "value": .1}, 400)
+    post(TOKEN, {"name": "missing", "value": .9}, 400)
+    post(TOKEN, [], 400)
+    handler.path = f"/state?token={TOKEN}"
+    handler.wfile = io.BytesIO()
+    handler.do_GET()
+    state = json.loads(handler.wfile.getvalue())
+    assert state["settings"]["match"] == .9 and not state["window"]["active"]
+    assert Settings(config.path).match == .9
+    post(TOKEN, {"reset": True}, 202)
+    assert config.snapshot() == DEFAULTS

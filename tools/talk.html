@@ -9,6 +9,7 @@
 @media(max-width:900px){body{padding:16px}.grid{grid-template-columns:1fr}.conversation{grid-column:1;grid-row:auto;height:clamp(250px,65dvh,600px)}.controls{align-items:flex-start;flex-direction:column;gap:14px}.badge{font-size:11px}header{gap:12px}.camerafoot{gap:10px;flex-wrap:wrap}.actions{flex-wrap:wrap}.cardhead{gap:12px}}
 @media(max-width:480px){header{flex-wrap:wrap}body{padding:12px}.audio{gap:12px;padding:14px}.actions button{padding:10px 17px}}
 @media(max-height:650px){body{padding-top:12px;padding-bottom:12px}header{margin-bottom:12px}.controls{padding:12px 16px;margin-bottom:12px}.transcript{padding:14px}}
+.recognition .cardhead{flex-wrap:wrap}.setting{padding:12px 20px;border-bottom:1px solid var(--line)}.setting small{display:block;margin:5px 0}.setting input{font:inherit;width:110px;max-width:100%;padding:8px;background:#243141;color:#eef3fa;border:1px solid var(--line);border-radius:8px}.setting button{margin-left:8px;padding:8px 16px}#learning{padding:0 20px;color:var(--dim)}
 </style>
 <header><div class="brand"><div class="logo" aria-hidden="true">e</div><div><h1>Edgy</h1><p>Your robot's view, voice, and memory</p></div></div><div class="badge">On Jetson · Qdrant Edge</div></header>
 <section class="controls" aria-label="Session controls"><div><div id="phase" role="status" aria-live="polite">Idle</div><p id="activity">Start attaches to the robot on the Jetson, or starts it.</p><p id="error" role="alert"></p></div><div class="actions"><button id="start" onclick="control('start')">Start</button><button id="mute" class="secondary" onclick="robot('mute',{on:!muted})" disabled>Mute</button><button id="stop" class="secondary" onclick="control('stop')" disabled>Stop</button></div></section>
@@ -16,6 +17,7 @@
 <section class="card"><div class="cardhead"><h2>Live camera</h2><small id="cameraState">Session idle</small></div><div class="camera"><div id="placeholder" class="placeholder"><strong>Ready when you are</strong>Start to see the Jetson camera and its detection boxes.</div><img id="camera" alt="Live Jetson camera with person, object, and focus boxes" hidden></div><div class="camerafoot"><span>Green boxes name recognized objects. Person names appear only on their verified camera frame.</span><span>Focus boxes show the object Edgy can learn.</span></div><div class="camerafoot"><label for="item">Visible item</label><select id="item" aria-label="Item to ignore"></select><button id="ignore" class="secondary" disabled>Do not track that</button></div><div class="camerafoot"><label for="restoreItem">Ignored item</label><select id="restoreItem" aria-label="Ignored item to restore"></select><button id="restore" class="secondary" disabled>Restore</button></div><p id="itemMessage" role="status"></p><p id="viewerror" role="status"></p></section>
 <section class="card conversation"><div class="cardhead"><h2>Conversation</h2><small>Current session</small></div><div id="transcript" class="transcript" aria-label="Live conversation"><p class="empty">Say “Hey Edgy” to begin.<br>Your words and Edgy's reply appear here as they become available.</p></div><div class="audio"><label for="volume">Robot speaker volume <output id="volumeValue"></output></label><input id="volume" type="range" min="0" max="100" step="1" value="62" disabled></div></section>
 <section class="card"><div class="cardhead"><h2>Evidence supplied to this reply</h2><small id="answerPath"></small></div><div id="evidence" class="evidence"><p class="empty">Stored facts and memory references appear when Edgy uses them.</p></div></section>
+<section class="card recognition"><div class="cardhead"><h2>Recognition settings</h2><button id="resetSettings" class="secondary" disabled>Reset to defaults</button></div><p id="learning" role="status"></p><div id="recognitionSettings"></div></section>
 </main>
 <footer>All models and Qdrant Edge run on the Jetson. The Mac stores no microphone recording or camera frames. The Jetson keeps its existing session logs and answer audio.
 <details><summary>Things you can say</summary>Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?” or “Forget my phone”. Choose an item in the camera card and press “Do not track that” to ignore it; “Restore” brings it back. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it. Follow-up questions stay open for about a minute after each answer finishes. Say “Track this” with no name and Edgy asks what to call it. The robot ignores its microphone while its speaker plays and while muted; Mute and the volume slider act on the robot’s own USB microphone and speaker. Stop stops the robot on the Jetson and clears this view. Closing this page or losing the connection leaves the robot running; Start attaches to it again.</details></footer>
@@ -26,7 +28,7 @@ function clearLive(){
   el('camera').removeAttribute('src');el('camera').hidden=true;el('placeholder').hidden=false;cameraActive=false;
   el('cameraState').textContent='Session idle';el('viewerror').textContent='';el('answerPath').textContent='';
   el('transcript').replaceChildren();const p=document.createElement('p');p.className='empty';p.textContent='Say “Hey Edgy” to begin. Your words and Edgy’s reply appear here.';el('transcript').append(p);transcriptText='';
-  itemControl={};ignoredItems=[];muted=false;items();
+  itemControl={};ignoredItems=[];muted=false;items();recognition({},false);
   el('evidence').replaceChildren();const hint=document.createElement('p');hint.className='empty';hint.textContent='Stored facts and memory references appear when Edgy uses them.';el('evidence').append(hint);
 }
 async function control(action){
@@ -35,9 +37,33 @@ async function control(action){
   catch(error){el('error').textContent=error.message;}
 }
 async function robot(action,data){
-  try{const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw Error('The robot did not apply that control');}
+  try{const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw Error('The robot did not apply that control');return true;}
   catch(error){el('error').textContent=error.message;}
 }
+const recognitionFields=[
+  ['match','Recognition threshold',0.6,0.99,0.001,'Higher values require a closer visual match.'],
+  ['guess_band','Near-match band',0,0.2,0.01,'Show a possible name within this distance below the threshold.'],
+  ['window_s','Teaching window (seconds)',0,30,0.5,'Learn new views after naming; zero turns learning off.'],
+  ['window_gap_s','Admission gap (seconds)',0.2,5,0.1,'Wait this long between stored views.'],
+  ['window_floor','Teaching match floor',0,0.99,0.01,'Require this match to the taught object before adding a view.'],
+  ['duplicate','Duplicate threshold',0.8,1,0.01,'Skip a view this similar to any stored view.'],
+  ['views_cap','Maximum views',3,64,1,'Keep the first view and the newest other views.']
+];
+for(const [name,label,min,max,step,description] of recognitionFields){
+  const row=document.createElement('form');row.className='setting';
+  const title=document.createElement('label');title.htmlFor='setting-'+name;title.textContent=label+' ('+min+' to '+max+')';
+  const detail=document.createElement('small');detail.id='description-'+name;detail.textContent=description;
+  const input=document.createElement('input');input.id=title.htmlFor;input.type='number';input.min=min;input.max=max;input.step=step;input.required=true;input.disabled=true;input.setAttribute('aria-describedby',detail.id);
+  const button=document.createElement('button');button.type='submit';button.textContent='Apply';button.disabled=true;button.setAttribute('aria-label','Apply '+label.toLowerCase());
+  row.append(title,detail,input,button);row.addEventListener('submit',async event=>{event.preventDefault();if(row.reportValidity()&&await robot('settings',{name,value:Number(input.value)}))delete input.dataset.editing;});el('recognitionSettings').append(row);
+}
+el('resetSettings').addEventListener('click',async()=>{if(await robot('settings',{reset:true}))for(const [name] of recognitionFields)delete el('setting-'+name).dataset.editing;});
+function recognition(live,ready){
+  el('resetSettings').disabled=!ready;
+  for(const [name] of recognitionFields){const input=el('setting-'+name);input.disabled=!ready;input.form.querySelector('button').disabled=!ready;if(live.settings&&document.activeElement!==input&&!input.dataset.editing)input.value=live.settings[name];}
+  const window=live.window;el('learning').textContent=window?.active?'Learning views of your '+window.name+': '+window.views_admitted+' ('+Math.ceil(window.seconds_left)+' s left)':'';
+}
+for(const [name] of recognitionFields){const input=el('setting-'+name);input.addEventListener('input',()=>input.dataset.editing='true');}
 el('volume').addEventListener('input',()=>el('volumeValue').textContent=el('volume').value+'%');
 el('volume').addEventListener('change',()=>robot('volume',{percent:Number(el('volume').value)}));
 function scrollConversation(){const transcript=el('transcript');transcript.scrollTop=transcript.scrollHeight;}
@@ -77,9 +103,9 @@ async function status(){
     const response=await fetch('/status');if(!response.ok)throw Error('Page connection failed');const s=await response.json();
     el('phase').textContent=s.phase;el('error').textContent=s.error;el('start').disabled=s.active;el('stop').disabled=!s.active;el('mute').disabled=!s.view_ready;el('volume').disabled=!s.view_ready;
     el('activity').textContent=muted?'Microphone muted':s.phase==='Listening'?'Listening through the robot’s microphone':s.active?'Preparing the connection; please wait':'Start attaches to the robot on the Jetson, or starts it.';
-    if(!s.view_ready){if(cameraActive||transcriptText)clearLive();return;}
+    if(!s.view_ready){recognition({},false);if(cameraActive||transcriptText)clearLive();return;}
     if(!cameraActive){el('camera').src='/camera';el('camera').hidden=false;el('placeholder').hidden=true;cameraActive=true;}
-    try{const view=await fetch('/robot');if(!view.ok)throw Error('Live view connection unavailable');const live=await view.json();el('phase').textContent=s.playing?'Speaking':live.status||s.phase;el('cameraState').textContent=(live.control?.camera_source||'Live camera')+' · detection and focus';el('viewerror').textContent='';conversation(live.transcript);evidence(live.evidence);itemControl=live.control||{};muted=!!itemControl.muted;el('mute').textContent=muted?'Unmute':'Mute';if(document.activeElement!==el('volume')&&itemControl.volume!==undefined){el('volume').value=itemControl.volume;el('volumeValue').textContent=itemControl.volume+'%';}ignoredItems=live.ignored_items||[];items();}
+    try{const view=await fetch('/robot');if(!view.ok)throw Error('Live view connection unavailable');const live=await view.json();recognition(live,true);el('phase').textContent=s.playing?'Speaking':live.status||s.phase;el('cameraState').textContent=(live.control?.camera_source||'Live camera')+' · detection and focus';el('viewerror').textContent='';conversation(live.transcript);evidence(live.evidence);itemControl=live.control||{};muted=!!itemControl.muted;el('mute').textContent=muted?'Unmute':'Mute';if(document.activeElement!==el('volume')&&itemControl.volume!==undefined){el('volume').value=itemControl.volume;el('volumeValue').textContent=itemControl.volume+'%';}ignoredItems=live.ignored_items||[];items();}
     catch(error){el('viewerror').textContent=error.message;}
   }catch(error){el('phase').textContent='Page disconnected';el('error').textContent=error.message;el('start').disabled=true;clearLive();}
 }

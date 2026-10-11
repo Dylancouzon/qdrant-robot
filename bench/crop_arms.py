@@ -20,7 +20,16 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from robot.config import DETECT_LOW, OBJECT_MIN_SIDE  # noqa: E402
 from robot.detect import MODEL, iou, letterbox, mask  # noqa: E402
-from robot.things import MATCH, Crops, cut, diverse  # noqa: E402
+from robot.settings import DEFAULTS, settings  # noqa: E402
+from robot.things import DIM, Crops, add_vectors, cut  # noqa: E402
+
+settings.values = dict(DEFAULTS)  # benches measure the shipped defaults, never a live file
+MATCH = DEFAULTS["match"]
+
+
+def taught_gallery(vectors):
+    """The runtime's taught gallery from the naming turn's shots."""
+    return add_vectors(np.empty((0, DIM), np.float32), np.asarray(vectors))
 
 DATA = ROOT / 'build/reconciliation-20261010/worktrees/mac-audio-interface/build'
 ARMS = ('box', 'masked')
@@ -87,7 +96,7 @@ def teach(session, encoder, protocol):
         for arm in ARMS:
             shots[arm].append(pair[arm])
     assert all(len(values) == 3 for values in shots.values())
-    return {arm: diverse(encoder(shots[arm]), 0) for arm in ARMS}, teaching
+    return {arm: taught_gallery(encoder(shots[arm])) for arm in ARMS}, teaching
 
 
 def classify(found, pair, values, record, counts, scores, examples, output, run, index):

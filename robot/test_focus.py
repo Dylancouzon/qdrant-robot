@@ -496,9 +496,9 @@ def test_duplicate_name_abstains_even_when_one_match_becomes_weak():
 
 @pytest.mark.parametrize(('detector', 'descriptor', 'displayed'), [
     (.143188, .7754759788513184, False),  # Recorded face crop: both current signals weak.
-    (.143188, F.GUESS, False),
-    (.143188, F.SURE - .0001, False),
-    (.143188, F.SURE, True),
+    (.143188, (F.settings.match - F.settings.guess_band), False),
+    (.143188, F.settings.match - .0001, False),
+    (.143188, F.settings.match, True),
     (.143188, 1, True),
     (F.DISPLAY_CONFIDENCE, .7754759788513184, True),
     (.9, .2544, True),
@@ -518,7 +518,7 @@ def test_display_requires_one_current_positive_signal(detector, descriptor, disp
     assert f.eligible(t, pending=True), 'the crop remains eligible for fresh re-verification'
     f.update(10.2, [t], [])
     assert bool(f.names()) is displayed, 'skipped queries do not change either signal'
-    assert f.named[t.id].misses == int(descriptor < F.SURE)
+    assert f.named[t.id].misses == int(descriptor < F.settings.match)
 
 
 def test_two_weak_signals_hide_until_detector_or_descriptor_recovers():
@@ -533,12 +533,12 @@ def test_two_weak_signals_hide_until_detector_or_descriptor_recovers():
     f.update(10.2, [strong_detector], [])
     assert f.names() == {t.id: ('Chosen', True)}
     assert f.named[t.id].refreshed == refreshed, 'detector recovery invents no crop authority'
-    assert f.named[t.id].score < F.SURE
+    assert f.named[t.id].score < F.settings.match
     f.update(10.3, [t], [])
     assert not f.names(), 'the retained association cannot override two weak signals'
-    f.update(10.4, [t], [], recognized={t.id: ('Chosen', F.SURE)})
+    f.update(10.4, [t], [], recognized={t.id: ('Chosen', F.settings.match)})
     assert f.names() == {t.id: ('Chosen', True)} and f.eligible(t)
-    assert f.named[t.id].score == F.SURE and f.named[t.id].refreshed == 10.4
+    assert f.named[t.id].score == F.settings.match and f.named[t.id].refreshed == 10.4
 
 
 def test_item_exclusion_requires_match_and_counts_only_actual_misses():

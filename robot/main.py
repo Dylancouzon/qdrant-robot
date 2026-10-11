@@ -25,9 +25,10 @@ import numpy as np
 from robot import audio, brain
 from robot.asr import Ears, Scribe, woken
 from robot.config import SHARED
-from robot.detect import CONFIRM, Detector, Sighting, Tracker, region
+from robot.settings import settings
+from robot.detect import CONFIRM, Detector, Sighting, Tracker, iou, region
 from robot.recognition import Recognition
-from robot.focus import BODY, OCCLUSION_S, SMOOTH, SNAP, SURE, Focus, Track, inside
+from robot.focus import BODY, OCCLUSION_S, SMOOTH, SNAP, Focus, Track, inside
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     UNAVAILABLE,
@@ -60,7 +61,6 @@ from robot.people import (
 from robot.route import Router
 from robot.text_embed import TextEmbedder
 from robot.things import (
-    MATCH,
     SHOTS,
     Things,
     command,
@@ -218,6 +218,7 @@ class Robot:
         self.shown_taken = 0.0
         self.shown_frame, self.shown_record = 0, 0
         self.shown_known = False
+        self.window = None
         self.session_id = secrets.token_hex(16)
         self.control_message = ""
         self.crop_due = {}
@@ -325,6 +326,7 @@ class Robot:
             self.verified, self.shown_taken, self.crop_due, self.item_checked = None, 0.0, {}, {}
             self.shown_frame, self.shown_record = 0, 0
             self.shown_known = False
+            self.window = None
             self.session_id = secrets.token_hex(16)
             self.crop_times.clear()
             self.matches_pending, self.control_message = False, ""
@@ -418,6 +420,7 @@ class Robot:
             if not self.views or self.view_taken - self.views[-1][0] >= VIEW_S:
                 self.views.append((self.view_taken, *self.view))
             self._refocus(frame)
+            self._window_status()
             tracks = [Track(*t) for t in self.tracker.scored()]
             self.recognition.submit((frame, self.view_taken,
                 tracks,
@@ -550,7 +553,8 @@ class Robot:
                 "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source,
                 "muted": self.muted, "volume": self.volume},
-                ignored_items=self.things.preferences())
+                ignored_items=self.things.preferences(), settings=settings.snapshot(),
+                window=self._window_status())
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
                       "Speaking" if self.speaker.playing() else
                       "Thinking" if self.ui_thinking else
@@ -601,7 +605,7 @@ class Robot:
                          focus.epoch(i) == epochs[i]}
                 self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry,
                                      gallery)
-        recognized, excluded = self._query_objects(frame, tracks, preferences)
+        recognized, excluded = self._query_objects(frame, tracks, preferences, (taken, epochs))
         if time.time() - taken > PREVIEW_TTL:
             return
         with self.detecting:
@@ -667,11 +671,55 @@ class Robot:
                     a + SMOOTH * (b - a) for a, b in zip(previous[3][1][:4], box, strict=True))
         return (*box, matched or "", "known" if matched else "other")
 
-    def _query_objects(self, frame, tracks, preferences):
+    def _window_status(self):
+        """End a teaching window for good when time runs out or its track is gone. Resets,
+        new conversations, naming, and forgetting clear it where they happen."""
+        window = self.window
+        if window and (time.time() >= window["end"] or settings.window_s == 0 or
+                not self.focus or window["track"] not in self.focus.visible or
+                self.focus.epoch(window["track"]) != window["epoch"]):
+            self.window = window = None
+        return {"active": bool(window), "name": window["name"] if window else "",
+                "views_admitted": window["admitted"] if window else 0,
+                "seconds_left": max(0., window["end"] - time.time()) if window else 0.}
+
+    def _admit_window(self, window, track, vector, source):
+        """Add the taught track's crop if the window still holds that track (D154)."""
+        taken, epochs = source
+        with self.detecting:
+            self._window_status()
+            if self.window is not window or track.label in BODY or \
+                    epochs.get(track.id) != window["epoch"] or \
+                    not self.focus.accepts(track.id, taken) or \
+                    time.time() - taken > PREVIEW_TTL:
+                return
+        # Outside the detection lock: forget runs on this same owner thread, so nothing races.
+        own = self.things.score(vector, window["name"])
+        # Added views preserve valid results and offers, so keep the gallery epoch.
+        if own and own[1] >= settings.window_floor and \
+                self.things.add_view(window["name"], vector):
+            window["admitted"] += 1
+            with (self.out / "turns.jsonl").open("a") as stream:
+                stream.write(json.dumps({"event": "teaching_view", "name": own[0],
+                    "track": track.id, "time": time.time(),
+                    "session": self.session_id}) + "\n")
+
+    def _start_window(self, track, epoch, name):
+        """Learn more views of `name` from its taught track while that track lasts (D154)."""
+        now = time.time()
+        if settings.window_s > 0 and self.focus.epoch(track) == epoch and \
+                track in self.focus.visible:
+            self.window = dict(track=track, epoch=epoch, name=name,
+                               end=now + settings.window_s, last=now, admitted=0)
+
+    def _query_objects(self, frame, tracks, preferences, source=None):
         """Oldest-due eligible crop, reusing one vector for identity and item preference."""
         candidates = [t for t in tracks if t.label not in BODY and
                       self.focus.sized(t) and self.focus.confident(t, pending=True) and
                       t.label not in self.ignored]
+        self._window_status()
+        window = self.window
+        source = source or (self.view_taken, {t.id: self.focus.epoch(t.id) for t in tracks})
         active = {t.id for t in candidates}
         self.crop_due = {i: due for i, due in self.crop_due.items() if i in active}
         while self.crop_times and time.monotonic() - self.crop_times[0] >= 1:
@@ -679,15 +727,24 @@ class Robot:
         recognized, excluded = {}, {}
         if (self.named or self.things.items) and len(self.crop_times) < 3 and candidates:
             eligible = self.things.visual_links(self.ignored)
-            t = min(candidates, key=lambda t: self.crop_due.get(t.id, 0))
+            due = window and time.time() - window["last"] >= settings.window_gap_s
+            taught = next((t for t in candidates if window and t.id == window["track"]), None)
+            t = taught if due and taught else min(
+                candidates, key=lambda t: self.crop_due.get(t.id, 0))
             self.crop_times.append(time.monotonic())
             self.crop_due[t.id] = time.monotonic()
             vector = self.recognition.crops([cut(frame, t.box)])[0]
             excluded[t.id] = self.things.excluded(vector)
+            if due and t is taught:
+                window["last"] = time.time()  # each attempt spends the gap, so others get slots
+                rivals = [o.box for o in tracks if o.id != t.id and o.label == t.label]
+                crowded = bool(rivals) and iou(np.array([t.box]), np.array(rivals)).max() > .3
+                if not excluded[t.id] and not crowded:  # an overlapping lookalike: impure crop
+                    self._admit_window(window, t, vector, source)
             hit = self.things.score(vector, preferences[t.id])
-            if preferences[t.id] and (not hit or hit[1] < MATCH):
+            if preferences[t.id] and (not hit or hit[1] < settings.match):
                 other = self.things.score(vector)
-                if other and other[1] >= MATCH and other[0] in eligible:
+                if other and other[1] >= settings.match and other[0] in eligible:
                     hit = other
             recognized[t.id] = hit if hit and hit[0] in eligible else (None, 0.0)
         return recognized, excluded
@@ -701,9 +758,10 @@ class Robot:
             name, score = recognized.get(t.id, (None, 0.0))
             claims = {i for i, n in self.focus.named.items()
                       if i in self.focus.visible and
-                      ((n.name == name and n.confidence >= SURE) or
-                       (n.run[0] == name and n.score >= SURE))}
-            if name and score >= SURE and t.label not in self.ignored and claims == {t.id}:
+                      ((n.name == name and n.confidence >= settings.match) or
+                       (n.run[0] == name and n.score >= settings.match))}
+            if name and score >= settings.match and t.label not in self.ignored and \
+                    claims == {t.id}:
                 pid = self.points.get(t.id)
                 row = self.memory.points([pid]) if pid else []
                 if not row or row[0].get("named") != name:
@@ -1047,6 +1105,7 @@ class Robot:
         linked = (seen is not None and float(seen[0] @ held) >= THRESHOLD) if held is not None \
             else turn.speech_start - self.last_line <= CONVERSATION_S
         if not linked:
+            self.window = None
             self.told, self.since = None, time.time_ns() // 1000
         self.face = seen[0] if seen else None
         return not linked
@@ -1084,6 +1143,8 @@ class Robot:
         in view; pending caption writes to a deleted point are dropped by Memory.set."""
         # Carried gap: a turn frame where this person appears unidentified (before enrollment,
         # or behind another visitor) is not linked, so it stays until retention (RETAIN_S, 12 h).
+        with self.detecting:
+            self.window = None  # no more views are learned for a visitor being forgotten
         try:
             self.memory.forget(self.recognition.call(
                 lambda f, c: self.people.forget(name), mutate=True))
@@ -1110,6 +1171,7 @@ class Robot:
         if cmd := command(turn.question, self.vocab):
             kind, name, labels = cmd
             if kind == "teach":
+                self.window = None
                 self._settle(turn.speech_start)
                 if (track := self._target(turn)) is None:
                     return NOTHING_HELD
@@ -1143,7 +1205,10 @@ class Robot:
                     0 <= time.time() - offer.seen <= OFFER_HOLD_S)
 
     def _setting(self, action, data):
-        """Mute the microphone or set the speaker volume, at once."""
+        """Apply live microphone, volume, or recognition settings."""
+        if action == "settings":
+            settings.change(data)
+            return True
         if action == "mute":
             if type(data.get("on")) is not bool:
                 return False
@@ -1164,7 +1229,7 @@ class Robot:
 
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
-        if action in ("mute", "volume") and isinstance(data, dict):
+        if action in ("mute", "volume", "settings") and isinstance(data, dict):
             return self._setting(action, data)
         if action not in ("ignore", "restore") or not isinstance(data, dict):
             return False
@@ -1199,7 +1264,7 @@ class Robot:
         current = crops([shot])
         if chosen:
             hit = self.things.score(current[0], chosen)
-            if not hit or hit[0] != chosen or hit[1] < MATCH:
+            if not hit or hit[0] != chosen or hit[1] < settings.match:
                 return None
             return self.things.descriptors(chosen)
         return current
@@ -1296,7 +1361,7 @@ class Robot:
                 candidates = [t.id for t in tracks if t.id in self.focus.visible and
                               self.focus.eligible(t) and
                               names.get(t.id) == (old["name"], True) and
-                              self.focus.named[t.id].score >= MATCH and
+                              self.focus.named[t.id].score >= settings.match and
                               0 <= time.time() - self.focus.named[t.id].refreshed <= PREVIEW_TTL]
                 if len(candidates) == 1:
                     found = candidates[0]
@@ -1309,6 +1374,7 @@ class Robot:
         """Remember the actual binding crop, its source box/time, and deletion links. `pinned`:
         the focus epoch the track must still have (a track that left and returned is new)."""
         with self.detecting:
+            self.window = None
             views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
                      if track in v[2] and self.focus.accepts(track, v[0])]
             epoch = self.focus.epoch(track)
@@ -1354,9 +1420,12 @@ class Robot:
         turn.memories, turn.named = [pid], name
         with self.detecting:
             self.focus.bind(track, name, taken)
+            self._start_window(track, epoch, name)
         self.jobs.put(("caption", pid, brain.jpeg(shots[0])))
         self._retain(time.time())
-        return f"Got it, that is your {name}. I will remember it."
+        return f"Got it, that is your {name}. " + (
+            "Turn it slowly so I can see all sides." if settings.window_s > 0 else
+            "I will remember it.")
 
     def _forget_thing(self, name: str, labels: list[str]) -> str:
         """Delete named crops, linked turns, and selected sightings; ignore rules survive."""
@@ -1367,6 +1436,8 @@ class Robot:
         self.memory.forget_named(named["name"])
         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
         with self.detecting:
+            if self.window and self.window["name"] == named["name"]:
+                self.window = None
             if self.focus:
                 self.focus.forget(named["name"])
             self.verified = None
@@ -1378,7 +1449,7 @@ class Robot:
                        ) -> tuple[list[str], int | None, int, str]:
         """Retrieval for a question about the visitor's object `named`: evidence lines (what
         it looks like, when it was named, each object in view with its score, its latest
-        matched sightings), the track in view that matches it at MATCH or above (None: no
+        matched sightings), the track in view that meets the recognition threshold (None: no
         claim), how many tracks of its kind are in view, and when it was last seen ("20
         seconds ago"). Every object in view is scored, whatever its label; `this`: only the
         one nearest the center. Sets turn.memories to the evidence ids."""
@@ -1397,7 +1468,7 @@ class Robot:
                 [cut(frame, b) for b in found.values()])) if found else [],
             strict=True)}
         mine = max(scores, key=scores.__getitem__, default=None)
-        mine = mine if mine is not None and scores[mine] >= MATCH else None
+        mine = mine if mine is not None and scores[mine] >= settings.match else None
         past = self.memory.sightings(turn.speech_start, 3, here, named=[name])
         turns = self.memory.points(named["turns"])
         turn.memories = [t["id"] for t in turns] + [s["id"] for s in past] + (
@@ -1406,7 +1477,8 @@ class Robot:
         looks = next((x for t in turns if (x := main_object(t.get("caption", "")))), name)
         lines = [f"The visitor's {name}: {looks}" + (
             f", named {ago(turns[-1]['ts'])}" if turns else "")] + [
-            f"In view now: {view[t][0]}, match {scores[t]:.2f} (needs {MATCH})" for t in found] + [
+            f"In view now: {view[t][0]}, match {scores[t]:.2f} (needs {settings.match})"
+            for t in found] + [
             f"Matched sighting: {x['label']}, last seen {ago(x['last_seen'])}" for x in past]
         last = ago(past[0]["last_seen"]) if past else ago(turns[-1]["ts"]) if turns else ""
         return lines, mine, sum(view[t][0] in named["labels"] for t in found), last

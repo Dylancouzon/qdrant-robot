@@ -31,7 +31,7 @@ CHECK_TIMEOUT_S = 300  # the suite takes 95-120 s on an idle Mac, more under loa
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
 SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.detect", "robot.memory",
-             "robot.things", "robot.tts"]
+             "robot.things", "robot.settings", "robot.tts"]
 
 def git(*args: str, env: dict | None = None) -> str:
     """git in ROOT. A hook's GIT_DIR and GIT_INDEX_FILE are dropped: in a linked worktree they

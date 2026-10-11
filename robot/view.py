@@ -17,7 +17,7 @@ import numpy as np
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, or other
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
-ACTIONS = ("/ignore", "/restore", "/mute", "/volume")  # POST paths the robot handles
+ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings")  # POST paths the robot handles
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."
 FONT, SMALL = cv2.FONT_HERSHEY_SIMPLEX, 0.5
@@ -38,6 +38,8 @@ class Screen:
     evidence: dict = field(default_factory=dict)  # supplied to the current answer
     control: dict = field(default_factory=dict)
     ignored_items: list[dict] = field(default_factory=list)
+    settings: dict = field(default_factory=dict)
+    window: dict = field(default_factory=dict)
     valid: Callable[[], bool] | None = field(default=None, repr=False, compare=False)
     source: tuple = field(default=(), repr=False, compare=False)  # exact selection for retries
 
@@ -111,6 +113,7 @@ class _Handler(BaseHTTPRequestHandler):
             data = json.dumps({"status": screen.status, "transcript": screen.transcript,
                                "evidence": screen.evidence, "memory": screen.memory,
                                "control": screen.control,
+                               "settings": screen.settings, "window": screen.window,
                                "ignored_items": screen.ignored_items}).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -176,7 +179,13 @@ class _Handler(BaseHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             self.send_error(400)
             return
-        accepted = view.action and view.action(parsed.path[1:], data)
+        try:
+            if not isinstance(data, dict):
+                raise ValueError("Action must be an object")
+            accepted = view.action and view.action(parsed.path[1:], data)
+        except ValueError:
+            self.send_error(400)
+            return
         self.send_response(202 if accepted else 409)
         self.send_header("Content-Length", "0")
         self.end_headers()

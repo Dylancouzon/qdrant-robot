@@ -6,6 +6,7 @@ from collections import deque
 from dataclasses import dataclass, field
 
 from robot.config import DETECT_LOW, DISPLAY_CONFIDENCE, OBJECT_MIN_SIDE
+from robot.settings import settings
 
 Box = tuple[int, int, int, int]  # x1, y1, x2, y2 in frame pixels
 
@@ -29,8 +30,7 @@ HELD = 0.8  # fraction of a box inside a person or hand box: held up, to take th
 # The teaching zone, a calibration knob for the booth mat (fractions of the frame): an object
 # whose whole box is inside it may take the focus without being held.
 ZONE = (0.25, 0.5, 0.75, 1.0)
-SURE, GUESS = 0.822, 0.772  # things.MATCH, and the bottom of the guess band ("Dylan's phone?")
-SET_N, CLEAR_N = 2, 3  # agreeing queries that set a name; queries under GUESS that clear it
+SET_N, CLEAR_N = 2, 3  # agreeing queries that set a name; weak queries that clear it
 OCCLUSION_S = 0.2  # drawing only; a gap invalidates every older recognition result
 
 
@@ -60,8 +60,8 @@ class _Seen:
 
 @dataclass
 class _Name:
-    """A track's name with hysteresis: set after SET_N agreeing queries at GUESS or more,
-    green confidence fades after CLEAR_N below-SURE queries; below-GUESS also clears the name."""
+    """Set a name after agreeing queries within the near-match band.
+    Weak queries fade confidence, and queries below the band clear the name."""
     name: str | None = None
     score: float = 0.0  # latest query, never retained to authorize a write
     confidence: float = 0.0  # accepted display confidence through bounded weak queries
@@ -73,8 +73,8 @@ class _Name:
         """Count one recognition result; True when the shown name changed."""
         old = self.name
         self.score = score
-        self.misses = self.misses + 1 if name is None or score < SURE else 0
-        if name is None or score < GUESS:
+        self.misses = self.misses + 1 if name is None or score < settings.match else 0
+        if name is None or score < (settings.match - settings.guess_band):
             self.run = None, 0
             if self.misses >= CLEAR_N:
                 self.name, self.confidence = None, 0.0
@@ -207,7 +207,7 @@ class Focus:
     def confident(self, t: Track, *, pending: bool = False) -> bool:
         """A sure name can continue at LOW; pending associations can only be reverified."""
         name = self.named.get(t.id)
-        known = name and name.name and (pending or name.score >= SURE)
+        known = name and name.name and (pending or name.score >= settings.match)
         return t.score >= (DETECT_LOW if known else DISPLAY_CONFIDENCE)
 
     def eligible(self, t: Track, *, pending: bool = False) -> bool:
@@ -324,9 +324,9 @@ class Focus:
             if seen and seen.track and self.confident(seen.track) and \
                     self.eligible(seen.track, pending=True) and \
                     (i in self.visible or now - seen.last <= OCCLUSION_S) and \
-                    n.name and n.confidence >= GUESS:
+                    n.name and n.confidence >= (settings.match - settings.guess_band):
                 grouped.setdefault(n.name, []).append((i, n.confidence))
-        return {hits[0][0]: (name, hits[0][1] >= SURE)
+        return {hits[0][0]: (name, hits[0][1] >= settings.match)
                 for name, hits in grouped.items() if len(hits) == 1}
 
     def target(self, tracks: list[Track]) -> int | None:

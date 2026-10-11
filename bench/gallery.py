@@ -26,7 +26,7 @@ from crop_arms import (
     Crops,
     crops,
     detect,
-    diverse,
+    taught_gallery,
     frames,
     iou,
     percentiles,
@@ -164,7 +164,7 @@ def finish_collection(name, start, ended, reason, boundary, protocol, session, e
     if protocol:
         galleries, teaching = teach(session, encoder, protocol)
     else:
-        galleries = {arm: diverse(np.array(shots[arm]), 0) for arm in ARMS}
+        galleries = {arm: taught_gallery(shots[arm]) for arm in ARMS}
         teaching = [start, start + 10, start + 20]
     return ended, reason, galleries, teaching
 

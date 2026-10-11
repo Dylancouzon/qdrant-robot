@@ -268,7 +268,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
-        if self.path in ("/ignore", "/restore", "/mute", "/volume"):
+        if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")

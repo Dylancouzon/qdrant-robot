@@ -31,16 +31,11 @@ from qdrant_edge import (
 from robot.config import MODELS, SHARED
 from robot.memory import deletion_target, is_question, kind_of, kinds
 from robot.people import request
+from robot.settings import settings
 
 MODEL = MODELS / "dinov2-small/model.onnx"
 DIM = 768  # DINOv2-small CLS and mean patch token, each unit length, concatenated
 SHOTS = 3  # crops of the named track, a third of a second apart
-VIEWS = 3  # maximum diverse crops retained across verified explicit reteaching turns
-# The highest score of another object, of any kind, on half the bake-off instances; on the
-# other half: zero false matches in 625 same-kind and 1,400 other-kind crops, true matches
-# 15/22 phones, 15/35 teddy bears (bench/reid.py,
-# bench/results/2026-10-08-reid-1791502259.jsonl). Below it, never "yours".
-MATCH = 0.822
 _MEAN, _STD = np.array([0.485, 0.456, 0.406]), np.array([0.229, 0.224, 0.225])
 
 
@@ -79,23 +74,17 @@ def cut(frame: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarray:
     return frame[y1:y2, x1:x2]
 
 
-def diverse(crops: np.ndarray, current: int, limit: int = VIEWS) -> np.ndarray:
-    """Keep distinct original/current anchors, then the farthest remaining cosine views."""
-    unique, anchors = [], []
-    for i, vector in enumerate(crops):
-        at = next((j for j, old in enumerate(unique) if np.array_equal(old, vector)), None)
-        if at is None:
-            at = len(unique)
-            unique.append(vector)
-        if i in (0, current) and at not in anchors:
-            anchors.append(at)
-    vectors = np.asarray(unique, dtype=np.float32)
-    unit = _unit(vectors)
-    chosen = anchors[:limit]
-    while len(chosen) < min(limit, len(vectors)):
-        remaining = [i for i in range(len(vectors)) if i not in chosen]
-        chosen.append(max(remaining, key=lambda i: float((1 - unit[i] @ unit[chosen].T).min())))
-    return vectors[chosen]
+def add_vectors(stored: np.ndarray, new: np.ndarray) -> np.ndarray:
+    """Append distinct views, retaining the first view and removing the oldest others."""
+    views = list(stored)
+    for vector in new:
+        if views and np.max(_unit(np.asarray(views)) @ _unit(vector[None])[0]) >= \
+                settings.duplicate:
+            continue
+        views.append(vector)
+    while len(views) > settings.views_cap:
+        views.pop(1)
+    return np.asarray(views, dtype=np.float32)
 
 
 class Things:
@@ -112,27 +101,42 @@ class Things:
             filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))[0]
 
     def name(self, name: str, labels: list[str], crops: np.ndarray) -> str:
-        """Keep diverse explicitly taught views when the current crop verifies the exact name.
+        """Keep distinct explicitly taught views when the current crop verifies the exact name.
         Otherwise replace it with the current crop, excluding possibly older physical objects.
         Preserve the first casing, aliases, and deletion links."""
         existing = self.shard.retrieve([_id(name)], True, True)
-        current = 0
+        previous = np.empty((0, DIM), dtype=np.float32)
         if existing:
             old = existing[0]
             name = old.payload["name"]
             labels = sorted({*labels, *old.payload["labels"]})
             hit = self.score(crops[0], name)
-            if hit and hit[1] >= MATCH:
+            if hit and hit[1] >= settings.match:
                 previous = np.asarray(old.vector["crops"], dtype=np.float32)
-                current = len(previous)
-                crops = np.concatenate([previous, crops[:SHOTS]])
             else:
                 crops = crops[:1]
         self.shard.update(UpdateOperation.upsert_points([Point(
-            _id(name), {"crops": diverse(crops if current else crops[:SHOTS], current).tolist()},
+            _id(name), {"crops": add_vectors(previous, crops[:SHOTS]).tolist()},
             {"name": name, "labels": labels, "turns": self._turns(name)})]))
         self.shard.flush()
         return name
+
+    def add_view(self, name: str, vector: np.ndarray) -> bool:
+        """Add a distinct view to an existing name; never recreate a forgotten object."""
+        rows = self.shard.retrieve([_id(name)], True, True)
+        if not rows:
+            return False
+        row = rows[0]
+        previous = np.asarray(row.vector["crops"], dtype=np.float32)
+        updated = add_vectors(previous, vector[None])
+        if np.array_equal(previous, updated):
+            return False
+        self.shard.update(UpdateOperation.upsert_points([
+            Point(row.id, {"crops": updated.tolist()}, row.payload)]))
+        self.shard.flush()
+        # A lowered cap can trim the gallery while the new vector itself was a duplicate.
+        return any(np.array_equal(vector, v) for v in updated) and \
+            not any(np.array_equal(vector, v) for v in previous)
 
     def _turns(self, name: str) -> list:
         found = self.shard.retrieve([_id(name)], ["turns"], False)
@@ -222,17 +226,17 @@ class Things:
         hits = self.shard.query(QueryRequest(limit=1,
             query=Query.Nearest([crop.tolist()], using="crops"), with_payload=False,
             filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))
-        return str(hits[0].id) if hits and hits[0].score >= MATCH else None
+        return str(hits[0].id) if hits and hits[0].score >= settings.match else None
 
     def ignore_item(self, title: str, crops: np.ndarray) -> str:
         """Persist descriptors only, separately from names, media, and category rules."""
         rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=["name"],
             with_vector=True, filter=Filter(must=[FieldCondition(key="name", is_empty=False)])))[0]
         excludes = [r.payload["name"] for r in rows
-                    if np.max(crops @ np.asarray(r.vector["crops"]).T) >= MATCH]
+                    if np.max(crops @ np.asarray(r.vector["crops"]).T) >= settings.match]
         ident = str(uuid.uuid4())
         self.shard.update(UpdateOperation.upsert_points([Point(ident,
-            {"crops": diverse(crops, 0).tolist()},
+            {"crops": add_vectors(np.empty((0, DIM)), crops).tolist()},
             {"type": "item_ignore", "title": title, "excludes": excludes})]))
         self.shard.flush()
         self.items = self.shard.retrieve([*[r.id for r in self.items], ident], True, False)
@@ -441,7 +445,7 @@ def _selftest() -> None:
         img = cv2.imread(str(Path(__file__).parent.parent / "eval/dev/images/m2-phones.jpg"))
         v = Crops()([img[200:400, 100:300], img[200:400, 100:300], img[:100, :100]])
         assert v.shape == (3, DIM) and abs(float(v[0] @ v[1]) - 1) < 1e-4
-        assert float(v[0] @ v[2]) < MATCH, "a phone crop and a corner of the room differ"
+        assert float(v[0] @ v[2]) < settings.match, "a phone crop and a corner of the room differ"
     print("selftest ok")
 
 
