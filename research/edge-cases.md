@@ -46,7 +46,6 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | More than 1,000 item Ignore records | Restart loads only the first 1,000, so cleanup can miss later copies | Page the load | same |
 | Two visitors with the same display name | The Memory tab groups their objects under one heading (edits stay distinct by id) | Group by owner id | reviews/20261011-034135-6848-review.md |
 | A Memory tab edit waits behind a long turn | The card stays after 5 s of polling with no message | Show "Saving..." when polling ends | same |
-| The brain writes an emoji in an answer | Kokoro speaks it aloud ("Smiling face with smiling eyes") | Strip emoji before speech synthesis | `bench/results/2026-10-11-replay-1791697885.judged.jsonl` speech check |
 | A lookalike that appears during a teaching window, or carries another label, is not yet a confirmed same-label track | Its overlapping crop can enter the taught gallery (D154) | Check current detections instead of confirmed tracks for the overlap guard | reviews/20261011-013812-81300-review.md |
 | Saving settings fails (disk full, permissions) | The page sees a dropped connection; the old settings stay active | Catch OSError and return a control failure | same |
 

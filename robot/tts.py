@@ -2,6 +2,7 @@
 first words play while the rest is still being generated.
 """
 import re
+import unicodedata
 from collections.abc import Iterable, Iterator
 
 import numpy as np
@@ -20,6 +21,12 @@ BREAK_AFTER = 4   # the first phrase may also end before a connecting word after
 BREAKS = {"and", "but", "with", "because", "which", "while", "so", "near", "next", "behind",
           "under", "on", "in", "at", "where", "who"}
 _END = re.compile(r"[.!?;:](?=\s|$)|,(?=\s)")
+
+
+def speakable(text: str) -> str:
+    """Drop emoji and other pictographs, which Kokoro would read out by name."""
+    return "".join(c for c in text if unicodedata.category(c) != "So"
+                   and c not in "\u200d\ufe0f").strip()
 
 
 def phrases(deltas: Iterable[str]) -> Iterator[str]:
@@ -81,6 +88,9 @@ class Speaker:
         self.say("Ready.")  # warm every kernel before the first visitor
 
     def say(self, text: str) -> np.ndarray:
+        text = speakable(text)
+        if not text:
+            return np.zeros(0, np.float32)
         for written, spoken in SAY_AS.items():
             text = text.replace(written, spoken)
         audio, rate = self.kokoro.create(text, voice=VOICE, lang="en-us")
@@ -89,6 +99,9 @@ class Speaker:
 
 
 if __name__ == "__main__":
+    assert speakable("How's yours going? \U0001F60A") == "How's yours going?"
+    assert speakable("I \u2764\ufe0f Qdrant \U0001F468\u200d\U0001F4BB") == "I  Qdrant"
+    assert speakable("\U0001F60A") == "" and speakable("Edge: 0.5 ms, 90%") == "Edge: 0.5 ms, 90%"
     got = list(phrases(["Two cats", ", sleeping on", " a pink blanket. One of them is ",
                         "curled up next to a remote control, and the other", " is stretched out"]))
     assert got == ["Two cats,", "sleeping on a pink blanket.",

@@ -120,6 +120,8 @@ class Mouth:
         self.q.task_done()
 
     def play(self, audio: np.ndarray) -> None:
+        if not len(audio):  # a phrase that was only an emoji: nothing to say
+            return
         if self.sink:
             with self.lock:
                 self.pending += 1
