@@ -2,7 +2,7 @@
 """Run a Codex gate read-only on this repo, save its verdict in reviews/, and
 exit 0 only when the verdict passes (3 = act on findings, 124 = timeout).
 
-    tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths>"
+    tools/gate.py <design|review|milestone> [--model <name>] [--effort <level>] "<what, paths>"
     tools/gate.py checks      deterministic checks: lint, complexity, dead code, tests, self-checks
     tools/gate.py precommit   git pre-commit hook (git config core.hooksPath tools/githooks)
     tools/gate.py selftest
@@ -154,13 +154,14 @@ def interrupted(_signum, _frame):
     raise KeyboardInterrupt  # so SIGTERM also runs the cleanup in run()
 
 
-def run(gate: str, what: str, model: str) -> int:
+def run(gate: str, what: str, model: str, effort: str | None = None) -> int:
     tree = code_tree("worktree")
     reviews = ROOT / "reviews"
     reviews.mkdir(exist_ok=True)
     out = reviews / f"{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}-{gate}.md"
     prompt = (ROOT / "gates" / f"{gate}.md").read_text() + f"\nWhat to judge: {what}\n"
     cmd = ["codex", "exec", "--model", model, "-s", "read-only",
+           *(["-c", f"model_reasoning_effort={effort}"] if effort else []),
            "--skip-git-repo-check", "-C", str(ROOT), "-o", str(out), prompt]
     started = time.monotonic()
     print(f"{gate}: {model}, tree={tree}, limit={TIMEOUT_S}s; log: {out}.log", flush=True)
@@ -217,5 +218,7 @@ if __name__ == "__main__":
     parser.add_argument("gate", choices=MODEL)
     parser.add_argument("what", help="what to judge, with paths and evidence")
     parser.add_argument("--model", help="override the gate's default model")
+    parser.add_argument("--effort", choices=["low", "medium", "high", "xhigh"],
+                        help="Codex reasoning effort (default: ~/.codex/config.toml)")
     args = parser.parse_args()
-    sys.exit(run(args.gate, args.what, args.model or MODEL[args.gate]))
+    sys.exit(run(args.gate, args.what, args.model or MODEL[args.gate], args.effort))
