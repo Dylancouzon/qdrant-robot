@@ -2492,3 +2492,29 @@
 {"key": "afc712d9158add69", "pass": true, "why": "Names a donut.", "votes": [true, true, true]}
 {"key": "8499ff997237a4ec", "pass": true, "why": "Recalls the banana.", "votes": [true, true, true]}
 {"key": "3cc65f54bbf1757f", "pass": false, "why": "Omits the banana and earlier cup.", "votes": [false, true, false]}
+{"key": "9da4e1df0a4b161c", "pass": false, "why": "Does not identify the mug.", "votes": [false, false, false]}
+{"key": "d7264f2b8522488e", "pass": false, "why": "Does not remember the mug.", "votes": [false, false, false]}
+{"key": "54f899b63a47c438", "pass": false, "why": "Says no, but fails to identify the missing mug.", "votes": [false, false, false]}
+{"key": "8724723bcc8b639d", "pass": true, "why": "Names the banana and donut.", "votes": [true, true, true]}
+{"key": "128aabdf5d5262ce", "pass": false, "why": "Names the donut instead of the banana.", "votes": [false, false, false]}
+{"key": "313954cd128ee7ba", "pass": true, "why": "Identifies the mug.", "votes": [true, true, true]}
+{"key": "e8f5caf7d40e7f9f", "pass": false, "why": "Incorrectly says it is the same object.", "votes": [false, false, false]}
+{"key": "03ae4b6813d7751c", "pass": true, "why": "Identifies a skier jumping.", "votes": [true, true, true]}
+{"key": "c7fafc559b66bc62", "pass": true, "why": "Says the photo is black and white.", "votes": [true, true, true]}
+{"key": "f0d558ab8cbad728", "pass": true, "why": "Says the weather looks sunny and clear.", "votes": [true, true, true]}
+{"key": "ccd966427cb7c884", "pass": true, "why": "Names rice, chicken, and vegetables.", "votes": [true, true, true]}
+{"key": "27f4aea04fcea36f", "pass": true, "why": "Says the men are shaking hands.", "votes": [true, true, true]}
+{"key": "d4dedf1926618ccc", "pass": true, "why": "Identifies the tie.", "votes": [true, true, true]}
+{"key": "21100e42bf3ee453", "pass": false, "why": "Identifies the television but omits its stand.", "votes": [false, false, true]}
+{"key": "74e550d45a95fc87", "pass": false, "why": "Does not answer that he is writing on a skateboard.", "votes": [false, true, false]}
+{"key": "560216fc30140d70", "pass": true, "why": "Correctly explains Qdrant's vector search.", "votes": [true, true, true]}
+{"key": "e1d5e315824a20f9", "pass": false, "why": "Omits Qdrant Edge and storage on the robot's disk.", "votes": [false, false, false]}
+{"key": "e2616eb3698ef231", "pass": true, "why": "Explains fast local search without a server.", "votes": [true, false, true]}
+{"key": "58f9f6ef7a0eb3ac", "pass": true, "why": "Names the Python package.", "votes": [true, true, true]}
+{"key": "1737ab1b6f21e532", "pass": true, "why": "Says Rust.", "votes": [true, true, true]}
+{"key": "a798df6749569118", "pass": true, "why": "Responds warmly to the dog.", "votes": [true, true, true]}
+{"key": "08af24572ed93f6d", "pass": true, "why": "Does not invent a favorite color.", "votes": [true, true, true]}
+{"key": "90fd772f26d9fc93", "pass": false, "why": "Does not say Max.", "votes": [false, false, false]}
+{"key": "ad24be7b0bd3fb76", "pass": true, "why": "Admits it does not remember.", "votes": [true, true, true]}
+{"key": "72f8888a94df92cf", "pass": true, "why": "Greets the visitor back.", "votes": [true, true, true]}
+{"key": "0fdf5cbb0763b95f", "pass": true, "why": "Answers briefly and naturally.", "votes": [true, true, true]}

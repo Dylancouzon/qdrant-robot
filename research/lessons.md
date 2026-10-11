@@ -89,7 +89,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 - A single-vote judge flipped 5 of 60 identical answers. The judge now votes three times and caches verdicts (D46).
 - Keyword `correct` and judged scores differ a lot: D75 M2 is 62/74 keyword but 44/74 judged.
-- The held-out set has been used twice: 15/26 (17/26 after Dylan's rulings), then 18/26 with real voices (`bench/results/2026-10-08-replay-1791470020.judged.jsonl`). Count every use in DECISIONS.md.
+- The held-out set has been used three times: 15/26 (17/26 after Dylan's rulings), 18/26 with real voices, then 17/26 for both arms of D150. Count every use in DECISIONS.md.
 - Synthetic voices overstate ASR quality. Real voices split at pauses (D36).
 - The same video decodes to different pixels on the Mac and the Jetson. Verify pixels with the deployed decoder (D93).
 - Small paired runs are noisy: llama-server answers differ on identical prompts. One question in 47 is about 2%.
