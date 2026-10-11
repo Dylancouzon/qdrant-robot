@@ -67,17 +67,21 @@ def test_statement_evidence() -> None:
 
 
 def test_earlier_frame_evidence() -> None:
-    """A question step's evidence is also met when the turn was answered from the frame the
-    named step looked at; another frame, or none, is not."""
+    """A question step's evidence is also met when the turn was answered from the look the
+    named step looked at and that look's caption reached the answer; selection alone, another
+    look, or none is not."""
     frames: dict[str, replay.Shown] = {}
     first = Turn(question="What is this?", answer="A clock.", frame_id=1, looked=10.0)
     replay.score({"id": "a", "expect_any": [""]}, [first], frames, oracle=True)
     step = {"id": "b", "expect_any": [""], "evidence": ["a"]}
-    asked = Turn(question="What did I show you?", answer="A clock.", frame_id=2, supplied=10.0)
+    asked = Turn(question="What did I show you?", answer="A clock.", frame_id=2, selected=10.0,
+                 caption="demand", delivered=True)
     assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is True
-    asked.supplied = 20.0
+    asked.delivered = False  # selected, but nothing of it reached the answer
     assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is False
-    asked.supplied = 0.0  # no retained frame answered
+    asked.delivered, asked.selected = True, 20.0
+    assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is False
+    asked.selected = 0.0  # no retained look answered
     assert replay.score(step, [asked], frames, oracle=True)["evidence_ok"] is False
 
 

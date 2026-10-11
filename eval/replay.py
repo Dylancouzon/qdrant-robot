@@ -79,8 +79,8 @@ def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> di
     Evidence: a named step's statement must be among the recalled statements (the robot stores
     statements, robot/main.py); a named question step's frame, or one of a named wait step's
     sightings, among the recalled memories, or the frame that step's turn looked at being the
-    retained frame this turn was answered from (kept in RAM only; an unchanged view names the
-    earlier look of the present view)."""
+    retained frame this turn was answered from, and only when that look's caption reached the
+    answer (selection alone earns nothing; the look is kept in RAM only)."""
     if not turns:  # the VAD or the transcript dropped the question
         return {"id": step["id"], "ok": False, "split": 0, "heard": "", "answer": "",
                 "evidence_ok": None, **dict.fromkeys(STAGES)}
@@ -92,11 +92,12 @@ def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> di
            "heard": " | ".join(t.question for t in turns), "split": len(turns),
            "evidence_ok": all(said in turn.told if said else
                                bool(ids & set(turn.memories)) or
-                               (looked and turn.supplied == looked)
+                               (looked and turn.selected == looked and turn.delivered)
                                for ids, said, looked in want)
                            if want else None,
            "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
-           "supplied": turn.supplied, "kind": turn.kind, "verbatim": turn.verbatim,
+           "selected": turn.selected, "caption": turn.caption, "caption_s": turn.caption_s,
+           "delivered": turn.delivered, "kind": turn.kind, "verbatim": turn.verbatim,
            "told": turn.told,
            "prompt": turn.prompt,
            "line_s": turn.line - turn.speech_end,

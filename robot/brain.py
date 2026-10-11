@@ -56,11 +56,9 @@ SYSTEM = (
     "and do not describe the image. You enjoy small talk and tell short, clean jokes "
     "when asked, and you may use general knowledge. Never claim to see what is not in the "
     "image; if unsure, say so.\n"
-    "The image is the present unless a note says it is from the past: trust it over anything "
-    "said before, because things move and people take objects away. An image from the past "
-    "shows what the visitor showed you then: answer from it. "
-    "Lines under 'Memories' describe what you saw before, oldest first, with their age: use "
-    "them only for questions about the past. For questions about "
+    "The image is the present: trust it over anything said before, because things move "
+    "and people take objects away. Lines under 'Memories' describe what you saw before, "
+    "oldest first, with their age: use them only for questions about the past. For questions about "
     "Qdrant, answer from the listed facts, close to their wording; Qdrant is a vector search "
     "engine. Your memories and what the visitor told you are real: answer from them; "
     "'do you remember X?' asks for X, so say X. Only when none of them answers a question "
@@ -69,8 +67,6 @@ SYSTEM = (
 CHANGED = "The view has changed since your last answer.\n"
 # "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
 PAST = "The visitor asks about the past: answer from the lines above.\n"
-# The image is an earlier frame (earlier_view): the 2B takes any image for the present.
-EARLIER = "The image is from {age}, not the present. It shows what the visitor showed you.\n"
 # Before the evidence, after the image, so the prefilled prefix holds (shape I, D74).
 EVIDENCE = "Answer from these memories; if one answers the question, use it.\n\n"
 # Main object first: recall answers with the first thing a caption names (prompt probes, D29).
@@ -144,21 +140,18 @@ def age(seconds: float) -> str:
 
 def messages(history: list[dict], now: dict | None, memories: list[str] = (), facts: list[str] = (),
              question: str | None = None, changed: bool = False,
-             past: bool = False, told: list[str] = (), earlier: str | None = None
-             ) -> list[dict]:
+             past: bool = False, told: list[str] = ()) -> list[dict]:
     """The chat prompt. Without a question it is the prefix that prefill caches: the frame
     comes before everything that depends on the question. `changed`: the view differs from
     the previous turn's, so earlier answers no longer describe it. `past`: the question is
-    about the past, so the answer comes from memories, not from the image. `earlier`: the age of
-    `now`, a frame from the past. `now` None: no image, for questions about the past (a 2B brain
-    describes the image whatever it is told)."""
+    about the past, so the answer comes from memories, not from the image. `now` None: no
+    image, for questions about the past (a 2B brain describes the image whatever it is told)."""
     content = [now] if now else []
     if question is not None:
         blocks = (("Memories", memories), ("The visitor told you", told), ("Facts", facts))
         text = "".join(f"{title}:\n- " + "\n- ".join(lines) + "\n\n"
                        for title, lines in blocks if lines)
-        note = (CHANGED if changed and history and not earlier else "") + (
-            EARLIER.format(age=earlier) if earlier else PAST if past else "")
+        note = (CHANGED if changed and history else "") + (PAST if past else "")
         lead = EVIDENCE if memories or told else ""
         content.append({"type": "text", "text": f"{lead}{text}{note}Visitor: {question}"})
     return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
@@ -261,8 +254,4 @@ if __name__ == "__main__":
     hist = [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello!"}]
     note = messages(hist, now, question="And now?", changed=True)[-1]["content"][-1]["text"]
     assert note.startswith(CHANGED)
-    old = messages(hist, now, question="What did I show you?", changed=True, past=True,
-                   earlier="2 minutes ago")[-1]["content"][-1]["text"]
-    assert old.startswith("The image is from 2 minutes ago") and PAST not in old \
-        and CHANGED not in old, "an earlier frame is labeled, not the present"
     print("selftest ok")

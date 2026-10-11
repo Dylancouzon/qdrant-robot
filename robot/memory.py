@@ -85,6 +85,19 @@ def main_object(caption: str) -> str | None:
     return x.group(1).strip() if (x := _MAIN.search(caption)) else None
 
 
+UNAVAILABLE = "Sorry, I could not tell what I saw then."
+
+
+def compares(question: str) -> bool:
+    """Whether a question sets what the visitor showed against the present ("Is this the same
+    as before?"): the present image answers it, with the earlier object beside it."""
+    return about_now(question) or bool(_COMPARE.search(question))
+
+
+def showed(thing: str, age: str) -> str:
+    return f"You showed me {thing}, {age}."
+
+
 def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
     """The answer to "what did I show you" from memories (newest first), or None when the
     question is another kind or no memory names a main object."""
@@ -94,20 +107,20 @@ def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> st
     if not named:
         return None
     m, thing = named[-1] if _FIRST.search(question) else named[0]
-    return f"You showed me {thing}, {age(m)}."
+    return showed(thing, age(m))
 
 
 def earlier_view(question: str, looks: list, now, differs: Callable) -> object | None:
     """The one retained look (oldest first) that a past question about something shown means,
     for a visitor who shows things and then changes the view. None: another kind of question
-    (a present one, a comparison, a time or place the window cannot hold: stored memories answer
-    those), or no look to pick, so nothing changes. When no look `differs` from `now`, the newest
-    look shows the present view, and the caller sends the present image. Otherwise the
-    candidates are the looks that differ, runs of the same view counted once and represented by
-    their newest; "first", "second", and "third" count from the oldest, anything else is the
-    newest."""
-    if not (about_past(question) and _SHOWN.search(question)) or about_now(question) \
-            or _COMPARE.search(question) or _WHEN.search(question) or not looks:
+    (a present one, a time or place the window cannot hold: stored memories answer those), or
+    no look to pick, so nothing changes. The candidates are the looks that `differs` from
+    `now`, runs of the same view counted once and represented by their newest; "first",
+    "second", and "third" count from the oldest, anything else is the newest. When none differs,
+    the visitor still shows the same view: the newest look answers a plain question, and a
+    comparison with the present has nothing earlier to compare (None)."""
+    if not (about_past(question) and _SHOWN.search(question)) or _WHEN.search(question) \
+            or not looks:
         return None
     apart: list = []
     for look in looks:
@@ -117,7 +130,7 @@ def earlier_view(question: str, looks: list, now, differs: Callable) -> object |
             else:
                 apart.append(look)
     if not apart:
-        return looks[-1]
+        return None if compares(question) else looks[-1]
     n = _NTH.get(m.group(1).lower(), -1) if (m := _ORDINAL.search(question)) else -1
     return apart[n] if n < len(apart) else None
 
@@ -469,13 +482,14 @@ def _earlier_selftest() -> None:
     assert pick("Which thing did I hold up a moment ago?", looks) == 20
     assert pick("Remind me what I brought earlier.", looks) == 20
     assert pick("What did I just show you?", [0.2, 0.9]) == 0.9, "unchanged: the same view"
+    assert pick("Is this the same as what I showed you before?", [0.2, 0.9]) is None
+    assert pick("Is this the same as what I showed you before?", looks) == 20, "combined"
+    assert pick("Was it the same as what I showed you before?", looks) == 20, "no 'this'"
     for when in ("yesterday", "this morning", "two hours ago", "on the left"):
         assert pick(f"What did I show you {when}?", looks) is None, when
     assert pick("What did I just show you?", []) is None, "no earlier exchange"
     assert pick("What am I holding now?", looks) is None, "a present question"
     assert pick("What is this?", looks) is None
-    assert pick("Is this the same thing I showed you?", looks) is None, "combined: not here"
-    assert pick("Was it the same as what I showed you before?", looks) is None
     assert pick("What did we talk about before?", looks) is None, "not about something shown"
 
 
@@ -623,6 +637,8 @@ if __name__ == "__main__":
     assert shown("What was the first thing I showed you?", mems, ago).startswith(
         "You showed me green apples")
     assert shown("Is this the same thing I showed you?", mems, ago) is None
+    assert showed("a stop sign", "2 minutes ago") == "You showed me a stop sign, 2 minutes ago."
+    assert compares("Is this what I showed you?") and not compares("What did I show you?")
     assert shown("What did we talk about?", mems, ago) is None
     assert shown("What did I show you yesterday?", mems, ago) is None
     assert shown("What did I show you on the left?", mems, ago) is None

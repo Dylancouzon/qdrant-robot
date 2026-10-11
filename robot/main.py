@@ -31,15 +31,17 @@ from robot.recognition import Recognition
 from robot.focus import BODY, OCCLUSION_S, SMOOTH, SNAP, SURE, Focus, Track, inside
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
+    UNAVAILABLE,
     Memory,
-    about_now,
     about_past,
+    compares,
     earlier_view,
     article,
     is_question,
     kind_of,
     main_object,
     shown,
+    showed,
     sighting_answer,
     sighting_query,
     thumb,
@@ -103,6 +105,10 @@ def scene_change(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.abs(thumb(a).astype(np.float32) - thumb(b)).mean())
 
 
+def differs(a: "Look", b: "Look") -> bool:
+    return scene_change(a.frame, b.frame) > SCENE_CHANGE
+
+
 @dataclass
 class Look:
     """A frame whose prompt prefix, after `exchanges` exchanges, is in the brain's KV cache."""
@@ -112,6 +118,7 @@ class Look:
     exchanges: int
     changed: bool                 # the view differs from the previous turn's
     history: list[dict]           # the conversation as prefilled with this frame
+    caption: str | None = None    # what the brain made of this frame alone (brain.caption)
 
 
 @dataclass
@@ -133,9 +140,13 @@ class Turn:
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
     frame_id: int = 0             # this turn's text memory point
     looked: float = 0.0           # capture time of the frame this turn looked at
-    supplied: float = 0.0         # capture time of the retained frame that answers a past
-    #                               question about something shown (0: none); an unchanged view
-    #                               sends the present image, and this names its earlier look
+    selected: float = 0.0         # capture time of the retained look a past question about
+    #                               something shown is answered from (0: none)
+    caption: str = ""             # that look's caption: ready, demand (made in this turn), or
+    #                               failed (none, interrupted, or no main object); "" no look
+    caption_s: float = 0.0        # seconds the on-demand caption took
+    delivered: bool = False       # the caption supplied the code answer, or was in the request
+    #                               the brain answered
     speech_start: float = 0.0     # the VAD heard speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
     line: float = 0.0             # the VAD ended the line
@@ -318,6 +329,9 @@ class Robot:
         # The same worker does bounded idle recognition and prefill; speech takes priority.
         while not self.closing.wait(WATCH_S):
             if self.speaking or self.ui_thinking or not self.jobs.empty():
+                continue
+            if look := self._undescribed():
+                self.jobs.put(("describe", look))
                 continue
             shot = self.camera.latest()
             if self._stale(shot[0]):
@@ -705,6 +719,8 @@ class Robot:
                 self._remember_matches(frame, taken, tracks, hits, person)
             elif job[0] == "control":
                 self.control_message = self._item_control(*job[1:])
+            elif job[0] == "describe":
+                self._describe_idle(job[1])
             elif (rows := self.memory.points([job[1]])) and \
                     rows[0].get("label") not in self.ignored and \
                     rows[0].get("named") in self.things.visual_links(self.ignored) and \
@@ -721,6 +737,60 @@ class Robot:
         look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
         self.brain.prefill(brain.messages(history, look.image))
         self.ready = look
+
+    def _undescribed(self) -> Look | None:
+        """The oldest retained look without a caption that ends its view run: one caption per
+        view, never one per duplicate frame."""
+        looks = self.looked
+        return next((x for i, x in enumerate(looks) if x.caption is None and (
+            i + 1 == len(looks) or differs(x, looks[i + 1]))), None)
+
+    def _describe_idle(self, look: Look) -> None:
+        """The idle caption job: dropped when a deletion or a new conversation took the look
+        meanwhile, or when foreground work arrived. The caption evicts the prefilled prefix, so
+        the next _look prefills it again (`ready` is no longer valid)."""
+        if self.speaking or self.ui_thinking or not self.jobs.empty():
+            return
+        if any(x is look for x in self.looked) and look.caption is None:
+            self._describe(look)
+            self.ready = None
+
+    def _describe(self, look: Look) -> None:
+        """Caption a retained look from its own frame, the one path for the idle worker and for a
+        turn that needs it now; the caption stays None if speech interrupts it."""
+        look.caption = self.brain.caption(look.image, lambda: self.speaking) or None
+
+    def _look_back(self, turn: Turn, selected: Look, memories: list[str]) -> str | None:
+        """What the selected look (earlier_view) showed, from its own caption, made now when the
+        idle worker has not yet: the answer to a plain question, or None for a comparison with
+        the present, whose Memories line gets it instead. Never another look's caption."""
+        turn.selected, turn.caption = selected.taken, "ready"
+        if selected.caption is None:
+            started = time.time()
+            self._describe(selected)
+            turn.caption, turn.caption_s = "demand", time.time() - started
+        thing = main_object(unmention(selected.caption or "", self.ignored))
+        turn.delivered = thing is not None  # a comparison's line is sent only if the brain answers
+        if thing is None:
+            turn.caption = "failed"
+        ago = brain.age(turn.speech_start - selected.taken)
+        if compares(turn.question):
+            if thing:
+                memories.append(f"{ago}: you showed me {thing}")
+            return None
+        return showed(thing, ago) if thing else UNAVAILABLE
+
+    def _code_answer(self, turn: Turn, now: np.ndarray, track: int | None, look: Look,
+                     recalled: list[dict], memories: list[str]) -> str | None:
+        """The answer given in code, or None for the brain: identity, then the visitor's things,
+        then what the selected earlier look showed (which alone decides the path: its answer, or
+        the brain with its Memories line), then stored shown objects and sightings."""
+        if answer := self._identity(turn, now, track) or self._things(turn):
+            return answer
+        if selected := earlier_view(turn.question, self.looked, look, differs):
+            return self._look_back(turn, selected, memories)
+        return shown(turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
+                     ) or self._sighted(turn)
 
     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
         """Answer about the frame shown when this line's speech started, or about an earlier
@@ -767,24 +837,16 @@ class Robot:
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
                           (f"seen: {line}", None) for line in memories]}
         track = self._visitor()
-        recalled_answer = self._identity(turn, now, track) or self._things(turn) or shown(
-            turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
-        ) or self._sighted(turn)
+        recalled_answer = self._code_answer(turn, now, track, look, recalled, memories)
         turn.retrieved = time.time()
         self.last_frame, turn.looked = look.frame, look.taken
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
-        # A past question about something shown gets the frame the robot saw then, labeled with
-        # its age; when that view is the present one, the present image answers.
-        differs = lambda a, b: scene_change(a.frame, b.frame) > SCENE_CHANGE  # noqa: E731
-        view = earlier_view(turn.question, self.looked, look, differs)
-        old = view if view and differs(view, look) else None
-        sees = about_now(turn.question) or (turn.kind == "sight" and not past) or view is not None
-        image = (old or look).image if sees else None
-        msgs = brain.messages(look.history, image, memories, turn.facts, turn.question,
-                              look.changed, past, told,
-                              brain.age(turn.speech_start - old.taken) if old else None)
+        sees = compares(turn.question) or (turn.kind == "sight" and not past)
+        image = look.image if sees else None
+        msgs = brain.messages(look.history, image, memories, turn.facts,
+                              turn.question, look.changed, past, told)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
                        if isinstance(m["content"], list) else m
@@ -793,9 +855,9 @@ class Robot:
             turn.verbatim = True
             tokens = self._said(recalled_answer, turn)
         elif turn.verbatim:
+            turn.delivered = False  # a fact answered: a comparison's line was not sent
             tokens = self._said(turn.facts[0], turn)
         else:
-            turn.supplied = view.taken if view else 0.0  # only a frame the brain saw
             tokens = self._tokens(msgs, turn)
         audio_parts = self._speak(tokens, turn)
         turn.done = time.time()
@@ -813,6 +875,8 @@ class Robot:
         statement = None if is_question(turn.question) or command(
             turn.question, self.vocab) else question
         if self._store(turn, (now, taken), statement, track):  # one privacy decision for both
+            if self.looked and not differs(self.looked[-1], look):
+                look.caption = self.looked[-1].caption  # one caption per view run
             self.looked = (self.looked + [look])[-HISTORY_TURNS:]
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
@@ -1131,6 +1195,8 @@ class Robot:
                 self.delivery.notify_all()
                 return ident
         ident = self.recognition.call(persist, mutate=True)
+        if ident:
+            self.looked = []  # a retained look may show the item
         return "Okay, I will ignore only that item." if ident else "That selection expired."
 
     def _settle(self, since: float) -> None:

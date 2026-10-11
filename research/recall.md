@@ -37,3 +37,36 @@ The design gate (2026-10-10, GO WITH CHANGES) rejected A, because the robot's ea
 - **Known gap.** A combined question ("Is this the same as what I showed you before?") needs both images. It keeps today's behavior, and `rc-compare` measures it.
 
 C (persisting captions for every shown frame) stays out of scope unless B fails.
+
+## Result of option B (2026-10-10, J)
+
+Paired replay, the same forget guard in both arms. Baseline release `cb7120f77e81`, candidate `53867a9`.
+
+| Set | Baseline | Candidate |
+| --- | --- | --- |
+| Recorded development, 47 turns | 39/47 judged, first audio 1.45 s p50 | 38/47, 1.46 s |
+| Recall sessions, 15 turns, synthetic voice | 8/15 | 10/15, 1.65 s |
+
+The right frame reached the brain on every recall turn except the combined question. The 2B mishandles a labeled past image: it answers in the present tense ("You're showing me a stop sign") or talks about the image. `fruit-then-bus-3/4` regressed. The baseline passed them only from the visitor's own line in history. B is not adopted as built.
+
+## Next: option B2, captions of retained frames
+
+First design gate on B2: RETHINK (`reviews/20261010-212839-10410-design.md`), for a missing comparison plan and selection details. This section resolves those findings.
+
+- **Select, then caption.** `earlier_view()` picks the retained Look, as in B. That Look's caption formats the answer in code: "You showed me <main object>, <age>." `shown()` no longer chooses among RAM Looks.
+- **One caption path.** The existing worker captions each new retained view when idle (one caption per view run, not per duplicate frame). If the selected Look has no caption at question time, the turn captions it on demand through the same function. There is no image fallback, and a Look never borrows another Look's caption.
+- **Combined questions.** The selected caption's main object and age go in as one "Memories" line beside the present image.
+- **Boundaries.** Captions live on the Look, so visitor change, reset, deletion, and the shared privacy predicate clear them with the frame.
+- **Log.** Each turn logs the selected Look, whether its caption was ready or made on demand, the caption time, and whether the answer came from code or generation.
+
+### Comparison
+
+One paired Jetson run per arm on identical inputs: the 47 recorded development turns and the 15 recall turns.
+
+| Arm | What changes from the baseline |
+| --- | --- |
+| Baseline | Forget guard only (`e688d90`, already measured: 39/47, 8/15) |
+| B-note | B with one revised EARLIER note: past tense, name the object, no talk about the image |
+| B2 | Captions as above, B's image path removed |
+
+Report judged answers, evidence selection, caption readiness and correctness, first-WAV p50 and p95, detection fps, and tegrastats headroom and swap separately. Adopt the arm with a judged gain and no capability loss. A one-line follow-up asked right after an answer measures the on-demand path.

@@ -152,14 +152,18 @@ def test_detector_failure(monkeypatch) -> None:
 
 
 def test_earlier_frame(monkeypatch, tmp_path) -> None:
-    """Robot._turn on real Edge with a stub brain: a past question about something shown gets
-    the frame the robot looked at then, labeled as earlier; a present question never does;
-    the retained frames follow the conversation window and every deletion."""
+    """Robot._turn on real Edge with a stub brain: a past question about something shown is
+    answered in code from the caption of the look it selects (made on demand once, then
+    ready), never another look's; a comparison gets that caption as one Memories line beside
+    the present image; a failed caption is an explicit unavailable answer; a present question
+    selects nothing; the looks and their pending captions follow the window and every
+    deletion."""
     import queue
     import time
     from types import SimpleNamespace as Stub
 
     from robot import brain
+    from robot.memory import UNAVAILABLE
     from robot.text_embed import DIM as TEXT_DIM
 
     monkeypatch.setattr(main, "face", lambda faces, frame: None)
@@ -170,61 +174,123 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
     robot.out.mkdir()
     robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
     robot.knowledge, robot.route = Stub(search=lambda q: []), lambda q: "sight"
-    sent: list = []
+    shot = lambda k: np.full((720, 1280, 3), k, np.uint8)  # noqa: E731
+    url = lambda image: image["image_url"]["url"]  # noqa: E731
+    things = {url(brain.jpeg(shot(k))): name for k, name in
+              ((200, "a stop sign"), (100, "a clock"), (0, "an empty room"))}
+    sent: list = []  # the prompts the brain answered
+    captioned: list[str] = []  # the things it captioned, in order
+    broken = []  # a non-empty list makes captioning fail
+
     def answer(msgs, **kwargs):
         sent.append(msgs)
         yield "Ok."
 
-    robot.brain = Stub(prefill=lambda m: None, answer=answer)
+    def caption(image, stop):
+        captioned.append(things[url(image)])
+        return None if broken else f"Main object: {things[url(image)]}. Around it: a wall."
+
+    robot.brain = Stub(prefill=lambda m: None, answer=answer, caption=caption)
     robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
     robot.speaker = Stub(play=lambda pcm: None)
-    shot = lambda k: np.full((720, 1280, 3), k, np.uint8)  # noqa: E731
     clock = iter(range(int(time.time()), int(time.time()) + 10_000))
 
-    def ask(text: str, view: int) -> dict:
-        """The turn and the content of the last user message the brain got."""
+    def ask(text: str, view: int) -> main.Turn:
         t = float(next(clock))
         turn = main.Turn(question=text, speech_start=t, line=t, speech_end=t)
         robot._turn(turn, (shot(view), t))
-        last = sent[-1][-1]["content"]
-        return turn, last
-
-    def image(content, view: int) -> bool:
-        return content[0] == brain.jpeg(shot(view))
+        return turn
 
     stop, clock_view, night = 200, 100, 0
-    turn, content = ask("What is this?", stop)
-    assert image(content, stop) and turn.supplied == 0.0, "a present question: the present frame"
-    first = turn.looked
+    first = ask("What is this?", stop)
     ask("And what is this?", clock_view)
-    turn, content = ask("What did I just show you?", night)
-    assert image(content, clock_view) and turn.supplied > 0
-    assert "not the present" in content[-1]["text"]
-    assert turn.supplied != first, "the newest differing frame, not the first"
-    turn, content = ask("What was the first thing I showed you?", night)
-    assert image(content, stop) and turn.supplied == first
-    turn, content = ask("What am I holding now?", clock_view)
-    assert image(content, clock_view) and turn.supplied == 0.0 and "not the present" not in \
-        content[-1]["text"], "never an earlier frame for the present"
+    spoken = len(sent)
+    assert captioned == [], "the answers need no caption"
+    turn = ask("What did I just show you?", night)
+    assert turn.answer.startswith("You showed me a clock, ") and turn.verbatim
+    assert (turn.caption, captioned) == ("demand", ["a clock"]), "made now, for this look only"
+    assert turn.delivered
+    assert turn.selected == robot.looked[1].taken and len(sent) == spoken, "code, not the brain"
+    turn = ask("Which thing did I show you a moment ago?", night)
+    assert turn.answer.startswith("You showed me a clock") and turn.caption == "ready"
+    assert captioned == ["a clock"], "ready: not captioned again"
+    turn = ask("What was the first thing I showed you?", night)
+    assert turn.answer.startswith("You showed me a stop sign") and turn.selected == first.looked
+    assert captioned == ["a clock", "a stop sign"], "each look has its own caption"
+    turn = ask("What am I holding now?", clock_view)
+    assert turn.selected == 0.0 and turn.caption == "", "a present question selects nothing"
     assert len(robot.looked) == main.HISTORY_TURNS, "the window of the conversation"
-    robot.looked = [robot.looked[-1]]  # only the present view remains: nothing differs
-    turn, content = ask("What did I show you?", clock_view)
-    assert image(content, clock_view) and turn.supplied == robot.looked[0].taken, \
-        "an unchanged view: the present image, scored against the earlier look of that view"
-    assert "not the present" not in content[-1]["text"]
-    turn, content = ask("What did I show you yesterday?", night)
-    assert len(content) == 1 and turn.supplied == 0.0, "a time the window cannot hold"
+    n = len(sent)
+    turn = ask("Is this the same as what I showed you before?", night)
+    assert len(sent) > n and not turn.verbatim, "the brain answers a comparison"
+    prompt = sent[-1][-1]["content"]
+    assert prompt[0] == brain.jpeg(shot(night)), "beside the present image"
+    assert "Memories:\n- " in prompt[-1]["text"] and "you showed me a clock" in prompt[-1]["text"]
+    assert turn.caption == "demand" and turn.selected > 0, "the newest look of another view"
+    assert turn.delivered, "its line is in the request the brain answered"
+    turn = ask("Was it the same as what I showed you before?", night)
+    assert sent[-1][-1]["content"][0] == brain.jpeg(shot(night)), "a comparison sees the present"
+    robot.looked = [robot.looked[-1]]  # only the present view remains
+    robot.looked[0].caption = None
+    turn = ask("Is this the same as what I showed you before?", night)
+    assert turn.selected == 0.0, "nothing earlier to compare: no look"
+    turn = ask("What did I show you yesterday?", night)
+    assert turn.selected == 0.0, "a time the window cannot hold"
     robot.history, robot.looked = [], []
-    turn, content = ask("What did I just show you?", night)
-    assert len(content) == 1 and turn.supplied == 0.0, "no earlier exchange: no image"
+    turn = ask("What did I just show you?", night)
+    assert turn.selected == 0.0 and not turn.verbatim, "no earlier exchange: today's path"
     ask("What is this?", stop)
-    assert len(robot.looked) == 2
+    ask("And this?", clock_view)
+    broken.append(1)
+    before = list(captioned)
+    turn = ask("What did I just show you?", night)
+    assert turn.answer == UNAVAILABLE and turn.caption == "failed" and not turn.delivered
+    assert captioned == [*before, "a clock"], "no other look's caption was borrowed or tried"
+    assert robot.looked[1].caption is None
+    # An idle caption is made once per view run, for its newest look, and the foreground comes
+    # first: speech or queued work skips it. The prefilled prefix is invalid afterwards.
+    del broken[:]
+    robot.history, robot.looked = [], []
+    ask("What is this?", stop)
+    ask("And this?", clock_view)
+    ask("And this one?", clock_view)
+    a, b, c = robot.looked
+    assert robot._undescribed() is a and b.caption is None, "the first view run"
+    robot.speaking = True
+    robot._describe_idle(a)
+    robot.speaking = False
+    robot.jobs.put(("look", None))
+    robot._describe_idle(a)
+    robot.jobs.get()
+    assert a.caption is None, "foreground work first"
+    robot.ready = a
+    robot._describe_idle(a)
+    assert a.caption and robot.ready is None, "the next _look prefills again"
+    assert robot._undescribed() is c, "the duplicate look of a run is not captioned"
+    robot._describe_idle(c)
+    made = list(captioned)
+    ask("Once more?", clock_view)
+    assert robot.looked[-1].caption == c.caption, "an unchanged look shares its run's caption"
+    assert robot._undescribed() is None and captioned == made, "no second caption"
+    # A caption pending when the conversation ends is dropped by the worker, not made.
+    robot.looked[-1].caption = None
+    pending = robot._undescribed()
+    assert pending is robot.looked[-1]
+    # A comparison answered by a fact never sends its Memories line: no delivery credit.
+    robot.knowledge = Stub(search=lambda q: [(1.0, "Qdrant is a vector search engine.")])
+    turn = ask("Is this the same as what I showed you before?", night)
+    assert turn.verbatim and turn.selected > 0 and not turn.delivered
+    robot.knowledge = Stub(search=lambda q: [])
+    pending.caption = None
     assert robot._forget(None, "Ana", np.zeros(DIM, np.float32))
-    assert robot.looked == [], "'forget me': the frames may show the visitor"
+    before = list(captioned)
+    robot._describe_idle(pending)
+    assert captioned == before and pending.caption is None, "'forget me' drops it"
+    assert robot.looked == [], "'forget me': the looks may show the visitor"
     ask("What is this?", stop)
     assert robot.looked == [], "nothing is kept while the forgotten visitor may be in view"
-    # The hiding times out with no usable face, but the track stays forgotten: still no frame.
+    # The hiding times out with no usable face, but the track stays forgotten: still no look.
     robot.hiding = (np.zeros(DIM, np.float32), time.time() - main.CLEAR_S - 1)
     robot._visitor, robot.visitors = lambda: 7, {7: main.Visitor(forgotten=True)}
     ask("What is this?", stop)
-    assert robot.hiding is None and robot.looked == [], "one privacy decision for text and frames"
+    assert robot.hiding is None and robot.looked == [], "one privacy decision for text and looks"
