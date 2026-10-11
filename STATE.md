@@ -2,24 +2,20 @@
 
 Updated 2026-10-10. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders this session: Sonnet sub-agents; the main session orchestrates (Dylan, 2026-10-10).
 
-## Active task: robot speaker and microphone
+## Active task: internal showcase polish
 
-The USB speaker and microphone are connected (ALSA card `Device`). Loopback and a spoken test (J): the USB microphone transcribes Dylan nearly perfectly at about -25 dBFS speech over a -53 dBFS floor, about 3 dB better than the camera microphone. It hears the robot's own speaker at -17 dBFS, so a playback gate is required.
+Dylan's live session (2026-10-10, Jetson audio) found: follow-ups lapsed after 20 s, Ignore items vanished at once (the jumpy focus popped them), and teaching failed on split lines and a lost focus. D153 fixes these: a 60 s follow-up window with a "Say 'Hey Edgy'" status, 30 s Ignore offers, two-step teaching ("Track this" then "What should I call it?"), and speech-start focus. Robot audio (D152) works: no self-answers in the session.
 
-1. Build on `spike/jetson-audio` (builder running): self-voice gate with a tail, Jetson audio as the default, a volume slider on the Mac page saved in `shared/`, and Mute acting on the Jetson microphone.
-2. Review, deploy, then a live check with Dylan (checklist below).
-3. Measure physical latency by loopback (an M4 requirement).
-
-## Next tasks
-
-1. Command set v2 (Dylan approved): distinct verbs ("remember me", "remember this", "forget ..."); the robot asks for names and confirms deletions; introductions no longer offer face enrollment; unknown objects get a teach-the-command reply. Design gate, frozen dialogue fixtures, then build.
-2. Missed-face conversation reset: a face leaving the frame ends the conversation and now also clears recall frames (`research/edge-cases.md`).
-3. Owner and location payloads ([research/owner-location.md](research/owner-location.md)).
+1. Live check of D153 with Dylan (checklist below), then read the session log.
+2. Next: the jumpy "???" focus box (detection task), then command set v2 (the rest: "remember me", confirmed "forget").
+3. Then the missed-face conversation reset, physical latency by loopback, and owner and location payloads ([research/owner-location.md](research/owner-location.md)).
 
 ## Human checks
 
-- Live audio: wake the robot from visitor distance, ask two questions, and confirm it never answers its own voice. Set the volume with the slider; restart and confirm the level holds.
-- UI Ignore: open the item list with an object in view, let it leave the frame, and press "Do not track that" within 8 s. Confirm it stays ignored after a restart, then Restore it. After 10 s the item should be gone from the list.
+- Teaching: hold an object, say "Hey Edgy, track this", answer the question with "my bottle". Then "Track this as my cup" in one line. Note any wrong object or person named, and whether a reply spoken during the robot's question is lost.
+- Follow-ups: wait 40 s between questions without the wake phrase; after 60 s the page should say "Say 'Hey Edgy'".
+- UI Ignore: an item stays in the list for 30 s after it was last focused; ignore it, restart, Restore it.
+- Volume slider and Mute; close the page and confirm the robot keeps answering.
 
 ## Robot
 
