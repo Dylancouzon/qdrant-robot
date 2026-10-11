@@ -30,6 +30,7 @@ from qdrant_edge import (
 
 from robot.config import MODELS, SHARED
 from robot.memory import deletion_target, is_question, kind_of, kinds
+from robot.people import request
 
 MODEL = MODELS / "dinov2-small/model.onnx"
 DIM = 768  # DINOv2-small CLS and mean patch token, each unit length, concatenated
@@ -316,7 +317,8 @@ def name_slot(text: str, vocab: Collection[str]) -> tuple[str, list[str]] | None
     """The name in the line that answers "What should I call it?" ("my collagen", "as my
     collagen", "call it collagen"), or None for a question, a command, or a refusal."""
     text = text.replace("’", "'")
-    if is_question(text) or command(text, vocab) or question(text, vocab) or _DECLINE.search(text):
+    if is_question(text) or command(text, vocab) or question(text, vocab) or \
+            deletion_target(text) is not None or request(text) or _DECLINE.search(text):
         return None
     m = _SLOT.search(text)
     return _thing(m["thing"], vocab) if m and len(m["thing"].split()) <= 4 and \

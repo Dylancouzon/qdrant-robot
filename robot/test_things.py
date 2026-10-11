@@ -23,7 +23,7 @@ from robot.memory import CountRequest, Memory, ScrollRequest
 from robot.people import DIM as FACE_DIM, People
 from robot.recognition import Recognition
 from robot.text_embed import DIM as TEXT_DIM
-from robot.things import DIM, SHOTS, VIEWS, Things, command, diverse
+from robot.things import DIM, SHOTS, VIEWS, Things, command, diverse, name_slot
 
 GOLD, BLACK = 200, 30  # the pixel value of each phone: the stub tells them apart by it
 LEFT, CENTER, RIGHT = (100, 300, 300, 600), (540, 300, 740, 600), (1000, 300, 1200, 600)
@@ -62,6 +62,7 @@ def open_robot(root: Path) -> Robot:
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
     robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
     robot.teaching, robot.start_target = None, None
+    robot.wake_word = False
     robot.panel, robot.ui_turn = None, None
     robot.ui_turns = deque(maxlen=8)
     robot.ui_thinking, robot.speaking = False, False
@@ -871,6 +872,75 @@ def test_track_this_asks_for_the_name_in_the_next_line(robot):
     assert ask(r, "as my phone.")[0].startswith("Got it")
 
 
+def test_pinned_object_gone_or_turned_person_is_never_replaced_or_bound(robot):
+    r = robot
+    r.last_line = time.time()
+    show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
+    hold(r, CENTER)
+    pinned = r.focus.focus
+    assert ask(r, "Track this")[0] == "What should I call it?"
+    show(r, [], LOST + 1)  # the pinned object is taken away, another one stays
+    show(r, [(BLACK, RIGHT)])
+    hold(r, RIGHT)
+    said, turn = ask(r, "my phone")
+    assert said.startswith("I don't see") and not turn.named, "never the other object"
+    assert r.focus.focus != pinned
+
+    track = r.focus.focus  # a captured track whose label turns into a person
+    r.teaching = track, r.focus.epoch(track)
+    frame, boxes = r.view
+    r.view, r.views = (frame, {track: ("person", boxes[track][1])}), deque(maxlen=SHOTS)
+    said, turn = ask(r, "my phone")
+    assert said.startswith("I only track objects") and not turn.named
+
+
+def test_pin_that_left_and_returned_has_a_new_epoch(robot):
+    r = robot
+    r.last_line = time.time()
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "Track this")[0] == "What should I call it?"
+    track, epoch = r.teaching
+    r.focus.update(r.view_taken + .5, [], [])  # the track drops out of the frame
+    frame_of(r)
+    assert track in r.focus.visible and r.focus.epoch(track) != epoch, "same id, new epoch"
+    said, turn = ask(r, "my phone")
+    assert said.startswith("Sorry, I lost sight") and not turn.named
+
+
+def test_status_says_hey_edgy_once_the_window_lapses(robot, monkeypatch):
+    r = robot
+    r.wake_word = True
+    frame_of(r)
+    monkeypatch.setattr(r.speaker, "playing", lambda: False)
+    r.last_line = time.time()
+    assert r._shown(False)[1].status == "Listening"
+    r.last_line = time.time() - main.CONVERSATION_S - 1
+    assert r._shown(False)[1].status == "Say 'Hey Edgy'"
+
+
+def test_other_commands_drop_the_pending_name(robot):
+    r = robot
+    r.last_line = time.time()
+    frame_of(r)
+    hold(r, CENTER)
+    for line in ("Forget everything.", "Remember me.", "Do you remember me?"):
+        assert ask(r, "Track this")[0] == "What should I call it?"
+        ask(r, line)
+        assert r.teaching is None and not r.things.named("everything", []), line
+        assert name_slot(line, r.vocab) is None, line
+
+
+def test_ignore_offer_outlives_the_focus_moving_on(robot):
+    r = robot
+    show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
+    first, second = sorted(r.view[1])
+    r.focus.focus = first
+    assert [t["track"] for t in r._shown(False)[1].control["targets"]] == [first]
+    r.focus.focus = second  # the focus jumps; the first item is still in view
+    assert sorted(t["track"] for t in r._shown(False)[1].control["targets"]) == [first, second]
+
+
 def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
     robot.last_line = 1000.0
     for gap, goes_on in ((main.CONVERSATION_S, True), (main.CONVERSATION_S + 1, False)):
@@ -1448,8 +1518,8 @@ def test_named_confidence_dip_reverifies_and_admitted_unknown_stays_grey(robot, 
     assert calls[-2:] == ["Dylan's smartphone", None]
     assert not r.focus.names(), "two weak current signals hide the retained association"
     assert all(b[4:] == ("", "other") for b in r._shown()[1].boxes)
-    assert not r._shown(False)[1].control["targets"], \
-        "retained labels cannot authorize low-confidence actions"
+    assert [t["track"] for t in r._shown(False)[1].control["targets"]] == [chosen], \
+        "the held offer keeps its last eligible crop; retained labels authorize nothing new"
     preview(r)
     preview(r)
     assert r.focus.name(chosen) is None, "three fresh misses clear the low-confidence preference"

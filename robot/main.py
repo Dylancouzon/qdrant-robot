@@ -242,7 +242,8 @@ class Robot:
         # to remember their face (D69), once per conversation.
         self.told: tuple[str, bool] | None = None
         self.last_line = 0.0  # when the answer to the last answered line ended
-        self.teaching: int | None = None  # the object track "Track this" asked a name for
+        # (track, focus epoch) that "Track this" asked a name for
+        self.teaching: tuple[int, int] | None = None
         self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
         self.ui_turn: Turn | None = None
         self.ui_thinking = False
@@ -499,7 +500,8 @@ class Robot:
     def _offers(self, tracks: list[Track]) -> list[dict]:
         """Refresh the Ignore choices (held under self.detecting). A visible, eligible named or
         focused track keeps a crop at most OFFER_REFRESH_S old; a stalled source stops
-        refreshing, and a track that left the view stays offered for OFFER_HOLD_S."""
+        refreshing. An offer stays for OFFER_HOLD_S after its last eligible moment, in view or not;
+        a person is never offered."""
         now, (frame, boxes), taken = time.time(), self.view, self.view_taken
         labels = self.focus.names()
         for t in tracks:
@@ -513,7 +515,7 @@ class Robot:
                         labels[t.id][0] if t.id in labels else "Unknown " + t.label,
                         labels[t.id][0] if named else None, t.label.capitalize(),
                         self.focus.epoch(t.id), cut(frame, boxes[t.id][1]).copy(), taken)
-            else:
+            elif t.label in BODY:
                 self.offers.pop(t.id, None)
         self.offers = {i: o for i, o in self.offers.items() if now - o.seen <= OFFER_HOLD_S}
         return [{"track": i, "epoch": o.epoch, "title": o.title} for i, o in self.offers.items()]
@@ -551,7 +553,9 @@ class Robot:
                 ignored_items=self.things.preferences())
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
                       "Speaking" if self.speaker.playing() else
-                      "Thinking" if self.ui_thinking else "Listening")
+                      "Thinking" if self.ui_thinking else
+                      "Say 'Hey Edgy'" if self.wake_word and
+                      time.time() - self.last_line > CONVERSATION_S else "Listening")
             turns = list(self.ui_turns)
             turn = self.ui_turn
             if turn is not None and (not turns or turns[-1] is not turn):
@@ -1095,20 +1099,23 @@ class Robot:
             self.delivery.notify_all()
         return True
 
-    def _things(self, turn: Turn, teaching: int | None = None) -> str | None:
+    def _things(self, turn: Turn, teaching: tuple[int, int] | None = None) -> str | None:
         """Commands and questions about the visitor's things (robot/things.py): naming,
         "forget my phone", and "where is my phone?". `teaching`: the track "Track this" asked a
         name for, answered by this line within the conversation window. None for any other
         turn."""
         if teaching is not None and turn.speech_start - self.last_line <= CONVERSATION_S and (
                 slot := name_slot(turn.question, self.vocab)):
-            return self._name(turn, *slot, track=teaching)
+            return self._name(turn, *slot, pin=teaching)
         if cmd := command(turn.question, self.vocab):
             kind, name, labels = cmd
             if kind == "teach":
                 self._settle(turn.speech_start)
-                self.teaching = self._target(turn)
-                return "What should I call it?" if self.teaching is not None else NOTHING_HELD
+                if (track := self._target(turn)) is None:
+                    return NOTHING_HELD
+                with self.detecting:
+                    self.teaching = track, self.focus.epoch(track)
+                return "What should I call it?"
             if kind == "name":
                 self._settle(turn.speech_start)
                 return self._name(turn, name, labels)
@@ -1260,29 +1267,31 @@ class Robot:
                and not self.detect_failed):
             time.sleep(0.02)
 
-    def _target(self, turn: Turn, track: int | None = None) -> int | None:
-        """The object a naming turn binds to (D67): `track`, else the focus object as it stood
-        at the line's speech start, while it is still in view (a focus lost for a moment before
-        the line still counts; _bind needs a fresh accepted view anyway), else the focus or
-        held object now (Focus.target)."""
-        track = turn.target if track is None else track
+    def _target(self, turn: Turn, pin: tuple[int, int] | None = None) -> int | None:
+        """The object a naming turn binds to (D67): an explicit `pin` track while it is in
+        view, else None; otherwise the focus object as it stood at the line's speech start,
+        while it is still in view (a focus lost for a moment before the line still counts;
+        _bind needs a fresh accepted view anyway), else the focus or held object now."""
         with self.detecting:
             if self.focus is None:
                 return None
-            if track in self.focus.visible:
-                return track
+            if pin is not None:
+                return pin[0] if pin[0] in self.focus.visible else None
+            if turn.target in self.focus.visible:
+                return turn.target
             return self.focus.target([Track(*t) for t in self.tracker.scored()])
 
-    def _name(self, turn: Turn, name: str, labels: list[str], track: int | None = None) -> str:
+    def _name(self, turn: Turn, name: str, labels: list[str],
+              pin: tuple[int, int] | None = None) -> str:
         """Bind `name` to the object _target gives, else the one fresh, visible association
         for this exact name."""
         old = self.things.named(name, [])
         if {*labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
-        found = self._target(turn, track)
+        found = self._target(turn, pin)
         with self.detecting:
             tracks = [Track(*t) for t in self.tracker.scored()]
-            if found is None and old and self.focus:
+            if found is None and old and self.focus and pin is None:
                 names = self.focus.names()
                 candidates = [t.id for t in tracks if t.id in self.focus.visible and
                               self.focus.eligible(t) and
@@ -1293,19 +1302,23 @@ class Robot:
                     found = candidates[0]
         if found is None:
             return f"I don't see {article(name)} held up. Hold it up and say it again."
-        return self._bind(turn, name, labels, found)
+        return self._bind(turn, name, labels, found, pin and pin[1])
 
-    def _bind(self, turn: Turn, name: str, labels: list[str], track: int) -> str:
-        """Remember the actual binding crop, its source box/time, and deletion links."""
+    def _bind(self, turn: Turn, name: str, labels: list[str], track: int,
+              pinned: int | None = None) -> str:
+        """Remember the actual binding crop, its source box/time, and deletion links. `pinned`:
+        the focus epoch the track must still have (a track that left and returned is new)."""
         with self.detecting:
             views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
                      if track in v[2] and self.focus.accepts(track, v[0])]
             epoch = self.focus.epoch(track)
             gallery, session = self.recognition.epoch, self.session_id
-        if not views:
+        if not views or pinned not in (None, epoch):
             return "Sorry, I lost sight of it. Hold it up and say it again."
         taken, frame, view = views[0]
         label, box = view[track]
+        if label in BODY:
+            return "I only track objects, not people."
         old = self.things.named(name, [])
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
@@ -1318,7 +1331,9 @@ class Robot:
             return "I am ignoring this item. Restore it in the camera controls first."
         def bind(faces, crops):
             with self.detecting:
-                if not self.focus.accepts(track, taken) or self.focus.epoch(track) != epoch or \
+                if self.view[1].get(track, (label,))[0] in BODY or \
+                        not self.focus.accepts(track, taken) or \
+                        self.focus.epoch(track) != epoch or \
                         self.recognition.epoch != gallery + 1 or self.session_id != session or \
                         time.time() - taken > PREVIEW_TTL:
                     return None
