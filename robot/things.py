@@ -261,6 +261,13 @@ _NAMING = [re.compile(p, re.I) for p in (
     rf"^\W*(?:and |so |ok(?:ay)?,? )?(?:this|that|here)(?: one)?(?:'s| is)\s+my\s+{_THING}\W*$",
     rf"^\W*(?:and )?(?:this|that)\s+{_THING}\s+(?:is mine|belongs to me)\W*$",
     rf"\b(?:remember|track)\s+(?:this|that)(?:\s+[a-z-]+)?\s+as\s+my\s+{_THING}\W*$")]
+# "Track this" with no name: the robot asks for it, and name_slot reads the next line.
+_UNNAMED = re.compile(
+    r"^\W*(?:(?:and|so|please|ok(?:ay)?),? )?(?:(?:remember|track)\s+(?:this|that)(?:\s+[a-z-]+)?|"
+    r"(?:this|that)(?: one)?(?:'s| is) mine)\W*$", re.I)
+_SLOT = re.compile(rf"^\W*(?:(?:as|call it|it's|it is|this is|that's|that is)\s+)?(?:my\s+)?"
+                   rf"{_THING}\W*$", re.I)
+_DECLINE = re.compile(r"^\W*(?:no|nope|nothing|never ?mind|cancel|stop|skip|forget it)\b", re.I)
 _OWNED_NAMING = re.compile(rf"^\W*(?:this|that)(?:'s| is)\s+{_OWNED}\W*$", re.I)
 _FORGET = re.compile(rf"(?:about\s+)?my\s+{_REFERENCE}", re.I)  # after the deletion verb
 _OWNED_FORGET = re.compile(rf"{_OWNED}\W*$", re.I)
@@ -287,8 +294,11 @@ def _identity(text: str) -> bool:
 
 
 def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:
-    """("name" | "forget", name, labels) for a command about the visitor's things, else None."""
+    """("name" | "forget", name, labels) for a command about the visitor's things, else None;
+    ("teach", "", []) for "track this" without a name."""
     text = text.replace("’", "'")
+    if _UNNAMED.search(text):
+        return "teach", "", []
     if m := next((x for p in _NAMING if (x := p.search(text))), None):
         return None if _identity(m["thing"]) else ("name", *_thing(m["thing"], vocab))
     if (m := _OWNED_NAMING.search(text)) and not _identity(m["thing"]) and \
@@ -300,6 +310,17 @@ def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | N
             return None  # "forget my face" is an identity request (robot/people.py)
         return "forget", *_thing(m["thing"], vocab)
     return None
+
+
+def name_slot(text: str, vocab: Collection[str]) -> tuple[str, list[str]] | None:
+    """The name in the line that answers "What should I call it?" ("my collagen", "as my
+    collagen", "call it collagen"), or None for a question, a command, or a refusal."""
+    text = text.replace("’", "'")
+    if is_question(text) or command(text, vocab) or question(text, vocab) or _DECLINE.search(text):
+        return None
+    m = _SLOT.search(text)
+    return _thing(m["thing"], vocab) if m and len(m["thing"].split()) <= 4 and \
+        not _identity(m["thing"]) else None
 
 
 def question(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:

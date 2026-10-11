@@ -67,6 +67,7 @@ from robot.things import (
     cut,
     plural,
     mentions,
+    name_slot,
     question,
     unmention,
 )
@@ -88,14 +89,17 @@ FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I
 # Conversation identity uses the fresh speech-start frame.
 # Background display verifies its own frame.
 # Without an enrolled face match, a name told in this conversation answers (D60).
-CONVERSATION_S = 20  # a line this soon after the last answer continues the conversation (D65)
+# A line this soon after the last answer finishes playing continues the conversation (D65);
+# a visitor can walk to the keyboard and back inside it.
+CONVERSATION_S = 60
 CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 VIEW_S = 0.33  # spacing of the recent views a named object's crops come from
 PREVIEW_TTL = 0.75  # source expiry for recognition writes
 # A UI item stays offered, and Ignore stays valid, this long after its track leaves the view,
 # so a person has time to open the dropdown and choose it. The offer keeps its own crop.
-OFFER_HOLD_S = 8.0
+OFFER_HOLD_S = 30.0
 OFFER_REFRESH_S = 1.0  # a visible item gets a new crop this often; an Ignore in flight can finish
+NOTHING_HELD = "I don't see an object held up. Hold it up and say it again."
 SETTLE_S = 0.5  # how long a "my phone" turn waits for tracks confirmed after its speech start
 
 
@@ -162,6 +166,7 @@ class Turn:
     delivered: bool = False       # the caption supplied the code answer, or was in the request
     #                               the brain answered
     speech_start: float = 0.0     # the VAD heard speech start
+    target: int | None = None     # the object track the focus gave at speech start (Focus.target)
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
     line: float = 0.0             # the VAD ended the line
     transcribed: float = 0.0      # Parakeet's final transcript ready
@@ -237,6 +242,7 @@ class Robot:
         # to remember their face (D69), once per conversation.
         self.told: tuple[str, bool] | None = None
         self.last_line = 0.0  # when the answer to the last answered line ended
+        self.teaching: int | None = None  # the object track "Track this" asked a name for
         self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
         self.ui_turn: Turn | None = None
         self.ui_thinking = False
@@ -258,6 +264,7 @@ class Robot:
         self.ready: Look | None = None          # the frame whose prompt prefix is prefilled
         self.speaking = False                   # a visitor is mid-line: background work yields
         self.speech_start = 0.0
+        self.start_target: int | None = None  # the focus object when the current line began
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
         self.closing = threading.Event()
         self.detecting = threading.Lock()       # held while a frame is detected and tracked
@@ -287,7 +294,8 @@ class Robot:
         self.speaking = False
         self.asked += 1
         self.jobs.put(("turn", Turn(question=text, line=t, transcribed=t, speech_end=t,
-                                    speech_start=self.speech_start), self.start_frame))
+                                    speech_start=self.speech_start, target=self.start_target),
+                          self.start_frame))
 
     def reset(self, memory: Path) -> None:
         """Start over with an empty memory and conversation (scripted sessions). Detection
@@ -308,6 +316,7 @@ class Robot:
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
+            self.teaching, self.start_target = None, None
             self.since, self.panel = time.time_ns() // 1000, None
             self.view, self.offers = (None, {}), {}
             self.focus, self.screen = None, (None, Screen())
@@ -327,21 +336,25 @@ class Robot:
     def _heard_start(self) -> None:
         self.speaking, self.speech_start = True, time.time()
         self.start_frame = self.camera.latest()  # what the visitor sees as they speak
+        with self.detecting:
+            self.start_target = self.focus and self.focus.target(
+                [Track(*t) for t in self.tracker.scored()])
         if self._stale(self.start_frame[0]):
             self.jobs.put(("look", self.start_frame))
 
     def _heard_line(self, speech: np.ndarray, speech_end: float) -> None:
         self.speaking = False
-        self.lines.put((speech, time.time(), speech_end, self.speech_start, self.start_frame))
+        self.lines.put((speech, time.time(), speech_end, self.speech_start, self.start_frame,
+                        self.start_target))
 
     def _transcribe(self) -> None:
         # Its own thread: the final transcript overlaps a prefill instead of queuing behind it.
         while (line := self.lines.get()) is not None:  # None: close() stops the thread
-            speech, t_line, speech_end, speech_start, shot = line
+            speech, t_line, speech_end, speech_start, shot, target = line
             if text := self.scribe(speech):  # empty: noise the VAD took for speech
                 self.asked += 1
                 turn = Turn(question=text, line=t_line, transcribed=time.time(),
-                            speech_end=speech_end, speech_start=speech_start)
+                            speech_end=speech_end, speech_start=speech_start, target=target)
                 self.ui_turn, self.ui_thinking = turn, True
                 self.jobs.put(("turn", turn, shot))
             self.lines.task_done()
@@ -823,7 +836,8 @@ class Robot:
         """The answer given in code, or None for the brain: identity, then the visitor's things,
         then what the selected earlier look showed (which alone decides the path: its answer, or
         the brain with its Memories line), then stored shown objects and sightings."""
-        if answer := self._identity(turn, now, track) or self._things(turn):
+        teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
+        if answer := self._identity(turn, now, track) or self._things(turn, teaching):
             return answer
         if selected := earlier_view(turn.question, self.looked, look, differs):
             return self._look_back(turn, selected, memories)
@@ -864,7 +878,7 @@ class Robot:
         if self.history and self._converse(turn, self._whois(now)):
             self.ui_turns.clear()
             self.ui_turns.append(turn)
-            self.history, self.looked = [], []
+            self.history, self.looked, self.teaching = [], [], None
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
         statements = self._told(question, turn)
@@ -1075,16 +1089,26 @@ class Robot:
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding, self.told, self.looked = (face_, time.time()), None, []
+        self.teaching = None
         with self.delivery:
             self.verified = None
             self.delivery.notify_all()
         return True
 
-    def _things(self, turn: Turn) -> str | None:
+    def _things(self, turn: Turn, teaching: int | None = None) -> str | None:
         """Commands and questions about the visitor's things (robot/things.py): naming,
-        "forget my phone", and "where is my phone?". None for any other turn."""
+        "forget my phone", and "where is my phone?". `teaching`: the track "Track this" asked a
+        name for, answered by this line within the conversation window. None for any other
+        turn."""
+        if teaching is not None and turn.speech_start - self.last_line <= CONVERSATION_S and (
+                slot := name_slot(turn.question, self.vocab)):
+            return self._name(turn, *slot, track=teaching)
         if cmd := command(turn.question, self.vocab):
             kind, name, labels = cmd
+            if kind == "teach":
+                self._settle(turn.speech_start)
+                self.teaching = self._target(turn)
+                return "What should I call it?" if self.teaching is not None else NOTHING_HELD
             if kind == "name":
                 self._settle(turn.speech_start)
                 return self._name(turn, name, labels)
@@ -1236,15 +1260,28 @@ class Robot:
                and not self.detect_failed):
             time.sleep(0.02)
 
-    def _name(self, turn: Turn, name: str, labels: list[str]) -> str:
-        """Bind `name` to the object the focus gives (D67, Focus.target): the focus object,
-        else a held object, else the one fresh, visible association for this exact name."""
+    def _target(self, turn: Turn, track: int | None = None) -> int | None:
+        """The object a naming turn binds to (D67): `track`, else the focus object as it stood
+        at the line's speech start, while it is still in view (a focus lost for a moment before
+        the line still counts; _bind needs a fresh accepted view anyway), else the focus or
+        held object now (Focus.target)."""
+        track = turn.target if track is None else track
+        with self.detecting:
+            if self.focus is None:
+                return None
+            if track in self.focus.visible:
+                return track
+            return self.focus.target([Track(*t) for t in self.tracker.scored()])
+
+    def _name(self, turn: Turn, name: str, labels: list[str], track: int | None = None) -> str:
+        """Bind `name` to the object _target gives, else the one fresh, visible association
+        for this exact name."""
         old = self.things.named(name, [])
         if {*labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
+        found = self._target(turn, track)
         with self.detecting:
             tracks = [Track(*t) for t in self.tracker.scored()]
-            found = self.focus and self.focus.target(tracks)
             if found is None and old and self.focus:
                 names = self.focus.names()
                 candidates = [t.id for t in tracks if t.id in self.focus.visible and

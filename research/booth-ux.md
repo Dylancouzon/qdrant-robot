@@ -4,8 +4,8 @@ Current behavior follows D140–D147. Dylan accepted live release `7f67670fa91e`
 
 ## Visitor flow
 
-1. Select **Start**, wait for **Listening**, and say "Hey Edgy". Follow-up questions work for about 20 seconds after an answer.
-2. Hold up one object and say "Track this as my wallet" or "This is my phone".
+1. Select **Start**, wait for **Listening**, and say "Hey Edgy". Follow-up questions work for about a minute after an answer finishes.
+2. Hold up one object and say "Track this as my wallet" or "This is my phone". "Track this" alone makes the robot ask for the name.
 3. Ask what the robot sees, what you showed it, or where it last saw a named object.
 4. Select an eligible item and press **Do not track that** to save negative example vectors. **Restore** removes that preference.
 5. Use explicit face-enrollment consent before asking the robot to remember a person. Forgetting deletes linked records and files.

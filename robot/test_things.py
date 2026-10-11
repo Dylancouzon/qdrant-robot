@@ -61,6 +61,7 @@ def open_robot(root: Path) -> Robot:
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
     robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
+    robot.teaching, robot.start_target = None, None
     robot.panel, robot.ui_turn = None, None
     robot.ui_turns = deque(maxlen=8)
     robot.ui_thinking, robot.speaking = False, False
@@ -101,7 +102,8 @@ def hold(robot: Robot, box: tuple) -> None:
 
 def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
     turn = Turn(question=text, speech_start=time.time() + 1)
-    return robot._things(turn), turn
+    teaching, robot.teaching = robot.teaching, None  # as Robot._code_answer hands it over
+    return robot._things(turn, teaching), turn
 
 
 def test_things(monkeypatch) -> None:
@@ -830,6 +832,66 @@ def test_diverse_reteaching_exact_name_replacement_links_and_ignore(tmp_path):
     assert things.forget("chosen") == [17, 19] and things.named("chosen", []) is None
     assert things.named("Separate", []) and not things.preferences()
     things.shard.close()
+
+
+
+def test_track_this_asks_for_the_name_in_the_next_line(robot):
+    r = robot
+    r.last_line = time.time()  # the conversation window runs from the last answer
+    asking = "What should I call it?"
+    frame_of(r)
+    assert ask(r, "Track this.")[0] == "I don't see an object held up. Hold it up and say " \
+        "it again." and r.teaching is None
+    hold(r, CENTER)
+    for line in ("as my phone.", "it's my phone", "call it phone", "my phone", "phone"):
+        assert ask(r, "Remember that")[0] == asking and r.teaching is not None
+        said, turn = ask(r, line)
+        assert said == "Got it, that is your phone. I will remember it." and r.teaching is None
+        assert turn.named == "phone", line
+
+    assert ask(r, "Track this")[0] == asking
+    assert ask(r, "Where is my phone?")[0] == "Yes, your phone is here now."
+    assert ask(r, "as my wallet")[0] is None and not r.things.named("wallet", []), \
+        "a question instead drops the capture"
+    assert ask(r, "Track this")[0] == asking
+    assert ask(r, "This is my wallet.")[0].startswith("Got it, that is your wallet"), \
+        "a different command runs as itself"
+    assert ask(r, "my cup")[0] is None, "the capture is used once"
+
+    assert ask(r, "Track this")[0] == asking
+    r.last_line = time.time() - main.CONVERSATION_S - 5
+    assert ask(r, "my cup")[0] is None, "expired with the follow-up window"
+    r.last_line = time.time()
+
+    assert ask(r, "Track this")[0] == asking
+    r.teaching = None  # a visitor change or "forget me" clears it
+    assert ask(r, "my cup")[0] is None
+
+    assert ask(r, "Track this.")[0] == asking  # a pause splits the line
+    assert ask(r, "as my phone.")[0].startswith("Got it")
+
+
+def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
+    robot.last_line = 1000.0
+    for gap, goes_on in ((main.CONVERSATION_S, True), (main.CONVERSATION_S + 1, False)):
+        robot.face = None
+        assert robot._converse(Turn(speech_start=1000.0 + gap), None) is not goes_on
+
+
+def test_naming_uses_the_focus_from_speech_start(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    track = r.focus.focus
+    r.camera = SimpleNamespace(latest=lambda: (None, 0.0))
+    r._heard_start()
+    assert r.start_target == track, "the focus as the line begins"
+    monkeypatch.setattr(r.focus, "target", lambda tracks: None)  # lost just before the line
+    turn = Turn(question="This is my phone.", speech_start=time.time() + 1, target=track)
+    assert r._things(turn).startswith("Got it, that is your phone")
+    r.focus.focus = None
+    r.focus.visible = set()  # gone now: no fresh view to bind
+    assert r._things(Turn(question="This is my cup.", target=track)).startswith("I don't see")
 
 
 @pytest.mark.parametrize("blocked", [None, "duplicate", "pending", "stale", "category", "weak",
