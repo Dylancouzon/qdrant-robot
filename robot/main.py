@@ -89,7 +89,11 @@ FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I
 CONVERSATION_S = 20  # a line this soon after the last answer continues the conversation (D65)
 CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 VIEW_S = 0.33  # spacing of the recent views a named object's crops come from
-PREVIEW_TTL = 0.75  # source expiry for recognition writes and selected actions
+PREVIEW_TTL = 0.75  # source expiry for recognition writes
+# A UI item stays offered, and Ignore stays valid, this long after its track leaves the view,
+# so a person has time to open the dropdown and choose it. The offer keeps its own crop.
+OFFER_HOLD_S = 8.0
+OFFER_REFRESH_S = 1.0  # a visible item gets a new crop this often; an Ignore in flight can finish
 SETTLE_S = 0.5  # how long a "my phone" turn waits for tracks confirmed after its speech start
 
 
@@ -117,6 +121,17 @@ class Look:
 class Visitor:
     """What a person track carries for its life only (D49)."""
     forgotten: bool = False   # "forget me": nothing more of this track is written
+
+
+@dataclass
+class Offer:
+    """An item the UI can Ignore: the crop it had when last in view, and when that was."""
+    title: str
+    chosen: str | None   # the saved object's name, when a name was accepted for the track
+    label: str
+    epoch: int
+    shot: np.ndarray     # a copy of the crop only, never a view of the whole camera frame
+    seen: float          # capture time of the source it was cut from
 
 
 @dataclass
@@ -176,6 +191,7 @@ class Robot:
         # apart: a box and the frame it was found in stay together for a crop.
         self.view: tuple[np.ndarray | None, dict] = (None, {})
         self.view_at = self.view_taken = 0.0  # detection time, source capture time
+        self.offers: dict[int, Offer] = {}  # track id -> its Ignore choice (see _offers)
         self.verified = None  # completed positive/negative face result on exact source pixels
         self.shown_taken = 0.0
         self.shown_frame, self.shown_record = 0, 0
@@ -268,7 +284,7 @@ class Robot:
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
             self.since, self.panel = time.time_ns() // 1000, None
-            self.view = (None, {})
+            self.view, self.offers = (None, {}), {}
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
             self.verified, self.shown_taken, self.crop_due, self.item_checked = None, 0.0, {}, {}
@@ -439,6 +455,28 @@ class Robot:
             self.shown_known = bool(record and record[3][1] and record[3][1][5] == "known")
             return True
 
+    def _offers(self, tracks: list[Track]) -> list[dict]:
+        """Refresh the Ignore choices (held under self.detecting). A visible, eligible named or
+        focused track keeps a crop at most OFFER_REFRESH_S old; a stalled source stops
+        refreshing, and a track that left the view stays offered for OFFER_HOLD_S."""
+        now, (frame, boxes), taken = time.time(), self.view, self.view_taken
+        labels = self.focus.names()
+        for t in tracks:
+            named = labels.get(t.id, (None, False))[1]
+            old = self.offers.get(t.id)
+            if frame is not None and t.id in boxes and t.label not in BODY and \
+                    self.focus.eligible(t) and (named or t.id == self.focus.focus):
+                if old is None or taken - old.seen >= OFFER_REFRESH_S or \
+                        old.epoch != self.focus.epoch(t.id):
+                    self.offers[t.id] = Offer(
+                        labels[t.id][0] if t.id in labels else "Unknown " + t.label,
+                        labels[t.id][0] if named else None, t.label.capitalize(),
+                        self.focus.epoch(t.id), cut(frame, boxes[t.id][1]).copy(), taken)
+            else:
+                self.offers.pop(t.id, None)
+        self.offers = {i: o for i, o in self.offers.items() if now - o.seen <= OFFER_HOLD_S}
+        return [{"track": i, "epoch": o.epoch, "title": o.title} for i, o in self.offers.items()]
+
     def _shown(self, display=True, deadline=None, cancel=lambda: False
                ) -> tuple[np.ndarray | None, Screen]:
         """Deliver completed sources; a timeout keeps fresh in-flight pixels anonymous."""
@@ -463,16 +501,10 @@ class Robot:
             screen = replace(screen, valid=(lambda: self._publication_valid(
                 frame, taken, record, session, gallery, epochs, cancel)) if display else None,
                 source=(taken, id(frame), id(record)))
-            targets = []
-            if self.focus:
-                labels = self.focus.names()
-                targets = [{"track": t.id, "epoch": self.focus.epoch(t.id),
-                            "title": labels[t.id][0] if t.id in labels else "Unknown " + t.label}
-                           for t in tracks if self.focus.eligible(t) and
-                           (labels.get(t.id, (None, False))[1] or t.id == self.focus.focus)]
+            targets = self._offers(tracks) if self.focus else []
             screen = replace(screen, control={"session": self.session_id,
                 "targets": targets,
-                "source": self.view_taken, "gallery": self.recognition.epoch,
+                "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source},
                 ignored_items=self.things.preferences())
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
@@ -961,42 +993,18 @@ class Robot:
 
     def _things(self, turn: Turn) -> str | None:
         """Commands and questions about the visitor's things (robot/things.py): naming,
-        "forget my phone", ignore rules, and "where is my phone?". None for any other turn."""
-        if re.fullmatch(r"(?:ignore|do not track|don't track) (?:this|that)(?: item)?[.!]?",
-                        turn.question.strip(), re.I):
-            with self.detecting:
-                target = self.focus and self.focus.target(
-                    [Track(*t) for t in self.tracker.scored()])
-                payload = {"session": self.session_id, "track": target,
-                           "epoch": self.focus.epoch(target) if target else None,
-                           "source": self.view_taken, "gallery": self.recognition.epoch}
-            return self._item_control("ignore", payload)
+        "forget my phone", and "where is my phone?". None for any other turn."""
         if cmd := command(turn.question, self.vocab):
             kind, name, labels = cmd
             if kind == "name":
                 self._settle(turn.speech_start)
                 return self._name(turn, name, labels)
-            if kind == "forget":
-                turn.keep = False
-                return self._forget_thing(name, labels)
-            self.recognition.call(lambda f, c: self.things.ignore(labels, kind == "ignore"),
-                                  mutate=True)
-            self.ignored = self.things.ignored()
-            eligible = self.things.visual_links(self.ignored)
-            with self.detecting:
-                if self.focus:
-                    self.focus.ignored = self.ignored
-                    self.focus.named = {i: n for i, n in self.focus.named.items()
-                                        if (n.name or n.run[0]) in eligible}
-            return (f"Okay, I will ignore {plural(name)}." if kind == "ignore" else
-                    f"Okay, I will notice {plural(name)} again.")
+            turn.keep = False
+            return self._forget_thing(name, labels)
         if (asked := question(turn.question, self.vocab)) is None:
             return None
         mode, name, labels = asked
         self._settle(turn.speech_start)
-        if mode == "ignoring":
-            return (f"Yes, I am ignoring {plural(name)}." if set(labels) & self.ignored else
-                    f"No, I am not ignoring {plural(name)}.")
         if (named := self.things.named(name, labels)) is None:
             # Not an object ("my favorite color"), or "have you seen my keys?" without named
             # keys: the sightings or the brain answer.
@@ -1007,17 +1015,12 @@ class Robot:
         return self._mine(turn, mode, named)
 
     def _valid_item(self, data):
-        track = data.get("track")
-        tracks = {t.id: t for t in map(lambda t: Track(*t), self.tracker.scored())}
-        names = self.focus.names() if self.focus else {}
-        return (data.get("session") == self.session_id and self.focus and
-                data.get("gallery") == self.recognition.epoch and track in tracks and
-                self.focus.eligible(tracks[track]) and
-                (track == self.focus.focus or names.get(track, (None, False))[1]) and
-                data.get("epoch") == self.focus.epoch(track) and
-                isinstance(data.get("source"), (int, float)) and
-                0 <= time.time() - data["source"] <= PREVIEW_TTL and
-                self.focus.accepts(track, data["source"]))
+        """The choice is a current offer of the same session, gallery, and track object."""
+        offer = self.offers.get(data.get("track"))
+        return bool(offer and data.get("session") == self.session_id and
+                    data.get("gallery") == self.recognition.epoch and
+                    data.get("epoch") == offer.epoch and
+                    0 <= time.time() - offer.seen <= OFFER_HOLD_S)
 
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
@@ -1082,14 +1085,10 @@ class Robot:
         with self.detecting:
             if not self._valid_item(data):
                 return "That selection expired. Select it again."
-            track = data["track"]
-            accepted = self.focus.names().get(track)
-            chosen = accepted[0] if accepted and accepted[1] else None
-            title = chosen or self.view[1][track][0].capitalize()
-            taken = self.view_taken
-            shot = cut(self.view[0], self.view[1][track][1])
+            track, offer = data["track"], self.offers[data["track"]]
+            title = offer.chosen or offer.label
         vectors = self.recognition.call(
-            lambda f, c: self._ignore_vectors(c, shot, chosen, data["gallery"]))
+            lambda f, c: self._ignore_vectors(c, offer.shot, offer.chosen, data["gallery"]))
         if vectors is None:
             return "That selection expired. Select it again."
         # Mutation invalidates the gallery epoch before entering the owner. The source
@@ -1097,17 +1096,19 @@ class Robot:
         def persist(faces, crops):
             with self.detecting:
                 if self.recognition.epoch != data["gallery"] + 1 or \
-                        not self._valid_item({**data, "gallery": self.recognition.epoch}) or \
-                        not self.focus.accepts(track, taken):
+                        self.offers.get(track) is not offer or \
+                        not self._valid_item({**data, "gallery": self.recognition.epoch}):
                     return None
                 ident = self.things.ignore_item(title, vectors)
-                self.focus.exclude(track, ident)
+                del self.offers[track]
                 hidden = self.things.hidden_names()
                 self.focus.named = {i: n for i, n in self.focus.named.items()
                                     if n.name not in hidden}
-                if self.focus.focus == track:
-                    self.focus.focus, self.focus.changed = None, time.time()
-                    self.focus.challenger = None, 0.0
+                if track in self.focus.seen and self.focus.epoch(track) == offer.epoch:
+                    self.focus.exclude(track, ident)
+                    if self.focus.focus == track:
+                        self.focus.focus, self.focus.changed = None, time.time()
+                        self.focus.challenger = None, 0.0
                 self.verified = None
                 self.delivery.notify_all()
                 return ident

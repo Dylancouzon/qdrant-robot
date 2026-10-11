@@ -264,11 +264,6 @@ _NAMING = [re.compile(p, re.I) for p in (
 _OWNED_NAMING = re.compile(rf"^\W*(?:this|that)(?:'s| is)\s+{_OWNED}\W*$", re.I)
 _FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\b(?:\s+about)?\s+my\s+{_REFERENCE}", re.I)
 _OWNED_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\s+{_OWNED}\W*$", re.I)
-_UNIGNORE = re.compile(r"\b(?:stop|quit|no longer|don'?t|do not)\s+ignor\w*|\bunignore\b|"
-                       r"\bnotice\b.*\bagain\b", re.I)
-_IGNORE = re.compile(r"\b(?:ignore|stop (?:remembering|noticing|tracking|storing)|"
-                     r"(?:don'?t|do not) (?:remember|notice|track|store))\b", re.I)
-_IGNORING = re.compile(r"\bignoring\b", re.I)
 _MY = re.compile(rf"\bmy\s+{_REFERENCE}\b", re.I)
 _OWNED_QUERY = re.compile(
     rf"^\W*(?:where (?:is|are)|(?:have|did) you (?:see|seen)|"
@@ -292,8 +287,7 @@ def _identity(text: str) -> bool:
 
 
 def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:
-    """("name" | "forget" | "ignore" | "unignore", name, labels) for a command about the
-    visitor's things, else None."""
+    """("name" | "forget", name, labels) for a command about the visitor's things, else None."""
     text = text.replace("’", "'")
     if m := next((x for p in _NAMING if (x := p.search(text))), None):
         return None if _identity(m["thing"]) else ("name", *_thing(m["thing"], vocab))
@@ -304,22 +298,15 @@ def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | N
         if _identity(m["thing"]):
             return None  # "forget my face" is an identity request (robot/people.py)
         return "forget", *_thing(m["thing"], vocab)
-    if is_question(text) or re.search(r"\bmy\b", text, re.I):
-        return None
-    for kind, pattern in (("unignore", _UNIGNORE), ("ignore", _IGNORE)):
-        if pattern.search(text) and (labels := sorted(kinds(text, vocab))):
-            return kind, kind_of(labels[0]), labels
     return None
 
 
 def question(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:
-    """("this" | "where" | "seen" | "remember" | "ignoring", name, labels) for a question
-    about one of the visitor's things or an ignore rule, else None."""
+    """("this" | "where" | "seen" | "remember", name, labels) for a question about one of
+    the visitor's things, else None."""
     text = text.replace("’", "'")
     if not (is_question(text) or re.match(r"^\W*(?:and|what about)\b", text, re.I)):
         return None
-    if _IGNORING.search(text) and (labels := sorted(kinds(text, vocab))):
-        return "ignoring", kind_of(labels[0]), labels
     if (m := _MINE.search(text)) and m["thing"]:
         found = _thing(m["thing"], vocab)
         return ("this", *found) if found[1] else None
@@ -379,10 +366,8 @@ def _selftest() -> None:
     assert c("Please forget my laptop.") == ("forget", "laptop", ["laptop"])
     assert c("Delete my cup from your memory.")[:2] == ("forget", "cup")
     assert c("Forget my face.") is None and c("Forget me.") is None
-    assert c("Ignore the chair.") == ("ignore", "chair", ["chair"])
-    assert c("Please don't remember bottles.") == ("ignore", "bottle", ["bottle"])
-    assert c("You can stop ignoring chairs now.") == ("unignore", "chair", ["chair"])
-    assert c("Ignore my phone.") is None and c("Ignore that.") is None
+    assert c("Ignore the chair.") is None and c("Stop ignoring chairs.") is None, \
+        "ignore and restore are Mac UI actions"
     assert c("My favorite color is green.") is None and c("I like this cup.") is None
     q = lambda t: question(t, vocab)  # noqa: E731
     assert q("Where is my phone?") == ("where", "phone", ["phone"])
@@ -392,7 +377,7 @@ def _selftest() -> None:
     assert q("Is this phone mine?")[:2] == ("this", "phone")
     assert q("Do you still remember my teddy bear?")[:2] == ("remember", "teddy bear")
     assert q("And my laptop?")[:2] == ("remember", "laptop")
-    assert q("Are you still ignoring chairs?")[:2] == ("ignoring", "chair")
+    assert q("Are you still ignoring chairs?") is None
     assert q("What's my cat's name?") is None and q("Do you remember my cat's name?") is None
     assert q("Do you remember my favorite color?") == ("remember", "favorite color", []), \
         "an unknown thing: the caller answers only if something has that name"

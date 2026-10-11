@@ -18,7 +18,7 @@
 <section class="card"><div class="cardhead"><h2>Evidence supplied to this reply</h2><small id="answerPath"></small></div><div id="evidence" class="evidence"><p class="empty">Stored facts and memory references appear when Edgy uses them.</p></div></section>
 </main>
 <footer>All models and Qdrant Edge run on the Jetson. The Mac stores no microphone recording or camera frames. The Jetson keeps its existing session logs and answer audio.
-<details><summary>Things you can say</summary>Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?”, “Forget my phone”, or “Ignore chairs”. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it. Follow-up questions stay open for about 20 seconds after each answer. The microphone sends silence during playback and while muted. Stop releases the session and clears this view.</details></footer>
+<details><summary>Things you can say</summary>Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?” or “Forget my phone”. Choose an item in the camera card and press “Do not track that” to ignore it; “Restore” brings it back. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it. Follow-up questions stay open for about 20 seconds after each answer. The microphone sends silence during playback and while muted. Stop releases the session and clears this view.</details></footer>
 <script>
 const el=id=>document.getElementById(id);
 let cameraActive=false, transcriptText='', itemControl={}, ignoredItems=[];
@@ -48,14 +48,20 @@ function evidence(data){
   if(!el('evidence').childNodes.length){const p=document.createElement('p');p.className='empty';p.textContent='No stored evidence supplied for this reply.';el('evidence').append(p);}
 }
 function options(id, values, key){
-  const select=el(id), selected=select.value;select.replaceChildren();
-  for(const item of values){const option=document.createElement('option');option.value=String(item[key]);option.textContent=item.title;select.append(option);}
-  if(values.some(item=>String(item[key])===selected))select.value=selected;
+  // Edit the list in place: rebuilding it on every poll closes an open dropdown and drops the selection.
+  const select=el(id), want=new Map(values.map(item=>[String(item[key]),item.title]));
+  for(const option of [...select.options]){
+    if(!want.has(option.value)){option.remove();continue;}
+    if(option.textContent!==want.get(option.value))option.textContent=want.get(option.value);
+    want.delete(option.value);
+  }
+  for(const [value,title] of want)select.add(new Option(title,value));
 }
 function items(){options('item',itemControl.targets||[],'track');options('restoreItem',ignoredItems,'id');el('ignore').disabled=!el('item').value;el('restore').disabled=!el('restoreItem').value;el('itemMessage').textContent=itemControl.message||'';}
 async function itemAction(action){
   const selected=(itemControl.targets||[]).find(t=>String(t.track)===el('item').value);
-  const data=action==='ignore'?{session:itemControl.session,gallery:itemControl.gallery,source:itemControl.source,...selected}:{session:itemControl.session,gallery:itemControl.gallery,id:el('restoreItem').value};
+  if(action==='ignore'&&!selected){el('itemMessage').textContent='That selection expired. Select it again.';return;}
+  const data=action==='ignore'?{session:itemControl.session,gallery:itemControl.gallery,track:selected.track,epoch:selected.epoch}:{session:itemControl.session,gallery:itemControl.gallery,id:el('restoreItem').value};
   try{const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw Error(response.status===409?'That selection expired. Select it again.':'Item control unavailable');el('itemMessage').textContent='Request queued';}
   catch(error){el('itemMessage').textContent=error.message;}
 }

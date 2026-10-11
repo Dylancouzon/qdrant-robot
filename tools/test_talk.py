@@ -8,6 +8,7 @@ import sys
 import threading
 import time
 import types
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -397,6 +398,13 @@ def test_item_proxy_requires_cookie_and_forwards_bounded_body():
         types.SimpleNamespace(close=lambda: None), types.SimpleNamespace(status=202))
     handler.do_POST()
     assert replies[-1][0] == 202 and forwarded == [("/ignore", b"{}")]
+
+
+def test_page_edits_item_lists_in_place_and_offers_no_spoken_ignore():
+    page = (Path(talk.__file__).parent / "talk.html").read_text()
+    options = page[page.index("function options("):page.index("function items(")]
+    assert "replaceChildren" not in options, "a rebuilt list closes an open dropdown"
+    assert "Ignore chairs" not in page and "Do not track that" in page
 
 
 def test_recorded_camera_never_opens_inputstream(monkeypatch):
