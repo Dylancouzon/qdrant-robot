@@ -9,11 +9,12 @@ The eight failed recorded answers (39/47) include no evidence-selection error, s
 1. Forget guard: done (`2a88558`); deletion needs an imperative (`robot/memory.py` `deletion_target`).
 2. Design gate: option B, the earlier frame in RAM (GO WITH CHANGES). Fixtures frozen in `e688d90`: `eval/dev/recall.jsonl`.
 3. Built and reviewed (PASS): `53867a9`.
-4. Paired Jetson replay of B: recorded 39/47 to 38/47, recall sessions 8/15 to 10/15 (J). The right frame arrives, but the 2B mishandles a labeled past image. Not adopted; see `research/recall.md`.
-5. B-note arm (B with a past-tense note, `ac7395d` in worktree `build/wt-bnote`): recorded 41/47, recall 11/15 (J). B2 (captions of retained frames, code answers; design and review passed): Jetson arm running. Adopt the better arm after a per-capability check.
-6. Then command set v2 (Dylan approved, 2026-10-10): distinct verbs ("remember me", "remember this", "forget ..."); the robot asks for names and confirms deletions; introductions no longer offer face enrollment; unknown objects get a teach-the-command reply. Design gate, frozen dialogue fixtures, then build.
+4. Recall adopted (D150, `71078ac`): RAM captions of retained frames. Recorded 41/47, recall sessions 13/15, first audio 1.41 s p50 (J).
+5. UI Ignore (D151) merged: held 8 s offers, spoken ignore removed. Needs the human check below.
+6. Next: one held-out use, baseline `e688d90` against this branch in the same session (third use; record it in DECISIONS.md). Then deploy and merge to main.
+7. Then command set v2 (Dylan approved, 2026-10-10): distinct verbs ("remember me", "remember this", "forget ..."); the robot asks for names and confirms deletions; introductions no longer offer face enrollment; unknown objects get a teach-the-command reply. Design gate, frozen dialogue fixtures, then build.
 
-Parallel builder (worktree): the UI ignore dropdown keeps items about 8 s after they leave the frame, and spoken ignore is removed (Dylan, 2026-10-10).
+Human check (Mac UI on the Jetson): open the item list while an object is in view, let the object leave the frame, choose it and press "Do not track that" within 8 s; confirm it stays ignored after a restart, then Restore it. Also try after 10 s: it should be gone from the list.
 
 Four misses are model answers with adequate evidence (hand-teddy-3, same-apples-1, joke-1, intro-2). Owner and location payloads (Dylan, 2026-10-10) need their own design gate. RAM headroom follows.
 

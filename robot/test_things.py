@@ -1,6 +1,7 @@
 """Naming, recall by name, forget, and ignore through the robot's own tracking and
 answers, on real Edge shards and the real tracker, with a stub crop embedder (one vector per
 color), including restarts."""
+import dataclasses
 import queue
 import tempfile
 import threading
@@ -46,7 +47,7 @@ def open_robot(root: Path) -> Robot:
     robot.recognition = Owner()
     robot.named, robot.ignored = robot.things.labels(), robot.things.ignored()
     robot.tracker, robot.points, robot.away, robot.visitors = Tracker(), {}, set(), {}
-    robot.view, robot.views = (None, {}), deque(maxlen=SHOTS)
+    robot.view, robot.views, robot.offers = (None, {}), deque(maxlen=SHOTS), {}
     robot.view_at, robot.view_taken, robot.verified = 0, 0, None
     robot.camera_source = "Live camera"
     robot.shown_taken, robot.session_id, robot.control_message = 0, "test-session", ""
@@ -202,7 +203,7 @@ def test_ignore(monkeypatch) -> None:
     monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
     with tempfile.TemporaryDirectory() as tmp:
         robot = open_robot(Path(tmp))
-        assert ask(robot, "Ignore the chair.")[0] == "Okay, I will ignore chairs."
+        robot.things.ignore(["chair"], True)  # a stored rule: the UI writes only item rules
         close_robot(robot)
         robot = open_robot(Path(tmp))  # the rule survives a restart
         frame = np.zeros((720, 1280, 3), np.uint8)
@@ -211,7 +212,7 @@ def test_ignore(monkeypatch) -> None:
         robot._sight(found)
         assert found and robot.memory.sightings(time.time() + 1, 9) == [], \
             "an ignored kind is not stored"
-        assert ask(robot, "Are you still ignoring chairs?")[0] == "Yes, I am ignoring chairs."
+        assert robot.ignored == {"chair"}
         v = np.eye(TEXT_DIM, dtype=np.float32)[0]
         robot.memory.add(frame, "My chair at home is red.", v, ts=time.time())
         robot.last_line = time.time()  # the same conversation
@@ -219,8 +220,8 @@ def test_ignore(monkeypatch) -> None:
         assert robot._told(v, turn) == [], "a statement about chairs is not recalled"
         turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1)
         assert robot._sighted(turn) == "I am ignoring chairs, so I do not remember any."
-        assert ask(robot, "You can stop ignoring chairs now.")[0] == \
-            "Okay, I will notice chairs again."
+        robot.things.ignore(["chair"], False)
+        robot.ignored = robot.things.ignored()
         assert [m["said"] for m in robot._told(v, turn)] == ["My chair at home is red."]
         robot.since = time.time_ns() // 1000
         assert robot._told(v, turn) == [], "a first-person statement of an earlier visitor (D70)"
@@ -385,7 +386,7 @@ def test_legacy_named_recall_filters_before_limit(robot):
     assert len(list(r.memory.frames.iterdir())) == 6, "old ambient evidence remains intact"
 
 
-def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeypatch):
+def test_ignore_rule_survives_restart_and_object_forget(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
     monkeypatch.setattr(main, "face", lambda faces, frame: None)
     monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
@@ -394,8 +395,10 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     r.focus.focus = next(iter(r.view[1]))
     assert ask(r, "This is my phone")[0].startswith("Got it")
     count = r.memory.shard.count(CountRequest())
-    assert ask(r, "Ignore phones")[0].startswith("Okay")
-    assert not r.focus.names(), "ignore clears stored-class display immediately"
+    r.things.ignore(["phone"], True)
+    r.ignored = r.focus.ignored = r.things.ignored()
+    frame_of(r)
+    assert not r.focus.names(), "a stored rule clears stored-class display"
     frame_of(r, label="bag")  # relabeling cannot bypass the stored object's ignored kind
     preview(r)
     assert r.memory.shard.count(CountRequest()) == count
@@ -407,10 +410,10 @@ def test_ignore_and_unignore_survive_restart_and_object_forget(tmp_path, monkeyp
     close_robot(r)
     fresh = open_robot(tmp_path)
     assert fresh.ignored == {"phone"} and fresh.things.visual_links(fresh.ignored) == {}
-    assert ask(fresh, "Stop ignoring phones")[0].startswith("Okay")
+    fresh.things.ignore(["phone"], False)
     close_robot(fresh)
     fresh = open_robot(tmp_path)
-    assert fresh.ignored == set()
+    assert fresh.things.ignored() == set()
     close_robot(fresh)
 
 
@@ -702,7 +705,7 @@ def test_spoken_names_categories_case_and_restart(tmp_path):
     assert command("This is my face", vocab) is None
     assert command("This is my name", vocab) is None
     assert command("Dylan's smartphone is charging", vocab) is None
-    assert command("Ignore smartphones", vocab) == ("ignore", "phone", ["phone"])
+    assert command("Ignore smartphones", vocab) is None, "ignore is a UI action, not a command"
     assert command("Forget my Dylan's smartphone", vocab)[:2] == ("forget", "Dylan's smartphone")
     assert command("Delete my red coffee mug from your memory", vocab)[:2] == (
         "forget", "red coffee mug")
@@ -1186,10 +1189,12 @@ def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot, monkeyp
     data = r._shown(False)[1].control
     selected = next(t for t in data["targets"] if t["track"] == track)
     data = {**data, **selected}
+    offered = time.time()
     assert r._control("ignore", {**data, "session": "old"}) is False
     assert r._control("ignore", data)
-    r._track(r.view[0], [], r.view_taken + .01)
-    assert r._item_control("ignore", data).startswith("That selection expired")
+    with monkeypatch.context() as late:
+        late.setattr(main.time, "time", lambda: offered + main.OFFER_HOLD_S + 1)
+        assert r._item_control("ignore", data).startswith("That selection expired")
     assert not r.things.preferences()
     frame_of(r)
     r.focus.focus = track
@@ -1216,6 +1221,105 @@ def test_unknown_item_ignore_empty_named_gallery_and_stale_action(robot, monkeyp
     frame_of(r, BLACK)
     preview(r, clear=False)
     assert r._shown()[1].boxes and embeddings == [1] * 3 and len(exclusions) == 3
+
+
+def test_offer_is_held_after_the_track_leaves_then_expires_and_restores(robot, monkeypatch):
+    r = robot
+    frame = frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.focus = track
+    offered = time.time()
+    assert [t["track"] for t in r._shown(False)[1].control["targets"]] == [track]
+    r._track(frame, [], r.view_taken + .01)  # the object leaves the view
+    assert track not in r.view[1]
+
+    def control(ago):
+        monkeypatch.setattr(main.time, "time", lambda: offered + ago)
+        state = r._shown(False)[1].control
+        return state, [{**state, **t} for t in state["targets"]]
+
+    state, held = control(main.OFFER_HOLD_S - 1)
+    assert [d["track"] for d in held] == [track], "still offered after it left the view"
+    assert r._item_control("ignore", held[0]).startswith("Okay")
+    assert [p["title"] for p in r.things.preferences()] == ["Phone"]
+    assert control(0)[1] == [], "an ignored item is no longer offered"
+    state = control(0)[0]
+    restore = {"session": state["session"], "gallery": state["gallery"],
+               "id": r.things.preferences()[0]["id"]}
+    assert r._item_control("restore", restore) == "I will notice that item again."
+    assert r.things.preferences() == []
+
+    r.offers.clear()
+    frame_of(r)
+    r.focus.focus = next(iter(r.view[1]))
+    state, [data] = control(0)
+    r._track(frame, [], r.view_taken + .01)
+    monkeypatch.setattr(main.time, "time", lambda: offered + main.OFFER_HOLD_S + 1)
+    assert r._shown(False)[1].control["targets"] == [], "gone after the hold time"
+    assert r._item_control("ignore", data).startswith("That selection expired")
+
+
+def state_of(r):
+    state = r._shown(False)[1].control
+    return {**state, **(state["targets"] or [{}])[0]}
+
+
+def test_offer_crop_owns_memory_and_stalled_source_expires(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    r.focus.focus = next(iter(r.view[1]))
+    offered = time.time()
+    [target] = r._shown(False)[1].control["targets"]
+    assert r.offers[target["track"]].shot.base is None, "the crop must not keep the camera frame"
+    monkeypatch.setattr(main.time, "time", lambda: offered + main.OFFER_HOLD_S + 1)
+    assert r._shown(False)[1].control["targets"] == [], "a stalled source stops refreshing"
+    monkeypatch.setattr(main.time, "time", lambda: offered - 5)
+    assert not r._valid_item({**state_of(r), "track": target["track"]}), "negative age"
+
+
+def test_people_are_never_offered(robot):
+    r = robot
+    frame_of(r, people=True)
+    person = next(i for i, (label, _) in r.view[1].items() if label == "person")
+    r.focus.focus = person
+    assert person not in [t["track"] for t in r._shown(False)[1].control["targets"]]
+
+
+def test_replaced_offer_does_not_persist(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    r.focus.focus = next(iter(r.view[1]))
+    state = r._shown(False)[1].control
+    data = {**state, **state["targets"][0]}
+    vectors = r._ignore_vectors
+
+    def replaced(crops, shot, chosen, gallery):
+        r.offers[data["track"]] = dataclasses.replace(r.offers[data["track"]])
+        return vectors(crops, shot, chosen, gallery)
+
+    monkeypatch.setattr(r, "_ignore_vectors", replaced)
+    assert r._item_control("ignore", data).startswith("That selection expired")
+    assert r.things.preferences() == []
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_offer_refresh_during_embedding_decides_persistence(robot, monkeypatch, refresh):
+    r = robot
+    frame = frame_of(r)
+    r.focus.focus = next(iter(r.view[1]))
+    data = state_of(r)
+    vectors = r._ignore_vectors
+
+    def embedding(crops, shot, chosen, gallery):
+        if refresh:  # a newer source arrives while the crop is embedded
+            r._track(frame, [Detection("phone", 0.9, CENTER)], r.view_taken + main.OFFER_REFRESH_S)
+            r._shown(False)
+        return vectors(crops, shot, chosen, gallery)
+
+    monkeypatch.setattr(r, "_ignore_vectors", embedding)
+    reply = r._item_control("ignore", data)
+    assert reply.startswith("That selection expired" if refresh else "Okay")
+    assert bool(r.things.preferences()) is not refresh
 
 
 def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(robot, monkeypatch):
