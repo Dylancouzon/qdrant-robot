@@ -41,7 +41,9 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
 | Intent parsing (rules, BGE scores, linear head) | Never built. The 8 recorded misses (39/47, J) include no wrong past or present choice: `about_past()` fired on every past question. Combined questions still lack earlier evidence | Not the bottleneck for this set; reopen with routing misses | `recall.md` |
-| Recall of unnamed objects shown earlier | 3 of 8 misses: no caption (D127) and earlier answers dropped after a scene change (D27) | Next task | `recall.md` |
+| Recall: earlier frame labeled as past (B) | Right frame delivered; 2B answers in present tense or about the image. 38/47, 10/15 (J) | Rejected | D150 |
+| Recall: B plus a past-tense note (B-note) | 41/47, 11/15 (J); answers still wander ("the first thing I saw was...") | Rejected for B2 | D150 |
+| Recall: RAM captions of retained frames, code answers (B2) | 41/47, 13/15, first audio 1.41 s p50 (J); combined question passes | Current | D150; `recall.md` |
 
 ## Voice
 

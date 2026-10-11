@@ -40,6 +40,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D75/D108 2026-10-09: Code answers stay for ordinary memory questions.** Two integrated attempts to route retrieval into the brain lost (38 vs 44/74; 39 vs 42/47 recorded audio). The saved alternate is `research/archive/one-voice.patch`.
 
+**D150 2026-10-10: Recall of unnamed objects shown earlier uses RAM captions.** Each exchange keeps its frame in RAM for the conversation window; the idle worker captions one frame per view, and a past or combined question about something shown is answered from the selected frame's caption (code answer, or one Memories line beside the present image). Nothing new persists (D127 holds). Paired J runs: recorded 39 to 41/47, recall sessions 8 to 13/15, first audio 1.45 to 1.41 s p50; B (labeled earlier image) 38/47 and 10/15 rejected. `research/recall.md`.
+
 **D66 2026-10-08: Pause decode at the first phrase.** Synthesize, then resume with the text so far. First audio 0.73 vs 0.94 s p50 with identical answers.
 
 ## Voice

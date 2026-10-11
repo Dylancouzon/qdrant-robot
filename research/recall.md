@@ -1,6 +1,6 @@
 # Recall of objects shown earlier
 
-The visitor shows an unnamed object, the scene changes, and the visitor asks "What did I just show you?". Today the brain gets no evidence for that question. This file holds the design for closing that gap.
+The visitor shows an unnamed object, the scene changes, and the visitor asks "What did I just show you?". The robot keeps each exchange's frame in RAM for the conversation window, captions one frame per view when idle, and answers from the selected frame's caption (D150). Paired Jetson runs: recorded 39 to 41/47, recall sessions 8 to 13/15, first audio 1.45 to 1.41 s p50 (J). The sections below record how the design got there.
 
 ## Evidence
 
@@ -70,3 +70,14 @@ One paired Jetson run per arm on identical inputs: the 47 recorded development t
 | B2 | Captions as above, B's image path removed |
 
 Report judged answers, evidence selection, caption readiness and correctness, first-WAV p50 and p95, detection fps, and tegrastats headroom and swap separately. Adopt the arm with a judged gain and no capability loss. A one-line follow-up asked right after an answer measures the on-demand path.
+
+## Result of option B2 (2026-10-10, J)
+
+| Arm | Recorded, 47 turns | Recall sessions, 15 turns | First audio p50 |
+| --- | --- | --- | --- |
+| Baseline (`e688d90`) | 39 | 8 | 1.45 s |
+| B (`53867a9`) | 38 | 10 | 1.46 s |
+| B-note (`ac7395d`) | 41 | 11 | 1.47 s |
+| B2 (`1740f0b`) | 41 | 13 | 1.41 s |
+
+B2 fixed all three baseline recall misses. Its code answers take about 1.15 s to first audio. `bus-red-2` failed in B-note and B2 through the same untouched sight path, with the same ASR text ("root number"); it is decode noise. `rc-compare-1` (the 2B calls a Pepsi cup "my workspace") remains a sight miss. Tegrastats shows the same minimum unused RAM in every recorded arm (baseline 1,138 MB, B2 1,102 MB) and flat swap (B2 67 to 71 MB), so the RAM frames and captions cost no measurable memory in replay. This is not the full-stack stress run behind the 558 MiB headroom figure. B2 is adopted.

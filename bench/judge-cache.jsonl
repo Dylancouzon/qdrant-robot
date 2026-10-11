@@ -2429,3 +2429,66 @@
 {"key": "d0b2ffb2027b7980", "pass": true, "why": "Says espresso.", "votes": [true, true, true]}
 {"key": "7c44482cb99ca211", "pass": true, "why": "Says Hello Kitty.", "votes": [true, true, true]}
 {"key": "fd5a49ae1ca62671", "pass": true, "why": "Says Berlin.", "votes": [true, true, true]}
+{"key": "3e8c794a0c3229d2", "pass": false, "why": "Identifies the sign but says it is still being shown.", "votes": [true, false, false]}
+{"key": "ca166ef74430b449", "pass": true, "why": "Identifies a motorcycle.", "votes": [true, true, true]}
+{"key": "c9fa9c20432ab2ff", "pass": false, "why": "Denies remembering what the visitor showed.", "votes": [false, false, false]}
+{"key": "f8d7c47650142c57", "pass": true, "why": "Identifies a cat sleeping on a pink blanket.", "votes": [true, true, true]}
+{"key": "14d0f4f92b850854", "pass": true, "why": "Describes the room without claiming the cat remains.", "votes": [true, true, true]}
+{"key": "435c9c43977925f3", "pass": true, "why": "Describes embedded vector search in the application process.", "votes": [true, true, true]}
+{"key": "d496598392879508", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "ad54dec69350703d", "pass": true, "why": "Says espresso.", "votes": [true, true, true]}
+{"key": "272ba096a1f823d9", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "31bc8a86ee09fc50", "pass": true, "why": "Reads route 15.", "votes": [true, true, true]}
+{"key": "3e258a8dd01e09c2", "pass": true, "why": "Identifies Sydney.", "votes": [true, true, true]}
+{"key": "235faa5e240ad565", "pass": true, "why": "Identifies a red double-decker bus.", "votes": [true, true, true]}
+{"key": "dc9fa9bd215278ac", "pass": false, "why": "Does not say apples came first.", "votes": [false, false, false]}
+{"key": "2fb8f0856a5ba77d", "pass": false, "why": "Does not say the bus came second.", "votes": [false, false, false]}
+{"key": "9627201d15ebd508", "pass": true, "why": "Identifies zebras.", "votes": [true, true, true]}
+{"key": "5988ea4ca514df02", "pass": true, "why": "Says Hello Kitty.", "votes": [true, true, true]}
+{"key": "3efbcfaa555058b8", "pass": true, "why": "Places a cake with berries on the left.", "votes": [true, true, true]}
+{"key": "c721d53301168d33", "pass": true, "why": "Responds naturally to the visitor being from Berlin.", "votes": [true, true, true]}
+{"key": "7d15a19e36124761", "pass": true, "why": "Says Paris.", "votes": [true, true, true]}
+{"key": "9c2aa96ad7cd18f4", "pass": true, "why": "Remembers Berlin.", "votes": [true, true, true]}
+{"key": "c2b767b746165f8c", "pass": false, "why": "The joke is long and has no coherent punchline.", "votes": [false, false, false]}
+{"key": "00c34fece02b789a", "pass": true, "why": "Says he may be enjoying the wave.", "votes": [true, true, true]}
+{"key": "31c4352a6fee3c5b", "pass": false, "why": "Does not identify the teddy bears.", "votes": [false, false, false]}
+{"key": "65ed6c7ecd6f8e7a", "pass": false, "why": "Does not say the teddy bears are gone.", "votes": [false, false, false]}
+{"key": "e077fe161d60cdac", "pass": true, "why": "Mentions the green apples it sees.", "votes": [true, true, true]}
+{"key": "fafc5a1e700f4922", "pass": false, "why": "Incorrectly says the teddy bears are the same.", "votes": [false, false, false]}
+{"key": "cf4bf286961e48e6", "pass": true, "why": "Greets Anna by name.", "votes": [true, true, true]}
+{"key": "7749d03cca7de671", "pass": false, "why": "Repeats a greeting instead of answering about its day.", "votes": [false, false, false]}
+{"key": "2715818f837c9df1", "pass": true, "why": "Identifies a cat.", "votes": [true, true, true]}
+{"key": "e1d9a54ebd71e278", "pass": false, "why": "Describes the current image, not what the visitor held up.", "votes": [false, false, false]}
+{"key": "991935105ccf0600", "pass": true, "why": "Identifies a cup.", "votes": [true, true, true]}
+{"key": "3435b861a020209e", "pass": true, "why": "Says the visitor brought a cup.", "votes": [true, true, true]}
+{"key": "987305477f2add8f", "pass": true, "why": "Identifies a clock.", "votes": [true, true, true]}
+{"key": "edaede7653969df4", "pass": true, "why": "Identifies a laptop.", "votes": [true, true, true]}
+{"key": "f8cd446e42431e1a", "pass": false, "why": "Does not identify the clock.", "votes": [false, false, false]}
+{"key": "597289132312d864", "pass": true, "why": "Identifies the laptop.", "votes": [true, true, true]}
+{"key": "075c0b2a65253046", "pass": true, "why": "Says it does not remember.", "votes": [true, true, true]}
+{"key": "ae1a6dc634b7d98e", "pass": true, "why": "Identifies a cat.", "votes": [true, true, true]}
+{"key": "6666b8f088b86423", "pass": true, "why": "Identifies a banana without mentioning the earlier cat.", "votes": [true, true, true]}
+{"key": "b9a6d65ae0a0c246", "pass": true, "why": "Names a donut.", "votes": [true, true, true]}
+{"key": "396d9aa4f01a1c65", "pass": false, "why": "Names neither the banana nor the donut.", "votes": [false, false, false]}
+{"key": "ad4db231646d881a", "pass": false, "why": "Does not identify the cup.", "votes": [false, false, false]}
+{"key": "f08e47f668bfdafd", "pass": false, "why": "Wrongly says the banana and earlier cup are the same.", "votes": [false, false, false]}
+{"key": "9c04d592552d93c5", "pass": true, "why": "Correctly recalls the stop sign.", "votes": [true, true, true]}
+{"key": "8f3ed3ce94eb8812", "pass": true, "why": "Correctly recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "8df1444cbdc3053c", "pass": true, "why": "Correctly says espresso.", "votes": [true, true, true]}
+{"key": "6a80d23cc904e276", "pass": true, "why": "Correctly says the bus is red.", "votes": [true, true, true]}
+{"key": "a0c2a0a1a067d145", "pass": false, "why": "Does not read route 15.", "votes": [false, false, false]}
+{"key": "0d35a53ca2e7bb01", "pass": true, "why": "Correctly says the apples were first.", "votes": [true, true, true]}
+{"key": "be2c088f0af2315c", "pass": true, "why": "Correctly says the bus came second.", "votes": [true, true, true]}
+{"key": "543f2300e5a43b18", "pass": true, "why": "Stuffed animals is acceptable under the rubric.", "votes": [true, true, true]}
+{"key": "23e17beab612e5e9", "pass": false, "why": "Falsely says the teddy bears are the same as the apples.", "votes": [false, false, false]}
+{"key": "7e8a2782a2660387", "pass": true, "why": "Identifies a cat.", "votes": [true, true, true]}
+{"key": "1acb4b3d45f7825d", "pass": true, "why": "Recalls the cat.", "votes": [true, true, true]}
+{"key": "f55d75bb06c7d31c", "pass": true, "why": "Identifies a cup.", "votes": [true, true, true]}
+{"key": "af587e89e591ff57", "pass": true, "why": "Recalls the cup.", "votes": [true, true, true]}
+{"key": "d34e7bde26621118", "pass": true, "why": "Identifies a laptop.", "votes": [true, true, true]}
+{"key": "cbbb6c61fb807f59", "pass": true, "why": "Recalls the clock first.", "votes": [true, true, true]}
+{"key": "fb0f0a8243afcb74", "pass": true, "why": "Recalls the laptop next.", "votes": [true, true, true]}
+{"key": "3008e9472f042588", "pass": true, "why": "Identifies a banana without mentioning the cat.", "votes": [true, false, true]}
+{"key": "afc712d9158add69", "pass": true, "why": "Names a donut.", "votes": [true, true, true]}
+{"key": "8499ff997237a4ec", "pass": true, "why": "Recalls the banana.", "votes": [true, true, true]}
+{"key": "3cc65f54bbf1757f", "pass": false, "why": "Omits the banana and earlier cup.", "votes": [false, true, false]}

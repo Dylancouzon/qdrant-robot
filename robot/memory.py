@@ -94,8 +94,12 @@ def compares(question: str) -> bool:
     return about_now(question) or bool(_COMPARE.search(question))
 
 
+_DETERMINER = re.compile(r"^(?:a|an|the|some|two|three|four|several|many|\d+)\b", re.I)
+
+
 def showed(thing: str, age: str) -> str:
-    return f"You showed me {thing}, {age}."
+    """The spoken recall answer; captions name the main object with or without an article."""
+    return f"You showed me {thing if _DETERMINER.match(thing) else article(thing)}, {age}."
 
 
 def shown(question: str, memories: list[dict], age: Callable[[dict], str]) -> str | None:
@@ -643,6 +647,10 @@ if __name__ == "__main__":
     assert shown("What did I show you yesterday?", mems, ago) is None
     assert shown("What did I show you on the left?", mems, ago) is None
     _earlier_selftest()
+    assert showed("cat", "now") == "You showed me a cat, now."
+    assert showed("apples", "now") == "You showed me apples, now."
+    assert showed("an orange mug", "now") == "You showed me an orange mug, now."
+    assert showed("Two teddy bears", "now") == "You showed me Two teddy bears, now."
     assert not is_question("I'm visiting from Berlin.") and not is_question("My name is Dylan.")
     _sighting_selftest()
     print("selftest ok")

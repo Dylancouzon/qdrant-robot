@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MODEL = {"design": "gpt-6.1-sol", "review": "gpt-6.1-sol", "milestone": "gpt-6-astra"}
 PASSING = {"design": "GO", "review": "PASS", "milestone": "MILESTONE MET"}
 TIMEOUT_S = 900
-CHECK_TIMEOUT_S = 120
+CHECK_TIMEOUT_S = 300  # the suite takes 95-120 s on an idle Mac, more under load
 # Bookkeeping the lead edits after a review; excluded from the reviewed code tree.
 BOOKKEEPING = ["STATE.md", "DECISIONS.md", "research", "reviews", "bench/results"]
 SELFTESTS = ["robot.asr", "robot.audio", "robot.brain", "robot.detect", "robot.memory",
