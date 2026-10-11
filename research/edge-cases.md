@@ -68,7 +68,7 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 ## Two-step teaching, 2026-10-10
 
-- "Turn down the volume" and other commands with no existing recognizer become the name after "Track this"; the volume control is on the page only. A spoken command parser would fix it; none exists. Evidence: reviews/20261010-232645-44755-review.md.
+- Right after "What should I call it?", an unrelated line such as "turn down the volume" becomes the name. Volume stays a UI control by design (Dylan, 2026-10-10), so no spoken volume command will be added; the visitor can say "forget my <name>". Evidence: reviews/20261010-232645-44755-review.md.
 - A short bare statement (up to four words) after "What should I call it?" becomes the name. Prefer explicit naming forms if this shows up live.
 
 ## Full-stack model comparison observations, 2026-10-10

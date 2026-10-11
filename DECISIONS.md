@@ -78,6 +78,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D152 2026-10-10: The robot hears and speaks through its own USB audio** (card `Device`; its microphone beat the camera microphone by about 3 dB, J). It runs as the Jetson unit `qr-robot`, which the Mac page attaches to and never stops on disconnect. Input is silenced while a phrase is queued or playing and for 0.3 s after (no barge-in). The volume slider sets the USB mixer and is saved in `shared/`. Supersedes the Mac audio path of D122–D126.
 
+**D153 2026-10-10: Booth interaction timing and two-step teaching** (Dylan's live session). Follow-ups need no wake phrase for 60 s after an answer ends (supersedes D65's 20 s; the page says "Say 'Hey Edgy'" once it lapses). Ignore offers last 30 s after their last eligible view (supersedes D151's 8 s). A nameless "Track this" pins the focus track and epoch from speech start and asks "What should I call it?"; a lost pin fails closed and person views never enter object memory. Volume is a UI control only.
+
 **D122–D126 2026-10-09: Mac interface.** `tools/talk.py` serves a loopback page with Start, Mute, and Stop over native audio and SSH. All models stay on the Jetson.
 
 ## Pending requirements
