@@ -1,0 +1,34 @@
+{
+  "input": "fresh live camera and one oracle-text turn; isolated empty memory",
+  "brightness": 105.98497757523148,
+  "seconds": 15.0153169631958,
+  "received_jpegs": 208,
+  "rejected_publications": 17,
+  "source_lag_p50_ms": 139.473557472229,
+  "source_lag_p95_ms": 172.0146298408508,
+  "received_interval_p95_ms": 94.45457458496087,
+  "detector_fps": 14.98469866147347,
+  "face_identity": "No enrolled gallery; identity transitions covered by tests.",
+  "answer": "Qdrant Edge is the embedded version of Qdrant. It runs inside the application's own process, with no server. Think of it as SQLite, but for vector search.",
+  "complete": true,
+  "what": "bounded overlay continuity",
+  "machine": "qdrant-robot",
+  "release": "56ce07810e7a",
+  "tegrastats": "overlay-check-20261011-112447.tegrastats",
+  "revision": "c47f59331bd41a4b4cbac870b37e73d27be66460",
+  "source_sha256": {
+    "robot/focus.py": "47dff14c449e0fe3ffa14bb8c8cd0dd006895d9b8369116496644fac331a1c79",
+    "robot/main.py": "119ed3cd98824cb20f0249829ae18c648fcdde4dc8990c158c1f7d5f629a53f4",
+    "bench/overlay.py": "cca1a38fb95501bb51b06a828b9e249d3288405d5052b34b4c515b808ab5ce15"
+  },
+  "command": "python -m bench.overlay --live --seconds 15",
+  "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+  "numpy": "2.3.3",
+  "revision_state": "Uncommitted candidate; source hashes identify the measured files.",
+  "limits": {
+    "display_gap_s": 0.2,
+    "requested_seconds": 15,
+    "memory": "isolated temporary directory",
+    "enrolled_faces": 0
+  }
+}

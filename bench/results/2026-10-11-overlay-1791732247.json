@@ -1,0 +1,77 @@
+{
+  "input": "deterministic trajectories and existing development detections",
+  "baseline_sha256": "f3f86dfd631c402534b684a9c2acc2f378e6e788fca94fba5b142e3ad79c14f6",
+  "motion": {
+    "baseline": {
+      "0": {
+        "rms_px": 3.0767948691238205,
+        "final_lag_px": 3
+      },
+      "5": {
+        "rms_px": 8.93681524183345,
+        "final_lag_px": 9
+      },
+      "20": {
+        "rms_px": 36.287738976133525,
+        "final_lag_px": 37
+      },
+      "40": {
+        "rms_px": 72.70213201825652,
+        "final_lag_px": 74
+      },
+      "80": {
+        "rms_px": 145.28500725585326,
+        "final_lag_px": 149
+      }
+    },
+    "candidate": {
+      "0": {
+        "rms_px": 3.0767948691238205,
+        "final_lag_px": 3
+      },
+      "5": {
+        "rms_px": 8.93681524183345,
+        "final_lag_px": 9
+      },
+      "20": {
+        "rms_px": 18.0,
+        "final_lag_px": 18
+      },
+      "40": {
+        "rms_px": 0.0,
+        "final_lag_px": 0
+      },
+      "80": {
+        "rms_px": 0.0,
+        "final_lag_px": 0
+      }
+    }
+  },
+  "clip": "bench/results/2026-10-08-clip-1791487472.jsonl",
+  "clip_sha256": "ae91c7b0e3b0553e777370256e79f60ddc2a30b1d2ee27721b9fa4e4a92122c5",
+  "recorded": {
+    "baseline": {
+      "frames": 675,
+      "carried_boxes": 0,
+      "selected_without_outline": 111
+    },
+    "candidate": {
+      "frames": 675,
+      "carried_boxes": 22,
+      "selected_without_outline": 102
+    }
+  },
+  "what": "bounded overlay continuity",
+  "machine": "dylans-macbook-pro.tail04131.ts.net",
+  "release": null,
+  "tegrastats": null,
+  "revision": "c47f59331bd41a4b4cbac870b37e73d27be66460",
+  "source_sha256": {
+    "robot/focus.py": "47dff14c449e0fe3ffa14bb8c8cd0dd006895d9b8369116496644fac331a1c79",
+    "robot/main.py": "a62f0d1f6e6e0cdc45d7c741820521b7f02a274575253a38861279e8b3c9dd07",
+    "bench/overlay.py": "205103f8cdcc9446bc9abd01a3b9e7c01125849fe1c53cc5cfce40daaa347156"
+  },
+  "command": "python -m bench.overlay --baseline build/overlay/focus_baseline.py",
+  "python": "3.12.13 (main, May 10 2026, 19:20:41) [Clang 22.1.3 ]",
+  "numpy": "2.3.3"
+}

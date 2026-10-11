@@ -87,3 +87,8 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - Removing a view reloads the gallery, resets its scroll position, and collapses Edit memory. Preserve the affected card state if repeated removal becomes disruptive.
 - Evidence ages update when evidence changes. After a long idle period, the relative time can become stale. Refresh time labels if visitors encounter this.
 - Stop or disconnect disables the microphone button but can leave its last mute icon and accessible state. Reset these in `clearLive()` if this causes confusion. The next connection publishes the correct state.
+
+## Bounded overlay persistence
+
+- A size dip followed by a detection gap can extend an undersized outline beyond its original size grace, for at most the 200 ms missing-detection grace. Action authority remains absent. If this becomes visible, also bound undersized carry by publication time minus admission time.
+- The paired recorded-detection benchmark uses confirmed tracks for overlap suppression. Production also checks unconfirmed replacements, so the reported nine-frame outline gain can overstate production behavior. Use all matched detections when this comparison next informs a decision.

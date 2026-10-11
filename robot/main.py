@@ -28,7 +28,7 @@ from robot.config import SHARED
 from robot.settings import settings
 from robot.detect import CONFIRM, Detector, Sighting, Tracker, iou, region
 from robot.recognition import Recognition
-from robot.focus import BODY, OCCLUSION_S, SMOOTH, SNAP, Focus, Track, inside
+from robot.focus import BODY, OCCLUSION_S, Focus, Track, drawing_box, inside
 from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     UNAVAILABLE,
@@ -492,7 +492,7 @@ class Robot:
                                     and self.focus.epoch(t.id) == epochs[t.id]]
         return frame, taken, shown_tracks, geometry, faces, record
 
-    def _publication_valid(self, frame, taken, record, session, gallery, epochs, cancel):
+    def _publication_valid(self, frame, taken, record, session, gallery, epochs, carried, cancel):
         with self.delivery:
             if cancel() or session != self.session_id or gallery != self.recognition.epoch or \
                     not 0 <= time.time() - taken <= .2 or taken < self.shown_taken:
@@ -502,6 +502,10 @@ class Robot:
             if any(not self.focus or not self.focus.accepts(i, taken) or
                    self.focus.epoch(i) != epoch for i, epoch in epochs.items()):
                 return False
+            if carried:
+                current = self.focus.carried(self._observed_tracks(), taken, time.time())
+                if any(current.get(i) != box for i, box in carried.items()):
+                    return False
             if not record and self._completed_valid(self.verified) and self.verified[0] >= taken:
                 return False
             if taken == self.shown_taken and id(frame) != self.shown_frame:
@@ -512,6 +516,11 @@ class Robot:
             self.shown_record = id(record) if record else 0
             self.shown_known = bool(record and record[3][1] and record[3][1][5] == "known")
             return True
+
+    def _observed_tracks(self):
+        """Include unconfirmed current detections when suppressing carried object drawings."""
+        return [Track(t.id, t.det.box, t.label, t.det.conf)
+                for t in self.tracker.tracks if t.missed == 0]
 
     def _offers(self, tracks: list[Track], label_map: dict[str, str]) -> list[dict]:
         """Refresh the Ignore choices (held under self.detecting). A visible, eligible named or
@@ -552,9 +561,12 @@ class Robot:
             screen = self.screen[1]
             tracks = [Track(*t) for t in self.tracker.scored()] if self.focus else []
             frame, taken, shown_tracks, geometry, faces, record = self._display_source(tracks)
+            carried = self.focus.carried(self._observed_tracks(), taken, time.time()) \
+                if self.focus else {}
             if self.focus:
                 screen = replace(screen, boxes=self.focus.boxes(
-                    shown_tracks, [], time.time(), geometry=geometry) + faces)
+                    shown_tracks, [], time.time(), geometry=geometry) +
+                    list(carried.values()) + faces)
             objects = self.things.label_map()
             screen = replace(
                 screen,
@@ -568,7 +580,8 @@ class Robot:
             session, gallery = self.session_id, self.recognition.epoch
             epochs = {t.id: self.focus.epoch(t.id) for t in shown_tracks}
             screen = replace(screen, valid=(lambda: self._publication_valid(
-                frame, taken, record, session, gallery, epochs, cancel)) if display else None,
+                frame, taken, record, session, gallery, epochs, carried, cancel))
+                if display else None,
                 source=(taken, id(frame), id(record)))
             targets = self._offers(tracks, objects) if self.focus else []
             screen = replace(screen, control={"session": self.session_id,
@@ -688,10 +701,8 @@ class Robot:
                 previous[3][1] and previous[3][2] and previous[3][1][4] == (matched or "") and \
                 0 <= taken - previous[0] <= OCCLUSION_S:
             old = previous[3][2]
-            delta = np.subtract(np.add(box[:2], box[2:]), np.add(old[:2], old[2:])) / 2
-            if np.linalg.norm(delta) <= SNAP * self.focus.width:
-                box = previous[3][1][:4] if taken == previous[0] else tuple(
-                    a + SMOOTH * (b - a) for a, b in zip(previous[3][1][:4], box, strict=True))
+            box = previous[3][1][:4] if taken == previous[0] else drawing_box(
+                previous[3][1][:4], old, box, self.focus.width)
         return (*box, matched or "", "known" if matched else "other")
 
     def _window_status(self, label_map=None):

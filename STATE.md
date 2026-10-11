@@ -2,24 +2,23 @@
 
 Updated 2026-10-11. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Last task: compact Qdrant UI
+## Last task: bounded overlay persistence
 
-The camera fills most of Live, with compact controls, fewer labels, and the official Qdrant theme (D157, D158). Desktop and phone checks pass (E). Readable recall, carousels, sliders, and ordinary transcript auto-scroll remain. The full-model Jetson check passes recall thumbnails, settings, and deletion with two oracle-text turns and a fixture image (J); this is not answer-quality or physical-latency acceptance.
+The selected "???" and named-object outlines bridge missing detection for at most 200 ms (D159). Movement raises the shared object/face drawing blend, while small stationary jitter stays unchanged (E). All deterministic checks and the task review pass. The full-model live Jetson stream check passes during one oracle-text reply (J), with isolated empty face memory; named-face transitions remain runtime-test coverage.
 
-At the next human session, check two owners' labels, yes/no near-match replies, and "Forget me" removing the visitor's objects. Dylan already confirmed recognition works. More light addresses the grainy feed.
+At the next human session, check smoother boxes while holding, moving, and removing an object. Also check two owners, yes/no near matches, and "Forget me". Face names still clear on a negative recognition result.
 
 ## Next tasks (in order)
 
-1. The jumpy "???" focus box.
-2. Command set v2.
-3. Missed-face reset.
-4. Physical latency by loopback.
+1. Command set v2.
+2. Missed-face reset.
+3. Physical latency by loopback.
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `7b53263969f1`; rollback target `a820d7495631`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 7b53263969f1`, then open http://127.0.0.1:8765.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `56ce07810e7a`; rollback target `7b53263969f1`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 56ce07810e7a`, then open http://127.0.0.1:8765.
 - Backups of the pre-owner things shard: `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
-- Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/ui-refresh/page.log`. Jetson and WSL are idle.
+- Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/overlay/page.log`. Jetson is idle until Start. WSL is unused.
 
 ## Targets (floor, not ceiling)
 
@@ -37,4 +36,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read the focus-box rows in `research/edge-cases.md`, then write the brief for task 1.
+Read the command-set requirements in `research/mac-audio-interface.md` before writing the task 2 brief.

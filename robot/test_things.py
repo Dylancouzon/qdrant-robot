@@ -18,7 +18,7 @@ import pytest
 from robot import main
 from robot.settings import DEFAULTS, Settings, settings
 from robot.detect import CONFIRM, LOST, Detection, Tracker
-from robot.focus import Track
+from robot.focus import SMOOTH, Track
 from robot.main import Robot, Turn
 from robot.memory import CountRequest, Memory, ScrollRequest
 from robot.people import DIM as FACE_DIM, People
@@ -2256,7 +2256,7 @@ def test_face_drawing_filters_exact_source_without_identity_carry(robot, monkeyp
     assert not r._completed_valid(r.verified), "old geometry is expired for publication"
     preview(r)
     outline = r.verified[3][1]
-    assert outline[:4] == pytest.approx(tuple(a + main.SMOOTH * (b - a)
+    assert outline[:4] == pytest.approx(tuple(a + SMOOTH * (b - a)
                                              for a, b in zip(before[:4], raw[0], strict=True)))
     assert outline[4:] == (('Ana', 'known') if known else ('', 'other'))
     assert r.verified[3][2] == raw[0], 'source matching keeps the raw face rectangle'
@@ -2311,8 +2311,11 @@ def test_completed_object_geometry_keeps_source_admission_without_size_leak(robo
     preview(r)
     assert r._shown()[1].boxes
     r._track(r.view[0], [], clock[0] + .01)
-    assert not r.focus.boxes([], []) and not r._shown()[1].boxes
-    assert r.focus.seen[track].admitted is None
+    assert not r.focus.boxes([], []), 'missing tracks never enter source geometry'
+    assert r._shown()[1].boxes[0][4:] == ('', 'other'), 'drawing alone bridges the short gap'
+    assert not r.focus.accepts(track, clock[0])
+    clock[0] += .21
+    assert not r._shown()[1].boxes, 'wall time also expires carried drawing'
 
 
 @pytest.mark.parametrize('reset', ['gallery', 'session', 'gap', 'large-motion'])
@@ -3163,3 +3166,30 @@ def test_state_poll_does_not_resolve_evidence_again(robot, monkeypatch):
     monkeypatch.setattr(r.memory, "points", unexpected)
     for _ in range(3):
         assert r._shown(False)[1].evidence["memories"][0]["text"] == "I enjoy photography"
+
+
+@pytest.mark.parametrize('change', ['expiry', 'ignore', 'forget', 'replacement', 'return'])
+def test_carried_preview_rechecks_validity_at_publication(robot, monkeypatch, change):
+    r = robot
+    clock = [time.time()]
+    monkeypatch.setattr(main.time, 'time', lambda: clock[0])
+    frame = frame_of(r)
+    track = next(iter(r.view[1]))
+    r.focus.bind(track, 'Known object')
+    clock[0] += .05
+    r._track(frame.copy(), [], clock[0])
+    _, screen = r._shown()
+    assert screen.boxes[0][4:] == ('Known object', 'known') and screen.valid()
+    assert not r.focus.target([]) and not r.focus.accepts(track, clock[0] - .05)
+    if change == 'expiry':
+        clock[0] += .16
+    elif change == 'ignore':
+        r.focus.ignored.add('phone')
+    elif change == 'forget':
+        r.focus.forget('Known object')
+    elif change == 'replacement':
+        # One frame, still unconfirmed: it already suppresses the old label at that position.
+        r._track(frame, [Detection('book', .9, (580, 380, 700, 500))], clock[0] + .01)
+    else:
+        frame_of(r)
+    assert not screen.valid(), 'an encoded held overlay cannot outlive its display authority'

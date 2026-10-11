@@ -93,6 +93,15 @@ def _center(b: Box) -> tuple[float, float]:
     return (b[0] + b[2]) / 2, (b[1] + b[3]) / 2
 
 
+def drawing_box(shown: tuple, previous: Box, current: Box, width: int) -> tuple:
+    """Smooth stationary jitter, and follow measured motion without predicting positions."""
+    motion = math.dist(_center(previous), _center(current))
+    if motion > SNAP * width:
+        return current
+    blend = max(SMOOTH, min(1.0, motion / (MOVED * width)))
+    return tuple(a + blend * (b - a) for a, b in zip(shown, current, strict=True))
+
+
 def inside(a: Box, b: Box) -> float:
     """The fraction of box a inside box b."""
     w = max(0, min(a[2], b[2]) - max(a[0], b[0]))
@@ -134,8 +143,8 @@ class Focus:
             if i not in live and now > s.last:
                 s.epoch += 1
                 s.continuous = now
-                s.admitted = None
                 if now - s.last > OCCLUSION_S:
+                    s.admitted = None
                     self.named.pop(i, None)
                     self.excluded.pop(i, None)
                     s.exclude_misses = 0
@@ -184,7 +193,7 @@ class Focus:
             s.shown = t.box
             s.admitted = None
         elif self.now > s.last:
-            s.shown = tuple(a + SMOOTH * (b - a) for a, b in zip(s.shown, t.box, strict=True))
+            s.shown = drawing_box(s.shown, s.track.box, t.box, self.width)
         if self.eligible(t) or (s.admitted is not None and self.sized(t) and
                 t.score >= DETECT_LOW and t.id not in self.checking):
             s.admitted = self.now
@@ -358,6 +367,27 @@ class Focus:
                 out.append((*box, "???", "focus"))
             else:
                 out.append((*box, "", "other"))
+        return out
+
+    def carried(self, tracks: list[Track], taken: float, now: float) -> dict[int, tuple]:
+        """Bridge a short object gap for drawing only, bounded by capture and wall time."""
+        names, out = self.names(now), {}
+        for i, seen in self.seen.items():
+            t = seen.track
+            if i in self.visible or not t or t.label in BODY or seen.admitted is None or \
+                    seen.shown is None or not 0 <= taken - seen.last <= OCCLUSION_S or \
+                    not 0 <= now - seen.last <= OCCLUSION_S or t.label in self.ignored or \
+                    i in self.excluded or i in self.checking or t.score < DETECT_LOW or \
+                    (not self.sized(t) and seen.last - seen.admitted > OCCLUSION_S):
+                continue
+            # Even an unconfirmed replacement removes the old outline at this position.
+            if any(other.label not in BODY and max(inside(t.box, other.box),
+                    inside(other.box, t.box)) >= 0.5 for other in tracks):
+                continue
+            name, sure = names.get(i, ("", False))
+            label, kind = (name, "known") if sure else (
+                ("???", "focus") if i == self.focus else ("", "other"))
+            out[i] = (*tuple(round(v) for v in seen.shown), label, kind)
         return out
 
     def geometry(self, tracks: list[Track]) -> dict[int, Box]:

@@ -340,8 +340,7 @@ def test_eligibility_dip_keeps_grey_drawing_history(dip):
     recovered = phone((520, 200, 620, 360))
     f.update(10 + 2 * DT, [recovered], [])
     shown = f.boxes([recovered], [])[0][:4]
-    assert shown != recovered.box, "recovery continues the existing filter"
-    assert all(abs(b - a) <= F.SMOOTH * abs(c - a) + 1
+    assert all(min(a, c) - 1 <= b <= max(a, c) + 1
                for a, b, c in zip(hidden, shown, recovered.box, strict=True))
     assert recovered.box == (520, 200, 620, 360)
     f.update(10.5, [], [])
@@ -611,7 +610,7 @@ def test_low_drawing_needs_raw_admission_and_never_grants_focus_or_actions():
     f.update(12.2, [below], [])
     assert not f.boxes([below], [])
     f.update(12.3, [], [])
-    assert not f.boxes([low], []) and f.seen[1].admitted is None
+    assert not f.boxes([low], []) and not f.carried([], 12.3, 12.3)
     f.update(12.4, [low], [])
     assert not f.boxes([low], []), 'a returning weak track needs a new raw admission'
 
@@ -701,3 +700,78 @@ def test_source_geometry_admission_is_frozen_but_current_safety_can_remove_it(mo
     f.ignored.clear()
     f.update(10.3, [], [])
     assert not f.boxes([high], [], geometry=source), 'departed pixels cannot be drawn'
+
+
+@pytest.mark.parametrize("name", [None, "My cup"])
+def test_carried_object_expires_without_crop_or_selection_authority(name):
+    f = Focus(W, H)
+    raw = phone((420, 220, 640, 440))
+    f.update(10, [raw], [])
+    f.focus = raw.id
+    f.fit = 10
+    if name:
+        f.bind(raw.id, name)
+    epoch = f.epoch(raw.id)
+    f.update(10.05, [], [])
+    carried = f.carried([], 10.05, 10.10)
+    assert carried[raw.id] == (*raw.box, name or "???", "known" if name else "focus")
+    assert f.epoch(raw.id) > epoch and not f.accepts(raw.id, 10)
+    assert not f.target([]) and not f.geometry([]), "drawing creates no source or action authority"
+    assert not f.carried([], 9.99, 10.1), "an earlier source cannot draw a later observation"
+    assert not f.carried([], 10.21, 10.21), "capture age expires the held box"
+    assert not f.carried([], 10.05, 10.21), "wall time expires even a stalled source"
+    f.update(10.12, [raw], [], recognized={raw.id: ("Wrong", .99)}, recognized_at=10)
+    assert not f.carried([raw], 10.12, 10.12)
+    assert f.name(raw.id) == name, "a result before the gap cannot change the association"
+
+
+@pytest.mark.parametrize("change", ["ignore", "exclude", "checking", "forget", "replacement"])
+def test_carried_name_respects_current_suppression(change):
+    f = Focus(W, H)
+    raw = phone((400, 200, 620, 420))
+    f.update(10, [raw], [])
+    f.bind(raw.id, "Cup")
+    f.update(10.05, [], [])
+    assert f.carried([], 10.05, 10.05)[raw.id][4] == "Cup"
+    tracks = []
+    if change == "ignore":
+        f.ignored.add(raw.label)
+    elif change == "exclude":
+        f.excluded[raw.id] = "preference"
+    elif change == "checking":
+        f.checking.add(raw.id)
+    elif change == "forget":
+        f.forget("Cup")
+    else:
+        tracks = [Track(2, raw.box, "book", .9)]
+    assert not any(b[4] == "Cup" for b in f.carried(tracks, 10.05, 10.05).values())
+
+
+def test_carried_objects_do_not_revive_expired_size_admission_or_faces():
+    f = Focus(W, H)
+    raw = phone((400, 200, 620, 420))
+    face = Track(2, PERSON, "person", .9)
+    f.update(10, [raw, face], [])
+    tiny = phone((400, 200, 410, 420))
+    f.update(10.3, [tiny, face], [])
+    f.update(10.35, [], [])
+    assert not f.carried([], 10.35, 10.35)
+
+
+@pytest.mark.parametrize("speed", [5, 20, 40, 80])
+def test_movement_blend_reduces_lag_without_forward_prediction(speed):
+    f = Focus(W, H)
+    baseline, errors, reference = None, [], []
+    for k in range(20):
+        x = 100 + speed * k
+        raw = phone((x, 200, x + 180, 380))
+        baseline = raw.box if baseline is None else tuple(
+            a + F.SMOOTH * (b - a) for a, b in zip(baseline, raw.box, strict=True))
+        f.update(10 + k * DT, [raw], [])
+        box = f.geometry([raw])[raw.id]
+        assert box[0] <= x, "display never predicts ahead of the detected object"
+        errors.append(x - box[0])
+        reference.append(x - round(baseline[0]))
+    assert errors[-1] <= reference[-1]
+    if speed >= 20:
+        assert errors[-1] < reference[-1]

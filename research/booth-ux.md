@@ -1,6 +1,6 @@
 # Booth behavior: focus, labels, memory, and turns
 
-Current behavior follows D140–D147. Dylan accepted live release `7f67670fa91e` as good enough. The final change keeps the selected "???" style through confidence dips on the same admitted object. [STATE.md](../STATE.md) owns live status. Earlier D63/D77 proposals remain historical in [DECISIONS.md](../DECISIONS.md); they do not describe the shipped interface.
+Current behavior follows D140–D147 and D159. The selected "???" and named-object outlines bridge detection gaps for at most 200 ms. Movement increases the drawing blend so the boxes follow motion while stationary jitter remains smoothed. [STATE.md](../STATE.md) owns live status. Earlier D63/D77 proposals remain historical in [DECISIONS.md](../DECISIONS.md); they do not describe the shipped interface.
 
 ## Visitor flow
 
@@ -21,7 +21,7 @@ Stable, eligible unknown objects can become teaching candidates. Area, centralit
 
 New unknown assignments occur at most once per three seconds. Loss and recognition can remove an assignment before the next replacement. A challenger needs sustained priority after the existing hold interval. The selected admitted box keeps its "???" style through matched LOW-confidence observations. This style does not grant teaching or action authority to a weak crop.
 
-Raw size and confidence still govern focus selection, teaching, crop queries, and writes. The 120px minimum scales with source width. Drawing uses smoothed source geometry, matched-track LOW continuation, and the existing 200ms size grace. Actual gaps remove outlines; size expiry can also hide them briefly. Ignore and pending preference verification suppress drawing. No missing-track drawing cache was added.
+Raw size and confidence still govern focus selection, teaching, crop queries, and writes. The 120px minimum scales with source width. Drawing uses smoothed source geometry, matched-track LOW continuation, and a 200 ms size grace. During a missing detection, the existing last box can draw for 200 ms after its last matched capture. The selected frame must follow that observation, and wall time also expires the drawing. A returning detection, overlapping replacement, Ignore, or pending preference check suppresses the carried outline. Publication checks these conditions again after JPEG encoding. Missing tracks never enter source geometry, teaching, crops, writes, or fresh recognition authority.
 
 ## Recognition and item controls
 
@@ -33,7 +33,7 @@ YOLOE-26s at 384x640 with TensorRT FP16 is the development default; nano remains
 
 The wake phrase is "Hey Edgy". The Mac client suppresses microphone input during playback. The view shows status, streamed answers, and supplied evidence. This session made no voice behavior changes.
 
-The accepted interface can still blink after genuine detector losses or size expiry. Similar objects, changed viewpoints, occasional conversation stalls, and paging remain limits. External cup recognition reaches 73.78%; this does not establish general viewpoint coverage. Physical audible latency and the broader milestone targets remain open in STATE.md.
+The interface can still blink after detection losses longer than 200 ms or size expiry. Face names still require positive recognition on the exact displayed source; negative results clear them immediately. Similar objects, changed viewpoints, occasional conversation stalls, and paging remain limits. External cup recognition reaches 73.78%; this does not establish general viewpoint coverage. Physical audible latency and the broader milestone targets remain open in STATE.md.
 
 ## Evidence
 
@@ -43,3 +43,9 @@ The accepted interface can still blink after genuine detector losses or size exp
 - [D145 negative vectors and Restore](../bench/results/2026-10-10-d145-ignore-continuity.json).
 - [D146 detector and phone flow](../bench/results/2026-10-10-d146-detector-default.json).
 - [Lessons and rejected alternatives](lessons.md), including the superseded D63/D77 auto-view and speech-gate proposals.
+
+## Bounded persistence check
+
+The paired Mac check keeps stationary jitter at 3.08 px RMS (E). At 20 px per detected frame, final movement lag falls from 37 to 18 px; at 40 px, it falls from 74 to zero (E). On the first 675 frames of an existing development clip, selected focus without an outline falls from 111 to 102 frames (E). This comparison uses confirmed tracks; production also suppresses carry around unconfirmed replacements. Its nine-frame gain can therefore overstate the production gain. It measures drawing, not detector quality.
+
+The full-model live Jetson check receives 208 JPEGs during one oracle-text turn, with 139 ms median source age and 172 ms p95 (J). Its isolated memory has no enrolled faces, so named-face transitions remain covered by runtime tests rather than live acceptance. See `bench/results/2026-10-11-overlay-1791732278.json` and `bench/results/2026-10-11-overlay-1791732322.json`. Recreate the baseline with `git show c47f593:robot/focus.py > build/overlay/focus_baseline.py`, then run `python -m bench.overlay --baseline build/overlay/focus_baseline.py`.
