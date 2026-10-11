@@ -2,9 +2,9 @@
 
 Updated 2026-10-11. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Last task: compact UI refresh
+## Last task: compact Qdrant UI
 
-Live, Memory, and Settings stay separate. The page shows readable recall, three-view carousels, sliders, four command examples, and ordinary transcript auto-scroll (D157). Technical details and editing controls stay expandable. Desktop and phone browser checks pass (E). The full-model Jetson check passes readable recall, thumbnails, settings, and deletion with two oracle-text turns and a fixture image (J); this is not answer-quality or physical-latency acceptance.
+The camera fills most of Live, with compact controls, fewer labels, and the official Qdrant theme (D157, D158). Desktop and phone checks pass (E). Readable recall, carousels, sliders, and ordinary transcript auto-scroll remain. The full-model Jetson check passes recall thumbnails, settings, and deletion with two oracle-text turns and a fixture image (J); this is not answer-quality or physical-latency acceptance.
 
 At the next human session, check two owners' labels, yes/no near-match replies, and "Forget me" removing the visitor's objects. Dylan already confirmed recognition works. More light addresses the grainy feed.
 
@@ -17,7 +17,7 @@ At the next human session, check two owners' labels, yes/no near-match replies, 
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `a820d7495631`; rollback target `39b2b07265da`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release a820d7495631`, then open http://127.0.0.1:8765.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `7b53263969f1`; rollback target `a820d7495631`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 7b53263969f1`, then open http://127.0.0.1:8765.
 - Backups of the pre-owner things shard: `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
 - Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/ui-refresh/page.log`. Jetson and WSL are idle.
 

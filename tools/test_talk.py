@@ -334,3 +334,17 @@ def test_memory_proxy_cookie_and_forwarding(path):
     handler.headers["Cookie"] = "edgy=secret"
     handler.do_GET()
     assert forwarded == [path] and replies[-1] == (404, b"missing", "image/jpeg")
+
+
+def test_brand_font_is_served_locally():
+    from email.message import Message
+    handler = talk.Handler.__new__(talk.Handler)
+    handler.origin = "http://127.0.0.1:8765"
+    handler.path = "/mona-sans.woff2"
+    handler.headers = Message()
+    handler.headers["Host"] = "127.0.0.1:8765"
+    replies = []
+    handler.reply = lambda *args: replies.append(args)
+    handler.do_GET()
+    code, font, kind = replies[0]
+    assert code == 200 and kind == "font/woff2" and font.startswith(b"wOF2")

@@ -95,3 +95,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **Owner and location 2026-10-10 (Dylan): Bind places and people to object evidence.** A UI-set location on each sighting; an owner from the named introducer on the named object. Not built yet; see `research/owner-location.md`.
 
 **D157 2026-10-11: Keep the demo UI compact.** Dylan approved Live, Memory, and Settings tabs, three-view carousels, sliders, visible commands, and readable evidence. Conversation follows replies with a normal scrollbar. Transient evidence resolves once per turn from stored source links; technical retrieval details stay expandable.
+
+**D158 2026-10-11: Put the robot view first.** Dylan requested fewer labels and a stronger Qdrant theme. The camera takes most of Live; camera, conversation, and speaker headings are visually removed. Use the official logo, palette, and locally served Mona Sans; preserve accessible control names and the ordinary transcript scrollbar. Refines D157.

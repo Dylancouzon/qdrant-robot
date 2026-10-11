@@ -86,3 +86,4 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - Removing a view reloads the gallery, resets its scroll position, and collapses Edit memory. Preserve the affected card state if repeated removal becomes disruptive.
 - Evidence ages update when evidence changes. After a long idle period, the relative time can become stale. Refresh time labels if visitors encounter this.
+- Stop or disconnect disables the microphone button but can leave its last mute icon and accessible state. Reset these in `clearLive()` if this causes confusion. The next connection publishes the correct state.

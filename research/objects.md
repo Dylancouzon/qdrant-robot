@@ -24,8 +24,10 @@ When the focused object scores within `guess_band` (0.05) under `match` (0.822) 
 
 - **Settings** tab: sliders save when released. Recognition threshold, teaching time, and question count stay visible; other values are under Advanced. Values are validated and saved to `shared/settings.json`; a change applies to the next query.
 - **Memory** tab: object cards grouped by owner show three thumbnails at a time, or one on a phone. Arrows and native scrolling reach every view. Edit memory exposes Remove view and Forget. Thumbnails are 160 px JPEGs in `shared/memory/things/thumbs`. Edits run on the conversation worker.
-- **Live** tab: four voice examples stay visible beside the scrolling conversation. How Edgy remembered shows readable evidence with stored object links and thumbnails. Qdrant Edge details exposes search results and the retrieval-preparation timer, which includes work beyond Edge queries. Summaries resolve once per turn, stay out of logs, and clear when their sources expire or are deleted.
+- **Live** tab: the camera fills most of the page. Four voice examples sit under it; session controls overlay the camera, and conversation bubbles use a scrollbar without visible speaker headings. The Qdrant Edge strip shows saved object thumbnails and readable sources. Details exposes search results and the retrieval-preparation timer, which includes work beyond Edge queries. Summaries resolve once per turn, stay out of logs, and clear when their sources expire or are deleted.
 
 ## Camera
 
 The live feed is grainy in a dim room because the camera's auto exposure raises its internal gain; our 960 px preview encode adds no measurable noise (J, 2026-10-11). Requesting 15 fps instead of 30 fps did not lower the noise (7.34 against 6.29, J). More light on the subject is the fix.
+
+The page uses the official Qdrant logo, Amaranth (`#DC244C`), Neon Blue (`#6047FF`), and black (`#0B0F19`) from [Qdrant Brand Resources](https://qdrant.tech/brand-resources/). Mona Sans is served locally from `tools/assets/` with its OFL license, so the page needs no external font requests.

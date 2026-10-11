@@ -1,0 +1,43 @@
+{
+  "run": "ui-brand-browser",
+  "machine": "Mac",
+  "measurement": "E",
+  "revision": "4a36bc222c035802f81a027c27bf3c98252f6607",
+  "page_sha256": "14937e28bd398d753c5f6ade4456e9b69a290d86eb36317cf5042cae1143cdf4",
+  "input": "Mock endpoint data, Chromium",
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "checks_passed": true,
+  "checks": [
+    "no visible camera or conversation heading",
+    "official Qdrant logo and palette",
+    "local Mona Sans loaded",
+    "desktop content fits viewport",
+    "phone page has no extra overflow",
+    "four visible commands",
+    "normal scrollbar and auto-scroll",
+    "conversation nodes retained while streaming",
+    "unchanged evidence retains DOM and expanded details",
+    "memory link opens card",
+    "all seven saved views reachable",
+    "three images desktop and one phone",
+    "edit and Remove view",
+    "all ten sliders reachable, save confirmed",
+    "no JavaScript errors"
+  ],
+  "brand_source": "https://qdrant.tech/brand-resources/",
+  "logo_source": "https://qdrant.tech/img/brand-resources-logos/qdrant-logo-red-white.svg",
+  "font_source": "https://fonts.gstatic.com/s/monasans/v4/o-0bIpQmx24alC5A4PNB6Ryti20_6n1iPHjc5a7du3mhPy0.woff2",
+  "font_sha256": "44e710b0717b17343dd52dd731b9d9efaf62ed6b4fb466e3b49742ae85325f4e",
+  "font_license": "tools/assets/OFL.txt",
+  "command": "node build/ui-refresh/check.cjs",
+  "script": "const {chromium}=require('/Users/dylanc/.npm/_npx/705bc6b22212b352/node_modules/playwright');\nconst fs=require('fs'),assert=require('assert');\n(async()=>{\nconst browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000}});\nconst errors=[];page.on('pageerror',e=>errors.push(e.message));\nconst settings={match:.822,guess_band:.05,window_s:6,window_gap_s:1,window_floor:.7,duplicate:.95,ask_delay_s:3,ask_blank_s:4,ask_max:3,views_cap:24};\nlet objects=[{id:'camera',label:\"Ana's camera\",owner_label:'Ana',sightings:12,last_seen:Date.now()/1000-20,views:Array.from({length:7},(_,i)=>({id:'view'+i,time:Date.now()/1000,source:'taught'}))}];\nconst live={status:'Listening',settings,window:{active:false},transcript:Array.from({length:8},(_,i)=>({id:String(i),question:'What did I show you? '+i,answer:'You showed me your camera. I last saw it on the desk.'})),evidence:{knowledge:[],statements:[],memory_ids:[123],memories:[{id:123,label:\"Ana's camera\",object:'camera',view:'view0',text:'camera',source:'Observed object',time:Date.now()/1000-20}]},memory:{shards:['knowledge','seen'],ms:6.2,hits:[[\"seen: camera, 20 seconds ago\",null]]},control:{targets:[],volume:62}};\nlet source=fs.readFileSync('tools/talk.html','utf8');\nawait page.route('http://127.0.0.1:8765/**',async route=>{const path=new URL(route.request().url()).pathname;\n if(path==='/')return route.fulfill({contentType:'text/html',body:source});\n if(path==='/mona-sans.woff2')return route.fulfill({contentType:'font/woff2',body:fs.readFileSync('tools/assets/mona-sans-latin.woff2')});\n if(path==='/status')return route.fulfill({json:{phase:'Listening',active:true,view_ready:true,error:''}});\n if(path==='/robot')return route.fulfill({json:live});\n if(path==='/memory')return route.fulfill({json:objects});\n if(path==='/camera'||path==='/thumb')return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\"><rect width=\"640\" height=\"360\" fill=\"#14232d\"/><rect x=\"170\" y=\"90\" width=\"300\" height=\"190\" rx=\"18\" fill=\"#303b4d\"/><circle cx=\"320\" cy=\"185\" r=\"65\" fill=\"#101820\" stroke=\"#fb4267\" stroke-width=\"8\"/><text x=\"220\" y=\"315\" fill=\"white\" font-family=\"sans-serif\" font-size=\"22\">Ana\u2019s camera</text></svg>'});\n if(path==='/settings'){const data=route.request().postDataJSON();Object.assign(settings,data.reset?{match:.822}:{[data.name]:data.value});return route.fulfill({status:202,body:''});}\n if(path==='/remove_view'){const data=route.request().postDataJSON();objects[0].views=objects[0].views.filter(v=>v.id!==data.view);return route.fulfill({status:202,body:''});}\n return route.fulfill({status:202,body:''});\n});\nconst current=source;source=fs.readFileSync('build/ui-refresh/before.html','utf8');await page.goto('http://127.0.0.1:8765');await page.waitForTimeout(700);await page.screenshot({path:'build/ui-refresh/before-desktop.png',fullPage:true});source=current;await page.reload();await page.locator('.evidenceitem').waitFor();await page.evaluate(()=>document.fonts.ready);\nawait page.screenshot({path:'build/ui-refresh/live-desktop.png',fullPage:true});\nassert(await page.locator('.commands').isVisible());assert.equal(await page.getByRole('heading',{name:'Live camera',exact:true}).count(),0);assert.equal(await page.getByRole('heading',{name:'Conversation',exact:true}).count(),0);assert(await page.evaluate(()=>document.fonts.check('14px \\\"Mona Sans\\\"')));assert(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+5));\nassert(await page.locator('#transcript').evaluate(e=>e.scrollHeight-e.clientHeight-e.scrollTop<2));\nconst exchange=await page.locator('.exchange').last().elementHandle();await page.locator('#transcript').evaluate(e=>e.scrollTop=0);live.transcript[7].answer+=' New reply.';\nawait page.waitForTimeout(600);assert(await page.locator('.exchange').last().evaluate((e,old)=>e===old,exchange));assert(await page.locator('#transcript').evaluate(e=>e.scrollHeight-e.clientHeight-e.scrollTop<2));\nawait page.getByText('Details',{exact:true}).click();const detail=await page.locator('#retrievalDetails').elementHandle();await page.waitForTimeout(600);assert(await page.locator('#retrievalDetails').evaluate((e,old)=>e===old,detail));\nawait page.getByRole('button',{name:\"Ana's camera\",exact:true}).click();await page.locator('.objectcard').waitFor();\nassert.equal(await page.locator('.savedview').count(),7);assert.equal(await page.locator('.savedview button:visible').count(),0);\nawait page.screenshot({path:'build/ui-refresh/memory-desktop.png',fullPage:true});\nconst width=await page.locator('.views').evaluate(e=>e.firstElementChild.offsetWidth/e.clientWidth);assert(width>.25&&width<.34);\nawait page.getByRole('button',{name:'Next views of'}).click();await page.waitForTimeout(450);assert(await page.locator('.views').evaluate(e=>e.scrollLeft>0));\nawait page.getByText('Edit memory',{exact:true}).click();page.on('dialog',d=>d.accept());await page.locator('.savedview button').first().click();await page.waitForTimeout(700);assert.equal(await page.locator('.savedview').count(),6);\nawait page.getByRole('button',{name:'Settings',exact:true}).click();assert.equal(await page.locator('#settingsPanel input:visible').count(),3);\nawait page.locator('#setting-match').focus();await page.keyboard.press('ArrowRight');await page.locator('#settingsMessage').filter({hasText:'Saved.'}).waitFor();assert.equal(settings.match,.823);\nawait page.getByText('Advanced',{exact:true}).click();assert.equal(await page.locator('#settingsPanel input:visible').count(),10);\nawait page.screenshot({path:'build/ui-refresh/settings-desktop.png',fullPage:true});\nawait page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Memory',exact:true}).click();await page.locator('.objectcard').waitFor();\nassert(await page.locator('.views').evaluate(e=>Math.abs(e.firstElementChild.offsetWidth-e.clientWidth)<2));\nassert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'build/ui-refresh/memory-mobile.png',fullPage:true});\nawait page.getByRole('button',{name:'Live',exact:true}).click();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert(await page.evaluate(()=>document.documentElement.scrollHeight<=document.body.getBoundingClientRect().height+5));await page.screenshot({path:'build/ui-refresh/live-mobile.png',fullPage:true});\nconsole.log(await page.evaluate(()=>({viewport:innerHeight,height:document.documentElement.scrollHeight,body:document.body.getBoundingClientRect().height,grid:document.querySelector('.grid').getBoundingClientRect().toJSON(),foot:document.querySelector('footer').getBoundingClientRect().toJSON(),settings:document.querySelector('#settingsPanel').getBoundingClientRect().toJSON(),memory:document.querySelector('#memoryPanel').getBoundingClientRect().toJSON()})));assert.deepEqual(errors,[]);console.log('PASS: desktop/mobile layout, all carousel views and edit, sliders, evidence link, unchanged DOM, scrollbar auto-scroll, no JavaScript errors.');\nawait browser.close();\n})();\n"
+}
