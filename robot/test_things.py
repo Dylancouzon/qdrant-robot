@@ -3079,3 +3079,87 @@ def test_near_confirmation_cancellation_and_limits(robot, monkeypatch, block):
         r.jobs.put(('look', None))
     r._confirm(job[1])
     assert r.confirming is None and r.candidate is None
+
+
+def test_readable_evidence_uses_stored_links_and_stays_out_of_logs(robot):
+    import json
+    r = robot
+    ident = r.things.name(OWNER, "camera", ["camera"], np.eye(DIM, dtype=np.float32)[:1],
+                          thumbnail_crops([1]), "Ana")
+    pid = r.memory.sighting("camera", "center", 10, ident)
+    statement = r.memory.add(None, "I like photography", ts=12)
+    caption = r.memory.add(None, "", ts=13, caption="A black camera on a desk")
+    turn = Turn(memories=[pid, statement, caption, 999])
+    turn.ui_evidence = r._evidence(turn)
+    assert len(turn.ui_evidence) == 3
+    obj, said, generated = turn.ui_evidence
+    assert obj["id"] == pid and obj["label"] == "Ana's camera"
+    assert obj["object"] == ident and r._thumbnail(obj["view"]).startswith(b"\xff\xd8")
+    assert obj["source"] == "Observed object" and obj["time"] == 10
+    assert said["text"] == "I like photography" and "object" not in said
+    assert generated["source"] == "Stored caption"
+    r.turns = queue.Queue()
+    r._log(turn)
+    record = json.loads((r.out / "turns.jsonl").read_text())
+    assert "ui_evidence" not in record and record["memories"] == turn.memories
+    r.things.thumbs.joinpath(r.things.objects()[0].payload["views"][0]["thumbnail"]).unlink()
+    assert r._evidence(turn)[0]["view"] is None
+    r.things.forget(ident)
+    assert all("object" not in item for item in r._evidence(turn))
+
+
+def test_readable_evidence_expires_with_its_source(robot):
+    from robot.memory import RETAIN_S
+    r = robot
+    pid = r.memory.add(None, "An old observation", ts=1)
+    r.ui_turn = Turn(memories=[pid], ui_evidence=r._evidence(Turn(memories=[pid])))
+    r.ui_turns.append(r.ui_turn)
+    assert r.ui_turn.ui_evidence
+    r._retain(RETAIN_S + 2)
+    assert not r.ui_turn.ui_evidence
+
+
+@pytest.mark.parametrize("action", ["speech", "forget_object", "remove_view", "visitor"])
+def test_readable_evidence_clears_on_deletion(robot, action):
+    r = robot
+    ident = r.things.name(OWNER, "mouse", ["mouse"], np.eye(DIM, dtype=np.float32)[:1],
+                          thumbnail_crops([1]), "Ana")
+    pid = r.memory.sighting("mouse", "center", 10, ident)
+    r.ui_turn = Turn(memories=[pid], ui_evidence=r._evidence(Turn(memories=[pid])))
+    r.ui_turns.append(r.ui_turn)
+    view = r.ui_turn.ui_evidence[0]["view"]
+    if action == "speech":
+        r._forget_thing(OWNER, "mouse", [])
+    elif action == "visitor":
+        assert r._forget(None, None, None, OWNER)
+    else:
+        assert r._memory_job(action, {"object": ident, "view": view}) == "Done."
+    assert not r.ui_turn.ui_evidence
+    assert not r.memory.points([pid]) and r._thumbnail(view) is None
+
+
+def test_readable_evidence_resolves_linked_teaching_statements(robot):
+    r = robot
+    ident = r.things.name(OWNER, "camera", ["camera"], np.eye(DIM, dtype=np.float32)[:1],
+                          thumbnail_crops([1]), "Ana")
+    pid = r.memory.add(None, "Track this as my camera", ts=10)
+    r.things.link(ident, pid)
+    r.ui_turn = Turn(memories=[pid], ui_evidence=r._evidence(Turn(memories=[pid])))
+    r.ui_turns.append(r.ui_turn)
+    assert r.ui_turn.ui_evidence[0]["object"] == ident
+    assert r.ui_turn.ui_evidence[0]["label"] == "Ana's camera"
+    r._forget_thing(OWNER, "camera", [])
+    assert not r.ui_turn.ui_evidence and not r.memory.points([pid])
+
+
+def test_state_poll_does_not_resolve_evidence_again(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    pid = r.memory.add(None, "I enjoy photography", ts=12)
+    r.ui_turn = Turn(memories=[pid], ui_evidence=r._evidence(Turn(memories=[pid])))
+    def unexpected(*args):
+        raise AssertionError("State polling must not resolve evidence")
+    monkeypatch.setattr(r, "_evidence", unexpected)
+    monkeypatch.setattr(r.memory, "points", unexpected)
+    for _ in range(3):
+        assert r._shown(False)[1].evidence["memories"][0]["text"] == "I enjoy photography"

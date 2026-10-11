@@ -152,6 +152,7 @@ class Turn:
     answer: str = ""
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
+    ui_evidence: list[dict] = field(default_factory=list)  # readable sources, never logged
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
@@ -593,7 +594,7 @@ class Robot:
                 evidence = {"knowledge": turn.facts if not turn.verbatim else
                             [turn.answer] if turn.answer in turn.facts else [],
                             "statements": turn.told if not turn.verbatim else [],
-                            "memory_ids": turn.memories,
+                            "memory_ids": turn.memories, "memories": turn.ui_evidence,
                             "answer_path": ("Code" if turn.verbatim else "Generated")
                             if turn.first_token else ""}
             transcript = [{"id": str(t.line), "question": t.question, "answer": t.answer}
@@ -945,6 +946,9 @@ class Robot:
         evicted = set(self.memory.retain(now, {
             p for t, p in self.points.items() if t not in self.away}))
         self.points = {t: p for t, p in self.points.items() if p not in evicted}
+        for turn in [*self.ui_turns, self.ui_turn]:
+            if turn is not None:
+                turn.ui_evidence = [m for m in turn.ui_evidence if m.get("id") not in evicted]
 
     def _stale(self, frame: np.ndarray | None) -> bool:
         """The prefilled look no longer matches `frame` or the conversation."""
@@ -1102,6 +1106,7 @@ class Robot:
                           (f"seen: {line}", None) for line in memories]}
         track = self._visitor()
         recalled_answer = self._code_answer(turn, now, track, look, recalled, memories)
+        turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
         turn.retrieved = time.time()
         self.last_frame, turn.looked = look.frame, look.taken
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
@@ -1149,11 +1154,14 @@ class Robot:
     def _log(self, turn: Turn) -> None:
         self.ui_thinking = False
         if not turn.keep or self.hiding:
+            turn.ui_evidence = []
             self.panel = None
             self.ui_turns.clear()
             self.ui_turns.append(turn)
         with (self.out / "turns.jsonl").open("a") as f:
-            f.write(json.dumps(asdict(turn)) + "\n")
+            record = asdict(turn)
+            record.pop("ui_evidence")
+            f.write(json.dumps(record) + "\n")
         self.turns.put(turn)
 
     def _told(self, question: np.ndarray, turn: Turn) -> list[dict]:
@@ -1361,6 +1369,9 @@ class Robot:
         self.told, self.looked, self.face, self.asking = None, [], None, None
         self.history, self.ready, self.exchanges = [], None, 0
         self.panel = None
+        for turn in [*self.ui_turns, self.ui_turn]:
+            if turn is not None:
+                turn.ui_evidence = []
         self.ui_turns.clear()
         self.turn_seen = None
         self.teaching = None
@@ -1542,7 +1553,10 @@ class Robot:
             if data["view"] not in {v["id"] for v in named["views"]}:
                 return False
             if len(named["views"]) > 1:
-                return self.things.remove_view(named["id"], data["view"])
+                removed = self.things.remove_view(named["id"], data["view"])
+                if removed:
+                    self._clear_object_evidence(named["id"])
+                return removed
         self._forget_object(named)
         return True
 
@@ -1751,6 +1765,14 @@ class Robot:
             self.verified = None
             self.delivery.notify_all()
         self.named, self.looked = self.things.labels(), []
+        self._clear_object_evidence(named["id"])
+
+    def _clear_object_evidence(self, ident):
+        """Discard displayed sources after any object edit, including thumbnail removal."""
+        for turn in [*self.ui_turns, self.ui_turn]:
+            if turn is not None:
+                turn.ui_evidence = [m for m in turn.ui_evidence if m.get("object") != ident]
+        self.panel = None
 
     def named_evidence(self, turn: Turn, named: dict, this: bool = False
                        ) -> tuple[list[str], int | None, int, str]:
@@ -1838,6 +1860,48 @@ class Robot:
             (s["last_seen"], f"{ago(s['last_seen'])}: you saw {article(s['label'])}; it is not "
                              "in view now") for s in sights], key=lambda x: x[0])
         return recalled, [line for _, line in lines]
+
+    def _evidence(self, turn: Turn) -> list[dict]:
+        """Resolve supplied evidence once on the conversation worker, with stored object links."""
+        points = self.memory.points(turn.memories)
+        ids = {m["named"] for m in points if m.get("named")}
+        point_ids = {m["id"] for m in points}
+        def objects(f, c):
+            named, links = {}, {}
+            for row in self.things.objects():
+                ident, payload = str(row.id), row.payload
+                if ident not in ids and not point_ids.intersection(payload["turns"]):
+                    continue
+                named[ident] = {"label": self.things.label(ident),
+                    "view": next((v["id"] for v in payload["views"]
+                                  if (self.things.thumbs / v["thumbnail"]).is_file()), None)}
+                links.update({pid: ident for pid in payload["turns"]})
+            return named, links
+        named, links = self.recognition.call(objects) if points else ({}, {})
+        summaries = {}
+        for point in sorted(points, key=lambda p: p.get("last_seen", p.get("ts", 0))):
+            ident = point.get("named") or links.get(point["id"])
+            obj = named.get(ident)
+            if point.get("named") and obj is None:
+                continue
+            text = point.get("caption") or point.get("said") or point.get("label")
+            if not text:
+                continue
+            source = "Observed object" if "last_seen" in point else (
+                "Stored caption" if point.get("caption") else "Stored statement")
+            item = {"id": point["id"], "label": obj["label"] if obj else source,
+                    "text": text, "source": source,
+                    "time": point.get("last_seen", point.get("ts"))}
+            if obj:
+                item.update(object=ident, view=obj["view"])
+            summaries[ident or point["id"]] = item
+        if turn.delivered:
+            look = next((look for look in self.looked if look.taken == turn.selected), None)
+            if look and look.caption:
+                summaries["session"] = {"label": "Session caption", "text": look.caption,
+                                        "source": "Generated caption in this conversation",
+                                        "time": look.taken}
+        return list(summaries.values())
 
     def _sighted(self, turn: Turn) -> str | None:
         """The answer to a sighting question from the sightings and the tracks in view now, or

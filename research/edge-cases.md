@@ -81,3 +81,8 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
 - The recorded knowledge-more-2 question splits into two answered lines (J). Keep the existing VAD/ASR implementation and score the split as a failure. Evidence: the same recorded replay; compare its occurrence across arms before drawing a model conclusion.
+
+## Compact UI
+
+- Removing a view reloads the gallery, resets its scroll position, and collapses Edit memory. Preserve the affected card state if repeated removal becomes disruptive.
+- Evidence ages update when evidence changes. After a long idle period, the relative time can become stale. Refresh time labels if visitors encounter this.

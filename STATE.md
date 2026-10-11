@@ -2,11 +2,11 @@
 
 Updated 2026-10-11. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Last task: recognition import (done, merged)
+## Last task: compact UI refresh
 
-The teaching window, owner-keyed objects, Memory tab, live recognition settings, and the voice near-match question are on `main` (D154 to D156). How they work: [research/objects.md](research/objects.md). Final Jetson replay on release `39b2b07265da`: 42/47 judged, speech 45/47, first audio 1.43 s p50 (J).
+Live, Memory, and Settings stay separate. The page shows readable recall, three-view carousels, sliders, four command examples, and ordinary transcript auto-scroll (D157). Technical details and editing controls stay expandable. Desktop and phone browser checks pass (E). The full-model Jetson check passes readable recall, thumbnails, settings, and deletion with two oracle-text turns and a fixture image (J); this is not answer-quality or physical-latency acceptance.
 
-Dylan's live check (2026-10-11): recognition works well. The feed is grainy in a dim room; more light is the fix (lessons row "Camera at 15 fps"). At the next human session, recheck the items not yet reported one by one: two owners get different labels, the near-match question answered yes and no, and "Forget me" removes the visitor's objects.
+At the next human session, check two owners' labels, yes/no near-match replies, and "Forget me" removing the visitor's objects. Dylan already confirmed recognition works. More light addresses the grainy feed.
 
 ## Next tasks (in order)
 
@@ -17,9 +17,9 @@ Dylan's live check (2026-10-11): recognition works well. The feed is grainy in a
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `39b2b07265da` (D154 to D156); rollback target `2e3308d61e5b`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 39b2b07265da`, then open http://127.0.0.1:8765.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `a820d7495631`; rollback target `39b2b07265da`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release a820d7495631`, then open http://127.0.0.1:8765.
 - Backups of the pre-owner things shard: `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
-- Running jobs: none. WSL box: idle.
+- Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/ui-refresh/page.log`. Jetson and WSL are idle.
 
 ## Targets (floor, not ceiling)
 
@@ -37,4 +37,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read `research/edge-cases.md` for the focus-box rows, then write the brief for task 1.
+Read the focus-box rows in `research/edge-cases.md`, then write the brief for task 1.

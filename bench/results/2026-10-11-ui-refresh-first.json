@@ -1,0 +1,24 @@
+{
+  "run": "ui-refresh",
+  "machine": "qdrant-robot",
+  "release": "c47dcf542e6e",
+  "revision": "a5531c469400d25f1b5426303fa0c74e896ed750",
+  "input": "oracle text and fixture image",
+  "n_turns": 2,
+  "checks": {
+    "readable_recall_and_thumbnail": true,
+    "settings": true,
+    "deletion": false
+  },
+  "checks_passed": false,
+  "failure": "A teaching statement linked through the object turns list stayed in UI evidence after deletion. The new summary resolver used only the memory point named field.",
+  "command": [
+    "tools.jetson.run",
+    "ui-refresh",
+    "-c",
+    "import json, os, platform, secrets, tempfile, time, urllib.request\nfrom pathlib import Path\nfrom types import SimpleNamespace\nimport cv2\nfrom robot import main\nfrom robot.config import SHARED\nfrom robot.settings import Settings\n\nresult = {'run':'ui-refresh','machine':platform.node(),'release':os.environ['ROBOT_RELEASE'],\n          'revision':os.environ.get('UI_REVISION','working-tree'), 'input':'oracle text and fixture image',\n          'tegrastats':os.environ['ROBOT_TEGRASTATS'], 'checks':{}, 'n_turns':2}\nstart=time.time()\nos.environ['ROBOT_VIEW_TOKEN']=secrets.token_urlsafe(24)\nwith tempfile.TemporaryDirectory(dir=SHARED) as temp:\n    root=Path(temp)\n    main.settings=Settings(root/'settings.json')\n    frame=cv2.imread('eval/dev/images/m2-clock.jpg')\n    assert frame is not None\n    # Repeat the fixture as fresh camera frames; no live camera or visitor memories are used.\n    camera=SimpleNamespace(latest=lambda:(frame,time.time()))\n    robot=main.Robot(camera,root/'audio',memory=root/'memory',wake_word=False)\n    try:\n        time.sleep(2)\n        def ask(text):\n            robot.ask(text)\n            turn=robot.turns.get(timeout=90)\n            assert turn.answer\n            return turn\n        taught=ask('Track this as my clock')\n        assert taught.named, taught.answer\n        recalled=ask('Where is my clock?')\n        url=f'http://127.0.0.1:{robot.video.port}'\n        token=os.environ['ROBOT_VIEW_TOKEN']\n        def get(path):\n            with urllib.request.urlopen(url+path+'?token='+token,timeout=10) as response:\n                return json.load(response)\n        def post(path,data):\n            request=urllib.request.Request(url+path+'?token='+token,\n                data=json.dumps(data).encode(),headers={'Origin':url,'Content-Type':'application/json'})\n            with urllib.request.urlopen(request,timeout=10) as response:\n                assert response.status==202\n        state=get('/state');items=state['evidence']['memories'];assert items\n        item=next(m for m in items if m.get('object')==taught.named)\n        assert item['label'].endswith(\"'s clock\") and item['view']\n        with urllib.request.urlopen(url+'/thumb?view='+item['view']+'&token='+token) as response:\n            assert response.read().startswith(b'\\xff\\xd8')\n        result['checks']['readable_recall_and_thumbnail']=True\n        post('/settings',{'name':'match','value':.823})\n        assert get('/state')['settings']['match']==.823\n        result['checks']['settings']=True\n        post('/forget_object',{'object':taught.named})\n        robot.jobs.join()\n        assert not get('/memory')\n        assert not get('/state')['evidence']['memories'], get('/state')['evidence']['memories']\n        result['checks']['deletion']=True\n        result['answers']=[taught.answer,recalled.answer]\n    finally:\n        robot.close()\nresult['elapsed_s']=time.time()-start\nresult['checks_passed']=all(result['checks'].values())\npath=SHARED/'results'/f'{time.strftime(\"%Y-%m-%d\")}-ui-refresh-{int(time.time())}.json'\npath.write_text(json.dumps(result,indent=2)+'\\n')\nprint(json.dumps(result),flush=True)\n"
+  ],
+  "tegrastats": "ui-refresh-20261011-103913.tegrastats",
+  "scope": "Two oracle-text turns with a repeated fixture image and temporary memories; no held-out or physical latency acceptance.",
+  "runtime": "Pinned project dependencies in the release ENV.txt."
+}

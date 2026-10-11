@@ -1,0 +1,35 @@
+{
+  "run": "ui-browser",
+  "machine": "Mac",
+  "measurement": "E",
+  "revision": "a5531c469400d25f1b5426303fa0c74e896ed750",
+  "page_sha256": "04775261b2fc1cb46b053f8a6fdd2184fa10c4978dbafd67c1db5d30c975e14d",
+  "input": "Mock endpoint data, Chromium",
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "checks_passed": true,
+  "checks": [
+    "four visible command examples",
+    "normal scrollbar and auto-scroll",
+    "streaming updates retain conversation nodes",
+    "unchanged evidence retains DOM and expanded details",
+    "memory link opens card",
+    "all seven saved views reachable",
+    "three images desktop, one phone",
+    "edit and Remove view",
+    "three basic sliders and seven Advanced sliders",
+    "slider change saves and confirms",
+    "no horizontal page overflow",
+    "no JavaScript errors"
+  ],
+  "command": "node build/ui-refresh/check.cjs",
+  "script": "const {chromium}=require('/Users/dylanc/.npm/_npx/705bc6b22212b352/node_modules/playwright');\nconst fs=require('fs'),assert=require('assert');\n(async()=>{\nconst browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000}});\nconst errors=[];page.on('pageerror',e=>errors.push(e.message));\nconst settings={match:.822,guess_band:.05,window_s:6,window_gap_s:1,window_floor:.7,duplicate:.95,ask_delay_s:3,ask_blank_s:4,ask_max:3,views_cap:24};\nlet objects=[{id:'camera',label:\"Ana's camera\",owner_label:'Ana',sightings:12,last_seen:Date.now()/1000-20,views:Array.from({length:7},(_,i)=>({id:'view'+i,time:Date.now()/1000,source:'taught'}))}];\nconst live={status:'Listening',settings,window:{active:false},transcript:Array.from({length:8},(_,i)=>({id:String(i),question:'What did I show you? '+i,answer:'You showed me your camera. I last saw it on the desk.'})),evidence:{knowledge:[],statements:[],memory_ids:[123],memories:[{id:123,label:\"Ana's camera\",object:'camera',view:'view0',text:'camera',source:'Observed object',time:Date.now()/1000-20}]},memory:{shards:['knowledge','seen'],ms:6.2,hits:[[\"seen: camera, 20 seconds ago\",null]]},control:{targets:[],volume:62}};\nlet source=fs.readFileSync('tools/talk.html','utf8');\nawait page.route('http://127.0.0.1:8765/**',async route=>{const path=new URL(route.request().url()).pathname;\n if(path==='/')return route.fulfill({contentType:'text/html',body:source});\n if(path==='/status')return route.fulfill({json:{phase:'Listening',active:true,view_ready:true,error:''}});\n if(path==='/robot')return route.fulfill({json:live});\n if(path==='/memory')return route.fulfill({json:objects});\n if(path==='/camera'||path==='/thumb')return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\"><rect width=\"640\" height=\"360\" fill=\"#14232d\"/><rect x=\"170\" y=\"90\" width=\"300\" height=\"190\" rx=\"18\" fill=\"#303b4d\"/><circle cx=\"320\" cy=\"185\" r=\"65\" fill=\"#101820\" stroke=\"#fb4267\" stroke-width=\"8\"/><text x=\"220\" y=\"315\" fill=\"white\" font-family=\"sans-serif\" font-size=\"22\">Ana\u2019s camera</text></svg>'});\n if(path==='/settings'){const data=route.request().postDataJSON();Object.assign(settings,data.reset?{match:.822}:{[data.name]:data.value});return route.fulfill({status:202,body:''});}\n if(path==='/remove_view'){const data=route.request().postDataJSON();objects[0].views=objects[0].views.filter(v=>v.id!==data.view);return route.fulfill({status:202,body:''});}\n return route.fulfill({status:202,body:''});\n});\nconst current=source;source=fs.readFileSync('build/ui-refresh/before.html','utf8');await page.goto('http://127.0.0.1:8765');await page.waitForTimeout(700);await page.screenshot({path:'build/ui-refresh/before-desktop.png',fullPage:true});source=current;await page.reload();await page.locator('.evidenceitem').waitFor();\nawait page.screenshot({path:'build/ui-refresh/live-desktop.png',fullPage:true});\nassert(await page.locator('.commands').isVisible());\nassert(await page.locator('#transcript').evaluate(e=>e.scrollHeight-e.clientHeight-e.scrollTop<2));\nconst exchange=await page.locator('.exchange').last().elementHandle();await page.locator('#transcript').evaluate(e=>e.scrollTop=0);live.transcript[7].answer+=' New reply.';\nawait page.waitForTimeout(600);assert(await page.locator('.exchange').last().evaluate((e,old)=>e===old,exchange));assert(await page.locator('#transcript').evaluate(e=>e.scrollHeight-e.clientHeight-e.scrollTop<2));\nawait page.getByText('Qdrant Edge details',{exact:true}).click();const detail=await page.locator('#retrievalDetails').elementHandle();await page.waitForTimeout(600);assert(await page.locator('#retrievalDetails').evaluate((e,old)=>e===old,detail));\nawait page.getByRole('button',{name:\"Ana's camera\",exact:true}).click();await page.locator('.objectcard').waitFor();\nassert.equal(await page.locator('.savedview').count(),7);assert.equal(await page.locator('.savedview button:visible').count(),0);\nawait page.screenshot({path:'build/ui-refresh/memory-desktop.png',fullPage:true});\nconst width=await page.locator('.views').evaluate(e=>e.firstElementChild.offsetWidth/e.clientWidth);assert(width>.25&&width<.34);\nawait page.getByRole('button',{name:'Next views of'}).click();await page.waitForTimeout(450);assert(await page.locator('.views').evaluate(e=>e.scrollLeft>0));\nawait page.getByText('Edit memory',{exact:true}).click();page.on('dialog',d=>d.accept());await page.locator('.savedview button').first().click();await page.waitForTimeout(700);assert.equal(await page.locator('.savedview').count(),6);\nawait page.getByRole('button',{name:'Settings',exact:true}).click();assert.equal(await page.locator('#settingsPanel input:visible').count(),3);\nawait page.locator('#setting-match').focus();await page.keyboard.press('ArrowRight');await page.locator('#settingsMessage').filter({hasText:'Saved.'}).waitFor();assert.equal(settings.match,.823);\nawait page.getByText('Advanced',{exact:true}).click();assert.equal(await page.locator('#settingsPanel input:visible').count(),10);\nawait page.screenshot({path:'build/ui-refresh/settings-desktop.png',fullPage:true});\nawait page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Memory',exact:true}).click();await page.locator('.objectcard').waitFor();\nassert(await page.locator('.views').evaluate(e=>Math.abs(e.firstElementChild.offsetWidth-e.clientWidth)<2));\nassert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'build/ui-refresh/memory-mobile.png',fullPage:true});\nawait page.getByRole('button',{name:'Live',exact:true}).click();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'build/ui-refresh/live-mobile.png',fullPage:true});\nassert.deepEqual(errors,[]);console.log('PASS: desktop/mobile layout, all carousel views and edit, sliders, evidence link, unchanged DOM, scrollbar auto-scroll, no JavaScript errors.');\nawait browser.close();\n})();\n"
+}

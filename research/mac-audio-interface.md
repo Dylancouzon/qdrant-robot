@@ -22,7 +22,7 @@ Use one camera viewer. A second MJPEG subscriber replaces the first. Each sessio
 
 The camera shows known object names, one orange "???" teaching focus, and admitted grey object outlines. Person detection supplies internal cues; the page draws verified face outlines instead of body boxes. Face identity uses only the current verified result on its exact source pixels. The status and transcript show Listening, Hearing you, Thinking, and Speaking.
 
-The evidence panel lists supplied knowledge, recalled statements, and memory IDs. This records what the answer received; answer correctness still needs separate verification.
+How Edgy remembered shows readable sources and saved object thumbnails. Selecting an object opens its Memory card. Qdrant Edge details keeps search results and source IDs expandable. The retrieval-preparation timer includes work beyond Edge queries. Answer correctness still needs separate verification.
 
 Focus assignments change at most once per three seconds. The selected admitted object keeps its "???" style while a matched detection continues at the existing LOW threshold. Source admission, visibility, Ignore, and pending preference checks still gate drawing. Actual detection gaps remove outlines. The existing 200ms size grace can expire during undersized observations.
 

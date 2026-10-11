@@ -22,8 +22,9 @@ When the focused object scores within `guess_band` (0.05) under `match` (0.822) 
 
 ## Page
 
-- **Recognition settings** card: every value above, validated and saved to `shared/settings.json`; a change applies to the next query.
-- **Memory** tab: object cards grouped by owner with every view thumbnail (160 px JPEGs in `shared/memory/things/thumbs`), Remove view, and Forget. Edits run on the conversation worker.
+- **Settings** tab: sliders save when released. Recognition threshold, teaching time, and question count stay visible; other values are under Advanced. Values are validated and saved to `shared/settings.json`; a change applies to the next query.
+- **Memory** tab: object cards grouped by owner show three thumbnails at a time, or one on a phone. Arrows and native scrolling reach every view. Edit memory exposes Remove view and Forget. Thumbnails are 160 px JPEGs in `shared/memory/things/thumbs`. Edits run on the conversation worker.
+- **Live** tab: four voice examples stay visible beside the scrolling conversation. How Edgy remembered shows readable evidence with stored object links and thumbnails. Qdrant Edge details exposes search results and the retrieval-preparation timer, which includes work beyond Edge queries. Summaries resolve once per turn, stay out of logs, and clear when their sources expire or are deleted.
 
 ## Camera
 
