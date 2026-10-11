@@ -8,8 +8,10 @@ Plan: [research/recognition-import.md](research/recognition-import.md) (design g
 
 1. Done: `bench/crop_arms.py` on the D145 cup video. Box 263/360, masked 241/360 (E); the detector found the cup on every frame, so the misses are descriptor scores under 0.822 during viewpoint changes. Masking is not adopted.
 2. Done: D154 in the runtime: a 6 s teaching window after naming ("Turn it slowly so I can see all sides"), live recognition settings on the page (`robot/settings.py`, `shared/settings.json`). Mac checks pass.
-3. Next: integrated Jetson run (fixed vs window, restart, deletion, `tegrastats`), then a live check by Dylan; then the owner contract (design gate), memory tab, voice confirmation.
-4. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
+3. Jetson regression replay of D154 (release `2e3975d8d8fc`): 41/47 judged, first audio 1.42 s p50, same as before (J).
+4. Done: owner contract (D155), release `f84e54f81e55` deployed (not started). Live things shard migrated; old one in `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
+5. Next, kept small (Dylan: no over-engineering): memory tab, then the voice near-match question, then emoji stripping before speech. Then a live check by Dylan.
+6. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
 
 ## Human checks
 
@@ -20,7 +22,7 @@ Plan: [research/recognition-import.md](research/recognition-import.md) (design g
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `2e3308d61e5b` (D150–D153); rollback target `5c9a89a33fd4`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 2e3308d61e5b`, then open http://127.0.0.1:8765. The unit is stopped now.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `f84e54f81e55` (D154–D155, deployed, not started); rollback target `2e3308d61e5b`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 2e3308d61e5b`, then open http://127.0.0.1:8765. The unit is stopped now.
 - Running jobs: none. WSL box: idle.
 
 ## Targets (floor, not ceiling)

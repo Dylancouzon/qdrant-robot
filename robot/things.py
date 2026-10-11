@@ -1,8 +1,8 @@
-"""Named objects and ignored kinds, in their own Qdrant Edge shard: "this is my phone" stores one
-point per name with DINOv2-small crop vectors as a multivector (MaxSim), and "ignore the chair"
-stores a rule point with no vector. Both survive a restart; parsing and answers run in code."""
+"""Owner-scoped named objects, view thumbnails, visitors, and Ignore rules in Qdrant Edge.
+Object point IDs remain stable when the visitor tells a name or enrolls a face."""
 import re
 import uuid
+import time
 from collections.abc import Collection
 from pathlib import Path
 
@@ -16,12 +16,12 @@ from qdrant_edge import (
     EdgeVectorParams,
     FieldCondition,
     Filter,
-    MatchAny,
     MatchValue,
     HasIdCondition,
     MultiVectorComparator,
     MultiVectorConfig,
     Point,
+    PayloadSchemaType,
     Query,
     QueryRequest,
     ScrollRequest,
@@ -88,114 +88,221 @@ def add_vectors(stored: np.ndarray, new: np.ndarray) -> np.ndarray:
 
 
 class Things:
-    def __init__(self, root: Path = SHARED / "memory"):
+    def __init__(self, root: Path = SHARED / "memory", people=None):
+        self.people = people
         path = root / "things"
+        marker = _id("schema:owners")
         if path.exists():
             self.shard = EdgeShard.load(str(path))
-        else:
+            if not self.shard.retrieve([marker], False, False):
+                self.shard.close()
+                path.rename(root / time.strftime("things-backup-%Y%m%d-%H%M%S"))
+        if not path.exists():
             path.mkdir(parents=True)
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={"crops": EdgeVectorParams(
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
+            self.shard.update(UpdateOperation.upsert_points([Point(marker, {}, {"schema": 1})]))
+        # Every filtered query needs these; unindexed, `type` alone cost 9 ms per score (J).
+        # Created on every open, so a shard made before an index was added gets it too.
+        for key in ("type", "owner", "key"):
+            self.shard.update(UpdateOperation.create_field_index(key, PayloadSchemaType.Keyword))
+        self.shard.flush()
+        if people is not None:
+            people.initialize_visitors()
+        self.thumbs = path / "thumbs"
+        self.thumbs.mkdir(exist_ok=True)
+        self.pending = {}
         self.items = self.shard.scroll(ScrollRequest(limit=1000, with_payload=True,
             filter=Filter(must=[FieldCondition(key="type", match=MatchValue("item_ignore"))])))[0]
+        referenced = {v["thumbnail"] for r in self.objects() for v in r.payload["views"]}
+        for file in self.thumbs.glob("*.jpg"):
+            if file.name not in referenced:
+                file.unlink()
 
-    def name(self, name: str, labels: list[str], crops: np.ndarray) -> str:
-        """Keep distinct explicitly taught views when the current crop verifies the exact name.
-        Otherwise replace it with the current crop, excluding possibly older physical objects.
-        Preserve the first casing, aliases, and deletion links."""
-        existing = self.shard.retrieve([_id(name)], True, True)
-        previous = np.empty((0, DIM), dtype=np.float32)
-        if existing:
-            old = existing[0]
-            name = old.payload["name"]
-            labels = sorted({*labels, *old.payload["labels"]})
-            hit = self.score(crops[0], name)
-            if hit and hit[1] >= settings.match:
-                previous = np.asarray(old.vector["crops"], dtype=np.float32)
-            else:
-                crops = crops[:1]
-        self.shard.update(UpdateOperation.upsert_points([Point(
-            _id(name), {"crops": add_vectors(previous, crops[:SHOTS]).tolist()},
-            {"name": name, "labels": labels, "turns": self._turns(name)})]))
+    def objects(self, owner: str | None = None):
+        rows, offset = [], None
+        while True:
+            page, offset = self.shard.scroll(ScrollRequest(offset=offset, limit=1000,
+                with_payload=True, filter=Filter(must=[
+                    FieldCondition(key="type", match=MatchValue("object")),
+                    *([FieldCondition(key="owner", match=MatchValue(owner))] if owner else [])])))
+            rows.extend(page)
+            if offset is None:
+                return rows
+
+    def label_map(self) -> dict[str, str]:
+        displays = {}
+        labels = {}
+        for row in self.objects():
+            owner = row.payload["owner"]
+            if owner not in displays:
+                person = self.people.by_visitor(owner) if self.people else None
+                displays[owner] = (person or self.visitor(owner))["name" if person else "display"]
+            labels[str(row.id)] = f"{displays[owner]}'s {row.payload['name']}"
+        return labels
+
+    def new_visitor(self) -> str:
+        ident = str(uuid.uuid4())
+        self.pending[ident] = self._guest_number()
+        return ident
+
+    def _guest_number(self) -> int:
+        counter = _id("visitor-counter")
+        rows = self.shard.retrieve([counter], True, False)
+        number = rows[0].payload["number"] + 1 if rows else 1
+        self.shard.update(UpdateOperation.upsert_points([Point(counter, {}, {"number": number})]))
         self.shard.flush()
-        return name
+        return number
 
-    def add_view(self, name: str, vector: np.ndarray) -> bool:
-        """Add a distinct view to an existing name; never recreate a forgotten object."""
-        rows = self.shard.retrieve([_id(name)], True, True)
+    def visitor(self, owner: str) -> dict | None:
+        rows = self.shard.retrieve([owner], True, False)
+        return rows[0].payload if rows else None
+
+    def tell(self, owner: str, name: str) -> None:
+        if self.visitor(owner):
+            self.shard.update(UpdateOperation.set_payload([owner], {"display": name}))
+            self.shard.flush()
+
+    def label(self, ident: str) -> str:
+        rows = self.shard.retrieve([ident], True, False)
+        if not rows:
+            return ""
+        payload = rows[0].payload
+        owner = payload["owner"]
+        person = self.people.by_visitor(owner) if self.people else None
+        visitor = self.visitor(owner)
+        display = person["name"] if person else visitor["display"]
+        return f"{display}'s {payload['name']}"
+
+    def name(self, owner: str, name: str, labels: list[str], vectors: np.ndarray,
+             crops: list[np.ndarray], display: str | None = None) -> str:
+        """Append distinct taught views to the owner's object, preserving its identity."""
+        if self.visitor(owner) is None:
+            number = self.pending.pop(owner) if owner in self.pending else self._guest_number()
+            self.shard.update(UpdateOperation.upsert_points([Point(owner, {},
+                {"type": "visitor", "display": display or f"Guest {number}", "number": number})]))
+        existing = self.named(owner, name, [], include_ignored=True)
+        ident = existing["id"] if existing else str(uuid.uuid4())
+        payload = existing or {"type": "object", "owner": owner, "name": name,
+                               "key": " ".join(name.casefold().split()),
+                               "labels": [], "turns": [], "views": []}
+        payload = {k: v for k, v in payload.items() if k != "id"}
+        payload["labels"] = sorted({*labels, *payload["labels"]})
+        rows = self.shard.retrieve([ident], False, True)
+        previous = (
+            np.asarray(rows[0].vector["crops"], dtype=np.float32) if rows else np.empty((0, DIM))
+        )
+        self._views(ident, payload, previous, vectors[:SHOTS], crops[:SHOTS], "taught")
+        return ident
+
+    def _views(self, ident, payload, previous, vectors, crops, source):
+        vectors = np.asarray(vectors, dtype=np.float32)
+        previous = np.asarray(previous, dtype=np.float32)
+        updated = add_vectors(previous, vectors)
+        metadata = list(payload["views"])
+        available = [(v, m) for v, m in zip(previous, metadata, strict=True)]
+        kept = []
+        for vector in updated:
+            old = next((m for v, m in available if np.array_equal(v, vector)), None)
+            if old is not None:
+                kept.append(old)
+                continue
+            crop = crops[next(i for i, v in enumerate(vectors) if np.array_equal(v, vector))]
+            view = str(uuid.uuid4())
+            filename = f"{view}.jpg"
+            h, w = crop.shape[:2]
+            thumbnail = cv2.resize(crop, (max(1, round(w * 160 / max(h, w))),
+                                         max(1, round(h * 160 / max(h, w)))))
+            if not cv2.imwrite(str(self.thumbs / filename), thumbnail):
+                raise OSError("Cannot write object thumbnail")
+            kept.append({"id": view, "time": time.time(), "source": source, "thumbnail": filename})
+        payload["views"] = kept
+        stored = self.shard.retrieve([ident], True, False)
+        if np.array_equal(previous, updated) and stored and stored[0].payload == payload:
+            return False
+        self.shard.update(UpdateOperation.upsert_points([
+            Point(ident, {"crops": updated.tolist()}, payload)]))
+        self.shard.flush()
+        for old in metadata:
+            if old not in kept:
+                (self.thumbs / old["thumbnail"]).unlink(missing_ok=True)
+        return any(not any(np.array_equal(v, old) for old in previous) for v in updated)
+
+    def add_view(self, ident: str, vector: np.ndarray, crop: np.ndarray) -> bool:
+        rows = self.shard.retrieve([ident], True, True)
         if not rows:
             return False
         row = rows[0]
-        previous = np.asarray(row.vector["crops"], dtype=np.float32)
-        updated = add_vectors(previous, vector[None])
-        if np.array_equal(previous, updated):
-            return False
-        self.shard.update(UpdateOperation.upsert_points([
-            Point(row.id, {"crops": updated.tolist()}, row.payload)]))
-        self.shard.flush()
-        # A lowered cap can trim the gallery while the new vector itself was a duplicate.
-        return any(np.array_equal(vector, v) for v in updated) and \
-            not any(np.array_equal(vector, v) for v in previous)
+        return self._views(ident, row.payload, np.asarray(row.vector["crops"], dtype=np.float32),
+                           vector[None], [crop], "window")
 
-    def _turns(self, name: str) -> list:
-        found = self.shard.retrieve([_id(name)], ["turns"], False)
-        return found[0].payload["turns"] if found else []
-
-    def link(self, name: str, turn: int) -> None:
-        """Record the stored turn that named `name`, so forget() deletes it too."""
-        if self.shard.retrieve([_id(name)], False, False):
+    def link(self, ident: str, turn: int) -> None:
+        rows = self.shard.retrieve([ident], True, False)
+        if rows:
             self.shard.update(UpdateOperation.set_payload(
-                [_id(name)], {"turns": self._turns(name) + [turn]}))
+                [ident], {"turns": rows[0].payload["turns"] + [turn]}))
             self.shard.flush()
 
-    def named(self, name: str, labels: Collection[str],
+    def named(self, owner: str, name: str, labels: Collection[str],
               include_ignored: bool = False) -> dict | None:
-        """The payload of the object called `name`, else of one named with one of `labels`
-        ("my watch" finds the watch the visitor called "my grandmother's")."""
-        found = self.shard.retrieve([_id(name)], True, False)
-        if not found and labels:
-            found = self.shard.scroll(ScrollRequest(limit=1, with_payload=True, filter=Filter(
-                must=[FieldCondition(key="name", is_empty=False),
-                      FieldCondition(key="labels", match=MatchAny(list(labels)))],
-                must_not=[HasIdCondition({_id(n) for n in self.hidden_names()})]
-                if self.hidden_names() and not include_ignored else None)))[0]
-        if found and not include_ignored and found[0].payload["name"] in self.hidden_names():
-            return None
-        return found[0].payload if found else None
+        key = " ".join(name.casefold().split())
+        rows = self.shard.scroll(ScrollRequest(limit=1, with_payload=True, filter=Filter(
+            must=[FieldCondition(key="owner", match=MatchValue(owner)),
+                  FieldCondition(key="key", match=MatchValue(key))])))[0]
+        hidden = set() if include_ignored else self.hidden_ids()
+        found = next((r for r in rows if str(r.id) not in hidden), None)
+        if found is None and labels:
+            found = next((r for r in self.objects(owner) if str(r.id) not in hidden and
+                          set(r.payload["labels"]) & set(labels)), None)
+        return {**found.payload, "id": str(found.id)} if found else None
 
     def labels(self) -> set[str]:
-        """Every label some named object has (none: no new track is embedded)."""
-        found = self.shard.scroll(ScrollRequest(limit=1000, with_payload=["labels"], filter=Filter(
-            must=[FieldCondition(key="name", is_empty=False)])))[0]
-        return {label for r in found for label in r.payload["labels"]}
+        return {label for r in self.objects() for label in r.payload["labels"]}
 
     def visual_links(self, skip: Collection[str] = ()) -> dict[str, list[int]]:
-        """Named evidence, including legacy links, excluding ignored object classes."""
-        rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=True, filter=Filter(
-            must=[FieldCondition(key="name", is_empty=False)],
-            must_not=[FieldCondition(key="labels", match=MatchAny(list(skip)))]
-            if skip else None)))[0]
-        return {r.payload["name"]: r.payload.get("turns", []) for r in rows
-                if r.payload["name"] not in self.hidden_names()}
+        return {
+            str(r.id): r.payload["turns"]
+            for r in self.objects()
+            if not set(r.payload["labels"]) & set(skip) and str(r.id) not in self.hidden_ids()
+        }
 
-    def score(self, crop: np.ndarray, name: str | None = None) -> tuple[str, float] | None:
-        """(name, MaxSim score) of the named object nearest `crop` (or of `name`), whatever
-        its label: the detector's labels are hints (D61), one object can get several."""
+    def score(self, crop: np.ndarray, ident: str | None = None) -> tuple[str, float] | None:
         hits = self.shard.query(QueryRequest(
-            limit=1, query=Query.Nearest([crop.tolist()], using="crops"), with_payload=["name"],
-            filter=Filter(must=[FieldCondition(key="name", is_empty=False),
-                               *([HasIdCondition({_id(name)})] if name else [])],
-                          must_not=[HasIdCondition({_id(n) for n in self.hidden_names()})]
-                          if self.hidden_names() else None)))
-        return (hits[0].payload["name"], hits[0].score) if hits else None
+            limit=1, query=Query.Nearest([crop.tolist()], using="crops"), with_payload=False,
+            filter=Filter(must=[FieldCondition(key="type", match=MatchValue("object")),
+                               *([HasIdCondition({ident})] if ident else [])],
+                          must_not=[HasIdCondition(self.hidden_ids())]
+                          if self.hidden_ids() else None)))
+        return (str(hits[0].id), hits[0].score) if hits else None
 
-    def forget(self, name: str) -> list:
-        """Delete the named object; returns the turns that named it, for the caller to delete."""
-        turns = self._turns(name)
-        self.shard.update(UpdateOperation.delete_points([_id(name)]))
+    def _delete(self, rows, extra=()):
+        ids = {str(r.id) for r in rows}
+        turns = [turn for r in rows for turn in r.payload["turns"]]
+        thumbnails = [v["thumbnail"] for r in rows for v in r.payload["views"]]
+        rules = [r.id for r in self.items if ids & set(r.payload.get("excludes", []))]
+        self.remove_thumbnails(thumbnails)
+        self.shard.update(UpdateOperation.delete_points([*ids, *extra, *rules]))
         self.shard.flush()
+        self.items = (
+            self.shard.retrieve([r.id for r in self.items], True, False) if self.items else []
+        )
+        return turns, thumbnails
+
+    def remove_thumbnails(self, thumbnails: list[str]) -> None:
+        for thumbnail in thumbnails:
+            (self.thumbs / thumbnail).unlink(missing_ok=True)
+
+    def forget(self, ident: str) -> list:
+        turns, _ = self._delete(self.shard.retrieve([ident], True, False))
         return turns
+
+    def forget_visitor(self, owner: str) -> tuple[list[str], list, list[str]]:
+        """Remove objects and the visitor after the caller deletes their linked evidence."""
+        rows = self.objects(owner)
+        turns, thumbnails = self._delete(rows, [owner])
+        self.pending.pop(owner, None)
+        return [str(r.id) for r in rows], turns, thumbnails
 
     def ignore(self, labels: Collection[str], on: bool) -> None:
         """Start (`on`) or stop ignoring tracks with `labels`: one rule point per label."""
@@ -213,11 +320,11 @@ class Things:
     def preferences(self) -> list[dict]:
         return [{"id": str(r.id), "title": r.payload["title"]} for r in self.items]
 
-    def hidden_names(self) -> set[str]:
+    def hidden_ids(self) -> set[str]:
         return {n for r in self.items for n in r.payload.get("excludes", [])}
 
-    def descriptors(self, name: str) -> np.ndarray:
-        rows = self.shard.retrieve([_id(name)], False, True)
+    def descriptors(self, ident: str) -> np.ndarray:
+        rows = self.shard.retrieve([ident], False, True)
         return np.asarray(rows[0].vector["crops"], dtype=np.float32)
 
     def excluded(self, crop: np.ndarray) -> str | None:
@@ -232,7 +339,7 @@ class Things:
         """Persist descriptors only, separately from names, media, and category rules."""
         rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=["name"],
             with_vector=True, filter=Filter(must=[FieldCondition(key="name", is_empty=False)])))[0]
-        excludes = [r.payload["name"] for r in rows
+        excludes = [str(r.id) for r in rows
                     if np.max(crops @ np.asarray(r.vector["crops"]).T) >= settings.match]
         ident = str(uuid.uuid4())
         self.shard.update(UpdateOperation.upsert_points([Point(ident,
@@ -306,8 +413,7 @@ def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | N
         return "teach", "", []
     if m := next((x for p in _NAMING if (x := p.search(text))), None):
         return None if _identity(m["thing"]) else ("name", *_thing(m["thing"], vocab))
-    if (m := _OWNED_NAMING.search(text)) and not _identity(m["thing"]) and \
-            kinds(m["thing"], vocab):
+    if (m := _OWNED_NAMING.search(text)) and not _identity(m["thing"]):
         return "name", *_thing(m["thing"], vocab)
     if (rest := deletion_target(text)) is not None and (
             m := _FORGET.match(rest) or _OWNED_FORGET.match(rest)):
@@ -418,27 +524,39 @@ def _selftest() -> None:
     assert unmention("A cupboard and a cup.", ["cup"]) == "A cupboard."
     assert mentions("My armchair is comfy.", ["chair"]) and not mentions("I like tea.", ["chair"])
     assert not mentions("A chair.", [])
+    OWNER = str(uuid.uuid4())
+    test_crops = lambda vectors: [np.full((12, 20, 3), 90, np.uint8) for _ in vectors]  # noqa: E731
+    def object_id(things, owner, name):
+        row = things.named(owner, name, [], include_ignored=True)
+        return row["id"] if row else str(uuid.uuid4())
     with tempfile.TemporaryDirectory() as tmp:
         things = Things(Path(tmp))
         rng = np.random.default_rng(0)
         mine, other = _unit(rng.normal(size=(2, DIM)))
-        things.name("phone", ["phone"], np.array([mine, mine]))
-        things.link("phone", 7)
+        things.name(
+            OWNER, "phone", ["phone"], np.array([mine, mine]), test_crops(np.array([mine, mine]))
+        )
+        things.link(object_id(things, OWNER, 'phone'), 7)
         things.ignore(["chair"], True)
         assert things.score(mine)[1] > 0.99 and things.score(other)[1] < 0.2
-        things.name("cup", ["cup"], np.array([other]))
-        assert things.score(other)[0] == "cup" and things.score(other, "phone")[1] < 0.2, \
-            "a requested object is scored directly"
-        things.forget("cup")
-        assert things.named("cup", ["cup"]) is None
-        assert things.named("mobile", ["phone"])["name"] == "phone", "found by its label"
-        assert things.named("lucky charm", []) is None
+        things.name(OWNER, 'cup', ['cup'], np.array([other]), test_crops(np.array([other])))
+        assert (
+            things.score(other)[0] == object_id(things, OWNER, "cup")
+            and things.score(other, object_id(things, OWNER, "phone"))[1] < 0.2
+        ), "a requested object is scored directly"
+        things.forget(object_id(things, OWNER, 'cup'))
+        assert things.named(OWNER, 'cup', ['cup']) is None
+        assert things.named(OWNER, 'mobile', ['phone'])["name"] == "phone", "found by its label"
+        assert things.named(OWNER, 'lucky charm', []) is None
         assert things.labels() == {"phone"}, "rule points are not named objects"
         things.shard.close()
         things = Things(Path(tmp))
-        assert things.ignored() == {"chair"} and things.named("phone", [])["turns"] == [7], \
+        assert things.ignored() == {"chair"} and things.named(OWNER, 'phone', [])["turns"] == [7], \
             "names and rules survive a restart"
-        assert things.forget("phone") == [7] and things.named("phone", ["phone"]) is None
+        assert (
+            things.forget(object_id(things, OWNER, "phone")) == [7]
+            and things.named(OWNER, "phone", ["phone"]) is None
+        )
         things.ignore(["chair"], False)
         assert things.ignored() == set() and things.labels() == set()
     if MODEL.exists():

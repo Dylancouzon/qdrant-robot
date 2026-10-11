@@ -9,6 +9,7 @@ from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection, Tracker
 from robot.focus import Track
 from robot.main import Robot, Turn
 from robot.test_things import close_robot, open_robot
+from robot.test_things import thumbnail_crops, object_id
 from robot.things import DIM
 
 
@@ -20,9 +21,15 @@ def fresh_sightings(robot, frame, now):
     for track in tracks:
         assert robot.focus.eligible(track)
         name = f"{track.label} {track.id}"
-        if robot.things.named(name, []) is None:
-            robot.things.name(name, [track.label], np.eye(DIM, dtype=np.float32)[[track.id]])
-        recognized[track.id] = name, .99
+        if robot.things.named(robot.conversation_visitor, name, []) is None:
+            robot.things.name(
+                robot.conversation_visitor,
+                name,
+                [track.label],
+                np.eye(DIM, dtype=np.float32)[[track.id]],
+                thumbnail_crops(np.eye(DIM, dtype=np.float32)[[track.id]]),
+            )
+        recognized[track.id] = object_id(robot.things, robot.conversation_visitor, name), .99
     robot.named = robot.things.labels()
     robot.focus.update(now, tracks, [], recognized=recognized, recognized_at=now)
     robot._remember_matches(frame, now, tracks, recognized, None)
@@ -282,7 +289,7 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
     assert turn.verbatim and turn.selected > 0 and not turn.delivered
     robot.knowledge = Stub(search=lambda q: [])
     pending.caption = None
-    assert robot._forget(None, "Ana", np.zeros(DIM, np.float32))
+    assert robot._forget(None, "Ana", np.zeros(DIM, np.float32), robot.conversation_visitor)
     before = list(captioned)
     robot._describe_idle(pending)
     assert captioned == before and pending.caption is None, "'forget me' drops it"

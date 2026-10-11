@@ -82,6 +82,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D154 2026-10-11: Named-object views come from a teaching window.** After a naming turn, the robot adds views from the taught track while the tracker keeps its id (17 viewpoint videos, E: 530/816 later-view hits vs 397 fixed, 435 simulated confirmation; masking worse). Voice confirmation stays secondary; masking is not adopted. Recognition thresholds and timing are UI settings (Dylan). Refines D64/D141; `bench/results/2026-10-11-gallery-1791694947.json`.
 
+**D155 2026-10-11: Named objects belong to a visitor.** One point per (visitor id, name); a visitor id is stable for a conversation and stored on an enrolled person, so promotion moves nothing. The same owner's reteach always appends (Dylan). Labels read "Ana's mouse"; "Ana's X" resolves only through an enrolled Ana. "Forget me" deletes evidence, then objects, then the person. The old things shard was backed up and replaced. Edge things.score p99 2.29 ms at 200 objects x 24 views (J). Supersedes D148's same-name half.
+
 **D122–D126 2026-10-09: Mac interface.** `tools/talk.py` serves a loopback page with Start, Mute, and Stop over native audio and SSH. All models stay on the Jetson.
 
 ## Pending requirements

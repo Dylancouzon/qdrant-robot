@@ -179,6 +179,7 @@ class Turn:
     audio_s: float = 0.0          # length of the spoken answer
     detect_fps: float = 0.0       # detection and tracking rate while this turn ran
     identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
+    visitor: str = ""             # resolved once before object actions
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
     resumed: bool = False         # decode paused at the first phrase and resumed (D66)
@@ -195,7 +196,9 @@ class Robot:
         self.knowledge, self.embed = Knowledge(), TextEmbedder()
         self.people = People(memory)
         self.memory = Memory(memory)
-        self.things = Things(memory)
+        self.things = Things(memory, self.people)
+        self.conversation_visitor = self.things.new_visitor()
+        self.conversation_started = False
         self.named, self.ignored = self.things.labels(), self.things.ignored()
         self.scribe = Scribe()
         self.route = Router(self.embed)
@@ -312,7 +315,9 @@ class Robot:
             self.things.shard.close()
             self.people = People(memory)
             self.memory = Memory(memory)
-            self.things = Things(memory)
+            self.things = Things(memory, self.people)
+            self.conversation_visitor = self.things.new_visitor()
+            self.conversation_started = False
             self.named, self.ignored = self.things.labels(), self.things.ignored()
             self.history, self.looked, self.exchanges, self.ready = [], [], 0, None
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
@@ -500,7 +505,7 @@ class Robot:
             self.shown_known = bool(record and record[3][1] and record[3][1][5] == "known")
             return True
 
-    def _offers(self, tracks: list[Track]) -> list[dict]:
+    def _offers(self, tracks: list[Track], label_map: dict[str, str]) -> list[dict]:
         """Refresh the Ignore choices (held under self.detecting). A visible, eligible named or
         focused track keeps a crop at most OFFER_REFRESH_S old; a stalled source stops
         refreshing. An offer stays for OFFER_HOLD_S after its last eligible moment, in view or not;
@@ -515,7 +520,7 @@ class Robot:
                 if old is None or taken - old.seen >= OFFER_REFRESH_S or \
                         old.epoch != self.focus.epoch(t.id):
                     self.offers[t.id] = Offer(
-                        labels[t.id][0] if t.id in labels else "Unknown " + t.label,
+                        label_map.get(labels[t.id][0], "") if named else "Unknown " + t.label,
                         labels[t.id][0] if named else None, t.label.capitalize(),
                         self.focus.epoch(t.id), cut(frame, boxes[t.id][1]).copy(), taken)
             elif t.label in BODY:
@@ -542,19 +547,29 @@ class Robot:
             if self.focus:
                 screen = replace(screen, boxes=self.focus.boxes(
                     shown_tracks, [], time.time(), geometry=geometry) + faces)
+            objects = self.things.label_map()
+            screen = replace(
+                screen,
+                boxes=[
+                    (*b[:4], objects[b[4]], b[5])
+                    if b[5] == "known" and b[4] in objects
+                    else b
+                    for b in screen.boxes
+                ],
+            )
             session, gallery = self.session_id, self.recognition.epoch
             epochs = {t.id: self.focus.epoch(t.id) for t in shown_tracks}
             screen = replace(screen, valid=(lambda: self._publication_valid(
                 frame, taken, record, session, gallery, epochs, cancel)) if display else None,
                 source=(taken, id(frame), id(record)))
-            targets = self._offers(tracks) if self.focus else []
+            targets = self._offers(tracks, objects) if self.focus else []
             screen = replace(screen, control={"session": self.session_id,
                 "targets": targets,
                 "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source,
                 "muted": self.muted, "volume": self.volume},
                 ignored_items=self.things.preferences(), settings=settings.snapshot(),
-                window=self._window_status())
+                window=self._window_status(objects))
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
                       "Speaking" if self.speaker.playing() else
                       "Thinking" if self.ui_thinking else
@@ -671,7 +686,7 @@ class Robot:
                     a + SMOOTH * (b - a) for a, b in zip(previous[3][1][:4], box, strict=True))
         return (*box, matched or "", "known" if matched else "other")
 
-    def _window_status(self):
+    def _window_status(self, label_map=None):
         """End a teaching window for good when time runs out or its track is gone. Resets,
         new conversations, naming, and forgetting clear it where they happen."""
         window = self.window
@@ -679,11 +694,13 @@ class Robot:
                 not self.focus or window["track"] not in self.focus.visible or
                 self.focus.epoch(window["track"]) != window["epoch"]):
             self.window = window = None
-        return {"active": bool(window), "name": window["name"] if window else "",
+        name = ((self.things.label(window["name"]) if label_map is None else
+                 label_map.get(window["name"], "")) if window else "")
+        return {"active": bool(window), "name": name,
                 "views_admitted": window["admitted"] if window else 0,
                 "seconds_left": max(0., window["end"] - time.time()) if window else 0.}
 
-    def _admit_window(self, window, track, vector, source):
+    def _admit_window(self, window, track, vector, source, crop):
         """Add the taught track's crop if the window still holds that track (D154)."""
         taken, epochs = source
         with self.detecting:
@@ -697,7 +714,7 @@ class Robot:
         own = self.things.score(vector, window["name"])
         # Added views preserve valid results and offers, so keep the gallery epoch.
         if own and own[1] >= settings.window_floor and \
-                self.things.add_view(window["name"], vector):
+                self.things.add_view(window["name"], vector, crop):
             window["admitted"] += 1
             with (self.out / "turns.jsonl").open("a") as stream:
                 stream.write(json.dumps({"event": "teaching_view", "name": own[0],
@@ -740,7 +757,7 @@ class Robot:
                 rivals = [o.box for o in tracks if o.id != t.id and o.label == t.label]
                 crowded = bool(rivals) and iou(np.array([t.box]), np.array(rivals)).max() > .3
                 if not excluded[t.id] and not crowded:  # an overlapping lookalike: impure crop
-                    self._admit_window(window, t, vector, source)
+                    self._admit_window(window, t, vector, source, cut(frame, t.box))
             hit = self.things.score(vector, preferences[t.id])
             if preferences[t.id] and (not hit or hit[1] < settings.match):
                 other = self.things.score(vector)
@@ -898,6 +915,8 @@ class Robot:
         """The answer given in code, or None for the brain: identity, then the visitor's things,
         then what the selected earlier look showed (which alone decides the path: its answer, or
         the brain with its Memories line), then stored shown objects and sightings."""
+        if not turn.visitor:
+            self._resolve_visitor(turn, now)
         teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
         if answer := self._identity(turn, now, track) or self._things(turn, teaching):
             return answer
@@ -937,7 +956,7 @@ class Robot:
         now, taken = (look.frame, look.taken) if shot[0] is None else shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
         # earlier exchanges or first-person statements reach this prompt.
-        if self.history and self._converse(turn, self._whois(now)):
+        if self._resolve_visitor(turn, now):
             self.ui_turns.clear()
             self.ui_turns.append(turn)
             self.history, self.looked, self.teaching = [], [], None
@@ -1026,8 +1045,9 @@ class Robot:
         seen = self._whois(frame)
         if self._hidden(seen, track):
             return False
-        self._hear_name(turn, seen)
-        pid = turn.frame_id = self.memory.add(None, turn.question, statement, taken)
+        self._hear_name(turn)
+        pid = turn.frame_id = self.memory.add(
+            None, turn.question, statement, taken, visitor=turn.visitor)
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it
         if seen and seen[1]:
@@ -1064,21 +1084,37 @@ class Robot:
         frame, never from a track: consent, enrollment, "forget me", "do you remember me",
         "what's my name", and the offer to remember a face after "I'm Ana". None for any
         other turn."""
+        if not turn.visitor:
+            self._resolve_visitor(turn, frame)
+        req = request(turn.question)
         asked, self.asking = self.asking, None
-        if asked and (answer := self._consent(turn, asked, frame)) is not None:
+        if asked and not (req and req[0] == "forget") and (
+                answer := self._consent(turn, asked, frame)) is not None:
             return answer
-        if (req := request(turn.question)) is None and not name_in(turn.question):
+        if req is None and not name_in(turn.question):
             return None
-        seen = self._whois(frame, turn)
+        seen = self.turn_seen
         vec, name = seen or (None, None)
         turn.identity["claimed"] = name
-        self._hear_name(turn, seen)
+        self._hear_name(turn)
+        if req and req[0] == "forget":
+            turn.keep = False
+            ok = self._forget(track, name, vec, turn.visitor)
+            return (
+                done("forget", name, ok)
+                if name
+                else (
+                    "Done. I have forgotten you."
+                    if ok
+                    else "I could not forget you. Please ask again."
+                )
+            )
+        if req and req[0] == "enroll" and req[1] and not name and self.people.person(req[1]):
+            return f"I already know someone called {req[1]}."
         if req is None:
             return None if name else self._offer(vec)
         answer, action = reply(turn.question, (name, 1.0) if name else None, seen is not None,
                                self.told[0] if self.told else None)
-        if action and action[0] == "forget":
-            return done("forget", action[1], self._forget(track, action[1], vec))
         if action:
             self.asking = action[1], 1, [vec]
         return answer
@@ -1104,17 +1140,32 @@ class Robot:
         held = self.face
         linked = (seen is not None and float(seen[0] @ held) >= THRESHOLD) if held is not None \
             else turn.speech_start - self.last_line <= CONVERSATION_S
+        if not self.conversation_started:
+            linked = True
+        self.conversation_started = True
         if not linked:
             self.window = None
             self.told, self.since = None, time.time_ns() // 1000
+            self.conversation_visitor = self.things.new_visitor()
         self.face = seen[0] if seen else None
         return not linked
 
-    def _hear_name(self, turn: Turn, seen: tuple[np.ndarray, str | None] | None) -> None:
-        """Follow the conversation (_converse) and hold the name told in it."""
-        self._converse(turn, seen)
+    def _resolve_visitor(self, turn: Turn, frame: np.ndarray) -> bool:
+        """Resolve the speaker once before identity or object actions."""
+        if turn.visitor:
+            return False
+        seen = self._whois(frame, turn)
+        new = self._converse(turn, seen)
+        person = self.people.person(seen[1]) if seen and seen[1] else None
+        self.turn_seen = seen
+        turn.visitor = person["visitor"] if person else self.conversation_visitor
+        return new
+
+    def _hear_name(self, turn: Turn) -> None:
+        """Hold the told name and update the current visitor record, if it exists."""
         if name := name_in(turn.question):
             self.told = name, bool(self.told and self.told[1])
+            self.things.tell(turn.visitor, name)
 
     def _consent(self, turn: Turn, asked: tuple[str, int, list], frame: np.ndarray
                  ) -> str | None:
@@ -1126,6 +1177,10 @@ class Robot:
                 self.asking = name, times + 1, shots
                 return f"Sorry, may I remember your face, {name}? Please say yes or no."
             return None
+        if yes and self.people.person(name):
+            seen = self.turn_seen
+            if not seen or seen[1] != name:
+                return f"I already know someone called {name}."
         return done("enroll", name, self._enroll(name, shots, frame, turn)) if yes else DECLINED
 
     def _enroll(self, name: str, shots: list[np.ndarray], frame: np.ndarray, turn: Turn) -> bool:
@@ -1135,30 +1190,56 @@ class Robot:
                 float(seen[0] @ s) < THRESHOLD for s in shots):
             return False  # no face now, or not the face that asked
         return self.recognition.call(lambda f, c: self.people.enroll(
-            name, [*shots, seen[0]], time.time()), mutate=True)
+            name, [*shots, seen[0]], time.time(), turn.visitor), mutate=True)
 
-    def _forget(self, track: int | None, name: str, face_: np.ndarray) -> bool:
-        """"Forget me" from the face matched now: the person point, every linked turn still
-        kept (its frame, caption, and statement), and nothing more written for the person track
-        in view; pending caption writes to a deleted point are dropped by Memory.set."""
-        # Carried gap: a turn frame where this person appears unidentified (before enrollment,
-        # or behind another visitor) is not linked, so it stays until retention (RETAIN_S, 12 h).
+    def _forget(self, track: int | None, name: str | None, face_: np.ndarray | None,
+                visitor: str) -> bool:
+        """Delete visitor evidence before removing the object and person references."""
         with self.detecting:
             self.window = None  # no more views are learned for a visitor being forgotten
         try:
-            self.memory.forget(self.recognition.call(
-                lambda f, c: self.people.forget(name), mutate=True))
+            rows = self.things.objects(visitor)
+            person = self.people.person(name) if name else None
+            self.memory.forget_visitor(visitor)
+            self.memory.forget([turn for row in rows for turn in row.payload["turns"]])
+            if person:
+                self.memory.forget(person.get("linked", []))
+            for row in rows:
+                self.memory.forget_named(str(row.id))
+            self.things.remove_thumbnails([
+                view["thumbnail"] for row in rows for view in row.payload["views"]])
+            self.recognition.call(lambda f, c: self.things.forget_visitor(visitor), mutate=True)
+            if name:  # last: until here the face still resolves to `visitor` for a retry
+                self.recognition.call(lambda f, c: self.people.forget(name), mutate=True)
+            for row in rows:
+                if self.focus:
+                    self.focus.forget(str(row.id))
+            self.named = self.things.labels()
+            self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
         except Exception:
             traceback.print_exc()
             return False
         if track is not None:
             self.visitors[track] = Visitor(forgotten=True)
-        self.hiding, self.told, self.looked = (face_, time.time()), None, []
+        self.hiding = (face_, time.time()) if face_ is not None else None
+        self.told, self.looked, self.face, self.asking = None, [], None, None
+        self.history, self.ready, self.exchanges = [], None, 0
+        self.panel = None
+        self.ui_turns.clear()
+        self.turn_seen = None
         self.teaching = None
         with self.delivery:
             self.verified = None
             self.delivery.notify_all()
         return True
+
+    def _object_owner(self, turn: Turn, name: str) -> tuple[str | None, str, str]:
+        """Resolve a named possessive only through an enrolled person."""
+        if not re.search(r"\bmy\s", turn.question, re.I) and "'s " in name:
+            person_name, object_name = name.split("'s ", 1)
+            person = self.people.person(person_name.title())
+            return (person["visitor"] if person else None, object_name, f"{person_name}'s")
+        return turn.visitor, name, "yours"
 
     def _things(self, turn: Turn, teaching: tuple[int, int] | None = None) -> str | None:
         """Commands and questions about the visitor's things (robot/things.py): naming,
@@ -1182,19 +1263,33 @@ class Robot:
                 self._settle(turn.speech_start)
                 return self._name(turn, name, labels)
             turn.keep = False
-            return self._forget_thing(name, labels)
+            owner, name, possessive = self._object_owner(turn, name)
+            if owner is None:
+                return f"I don't know which {name} is {possessive}."
+            return self._forget_thing(owner, name, labels)
+        return self._thing_question(turn)
+
+    def _thing_question(self, turn: Turn) -> str | None:
+        """Answer only from the requested owner's object."""
         if (asked := question(turn.question, self.vocab)) is None:
             return None
         mode, name, labels = asked
         self._settle(turn.speech_start)
-        if (named := self.things.named(name, labels)) is None:
+        owner, name, possessive = self._object_owner(turn, name)
+        if owner is None:
+            return f"I don't know which {name} is {possessive}."
+        if (named := self.things.named(owner, name, labels)) is None:
             # Not an object ("my favorite color"), or "have you seen my keys?" without named
             # keys: the sightings or the brain answer.
-            return None if mode == "seen" or not labels else (
-                "No, I" if mode == "remember" else "I") + f" don't know which {name} is yours."
+            return (
+                None
+                if not labels and possessive == "yours"
+                else ("No, I" if mode == "remember" else "I")
+                + f" don't know which {name} is {possessive}."
+            )
         if set(named["labels"]) & self.ignored:
             return f"I am ignoring {plural(name)}, so I do not remember any."
-        return self._mine(turn, mode, named)
+        return self._mine(turn, mode, named, "your" if owner == turn.visitor else possessive)
 
     def _valid_item(self, data):
         """The choice is a current offer of the same session, gallery, and track object."""
@@ -1293,7 +1388,7 @@ class Robot:
             if not self._valid_item(data):
                 return "That selection expired. Select it again."
             track, offer = data["track"], self.offers[data["track"]]
-            title = offer.chosen or offer.label
+            title = offer.title if offer.chosen else offer.label
         vectors = self.recognition.call(
             lambda f, c: self._ignore_vectors(c, offer.shot, offer.chosen, data["gallery"]))
         if vectors is None:
@@ -1308,7 +1403,7 @@ class Robot:
                     return None
                 ident = self.things.ignore_item(title, vectors)
                 del self.offers[track]
-                hidden = self.things.hidden_names()
+                hidden = self.things.hidden_ids()
                 self.focus.named = {i: n for i, n in self.focus.named.items()
                                     if n.name not in hidden}
                 if track in self.focus.seen and self.focus.epoch(track) == offer.epoch:
@@ -1350,7 +1445,10 @@ class Robot:
               pin: tuple[int, int] | None = None) -> str:
         """Bind `name` to the object _target gives, else the one fresh, visible association
         for this exact name."""
-        old = self.things.named(name, [])
+        if "'s " in name and not re.search(r"\bmy\s", turn.question, re.I):
+            turn.keep = False
+            return "I can only learn things that are yours. Say: this is my mouse."
+        old = self.things.named(turn.visitor, name, [])
         if {*labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         found = self._target(turn, pin)
@@ -1360,7 +1458,7 @@ class Robot:
                 names = self.focus.names()
                 candidates = [t.id for t in tracks if t.id in self.focus.visible and
                               self.focus.eligible(t) and
-                              names.get(t.id) == (old["name"], True) and
+                              names.get(t.id) == (old["id"], True) and
                               self.focus.named[t.id].score >= settings.match and
                               0 <= time.time() - self.focus.named[t.id].refreshed <= PREVIEW_TTL]
                 if len(candidates) == 1:
@@ -1386,7 +1484,8 @@ class Robot:
         if label in BODY:
             return "I only track objects, not people."
         views = [v for v in views if v[2][track][0] not in BODY]  # earlier person views too
-        old = self.things.named(name, [])
+        old = self.things.named(turn.visitor, name, [])
+        name = old["name"] if old else name
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         seen = self._whois(frame)
@@ -1404,42 +1503,50 @@ class Robot:
                         self.recognition.epoch != gallery + 1 or self.session_id != session or \
                         time.time() - taken > PREVIEW_TTL:
                     return None
-                return self.things.name(name, sorted({*labels, label}), vectors)
+                return self.things.name(
+                    turn.visitor,
+                    name,
+                    sorted({*labels, label}),
+                    vectors,
+                    shots,
+                    self.told[0] if self.told else None,
+                )
         stored = self.recognition.call(bind, mutate=True)
         if stored is None:
             return "Sorry, I lost sight of it. Hold it up and say it again."
-        name = stored
+        ident = stored
         self.named = self.things.labels()
-        pid = self.memory.add(shots[0], turn.question, ts=taken, named=name, label=label,
+        pid = self.memory.add(shots[0], turn.question, ts=taken, named=ident, label=label,
+                              visitor=turn.visitor,
                               box=list(box), source_size=[frame.shape[1], frame.shape[0]])
-        self.things.link(name, pid)
+        self.things.link(ident, pid)
         sighting = self.points[track] = self.memory.sighting(
-            label, region(box, frame.shape[1]), taken, name)
+            label, region(box, frame.shape[1]), taken, ident)
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid, sighting]))
-        turn.memories, turn.named = [pid], name
+        turn.memories, turn.named = [pid], ident
         with self.detecting:
-            self.focus.bind(track, name, taken)
-            self._start_window(track, epoch, name)
+            self.focus.bind(track, ident, taken)
+            self._start_window(track, epoch, ident)
         self.jobs.put(("caption", pid, brain.jpeg(shots[0])))
         self._retain(time.time())
         return f"Got it, that is your {name}. " + (
             "Turn it slowly so I can see all sides." if settings.window_s > 0 else
             "I will remember it.")
 
-    def _forget_thing(self, name: str, labels: list[str]) -> str:
-        """Delete named crops, linked turns, and selected sightings; ignore rules survive."""
-        if (named := self.things.named(name, labels, include_ignored=True)) is None:
+    def _forget_thing(self, owner: str, name: str, labels: list[str]) -> str:
+        """Delete evidence first, then thumbnails, the object, and its item Ignore rules."""
+        if (named := self.things.named(owner, name, labels, include_ignored=True)) is None:
             return f"I don't know your {name}, so there is nothing to forget."
-        self.memory.forget(self.recognition.call(
-            lambda f, c: self.things.forget(named["name"]), mutate=True))
-        self.memory.forget_named(named["name"])
+        self.memory.forget(named["turns"])
+        self.memory.forget_named(named["id"])
+        self.recognition.call(lambda f, c: self.things.forget(named["id"]), mutate=True)
         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
         with self.detecting:
-            if self.window and self.window["name"] == named["name"]:
+            if self.window and self.window["name"] == named["id"]:
                 self.window = None
             if self.focus:
-                self.focus.forget(named["name"])
+                self.focus.forget(named["id"])
             self.verified = None
             self.delivery.notify_all()
         self.named, self.looked = self.things.labels(), []
@@ -1469,7 +1576,7 @@ class Robot:
             strict=True)}
         mine = max(scores, key=scores.__getitem__, default=None)
         mine = mine if mine is not None and scores[mine] >= settings.match else None
-        past = self.memory.sightings(turn.speech_start, 3, here, named=[name])
+        past = self.memory.sightings(turn.speech_start, 3, here, named=[named["id"]])
         turns = self.memory.points(named["turns"])
         turn.memories = [t["id"] for t in turns] + [s["id"] for s in past] + (
             [self.points[mine]] if mine in self.points else [])
@@ -1485,24 +1592,25 @@ class Robot:
 
     def _score(self, named: dict, v: np.ndarray) -> float:
         """A crop vector's MaxSim score against the requested object `named`."""
-        hit = self.things.score(v, named["name"])
+        hit = self.things.score(v, named["id"])
         return hit[1] if hit else 0.0
 
-    def _mine(self, turn: Turn, mode: str, named: dict) -> str:
+    def _mine(self, turn: Turn, mode: str, named: dict, possessive: str = "your") -> str:
         """A minimal code answer from named_evidence until those lines go to the brain."""
         name = named["name"]
         _, mine, found, last = self.named_evidence(turn, named, mode == "this")
         if mode == "this":
             return (f"I don't see {article(name)} right now." if not found else
-                    f"Yes, this is your {name}." if mine is not None else
-                    f"No, I don't think this is your {name}.")
-        said = f"Yes, I remember your {name}. " * (mode == "remember")
+                    f"Yes, this is {possessive} {name}." if mine is not None else
+                    f"No, I don't think this is {possessive} {name}.")
+        said = f"Yes, I remember {possessive} {name}. " * (mode == "remember")
         if mine is not None:
-            return said + f"Yes, your {name} is here now."
+            return said + f"Yes, {possessive} {name} is here now."
         if found:
-            return said + f"I see {article(name)}, but I am not sure it is yours."
-        return said + (f"I last saw your {name} {last}; I don't see it now." if last else
-                       f"I don't see your {name} now.")
+            owned = "yours" if possessive == "your" else possessive
+            return said + f"I see {article(name)}, but I am not sure it is {owned}."
+        return said + (f"I last saw {possessive} {name} {last}; I don't see it now." if last else
+                       f"I don't see {possessive} {name} now.")
 
     def _recall(self, turn: Turn, frame: np.ndarray) -> tuple[list[dict], list[str]]:
         """Captioned frames (newest first) and the Memories lines, oldest first, one short line

@@ -2518,3 +2518,8 @@
 {"key": "ad24be7b0bd3fb76", "pass": true, "why": "Admits it does not remember.", "votes": [true, true, true]}
 {"key": "72f8888a94df92cf", "pass": true, "why": "Greets the visitor back.", "votes": [true, true, true]}
 {"key": "0fdf5cbb0763b95f", "pass": true, "why": "Answers briefly and naturally.", "votes": [true, true, true]}
+{"key": "be8ce814030c58be", "pass": true, "why": "Correctly recalls the stop sign.", "votes": [true, true, true]}
+{"key": "65b0f06e55531a89", "pass": true, "why": "Correctly recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "a5e3ec7d47a8f84f", "pass": true, "why": "Identifies an apple as the first thing shown.", "votes": [true, true, true]}
+{"key": "08854499ba052efd", "pass": false, "why": "Does not say the earlier image showed apples.", "votes": [false, false, false]}
+{"key": "acb1ec97d5d671e9", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}

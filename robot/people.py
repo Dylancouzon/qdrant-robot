@@ -48,19 +48,41 @@ class People:
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
 
-    def enroll(self, name: str, shots: list[np.ndarray], consent: float | None) -> bool:
+    def enroll(self, name: str, shots: list[np.ndarray], consent: float | None,
+               visitor: str | None = None) -> bool:
         """Store a person from face vectors of different frames (the first SHOTS; no image is
-        kept); `consent` is when they said yes. One point per name: enrolling a known name
-        replaces its shots and keeps its links. Refused (False) without consent or with fewer
-        than two frames, since an identity claim needs two shots."""
+        kept); `consent` is when they said yes. A different face cannot reuse an enrolled name.
+        Refuse without consent or fewer than two frames; preserve the visitor and evidence links."""
         if not consent or len(shots) < 2:
             return False
+        existing = self.person(name)
+        if existing and any((match := self.identify(shot)) is None or match[0] != name
+                            for shot in shots):
+            return False
+        visitor = existing["visitor"] if existing else visitor or str(uuid.uuid4())
         self.shard.update(UpdateOperation.upsert_points([Point(
             _id(name), {"shots": [s.tolist() for s in shots[:SHOTS]]},
-            {"name": name, "consent": consent, "shots": min(len(shots), SHOTS),
+            {"name": name, "visitor": visitor, "consent": consent, "shots": min(len(shots), SHOTS),
              "linked": self._linked(name, [])})]))
         self.shard.flush()
         return True
+
+    def initialize_visitors(self) -> None:
+        rows = self.shard.scroll(ScrollRequest(limit=1000, with_payload=True))[0]
+        for row in rows:
+            if not row.payload.get("visitor"):
+                self.shard.update(UpdateOperation.set_payload([row.id],
+                    {"visitor": str(uuid.uuid4())}))
+        self.shard.flush()
+
+    def person(self, name: str) -> dict | None:
+        rows = self.shard.retrieve([_id(name)], True, False)
+        return rows[0].payload if rows else None
+
+    def by_visitor(self, visitor: str) -> dict | None:
+        rows = self.shard.scroll(ScrollRequest(limit=1, with_payload=True, filter=Filter(
+            must=[FieldCondition(key="visitor", match=MatchValue(visitor))])))[0]
+        return rows[0].payload if rows else None
 
     def _linked(self, name: str, ids: list) -> list:
         """The person's linked evidence ids plus `ids`. All are kept: forget() must return every

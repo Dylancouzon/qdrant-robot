@@ -302,6 +302,7 @@ class Memory:
         for field in ("ts", "last_seen"):  # a no-op when the index exists
             self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
         self.shard.update(UpdateOperation.create_field_index("frame", PayloadSchemaType.Keyword))
+        self.shard.update(UpdateOperation.create_field_index("visitor", PayloadSchemaType.Keyword))
         self.last_id = 0
         self.frame_bytes = self._sweep()  # the bytes MAX_FRAME_BYTES limits
 
@@ -350,8 +351,7 @@ class Memory:
         return pid
 
     def sighting(self, label: str, region: str, seen: float, named: str | None = None) -> int:
-        """Store a new track: `label` in the `region` third of the frame, and the name of the
-        visitor's object it matched (robot/things.py)."""
+        """Store a track label, region, time, and matched object point ID (robot/things.py)."""
         pid = self._id()
         self.shard.update(UpdateOperation.upsert_points([Point(pid, {}, {
             "label": label, "region": region, "first_seen": seen, "last_seen": seen,
@@ -461,10 +461,16 @@ class Memory:
                           ] * bool(skip) or None)))
         return [{"id": h.id, **h.payload} for h in hits]
 
-    def forget_named(self, name: str) -> None:
+    def forget_visitor(self, visitor: str) -> None:
+        """Delete all stored turns belonging to this visitor, including their source frames."""
+        while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
+                must=[FieldCondition(key="visitor", match=MatchValue(visitor))])))[0]:
+            self.forget([r.id for r in rows])
+
+    def forget_named(self, ident: str) -> None:
         """Delete selected crops and sightings, including records outside current track links."""
         while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
-                must=[FieldCondition(key="named", match=MatchValue(name))])))[0]:
+                must=[FieldCondition(key="named", match=MatchValue(ident))])))[0]:
             self.forget([r.id for r in rows])
 
     def points(self, ids: Collection[int]) -> list[dict]:

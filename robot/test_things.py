@@ -30,13 +30,31 @@ GOLD, BLACK = 200, 30  # the pixel value of each phone: the stub tells them apar
 LEFT, CENTER, RIGHT = (100, 300, 300, 600), (540, 300, 740, 600), (1000, 300, 1200, 600)
 
 
+OWNER = "00000000-0000-4000-8000-000000000001"
+
+
+def thumbnail_crops(vectors):
+    return [np.full((12, 20, 3), 90, np.uint8) for _ in vectors]
+
+
+def object_id(things, owner, name):
+    row = things.named(owner, name, [], include_ignored=True)
+    return row["id"] if row else "00000000-0000-4000-8000-000000000099"
+
+
 def stub_crops(crops: list[np.ndarray]) -> np.ndarray:
     return np.eye(DIM, dtype=np.float32)[[int(c.mean()) for c in crops]]
 
 
 def open_robot(root: Path) -> Robot:
     robot = Robot.__new__(Robot)  # no models: real shards, tracker, and a stub crop embedder
-    robot.memory, robot.things, robot.people = Memory(root), Things(root), People(root)
+    robot.memory, robot.people = Memory(root), People(root)
+    robot.things = Things(root, robot.people)
+    robot.conversation_visitor = OWNER
+    robot.conversation_started = True
+    if robot.things.visitor(OWNER) is None:
+        allocated = robot.things.new_visitor()
+        robot.things.pending[OWNER] = robot.things.pending.pop(allocated)
     class Owner:
         faces, crops, epoch = None, staticmethod(stub_crops), 0
         condition, active, latest = threading.Condition(), None, None
@@ -62,7 +80,7 @@ def open_robot(root: Path) -> Robot:
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
     robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
-    robot.teaching, robot.start_target, robot.window = None, None, None
+    robot.teaching, robot.start_target, robot.window, robot.asking = None, None, None, None
     robot.out = root
     robot.wake_word = False
     robot.panel, robot.ui_turn = None, None
@@ -105,6 +123,7 @@ def hold(robot: Robot, box: tuple) -> None:
 
 def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
     turn = Turn(question=text, speech_start=time.time() + 1)
+    turn.visitor = robot.conversation_visitor
     teaching, robot.teaching = robot.teaching, None  # as Robot._code_answer hands it over
     return robot._things(turn, teaching), turn
 
@@ -121,7 +140,7 @@ def test_things(monkeypatch) -> None:
         hold(robot, CENTER)
         said, turn = ask(robot, "This is my phone.")
         assert said == "Got it, that is your phone. Turn it slowly so I can see all sides."
-        assert turn.named == "phone"
+        assert turn.named == object_id(robot.things, robot.conversation_visitor, 'phone')
         assert store(robot, turn) == 1
         naming = turn.frame_id
         assert ask(robot, "Is this my phone?")[0] == "Yes, this is your phone."
@@ -129,7 +148,7 @@ def test_things(monkeypatch) -> None:
         robot.memory.set(naming, caption="Main object: a gold keypad phone. Around it: a desk.")
         said, turn = ask(robot, "Have you seen my phone?")
         assert said.startswith("I last saw your phone ") and naming in turn.memories
-        named = robot.things.named("phone", ["phone"])
+        named = robot.things.named(robot.conversation_visitor, 'phone', ['phone'])
         lines = robot.named_evidence(Turn(speech_start=time.time() + 1), named)[0]
         assert lines[0].startswith("The visitor's phone: a gold keypad phone, named ")
         assert lines[1].startswith("Matched sighting: phone, last seen "), lines
@@ -181,7 +200,11 @@ def test_things(monkeypatch) -> None:
             "eligible objects have neutral outlines before teaching focus settles"
         hold(robot, CENTER)
         assert ask(robot, "This is my cup.")[0].startswith("Got it"), "the focus, any label"
-        assert robot.things.named("cup", ["cup"])["labels"] == ["bag", "cup", "mug"]
+        assert robot.things.named(robot.conversation_visitor, "cup", ["cup"])["labels"] == [
+            "bag",
+            "cup",
+            "mug",
+        ]
         # Robot.reset also clears the old associations.
         robot.tracker, robot.points, robot.focus = Tracker(), {}, None
         frame[300:600, 540:740] = GOLD
@@ -189,8 +212,9 @@ def test_things(monkeypatch) -> None:
             if found := robot._track(frame, [Detection("bag", 0.9, CENTER)]):
                 robot._sight(found)
         preview(robot)
-        assert robot.memory.sightings(time.time() + 1, 1)[0]["named"] == "phone", \
-            "matched across detector labels"
+        assert robot.memory.sightings(time.time() + 1, 1)[0]["named"] == object_id(
+            robot.things, robot.conversation_visitor, "phone"
+        ), "matched across detector labels"
         robot.tracker, robot.points = Tracker(), {}
         frame[:] = 0
         frame[300:600, 540:740] = BLACK
@@ -200,8 +224,11 @@ def test_things(monkeypatch) -> None:
         assert ask(robot, "This is my phone.")[0].startswith("Got it")
         assert ask(robot, "Forget my phone.")[0].startswith("Done")
         robot._sight(found)  # the track's sighting, queued behind those two turns
-        assert not [x for x in robot.memory.sightings(time.time() + 1, 99)
-                    if x.get("named") == "phone"], "a queued sighting brings no tag back"
+        assert not [
+            x
+            for x in robot.memory.sightings(time.time() + 1, 99)
+            if x.get("named") == object_id(robot.things, robot.conversation_visitor, "phone")
+        ], "a queued sighting brings no tag back"
         close_robot(robot)
 
 
@@ -291,7 +318,7 @@ def test_text_only_retrieval_and_person_deletion(robot, monkeypatch):
     assert rows[0]["id"] == turn.frame_id and rows[0]["said"] == turn.question
     assert not {"frame", "thumb", "caption"} & rows[0].keys()
     assert not list(r.memory.frames.iterdir()) and r.jobs.empty()
-    assert r._forget(None, "Ana", face)
+    assert r._forget(None, "Ana", face, r.people.person("Ana")["visitor"])
     assert not r.memory.points([turn.frame_id]) and not r.memory.told(v, time.time() + 1)
 
 
@@ -317,8 +344,11 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     assert saved.shape == (300, 200, 3) and abs(saved.mean() - GOLD) < 1
     assert point["ts"] == pytest.approx(r.view_taken, rel=0, abs=1e-6)
     assert point["box"] == list(CENTER)
-    assert point["named"] == "wallet" and r._shown()[0] is frame
-    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert (
+        point["named"] == object_id(r.things, r.conversation_visitor, "wallet")
+        and r._shown()[0] is frame
+    )
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known")
     assert r.focus.named[next(iter(r.view[1]))].refreshed == r.view_taken
     assert r.jobs.queue[0][0] == "caption"
     assert ask(r, "Forget my wallet")[0].startswith("Done")
@@ -334,7 +364,13 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
 
 def test_fresh_recognition_sightings_and_miss(robot):
     r = robot
-    r.things.name("wallet", ["phone"], stub_crops([np.full((10, 10, 3), GOLD)]))
+    r.things.name(
+        r.conversation_visitor,
+        "wallet",
+        ["phone"],
+        stub_crops([np.full((10, 10, 3), GOLD)]),
+        thumbnail_crops(stub_crops([np.full((10, 10, 3), GOLD)])),
+    )
     r.named = r.things.labels()
     frame_of(r)
     calls = []
@@ -344,7 +380,7 @@ def test_fresh_recognition_sightings_and_miss(robot):
                {i: r.focus.epoch(i) for i in r.focus.visible}, r.session_id,
                r.focus.geometry([Track(*t) for t in r.tracker.scored()]), r.recognition.epoch)
     drain_matches(r)
-    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known")
     [seen] = r.memory.sightings(time.time() + 1)
     newest = frame_of(r)
     r._preview(r.view[0], r.view_taken, [Track(*t) for t in r.tracker.scored()],
@@ -353,16 +389,18 @@ def test_fresh_recognition_sightings_and_miss(robot):
     drain_matches(r)
     assert r._shown()[0] is newest
     assert len(calls) == 3, "idle crop queries are bounded to three per second"
-    assert r._shown()[1].boxes[0][4:] == ("wallet", "known"), "skipped query preserves display only"
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known"), (
+        "skipped query preserves display only"
+    )
     assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"], \
         "cached display does not authorize a new sighting"
-    assert seen["named"] == "wallet"
+    assert seen["named"] == object_id(r.things, r.conversation_visitor, 'wallet')
     frame_of(r, BLACK)
     preview(r)
-    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known")
     assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"]
     preview(r)
-    assert r._shown()[1].boxes[0][4:] == ("wallet", "known")
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known")
     preview(r)
     assert all(b[5] != "known" for b in r._shown()[1].boxes)
     assert r.memory.sightings(time.time() + 1)[0]["last_seen"] == seen["last_seen"]
@@ -374,8 +412,14 @@ def test_legacy_named_recall_filters_before_limit(robot):
     image = np.full((30, 30, 3), GOLD, np.uint8)
     legacy = r.memory.add(image, "This is my wallet", ts=10)
     r.memory.set(legacy, caption="Main object: a gold wallet.")
-    r.things.name("wallet", ["phone"], stub_crops([image]))
-    r.things.link("wallet", legacy)
+    r.things.name(
+        r.conversation_visitor,
+        "wallet",
+        ["phone"],
+        stub_crops([image]),
+        thumbnail_crops(stub_crops([image])),
+    )
+    r.things.link(object_id(r.things, r.conversation_visitor, 'wallet'), legacy)
     for ts in range(11, 16):
         pid = r.memory.add(image, "ambient", ts=ts)
         r.memory.set(pid, caption="Main object: a chair.")
@@ -442,7 +486,7 @@ def test_verified_face_frame_and_anonymous_replacement(robot, monkeypatch):
     assert r.verified[1] is newer and r._shown()[0] is newer
     assert r.verified[3][1][4:] == ("", "other"), "unidentified face stays anonymous"
     assert not any(b[5] == "person" for b in r._shown()[1].boxes)
-    assert r._forget(None, "Ana", v) and r.verified is None
+    assert r._forget(None, "Ana", v, r.people.person("Ana")["visitor"]) and r.verified is None
 
 
 def delivery_job(r, frame, taken):
@@ -659,7 +703,13 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
     r.people.enroll("Ana", [v, v], time.time())
     show(r, [(GOLD, LEFT), (BLACK, CENTER), (90, RIGHT)])
     hold(r, LEFT)
-    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.things.name(
+        r.conversation_visitor,
+        "Chosen",
+        ["phone"],
+        stub_crops([np.full((4, 4, 3), GOLD)]),
+        thumbnail_crops(stub_crops([np.full((4, 4, 3), GOLD)])),
+    )
     r.named = r.things.labels()
     taken = r.view_taken + 1.2
     monkeypatch.setattr(main.time, "time", lambda: taken)
@@ -674,7 +724,10 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
         preview(r)
     chosen = next(i for i, (_, b) in r.view[1].items() if b == LEFT)
     teaching = next(i for i, (_, b) in r.view[1].items() if b == CENTER)
-    assert r.focus.names() == {chosen: ("Chosen", True)} and r.focus.focus == teaching
+    assert (
+        r.focus.names() == {chosen: (object_id(r.things, r.conversation_visitor, "Chosen"), True)}
+        and r.focus.focus == teaching
+    )
     verified = r.verified
     assert verified is not None
     for source in [None, verified] * 4:
@@ -682,7 +735,7 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
         _, screen = r._shown()
         assert r.focus.focus == teaching, "presentation does not change the selected focus"
         assert [b[:4] for b in screen.boxes if b[5] == "focus"] == [CENTER]
-        assert any(b[4] == "Chosen" for b in screen.boxes)
+        assert any(b[4] == "Guest 1's Chosen" for b in screen.boxes)
         assert next(t for t in screen.control["targets"] if t["track"] == teaching)["title"] \
             == "Unknown phone"
         assert not any(b[5] == "person" for b in screen.boxes)
@@ -696,8 +749,8 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
     # A short gap preserves the chosen association, but invalidates its older source geometry.
     r._track(frame.copy(), dets[1:], taken + .08)
     r._track(frame.copy(), dets, taken + .10)
-    assert r.focus.name(chosen) == "Chosen"
-    assert not any(b[4] == "Chosen" for b in r._shown(False)[1].boxes)
+    assert r.focus.name(chosen) == object_id(r.things, r.conversation_visitor, 'Chosen')
+    assert not any(b[4] == "Guest 1's Chosen" for b in r._shown(False)[1].boxes)
 
 
 def test_spoken_names_categories_case_and_restart(tmp_path):
@@ -757,24 +810,28 @@ def test_spoken_names_categories_case_and_restart(tmp_path):
     assert question("What's my cat's name?", vocab) is None
     things = Things(tmp_path)
     vectors = stub_crops([np.full((10, 10, 3), GOLD)])
-    things.name("Dylan's smartphone", ["phone"], vectors)
-    things.link("DYLAN'S SMARTPHONE", 17)
-    things.name("red coffee mug", ["cup", "mug"], vectors)
-    things.name("Ana's smartphone", ["phone"], vectors)
+    things.name(OWNER, "Dylan's smartphone", ['phone'], vectors, thumbnail_crops(vectors))
+    things.link(object_id(things, OWNER, "DYLAN'S SMARTPHONE"), 17)
+    things.name(OWNER, 'red coffee mug', ['cup', 'mug'], vectors, thumbnail_crops(vectors))
+    things.name(OWNER, "Ana's smartphone", ['phone'], vectors, thumbnail_crops(vectors))
     asked = question("Where is Dylan's smartphone?", vocab)
-    assert things.named(asked[1], asked[2])["name"] == "Dylan's smartphone"
-    assert things.named("phone", ["phone"])["name"] == "Dylan's smartphone"
-    assert things.named("RED COFFEE MUG", [])["name"] == "red coffee mug"
-    assert things.score(vectors[0], "DYLAN'S SMARTPHONE")[0] == "Dylan's smartphone"
+    assert things.named(OWNER, asked[1], asked[2])["name"] == "Dylan's smartphone"
+    assert things.named(OWNER, "phone", ["phone"])["name"] in {
+        "Dylan's smartphone", "Ana's smartphone"}
+    assert things.named(OWNER, 'RED COFFEE MUG', [])["name"] == "red coffee mug"
+    assert (
+        things.score(vectors[0], object_id(things, OWNER, "DYLAN'S SMARTPHONE"))[0]
+        == object_id(things, OWNER, "Dylan's smartphone")
+    )
     things.shard.close()
     things = Things(tmp_path)
-    assert things.named("dylan's smartphone", [])["turns"] == [17]
-    things.name("Dylan's Smartphone", ["phone"], vectors)
-    assert things.named("DYLAN'S SMARTPHONE", [])["name"] == "Dylan's smartphone"
-    assert things.forget("dylan's smartphone") == [17]
-    assert things.named("dylan's smartphone", []) is None
-    assert things.named("phone", ["phone"])["name"] == "Ana's smartphone"
-    assert things.named("red coffee mug", [])["name"] == "red coffee mug"
+    assert things.named(OWNER, "dylan's smartphone", [])["turns"] == [17]
+    things.name(OWNER, "Dylan's Smartphone", ['phone'], vectors, thumbnail_crops(vectors))
+    assert things.named(OWNER, "DYLAN'S SMARTPHONE", [])["name"] == "Dylan's smartphone"
+    assert things.forget(object_id(things, OWNER, "dylan's smartphone")) == [17]
+    assert things.named(OWNER, "dylan's smartphone", []) is None
+    assert things.named(OWNER, 'phone', ['phone'])["name"] == "Ana's smartphone"
+    assert things.named(OWNER, 'red coffee mug', [])["name"] == "red coffee mug"
     things.shard.close()
 
 
@@ -782,11 +839,20 @@ def test_case_only_reteach_and_forget_all_evidence(robot):
     r = robot
     frame_of(r)
     r.focus.focus = next(iter(r.view[1]))
-    assert ask(r, "This is Dylan's smartphone")[0].startswith("Got it")
+    assert ask(r, "This is my Dylan's smartphone")[0].startswith("Got it")
     answer, turn = ask(r, "Track this as my DYLAN'S SMARTPHONE")
-    assert "Dylan's smartphone" in answer and turn.named == "Dylan's smartphone"
-    assert r.focus.names() == {next(iter(r.view[1])): ("Dylan's smartphone", True)}
-    assert r.memory.points(turn.memories)[0]["named"] == "Dylan's smartphone"
+    assert "Dylan's smartphone" in answer and turn.named == object_id(
+        r.things, r.conversation_visitor, "Dylan's smartphone"
+    )
+    assert r.focus.names() == {
+        next(iter(r.view[1])): (
+            object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
+            True,
+        )
+    }
+    assert r.memory.points(turn.memories)[0]["named"] == object_id(
+        r.things, r.conversation_visitor, "Dylan's smartphone"
+    )
     assert ask(r, "Forget my DYLAN'S SMARTPHONE")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0
     assert not r.focus.names() and not list(r.memory.frames.iterdir())
@@ -798,42 +864,51 @@ def test_distinct_reteaching_exact_name_replacement_links_and_ignore(tmp_path):
     current = np.asarray([.9 * basis[0] + np.sqrt(1 - .9**2) * basis[3], basis[4], basis[5]],
                          dtype=np.float32)
     things = Things(tmp_path)
-    things.name("Chosen", ["phone"], original)
-    things.link("chosen", 17)
-    things.name("CHOSEN", ["wallet"], current)
-    things.link("chosen", 19)
-    saved = things.descriptors("Chosen")
+    things.name(OWNER, 'Chosen', ['phone'], original, thumbnail_crops(original))
+    things.link(object_id(things, OWNER, 'chosen'), 17)
+    things.name(OWNER, 'CHOSEN', ['wallet'], current, thumbnail_crops(current))
+    things.link(object_id(things, OWNER, 'chosen'), 19)
+    saved = things.descriptors(object_id(things, OWNER, 'Chosen'))
     assert len(saved) == 6
     np.testing.assert_array_equal(saved, np.concatenate([original, current]))
-    assert things.named("chosen", []) == {
-        "name": "Chosen", "labels": ["phone", "wallet"], "turns": [17, 19]}
+    payload = things.named(OWNER, "chosen", [])
+    assert payload["name"] == "Chosen" and payload["labels"] == ["phone", "wallet"]
+    assert payload["turns"] == [17, 19] and len(payload["views"]) == 6
     np.testing.assert_array_equal(add_vectors(basis[:1], basis[:8]), basis[:8])
     next_views = basis[[0, 6, 7]]
     expected = add_vectors(saved, next_views)
-    things.name("chosen", ["phone"], next_views)
-    np.testing.assert_array_equal(things.descriptors("Chosen"), expected)
+    things.name(OWNER, 'chosen', ['phone'], next_views, thumbnail_crops(next_views))
+    np.testing.assert_array_equal(things.descriptors(object_id(things, OWNER, 'Chosen')), expected)
     assert len(expected) == 8
-    things.name("Separate", ["phone"], basis[[12, 12, 12]])
-    assert len(things.descriptors("Separate")) == 1
-    np.testing.assert_array_equal(things.descriptors("Chosen"), expected)
+    things.name(
+        OWNER, "Separate", ["phone"], basis[[12, 12, 12]], thumbnail_crops(basis[[12, 12, 12]])
+    )
+    assert len(things.descriptors(object_id(things, OWNER, 'Separate'))) == 1
+    np.testing.assert_array_equal(things.descriptors(object_id(things, OWNER, 'Chosen')), expected)
     things.shard.close()
     things = Things(tmp_path)
-    np.testing.assert_array_equal(things.descriptors("chosen"), expected)
+    np.testing.assert_array_equal(things.descriptors(object_id(things, OWNER, 'chosen')), expected)
     ident = things.ignore_item("Chosen", expected)
     assert all(things.excluded(vector) == ident for vector in expected)
-    assert things.excluded(basis[30]) is None and things.score(basis[12])[0] == "Separate"
+    assert things.excluded(basis[30]) is None and things.score(basis[12])[0] == object_id(
+        things, OWNER, "Separate"
+    )
     things.shard.close()
     things = Things(tmp_path)
     assert all(things.excluded(vector) == ident for vector in expected)
     assert things.restore_item(ident) and all(things.excluded(v) is None for v in expected)
-    # A mismatching current crop rejects both the old gallery and buffered old-looking crops.
+    # Same-owner reteaching appends even when the new crop does not match.
     replacement = basis[[30, 0, 31]]
-    things.name("CHOSEN", ["bag"], replacement)
-    np.testing.assert_array_equal(things.descriptors("Chosen"), replacement[:1])
-    assert things.score(basis[0], "Chosen")[1] < settings.match
-    assert things.named("chosen", [])["labels"] == ["bag", "phone", "wallet"]
-    assert things.forget("chosen") == [17, 19] and things.named("chosen", []) is None
-    assert things.named("Separate", []) and not things.preferences()
+    things.name(OWNER, 'CHOSEN', ['bag'], replacement, thumbnail_crops(replacement))
+    np.testing.assert_array_equal(things.descriptors(object_id(things, OWNER, 'Chosen')),
+                                  add_vectors(expected, replacement))
+    assert things.score(basis[0], object_id(things, OWNER, 'Chosen'))[1] >= settings.match
+    assert things.named(OWNER, 'chosen', [])["labels"] == ["bag", "phone", "wallet"]
+    assert (
+        things.forget(object_id(things, OWNER, "chosen")) == [17, 19]
+        and things.named(OWNER, "chosen", []) is None
+    )
+    assert things.named(OWNER, 'Separate', []) and not things.preferences()
     things.shard.close()
 
 
@@ -851,12 +926,13 @@ def test_track_this_asks_for_the_name_in_the_next_line(robot):
         said, turn = ask(r, line)
         assert said == "Got it, that is your phone. Turn it slowly so I can see all sides."
         assert r.teaching is None
-        assert turn.named == "phone", line
+        assert turn.named == object_id(r.things, r.conversation_visitor, 'phone'), line
 
     assert ask(r, "Track this")[0] == asking
     assert ask(r, "Where is my phone?")[0] == "Yes, your phone is here now."
-    assert ask(r, "as my wallet")[0] is None and not r.things.named("wallet", []), \
-        "a question instead drops the capture"
+    assert ask(r, "as my wallet")[0] is None and not r.things.named(
+        r.conversation_visitor, "wallet", []
+    ), "a question instead drops the capture"
     assert ask(r, "Track this")[0] == asking
     assert ask(r, "This is my wallet.")[0].startswith("Got it, that is your wallet"), \
         "a different command runs as itself"
@@ -871,6 +947,8 @@ def test_track_this_asks_for_the_name_in_the_next_line(robot):
     r.teaching = None  # a visitor change or "forget me" clears it
     assert ask(r, "my cup")[0] is None
 
+    frame_of(r)  # a fresh source: on a slow machine the first frame is older than PREVIEW_TTL
+    hold(r, CENTER)
     assert ask(r, "Track this.")[0] == asking  # a pause splits the line
     assert ask(r, "as my phone.")[0].startswith("Got it")
 
@@ -946,7 +1024,9 @@ def test_other_commands_drop_the_pending_name(robot):
     for line in ("Forget everything.", "Remember me.", "Do you remember me?"):
         assert ask(r, "Track this")[0] == "What should I call it?"
         ask(r, line)
-        assert r.teaching is None and not r.things.named("everything", []), line
+        assert r.teaching is None and not r.things.named(
+            r.conversation_visitor, "everything", []
+        ), line
         assert name_slot(line, r.vocab) is None, line
 
 
@@ -976,7 +1056,8 @@ def test_naming_uses_the_focus_from_speech_start(robot, monkeypatch):
     r._heard_start()
     assert r.start_target == track, "the focus as the line begins"
     monkeypatch.setattr(r.focus, "target", lambda tracks: None)  # lost just before the line
-    turn = Turn(question="This is my phone.", speech_start=time.time() + 1, target=track)
+    turn = Turn(question="This is my phone.", speech_start=time.time() + 1,
+                target=track, visitor=r.conversation_visitor)
     assert r._things(turn).startswith("Got it, that is your phone")
     r.focus.focus = None
     r.focus.visible = set()  # gone now: no fresh view to bind
@@ -989,13 +1070,16 @@ def test_exact_name_reteach_without_held_or_unknown_focus(robot, blocked):
     r = robot
     frame_of(r)
     hold(r, CENTER)
-    assert ask(r, "This is Dylan's smartphone")[0].startswith("Got it")
+    assert ask(r, "This is my Dylan's smartphone")[0].startswith("Got it")
     frame_of(r)
     r.focus.focus = None
     track = next(iter(r.view[1]))
     if blocked == "duplicate":
         show(r, [(GOLD, CENTER), (GOLD, LEFT)])
-        r.focus.bind(next(t for t in r.focus.visible if t != track), "Dylan's smartphone")
+        r.focus.bind(
+            next(t for t in r.focus.visible if t != track),
+            object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
+        )
         r.focus.focus = None
     elif blocked == "pending":
         r.focus.checking.add(track)
@@ -1003,7 +1087,14 @@ def test_exact_name_reteach_without_held_or_unknown_focus(robot, blocked):
         r.focus.named[track].refreshed -= main.PREVIEW_TTL + 1
     elif blocked == "weak":
         tracks = [Track(*t) for t in r.tracker.scored()]
-        r.focus.update(r.view_taken, tracks, [], recognized={track: ("Dylan's smartphone", .797)})
+        r.focus.update(
+            r.view_taken,
+            tracks,
+            [],
+            recognized={
+                track: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), 0.797)
+            },
+        )
         assert r.focus.names()[track][1], "display continuity is still green"
     elif blocked == "small":
         frame_of(r, box=(540, 300, 620, 600))
@@ -1016,8 +1107,10 @@ def test_exact_name_reteach_without_held_or_unknown_focus(robot, blocked):
         assert answer.startswith("I am ignoring" if blocked == "ignored" else "I don't see")
         assert not turn.named
     else:
-        assert answer.startswith("Got it") and turn.named == "Dylan's smartphone"
-        assert len(r.things.named(name, [])["turns"]) == 2
+        assert answer.startswith("Got it") and turn.named == object_id(
+            r.things, r.conversation_visitor, "Dylan's smartphone"
+        )
+        assert len(r.things.named(r.conversation_visitor, name, [])["turns"]) == 2
 
 
 def test_same_track_guess_replacement_never_writes_or_claims_after_bound(robot):
@@ -1033,7 +1126,7 @@ def test_same_track_guess_replacement_never_writes_or_claims_after_bound(robot):
     for i in range(100):
         frame_of(r, BLACK)
         preview(r)
-        assert r.focus.name(track) == "phone"
+        assert r.focus.name(track) == object_id(r.things, r.conversation_visitor, 'phone')
         if i >= 2:
             assert all(b[5] != "known" for b in r._shown()[1].boxes)
     assert r.memory.shard.count(CountRequest()) == before
@@ -1050,7 +1143,13 @@ def test_weak_preference_rechecks_global_once_with_same_crop(robot, monkeypatch,
     basis = np.eye(DIM, dtype=np.float32)
     vector = .797 * basis[GOLD] + np.sqrt(1 - .797**2) * basis[BLACK]
     other = vector if competitor != "weak" else basis[BLACK]
-    r.things.name("B", ["wallet" if competitor == "ignored-kind" else "phone"], other[None])
+    r.things.name(
+        r.conversation_visitor,
+        "B",
+        ["wallet" if competitor == "ignored-kind" else "phone"],
+        other[None],
+        thumbnail_crops(other[None]),
+    )
     if competitor == "hidden":
         r.things.ignore_item("B", other[None])
     elif competitor == "ignored-kind":
@@ -1065,27 +1164,43 @@ def test_weak_preference_rechecks_global_once_with_same_crop(robot, monkeypatch,
     assert next(iter(r.view[1])) == track, "the replacement retains the original IoU track"
     before = r.memory.shard.count(CountRequest())
     preview(r)
-    assert calls == ["A", None] and crops == [1]
+    assert calls == [object_id(r.things, r.conversation_visitor, 'A'), None] and crops == [1]
     if competitor == "strong":
         assert not r.focus.names(), "the first conflicting strong result abstains"
         assert not r._shown(False)[1].control["targets"], "no accepted named action during conflict"
     elif competitor == "hidden":
         assert track in r.focus.excluded and not r.focus.names()
     else:
-        assert r.focus.names() == {track: ("A", True)}, "ineligible hits keep weak continuity"
+        assert r.focus.names() == {
+            track: (object_id(r.things, r.conversation_visitor, "A"), True)
+        }, "ineligible hits keep weak continuity"
     preview(r, clear=False)
     if competitor == "strong":
-        assert r.focus.names() == {track: ("B", True)}, "the second agreeing query confirms B"
+        assert r.focus.names() == {
+            track: (object_id(r.things, r.conversation_visitor, "B"), True)
+        }, "the second agreeing query confirms B"
     preview(r, clear=False)
     assert crops == [1, 1, 1] and len(r.crop_times) == 3
-    expected = {"strong": ["A", None, None, "B"], "hidden": ["A", None, None, None]}
-    assert calls == expected.get(competitor, ["A", None] * 3)
+    expected = {
+        "strong": [
+            object_id(r.things, r.conversation_visitor, "A"),
+            None,
+            None,
+            object_id(r.things, r.conversation_visitor, "B"),
+        ],
+        "hidden": [object_id(r.things, r.conversation_visitor, "A"), None, None, None],
+    }
+    assert calls == expected.get(
+        competitor, [object_id(r.things, r.conversation_visitor, "A"), None] * 3
+    )
     previous_calls = list(calls)
     preview(r, clear=False)
     assert calls == previous_calls and crops == [1, 1, 1], "the crop budget bounds fallback queries"
     if competitor == "strong":
-        assert r.focus.names() == {track: ("B", True)}
-        assert r.memory.sightings(time.time() + 1)[0]["named"] == "B"
+        assert r.focus.names() == {track: (object_id(r.things, r.conversation_visitor, 'B'), True)}
+        assert r.memory.sightings(time.time() + 1)[0]["named"] == object_id(
+            r.things, r.conversation_visitor, "B"
+        )
     else:
         assert r.memory.shard.count(CountRequest()) == before, "weak/excluded evidence cannot write"
         assert all(b[5] != "known" for b in r._shown()[1].boxes)
@@ -1100,7 +1215,9 @@ def test_global_reacquisition_rejects_invalidated_source(robot, monkeypatch, inv
     track = next(iter(r.view[1]))
     basis = np.eye(DIM, dtype=np.float32)
     vector = .797 * basis[GOLD] + np.sqrt(1 - .797**2) * basis[BLACK]
-    r.things.name("B", ["phone"], vector[None])
+    r.things.name(
+        r.conversation_visitor, "B", ["phone"], vector[None], thumbnail_crops(vector[None])
+    )
     r.named = r.things.labels()
     frame_of(r, BLACK)
     taken = r.view_taken
@@ -1122,13 +1239,19 @@ def test_global_reacquisition_rejects_invalidated_source(robot, monkeypatch, inv
     monkeypatch.setattr(r.things, "score", changed)
     before = r.memory.shard.count(CountRequest())
     preview(r)
-    assert calls == ["A", None]
-    assert r.focus.name(track) != "B" and not r.matches_pending
+    assert calls == [object_id(r.things, r.conversation_visitor, 'A'), None]
+    assert (
+        r.focus.name(track) != object_id(r.things, r.conversation_visitor, "B")
+        and not r.matches_pending
+    )
     assert r.memory.shard.count(CountRequest()) == before
-    assert all(row.get("named") != "B" for row in r.memory.sightings(time.time() + 1))
+    assert all(
+        row.get("named") != object_id(r.things, r.conversation_visitor, "B")
+        for row in r.memory.sightings(time.time() + 1)
+    )
 
 
-def test_robot_reteach_replacement_discards_buffered_previous_physical_object(robot, monkeypatch):
+def test_robot_reteach_appends_buffered_and_new_object_views(robot, monkeypatch):
     r = robot
     frame_of(r)
     hold(r, CENTER)
@@ -1148,10 +1271,18 @@ def test_robot_reteach_replacement_discards_buffered_previous_physical_object(ro
     hold(r, CENTER)
     assert ask(r, "This is my phone")[0].startswith("Got it")
     assert embedded == [[BLACK, GOLD]], "the real teaching route passes the current and old crops"
-    np.testing.assert_array_equal(r.things.descriptors("phone"), stub_crops([
-        np.full((4, 4, 3), BLACK)]))
-    assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0], "phone")[1] < settings.match
-    assert len(r.things.named("phone", [])["turns"]) == 2
+    np.testing.assert_array_equal(
+        r.things.descriptors(object_id(r.things, r.conversation_visitor, "phone")),
+        stub_crops([np.full((4, 4, 3), GOLD), np.full((4, 4, 3), BLACK)]),
+    )
+    assert (
+        r.things.score(
+            stub_crops([np.full((4, 4, 3), GOLD)])[0],
+            object_id(r.things, r.conversation_visitor, "phone"),
+        )[1]
+        >= settings.match
+    )
+    assert len(r.things.named(r.conversation_visitor, 'phone', [])["turns"]) == 2
     assert ask(r, "Forget my phone")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0 and not list(r.memory.frames.iterdir())
 
@@ -1163,10 +1294,17 @@ def test_robot_ignore_copies_all_verified_gallery_views_and_forget_deletes_links
     assert ask(r, "This is my phone")[0].startswith("Got it")
     basis = np.eye(DIM, dtype=np.float32)
     for indices in ([GOLD, 11, 12], [GOLD, 13, 14], [GOLD, 15, 16]):
-        r.recognition.call(lambda f, c, indices=indices: r.things.name("phone", ["phone"],
-                                                                    basis[indices]),
-                           mutate=True)
-    saved = r.things.descriptors("phone")
+        r.recognition.call(
+            lambda f, c, indices=indices: r.things.name(
+                r.conversation_visitor,
+                "phone",
+                ["phone"],
+                basis[indices],
+                thumbnail_crops(basis[indices]),
+            ),
+            mutate=True,
+        )
+    saved = r.things.descriptors(object_id(r.things, r.conversation_visitor, 'phone'))
     assert len(saved) == 7
     preview(r)
     state = r._shown(False)[1].control
@@ -1203,7 +1341,10 @@ def test_naming_crop_work_rejects_changed_authority(robot, monkeypatch, change):
     r.recognition.call = call
     answer, turn = ask(r, "This is my phone")
     assert answer.startswith("Sorry, I lost sight") and not turn.named
-    assert r.things.named("phone", []) is None and r.memory.shard.count(CountRequest()) == 0
+    assert (
+        r.things.named(r.conversation_visitor, "phone", []) is None
+        and r.memory.shard.count(CountRequest()) == 0
+    )
     assert not list(r.memory.frames.iterdir())
 
 
@@ -1216,41 +1357,63 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
     ask(r, "This is my phone")
     ask(r, "Track this as my Dylan's smartphone")
     crop = r.recognition.crops([main.cut(r.view[0], r.view[1][track][1])])[0]
-    assert r.things.score(crop)[0] == "phone", "the old identical alias wins unrestricted search"
+    assert r.things.score(crop)[0] == object_id(r.things, r.conversation_visitor, "phone"), (
+        "the old identical alias wins unrestricted search"
+    )
     calls = []
     score = r.things.score
     monkeypatch.setattr(r.things, "score",
                         lambda v, name=None: calls.append(name) or score(v, name))
     preview(r)
-    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+    assert r.focus.names() == {
+        track: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
     original = time.time()
     monkeypatch.setattr(main.time, "time", lambda: original + 3)
     newest = frame_of(r)
     assert r._shown()[0] is newest and r.focus.names(), "continuous names survive skipped work"
-    assert r.focus.name(track) == "Dylan's smartphone", "continuous track keeps a query preference"
+    assert r.focus.name(track) == object_id(
+        r.things, r.conversation_visitor, "Dylan's smartphone"
+    ), "continuous track keeps a query preference"
     preview(r)
-    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
-    assert calls == ["Dylan's smartphone"] * 2
+    assert r.focus.names() == {
+        track: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
+    assert calls == [object_id(r.things, r.conversation_visitor, "Dylan's smartphone")] * 2
     # A different instance on an uninterrupted ID must escape the preference after real misses.
     frame_of(r, BLACK)
     preview(r)
-    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+    assert r.focus.names() == {
+        track: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
     preview(r)
     preview(r)
     assert r.focus.name(track) is None
     preview(r)
-    assert calls[-7:] == ["Dylan's smartphone", None] * 3 + [None]
+    assert calls[-7:] == [
+        object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
+        None,
+    ] * 3 + [None]
     # A gap clears the accepted preference even when the tracker later reuses the ID.
-    r.focus.bind(track, "Dylan's smartphone", r.view_taken)
+    r.focus.bind(
+        track, object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), r.view_taken
+    )
     r._track(r.view[0], [], r.view_taken + .21)
     assert r.focus.name(track) is None
     frame_of(r)
     preview(r)
     assert calls[-1] is None
-    r.focus.bind(next(iter(r.view[1])), "Dylan's smartphone", r.view_taken)
+    r.focus.bind(
+        next(iter(r.view[1])),
+        object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
+        r.view_taken,
+    )
     ask(r, "Forget my Dylan's smartphone")
     assert not r.focus.names()
-    assert all(n.name != "Dylan's smartphone" for n in r.focus.named.values())
+    assert all(
+        n.name != object_id(r.things, r.conversation_visitor, "Dylan's smartphone")
+        for n in r.focus.named.values()
+    )
 
 
 def test_face_gap_during_generation_rejects_old_preview(robot, monkeypatch):
@@ -1302,7 +1465,10 @@ def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, m
         before = len(list(r.memory.frames.iterdir()))
         assert r._item_control("ignore", {**data, **selected}).startswith("Okay")
         assert len(list(r.memory.frames.iterdir())) == before, "preference stores descriptors only"
-        assert r.things.hidden_names() == {"phone", "Dylan's smartphone"}
+        assert r.things.hidden_ids() == {
+            object_id(r.things, r.conversation_visitor, "phone"),
+            object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
+        }
         assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0]) is None
         assert r.things.visual_links() == {} and not r._shown()[1].boxes
         # Same detector kind, a genuinely different descriptor remains eligible.
@@ -1314,22 +1480,16 @@ def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, m
         assert gold in r.focus.excluded and black not in r.focus.excluded
         assert r.things.excluded(stub_crops([np.full((4, 4, 3), BLACK)])[0]) is None
         assert ask(r, "Forget my Dylan's smartphone")[0].startswith("Done")
-        assert r.things.preferences(), "named deletion preserves independent item preference"
+        assert not r.things.preferences(), "deletion removes copied descriptors and title"
     finally:
         close_robot(r)
     fresh = open_robot(tmp_path)
     try:
         frame_of(fresh)
-        assert not fresh._shown()[1].boxes, "return waits for persisted preference qualification"
-        assert fresh.focus.checking and not fresh.focus.excluded
-        assert fresh._sighted(Turn(question="Where is the phone?",
-                                  speech_start=time.time() + 1)) is None
+        assert not fresh.things.preferences()
         preview(fresh)
-        assert fresh.focus.excluded and not fresh._shown()[1].boxes
-        ident = fresh.things.preferences()[0]["id"]
-        assert fresh._item_control("restore", {"session": fresh.session_id,
-            "gallery": fresh.recognition.epoch, "id": ident}).startswith("I will notice")
-        assert fresh.things.preferences() == [] and not fresh.focus.excluded
+        assert not fresh.focus.excluded
+        assert fresh.things.named(fresh.conversation_visitor, "phone", [])
     finally:
         close_robot(fresh)
 
@@ -1484,7 +1644,9 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     ask(r, "Track this as my Dylan's smartphone")
     r.things.ignore_item("Other phone", stub_crops([np.full((4, 4, 3), BLACK)]))
     preview(r)
-    assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0])[0] == "phone"
+    assert r.things.score(stub_crops([np.full((4, 4, 3), GOLD)])[0])[0] == object_id(
+        r.things, r.conversation_visitor, "phone"
+    )
     old_epoch, source = r.focus.epoch(track), r.view_taken
     r.crop_times.extend([time.monotonic()] * (3 - len(r.crop_times)))
     before = r.memory.sightings(time.time() + 1)
@@ -1497,14 +1659,16 @@ def test_unrelated_ignore_short_dropout_preserves_chosen_name_with_full_budget(r
     preview(r, clear=False)
     monkeypatch.setattr(main.time, "time", lambda: source + .15)
     frame_of(r, box=moved)
-    assert r.focus.name(track) == "Dylan's smartphone"
+    assert r.focus.name(track) == object_id(r.things, r.conversation_visitor, "Dylan's smartphone")
     assert r.focus.seen[track].shown == moved, "a real gap starts new drawing history"
     assert not r._shown()[1].boxes, "returning Ignore checks cannot borrow old admission"
     assert not r._shown(False)[1].control["targets"], "cached display cannot authorize actions"
     assert r.memory.sightings(source + 1) == before, "no query means no new sighting writes"
     preview(r)
     assert track not in r.focus.checking
-    assert r.focus.names() == {track: ("Dylan's smartphone", True)}
+    assert r.focus.names() == {
+        track: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
 
 
 def test_named_confidence_dip_reverifies_and_admitted_unknown_stays_grey(robot, monkeypatch):
@@ -1523,19 +1687,28 @@ def test_named_confidence_dip_reverifies_and_admitted_unknown_stays_grey(robot, 
     frame[300:600, 560:760], frame[300:600, 100:300] = GOLD, BLACK
     dets = [Detection("phone", .21, moved), Detection("phone", .21, LEFT)]
     r._track(frame, dets)
-    assert r.focus.name(chosen) == "Dylan's smartphone"
+    assert r.focus.name(chosen) == object_id(r.things, r.conversation_visitor, "Dylan's smartphone")
     assert r.focus.seen[chosen].shown != moved, "the confidence dip preserves smoothing"
-    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
+    assert r.focus.names() == {
+        chosen: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
     assert not r.focus.eligible(Track(*next(t for t in r.tracker.scored() if t[0] == other)))
-    assert [b[4:] for b in r._shown()[1].boxes] == [("Dylan's smartphone", "known"), ("", "other")]
+    assert [b[4:] for b in r._shown()[1].boxes] == [
+        ("Guest 1's Dylan's smartphone", "known"),
+        ("", "other"),
+    ]
     r.crop_due.clear()
     preview(r)
-    assert calls == ["Dylan's smartphone"], "a low-confidence chosen track still gets a crop query"
-    assert r.focus.names() == {chosen: ("Dylan's smartphone", True)}
+    assert calls == [object_id(r.things, r.conversation_visitor, "Dylan's smartphone")], (
+        "a low-confidence chosen track still gets a crop query"
+    )
+    assert r.focus.names() == {
+        chosen: (object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), True)
+    }
     frame[300:600, 560:760] = BLACK
     r._track(frame, dets)
     preview(r)
-    assert calls[-2:] == ["Dylan's smartphone", None]
+    assert calls[-2:] == [object_id(r.things, r.conversation_visitor, "Dylan's smartphone"), None]
     assert not r.focus.names(), "two weak current signals hide the retained association"
     assert all(b[4:] == ("", "other") for b in r._shown()[1].boxes)
     assert [t["track"] for t in r._shown(False)[1].control["targets"]] == [chosen], \
@@ -1562,7 +1735,7 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
     monkeypatch.setattr(main.time, "time", lambda: source + .05)
     frame_of(r, label="book", box=(540, 300, 659, 600))
     assert next(iter(r.view[1])) == track
-    assert r.focus.name(track) == "chosen item"
+    assert r.focus.name(track) == object_id(r.things, r.conversation_visitor, 'chosen item')
     assert r._shown()[1].boxes[0][4:] == ("", "other")
     assert not r._shown(False)[1].control["targets"]
     tracks = [Track(*t) for t in r.tracker.scored()]
@@ -1576,9 +1749,11 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
     assert r.memory.shard.count(CountRequest()) == points
     monkeypatch.setattr(main.time, "time", lambda: source + .1)
     frame_of(r, label="book")
-    assert r.focus.names() == {track: ("chosen item", True)}
+    assert r.focus.names() == {
+        track: (object_id(r.things, r.conversation_visitor, "chosen item"), True)
+    }
     preview(r, clear=False)  # Complete regrown face/source geometry without a spare crop query.
-    assert r._shown()[1].boxes[0][4:] == ("chosen item", "known")
+    assert r._shown()[1].boxes[0][4:] == ("Guest 1's chosen item", "known")
     assert not calls, "regrowth restores display without a fresh query or write"
     assert r.memory.sightings(source + 1) == before
 
@@ -1586,7 +1761,13 @@ def test_named_size_dip_hides_actions_queries_and_writes_then_regrows(robot, mon
 def test_detector_frames_admit_without_second_timer_and_preserve_bounded_owner(robot, monkeypatch):
     from robot.recognition import Recognition
     r = robot
-    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.things.name(
+        r.conversation_visitor,
+        "Chosen",
+        ["phone"],
+        stub_crops([np.full((4, 4, 3), GOLD)]),
+        thumbnail_crops(stub_crops([np.full((4, 4, 3), GOLD)])),
+    )
     r.named = r.things.labels()
     entered, release, completed = threading.Event(), threading.Event(), threading.Event()
     observed, crops, submitted = [], [], []
@@ -1646,7 +1827,13 @@ def test_detector_frames_admit_without_second_timer_and_preserve_bounded_owner(r
 
 def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypatch):
     r = robot
-    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.things.name(
+        r.conversation_visitor,
+        "Chosen",
+        ["phone"],
+        stub_crops([np.full((4, 4, 3), GOLD)]),
+        thumbnail_crops(stub_crops([np.full((4, 4, 3), GOLD)])),
+    )
     r.named = r.things.labels()
     r.ui_thinking = True
     show(r, [(GOLD, LEFT), (BLACK, CENTER), (90, RIGHT)])
@@ -1657,7 +1844,7 @@ def test_recognition_runs_during_generation_oldest_due_fairness(robot, monkeypat
     for _ in range(3):
         preview(r)
     assert set(queries) == {GOLD, BLACK, 90}, "oldest due visits each track during generation"
-    assert any(b[4] == "Chosen" for b in r._shown()[1].boxes)
+    assert any(b[4] == "Guest 1's Chosen" for b in r._shown()[1].boxes)
 
 
 @pytest.mark.parametrize("named", [False, True])
@@ -1674,9 +1861,15 @@ def test_item_ignore_preserves_selection_interval_or_unrelated_focus(robot, monk
     other = next(i for i, (_, box) in r.view[1].items() if box == RIGHT)
     assert r.focus.focus == chosen
     if named:
-        r.things.name("Other", ["phone"], stub_crops([np.full((4, 4, 3), BLACK)]))
+        r.things.name(
+            r.conversation_visitor,
+            "Other",
+            ["phone"],
+            stub_crops([np.full((4, 4, 3), BLACK)]),
+            thumbnail_crops(stub_crops([np.full((4, 4, 3), BLACK)])),
+        )
         r.named = r.things.labels()
-        r.focus.bind(other, "Other")
+        r.focus.bind(other, object_id(r.things, r.conversation_visitor, "Other"))
     state = r._shown(False)[1].control
     target = next(t for t in state["targets"] if t["track"] == (other if named else chosen))
     assert r._item_control("ignore", {**state, **target}).startswith("Okay")
@@ -1695,11 +1888,17 @@ def test_item_ignore_preserves_selection_interval_or_unrelated_focus(robot, monk
 def test_duplicate_accepted_name_blocks_fresh_write_after_one_weak_query(robot, monkeypatch):
     r = robot
     show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
-    r.things.name("Chosen", ["phone"], stub_crops([np.full((4, 4, 3), GOLD)]))
+    r.things.name(
+        r.conversation_visitor,
+        "Chosen",
+        ["phone"],
+        stub_crops([np.full((4, 4, 3), GOLD)]),
+        thumbnail_crops(stub_crops([np.full((4, 4, 3), GOLD)])),
+    )
     r.named = r.things.labels()
     tracks = list(r.focus.visible)
     for track in tracks:
-        r.focus.bind(track, "Chosen")
+        r.focus.bind(track, object_id(r.things, r.conversation_visitor, 'Chosen'))
     monkeypatch.setattr(r.things, "score", lambda v, name=None: (None, 0))
     preview(r)
     monkeypatch.setattr(r.things, "score", lambda v, name=None: ("Chosen", .99))
@@ -1717,12 +1916,12 @@ def test_retained_name_cannot_ignore_saved_object_after_same_track_replacement(r
     r.focus.focus = track
     answer, turn = ask(r, "This is my wallet")
     assert answer.startswith("Got it")
-    saved = r.things.descriptors("wallet").copy()
+    saved = r.things.descriptors(object_id(r.things, r.conversation_visitor, 'wallet')).copy()
     # The new physical object retains the same track and normal detector confidence.
     frame_of(r, BLACK)
     preview(r)
     assert r.focus.named[track].score == 0
-    assert r.focus.names() == {track: ("wallet", True)}
+    assert r.focus.names() == {track: (object_id(r.things, r.conversation_visitor, 'wallet'), True)}
     state = r._shown(False)[1].control
     data = {**state, **next(t for t in state["targets"] if t["track"] == track)}
     assert r._valid_item(data), "the display selection alone is not a fresh identity match"
@@ -1732,12 +1931,16 @@ def test_retained_name_cannot_ignore_saved_object_after_same_track_replacement(r
     assert r._item_control("ignore", data).startswith("That selection expired")
     assert len(calls) == 1 and calls[0].mean() == BLACK
     assert r.recognition.epoch == gallery and not r.things.preferences()
-    assert not r.focus.excluded and not r.things.hidden_names()
-    np.testing.assert_array_equal(r.things.descriptors("wallet"), saved)
-    assert r.memory.points(turn.memories)[0]["named"] == "wallet"
+    assert not r.focus.excluded and not r.things.hidden_ids()
+    np.testing.assert_array_equal(
+        r.things.descriptors(object_id(r.things, r.conversation_visitor, "wallet")), saved
+    )
+    assert r.memory.points(turn.memories)[0]["named"] == object_id(
+        r.things, r.conversation_visitor, "wallet"
+    )
     assert ask(r, "Forget my wallet")[0].startswith("Done")
     assert not r.memory.points(turn.memories)
-    assert r.things.named("wallet", []) is None
+    assert r.things.named(r.conversation_visitor, 'wallet', []) is None
 
 
 def test_unknown_ignore_embeds_only_current_crop_after_same_track_replacement(robot):
@@ -2161,11 +2364,19 @@ def test_view_retention_keeps_first_drops_oldest_and_skips_duplicates(tmp_path, 
     np.testing.assert_array_equal(add_vectors(basis[:3], basis[2:5]), basis[[0, 3, 4]])
     things = Things(tmp_path)
     try:
-        things.name("cup", ["cup"], basis[:3])
-        assert not things.add_view("cup", basis[0])
-        assert things.add_view("cup", basis[3])
-        np.testing.assert_array_equal(things.descriptors("cup"), basis[[0, 2, 3]])
-        assert not things.add_view("missing", basis[3])
+        things.name(OWNER, 'cup', ['cup'], basis[:3], thumbnail_crops(basis[:3]))
+        assert not things.add_view(
+            object_id(things, OWNER, "cup"), basis[0], np.full((12, 20, 3), 90, np.uint8)
+        )
+        assert things.add_view(
+            object_id(things, OWNER, "cup"), basis[3], np.full((12, 20, 3), 90, np.uint8)
+        )
+        np.testing.assert_array_equal(
+            things.descriptors(object_id(things, OWNER, "cup")), basis[[0, 2, 3]]
+        )
+        assert not things.add_view(
+            object_id(things, OWNER, "missing"), basis[3], np.full((12, 20, 3), 90, np.uint8)
+        )
     finally:
         things.shard.close()
 
@@ -2193,7 +2404,10 @@ def test_teaching_window_admits_at_gap_and_stops_permanently(robot, monkeypatch,
     assert r.window["admitted"] == 0
     clock[0] += .1
     query()
-    assert r.window["admitted"] == 1 and len(r.things.descriptors("cup")) == 2
+    assert (
+        r.window["admitted"] == 1
+        and len(r.things.descriptors(object_id(r.things, r.conversation_visitor, "cup"))) == 2
+    )
     assert r.recognition.epoch == epoch
     assert '"event": "teaching_view"' in (r.out / "turns.jsonl").read_text()
     if stop == "leave":
@@ -2203,7 +2417,7 @@ def test_teaching_window_admits_at_gap_and_stops_permanently(robot, monkeypatch,
     elif stop == "time":
         clock[0] += 6
     else:
-        r._forget_thing("cup", [])
+        r._forget_thing(r.conversation_visitor, "cup", [])
     query()
     assert not r.window
     frame_of(r)
@@ -2244,7 +2458,10 @@ def test_teaching_window_rechecks_admission_authority(robot, monkeypatch, block)
     r.recognition.crops = embed
     r.crop_times.clear()
     r._query_objects(r.view[0], tracks, {t.id: r.focus.name(t.id) for t in tracks}, source)
-    assert window["admitted"] == 0 and len(r.things.descriptors("cup")) == 1
+    assert (
+        window["admitted"] == 0
+        and len(r.things.descriptors(object_id(r.things, r.conversation_visitor, "cup"))) == 1
+    )
 
 
 def test_zero_window_keeps_the_short_naming_answer(robot, monkeypatch):
@@ -2259,11 +2476,17 @@ def test_duplicate_view_with_lowered_cap_is_not_an_admission(tmp_path, monkeypat
     things = Things(tmp_path)
     basis = np.eye(DIM, dtype=np.float32)
     try:
-        things.name("cup", ["cup"], basis[:3])
-        assert things.add_view("cup", basis[3])
+        things.name(OWNER, 'cup', ['cup'], basis[:3], thumbnail_crops(basis[:3]))
+        assert things.add_view(
+            object_id(things, OWNER, "cup"), basis[3], np.full((12, 20, 3), 90, np.uint8)
+        )
         monkeypatch.setitem(settings.values, "views_cap", 3)
-        assert not things.add_view("cup", basis[0])
-        np.testing.assert_array_equal(things.descriptors("cup"), basis[[0, 2, 3]])
+        assert not things.add_view(
+            object_id(things, OWNER, "cup"), basis[0], np.full((12, 20, 3), 90, np.uint8)
+        )
+        np.testing.assert_array_equal(
+            things.descriptors(object_id(things, OWNER, "cup")), basis[[0, 2, 3]]
+        )
     finally:
         things.shard.close()
 
@@ -2293,7 +2516,10 @@ def test_teaching_window_prioritizes_only_the_taught_track_at_the_gap(robot, mon
     r.crop_times.clear()
     recognized, _ = r._query_objects(r.view[0], tracks, preferences)
     assert set(recognized) == {taught} and r.window["admitted"] == 1
-    np.testing.assert_array_equal(r.things.descriptors("cup"), [basis[GOLD], vector])
+    np.testing.assert_array_equal(
+        r.things.descriptors(object_id(r.things, r.conversation_visitor, "cup")),
+        [basis[GOLD], vector],
+    )
 
 
 def test_forget_me_ends_the_teaching_window(robot):
@@ -2301,5 +2527,396 @@ def test_forget_me_ends_the_teaching_window(robot):
     hold(robot, CENTER)
     ask(robot, "This is my cup")
     assert robot.window
-    assert robot._forget(None, "Nobody", np.ones(512, np.float32))
+    assert robot._forget(None, "Nobody", np.ones(512, np.float32), robot.conversation_visitor)
     assert not robot.window
+
+
+def test_owner_contract_two_visitors_and_reteaching(robot):
+    r = robot
+    r.vocab.add("mouse")
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my mouse")[0].startswith("Got it")
+    first = object_id(r.things, r.conversation_visitor, "mouse")
+    assert r.things.label(first) == "Guest 1's mouse"
+    frame_of(r, BLACK)
+    hold(r, CENTER)
+    assert ask(r, "This is my mouse")[0].startswith("Got it")
+    assert object_id(r.things, r.conversation_visitor, "mouse") == first
+    assert len(r.things.descriptors(first)) == 2
+    r.conversation_visitor = r.things.new_visitor()
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my mouse")[0].startswith("Got it")
+    second = object_id(r.things, r.conversation_visitor, "mouse")
+    assert first != second and r.things.label(second) == "Guest 2's mouse"
+
+
+def test_owner_promotion_and_restart(tmp_path):
+    people = People(tmp_path)
+    things = Things(tmp_path, people)
+    owner = things.new_visitor()
+    vectors = np.eye(DIM, dtype=np.float32)[:2]
+    ident = things.name(owner, "mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+    things.tell(owner, "Ana")
+    assert things.label(ident) == "Ana's mouse"
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    assert people.enroll("Ana", [face, face], 1.0, owner)
+    things.tell(owner, "Other")
+    assert things.label(ident) == "Ana's mouse"
+    payload = things.named(owner, "mouse", [])
+    files = {v["thumbnail"] for v in payload["views"]}
+    assert files == {f.name for f in things.thumbs.glob("*.jpg")}
+    for file in things.thumbs.glob("*.jpg"):
+        assert max(cv2.imread(str(file)).shape[:2]) == 160
+    things.shard.close()
+    people.shard.close()
+    people = People(tmp_path)
+    things = Things(tmp_path, people)
+    try:
+        assert things.label(ident) == "Ana's mouse"
+        assert things.named(owner, "mouse", []) == payload
+        np.testing.assert_array_equal(things.descriptors(ident), vectors)
+        assert files == {f.name for f in things.thumbs.glob("*.jpg")}
+    finally:
+        things.shard.close()
+        people.shard.close()
+
+
+def test_unknown_possessive_does_not_answer_from_sightings(robot):
+    r = robot
+    r.vocab.add("mouse")
+    r.memory.sighting("mouse", "center", time.time())
+    for text in ("Where is Ana's mouse?", "Have you seen Ana's mouse?"):
+        assert ask(r, text)[0] == "I don't know which mouse is Ana's."
+
+
+def test_owner_category_fallback_stays_with_requested_owner(robot):
+    r = robot
+    r.vocab.add("mouse")
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    other = r.things.new_visitor()
+    r.things.name(other, "gaming mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+    assert r.things.named(r.conversation_visitor, "mouse", ["mouse"]) is None
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    assert r.people.enroll("Ana", [face, face], 1.0, other)
+    assert ask(r, "Do you remember Ana's mouse?")[0].startswith(
+        "Yes, I remember Ana's gaming mouse"
+    )
+
+
+def test_guest_forget_me_deletes_objects_record_and_window(robot, monkeypatch):
+    r = robot
+    frame = frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    ask(r, "This is my cup")
+    owner = r.conversation_visitor
+    r.things.tell(owner, "Ana")
+    r.told = "Ana", False
+    assert r.window and r.things.visitor(owner)
+    monkeypatch.setattr(r, "_whois", lambda frame, turn=None: None)
+    turn = Turn(question="Forget me", visitor=owner)
+    r.turn_seen = None
+    assert r._identity(turn, frame, None) == "Done. I have forgotten you."
+    assert not r.window and not r.told and not r.teaching and not turn.keep
+    assert not r.things.objects(owner) and r.things.visitor(owner) is None
+    assert not list(r.things.thumbs.glob("*.jpg"))
+    assert not r.memory.sightings(time.time() + 1, 99)
+    assert r.memory.shard.count(CountRequest()) == 0
+
+
+def test_startup_sweeps_orphan_thumbnails(tmp_path):
+    things = Things(tmp_path)
+    orphan = things.thumbs / "orphan.jpg"
+    orphan.write_bytes(b"orphan")
+    things.shard.close()
+    things = Things(tmp_path)
+    try:
+        assert not orphan.exists()
+    finally:
+        things.shard.close()
+
+
+def test_old_schema_backup_and_existing_people_visitors(tmp_path):
+    from qdrant_edge import (
+        EdgeConfig,
+        EdgeShard,
+        EdgeVectorParams,
+        Distance,
+        Point,
+        UpdateOperation,
+    )
+    path = tmp_path / "things"
+    path.mkdir()
+    old = EdgeShard.create(str(path), EdgeConfig(vectors={"crops": EdgeVectorParams(
+        size=DIM, distance=Distance.Cosine)}))
+    old.update(UpdateOperation.upsert_points([Point(1, {}, {"name": "old mouse"})]))
+    old.flush()
+    old.close()
+    people = People(tmp_path)
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    assert people.enroll("Ana", [face, face], 1.0)
+    from robot.people import _id
+    people.shard.update(UpdateOperation.delete_payload([_id("Ana")], ["visitor"]))
+    things = Things(tmp_path, people)
+    try:
+        assert people.person("Ana")["visitor"]
+        assert not things.objects()
+        backup, = tmp_path.glob("things-backup-*")
+        old = EdgeShard.load(str(backup))
+        assert old.retrieve([1], True, False)[0].payload["name"] == "old mouse"
+        old.close()
+    finally:
+        things.shard.close()
+        people.shard.close()
+
+
+def test_forget_object_removes_thumbnails_and_ignore_exclusions(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    ident = object_id(r.things, r.conversation_visitor, "phone")
+    vectors = r.things.descriptors(ident)
+    rule = r.things.ignore_item("phone", vectors)
+    assert ident in r.things.hidden_ids()
+    assert r.things.score(vectors[0]) is None
+    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert not r.window and not list(r.things.thumbs.glob("*.jpg"))
+    assert not r.things.add_view(ident, vectors[0], thumbnail_crops(vectors)[0])
+    assert ident not in r.things.hidden_ids()
+    assert not r.things.shard.retrieve([rule], True, True)
+
+
+def test_visitor_resolution_allocates_once_per_turn(robot, monkeypatch):
+    r = robot
+    calls = []
+    allocate = r.things.new_visitor
+    monkeypatch.setattr(r.things, "new_visitor", lambda: calls.append(1) or allocate())
+    monkeypatch.setattr(r, "_whois", lambda frame, turn=None: None)
+    r.conversation_started = False
+    first = Turn(question="Hello", speech_start=time.time())
+    assert not r._resolve_visitor(first, np.zeros((9, 9, 3), np.uint8))
+    assert first.visitor == r.conversation_visitor and not calls
+    r.last_line = time.time()
+    second = Turn(question="I'm Ana", speech_start=r.last_line + main.CONVERSATION_S + 1)
+    assert r._resolve_visitor(second, np.zeros((9, 9, 3), np.uint8))
+    r._resolve_visitor(second, np.zeros((9, 9, 3), np.uint8))
+    r._hear_name(second)
+    assert calls == [1] and second.visitor != first.visitor
+
+
+def test_spoken_name_then_enrollment_preserves_guest_objects(robot, monkeypatch):
+    r = robot
+    frame = frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my mouse")
+    owner = r.conversation_visitor
+    ident = object_id(r.things, owner, "mouse")
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    monkeypatch.setattr(r, "_whois", lambda frame, turn=None: (face, None))
+    r.face, r.last_line = face, time.time()
+    told = Turn(question="I'm Ana", speech_start=r.last_line + 1)
+    assert "remember your face" in r._identity(told, frame, None)
+    assert r.things.label(ident) == "Ana's mouse"
+    yes = Turn(question="Yes", speech_start=r.last_line + 2)
+    assert r._identity(yes, frame, None) == "Thank you, Ana. I will remember your face."
+    assert r.people.person("Ana")["visitor"] == owner
+    assert object_id(r.things, owner, "mouse") == ident
+    r.turn_seen = np.eye(FACE_DIM, dtype=np.float32)[1], None
+    stranger = Turn(question="Remember me, I'm Ana", visitor=owner)
+    assert r._identity(stranger, frame, None) == "I already know someone called Ana."
+
+
+def test_restart_sweeps_thumbnails_left_by_visitor_deletion(tmp_path, monkeypatch):
+    things = Things(tmp_path)
+    owner = things.new_visitor()
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    ident = things.name(owner, "mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+    _, _, thumbnails = things.forget_visitor(owner)
+    things.shard.close()
+    things = Things(tmp_path)
+    try:
+        assert things.visitor(owner) is None and not things.objects(owner)
+        assert not things.shard.retrieve([ident], True, False)
+        assert thumbnails and not list(things.thumbs.glob("*.jpg"))
+    finally:
+        things.shard.close()
+
+
+@pytest.mark.parametrize("shard_name, fail_at", [
+    ("memory", 1), ("memory", 2), ("memory", 3), ("memory", 4),
+    ("people", 1), ("things", 1)])
+def test_forget_visitor_retry_after_store_interruption(robot, shard_name, fail_at):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    owner = r.conversation_visitor
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    assert r.people.enroll("Ana", [face, face], 1.0, owner)
+    pid = r.memory.add(np.zeros((12, 12, 3), np.uint8), "I like tea", visitor=owner,
+                       caption="A personal frame")
+    r.people.link("Ana", [pid])
+    ident = object_id(r.things, owner, "phone")
+    rule = r.things.ignore_item("Ana's phone", r.things.descriptors(ident))
+    r.things.ignore(["chair"], True)
+    r.history = [{"role": "user", "content": "I like tea"}]
+    r.ready = object()
+    store = getattr(r, shard_name)
+    original = store.shard
+
+    class Interrupted:
+        calls = 0
+
+        def __getattr__(self, key):
+            return getattr(original, key)
+
+        def update(self, operation):
+            self.calls += 1
+            if self.calls == fail_at:
+                raise RuntimeError("Interrupted before shard deletion")
+            return original.update(operation)
+
+    store.shard = Interrupted()
+    assert not r._forget(None, "Ana", face, owner)
+    if shard_name == "people":  # people go last: objects are gone, the face still finds `owner`
+        assert not r.things.objects(owner) and r.people.person("Ana")["visitor"] == owner
+    else:
+        assert r.things.objects(owner) and r.things.visitor(owner)
+    store.shard = original
+    assert r._forget(None, "Ana", face, owner)
+    assert not r.things.objects(owner) and not r.things.visitor(owner)
+    assert r.people.person("Ana") is None
+    assert not r.memory.points([pid])
+    assert not r.memory.shard.count(CountRequest())
+    assert not list(r.memory.frames.glob("*.jpg"))
+    assert not list(r.things.thumbs.glob("*.jpg"))
+    assert not r.things.shard.retrieve([rule], True, True)
+    assert r.things.ignored() == {"chair"}
+    assert not r.history and not r.looked and r.ready is None
+
+
+@pytest.mark.parametrize("shard_name, fail_at", [("memory", 1), ("memory", 2), ("things", 1)])
+def test_forget_object_retry_after_store_interruption(robot, shard_name, fail_at):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    owner = r.conversation_visitor
+    store = getattr(r, shard_name)
+    original = store.shard
+
+    class Interrupted:
+        calls = 0
+
+        def __getattr__(self, key):
+            return getattr(original, key)
+
+        def update(self, operation):
+            self.calls += 1
+            if self.calls == fail_at:
+                raise RuntimeError("Interrupted before shard deletion")
+            return original.update(operation)
+
+    store.shard = Interrupted()
+    with pytest.raises(RuntimeError):
+        ask(r, "Forget my phone")
+    assert r.things.objects(owner)
+    store.shard = original
+    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert not r.things.objects(owner)
+    assert not r.memory.shard.count(CountRequest())
+    assert not list(r.things.thumbs.glob("*.jpg"))
+
+
+def test_other_owner_naming_stores_nothing(robot):
+    robot.vocab.add("mouse")
+    frame_of(robot)
+    hold(robot, CENTER)
+    answer, turn = ask(robot, "This is Ana's mouse")
+    assert answer == "I can only learn things that are yours. Say: this is my mouse."
+    assert not robot.things.objects() and not turn.keep
+    assert store(robot, turn) == 0
+
+
+def test_normalized_object_key_and_duplicate_no_write(tmp_path):
+    things = Things(tmp_path)
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    try:
+        ident = things.name(OWNER, "Gaming  Mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+        assert things.named(OWNER, "gaming mouse", [])["id"] == ident
+        original = things.shard
+
+        class NoWrites:
+            def __getattr__(self, key):
+                return getattr(original, key)
+
+            def update(self, _operation):
+                pytest.fail("An unchanged view must not write")
+
+        things.shard = NoWrites()
+        assert not things.add_view(ident, vectors[0], thumbnail_crops(vectors)[0])
+        things.shard = original
+    finally:
+        things.shard.close()
+
+
+def test_startup_thumbnail_sweep_keeps_objects_after_first_page(tmp_path):
+    import uuid
+    from qdrant_edge import Point, UpdateOperation
+
+    things = Things(tmp_path)
+    rows = [Point(str(uuid.uuid4()), {}, {"type": "object", "owner": OWNER,
+             "views": [{"thumbnail": f"{i}.jpg"}]}) for i in range(1001)]
+    things.shard.update(UpdateOperation.upsert_points(rows))
+    things.shard.flush()
+    for i in range(1001):
+        (things.thumbs / f"{i}.jpg").write_bytes(b"thumbnail")
+    things.shard.close()
+    things = Things(tmp_path)
+    try:
+        assert len(things.objects()) == 1001
+        assert len(list(things.thumbs.glob("*.jpg"))) == 1001
+    finally:
+        things.shard.close()
+
+
+def test_stored_guest_statement_uses_visitor_and_forget_clears_it(robot, monkeypatch):
+    monkeypatch.setattr(robot, "_whois", lambda frame: None)
+    turn = Turn(question="I like tea", visitor=robot.conversation_visitor)
+    assert store(robot, turn) == 1
+    assert robot.memory.points([turn.frame_id])[0]["visitor"] == turn.visitor
+    assert robot._forget(None, None, None, turn.visitor)
+    assert not robot.memory.points([turn.frame_id])
+
+
+def test_screen_reuses_label_map_without_per_box_lookup(robot, monkeypatch):
+    frame_of(robot)
+    hold(robot, CENTER)
+    ask(robot, "This is my phone")
+    monkeypatch.setattr(robot.things, "label", lambda ident: pytest.fail("Per-box lookup"))
+    assert robot._shown(False)[1].control["targets"][0]["title"] == "Guest 1's phone"
+
+
+def test_third_person_answer_preserves_object_name(robot, monkeypatch):
+    monkeypatch.setattr(robot, "named_evidence", lambda *args: ([], 1, 1, ""))
+    assert robot._mine(Turn(), "remember", {"name": "your mouse"}, "Ana's") == (
+        "Yes, I remember Ana's your mouse. Yes, Ana's your mouse is here now.")
+
+
+def test_interrupted_forget_me_keeps_the_face_to_visitor_link_for_a_retry(robot, monkeypatch):
+    r = robot
+    face = np.eye(FACE_DIM, dtype=np.float32)[0]
+    r.people.enroll("Ana", [face, face], time.time())
+    visitor = r.people.person("Ana")["visitor"]
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    r.things.name(visitor, "mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+    real = r.things.forget_visitor
+    monkeypatch.setattr(r.things, "forget_visitor", lambda owner: (_ for _ in ()).throw(OSError))
+    assert not r._forget(None, "Ana", face, visitor)
+    assert r.people.person("Ana")["visitor"] == visitor, "the face still finds the same visitor"
+    monkeypatch.setattr(r.things, "forget_visitor", real)
+    assert r._forget(None, "Ana", face, r.people.person("Ana")["visitor"])
+    assert not r.things.objects(visitor) and r.people.person("Ana") is None

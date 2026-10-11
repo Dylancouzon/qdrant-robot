@@ -348,3 +348,15 @@ def test_face_position_matches_selected_detection(monkeypatch):
     found, width, box = people.located_face(faces, frame)
     assert found is vector and width == 150 and box == (565, 120, 715, 275)
     assert face(faces, frame)[0] is vector
+
+
+def test_second_face_cannot_reuse_enrolled_name(tmp_path):
+    people = People(tmp_path)
+    faces = np.eye(DIM, dtype=np.float32)[:2]
+    try:
+        assert people.enroll("Ana", [faces[0], faces[0]], 1.0, "first")
+        assert not people.enroll("Ana", [faces[1], faces[1]], 2.0, "second")
+        assert people.person("Ana")["visitor"] == "first"
+        assert people.identify(faces[1]) is None
+    finally:
+        people.shard.close()

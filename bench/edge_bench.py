@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Qdrant Edge query latency on the robot's two shards, against the 10 ms p99 target: a memory
-shard filled with a booth day of turns (recency and statement queries) and the knowledge shard
-(MaxSim over fact phrasings). 1,000 queries per kind, issued as the robot issues them (its
-default limits), as the acceptance protocol asks.
+"""Qdrant Edge query latency on the robot's shards, against the 10 ms p99 target: a memory
+shard filled with a booth day of turns (recency and statement queries), the knowledge shard
+(MaxSim over fact phrasings), and the things shard (owner-scoped objects with full
+galleries). 1,000 queries per kind, issued as the robot issues them (its default limits), as
+the acceptance protocol asks.
 
     python -m bench.edge_bench [--points 1000]
 """
@@ -23,10 +24,13 @@ from robot.config import ROOT, SHARED
 from robot.knowledge import Knowledge
 from robot.memory import Memory
 from robot.text_embed import DIM, TextEmbedder
+from robot.things import DIM as CROP_DIM
+from robot.things import Things
 
 FACTS = ROOT / "knowledge/facts.jsonl"
 
 QUERIES = 1000
+OBJECTS, VIEWS = 200, 24  # a busy booth day: 100 visitors with two objects, full galleries
 
 
 def timed(fn, args: list) -> dict:
@@ -65,6 +69,23 @@ def main(points: int) -> None:
         rows.append({"query": "knowledge.search", "points": knowledge.shard.info().points_count,
                      **timed(knowledge.search, [(asked[i % len(asked)],) for i in range(QUERIES)])})
         knowledge.shard.close()
+        things = Things(Path(tmp))
+        crops = rng.normal(size=(OBJECTS * VIEWS, CROP_DIM)).astype(np.float32)
+        crops /= np.linalg.norm(crops, axis=1, keepdims=True)
+        thumb = [np.zeros((12, 12, 3), np.uint8)]
+        owners, idents = [things.new_visitor() for _ in range(OBJECTS // 2)], []
+        for k in range(OBJECTS):
+            owner, gallery = owners[k // 2], crops[k * VIEWS:(k + 1) * VIEWS]
+            idents.append(things.name(owner, f"thing {k}", [], gallery[:1], thumb))
+            for v in gallery[1:]:  # the teaching window fills the rest of the gallery
+                things.add_view(idents[-1], v, thumb[0])
+        probes = crops[picks % len(crops)] + .05 * rng.normal(size=(QUERIES, CROP_DIM))
+        rows += [{"query": "things.score", "points": OBJECTS, "views": VIEWS,
+                  **timed(things.score, [(v.astype(np.float32),) for v in probes])},
+                 {"query": "things.named", "points": OBJECTS,
+                  **timed(things.named, [(owners[i % len(owners)], f"thing {i % OBJECTS}", [])
+                                         for i in picks])}]
+        things.shard.close()
     for r in rows:  # what reproduces the numbers: command, release (ENV.txt), Edge version
         r.update(machine=platform.node(), release=os.environ.get("ROBOT_RELEASE"),
                  command=shlex.join(sys.argv), qdrant_edge=version("qdrant-edge-py"))

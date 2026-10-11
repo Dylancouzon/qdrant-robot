@@ -22,3 +22,6 @@ dist/
 .claude/worktrees/
 backups/
 eval/faces/
+
+# Codex session marker written into the working directory
+:memory:.ses
