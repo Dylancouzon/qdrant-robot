@@ -10,6 +10,9 @@ from pathlib import Path
 
 import cadquery as cq
 import numpy as np
+import trimesh
+from OCP.Bnd import Bnd_Box
+from OCP.BRepBndLib import BRepBndLib
 import matplotlib
 
 matplotlib.use("Agg")
@@ -18,13 +21,18 @@ import matplotlib.pyplot as plt
 import casing
 import joint
 import layout
+from enclosure_geometry import body_envelopes, head_envelopes
 
 OUT = Path(__file__).resolve().parent / "output" / "assembly"
 
 
 def parts():
     case = casing.build_parts()
-    mechanism = {n: s for n, s in joint.build_parts().items() if n not in joint.GAUGE_NAMES}
+    mechanism = {
+        n: s
+        for n, s in joint.build_parts().items()
+        if n not in joint.GAUGE_NAMES and n != joint.DRIVE_GEAR_NAME
+    }
     shapes = case | mechanism
     meta = casing.metadata() | {
         n: dict(
@@ -96,9 +104,7 @@ def checks(shapes, meta):
                 volume < 1e-5,
                 f"Assembled overlap {volume:.6g} mm³. Designed boundary contacts have zero volume.",
             )
-    stationary = compound(
-        s for n, s in shapes.items() if not meta[n]["moving"] and n != joint.DRIVE_GEAR_NAME
-    )
+    stationary = compound(s for n, s in shapes.items() if not meta[n]["moving"])
     moving_case = compound(s for n, s in case.items() if meta[n]["moving"])
     moving_joint = compound(s for n, s in mechanism.items() if meta[n]["moving"])
     fixed_case = compound(s for n, s in case.items() if not meta[n]["moving"])
@@ -133,21 +139,39 @@ def checks(shapes, meta):
         or n.startswith("closure_")
     }
     rows.extend(casing.check_joint_admission(case, core))
+    rows.append(casing.check_neck_admission(case, mechanism))
     return rows
 
 
 def mesh(shape):
-    vertices, faces = shape.tessellate(0.18, 0.25)
-    vertices = np.array([v.toTuple() for v in vertices])
-    triangles = vertices[np.array(faces)]
-    normals = np.cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
-    normals /= np.maximum(np.linalg.norm(normals, axis=1)[:, None], 1e-12)
-    return triangles, normals
+    """Use whole-solid triangles and angle-weighted normals without smoothing sharp edges."""
+    vertices, faces = shape.tessellate(0.06, 0.12)
+    mesh = trimesh.Trimesh(vertices=[v.toTuple() for v in vertices], faces=faces, process=False)
+    mesh.merge_vertices(digits_vertex=7)
+    mesh.update_faces(mesh.area_faces > 1e-12)
+    mesh.remove_unreferenced_vertices()
+    triangles = mesh.vertices[mesh.faces]
+    normals = mesh.face_normals
+    angles = mesh.face_angles
+    incident = [[] for _ in mesh.vertices]
+    for face_index, indices in enumerate(mesh.faces):
+        for corner, index in enumerate(indices):
+            incident[index].append((face_index, corner))
+    smooth = np.empty_like(triangles)
+    threshold = np.cos(np.radians(35))
+    for face_index, indices in enumerate(mesh.faces):
+        for corner, index in enumerate(indices):
+            entries = [
+                (f, c) for f, c in incident[index] if normals[f] @ normals[face_index] >= threshold
+            ]
+            normal = sum((normals[f] * angles[f, c] for f, c in entries), np.zeros(3))
+            smooth[face_index, corner] = normal / max(np.linalg.norm(normal), 1e-12)
+    return triangles, smooth
 
 
 def raster(shapes, meta, angle, width=720, height=1040):
     """Render actual triangles with a depth buffer so holes show the correct surfaces."""
-    canvas = np.full((height, width, 3), [0.957, 0.949, 0.925])
+    canvas = np.full((height, width, 3), [0.894, 0.91, 0.929])
     depth = np.full((height, width), np.inf)
     rotation = math.radians(angle)
     elevation = math.radians(16)
@@ -159,7 +183,6 @@ def raster(shapes, meta, angle, width=720, height=1040):
     for name, shape in shapes.items():
         triangles, normals = mesh(shape)
         base = np.array(matplotlib.colors.to_rgb(meta[name]["color"]))
-        shade = 0.5 + 0.5 * np.maximum(0, normals @ light)
         points = triangles.copy()
         points[:, :, 2] -= 115
         x = c * points[:, :, 0] - s * points[:, :, 1]
@@ -168,7 +191,7 @@ def raster(shapes, meta, angle, width=720, height=1040):
         screen = np.stack(
             [width / 2 + x * scale, height / 2 - (ce * z + se * y) * scale, ce * y - se * z], axis=2
         )
-        for triangle, brightness in zip(screen, shade, strict=True):
+        for triangle, vertex_normals in zip(screen, normals, strict=True):
             x0, y0, d0 = triangle[0]
             x1, y1, d1 = triangle[1]
             x2, y2, d2 = triangle[2]
@@ -189,7 +212,14 @@ def raster(shapes, meta, angle, width=720, height=1040):
             patch = depth[top : bottom + 1, left : right + 1]
             visible = (a >= -1e-8) & (b >= -1e-8) & (third >= -1e-8) & (distance < patch)
             patch[visible] = distance[visible]
-            canvas[top : bottom + 1, left : right + 1][visible] = base * brightness
+            interpolated = (
+                a[..., None] * vertex_normals[0]
+                + b[..., None] * vertex_normals[1]
+                + third[..., None] * vertex_normals[2]
+            )
+            interpolated /= np.maximum(np.linalg.norm(interpolated, axis=2)[..., None], 1e-12)
+            brightness = 0.5 + 0.5 * np.maximum(0, interpolated @ light)
+            canvas[top : bottom + 1, left : right + 1][visible] = base * brightness[visible, None]
     return canvas
 
 
@@ -197,12 +227,12 @@ def render(shapes, meta):
     # Display the full source camera and speaker envelope to fill their real openings.
     display = shapes | {"camera": layout.camera(), "speaker": layout.hardware()[1]["shape"]}
     colors = meta | {"camera": dict(color="#20252b"), "speaker": dict(color="#33373c")}
-    fig, axes = plt.subplots(1, 2, figsize=(12, 9), facecolor="#f4f2ec")
+    fig, axes = plt.subplots(1, 2, figsize=(12, 9), facecolor="#e4e8ed")
     for ax, angle, title in zip(axes, (-25, 155), ("Front / right", "Rear / left"), strict=True):
         ax.imshow(raster(display, colors, angle))
         ax.set_axis_off()
         ax.set_title(title)
-    fig.suptitle("Concept A | actual casing and manual joint | 230 mm tall", fontsize=16)
+    fig.suptitle("Concept A | actual casing and manual joint | 236 mm tall", fontsize=16)
     fig.text(
         0.5,
         0.025,
@@ -218,41 +248,150 @@ def render(shapes, meta):
     plt.close(fig)
 
 
-def viewer(shapes, meta):
+def exact_size(shape):
+    """Measure CAD surfaces without cached tessellation or added shape tolerance."""
+    bounds = Bnd_Box()
+    BRepBndLib.AddOptimal_s(shape.wrapped, bounds, False, False)
+    low_x, low_y, low_z, high_x, high_y, high_z = bounds.Get()
+    return high_x - low_x, high_y - low_y, high_z - low_z
+
+
+def viewer(
+    shapes, meta, hardware_entries=None, destination=None, study_name=None, model_envelopes=None
+):
+    """Export an offline triangle viewer with component and assembly metadata."""
     payload = []
-    for name, shape in shapes.items():
-        t, n = mesh(shape)
+    entries = [(name, shape, meta[name]) for name, shape in shapes.items()]
+    if hardware_entries is None:
+        entries += [(p["name"], p["shape"], p) for p in layout.hardware()]
+        entries += [
+            (
+                name,
+                shape,
+                dict(
+                    kind="moving hardware",
+                    color="#7299ab",
+                    moving=True,
+                    note=(
+                        "E: 15 × 24 × 5 mm bearing envelope. Actual race contact and fit remain U."
+                    ),
+                ),
+            )
+            for name, shape in joint.build()[1].items()
+            if name.startswith("bearing_")
+        ]
+        entries += [
+            (
+                "Complete camera",
+                layout.camera(),
+                dict(
+                    kind="moving hardware",
+                    color="#477967",
+                    moving=True,
+                    note=(
+                        "E: complete source board, optics, heatsink, and connectors. "
+                        "Physical support and cable motion remain U."
+                    ),
+                ),
+            )
+        ]
+    else:
+        entries += [(p["name"], p["shape"], p) for p in hardware_entries]
+    for name, shape, data in entries:
+        triangles, normals = mesh(shape)
+        size = exact_size(shape)
+        hardware = name not in shapes
+        moving = data.get("moving", data["kind"].startswith("moving"))
+        reservation = data["kind"].endswith("reservation")
+        exterior = name in {
+            "body-front",
+            "body-rear",
+            "body-right",
+            "body-roof",
+            "head-front",
+            "head-rear",
+            "head-visor",
+            "speaker-grille",
+            "neck-cover",
+        }
+        cover = name in {"body-rear", "body-right", "head-rear", "head-visor"}
+        if hardware:
+            group = "reservation" if reservation else "hardware"
+            stage = 3 if name.startswith("bearing_") else 5 if moving else 1
+        elif data["kind"] == "joint":
+            group, stage = "joint", 5 if name.startswith("head_key") else 3
+        elif moving:
+            group, stage = "head", 5
+        else:
+            group, stage = "body", 0
+        if name == "body-roof":
+            stage = 2
+        if name.startswith("roof-bridge") or name == "neck-cover":
+            stage = 4
+        if cover or name == "speaker-grille":
+            stage = 2 if name.startswith("body-") or name == "speaker-grille" else 6
         payload.append(
             dict(
                 name=name,
-                vertices=np.round(t.reshape(-1, 3), 4).tolist(),
-                normals=np.round(np.repeat(n, 3, axis=0), 5).tolist(),
-                color=list(matplotlib.colors.to_rgb(meta[name]["color"])),
-                moving=meta[name]["moving"],
-                removable=meta[name]["removable"],
-                hardware=False,
-                drive=name == joint.DRIVE_GEAR_NAME,
-            )
-        )
-    for p in layout.hardware() + [
-        dict(name="Complete camera", shape=layout.camera(), kind="moving hardware", color="#477967")
-    ]:
-        t, n = mesh(p["shape"])
-        payload.append(
-            dict(
-                name=p["name"],
-                vertices=np.round(t.reshape(-1, 3), 4).tolist(),
-                normals=np.round(np.repeat(n, 3, axis=0), 5).tolist(),
-                color=list(matplotlib.colors.to_rgb(p["color"])),
-                moving=p["kind"].startswith("moving"),
-                removable=False,
-                hardware=True,
-                drive=False,
+                label=name.replace("-", " ").replace("_", " ").capitalize()
+                if not hardware
+                else name,
+                vertices=np.round(triangles.reshape(-1, 3), 4).tolist(),
+                normals=np.round(normals.reshape(-1, 3), 5).tolist(),
+                color=list(matplotlib.colors.to_rgb(data["color"])),
+                moving=moving,
+                removable=data.get("removable", False),
+                hardware=hardware,
+                reservation=reservation,
+                group=group,
+                stage=stage,
+                cover=cover,
+                exterior=exterior,
+                service_removed=(
+                    cover
+                    or moving
+                    or group == "joint"
+                    or name == "body-roof"
+                    or name.startswith("roof-bridge")
+                    or name == "neck-cover"
+                ),
+                size=[round(value, 1) for value in size],
+                note=data.get(
+                    "note", "E: modeled printed geometry. Physical fit and retention remain U."
+                ),
             )
         )
     template = Path(__file__).with_name("assembly-viewer.html").read_text()
-    (OUT / "robot-viewer.html").write_text(
+    model_envelopes = model_envelopes or dict(body=body_envelopes()[0], head=head_envelopes()[0])
+    body = exact_size(model_envelopes["body"])
+    head = exact_size(model_envelopes["head"])
+    overall = exact_size(compound([model_envelopes["body"], model_envelopes["head"]]))
+
+    def dimensions(values):
+        return " × ".join(f"{round(v, 1):g}" for v in values)
+
+    model_info = (
+        "Enclosure study · actual CAD triangles · "
+        f"body {dimensions(body)} mm · head {dimensions(head)} mm · "
+        f"overall {round(overall[2], 1):g} mm."
+    )
+    target = Path(destination) if destination else OUT / "robot-viewer.html"
+    target.write_text(
         template.replace("__PART_DATA__", json.dumps(payload, separators=(",", ":")))
+        .replace("__MODEL_INFO__", model_info)
+        .replace("__STUDY_MODE__", "true" if study_name else "false")
+        .replace(
+            "__STUDY_NOTE__",
+            (
+                (
+                    f"{study_name}: preliminary silhouette and component packing. "
+                    "Ports, mounts, seams, joint interfaces, admission, cooling, "
+                    "and physical fit remain U."
+                )
+                if study_name
+                else "Mechanical prototype. Physical fit and powered mounting remain U."
+            ),
+        )
     )
 
 

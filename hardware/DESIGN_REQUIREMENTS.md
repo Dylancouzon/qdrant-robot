@@ -4,6 +4,8 @@ Updated 2026-10-11 from Dylan's instructions. Read this file before continuing t
 
 ## Required outcome
 
+Dylan requested the simplest practical design on 2026-10-11. Reduce parts and assembly steps where fit, service, and retention permit. Provide a simple preview that shows printed parts, assembled views, internal components, and their connections. The preview must explain assembly without requiring CAD experience.
+
 - Redesign the enclosure completely from the [original robot hardware](https://github.com/Dylancouzon/qdrant-edge-memory-robot/tree/main/hardware).
 - Use its `claude-design.html` as a reference for component dimensions. Verify dimensions against the actual parts before completing their mounts.
 - Provide printable 3MF files for the final enclosure and joint. Keep editable design sources and assembly instructions in this repository.
@@ -18,9 +20,11 @@ Dylan authorized head rotation despite the older no-servo rule. Decision H1 reco
 
 ## Appearance and size preferences
 
+Dylan clarified the appearance again on 2026-10-11. Use a neutral white body with a black visor and speaker grille. This supersedes the cream shell preference and the temporary graphite instruction. Use a clear trapezoid silhouette with wider lower body, narrower shoulders, and rounded shoulders and base. Raise the speaker grille and its component position above the earlier low placement. The rounded rectangular revision remains rejected. Review the actual tapered CAD silhouette before rebuilding detailed mounts or print exports.
+
 Dylan liked Concept A, with a visor camera head and a stationary body. The current study places one speaker in the body to reduce moving bulk. Speaker eyes were considered, and Dylan accepts using one speaker because the speakers are bulky.
 
-Dylan approved the updated [exterior concept](concept-a/output/exterior-concept.png) on 2026-10-11. Preserve its cream shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
+Dylan approved the updated [exterior concept](concept-a/output/exterior-concept.png) on 2026-10-11. Preserve its neutral white shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
 
 Dylan rejected the actual CAD exterior on 2026-10-11 because it resembles a "1980s computer" and needs substantial refinement. The mechanical prototype remains a fit study. Its boxy shell is not an approved final appearance. In the next session, Dylan plans to use an Astra agent to refine the exterior. Preserve the approved concept as the appearance target, and reassess the mechanical interfaces where that refinement requires changes.
 
@@ -105,7 +109,7 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 
 The [Concept A mechanical prototype](concept-a/README.md) now includes an actual removable casing, four detachable gauge cradles, a split bearing tower, retained keys, manual gears, and solid stops. Its complete STEP and CAD-derived preview show the assembled design. An offline viewer uses actual triangles and provides head yaw and service-cover controls.
 
-There are 44 generic prototype 3MF files and 44 individually sliced P1S projects. Casing and joint checks each pass 286 checks (E). Integrated checks pass 311 checks (E). The shared mesh exporter checks welded indexed seams, millimeter scale, and closed volumes. Physical fit remains U.
+There are 46 generic prototype 3MF files and 46 individually sliced P1S projects. Casing checks pass 582 checks, joint checks pass 286, and integrated checks pass 332 (E). The shared mesh exporter checks welded indexed seams, millimeter scale, and closed volumes. Physical fit remains U.
 
 The roof uses a removable bridge to admit the assembled joint. The camera frame enters before the camera. The manual prototype uses an external camera cable loop. Both closed bearing bores must admit the complete connector before adopting a hidden cable route.
 

@@ -1,0 +1,188 @@
+[
+  {
+    "radius_mm": 18,
+    "valid": true,
+    "containment": [
+      {
+        "name": "Jetson",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "One speaker",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "USB audio case",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Audio USB extension",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "STS3215 housing",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo ears and leads",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Bus interface",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo regulator",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Jetson USB/power plugs",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Fan intake space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Outlet space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      }
+    ],
+    "minimum_surface_gap_mm": 3.0413511914403233
+  },
+  {
+    "radius_mm": 22,
+    "valid": true,
+    "containment": [
+      {
+        "name": "Jetson",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "One speaker",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "USB audio case",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Audio USB extension",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "STS3215 housing",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo ears and leads",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Bus interface",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo regulator",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Jetson USB/power plugs",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Fan intake space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Outlet space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      }
+    ],
+    "minimum_surface_gap_mm": 3.0413511914403233
+  },
+  {
+    "radius_mm": 24,
+    "valid": false,
+    "containment": [
+      {
+        "name": "Jetson",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "One speaker",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "USB audio case",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Audio USB extension",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "STS3215 housing",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo ears and leads",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Bus interface",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Servo regulator",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Jetson USB/power plugs",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 5.211373396482905
+      },
+      {
+        "name": "Fan intake space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      },
+      {
+        "name": "Outlet space",
+        "outside_mm3": 0.0,
+        "expanded_outside_mm3": 0.0
+      }
+    ],
+    "minimum_surface_gap_mm": 2.4694959760465003
+  }
+]

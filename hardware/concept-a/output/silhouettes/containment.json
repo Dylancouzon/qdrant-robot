@@ -1,0 +1,112 @@
+[
+  {
+    "name": "A upright taper",
+    "body_mm": [
+      152,
+      130,
+      160
+    ],
+    "overall_height_mm": 236,
+    "sections": [
+      [
+        0,
+        134,
+        112,
+        22
+      ],
+      [
+        8,
+        150,
+        126,
+        26
+      ],
+      [
+        25,
+        152,
+        130,
+        28
+      ],
+      [
+        120,
+        138,
+        118,
+        28
+      ],
+      [
+        145,
+        124,
+        108,
+        27
+      ],
+      [
+        160,
+        100,
+        88,
+        26
+      ]
+    ],
+    "head_mm": [
+      116,
+      80,
+      56
+    ],
+    "speaker_center_z_mm": 48,
+    "footprint_increase_percent": 29.726890756302527,
+    "containment": [
+      {
+        "name": "Jetson",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "One speaker",
+        "outside_mm3": 12427.183318210473
+      },
+      {
+        "name": "USB audio case",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "Audio USB extension",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "STS3215 housing",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "Servo ears and leads",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "Bus interface",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "Servo regulator",
+        "outside_mm3": 12.566249812103434
+      },
+      {
+        "name": "Jetson USB/power plugs",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "Fan intake space",
+        "outside_mm3": 2.837122124048312
+      },
+      {
+        "name": "Outlet space",
+        "outside_mm3": 606.6756827772723
+      },
+      {
+        "name": "complete camera",
+        "outside_mm3": 0.0
+      },
+      {
+        "name": "camera rear cable reservation",
+        "outside_mm3": 0.0
+      }
+    ],
+    "passed": false,
+    "limits": "Preliminary cavity only; no validated mounts, seams, wall thickness, admission, joint relocation, physical fit, or thermal claim."
+  }
+]

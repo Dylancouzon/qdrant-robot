@@ -51,3 +51,5 @@ The rotating stop tab occupies R18 to R23 at Z173.5 to Z177. Fixed ribs include 
 Print tower halves with the seam against the bed. Their bearing seat ceilings and closure lugs require support inspection. Print the head flange upright on its annular hub base. Support its flange underside, stop tab, and transverse channel. Print the gear shaft upright with support beneath its collar. Print rectangular keys and pins on their flat faces. The manifest describes each orientation and support requirement. Remove support without changing bearing lands or tooth profiles.
 
 Physical bearing fits, race lands, key retention, PLA wear, backlash, servo mounting, cable motion, and camera cable strain relief remain U. The final external cable route requires a separate physical movement test. Powered motion remains pending verified horn geometry, installed servo retention, electrical compatibility, and load testing.
+
+The installed robot STEP and viewer omit the loose hand-held drive gear coupon. Its separate joint export remains available for tooth-mesh tests; it has no installed pivot or powered horn coupling.

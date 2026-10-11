@@ -4,42 +4,52 @@
     {
       "name": "body-front solid",
       "passed": true,
-      "detail": "1 connected solids; 122486.526 mm\u00b3."
+      "detail": "1 connected solids; 112271.606 mm\u00b3."
     },
     {
       "name": "body-rear solid",
       "passed": true,
-      "detail": "1 connected solids; 43625.664 mm\u00b3."
+      "detail": "1 connected solids; 75628.820 mm\u00b3."
     },
     {
       "name": "body-right solid",
       "passed": true,
-      "detail": "1 connected solids; 33241.600 mm\u00b3."
+      "detail": "1 connected solids; 27202.224 mm\u00b3."
     },
     {
       "name": "body-roof solid",
       "passed": true,
-      "detail": "1 connected solids; 40900.697 mm\u00b3."
+      "detail": "1 connected solids; 48502.228 mm\u00b3."
     },
     {
       "name": "head-front solid",
       "passed": true,
-      "detail": "1 connected solids; 49727.334 mm\u00b3."
+      "detail": "1 connected solids; 64850.971 mm\u00b3."
     },
     {
       "name": "head-rear solid",
       "passed": true,
-      "detail": "1 connected solids; 10251.296 mm\u00b3."
+      "detail": "1 connected solids; 21159.456 mm\u00b3."
     },
     {
       "name": "head-visor solid",
       "passed": true,
-      "detail": "1 connected solids; 4759.881 mm\u00b3."
+      "detail": "1 connected solids; 7514.743 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille solid",
+      "passed": true,
+      "detail": "1 connected solids; 11280.779 mm\u00b3."
+    },
+    {
+      "name": "neck-cover solid",
+      "passed": true,
+      "detail": "1 connected solids; 4495.649 mm\u00b3."
     },
     {
       "name": "speaker-cradle solid",
       "passed": true,
-      "detail": "1 connected solids; 6799.008 mm\u00b3."
+      "detail": "1 connected solids; 6194.208 mm\u00b3."
     },
     {
       "name": "jetson-cradle solid",
@@ -49,22 +59,22 @@
     {
       "name": "audio-cradle solid",
       "passed": true,
-      "detail": "1 connected solids; 3408.432 mm\u00b3."
+      "detail": "1 connected solids; 3843.673 mm\u00b3."
     },
     {
       "name": "camera-cradle solid",
       "passed": true,
-      "detail": "1 connected solids; 1059.360 mm\u00b3."
+      "detail": "1 connected solids; 1053.186 mm\u00b3."
     },
     {
       "name": "roof-bridge solid",
       "passed": true,
-      "detail": "1 connected solids; 4374.113 mm\u00b3."
+      "detail": "1 connected solids; 5569.397 mm\u00b3."
     },
     {
       "name": "roof-bridge-pin--1 solid",
       "passed": true,
-      "detail": "1 connected solids; 242.800 mm\u00b3."
+      "detail": "1 connected solids; 180.400 mm\u00b3."
     },
     {
       "name": "roof-bridge-keeper--1 solid",
@@ -74,7 +84,7 @@
     {
       "name": "roof-bridge-pin-1 solid",
       "passed": true,
-      "detail": "1 connected solids; 242.800 mm\u00b3."
+      "detail": "1 connected solids; 180.400 mm\u00b3."
     },
     {
       "name": "roof-bridge-keeper-1 solid",
@@ -108,6 +118,16 @@
     },
     {
       "name": "body-front / head-visor",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-front / neck-cover",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
@@ -182,6 +202,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-rear / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-rear / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-rear / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -247,6 +277,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-right / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-right / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-right / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -307,6 +347,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "body-roof / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "body-roof / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "body-roof / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -362,6 +412,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-front / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-front / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-front / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -412,6 +472,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-rear / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-rear / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-rear / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -457,6 +527,16 @@
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
     {
+      "name": "head-visor / speaker-grille",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "head-visor / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
       "name": "head-visor / speaker-cradle",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
@@ -498,6 +578,101 @@
     },
     {
       "name": "head-visor / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / neck-cover",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "speaker-grille / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / speaker-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / jetson-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / audio-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / camera-cradle",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / roof-bridge",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
+    },
+    {
+      "name": "neck-cover / roof-bridge-keeper-1",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3; boundary contact allowed."
     },
@@ -930,6 +1105,116 @@
       "name": "head-visor / full camera",
       "passed": true,
       "detail": "Overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "speaker-grille / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Jetson",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / One speaker",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / USB audio case",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Audio USB extension",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / STS3215 housing",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Servo ears and leads",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Bus interface",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Servo regulator",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Jetson USB/power plugs",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Fan intake space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
+    },
+    {
+      "name": "neck-cover / Outlet space",
+      "passed": true,
+      "detail": "Hardware/reservation overlap 0.000000 mm\u00b3."
     },
     {
       "name": "speaker-cradle / Jetson",
@@ -1389,7 +1674,7 @@
     {
       "name": "One speaker rear insertion",
       "passed": true,
-      "detail": "Continuous 200 mm rear sweep and 6 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
+      "detail": "Continuous 200 mm rear sweep and 0 mm lowering versus shell and matching cradle: 0.000000 mm\u00b3. Install speaker/audio before Jetson; remove loose cradles first."
     },
     {
       "name": "USB audio case rear insertion",
@@ -1419,17 +1704,1212 @@
     {
       "name": "Lens opening / focus 26",
       "passed": true,
-      "detail": "\u00d834 aperture; ideal 100\u00b0 diagonal cone radius 14.697 mm; actual framing U."
+      "detail": "\u00d840.4 aperture; ideal 100\u00b0 diagonal cone radius 19.464 mm; actual framing U."
     },
     {
       "name": "Lens opening / focus 27.5",
       "passed": true,
-      "detail": "\u00d834 aperture; ideal 100\u00b0 diagonal cone radius 12.909 mm; actual framing U."
+      "detail": "\u00d840.4 aperture; ideal 100\u00b0 diagonal cone radius 17.677 mm; actual framing U."
     },
     {
       "name": "Roof flange footprint",
       "passed": true,
       "detail": "Only the two specified 3\u00d74\u00d75 mm posts enter the \u00d850 flange footprint above Z160."
+    },
+    {
+      "name": "audio beam -44 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 14.400000 mm\u00b2 over8 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "audio beam -8 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 14.400000 mm\u00b2 over8 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "roof beam -46/-36 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 36.000000 mm\u00b2 over12 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "roof beam -46/36 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 36.000000 mm\u00b2 over12 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "roof beam 46/-36 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 36.000000 mm\u00b2 over12 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "roof beam 46/36 load sections",
+      "passed": true,
+      "detail": "Actual minimum section area 36.000000 mm\u00b2 over12 sections; 2.4\u00d76 mm reference."
+    },
+    {
+      "name": "rear socket 10 ligament -1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "rear socket 10 ligament 1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "rear socket 125 ligament -1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "rear socket 125 ligament 1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "port socket 15 ligament -1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "port socket 15 ligament 1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "port socket 125 ligament -1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "port socket 125 ligament 1",
+      "passed": true,
+      "detail": "2.4mm structural land; missing 0 mm\u00b3 from actual final part."
+    },
+    {
+      "name": "Jetson final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "One speaker / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "USB audio case / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Audio USB extension / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "STS3215 housing / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo ears and leads / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Bus interface / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Servo regulator / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Jetson USB/power plugs / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Fan intake space / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / body-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / body-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / body-right",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / body-roof",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / speaker-grille",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / neck-cover",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / speaker-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / jetson-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / audio-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / roof-bridge",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / roof-bridge-pin--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / roof-bridge-keeper--1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / roof-bridge-pin-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Outlet space / roof-bridge-keeper-1",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Camera rear cable space final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Camera rear cable space / head-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Camera rear cable space / head-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Camera rear cable space / head-visor",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "Camera rear cable space / camera-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "complete camera final cavity containment",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "complete camera / head-front",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "complete camera / head-rear",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "complete camera / head-visor",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "complete camera / camera-cradle",
+      "passed": true,
+      "detail": "0.0"
+    },
+    {
+      "name": "body minimum wall",
+      "passed": true,
+      "detail": "3.1684972065717476"
+    },
+    {
+      "name": "body section 0 wall",
+      "passed": true,
+      "detail": "3.9207282918270354"
+    },
+    {
+      "name": "body section 1 wall",
+      "passed": true,
+      "detail": "3.199999562409248"
+    },
+    {
+      "name": "body section 2 wall",
+      "passed": true,
+      "detail": "3.9230667245490127"
+    },
+    {
+      "name": "head minimum wall",
+      "passed": true,
+      "detail": "2.999999999999973"
+    },
+    {
+      "name": "head section 0 wall",
+      "passed": true,
+      "detail": "2.999999999999975"
+    },
+    {
+      "name": "head section 1 wall",
+      "passed": true,
+      "detail": "2.999999999999975"
+    },
+    {
+      "name": "head section 2 wall",
+      "passed": true,
+      "detail": "2.999999999999975"
+    },
+    {
+      "name": "speaker pedestal -42.0/-45.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "speaker pedestal -42.0/-45.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 684.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "speaker pedestal -42.0/-45.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "speaker pedestal 42.0/-45.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "speaker pedestal 42.0/-45.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 684.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "speaker pedestal 42.0/-45.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "Jetson pedestal -44.75/-2.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "Jetson pedestal -44.75/-2.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 144.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "Jetson pedestal -44.75/-2.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "Jetson pedestal -44.75/22.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "Jetson pedestal -44.75/22.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 144.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "Jetson pedestal -44.75/22.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "Jetson pedestal 29.75/-2.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "Jetson pedestal 29.75/-2.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 144.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "Jetson pedestal 29.75/-2.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "Jetson pedestal 29.75/22.5 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'z', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "Jetson pedestal 29.75/22.5 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 144.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "Jetson pedestal 29.75/22.5 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "audio support -44 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [2.4000000000000057, 6.0]}"
+    },
+    {
+      "name": "audio support -44 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 34.56000000000011, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "audio support -44 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "audio support -8 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [2.4000000000000057, 6.0]}"
+    },
+    {
+      "name": "audio support -8 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 34.56000000000011, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "audio support -8 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "roof support -46/-36 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "roof support -46/-36 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 432.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "roof support -46/-36 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "roof support -46/36 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "roof support -46/36 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 432.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "roof support -46/36 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "roof support 46/-36 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "roof support 46/-36 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 432.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "roof support 46/-36 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "roof support 46/36 support section",
+      "passed": true,
+      "detail": "{'load_axis': 'y', 'section_mm': [6.0, 6.0]}"
+    },
+    {
+      "name": "roof support 46/36 continuous core",
+      "passed": true,
+      "detail": "{'core_mm3': 432.0, 'missing_mm3': 0.0}"
+    },
+    {
+      "name": "roof support 46/36 shell load path",
+      "passed": true,
+      "detail": "1"
+    },
+    {
+      "name": "outlet actual cavity endpoints",
+      "passed": true,
+      "detail": "126/126 complete endpoint faces inside cavity and outside outer shell."
+    },
+    {
+      "name": "outlet actual clear projected opening",
+      "passed": true,
+      "detail": "2268 mm\u00b2; 126 complete 3\u00d76 mm through-prisms; worst obstruction 0 mm\u00b3."
+    },
+    {
+      "name": "intake actual cavity endpoints",
+      "passed": true,
+      "detail": "126/126 complete endpoint faces inside cavity and outside outer shell."
+    },
+    {
+      "name": "intake actual clear projected opening",
+      "passed": true,
+      "detail": "2268 mm\u00b2; 126 complete 3\u00d76 mm through-prisms; worst obstruction 0 mm\u00b3."
+    },
+    {
+      "name": "body-rear sampled service travel",
+      "passed": true,
+      "detail": "{\"name\": \"body-rear\", \"poses_mm\": [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0, 24.0, 26.0, 28.0, 30.0, 32.0, 34.0, 36.0, 38.0, 40.0, 42.0, 44.0, 46.0, 48.0, 50.0, 52.0, 54.0, 56.0, 58.0, 60.0, 62.0, 64.0, 66.0, 68.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0], \"direction\": [0, 1, 0], \"passed\": true, \"obstructions\": [], \"validation\": \"Actual solid poses every0.5mm for initial8mm and every2mm to80mm. Sampled validation, not a continuous clearance proof. Head, joint, neck, roof and bridge removed; other cover, cradles, fixed hardware and plug reservation retained. Physical release and cables remain U.\"}"
+    },
+    {
+      "name": "body-right sampled service travel",
+      "passed": true,
+      "detail": "{\"name\": \"body-right\", \"poses_mm\": [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0, 24.0, 26.0, 28.0, 30.0, 32.0, 34.0, 36.0, 38.0, 40.0, 42.0, 44.0, 46.0, 48.0, 50.0, 52.0, 54.0, 56.0, 58.0, 60.0, 62.0, 64.0, 66.0, 68.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0], \"direction\": [1, 0, 0], \"passed\": true, \"obstructions\": [], \"validation\": \"Actual solid poses every0.5mm for initial8mm and every2mm to80mm. Sampled validation, not a continuous clearance proof. Head, joint, neck, roof and bridge removed; other cover, cradles, fixed hardware and plug reservation retained. Physical release and cables remain U.\"}"
     }
   ],
   "geometry_passed": true,

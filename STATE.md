@@ -2,13 +2,11 @@
 
 Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Active task: Enclosure paused for Astra refinement
+## Active task: Tapered enclosure prototype
 
-Dylan rejected the boxy CAD exterior on 2026-10-11. He plans to use Astra next session. Start with [the concise handoff](hardware/concept-a/HANDOFF.md), then [requirements](hardware/DESIGN_REQUIREMENTS.md). Compare the approved concept with the actual CAD preview before further development.
+The neutral-white enclosure uses a raised black grille and 22 mm base roll. Its finished bounds are 148.6 × 127.2 × 236 mm (E). All 1,200 CAD checks and 46 P1S slicing checks pass. The assembly viewer shows parts, internal envelopes, assembly groups, and connection notes. Task review passed. Physical measurements and printed coupons are the next step.
 
-The manual fit study has 35 assembly parts, 44 sliced P1S projects, and 883 CAD checks (E). Physical fits remain U. Installed servo retention, powered coupling, final plug inserts, cable movement, cooling, and acoustics remain pending. Preserve this work where compatible with the exterior refinement. The user paused this session; do not continue runtime tasks automatically.
-
-Runtime backlog remains: the jumpy "???" focus box, command set v2, missed-face reset, and physical latency by loopback.
+Physical retention, powered mounting, cable movement, cooling, and acoustics remain U. Before a full print, measure safe support lands, servo ears and horn hardware, bearing contacts, installed plugs, and camera cable bends. Confirm fan direction and microphone positions. Start with the panel-fit coupons. Read [requirements](hardware/DESIGN_REQUIREMENTS.md) and [handoff](hardware/concept-a/HANDOFF.md).
 
 ## Robot
 
@@ -32,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read `hardware/concept-a/HANDOFF.md`. Compare its linked appearance images and plan the Astra exterior refinement.
+Review the offline assembly viewer and collect the physical measurements in the handoff before final retention and powered design.

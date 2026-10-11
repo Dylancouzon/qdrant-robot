@@ -95,3 +95,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **Owner and location 2026-10-10 (Dylan): Bind places and people to object evidence.** A UI-set location on each sighting; an owner from the named introducer on the named object. Not built yet; see `research/owner-location.md`.
 
 **H1 2026-10-11: Dylan authorizes a rotating camera head.** This supersedes D61's no-motor requirement for head yaw only. Concept A keeps the Jetson and one speaker in the stationary body, uses removable press-fit component installation, and reserves the owned 7.4 V STS3215; final fit, power, and motion remain U.
+
+**H2 2026-10-11: Use the tapered neutral-white enclosure.** This supersedes H1 appearance only. A 22 mm base roll softens the body without increasing its envelope; separate rear and port covers preserve service access. The modeled envelope is 148.6 × 127.2 × 236 mm (E); physical retention, powered coupling, and cooling remain U.

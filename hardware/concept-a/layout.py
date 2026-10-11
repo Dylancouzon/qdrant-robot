@@ -13,7 +13,7 @@ import trimesh
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "output"
-HEAD_Z = 205
+HEAD_Z = 208
 CAMERA_X = -24
 CAMERA_Z = HEAD_Z
 SOURCE = "https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/hardware/claude-design.html"
@@ -88,7 +88,7 @@ def hardware():
         item(
             "One speaker",
             (100, 21, 45),
-            (0, -39, 31),
+            (0, -45.5, 47.5),
             "#555960",
             "hardware",
             "E: larger manufacturer envelope; actual speaker size is U.",
@@ -97,7 +97,7 @@ def hardware():
         item(
             "USB audio case",
             (53, 14.6, 23.5),
-            (-27, -40, 85),
+            (-27, -40, 88),
             "#767a84",
             "hardware",
             ("E: case only, without USB plug. Orient microphone end toward a front sound channel."),
@@ -106,7 +106,7 @@ def hardware():
         item(
             "Audio USB extension",
             (20, 20, 22),
-            (10, -40, 85),
+            (10, -40, 88),
             "#d08e48",
             "reservation",
             (

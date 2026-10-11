@@ -23,7 +23,7 @@ Physical printing, installed plug fit, adjacent USB clearance, and final casing 
 
 ## Complete casing and joint prototype
 
-Bambu Studio 02.08.02.61 sliced all 44 individual casing, joint, cradle, and gauge projects through its official CLI (E). Each uses the saved native P1S profile, PLA, a 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All returned success with empty warning messages. Exported object bounds and triangle counts match their source meshes. No print was sent.
+Bambu Studio 02.08.02.61 sliced all 46 individual casing, joint, cradle, and gauge projects through its official CLI (E). Each uses the saved native P1S profile, PLA, a 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All returned success with empty warning messages. Exported object bounds and triangle counts match their source meshes. No print was sent.
 
 [The slicing report](output/bambu/slice-checks.json) records each source hash, project hash, estimate, and result. [The P1S projects](output/bambu/) preserve the print orientations and saved settings. Inspect each project's supports before physical printing. Native UI inspection of these new projects remains incomplete because the app control returned `noWindowsAvailable` and `timeoutReached` after opening the front-shell project. CLI slicing does not establish safe support removal or physical retention.
 

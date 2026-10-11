@@ -92,11 +92,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "body-front / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "body-rear / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -183,11 +178,6 @@
     },
     {
       "name": "body-rear / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "body-rear / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -282,11 +272,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "body-right / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "body-roof / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -373,11 +358,6 @@
     },
     {
       "name": "body-roof / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "body-roof / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -472,11 +452,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "head-front / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "head-rear / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -563,11 +538,6 @@
     },
     {
       "name": "head-rear / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "head-rear / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -662,7 +632,182 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "head-visor / manual_drive_gear",
+      "name": "speaker-grille / gear_shaft",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / inner_spacer",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / head_key_-18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / head_key_18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / head_flange",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / shaft_key",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / roof_key_-21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / roof_key_21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_pin_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_pin_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / tower_left",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "speaker-grille / tower_right",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / gear_shaft",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / inner_spacer",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / head_key_-18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / head_key_18",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / head_flange",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / shaft_key",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / roof_key_-21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / roof_key_21",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_pin_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_keeper_164_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_pin_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_keeper_164_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_pin_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_keeper_170_-19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_pin_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / closure_keeper_170_19",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / tower_left",
+      "passed": true,
+      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
+    },
+    {
+      "name": "neck-cover / tower_right",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -757,11 +902,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "speaker-cradle / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "jetson-cradle / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -848,11 +988,6 @@
     },
     {
       "name": "jetson-cradle / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "jetson-cradle / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -947,11 +1082,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "audio-cradle / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "camera-cradle / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -1038,11 +1168,6 @@
     },
     {
       "name": "camera-cradle / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "camera-cradle / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -1137,11 +1262,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "roof-bridge / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "roof-bridge-pin--1 / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -1228,11 +1348,6 @@
     },
     {
       "name": "roof-bridge-pin--1 / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "roof-bridge-pin--1 / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -1327,11 +1442,6 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "roof-bridge-keeper--1 / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "roof-bridge-pin-1 / gear_shaft",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
@@ -1418,11 +1528,6 @@
     },
     {
       "name": "roof-bridge-pin-1 / tower_right",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
-      "name": "roof-bridge-pin-1 / manual_drive_gear",
       "passed": true,
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
@@ -1517,18 +1622,13 @@
       "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
     },
     {
-      "name": "roof-bridge-keeper-1 / manual_drive_gear",
-      "passed": true,
-      "detail": "Assembled overlap 0 mm\u00b3. Designed boundary contacts have zero volume."
-    },
-    {
       "name": "head casing / stationary assembly",
       "passed": true,
       "detail": {
-        "samples": 63,
-        "proven_intervals": 32,
-        "radius_mm": 61.61168720299745,
-        "minimum_sample_gap_mm": 3.4000000000000057,
+        "samples": 127,
+        "proven_intervals": 64,
+        "radius_mm": 70.51248124693954,
+        "minimum_sample_gap_mm": 3.0,
         "method": "Exact midpoint solid distance exceeds maximum angular point travel through each interval.",
         "unresolved": []
       }
@@ -1537,10 +1637,10 @@
       "name": "moving joint / fixed casing",
       "passed": true,
       "detail": {
-        "samples": 15,
-        "proven_intervals": 8,
+        "samples": 63,
+        "proven_intervals": 32,
         "radius_mm": 31.827660925679098,
-        "minimum_sample_gap_mm": 6.199999999999997,
+        "minimum_sample_gap_mm": 2.3132072387696216,
         "method": "Exact midpoint solid distance exceeds maximum angular point travel through each interval.",
         "unresolved": []
       }
@@ -1569,6 +1669,11 @@
       "name": "Roof bridge admission / seated joint",
       "passed": true,
       "detail": "Peak 0.000000 mm\u00b3 at0.5 mm rear samples; bridge pins removed."
+    },
+    {
+      "name": "Neck cover continuous vertical admission",
+      "passed": true,
+      "detail": "60 mm complete vertical sweep with head casing removed; obstruction 0 mm\u00b3."
     }
   ]
 }
