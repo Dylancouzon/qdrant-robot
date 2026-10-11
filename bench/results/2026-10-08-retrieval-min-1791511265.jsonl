@@ -1,3 +1,0 @@
-{"shard": "sightings", "relevant": 50, "other": 8100, "relevant_min": 0.562, "relevant_p10": 0.607, "other_max": 0.759, "other_p99": 0.627}
-{"shard": "named", "relevant": 13, "other": 1128, "relevant_min": 0.662, "relevant_p10": 0.679, "other_max": 0.757, "other_p99": 0.62}
-{"summary": "retrieval-min", "questions": 163, "model": "bge-small-en-v1.5", "machine": "mac", "command": "python -m bench.calibrate_retrieval"}

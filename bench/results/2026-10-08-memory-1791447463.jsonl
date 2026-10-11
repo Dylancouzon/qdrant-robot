@@ -1,8 +1,0 @@
-{"step": "start", "mb": 0, "available_mb": 6032, "release": "4e4f711d9d4d"}
-{"step": "bge-small (ORT CUDA)", "mb": 442, "available_mb": 5590, "release": "4e4f711d9d4d"}
-{"step": "Kokoro (ORT CUDA)", "mb": 441, "available_mb": 5149, "release": "4e4f711d9d4d"}
-{"step": "Parakeet int8 + Silero (CPU)", "mb": 880, "available_mb": 4269, "release": "4e4f711d9d4d"}
-{"step": "llama-server Qwen3-VL-2B", "mb": 2067, "available_mb": 2202, "release": "4e4f711d9d4d"}
-{"step": "Kokoro after 39 phrase lengths", "mb": 211, "available_mb": 1991, "release": "4e4f711d9d4d"}
-{"step": "Parakeet after 1 to 14 s inputs", "mb": -25, "available_mb": 2016, "release": "4e4f711d9d4d"}
-{"step": "llama-server stopped", "mb": -1700, "available_mb": 3716, "release": "4e4f711d9d4d"}

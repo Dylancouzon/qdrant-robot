@@ -1,9 +1,0 @@
-# D138 independent recorded browser review
-
-Reviewer: /root/overlay_reviewer, Sol6.1/high. Deployed08ff2193ddc7 matches all704 source hashes for frozen code3a225f71e73b142864f3addacc2745cd99e2b30a. The reviewer uses native Chrome on original tab1202942045; no duplicate viewer. One Start runs the existing30-second person recording with microphone disabled, followed by Stop and visible Idle/muted confirmation.
-
-Verdict: PASS for the observed scope. Moving frames show Dylan directly above a green face-only box. One orange laptop focus stays on the same object across face-name-present and face-name-absent snapshots. Confidence changes Laptop? to ??? on the same target. No body outline, copied face card, tiny clutter, or obvious rapid target alternation appears. One early snapshot has no eligible focus; a final side-facing frame selects the chair once. No named physical object appears, so this replay adds no known-object-coexistence evidence. The scoped tracker/shard regression covers coexistence.
-
-Limits: sparse native snapshots leave continuous physical jitter, cadence, and exact transition timing unqualified. Source-absent or epoch-invalid objects abstain on older verified frames. No naming, ignore, restore, consent, or forget control is used. No second replay or full suite runs.
-
-The lead stops owned recorded server2734 after argv verification. Unit qr-live-mac-ff44a430cb1c.service is collected/inactive with no GPU-lock holder. Its resource log is shared/results/live-mac-ff44a430cb1c-20261010-000330.tegrastats. Replay-modified memory remains in shared/backups/2026-10-10-d138-recorded-review-memory. CURRENT pre-review archive2026-10-10-before-preview-d138.tar.gz restores all223 files with SHA256 verification, preserving the user's recent teaching and ignore actions. Normal live-camera server5883 opens only the original preview Idle, with microphone off. Prior623954f5cdb8 and backups remain.

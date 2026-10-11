@@ -1,9 +1,0 @@
-# D136 independent recorded browser review
-
-Reviewer: /root/overlay_reviewer, Sol6.1/high. Candidate623954f5cdb8, frozen reviewed code1d77da. The reviewer used native Chrome on the original tab1202942045 because the lead held its extension binding. No duplicate tab or MJPEG viewer was opened. The ordinary interface ran the existing30-second person recording after warmup, with paced silence and microphone disabled.
-
-Verdict: PASS for scoped actual UI review; no concrete blocker observed. Moving source frames showed only "Dylan" directly above the green face box, including front-facing, phone occlusion, and partial side turns. Turned-away frames cleared the name and showed anonymous body outlines. No copied face card or tiny boxes appeared. Session and item-ignore controls were reachable. Stop completed visibly Idle, with microphone muted, Unmute disabled, and meters zero.
-
-Limits: names remain intermittent on verified source frames. Native snapshots cannot establish continuous jitter or leave/reenter timing. Restore was present in the accessibility tree; a native window-unavailable response prevented its lower-screen visual layout check. Real Restore mutation and persistence passed the temporary-memory runtime check. No production naming, ignore, restore, consent, or forget action was performed in this browser review. Both failed extra fixture native1 receipts remain separately recorded with their invalid or ambiguous target assumptions.
-
-The lead stopped only the owned recorded server after checking its argv. With no robot job or GPU-lock holder, it retained replay-modified memory in shared/backups/2026-10-09-d136-recorded-review-memory and restored the closed original archive. All222 archived files matched SHA256 after restore. It relaunched normal live-camera settings as owned Macserver73794, reloaded the original tab, and verified Idle with microphone off. Prior releases and both memory copies remain for rollback and human acceptance.

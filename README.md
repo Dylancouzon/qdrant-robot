@@ -2,11 +2,9 @@
 
 A robot that sees, listens, talks, and remembers on one Jetson Orin Nano Super 8 GB. Qdrant Edge stores and retrieves its observed evidence inside the robot process. The goal is stronger perception, sustained conversation, useful memory, and fluid interaction; targets are a floor (D76).
 
-Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [experiment index](research/experiments.md). Use [lessons](research/lessons.md) for pitfalls. Open only the linked evidence needed for the next decision.
+Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and [research/lessons.md](research/lessons.md), which lists every avenue tried and its outcome. [DECISIONS.md](DECISIONS.md) holds the binding choices; older history is in [research/archive/](research/archive/).
 
-The [Gemma/Qwen comparison](research/gemma-fit.md) retains Qwen3-VL-2B with CUDA Kokoro. Gemma fits the model stack, but scores 31/47 recorded answers versus Qwen 39/47 and adds speech latency. The [next-session plan](research/answer-evidence.md) covers intent parsing and tool execution optimization with Qwen fixed.
-
-Current controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md); measured scope is in the [D147 audit](bench/results/2026-10-10-d147-box-continuity.json).
+The current brain is Qwen3-VL-2B with CUDA Kokoro. The [active task](research/answer-evidence.md) is intent parsing for evidence selection. Controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md).
 
 ## Read evidence without running models
 

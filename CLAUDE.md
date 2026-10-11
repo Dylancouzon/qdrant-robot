@@ -2,203 +2,158 @@
 
 This is an autonomous, AI-led project. **The rules in this file supersede Dylan's global CLAUDE.md** wherever they differ (Git, sub-agents, review gates, writing gates).
 
-The lead may choose architectures, models, training approaches, cleanup, deployments, commits, and pushes within this product scope without asking. After a task, continue to the next unmet milestone. Ask Dylan only for physical intervention (cables, reflashing, hardware), new spending, credentials, or recovery beyond available access. Keep unmet targets visible.
-
-Session-start reconciliation and edits to `STATE.md` and `DECISIONS.md` belong to the lead. Builders, researchers, and reviewers report discrepancies to the lead and never edit those two files.
-
 A desktop robot that sees, listens, talks, and remembers, with every model and every memory on one Jetson Orin Nano Super 8 GB. Its memory is Qdrant Edge, the embedded Qdrant engine, inside the robot's own process. It is a conference-booth showcase: the reaction we want is "how does this run on a $249 board?"
+
+The lead may choose architectures, models, training, cleanup, deployments, commits, and pushes within this scope without asking. After a task, continue to the next unmet target. Ask Dylan only for physical work (cables, reflashing, hardware), new spending, credentials, or recovery beyond available access.
 
 ## Session start (and after every compaction)
 
-1. Read this file, `STATE.md`, and `research/lessons.md`. Then read the decisions linked to the active task and its explored alternatives.
-2. The lead reconciles `STATE.md` with `git status`. Before remote work, check running jobs and the deployed release. Builders report discrepancies.
-3. Read the task's topic files and compact results with `python3 tools/results.py`. Inspect individual rows or logs only for the question being resolved.
-4. Finish and review the active task before you start another. Commit only if the Git section of `STATE.md` allows it. Otherwise, leave the diff and evidence as a verified checkpoint and record it in `STATE.md`.
+1. Read this file, `STATE.md`, and `research/lessons.md`. Then read the decisions and topic files the active task links.
+2. Reconcile `STATE.md` with `git status`. Before remote work, check running jobs and the deployed release.
+3. Read results with `python3 tools/results.py`. Open individual rows or logs only for the question at hand.
+4. Finish and review the active task before you start another.
 
-## Goal
+## Goal and priorities
 
-Raise the capability ceiling for perception, sustained conversation, useful retrieval, and fluid interaction on one 8 GB Jetson (D61, D62, D76). Qdrant Edge is central to how the assistant remembers and uses evidence. The reference `refs/reachy-edge-memory` establishes the initial capabilities; every model runs on our Jetson. Architecture, model size, training, and context length remain choices to test against the largest measured gaps.
-
-Visitor capabilities, with the current evidence paths (D21, D54, D61, D75):
+Raise the capability ceiling for perception, sustained conversation, useful retrieval, and fluid interaction on one 8 GB Jetson (D76). Qdrant Edge is central to how the assistant remembers and uses evidence.
 
 | Visitor says | Answered from |
 | --- | --- |
 | "What do you see?" | The camera, now |
 | "What did I show you?", "Where is my phone?" | Stored captions, detector sightings, and named-object crop vectors |
 | "What did we talk about?" | The conversation window and retrieved statements from Qdrant Edge |
-| "Do you remember me?" | Face match against people (one point per person, several face shots as a multivector, MaxSim) |
-| "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with several question phrasings as a multivector) |
+| "Do you remember me?" | Face match against people (one point per person, face shots as a multivector, MaxSim) |
+| "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with question phrasings as a multivector) |
 
-The robot has no motors. D61 removed left and right logic from the product direction. Historical results can still contain those words.
-
-Priority order when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. A Wikipedia knowledge shard is an add-on after M4, never at the cost of the core loop.
+Priority when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. The robot has no motors and no left or right logic (D61). A Wikipedia shard is an add-on after M4.
 
 ## Targets
 
-These targets are a floor, not the capability ceiling (D76). Passing a milestone never ends work on the largest perception, conversation, or retrieval gaps. Each milestone in `STATE.md` has interim numbers. Change a target only through an evidence-backed `DECISIONS.md` entry; unmet targets stay visible.
+Targets are a floor, not the ceiling (D76). Change one only through a `DECISIONS.md` entry with evidence; unmet targets stay visible in `STATE.md`.
 
 | Metric | Target |
 | --- | --- |
 | Physical end of speech to first audible output (includes endpointing) | 1.2 s p50, 2.0 s p95 |
 | Answer correctness on held-out `eval/` fixtures | 90% or more per capability; zero false identity claims on strangers |
 | LLM decode (secondary to answer quality) | 30 tok/s or more |
-| Detection and tracking while talking (not camera capture rate) | 15 fps or more, sustained |
+| Detection and tracking while talking | 15 fps or more, sustained |
 | Qdrant Edge query | 10 ms p99 per shard |
 | Peak RAM headroom with every component active | 500 MB minimum, aim for 1 GB; no swap during a turn |
 
-## Hardware and machines
-
-- **Robot:** Jetson Orin Nano Super 8 GB, headless, NVMe, USB camera (Arducam IMX291, about 100°), reachable over the network. Access details are in `STATE.md`. Keep SSH access working: never run the course robot's hotspot setup over the active Wi-Fi link.
-- **Allowed additions:** anything the Jetson drives directly over USB, I2C, SPI, or GPIO: speaker, microphones, sensors, LEDs, displays, a thermal printer. No servos, no arms.
-- **Mac (Apple silicon):** development, unit tests, dataset preparation, index builds, and training runs that need headroom. Build Jetson-specific engines on the Jetson, and measure every acceptance number on the Jetson. The product runs on the Jetson only.
-
-## Approach
-
-- Off-the-shelf models first. Fine-tune, distill, or train our own (for example a YOLO model) only when a benchmark shows the off-the-shelf option misses a target.
-- Build a thin working loop early, then measure and replace parts. Do not run a broad model sweep before something works end to end. There is no separate testing phase: every milestone ships a robot a visitor can use.
-- Pin `qdrant-edge-py` (0.8.0 at the start), model revisions, runtime versions, and preprocessing. Verify every Edge capability against the installed package's `.pyi` stubs, not against a skill or blog. The `qdrant:qdrant-edge` plugin skill is wrong about fusion: Edge fuses prefetches with `Fusion.Rrf` and `Fusion.Dbsf`.
-- 0.8.0 has no `query_batch` and no `Memory` placement setting; both are on Qdrant `master` only. Building Edge from source is allowed if a benchmark justifies it.
+M4 (booth-ready) needs held-out acceptance, all targets, offline cold start, restart persistence, deletion checks, a Jetson-connected speaker and microphone with the Mac disconnected, physical latency measured acoustically or by loopback, and an eight-hour run with no restart.
 
 ## Fixed outcomes and open choices
 
 Fixed (change only with Dylan): every model runs on the Jetson; memory lives in Qdrant Edge in-process; answers cite stored evidence; faces need explicit consent; "forget me" deletes for real; releases can roll back; runs are reproducible; unmet targets stay visible; answer quality comes first.
 
-Open (the build decides by measurement): model family, runtime, process count, CPU or GPU placement, precision, detector cadence, training, and context and answer lengths.
+Open (measurement decides): model family, runtime, process count, CPU or GPU placement, precision, detector cadence, training, and context and answer lengths.
 
-## Current measured design
+## Current design
 
-D14's starting architecture was superseded by the decisions below. Improve or replace the current design when new evidence supports it.
+`DECISIONS.md` lists every binding choice. In short: Qwen3-VL-2B on llama.cpp with retrieval in code and code-owned actions and identity; YOLOE-26s TensorRT with tracking; DINOv2-small named-object multivectors; YuNet and w600k_r50 faces; Silero VAD, Parakeet int8, and Kokoro on CUDA with a first-phrase decode pause; 2,048-token context, 256 image tokens, and 64 output tokens. Generated captions and replies are stored with their source evidence; a generated statement alone never counts as an observed fact. Improve or replace any part when evidence supports it.
 
-- **Brain:** Qwen3-VL-2B on llama.cpp; retrieval runs in code, without model tool calls (D21, D35). Evidence follows the image (shape I). Code answers stay because retrieval into the brain missed D75's frozen comparison by one M2 step. The alternate path is saved in `research/one-voice.patch`.
-- **Perception:** YOLOE-26s with TensorRT, tracking, label voting, and short-track merging; YOLOE-26n remains the fallback (D43, D56, D146). Named objects use DINOv2-small crop multivectors in Edge (D64). YuNet detects faces; w600k_r50 uses two-shot support for identity (D45, D56). Focus and the view are wired (D67, D72, D73).
-- **Voice:** Silero VAD and Parakeet int8 on CPU (D24, D38); Kokoro on CUDA. Decode pauses during the first phrase to reduce contention (D66, D72). Hey Edgy opens a follow-up window (D65, D73).
-- **Generation:** one active generation, 2,048-token context, 256 image tokens, and 64 output tokens with a sentence cap (D28, D39, D72). These short-answer runs establish no sustained-conversation result. Longer context and answers need integrated latency, quality, and paging measurements.
-- **Memory:** observed evidence in Qdrant Edge; sightings store labels and times without frames, while turn captions retain source evidence (D25, D54). Retention has a time window and hard caps (D51, D56). Identity, consent, deletion, and other actions run in code.
-- **Headroom:** the 4B did not fit the integrated budget (D66, D68). The reported live conversation uses swap (D76). MemAvailable snapshots and KV estimates cannot establish room for longer context or prove that active paging is absent.
+## Hardware and machines
 
-## Exploring without tunnel vision
+- **Robot:** Jetson Orin Nano Super 8 GB, NVMe, USB camera (Arducam IMX291, about 100°). Never run the course robot's hotspot setup over the active Wi-Fi link.
+- **Allowed additions:** anything the Jetson drives over USB, I2C, SPI, or GPIO. No servos, no arms.
+- **Mac:** development, tests, data preparation, and training. **WSL 3080 box:** bake-offs and heavy preparation. Build Jetson engines on the Jetson; measure every acceptance number on the Jetson.
+- Access details and pitfalls are in `research/lessons.md` (Machines).
 
-- A design brief names at least two real alternatives and how each would be measured. A brief with one option gets RETHINK.
-- Decisions preserve evidence and tradeoffs; challenge them when a concrete intervention or disputed assumption could raise capabilities. Before reopening an approach, read its prior lessons and results, name what changes, and define a paired comparison (D76, D77). An unchanged sweep adds no decision evidence.
-- Use a cheap local check or recorded-prompt comparison first. Run the full integrated replay once after a material change; keep acceptance measurements on the Jetson.
-- Settle a choice through a paired comparison. Prototype candidates on `spike/*` branches, measure them on the Jetson, and record both outcomes in `DECISIONS.md`.
-- D83 removes execution deadlines. Continue useful work as long as needed; reassess routes at progress checkpoints and stop on evidence or resource constraints. After two failed approaches to one problem, run Astra counsel before a third.
+## How to work
+
+- Off-the-shelf first. Fine-tune, distill, or train only when a benchmark shows a miss.
+- Build the runnable thing first, then measure. Do not prepare evaluations for hours before a candidate exists (D102).
+- Before you try an approach, find its row in `research/lessons.md`. Reopen it only with a named change and a paired comparison (D77).
+- A design brief names at least two real alternatives and how each is measured.
+- Settle choices by paired comparison: a cheap local check first, then one integrated Jetson run after a material change. Prototype on `spike/*` branches.
+- No deadlines (D83). Stop on evidence or resource limits. After two failed approaches to one problem, run counsel before a third.
+- Pin `qdrant-edge-py` 0.8.0, model revisions, runtimes, and preprocessing. Verify Edge capabilities against the installed `.pyi` stubs. The `qdrant:qdrant-edge` skill is wrong about fusion: Edge fuses prefetches with `Fusion.Rrf` and `Fusion.Dbsf`.
 
 ## Roles
 
 | Role | Who | When |
 | --- | --- | --- |
-| Lead | The main session | Plans, decides, integrates, deploys; sole owner of `STATE.md`, `DECISIONS.md`, and shared configuration |
-| Researcher | `gpt-6-luna` (D76) | One question needed for the next decision. Never edits code. Two at most at once |
-| Builder | User-selected model, otherwise Opus | One scoped task from a written brief. One builder at a time, except D44's explicit disjoint-work case |
-| Design gate | Codex `gpt-6.1-sol`, `tools/gate.py design` | Once per architectural decision (model, runtime, process layout, data schema, new module), before building it. Not for reversible small steps |
-| Task review | Codex `gpt-6.1-sol`, `tools/gate.py review` | Once per completed task, before it counts as done |
-| Milestone review | Codex `gpt-6-astra`, `tools/gate.py milestone` | End of each milestone |
-| Counsel | Codex `gpt-6-astra`, `tools/gate.py design --model gpt-6-astra` | After two failed approaches to the same problem, or an architecture-level doubt |
+| Lead | The main session | Plans, decides, integrates, deploys; sole editor of `STATE.md` and `DECISIONS.md` |
+| Researcher | `gpt-6-luna` | One question for the next decision. Never edits code. Two at most at once |
+| Builder | User-selected model, otherwise Opus | One scoped task from a written brief. One at a time unless paths and the Jetson are disjoint (D44) |
+| Design gate | `tools/gate.py design` (gpt-6.1-sol) | Once per architectural decision (model, runtime, process layout, schema, new module) |
+| Task review | `tools/gate.py review` (gpt-6.1-sol) | Once per completed task |
+| Milestone review | `tools/gate.py milestone` (gpt-6-astra) | End of each milestone |
+| Counsel | `tools/gate.py design --model gpt-6-astra` | After two failed approaches, or an architecture-level doubt |
 
-Subagents do not spawn subagents. The lead reads every builder diff before the review gate.
-
-Brief a builder with: the task ID, the linked decisions, allowed paths, interfaces it must keep, acceptance checks, the machine it runs on (Mac or Jetson), and when to stop and report instead of building around a problem.
+Subagents do not spawn subagents. The lead reads every builder diff before review. A builder brief gives the goal, linked decisions, allowed paths, interfaces to keep, acceptance checks, the machine, and when to stop and report.
 
 ## Gates
 
-`tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only on this repo, saves the verdict to `reviews/`, and exits 0 only on a passing verdict (`GO`, `PASS`, `MILESTONE MET`). Exit 3 means act on the findings. Exit 124 means it timed out.
+`tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only, saves the verdict to `reviews/`, and exits 0 only on `GO`, `PASS`, or `MILESTONE MET`. Exit 3 means act on the findings; exit 124 means timeout. The criteria are in [gates/design.md](gates/design.md), [gates/review.md](gates/review.md), and [gates/milestone.md](gates/milestone.md).
 
-- **[Design gate](gates/design.md)** asks: Which measured capability gap does this close? Does it raise the ceiling on this Jetson? What would a strong edge-ML engineer do instead? What is the simplest useful version? What can be deleted?
-- **[Review gate](gates/review.md)** checks correctness, performance, dead code, duplication, and whether the change is the smallest one that does the job. Rules 6–8 cover overfitting, proportion, scope, and carrying optional edge cases.
-- **[Milestone gate](gates/milestone.md)** judges the milestone's own acceptance criteria, lists unproven final targets separately, and checks architectural drift and over-engineering.
+- `tools/githooks/pre-commit` (enable once: `git config core.hooksPath tools/githooks`) runs ruff, vulture, tests, and module assertions. It blocks only on failure and reminds about a missing review (D17). Checks read the working tree: stage complete files, never partially staged bookkeeping, and never bypass the hook.
+- Resolve every blocking finding, or reject it with evidence in the task's decision entry. Rerun a gate only after a material change.
+- Do not gate records-only changes (status, lessons, decisions text).
 
-### Safety net (light by design)
+A task is done when its checks pass, blocking findings are resolved, replaced code is deleted, the review passed, and `STATE.md` is true.
 
-Gates are mainly a habit, not a lock. One extra layer helps:
+## Records (lean, D149)
 
-- `tools/githooks/pre-commit` (enable once per clone: `git config core.hooksPath tools/githooks`) runs `tools/gate.py checks`: ruff, vulture, tests, and existing module assertions in one interpreter. Each stage has a 120 s limit and reports elapsed time. It blocks on failure or timeout and prints the size delta.
-- The same hook prints a reminder when no PASS review matches the staged code. It never blocks on that.
-- A gate stamps the tree it started with only if that tree still matches when the gate finishes. A changed tree exits 3.
-- `spike/*` branches are for free exploration; bring the winner to `main` with a review.
+Records exist so the next session works well. Write each fact once, in the one place it belongs.
 
-Resolve every blocking finding. To reject a finding, record the evidence in `DECISIONS.md`. Rerun a gate only after a material change, never to ask again about unchanged work. A better approach wins over sunk cost when evidence supports it, not on a reviewer's preference alone.
+- **`STATE.md`:** under 50 lines. Active task and its steps, robot and running jobs (host, unit, log path), targets table, and the next command. Rewrite it; never add receipts, evidence hashes, or review IDs (release IDs are fine).
+- **`DECISIONS.md`:** binding choices only. Add an entry (three lines or fewer) when a task changes the design or a rule, and for each counted held-out use. Append-only; a new entry names the one it supersedes. Reviews, receipts, scope notes, and corrections are not decisions.
+- **`research/lessons.md`:** one row per avenue tried, with outcome, status, and decision link; plus pitfalls and machine access. Update the row when an avenue concludes. This is how we avoid repeating failed work.
+- **`research/<topic>.md`:** how the current system works, one file per topic. Summary first. Replace outdated text; move superseded plans to `research/archive/`.
+- **`research/edge-cases.md`:** known gaps (D71).
+- **`reviews/`:** gate verdicts. **`bench/results/`:** one result file per run. Private media, voices, and raw logs stay in gitignored `build/`.
+- Each task commit carries its own record updates. No records-only commits except a session handoff. Archive tags only when retiring a branch with unmerged work.
+- Write records in full plain sentences. Label numbers J (measured on our Jetson), E (elsewhere), or U (unverified).
 
-## Definition of done
+## Evaluation
 
-A task is done when its acceptance checks pass, blocking findings are resolved, the code it replaces is deleted, the review gate passed, and `STATE.md` reflects reality.
-
-## Keeping the repo clean
-
-The repo must stay the cleanest, most optimized version of itself. Every task leaves the code smaller or clearer where it can.
-
-- One way to do each thing. Delete the old path in the same change.
-- No dead code, no compatibility shims, no commented-out code, no "for later" scaffolding.
-- No abstraction that adds neither isolation nor testability. No config option for a value that never changes.
-- Each module starts with one or two lines on what it is for.
-- Non-trivial logic leaves one runnable check (a small `test_*.py` or an `assert`-based self-check).
-- Everything in `refs/` is read-only reference. Copy an idea, not a file.
-
-## Benchmarks and evaluation
-
-- Define acceptance fixtures before choosing models. Keep development fixtures separate from held-out acceptance fixtures in `eval/`.
-- Fixtures cover current sight, past observations, similar objects, conversation eviction and recall, people (including unknown people), knowledge, absent memories, restart, and deletion. Each case stores expected evidence IDs and acceptable answers. Historical fixtures can retain superseded direction words. Score retrieval and answer correctness separately.
-- Each benchmark run writes `bench/results/YYYY-MM-DD-<what>-<run id>.jsonl` with: code revision or diff hash, machine, software and model versions, precision, context and image-token limits, dataset size, the command, sample counts, and percentiles.
-- Separate cold start from warm turns. Per turn, record endpointing, ASR done, retrieval, first token, first audible output, and answer done. Milestone acceptance uses at least 100 representative turns and 1,000 queries per shard; smaller checks are fine while building.
-- Log memory, swap, temperatures, and clocks (`tegrastats`) during every Jetson run. Peak headroom is measured with every component active.
-- Read replay and bake-off history with `python3 tools/results.py` and exact cases, model, machine, or release filters. Each file and variant stays separate. `correct` in raw replay summaries is a keyword-and-split heuristic; `.judged.jsonl` supplies judged answer scores. Missing judgments or a missing completion footer are explicit, never passes. A footer establishes recorded completion; legacy files can lack an expected fixture count.
-- Oracle, synthetic speech, recorded voice, live interaction, and logged-prompt bake-offs answer different questions. A synthesized first phrase is not physical audible latency. Short bounded turns do not establish long-conversation quality or memory safety.
-- M4 needs held-out acceptance, all targets, offline cold start, restart persistence, deletion checks, and an eight-hour active run with no restart.
-
-## Context hygiene
-
-- `STATE.md` is the only status file. Rewrite it, do not append. Keep it under 120 lines. Before any delegation, remote change, compaction, or session end, it records: the active task and its acceptance checks, changed paths, unresolved findings, evidence paths, running jobs (host, directory, PID or service, command, log path), and the exact next command.
-- `DECISIONS.md` is append-only. Each entry is five lines or fewer: date, decision, why, rejected alternatives, evidence path.
-- `research/` holds one file per topic: summary first, sources last. Replace an outdated finding; do not stack corrections. Label numbers J (measured on an Orin Nano), E (measured elsewhere), or U (unverified).
-- `reviews/` keeps gate verdicts (logs are ignored). Record the outcome in `DECISIONS.md` when it changes a decision.
-- `research/lessons.md` logs every important lesson for future sessions (Dylan, 2026-10-09): each avenue explored with its outcome and decision link, each pitfall with its fix or workaround, and machine access and setup. Add to it as lessons happen, not only at the end; before any pause, compaction, or session end, check that the session's lessons are in it and that `STATE.md` links it. Replace an outdated lesson rather than stacking corrections.
-
-## Mac-to-Jetson workflow
-
-- Build one deploy, run, and collect workflow in the first task, and use only it afterwards.
-- A release is identified by a hash of its source, including untracked files. Copy source and fixtures from the Mac to `/home/qdrant/qdrant-robot/releases/<hash>`. Models, memories, and logs live in `/home/qdrant/qdrant-robot/shared`.
-- Create the venv on the Jetson with its system Python 3.12. Pin dependencies and save the full environment (`pip freeze`, CUDA, TensorRT, model revisions and checksums) with the release.
-- Download models before offline tests. Record revision, checksum, preprocessing, and license per model.
-- Run long jobs as named systemd units with bounded logs. Record unit, command, release, start time, and log path in `STATE.md`. Collect results to the Mac before review.
-- Keep the previous release and a closed-shard backup until the new release passes acceptance. If health or acceptance fails, switch back.
-
-## Recovery
-
-- After reconnecting or a reboot, inspect boot ID, services, the deployed release, logs, and unfinished results before restarting anything. Mark interrupted runs as interrupted, never as complete. systemd restarts are bounded (for example `StartLimitBurst=3`).
-- On OOM or throttling: keep the kernel log and `tegrastats`, then reduce concurrency or memory before retrying.
-- On low disk: stop downloads and builds; delete only reproducible caches. Never delete memories, backups, or benchmark evidence.
-- Lost SSH: retry with backoff for 15 minutes, keep doing Mac-side work, then record the blocker and ask Dylan.
-- Before long work, record its disk estimate, progress signal, and recovery procedure for a stalled process. Operational watchdogs protect individual commands; they do not set a session or experiment deadline (D83). Retry an infrastructure failure once, after diagnosis.
-
-## Launch checklist (each autonomous session)
-
-Verify Claude and Codex authentication, model selection, and remaining usage, and that `git config core.hooksPath` prints `tools/githooks`. Keep the Mac awake (`caffeinate -dimsu` in the background). Reconcile any still-running subagents before starting new ones.
-
-## Tools and gotchas
-
-- `codex exec` waits on stdin unless stdin is closed. `tools/gate.py` handles it; close stdin in any direct call.
-- This workspace cannot read folders outside the repo (macOS sandbox). Keep references inside `refs/` (gitignored); their revisions are in `DECISIONS.md`.
-- Writing style for docs and commit messages: plain, short sentences; "vector search engine", never "vector database".
-
-## Git
-
-Dylan gave standing approval (2026-10-07) to commit and push for this entire project. Commit each task after its review gate passes. Push when a remote exists. Commit messages: imperative subject, 5 to 10 words, with the `Co-Authored-By` footer.
-
-## Secrets
-
-The robot's sudo password is in `.env` as `ROBOT_SUDO_PASSWORD` (gitignored). Never write it into a tracked file, a log, or a commit. If passwordless sudo works, prefer it.
+- Keep development fixtures separate from held-out fixtures in `eval/`. Freeze held-out fixtures before tuning, and count every held-out use in `DECISIONS.md`.
+- Fixtures cover current sight, past observations, similar objects, conversation recall, people (including strangers), knowledge, absent memories, restart, and deletion. Each case stores expected evidence IDs and acceptable answers. Score retrieval and answers separately.
+- Each run writes `bench/results/YYYY-MM-DD-<what>-<run id>.jsonl` with the code revision, machine, versions, limits, command, sample counts, and percentiles. Log `tegrastats` during every Jetson run.
+- Milestone acceptance uses at least 100 representative turns and 1,000 queries per shard; smaller checks are fine while building.
+- Per turn, record endpointing, ASR done, retrieval, first token, first audio, and answer done. Separate cold start from warm turns.
+- `correct` in raw replays is a keyword heuristic; `.judged.jsonl` holds judged scores (three votes, cached). Missing judgments are failures, never passes.
+- Oracle text, synthetic speech, recorded voice, and live interaction answer different questions. A synthesized first phrase is not physical audible latency. Short turns do not prove long-conversation quality.
+- A fix must hold beyond the development steps it flips (review rule 6).
 
 ## Testing without a human
 
-Most of the time no one is near the robot. Every capability must be testable from this Mac without a person:
+- **Scripted sessions:** `eval/` steps (show this image, say this WAV, wait) replay on the Jetson through file sources and score themselves. A replay exits non-zero when a required step fails.
+- **Speech in:** synthetic WAVs from `say` (16 kHz mono) plus Dylan's recorded voice; synthetic voices alone overstate ASR quality.
+- **Speech out:** save every TTS answer as a WAV and transcribe it independently on the Mac; empty, truncated, or wrong speech fails.
+- **Sight:** use fixture images and recorded clips. Use the live camera only for capture, orientation, and fps checks; check frame brightness first because the room may be dark.
+- **Live:** `tools/talk.py` streams Mac audio to the Jetson. Report Mac transport latency separately.
+- **Human test days:** put a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.
 
-- **Scripted sessions.** The runtime reads audio and frames from a source: live devices, or files. `eval/` sessions are scripts of steps (show this image, say this WAV, wait) with expected answers and evidence IDs. Replay them on the Jetson and score them.
-- **Speech in.** Generate question WAVs on the Mac (`say -o q.aiff "..."`, then convert to 16 kHz mono WAV), and record real voices when Dylan is around. Keep both in `eval/`; synthetic voices alone overstate ASR quality.
-- **Speech out.** Save every TTS answer as a WAV with timestamps. Score it by transcribing it on the Mac and comparing it with the expected answer and with the LLM's text.
-- **Sight.** The robot's camera cannot be aimed by an agent. Use fixture images and recorded clips through the file source. Use the live camera only to check that capture, orientation, and fps work. The room lights may be off at night: check mean frame brightness first, and when the frame is dark, run fixture-based work and leave live-camera checks for when it is lit.
-- **Live interaction during development.** Use the camera's microphone (on the Jetson) or a Mac client that streams Mac mic audio in and plays answers. Every model still runs on the Jetson. Report file-generation latency and Mac-transport latency separately.
-- **Final acceptance (M4).** A Jetson-connected speaker and microphone, the Mac disconnected, offline cold start, full spoken interaction. Measure physical audible latency with an acoustic recording or an audio loopback.
-- **Scoring.** Each replay command exits non-zero when any required step fails. It records ASR text, tool arguments, retrieved evidence IDs, answer text, output audio, and stage timestamps. Score retrieval and answers separately against the fixture. Transcribe output audio independently on the Mac; empty, truncated, or wrong speech fails.
-- **Coverage.** Current and remembered objects, similar instances, conversation eviction, absent memories, identity uncertainty, visitor changes, consent, restart, and deletion (verify after restart, including images and pending writes). Calibrate thresholds on development fixtures; freeze held-out fixtures before tuning.
-- **Provenance.** Store generated captions and replies with their source evidence. A generated statement alone never counts as an observed fact.
-- **Human test days.** When Dylan is at the robot, prepare a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.
+## Mac-to-Jetson workflow
+
+- `tools/jetson.py` deploys, runs, and collects; use only it. A release is a hash of its source, copied to `/home/qdrant/qdrant-robot/releases/<hash>`. Models, memories, and logs live in `shared/`.
+- The Jetson venv uses system Python 3.12 with pinned dependencies; each release saves its environment. Download models before offline tests and record revision, checksum, preprocessing, and license per model.
+- Run long jobs as named systemd units with bounded logs, and record them in `STATE.md`. Collect results to the Mac before review.
+- Keep the previous release and a closed-shard backup until a new release passes. Switch back if health or acceptance fails.
+
+## Recovery
+
+- After a reconnect or reboot, inspect the boot ID, services, deployed release, logs, and unfinished results before restarting anything. Mark interrupted runs as interrupted.
+- On OOM or throttling, keep the kernel log and `tegrastats`, then reduce concurrency or memory before retrying. Retry an infrastructure failure once, after diagnosis; never retry a quality failure unchanged.
+- On low disk, delete only reproducible caches. Never delete memories, backups, or benchmark evidence.
+- Lost SSH: retry with backoff for 15 minutes while doing Mac work, then record the blocker and ask Dylan.
+
+## Session checklist
+
+Verify Claude and Codex authentication and usage, and that `git config core.hooksPath` prints `tools/githooks`. Keep the Mac awake (`caffeinate -dimsu`). Reconcile running subagents before starting new ones. `codex exec` waits on stdin unless it is closed; `tools/gate.py` handles that. This workspace cannot read outside the repo; keep references in `refs/` (gitignored, revisions in D7).
+
+## Git and secrets
+
+Dylan gave standing approval (2026-10-07) to commit and push for this project. Commit each task after its review passes. Commit messages: imperative subject, 5 to 10 words, with the `Co-Authored-By` footer. Docs and commits use plain, short sentences and "vector search engine", never "vector database".
+
+The robot's sudo password is in `.env` as `ROBOT_SUDO_PASSWORD` (gitignored). Never write it into a tracked file, a log, or a commit.
+
+## Keeping the repo clean
+
+- One way to do each thing; delete the old path in the same change.
+- No dead code, compatibility shims, commented-out code, or "for later" scaffolding.
+- No abstraction without isolation or testability; no config option for a value that never changes.
+- Each module starts with one or two lines on what it is for. Non-trivial logic leaves one runnable check.
+- `refs/` is read-only reference. Copy an idea, not a file.

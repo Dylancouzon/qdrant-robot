@@ -1,5 +1,7 @@
 # Known gaps and parked proposals
 
+Some evidence paths below exist only in archive tags; see [archive/README.md](archive/README.md) to read them.
+
 ## Next-session object recognition discussion
 
 Dylan accepted the D147 live checkpoint on 2026-10-10. Owner from the named introducer and UI-set Location are selected future requirements. Current code and memory schemas stay unchanged; same-owner grouping and background isolation remain parked under D148.
@@ -13,7 +15,7 @@ The [reference crop implementation](https://github.com/Dylancouzon/qdrant-edge-m
 
 ## Earlier recorded backlog
 
-As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot first, in case the architecture changes. Each entry: trigger, risk, candidate fix, and source. D77 also permits revisiting verified limitations with a concrete intervention and paired validation. Foundational retrieval and conversation questions are in research/grounding.md, object perception in research/booth-ux.md, and memory candidates in research/stack.md.
+As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot first, in case the architecture changes. Each entry: trigger, risk, candidate fix, and source. D77 also permits revisiting verified limitations with a concrete intervention and paired validation. Foundational retrieval and conversation questions are in research/archive/grounding.md, object perception in research/booth-ux.md, and memory candidates in research/stack.md.
 
 | Case | Risk | Proposed fix | Source |
 | --- | --- | --- | --- |
