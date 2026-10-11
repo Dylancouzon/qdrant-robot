@@ -20,7 +20,7 @@ Four misses are model answers with adequate evidence (hand-teddy-3, same-apples-
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Accepted release `7f67670fa91e` (still on disk). `current` points at unadopted candidate `4d1aaab22abd` from the paired replay; switch back to the accepted release before any live demo.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `5c9a89a33fd4` (D150 recall, D151 UI Ignore, forget guard); rollback target `7f67670fa91e` (last accepted before today), still on disk.
 - Running jobs: none on the Jetson. The live Mac preview is paused.
 - WSL box: idle.
 
