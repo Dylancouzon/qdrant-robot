@@ -1,12 +1,12 @@
 # State
 
-Updated 2026-10-10. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders this session: Sonnet sub-agents; the main session orchestrates (Dylan, 2026-10-10).
+Updated 2026-10-11. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders this session: Sonnet sub-agents; the main session orchestrates (Dylan, 2026-10-10).
 
 ## Active task: internal showcase polish
 
 Dylan's live session (2026-10-10, Jetson audio) found: follow-ups lapsed after 20 s, Ignore items vanished at once (the jumpy focus popped them), and teaching failed on split lines and a lost focus. D153 fixes these: a 60 s follow-up window with a "Say 'Hey Edgy'" status, 30 s Ignore offers, two-step teaching ("Track this" then "What should I call it?"), and speech-start focus. Robot audio (D152) works: no self-answers in the session.
 
-1. Live check of D153 with Dylan (checklist below), then read the session log.
+1. Live check of D153 (2026-10-11, session `20261010-235648`): Dylan reports it works well. 11 turns, none ignored for a missing wake phrase, and one-line teaching bound every time (J). The two-step "track this" flow and the 30 s Ignore hold were not exercised in the log; they stay on the checklist.
 2. Next: the jumpy "???" focus box (detection task), then command set v2 (the rest: "remember me", confirmed "forget").
 3. Then the missed-face conversation reset, physical latency by loopback, and owner and location payloads ([research/owner-location.md](research/owner-location.md)).
 
@@ -19,7 +19,7 @@ Dylan's live session (2026-10-10, Jetson audio) found: follow-ups lapsed after 2
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `5c9a89a33fd4` (D150 recall, D151 UI Ignore, forget guard); rollback target `7f67670fa91e`.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `2e3308d61e5b` (D150–D153); rollback target `5c9a89a33fd4`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 2e3308d61e5b`, then open http://127.0.0.1:8765. The unit is stopped now.
 - Running jobs: none. WSL box: idle.
 
 ## Targets (floor, not ceiling)
