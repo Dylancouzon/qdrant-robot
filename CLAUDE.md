@@ -54,7 +54,7 @@ Open (measurement decides): model family, runtime, process count, CPU or GPU pla
 
 ## Hardware and machines
 
-- **Robot:** Jetson Orin Nano Super 8 GB, NVMe, USB camera (Arducam IMX291, about 100°). Never run the course robot's hotspot setup over the active Wi-Fi link.
+- **Robot:** Jetson Orin Nano Super 8 GB, NVMe, USB camera (Arducam IMX291, about 100°), and a USB speaker with microphone (ALSA card `Device`, connected 2026-10-10). Never run the course robot's hotspot setup over the active Wi-Fi link.
 - **Allowed additions:** anything the Jetson drives over USB, I2C, SPI, or GPIO. No servos, no arms.
 - **Mac:** development, tests, data preparation, and training. **WSL 3080 box:** bake-offs and heavy preparation. Build Jetson engines on the Jetson; measure every acceptance number on the Jetson.
 - Access details and pitfalls are in `research/lessons.md` (Machines).
@@ -88,7 +88,7 @@ Subagents do not spawn subagents. The lead reads every builder diff before revie
 `tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only, saves the verdict to `reviews/`, and exits 0 only on `GO`, `PASS`, or `MILESTONE MET`. Exit 3 means act on the findings; exit 124 means timeout. The criteria are in [gates/design.md](gates/design.md), [gates/review.md](gates/review.md), and [gates/milestone.md](gates/milestone.md).
 
 - `tools/githooks/pre-commit` (enable once: `git config core.hooksPath tools/githooks`) runs ruff, vulture, tests, and module assertions. It blocks only on failure and reminds about a missing review (D17). Checks read the working tree: stage complete files, never partially staged bookkeeping, and never bypass the hook.
-- Resolve every blocking finding, or reject it with evidence in the task's decision entry. Rerun a gate only after a material change.
+- Resolve every blocking finding, or reject it with evidence in the next gate brief (the verdict file keeps it). `DECISIONS.md` gets only the binding outcome. Rerun a gate only after a material change.
 - Do not gate records-only changes (status, lessons, decisions text).
 
 A task is done when its checks pass, blocking findings are resolved, replaced code is deleted, the review passed, and `STATE.md` is true.

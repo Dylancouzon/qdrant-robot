@@ -2,17 +2,6 @@
 
 Some evidence paths below exist only in archive tags; see [archive/README.md](archive/README.md) to read them.
 
-## Next-session object recognition discussion
-
-Dylan accepted the D147 live checkpoint on 2026-10-10. Owner from the named introducer and UI-set Location are selected future requirements. Current code and memory schemas stay unchanged; same-owner grouping and background isolation remain parked under D148.
-
-| Gap | Current evidence | Discussion for the next session |
-| --- | --- | --- |
-| Two items with the same name can leave neither recognized. | Dylan's live report; `Focus.associations()` abstains when multiple tracks claim one name. `Things.name()` keys each object point by name. | Implement the selected named-owner binding through a reviewed design. Decide whether one owner's two same-name objects form one shared logical object. Preserve ambiguity and consent/deletion safety. |
-| Recognition crops retain background pixels inside the detection rectangle. | `robot/things.py` uses a rectangular `cut()` followed by square padding; it performs no segmentation masking. | Compare background isolation with the current crop on varied objects, hands, backgrounds, and negative examples. Its recognition benefit and Jetson cost remain unmeasured. |
-
-The [reference crop implementation](https://github.com/Dylancouzon/qdrant-edge-memory-robot/blob/cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9/robot/brain/detect.py) pads the box by 12%, dilates a supplied mask, and fills outside-mask pixels grey. Its pinned read-only local checkout verifies this behavior. A missing mask retains the rectangular background. Changing crop preprocessing also changes stored vectors; compatibility and any required reteaching need explicit measurement.
-
 ## Earlier recorded backlog
 
 As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot first, in case the architecture changes. Each entry: trigger, risk, candidate fix, and source. D77 also permits revisiting verified limitations with a concrete intervention and paired validation. Foundational retrieval and conversation questions are in research/archive/grounding.md, object perception in research/booth-ux.md, and memory candidates in research/stack.md.
@@ -54,28 +43,7 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 
 A later video decoding or seeking error raises from FileCamera.latest(). The detector loop can exit without setting detect_failed, so a replay may continue with stopped detection. Carry under D71; before relying on failure propagation in a continuous challenge, set detect_failed on source errors and make the evaluator fail. F0b source qualification completed without a decoding error. Evidence: reviews/20261009-030935-4181-review.md, robot/main.py _detect().
 
-- F0c verification regeneration (D91): `eval/prepare_challenge.py verify` rewrites decoded images and metadata. A changed OpenCV environment could change frozen artifacts while verification succeeds. Current hashes match. Before using a different environment, check every freeze hash; move generation to prepare and make verify read-only if this helper is extended. Review: reviews/20261009-034031-43247-review.md.
-
 - Continuous paging attribution (D93): progress activity labels describe one instant, while page deltas span the previous sample interval. Report active-labelled totals, and use full recorded turn intervals before attributing paging to active turns. Source decoder compatibility: Mac and Jetson OpenCV5.0.0 use FFmpeg avcodec61.19.101 and62.28.101. Identical smoke AVI bytes produce0/90 matching cross-platform pixel hashes; four Jetson switch/hold probes match their Jetson oracle. Record decoder builds and requalify under the deployed decoder after environment changes. Evidence: reviews/20261009-042113-94477-review.md and bench/results/2026-10-09-f0d-operations.jsonl.
-
-- F1a calibration ambiguity (D97): several questions name an object with two eligible descriptions. One expected source ID cannot establish instance resolution. Preserve the frozen calibration as source-ranking development data. Use separate disambiguated cases before claiming same-instance resolution. This does not change the24-case comparison. Evidence: reviews/20261009-060639-22828-review.md.
-
-- F1a candidate limit (D98): 64 higher-ranked hits can fail hydration or ignored-kind checks and hide eligible sources beyond the limit. Carry under D71. If measured visits expose this loss, filter before limiting or fetch another bounded page. Source: robot/memory.py events(); reviews/20261009-064447-68946-review.md.
-
-- F1b synthetic history patterns (D99): distractor sentence patterns recur across distinct invented venues. This limits generalization evidence. If varied visitor histories reduce recall, measure the gap in the selected final-candidate challenge without expanding the fixture freeze. Source: reviews/20261009-071035-215-review.md.
-
-- F1c complete fixture inspection (D100): benchmark inspection scores the entire small fixture before selection. This can hide production candidate exhaustion and tie ordering. Qualify actual Memory.events filtering and ties against the unchanged fixture before adoption. The earlier 64-candidate risk remains carried. Sorting cannot order tied sources outside that pool; representative measurements must expose any loss before a larger-volume claim. F1d review: reviews/20261009-075131-50293-review.md. Source: reviews/20261009-073249-27709-review.md.
-
-- F1f(D103): when a recalled timeline revises a time or location, the2B can omit the current value or combine old/new attributes. Two correction answers fail on both evidence arms. Carry them; revisit general grounding only if integration reproduces the gap. Keep fixtures, floors, and scenario rules unchanged. PASS reviews/20261009-084552-14016-review.md.
-
-- F1g rejected prototype: oversized fixed question/image/facts raises inside the memory worker and can prevent queue completion. A future adopted path must reject the turn while preserving worker availability. No observed overflow in F1g. Source: reviews/20261009-095148-87405-review.md, robot/brain.py context().
-- F1g code-answer turns query semantic slots even when generation does not use them. Measure this overhead in the next architecture comparison before moving selection; do not optimize an unmeasured small cost here. The legacy replay observer measures no evaluator-report time because it wraps Scheduler.report instead of reported(). Preserve this instrumentation gap; measure the executed reporter in the next diagnostic without repeating the rejected quality comparison.
-
-- P2 split prototype only: bench/first_phrase.py and bench/memory_budget.py pass image dictionaries to the new text-observation messages argument; their old VLM calls can serialize base64 as text. Do not use them on the split branch until adapted. The existing continuous child-health check sees dialogue only; an observer failure during idle can remain undetected. Main-flow replay works, and current prototype is not adopted. Review20261009-133152-47754 logs both optional issues; no broad benchmark/framework rewrite belongs in the first runnable checkpoint.
-
-- P2-R review140847: continuous source scoring and legacy brain bake-off assume final user content is a list. Tool-result content is text. Do not use those two callers on4f6b920 until their extraction preserves question/history/source roles. Existing replay/three-vote answer scoring remains usable. Source-role spike is not adopted, so this caller update is deferred.
-
-- P2-T frozen brain_bakeoff.py calls old Brain prior/tokens methods, which the native adapter deletes. Use the preserved baseline revision or its existing directHTTP packet drivers before another frozen comparison. This limitation does not block visitor-flow adapter construction; do not add a product compatibility shim. Sol review20261009-164739-57998 lists this as optional.
 
 - Mac audio interface (D122, Sol52230 PASS): a workflow-launcher timeout can leave its SSH descendant holding pipes and delay cleanup. If observed, reap the launcher process group on timeout. A queued Mute request can race with closing the native child stdin and raise ValueError; detach the child under the shared lock before closing pipes if observed. Normal native Start/Mute/Stop and warmup Stop pass. Both are carried under D71; no product architecture change.
 
@@ -92,14 +60,9 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - D136 review20183: a new turn can arrive during scripted Robot.reset after job drain and before recognition owner replacement. Existing external replay callers serialize reset and turns. Coordinate turn admission if this overlap becomes supported or observed; no admission redesign in the common booth continuity repair. Item-check departed-track retention was fixed through existing Focus lifecycle pruning.
 
-- D136 review30274 PASS: uninterrupted object replacement before fresh verification can make Ignore use the accepted previous name's stored descriptors. If observed, verify the selected current crop before preference persistence. Final D136 moves inventory reads into admitted crop queries without a cache.
-
 - D138 review96960 PASS: a current selected object absent from an older verified source can briefly lose its overlay. Source geometry and epoch validation remain required. If a deployed recording shows disruptive gaps, prefer the current frame for that presentation. The bounded UI review has one early no-focus snapshot, with no rapid target alternation; continuous transition timing remains unqualified.
-
-- Intent/owner planning review91510: duplicate person names or several same-name objects within one owner can make selection ambiguous. Preserve uncertainty and ask which person or object is meant. D148's same-owner grouping policy remains undecided. Do not infer an owner for old unowned records. See research/answer-evidence.md; this is a future-build requirement, not an implemented fix.
 
 ## Full-stack model comparison observations, 2026-10-10
 
 - FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
-- The current Qwen/CUDA replay misses stored evidence for recall-stop-2 and recall-moto-2 (J). Later fruit recall also misses its expected evidence. Preserve these answer/retrieval failures for the paired comparison; do not repair source routing here. Root cause remains unverified. Evidence: private build/gemma-fit-20261010/full-stack/jetson-evidence/qwen-cuda-retry/runtime/results/recorded.jsonl, source ec7eae92a682.
 - The recorded knowledge-more-2 question splits into two answered lines (J). Keep the existing VAD/ASR implementation and score the split as a failure. Evidence: the same recorded replay; compare its occurrence across arms before drawing a model conclusion.

@@ -4,7 +4,7 @@ A robot that sees, listens, talks, and remembers on one Jetson Orin Nano Super 8
 
 Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and [research/lessons.md](research/lessons.md), which lists every avenue tried and its outcome. [DECISIONS.md](DECISIONS.md) holds the binding choices; older history is in [research/archive/](research/archive/).
 
-The current brain is Qwen3-VL-2B with CUDA Kokoro. The [active task](research/recall.md) is recall of objects shown earlier. Controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md).
+The current brain is Qwen3-VL-2B with CUDA Kokoro. The active task is in [STATE.md](STATE.md). Controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md).
 
 ## Read evidence without running models
 

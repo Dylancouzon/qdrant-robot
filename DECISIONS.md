@@ -82,4 +82,4 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D148 2026-10-10: Same-name objects and crop backgrounds are parked.** Two objects with one name can leave neither recognized; crops keep background pixels. The policy is undecided.
 
-**Owner and location 2026-10-10 (Dylan): Bind places and people to object evidence.** A UI-set location on each sighting; an owner from the named introducer on the named object. Not built yet; see `research/answer-evidence.md`.
+**Owner and location 2026-10-10 (Dylan): Bind places and people to object evidence.** A UI-set location on each sighting; an owner from the named introducer on the named object. Not built yet; see `research/owner-location.md`.
