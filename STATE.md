@@ -6,9 +6,9 @@ Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, 
 
 Read [hardware/DESIGN_REQUIREMENTS.md](hardware/DESIGN_REQUIREMENTS.md) for Dylan's enclosure requirements and owned hardware. Keep the owned servo and prioritize repacking. Consider a replacement only for a substantial improvement.
 
-The dimensioned packaging study and two fit-coupon 3MFs are in [hardware/concept-a/](hardware/concept-a/README.md). Mac geometry checks pass (E). Final mounts, head joint, physical cable behavior, cooling, and print fits remain U. Dylan authorized head yaw (H1), owns 7.4 V STS3215 servos, and uses a P1S with its default nozzle. PLA is preferred. Identify the possible SO-ARM100 bus adapter and measure the JUXINICE down-angle cable ends before final mating geometry.
+The packaging study, fit coupons, and removable power-exit trial are in [hardware/concept-a/](hardware/concept-a/README.md). Mac geometry checks and power-trial slicing pass (E). Final mounts, head joint, cable behavior, cooling, and physical fits remain U. Dylan authorized head yaw (H1), owns 7.4 V STS3215 servos, and uses a P1S with its default nozzle. PLA is preferred. USB protrusion is 10 mm. The power plug has an 11 mm diameter, an 11 mm straight reach, and a 10 mm rotatable elbow. The trial uses an upward exit and a recessed face 9 mm from the provisional socket plane.
 
-The body envelope is 136 × 112 × 160 mm, with a revised 230 mm overall height (E). Next physical work: check bearing and camera coupons, confirm the servo against its source drawing, identify the bus adapter, and measure plugs and fan orientation. Then build the removable mounts and joint prototype. Browser and slicer visual checks remain unverified.
+The body envelope is 136 × 112 × 160 mm, with a 230 mm overall height (E). Next physical work: check the power-exit trial and fit coupons, confirm the servo drawing, identify the bus adapter, and measure port coordinates and fan orientation. Continue the removable casing and manual joint prototype from `PROTOTYPE_BRIEF.md`. Use external camera routing until complete connector admission through both bearing bores is verified. Browser appearance remains U.
 
 ## Next tasks (in order)
 
@@ -39,4 +39,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read `hardware/DESIGN_REQUIREMENTS.md` and `hardware/concept-a/README.md`, then verify cable and mount clearances before freezing the revised size.
+Read `hardware/concept-a/PROTOTYPE_BRIEF.md`, then build the bearing carrier and casing around verified interfaces. Keep uncertain interfaces replaceable.

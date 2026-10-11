@@ -83,7 +83,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Concept A with body speaker and owned STS3215 | Repacked owned upright servo reduces modeled height from 255 to 230 mm; 391 Mac envelope checks and two closed-volume 3MF coupons pass (E). Physical fit, cable motion, thermal behavior, and slicer appearance remain U | Packaging study; prototype next | H1; `hardware/concept-a/README.md` |
+| Concept A with body speaker and owned STS3215 | Repacking reduces modeled height from 255 to 230 mm. The 391 packaging checks and 10 power-exit trial checks pass (E). Trial slicing passes on P1S. CAD face seams required welding before 3MF export. Physical fit, cable motion, and thermal behavior remain U | Power trial delivered; casing and joint next | H1; `hardware/concept-a/README.md` |
 
 ## System and memory
 

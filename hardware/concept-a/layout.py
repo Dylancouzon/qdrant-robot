@@ -7,7 +7,10 @@ from __future__ import annotations
 import itertools
 import json
 import math
+import zipfile
+from collections import Counter
 from pathlib import Path
+from xml.etree import ElementTree
 
 import cadquery as cq
 import matplotlib
@@ -40,6 +43,26 @@ def color(value):
 
 def box(size, center):
     return cq.Workplane("XY").box(*size).translate(center).val()
+
+
+def export_3mf(solid, dest):
+    """Weld CAD face seams and verify indexed mesh closure before slicer import."""
+    vertices, faces = solid.tessellate(0.05, 0.1)
+    printable = trimesh.Trimesh(vertices=[v.toTuple() for v in vertices], faces=faces)
+    assert printable.is_watertight and printable.is_volume
+    printable.export(str(dest), file_type="3mf")
+    with zipfile.ZipFile(dest) as archive:
+        model = ElementTree.fromstring(archive.read("3D/3dmodel.model"))
+    assert model.attrib["unit"] == "millimeter"
+    ns = {"m": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
+    meshes = model.findall(".//m:mesh", ns)
+    assert len(meshes) == 1
+    edges = Counter()
+    for triangle in meshes[0].findall("m:triangles/m:triangle", ns):
+        ids = [int(triangle.attrib[key]) for key in ("v1", "v2", "v3")]
+        for i in range(3):
+            edges[tuple(sorted((ids[i], ids[(i + 1) % 3])))] += 1
+    assert edges and all(count == 2 for count in edges.values())
 
 
 def ring(outer, inner, height, z):
@@ -470,7 +493,7 @@ def coupons():
     for name, solid in [("bearing-fit", bearing), ("camera-thickness-fit", camera_fit)]:
         assert solid.val().isValid() and len(solid.val().Solids()) == 1
         dest = OUT / f"{name}.3mf"
-        cq.exporters.export(solid, str(dest), tolerance=0.05, angularTolerance=0.1)
+        export_3mf(solid.val(), dest)
         loaded = trimesh.load(dest, force="scene")
         meshes = [g for g in loaded.geometry.values() if isinstance(g, trimesh.Trimesh)]
         assert meshes and all(m.is_watertight and m.is_volume for m in meshes)

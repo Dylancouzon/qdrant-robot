@@ -21,6 +21,24 @@ Use the Bambu Lab P1S, a 0.4 mm nozzle, PLA, 0.2 mm layers, and three walls. Kee
 
 The camera board reference permits 1.4–1.8 mm thickness. A tight slot can damage a populated board. These coupons do not validate the Jetson cradle, servo cradle, complete neck, or casing.
 
+## Check the power exit
+
+`output/power-exit-trial.3mf` is a hand-held removable recess trial. Its size is 22.85 × 60 × 33.5 mm. The 13 mm upward-open channel reserves the reported 11 mm plug. Its exterior face sits 9 mm from the provisional socket plane, before the reported 11 mm elbow transition. The recess depth to the proposed outer wall is 21.25 mm. The trial has no attachment to the casing.
+
+Use `output/power-exit-trial-p1s.3mf` for the saved P1S settings. It uses PLA, a 0.4 mm nozzle, 0.2 mm layers, three walls, and no supports. Keep the continuous rectangular floor on the bed. The separate geometry-only 3MF contains no printer settings. Bambu may display its geometry-only import notice. Confirm the P1S profile before slicing.
+
+1. Shut down the Jetson and disconnect its supply from mains power.
+2. Connect the plug and point its elbow upward. Grip the connector housing.
+3. Hold the insert below the plug, with its recessed wall toward the board.
+4. Move the insert upward so the plug enters through the open channel.
+5. Measure 9 mm from the socket plane to the recessed exterior face. Check clearance around the elbow.
+6. Move the insert downward to remove it. Check that neither movement pulls on the socket.
+7. Record contact points, the actual socket coordinates, and clearance to nearby USB plugs before casing integration.
+
+`output/power-exit-trial.step` includes the trial and an assumed plug envelope. `output/power-exit-trial.png` shows their arrangement. `output/power-exit-checks.json` records geometry checks. The elbow uses a conservative square envelope with additional end allowance. Physical shape and cable movement remain U.
+
+The exporter now welds shared mesh vertices before writing all three 3MF files. It checks the indexed triangle edges directly. This removes the open-edge warnings caused by the earlier CAD face seams. Independent mesh reload alone had concealed these seams.
+
 ## Revised arrangement
 
 Keep the owned STS3215 upright, with its output shaft vertical. Rotate its housing 90° around that axis and move it into the front upper body. Lower the bus-interface reservation by 6 mm. The resulting head envelope and neck reduce overall height by 25 mm, from 255 to 230 mm (E), without replacing the servo. The body envelope stays unchanged.
@@ -49,7 +67,11 @@ The packaging model does not yet include these mounts, snap catches, the split s
 
 ## Cable and cooling requirements
 
-Dylan owns JUXINICE 4-inch down-angle USB-A extensions. Their molded connector sizes and bend directions remain U. The model reserves side plug space and an audio extension pocket. Confirm socket coordinates, complete plug shapes, and installed cable paths before shrinking the body.
+Dylan owns JUXINICE 4-inch down-angle USB-A extensions. He reports 10 mm installed protrusion at the measured USB socket and flexible cables. Full plug width, height, socket coordinates, and insertion travel remain U. The model keeps its 24 mm combined USB/power reservation because the power plug and service geometry are still unverified.
+
+Dylan clarified the installed round power plug: 11 mm outside diameter, 11 mm straight outward reach, and a 10 mm right-angle section. Its described total added connector length is 21 mm. The elbow rotates in any direction. Use an upward exit through a removable recessed insert. The exact elbow shape and socket coordinates still need verification. Keep the current combined reservation until the installed assembly is checked.
+
+Use a removable port-side panel to admit plugs along their socket axes from outside the body. Connect the cables with the panel open, leave routing slack, then close the panel around edge-open cable exits. Grip connector housings during removal. The head rear cover and split shaft must admit the camera connectors separately. These are assembly requirements; the panel, strain relief, and insertion sweeps are not modeled yet.
 
 The orange cable curve samples a loop below the shaft and routing through the head. The coil is tested against expanded stationary boxes every 2° over ±80°. Its length changes across angles, so it does not simulate a constant-length physical cable. The upper route, minimum bend radius, connector insertion, strain relief at both ends, pinching, and fatigue still need physical verification. Its changing length is recorded in `checks.json`.
 
@@ -57,9 +79,9 @@ The 22 mm inlet reservation must align with the actual fan inlet. A separate sid
 
 ## Reproduce the study
 
-Create a Python 3.12 environment outside the runtime environment. Install `requirements.lock` there. Run `layout.py`, then `node check-viewer.cjs` from this directory. The generator checks solid validity, envelope containment, component intersections, ideal optical clearance, bearing spacing, and the illustrative lower cable loop. It independently reloads each 3MF and checks closed volume and exported scale. The Node check exercises viewer logic with a simulated canvas, not browser appearance.
+Create a Python 3.12 environment outside the runtime environment. Install `requirements.lock` there. Run `layout.py`, `power_exit.py`, then `node check-viewer.cjs` from this directory. The generators check solids, packaging clearances, trial insertion, and ideal optical clearance. They verify indexed 3MF closure, millimeter units, independent closed volume, and exported scale. The Node check exercises viewer logic with a simulated canvas, not browser appearance.
 
-The generator and exports passed their Mac checks. Browser opening was blocked by the local-file URL policy. Bambu Studio inspection timed out. Slicer appearance and printing remain unverified; neither tool failure is a print approval.
+The generators and exports passed their Mac checks. Browser opening was blocked by the local-file URL policy. Bambu Studio now opens through its app identifier. The power trial imports with the correct dimensions and slices successfully. See [BAMBU_CHECK.md](BAMBU_CHECK.md) for the observed settings. Physical printing and fit remain unverified.
 
 ## Sources
 

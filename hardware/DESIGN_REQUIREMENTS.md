@@ -33,7 +33,27 @@ Dylan identified servo height as a problem. Select a short servo with its output
 | Audio | Waveshare USB TO AUDIO with an 8 Ω, 5 W speaker. | Actual speaker size, microphone opening positions, and acoustic performance. |
 | Servos | STS3215 servos rated for 7.4 V. Parts from an Uno R3 super starter kit are also available. | Starter-kit servo model and exact STS3215 mounting geometry. |
 | Servo adapter | Dylan may have the adapter used in SO-ARM100. | Board identity, revision, supply requirements, and connector clearances. |
-| USB cables | JUXINICE 4-inch, down-angle, 90° USB 2.0 A male-to-female flat extensions. | Molded connector sizes, installed direction, and usable cable length. |
+| Power plug | Dylan reports an 11 mm outside diameter and 21 mm added connector length: 11 mm straight outward reach, followed by a 10 mm right-angle section. The elbow rotates in any direction. | Exact elbow shape and socket coordinates. |
+| USB cables | JUXINICE 4-inch, down-angle, 90° USB 2.0 A male-to-female flat extensions. Dylan reports 10 mm protrusion when plugged into the USB socket. | Full connector width and height, socket datums, and insertion travel. |
+
+## Cable installation and service access
+
+Dylan measured 10 mm installed USB cable protrusion on 2026-10-11 and reports that every cable is flexible. Apply this measurement to the measured USB connection. Verify other plug types separately. Flexibility does not establish a minimum bend radius or resistance to repeated head movement.
+
+- Separate installed plug clearance from the space needed to insert and remove the plug.
+- Use a removable panel on the Jetson port side so plugs can enter along the socket axis from outside the body.
+- Keep each plug accessible for gripping its housing during insertion and removal.
+- Close the panel after connecting cables. Provide clearance for the installed connector, cable turn, and strain relief.
+- Shape the power cable exit to follow its right-angle bend. Keep the rigid elbow clear of the case wall.
+- Split the exit at the removable panel edge so the rigid elbow can enter without threading through a closed hole.
+- Use edge-open cable exits or split covers where a cable passes through a removable panel. Avoid threading large plugs through small cable holes.
+- Make the camera connector accessible through the rear head cover. Use a split neck passage for assembled cable connectors.
+- Preserve slack for service and head rotation. Check the closed covers throughout the complete rotation range.
+- Keep the existing 24 mm combined USB/power reservation until the power connector and complete access geometry are verified.
+
+Dylan clarified the installed power plug on 2026-10-11. Its outside diameter is 11 mm. Its added connector length comprises an 11 mm straight section and a 10 mm right-angle section. The elbow rotates in any direction. Route the last section outside the case. Treat 21 mm as the described connector length, not a straight outward clearance requirement. Prototype an upward exit through an edge-open recessed insert. The wall position and exit dimensions remain U until the installed shape and socket position are checked.
+
+The removable port-side panel is an assembly requirement. Its geometry and insertion sweeps remain U. The 10 mm protrusion can inform the installed USB pocket once the complete connector shape is available.
 
 ## Component dimension references
 
@@ -79,6 +99,6 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 
 ## Current delivery status
 
-The [Concept A study](concept-a/README.md) provides a dimensioned layout, STEP assembly, offline viewer, and two fit-coupon 3MF files. Geometry checks passed on the Mac (E). Physical fit, cable motion, cooling, and slicer appearance remain U.
+The [Concept A study](concept-a/README.md) provides a dimensioned layout, STEP assembly, offline viewer, and two fit-coupon 3MF files. A removable power-exit trial now has generic and P1S-configured 3MF files. Geometry checks and power-trial slicing passed on the Mac (E). Physical fit, cable motion, cooling, and final casing remain U.
 
 The complete casing, component catches, final joint, stops, and strain relief still need design and physical validation. The coupons establish fit information for that work.
