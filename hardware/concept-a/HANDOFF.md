@@ -2,7 +2,7 @@
 
 The current unpowered prototype measures 148.6 × 127.2 × 236 mm. It uses a tapered white body, a 22 mm base roll, and a black visor, grille, and neck cover.
 
-Start with [print files](output/Print-files/README.md) and [the offline viewer](output/assembly/robot-viewer.html). Delivery contains 38 required pieces and 19 optional tests, organized by White and Black. Native P1S projects retain print settings. Geometry import passes; GUI inspection remains unverified.
+Start with [STL files](output/Print-files/README.md), [native P1S 3MF projects](output/Print-projects/README.md), and [the offline viewer](output/assembly/robot-viewer.html). Delivery contains 38 required pieces and 19 optional tests, organized by White and Black. Native P1S projects retain print settings. Geometry import passes; GUI inspection remains unverified.
 
 Speaker and audio keys have bounded CAD capture and service checks. Jetson and camera remain location gauges. Read [requirements](../DESIGN_REQUIREMENTS.md) for owned hardware and [retention constraints](RETENTION_BRIEF.md) before modifying contacts.
 

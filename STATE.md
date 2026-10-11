@@ -4,7 +4,7 @@ Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, 
 
 ## Active task: Press-fit electronics retention
 
-The unpowered enclosure and [organized print files](hardware/concept-a/output/Print-files/README.md) are current: 38 required pieces and 19 optional tests. CAD and native import checks pass. Read the short [handoff](hardware/concept-a/HANDOFF.md) for current constraints and next steps. The [build log](hardware/concept-a/BUILD_LOG.md) preserves development history and evidence.
+The unpowered enclosure and [organized STL files](hardware/concept-a/output/Print-files/README.md) and [3MF projects](hardware/concept-a/output/Print-projects/README.md) are current: 38 required pieces and 19 optional tests. CAD and native import checks pass. Read the short [handoff](hardware/concept-a/HANDOFF.md) for current constraints and next steps. The [build log](hardware/concept-a/BUILD_LOG.md) preserves development history and evidence.
 
 Jetson and camera retainers await safe contact measurements. Physical fit, latch life, cables, cooling, acoustics, and powered motion remain U. No print or powered test occurred.
 

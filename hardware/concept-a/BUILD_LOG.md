@@ -8,7 +8,7 @@ This records the 2026-10-11 construction sequence. Current instructions live in 
 4. Rejected upright audio retention because its upper stop crossed the servo and its receiver crossed the speaker. Selected flatter audio and complete-module service. Corrected the tray USB cut, structural docking lands, and actual held-tool release access.
 5. Regenerated the final casing, retention coupons, and integrated viewer. Results: casing 665, joint 286, integrated assembly 368, and retention 182 checks pass (E). Nine coupon meshes pass closure and bed checks.
 6. Packaged 57 individual P1S projects. All slice without warnings. Rewriting thumbnail relationships with prefixed OPC tags caused native import failures. Restoring the default relationship namespace repaired the archives; packaging now checks final native geometry import.
-7. Abandoned the unfinished combined project. Delivery uses 38 Required and 19 Optional STL files, then White/Black folders. All 57 STL, native projects, and generic 3MF sources pass native parser geometry import. GUI inspection remains unverified. No print was sent.
+7. Abandoned the unfinished combined project. Delivery uses 38 Required and 19 Optional parts, then White/Black folders, for both STL files and native P1S 3MF projects. Organized 3MF copies retain the original project hashes. All 57 STL, native projects, and generic 3MF sources pass native parser geometry import. GUI inspection remains unverified. No print was sent.
 
 ## Evidence
 

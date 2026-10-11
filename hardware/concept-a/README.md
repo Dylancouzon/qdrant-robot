@@ -16,7 +16,7 @@ Use [the complete assembled STEP](output/assembly/robot-assembled.step) in a CAD
 
 ## Print files and assembly
 
-Use [the organized STL files](output/Print-files/README.md): Required first, then Optional, with White and Black folders. The 38 required pieces and 19 optional tests preserve their checked print orientations. All 57 STL files and repaired native P1S projects pass Bambu geometry import checks.
+Use [the organized STL files](output/Print-files/README.md) or [native P1S 3MF projects](output/Print-projects/README.md): Required first, then Optional, with White and Black folders. The 38 required pieces and 19 optional tests preserve their checked print orientations. All 57 STL files and repaired native P1S projects pass Bambu geometry import checks.
 
 [Bambu P1S projects](output/bambu/) contain casing, joint, cradle, gauge, and coupon parts. Each project uses PLA, the 0.4 mm nozzle, 0.2 mm layers, three walls, and automatic tree supports. All 57 projects slice without warnings and pass native geometry import. Source and project hashes match the delivered files. Inspect supports and their removal paths before printing. Start with the small gauges and spare keys. Physical fits remain U.
 
