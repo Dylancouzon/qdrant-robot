@@ -22,6 +22,8 @@ Dylan liked Concept A, with a visor camera head and a stationary body. The curre
 
 Dylan approved the updated [exterior concept](concept-a/output/exterior-concept.png) on 2026-10-11. Preserve its cream shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
 
+Dylan rejected the actual CAD exterior on 2026-10-11 because it resembles a "1980s computer" and needs substantial refinement. The mechanical prototype remains a fit study. Its boxy shell is not an approved final appearance. In the next session, Dylan plans to use an Astra agent to refine the exterior. Preserve the approved concept as the appearance target, and reassess the mechanical interfaces where that refinement requires changes.
+
 Dylan identified servo height as a problem. Select a short servo with its output shaft pointing upward for head rotation. Restrict purchases to Amazon and favor inexpensive options. Dylan rejected the Hitec D145SW because of its cost and the direction of its thin dimension. Keep the owned STS3215 unless an alternative gives a substantial improvement. Dylan rejected replacing it for only 6 mm of height reduction. Prioritize rearranging the existing hardware; no replacement purchase has been authorized.
 
 ## Owned equipment
@@ -71,7 +73,7 @@ These dimensions come from reference designs or manufacturers (E). Fit against D
 | Speaker | Reserve 100 × 45 × 21 mm. | [Waveshare speaker](https://www.waveshare.com/8ohm-5w-speaker.htm); its image gives smaller dimensions, so measure the owned speaker. |
 | STS3215 housing | 45.22 × 24.72 × 35 mm. | [Waveshare documentation](https://www.waveshare.com/wiki/ST3215_Servo); confirm the linked drawing against the owned servo. |
 
-The complete reference dimensions, connector envelopes, and proposed coordinates are documented in [the packaging study](concept-a/README.md) and its generated layout data.
+The complete reference dimensions, connector envelopes, and proposed coordinates are documented in [the prototype](concept-a/README.md), its manifests, and its assembled STEP.
 
 ## Joint and electrical requirements
 

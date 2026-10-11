@@ -1,5 +1,7 @@
 # Concept A mechanical prototype
 
+Dylan rejected this CAD exterior on 2026-10-11 because it resembles a "1980s computer". Exterior refinement is the next task. Read [the session handoff](HANDOFF.md) first. The approved concept remains the appearance target.
+
 The removable casing and bearing-supported camera head now have actual printable parts. The body measures 136 × 112 × 160 mm. The head measures 100 × 72 × 50 mm. Overall height is 230 mm (E). The existing STS3215 fits its reserved body space. Its installed mount and powered coupling remain pending measurements.
 
 ![Actual robot casing and manual joint, shown from the front and rear](output/assembly/robot-preview.png)

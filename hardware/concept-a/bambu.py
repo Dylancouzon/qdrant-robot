@@ -17,6 +17,51 @@ BINARY = Path("/Applications/BambuStudio.app/Contents/MacOS/BambuStudio")
 NS = {"m": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
 
 
+def clear_preview_metadata(config):
+    """Remove cached pick/top maps and point the plate to its current image."""
+    keys = {"thumbnail_file", "thumbnail_no_light_file", "top_file", "pick_file"}
+    for parent in config.iter():
+        for element in list(parent):
+            if element.tag == "metadata" and element.get("key") in keys:
+                parent.remove(element)
+    E.SubElement(
+        config.find("plate"), "metadata", key="thumbnail_file", value="Metadata/plate_1.png"
+    )
+    return config
+
+
+def current_thumbnail(project, work):
+    """Render the current geometry through Bambu's separate PNG action."""
+    images = work / "thumbnail"
+    images.mkdir(exist_ok=True)
+    for name in ("plate_1_0.png", "result.json"):
+        (images / name).unlink(missing_ok=True)
+    command = [str(BINARY), "--export-png", "0", "--outputdir", str(images), str(project)]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=180)
+    (images / "render.log").write_text(result.stdout + result.stderr)
+    assert result.returncode == 0, (project.name, result.stdout, result.stderr)
+    report = json.loads((images / "result.json").read_text())
+    assert report["return_code"] == 0
+    png = (images / "plate_1_0.png").read_bytes()
+    assert png.startswith(b"\x89PNG\r\n\x1a\n") and len(png) > 100
+    with ZipFile(project) as archive:
+        data = {n: archive.read(n) for n in archive.namelist() if not n.endswith(".png")}
+    config = clear_preview_metadata(E.fromstring(data["Metadata/model_settings.config"]))
+    data["Metadata/model_settings.config"] = E.tostring(
+        config, encoding="utf-8", xml_declaration=True
+    )
+    relationships = E.fromstring(data["_rels/.rels"])
+    for relationship in relationships:
+        if relationship.get("Target", "").endswith(".png"):
+            relationship.set("Target", "/Metadata/plate_1.png")
+    data["_rels/.rels"] = E.tostring(relationships, encoding="utf-8", xml_declaration=True)
+    data["Metadata/plate_1.png"] = png
+    with ZipFile(project, "w", ZIP_DEFLATED) as archive:
+        for name, content in data.items():
+            archive.writestr(name, content)
+    return hashlib.sha256(png).hexdigest()
+
+
 def model_settings(content, source, center, mesh, transform):
     config = E.fromstring(content)
     for element in config.iter("metadata"):
@@ -34,7 +79,7 @@ def model_settings(content, source, center, mesh, transform):
     for element in config.iter("assemble_item"):
         if element.get("instance_id") is not None:
             element.set("transform", transform)
-    return E.tostring(config, encoding="utf-8", xml_declaration=True)
+    return E.tostring(clear_preview_metadata(config), encoding="utf-8", xml_declaration=True)
 
 
 def package(source, dest):
@@ -43,7 +88,7 @@ def package(source, dest):
     E.register_namespace("p", "http://schemas.microsoft.com/3dmanufacturing/production/2015/06")
     E.register_namespace("BambuStudio", "http://schemas.bambulab.com/package/2021")
     with ZipFile(ROOT / "output" / "power-exit-trial-p1s.3mf") as archive:
-        data = {n: archive.read(n) for n in archive.namelist()}
+        data = {n: archive.read(n) for n in archive.namelist() if not n.endswith(".png")}
     mesh = trimesh.load(source, force="mesh")
     assert mesh.is_watertight and mesh.is_volume
     assert max(mesh.extents[:2]) < 238, "Centered placement must avoid the P1S excluded corner."
@@ -121,6 +166,7 @@ def main():
                 assert abs(bbox[axis] - dimension) < 0.05
             output = work / target
             assert output.is_file() and (work / "plate_1.gcode").stat().st_size > 100
+            thumbnail_hash = current_thumbnail(output, work)
             destination = OUT / target
             destination.write_bytes(output.read_bytes())
             rows.append(
@@ -130,6 +176,10 @@ def main():
                     source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                     project=target,
                     project_sha256=hashlib.sha256(destination.read_bytes()).hexdigest(),
+                    thumbnail_sha256=thumbnail_hash,
+                    thumbnail=(
+                        "Current geometry rendered by native Bambu CLI; inherited maps removed."
+                    ),
                     return_code=report["return_code"],
                     warning=plate.get("warning_message", ""),
                     seconds=plate["total_predication"],

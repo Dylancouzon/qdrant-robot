@@ -83,7 +83,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Concept A with body speaker and owned STS3215 | Repacking reduces modeled height from 255 to 230 mm. Actual casing and manual joint pass 883 CAD checks (E). All 44 P1S prototype projects slice. Indexed mesh seams require welding. A removable roof bridge avoids trapped joint assembly. Physical retention, powered coupling, cables, and thermal behavior remain U | Manual prototype delivered; physical gauges and powered interfaces next | H1; `hardware/concept-a/README.md` |
+| Concept A with body speaker and owned STS3215 | Repacking reduces modeled height from 255 to 230 mm. Actual casing and manual joint pass 883 CAD checks (E). All 44 P1S prototype projects slice. Indexed mesh seams require welding. Native slicing preserves template thumbnails; render each current mesh separately, clear stale outputs, and update image relationships. A removable roof bridge avoids trapped joint assembly. Physical retention, powered coupling, cables, and thermal behavior remain U | Mechanical fit study saved; exterior rejected; Astra refinement next | H1; `hardware/concept-a/README.md` |
 
 ## System and memory
 
