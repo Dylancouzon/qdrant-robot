@@ -66,6 +66,11 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - D138 review96960 PASS: a current selected object absent from an older verified source can briefly lose its overlay. Source geometry and epoch validation remain required. If a deployed recording shows disruptive gaps, prefer the current frame for that presentation. The bounded UI review has one early no-focus snapshot, with no rapid target alternation; continuous transition timing remains unqualified.
 
+## Two-step teaching, 2026-10-10
+
+- "Turn down the volume" and other commands with no existing recognizer become the name after "Track this"; the volume control is on the page only. A spoken command parser would fix it; none exists. Evidence: reviews/20261010-232645-44755-review.md.
+- A short bare statement (up to four words) after "What should I call it?" becomes the name. Prefer explicit naming forms if this shows up live.
+
 ## Full-stack model comparison observations, 2026-10-10
 
 - FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().

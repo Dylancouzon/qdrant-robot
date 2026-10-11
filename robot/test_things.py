@@ -919,6 +919,22 @@ def test_status_says_hey_edgy_once_the_window_lapses(robot, monkeypatch):
     assert r._shown(False)[1].status == "Say 'Hey Edgy'"
 
 
+def test_only_object_views_of_a_track_that_was_a_person_reach_the_embedder(robot):
+    r = robot
+    r.last_line = time.time()
+    frame_of(r)
+    hold(r, CENTER)
+    track = r.focus.focus
+    taken, frame, view = r.view_taken, *r.view
+    person = {track: ("person", view[track][1])}
+    r.focus.seen[track].continuous = 0  # the earlier views are of this same continuous track
+    r.views.extend([(taken - .2, frame, person), (taken - .1, frame, view)])
+    shots = []
+    r.recognition.crops = staticmethod(lambda crops: shots.append(len(crops)) or stub_crops(crops))
+    assert ask(r, "This is my phone.")[0].startswith("Got it")
+    assert shots == [2], "the current view and one earlier object view; the person view is out"
+
+
 def test_other_commands_drop_the_pending_name(robot):
     r = robot
     r.last_line = time.time()

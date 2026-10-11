@@ -1319,6 +1319,7 @@ class Robot:
         label, box = view[track]
         if label in BODY:
             return "I only track objects, not people."
+        views = [v for v in views if v[2][track][0] not in BODY]  # earlier person views too
         old = self.things.named(name, [])
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
