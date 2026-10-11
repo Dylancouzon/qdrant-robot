@@ -50,11 +50,17 @@ def paced(audio: np.ndarray, silence_s: float = 0.0) -> Iterator[np.ndarray]:
         yield audio[k:k + step]
 
 
+class VolumeNotSaved(OSError):
+    """The mixer changed but the level could not be saved for the next start."""
+
+
 def saved_volume() -> int:
+    """The saved level, or the default when it is missing, unreadable, or out of range."""
     try:
-        return int(VOLUME_FILE.read_text())
+        percent = int(VOLUME_FILE.read_text())
     except (OSError, ValueError):
         return DEFAULT_VOLUME
+    return percent if 0 <= percent <= 100 else DEFAULT_VOLUME
 
 
 def set_volume(percent: int) -> None:
@@ -62,7 +68,10 @@ def set_volume(percent: int) -> None:
     if type(percent) is not int or not 0 <= percent <= 100:
         raise ValueError(f"volume must be a whole percent from 0 to 100, got {percent!r}")
     subprocess.run(["amixer", "-q", "-c", "Device", "sset", "Speaker", f"{percent}%"], check=True)
-    VOLUME_FILE.write_text(str(percent))
+    try:
+        VOLUME_FILE.write_text(str(percent))
+    except OSError as error:
+        raise VolumeNotSaved(f"The volume is set to {percent}% but not saved: {error}") from error
 
 
 def pcm16(audio: np.ndarray) -> bytes:
@@ -80,17 +89,19 @@ def write_wav(path: Path, audio: np.ndarray, rate: int) -> None:
 def aplay(device: str, rate: int) -> Callable[[np.ndarray], None]:
     def play(audio: np.ndarray) -> None:
         subprocess.run(["aplay", "-q", "-D", device, "-f", "S16_LE", "-r", str(rate), "-c", "1",
-                        "-t", "raw"], input=pcm16(audio))
+                        "-t", "raw"], input=pcm16(audio), check=True)
     return play
 
 
 class Mouth:
     """Plays phrases in order through `play` (None: no speaker); the turn keeps the audio.
-    `until` is when the queued audio ends, from its sample count: `play` returns once the
-    data is written, which is before it is audible."""
+    `playing` is true while a phrase is queued or its sink runs: `aplay` exits after the
+    audio drains, so the sink's return is the end of the sound."""
 
-    def __init__(self, play: Callable[[np.ndarray], None] | None, rate: int):
-        self.sink, self.rate, self.until = play, rate, 0.0
+    def __init__(self, play: Callable[[np.ndarray], None] | None):
+        self.sink = play
+        self.pending, self.ended = 0, 0.0  # phrases not yet played; when the last one ended
+        self.lock = threading.Lock()
         self.q: queue.Queue[np.ndarray | None] = queue.Queue()
         self.thread = threading.Thread(target=self._run, name="mouth", daemon=True)
         self.thread.start()
@@ -98,18 +109,26 @@ class Mouth:
     def _run(self) -> None:
         while (audio := self.q.get()) is not None:  # None: close() stops the thread
             if self.sink:
-                self.sink(audio)
+                try:
+                    self.sink(audio)
+                except (subprocess.SubprocessError, OSError) as error:
+                    print(f"speaker failed: {error}", flush=True)  # the next phrase still plays
+                with self.lock:
+                    self.pending -= 1
+                    self.ended = time.monotonic()
             self.q.task_done()
         self.q.task_done()
 
     def play(self, audio: np.ndarray) -> None:
         if self.sink:
-            self.until = max(self.until, time.monotonic()) + len(audio) / self.rate
+            with self.lock:
+                self.pending += 1
         self.q.put(audio)
 
     def playing(self, tail: float = 0.0) -> bool:
-        """Audio is playing, or ended less than `tail` seconds ago."""
-        return time.monotonic() < self.until + tail
+        """A phrase is queued or playing, or the last one ended less than `tail` seconds ago."""
+        with self.lock:
+            return self.pending > 0 or time.monotonic() < self.ended + tail
 
     def close(self) -> None:
         """Play what is queued, then stop."""
@@ -118,11 +137,10 @@ class Mouth:
 
 
 if __name__ == "__main__":
-    mouth = Mouth(lambda _: None, 10)
+    mouth = Mouth(lambda _: time.sleep(0.2))
     assert not mouth.playing(SELF_VOICE_TAIL_S)
-    mouth.play(np.zeros(5, np.float32))  # 0.5 s of audio
-    assert mouth.playing() and not Mouth(None, 10).playing(), "playing, and no speaker"
-    mouth.until = time.monotonic() - 0.1
-    assert not mouth.playing() and mouth.playing(SELF_VOICE_TAIL_S), "the tail follows the end"
+    mouth.play(np.zeros(5, np.float32))
+    assert mouth.playing() and not Mouth(None).playing(), "playing, and no speaker"
     mouth.close()
+    assert not mouth.playing() and mouth.playing(SELF_VOICE_TAIL_S), "the tail follows the end"
     print("selftest ok")

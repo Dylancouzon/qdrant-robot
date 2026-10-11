@@ -195,8 +195,9 @@ class Robot:
         self.scribe = Scribe()
         self.route = Router(self.embed)
         self.voice = Speaker()
-        self.speaker = audio.Mouth(play, RATE)
+        self.speaker = audio.Mouth(play)
         self.muted, self.volume = False, audio.saved_volume()  # the page's controls
+        self.volume_lock = threading.Lock()  # mixer, saved level, and page value change together
         self.brain = brain.Brain(model)
         self.detect, self.tracker = Detector(), Tracker()
         self.vocab = set(self.detect.names.values())  # the labels the detector can give
@@ -1117,11 +1118,17 @@ class Robot:
                 return False
             self.muted = data["on"]
             return True
-        try:
-            audio.set_volume(data.get("percent"))
-        except (ValueError, OSError, subprocess.CalledProcessError):
-            return False
-        self.volume = data["percent"]
+        with self.volume_lock:
+            try:
+                audio.set_volume(data.get("percent"))
+            except audio.VolumeNotSaved as error:  # the mixer changed: show the level and why
+                self.volume = data["percent"]
+                with self.detecting:
+                    self.control_message = str(error)
+                return False
+            except (ValueError, subprocess.SubprocessError, OSError):
+                return False
+            self.volume = data["percent"]
         return True
 
     def _control(self, action, data):

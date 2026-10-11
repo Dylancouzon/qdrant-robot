@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Loopback monitor and controls for the robot. The robot hears and speaks through its own USB
-audio on the Jetson. All robot models run on the Jetson."""
+"""Loopback monitor and controls for the robot. The robot is a Jetson-owned unit (`qr-robot`)
+that hears and speaks through its own USB audio. Start attaches to it, or starts it. Closing
+this page or losing the tunnel leaves it running; only Stop stops it."""
 import argparse
 import contextlib
 import http.client
@@ -17,6 +18,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
+NAME = "robot"
+UNIT = f"qr-{NAME}.service"
 SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
 
@@ -52,14 +55,15 @@ def reap(process: subprocess.Popen | None) -> None:
 
 
 class Session:
-    """Own one remote session and tunnel, and keep the page reusable after cleanup."""
+    """Attach this page to the robot unit through one tunnel; the unit outlives the session."""
 
     def __init__(self, release: str, camera_file: str | None = None):
         self.release = release
         self.camera_file = camera_file
         self.view_port = self.view_token = None
         self.lock = threading.Lock()
-        self.stopped = threading.Event()
+        self.stopped = threading.Event()   # this session ends
+        self.shutdown = threading.Event()  # and the robot stops too (Stop)
         self.worker = None
         self.unit = None
         self.state = dict(phase="Idle", active=False, error="", view_ready=False)
@@ -77,11 +81,13 @@ class Session:
             if self.state["active"] or (self.worker and self.worker.is_alive()):
                 return
             self.stopped.clear()
+            self.shutdown.clear()
             self.state.update(phase="Connecting", active=True, error="")
             self.worker = threading.Thread(target=self.run, daemon=True)
             self.worker.start()
 
     def stop(self):
+        self.shutdown.set()
         self.stopped.set()
         self.update(view_ready=False)
         if self.worker and self.worker.is_alive():
@@ -129,6 +135,15 @@ class Session:
             connection.close()
             raise
 
+    def attach_token(self):
+        """The view token and release of the running robot, from its unit environment."""
+        env = dict(item.partition("=")[::2] for item in
+                   remote(f"systemctl show {UNIT} -p Environment --value").split())
+        if env.get("ROBOT_RELEASE") != self.release or not env.get("ROBOT_VIEW_TOKEN"):
+            raise RuntimeError(f"The running robot is not release {self.release} with a view. "
+                               "Select Stop on the page that started it, or stop it on the Jetson.")
+        return env["ROBOT_VIEW_TOKEN"]
+
     def cleanup_remote(self):
         error = ""
         if self.unit:
@@ -151,22 +166,25 @@ class Session:
             tunnel.stderr.close()
 
     def run(self):
-        name = f"live-mac-{secrets.token_hex(6)}"
         tunnel = None
         error = ""
         try:
-            status = remote(f"readlink -f {BASE}/current; "
-                            "systemctl list-units 'qr-*' --state=active --no-legend --plain")
-            if status.splitlines() != [f"{BASE}/releases/{self.release}"]:
-                raise RuntimeError(f"Jetson must be idle on release {self.release}. "
-                                   f"Received: {status}")
+            status = remote(f"readlink -f {BASE}/current; systemctl list-units 'qr-*' "
+                            "--state=active --no-legend --plain | awk '{print $1}'").splitlines()
+            running = status[1:]
+            if status[:1] != [f"{BASE}/releases/{self.release}"] or running not in ([], [UNIT]):
+                raise RuntimeError(f"Jetson must run no job but {UNIT}, on release "
+                                   f"{self.release}. Received: {status}")
             if self.stopped.is_set():
                 return
-            self.unit = f"qr-{name}.service"
-            self.view_token = secrets.token_hex(32)
-            command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
-                     "--", *robot_args(self.camera_file)],
-                    env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
+            self.unit = UNIT
+            if running:
+                self.view_token = self.attach_token()
+            else:
+                self.view_token = secrets.token_hex(32)
+                command([sys.executable, str(ROOT / "tools/jetson.py"), "run", NAME,
+                         "--", *robot_args(self.camera_file)],
+                        env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
             with socket.socket() as reserve:
                 reserve.bind(("127.0.0.1", 0))
                 self.view_port = reserve.getsockname()[1]
@@ -181,7 +199,9 @@ class Session:
             self.update(phase="Stopping", view_ready=False)
             self.view_port = self.view_token = None
             self.cleanup_local(tunnel)
-            cleanup_error = self.cleanup_remote()
+            cleanup_error = self.cleanup_remote() if self.shutdown.is_set() else ""
+            if not cleanup_error:
+                self.unit = None  # detached: the robot keeps running
             error = "\n".join(filter(None, (error, cleanup_error)))
             self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error)
 
@@ -292,7 +312,7 @@ def serve(port: int, release: str, camera_file: str | None = None) -> None:
         except KeyboardInterrupt:
             pass
         finally:
-            session.stop()
+            session.stopped.set()  # detach: the robot keeps running
             if session.worker:
                 session.worker.join(65)
 

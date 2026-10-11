@@ -65,7 +65,7 @@ def test_stop_during_warmup_never_shows_the_view(session):
     instance.worker.join(5)
     assert not instance.worker.is_alive()
     assert instance.snapshot()["phase"] == "Idle"
-    assert any("systemctl stop qr-live-mac-" in c for c in commands if isinstance(c, str))
+    assert any("systemctl stop qr-robot" in c for c in commands if isinstance(c, str))
 
 
 def test_repeated_start_stop_reaps_before_next_start(session):
@@ -82,7 +82,7 @@ def test_repeated_start_stop_reaps_before_next_start(session):
         assert not first_worker.is_alive()
         assert instance.snapshot()["phase"] == "Idle"
     starts = [c for c in commands if isinstance(c, list)]
-    assert len(starts) == 2 and starts[0][3] != starts[1][3]
+    assert len(starts) == 2 and starts[0][2:4] == ["run", "robot"]
     assert sum("systemctl stop" in c for c in commands if isinstance(c, str)) == 2
 
 
@@ -96,7 +96,7 @@ def test_reap_kills_stalled_native_child():
     child.stdout.close()
 
 
-def test_listener_failure_reports_error_and_reaps_owned_unit(session, monkeypatch):
+def test_listener_failure_reports_error_and_leaves_the_robot_alone(session, monkeypatch):
     instance, commands, _ = session
     original = talk.remote
     monkeypatch.setattr(talk, "remote", lambda script: "failed\nmodel error" if
@@ -104,8 +104,37 @@ def test_listener_failure_reports_error_and_reaps_owned_unit(session, monkeypatc
     instance.start()
     wait_until(lambda: not instance.snapshot()["active"])
     assert "Jetson session stopped" in instance.snapshot()["error"]
-    assert instance.unit is None
-    assert any("systemctl stop" in c for c in commands if isinstance(c, str))
+    assert not any("systemctl stop" in c for c in commands if isinstance(c, str))
+
+
+def test_losing_the_tunnel_or_page_never_stops_the_robot(session):
+    instance, commands, warm = session
+    warm.set()
+    instance.start()
+    wait_until(lambda: instance.snapshot()["phase"] == "Listening")
+    instance.stopped.set()  # what the page does on exit: detach
+    instance.worker.join(5)
+    assert not instance.snapshot()["active"] and instance.unit is None
+    assert not any("systemctl stop" in c for c in commands if isinstance(c, str))
+
+
+def test_start_attaches_to_a_running_robot_without_starting_another(session, monkeypatch):
+    instance, commands, warm = session
+    warm.set()
+    original = talk.remote
+
+    def running(script):
+        if script.startswith("readlink"):
+            return f"{talk.BASE}/releases/test-release\n{talk.UNIT}"
+        if "systemctl show" in script and "Environment" in script:
+            return "HOME=/home/qdrant ROBOT_RELEASE=test-release ROBOT_VIEW_TOKEN=abc123"
+        return original(script)
+
+    monkeypatch.setattr(talk, "remote", running)
+    instance.start()
+    wait_until(lambda: instance.snapshot()["phase"] == "Listening")
+    assert instance.view_token == "abc123"
+    assert not [c for c in commands if isinstance(c, list)], "no second robot started"
 
 
 def test_failed_cleanup_blocks_start_until_stop_retry(session, monkeypatch):
@@ -135,7 +164,7 @@ def test_failed_cleanup_blocks_start_until_stop_retry(session, monkeypatch):
 
 def test_collected_remote_unit_is_safe_to_clean(monkeypatch):
     instance = talk.Session("test-release")
-    instance.unit = "qr-live-mac-test.service"
+    instance.unit = "qr-robot.service"
     scripts = []
 
     def remote(script):
