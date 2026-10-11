@@ -27,6 +27,10 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Qualifiers outside the word lists ("last night", "at the office") still select the newest RAM frame | An answer from the wrong observation | Extend `_WHEN_WHERE` when observed | robot/memory.py; same review |
 | Speech during a caption prefill waits for the first generated token before it interrupts | A slower next turn | Measure foreground delay in the paired run | robot/brain.py caption(); reviews/20261010-215023-40827-review.md |
 | An interrupted or empty idle caption is retried on the next idle check | Wasted GPU work | Suppress unchanged retries until a new view or a question needs it | robot/main.py _describe_idle(); same |
+| Speech during playback or its 0.3 s tail is discarded (half duplex) | A visitor cannot interrupt the robot | Measure normal follow-ups first; echo cancellation only if interruptions matter | D152 |
+| A tunnel failure clears the page's unit reference | Stop is disabled until Start reattaches | Press Start, then Stop | tools/talk.py; reviews/20261010-225408-11584-review.md |
+| A recall answer can add an extra article to captions starting with "this", "one", or "five" | Awkward speech | Extend the determiner list if heard | robot/memory.py showed() |
+| An Ignore whose offer refreshes during embedding is rejected | The visitor presses again | Measure rejection rate in the live UI check | D151 |
 | Naming fixtures paste objects with no person | No focus forms, naming not tested | Held-object scenes or the live day | V1-B report |
 | A missed face on one frame ends a continuing conversation | The visitor loses context | Check face detection on the live day first | reviews/20261008-233058-72473-review.md |
 | Past-frame retrieval runs before the visitor check | A new visitor hears shared frame memories | Review after the whole v1 flow | same |

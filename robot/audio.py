@@ -21,7 +21,7 @@ CHUNK_S = 0.08
 # and speaker. It hears its own speaker at -17 dBFS, so input is silenced while speaking.
 USB_AUDIO = "plughw:CARD=Device,DEV=0"
 MIC, SPEAKER = USB_AUDIO, USB_AUDIO
-SELF_VOICE_TAIL_S = 0.3  # calibration: room echo and device latency after the last phrase
+SELF_VOICE_TAIL_S = 0.3  # provisional until loopback measures room echo and device latency
 VOLUME_FILE = SHARED / "speaker-volume"
 DEFAULT_VOLUME = 62  # percent of the `Speaker` mixer
 

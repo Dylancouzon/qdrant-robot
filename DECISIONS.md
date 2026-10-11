@@ -76,6 +76,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D151 2026-10-10: Ignore is a UI action on a held offer** (Dylan: UI only, items stay a few seconds after leaving view). Spoken ignore is removed. Each eligible object track keeps an offer (a copied crop, never a person track) for 8 s after its last source; Ignore persists only if that offer is still current. Supersedes the live-track check of D136/D140 for Ignore only.
 
+**D152 2026-10-10: The robot hears and speaks through its own USB audio** (card `Device`; its microphone beat the camera microphone by about 3 dB, J). It runs as the Jetson unit `qr-robot`, which the Mac page attaches to and never stops on disconnect. Input is silenced while a phrase is queued or playing and for 0.3 s after (no barge-in). The volume slider sets the USB mixer and is saved in `shared/`. Supersedes the Mac audio path of D122–D126.
+
 **D122–D126 2026-10-09: Mac interface.** `tools/talk.py` serves a loopback page with Start, Mute, and Stop over native audio and SSH. All models stay on the Jetson.
 
 ## Pending requirements

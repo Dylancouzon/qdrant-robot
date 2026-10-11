@@ -1509,7 +1509,8 @@ def main() -> None:
     p.add_argument("--camera-file", type=Path,
                    help="recorded camera fixture, in stored orientation")
     a = p.parse_args()
-    audio.set_volume(audio.saved_volume())
+    with contextlib.suppress(audio.VolumeNotSaved):  # the level is set; saving can wait
+        audio.set_volume(audio.saved_volume())
     chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
     camera = FileCamera() if a.camera_file else Camera()
     robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
