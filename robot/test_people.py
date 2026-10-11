@@ -68,6 +68,43 @@ def test_answers() -> None:
     assert request("Who am I?") == ("name", None)
     assert request("Please delete my face.") == ("forget", None)
     assert request("Don't forget me!") is None and request("I'm visiting from Lyon.") is None
+    for said in [
+                 "Don't delete my face.",
+                 "Do not erase me",
+                 "Can you not forget me",
+                 "Please do not ever forget me",
+                 "I do not want you to forget me",
+                 "Can you tell me why you forget me",
+                 "Should I forget me?",
+                 "Why did you forget me?",
+                 "Did you forget me?",
+                 "I said forget me",
+                 "You forget me every time",
+                 "Tell me how to delete my face",
+                 "When will you forget me?",
+                 "How do I make you forget me",
+                 "Never forget me",
+                 "Please don't forget my face",
+                 "He wants you to forget me",
+                 "Do you forget me?",
+    ]:
+        assert request(said) != ("forget", None), said
+    for said in [
+                 "Forget me",
+                 "forget me.",
+                 "Please forget me",
+                 "Okay, delete my face",
+                 "Ok so erase everything about me",
+                 "Can you forget me?",
+                 "could you please remove my face",
+                 "Would you forget who I am",
+                 "I want you to forget me",
+                 "I'd like you to please delete my face",
+                 "um please forget me",
+                 "Forget me, please",
+                 "Now erase all about me",
+    ]:
+        assert request(said) == ("forget", None), said
     assert reply("Do you recognize me?", sam, True)[0] == "You're Sam. I remember your face."
     assert reply("What's my name?", None, True) == (NOT_MET, None)
     assert reply("What's my name?", None, False, "Ana")[0] == "You told me you're Ana."

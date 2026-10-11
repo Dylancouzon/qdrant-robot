@@ -29,7 +29,7 @@ from qdrant_edge import (
 )
 
 from robot.config import MODELS, SHARED
-from robot.memory import is_question, kind_of, kinds
+from robot.memory import deletion_target, is_question, kind_of, kinds
 
 MODEL = MODELS / "dinov2-small/model.onnx"
 DIM = 768  # DINOv2-small CLS and mean patch token, each unit length, concatenated
@@ -262,8 +262,8 @@ _NAMING = [re.compile(p, re.I) for p in (
     rf"^\W*(?:and )?(?:this|that)\s+{_THING}\s+(?:is mine|belongs to me)\W*$",
     rf"\b(?:remember|track)\s+(?:this|that)(?:\s+[a-z-]+)?\s+as\s+my\s+{_THING}\W*$")]
 _OWNED_NAMING = re.compile(rf"^\W*(?:this|that)(?:'s| is)\s+{_OWNED}\W*$", re.I)
-_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\b(?:\s+about)?\s+my\s+{_REFERENCE}", re.I)
-_OWNED_FORGET = re.compile(rf"\b(?:forget|delete|erase|remove)\s+{_OWNED}\W*$", re.I)
+_FORGET = re.compile(rf"(?:about\s+)?my\s+{_REFERENCE}", re.I)  # after the deletion verb
+_OWNED_FORGET = re.compile(rf"{_OWNED}\W*$", re.I)
 _UNIGNORE = re.compile(r"\b(?:stop|quit|no longer|don'?t|do not)\s+ignor\w*|\bunignore\b|"
                        r"\bnotice\b.*\bagain\b", re.I)
 _IGNORE = re.compile(r"\b(?:ignore|stop (?:remembering|noticing|tracking|storing)|"
@@ -300,7 +300,8 @@ def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | N
     if (m := _OWNED_NAMING.search(text)) and not _identity(m["thing"]) and \
             kinds(m["thing"], vocab):
         return "name", *_thing(m["thing"], vocab)
-    if m := _FORGET.search(text) or _OWNED_FORGET.search(text):
+    if (rest := deletion_target(text)) is not None and (
+            m := _FORGET.match(rest) or _OWNED_FORGET.match(rest)):
         if _identity(m["thing"]):
             return None  # "forget my face" is an identity request (robot/people.py)
         return "forget", *_thing(m["thing"], vocab)

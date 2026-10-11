@@ -227,6 +227,19 @@ def is_question(text: str) -> bool:
     return text.rstrip().endswith("?") or bool(_ASKS.match(text.strip()))
 
 
+# A deletion is authorized only by an imperative: the line starts with the verb, after optional
+# filler, a polite frame ("can you please"), or "I want you to". Everything else is no command.
+_DELETE = re.compile(r"^\W*(?:(?:ok|okay|so|um|uh|well|now|and|then|please)\W+)*"
+                     r"(?:(?:(?:can|could|would|will)\s+you|i(?:'d| would)? (?:want|like)\s+you"
+                     r"\s+to)\s+(?:please\s+)?)?(?:forget|delete|erase|remove)\b\W*", re.I)
+
+
+def deletion_target(text: str) -> str | None:
+    """What an imperative deletion ("Please forget my phone") names, else None."""
+    text = text.replace("\u2019", "'")
+    return text[m.end():] if (m := _DELETE.match(text)) else None
+
+
 class Memory:
     def __init__(self, root: Path = SHARED / "memory"):
         self.frames = root / "frames"

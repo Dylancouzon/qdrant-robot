@@ -25,6 +25,7 @@ from qdrant_edge import (
 
 from robot.config import SHARED
 from robot.faces import Faces, align
+from robot.memory import deletion_target
 
 DIM = 512  # w600k_r50
 SHOTS = 5  # enrolled shots kept per person
@@ -129,9 +130,7 @@ def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
 
 
 # Identity requests. A name given with "remember me" makes it an enrollment request.
-_NOT_FORGET = re.compile(r"\b(don'?t|do not|never)\s+forget\b", re.I)
-_FORGET = re.compile(r"\b(forget|delete|erase|remove)\s+((everything|all)\s+)?(about\s+)?"
-                     r"(me|my face|who i am)\b", re.I)
+_FORGET = re.compile(r"((everything|all)\s+)?(about\s+)?(me|my face|who i am)\b", re.I)
 _REMEMBERS = re.compile(r"\b(do|did|can|could|will|would)\s+you\s+(still\s+)?(remember|"
                         r"recogni[sz]e|know)\s+(me|who i am)\b|\bhave we met\b|"
                         r"^\W*(remember|recogni[sz]e)\s+me\s*\?", re.I)
@@ -175,7 +174,7 @@ def name_in(text: str) -> str | None:
 def request(text: str) -> tuple[str, str | None] | None:
     """("forget" | "remembers" | "name" | "enroll", the given name) for an identity request,
     else None."""
-    if _FORGET.search(text) and not _NOT_FORGET.search(text):
+    if (rest := deletion_target(text)) is not None and _FORGET.match(rest):
         return "forget", None
     name = name_in(text)
     if name and (_ENROLL.search(text) or _REMEMBERS.search(text)):

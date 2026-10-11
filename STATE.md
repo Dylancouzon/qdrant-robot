@@ -1,16 +1,18 @@
 # State
 
-Updated 2026-10-10. Branch: main. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first.
+Updated 2026-10-10. Branch: `spike/evidence-selection`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders this session: Sonnet sub-agents, the main session orchestrates (Dylan, 2026-10-10).
 
-## Active task: intent parsing for evidence selection
+## Active task: recall of objects shown earlier
 
-Goal: answer quality. Of the 8 failed recorded answers (39/47, current Qwen/CUDA), 4–5 chose the wrong evidence: past questions sent to the camera, and combined "now and before" questions. The plan is [research/answer-evidence.md](research/answer-evidence.md).
+The eight failed recorded answers (39/47) include no evidence-selection error, so the intent parser is dropped. Three misses ask about an unnamed object shown before a scene change, and the brain gets no evidence for it. Design: [research/recall.md](research/recall.md).
 
-1. Rerun the held-out set on the deployed release as the baseline (third use; record it in DECISIONS.md).
-2. Design gate: rules vs independent BGE similarity scores, both with Qwen fixed. A linear multi-label head only if both miss unseen paraphrases.
-3. Build the winner and run a paired Jetson comparison on development questions. Adopt only on a judged gain with no capability loss.
+1. Forget guard: done; deletion needs an imperative (`robot/memory.py` `deletion_target`). Not deployed yet; ships with the recall release.
+2. Design gate on recall options A (earlier sight answers) and B (earlier frame). In progress.
+3. Freeze new show-then-ask development sessions, build the chosen option, check locally.
+4. One paired Jetson replay of `eval/dev/sessions.jsonl` (recorded voice) plus the new sessions. Adopt on a judged gain with no capability loss.
+5. Then one held-out use with both arms in the same run (third use; record it in DECISIONS.md).
 
-Owner and location payloads (Dylan, 2026-10-10) come after the parser and need their own design gate.
+Four misses are model answers with adequate evidence (hand-teddy-3, same-apples-1, joke-1, intro-2). Owner and location payloads (Dylan, 2026-10-10) need their own design gate. RAM headroom follows.
 
 ## Robot
 
@@ -32,10 +34,6 @@ Owner and location payloads (Dylan, 2026-10-10) come after the parser and need t
 
 M4 also needs a Jetson-connected speaker and microphone (Dylan), offline cold start, restart and deletion checks, physical latency, and an eight-hour run. Milestone gates: only M1 has a verdict (2026-10-08).
 
-## Known risks to fix soon
-
-- "Do not forget my phone" matches the forget regex: a possible unintended deletion (`research/edge-cases.md`). It risks a fixed outcome, so D71 allows a fix.
-
 ## Next command
 
-`cat research/answer-evidence.md`
+`cat research/recall.md`

@@ -705,6 +705,41 @@ def test_spoken_names_categories_case_and_restart(tmp_path):
     assert command("Forget my Dylan's smartphone", vocab)[:2] == ("forget", "Dylan's smartphone")
     assert command("Delete my red coffee mug from your memory", vocab)[:2] == (
         "forget", "red coffee mug")
+    for said in [
+                 "Do not forget my phone",
+                 "Don't delete my cup",
+                 "Should I forget my phone?",
+                 "Why did you forget my phone?",
+                 "Did you forget Dylan's smartphone?",
+                 "Please tell me why you forget my phone",
+                 "Can you not forget my phone",
+                 "Please do not ever forget my phone",
+                 "I do not want you to forget my phone",
+                 "Can you tell me why you forget my phone",
+                 "I said forget my phone",
+                 "You forget my phone",
+                 "Tell me how to delete my cup",
+                 "When will you erase my cup?",
+                 "How do I make you remove my phone",
+                 "Never delete my cup",
+                 "Do you forget my phone?",
+    ]:
+        assert command(said, vocab) is None, said
+    for said in [
+                 "Forget my phone",
+                 "forget my phone.",
+                 "Please delete my cup",
+                 "Okay, erase my cup",
+                 "Can you forget my phone?",
+                 "could you please delete my cup",
+                 "Would you remove my phone",
+                 "I want you to forget my phone",
+                 "I'd like you to please erase my cup",
+                 "um so please forget my phone",
+                 "Forget about my cup",
+                 "Now remove Dylan's smartphone",
+    ]:
+        assert command(said, vocab)[0] == "forget", said
     from robot.things import Things, question
     assert question("Where is my Dylan's smartphone?", vocab)[:2] == ("where", "Dylan's smartphone")
     assert question("Where is Dylan's smartphone?", vocab)[:2] == ("where", "Dylan's smartphone")
