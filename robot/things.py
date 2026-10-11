@@ -237,6 +237,28 @@ class Things:
         return self._views(ident, row.payload, np.asarray(row.vector["crops"], dtype=np.float32),
                            vector[None], [crop], "window")
 
+    def remove_view(self, ident: str, view: str) -> bool:
+        """Remove the matching vector, metadata, and thumbnail, or forget the final view."""
+        rows = self.shard.retrieve([ident], True, True)
+        if not rows or rows[0].payload.get("type") != "object":
+            return False
+        row = rows[0]
+        metadata = row.payload["views"]
+        index = next((i for i, v in enumerate(metadata) if v["id"] == view), None)
+        if index is None:
+            return False
+        if len(metadata) == 1:
+            self.forget(ident)
+            return True
+        removed = metadata[index]
+        payload = {**row.payload, "views": metadata[:index] + metadata[index + 1:]}
+        vectors = row.vector["crops"]
+        self.shard.update(UpdateOperation.upsert_points([
+            Point(ident, {"crops": vectors[:index] + vectors[index + 1:]}, payload)]))
+        self.shard.flush()
+        self.remove_thumbnails([removed["thumbnail"]])
+        return True
+
     def link(self, ident: str, turn: int) -> None:
         rows = self.shard.retrieve([ident], True, False)
         if rows:

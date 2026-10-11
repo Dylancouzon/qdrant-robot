@@ -2920,3 +2920,57 @@ def test_interrupted_forget_me_keeps_the_face_to_visitor_link_for_a_retry(robot,
     monkeypatch.setattr(r.things, "forget_visitor", real)
     assert r._forget(None, "Ana", face, r.people.person("Ana")["visitor"])
     assert not r.things.objects(visitor) and r.people.person("Ana") is None
+
+
+def test_remove_view_vector_metadata_file_and_final_object(tmp_path):
+    things = Things(tmp_path)
+    try:
+        vectors = np.eye(DIM, dtype=np.float32)[:3]
+        ident = things.name(OWNER, "mouse", ["mouse"], vectors, thumbnail_crops(vectors))
+        views = things.named(OWNER, "mouse", [])["views"]
+        assert not things.remove_view(ident, "unknown")
+        assert things.remove_view(ident, views[1]["id"])
+        row = things.shard.retrieve([ident], True, True)[0]
+        assert row.payload["views"] == [views[0], views[2]]
+        np.testing.assert_array_equal(row.vector["crops"], vectors[[0, 2]])
+        assert not (things.thumbs / views[1]["thumbnail"]).exists()
+        assert things.remove_view(ident, views[0]["id"])
+        assert things.remove_view(ident, views[2]["id"])
+        assert not things.objects() and not list(things.thumbs.glob("*.jpg"))
+        assert not things.remove_view(ident, views[2]["id"])
+    finally:
+        things.shard.close()
+
+
+@pytest.mark.parametrize("action", ["forget_object", "remove_view"])
+def test_memory_controls_delete_evidence_like_speech(robot, action):
+    r = robot
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    ident = r.things.name(OWNER, "mouse", ["mouse"], vectors, thumbnail_crops(vectors), "Ana")
+    sighting = r.memory.sighting("mouse", "center", 10, named=ident)
+    r.points = {1: sighting}
+    r.window = {"name": ident}
+    r.things.ignore_item("mouse", vectors)
+    listed = r._memory_list()
+    assert listed[0]["label"] == "Ana's mouse"
+    assert listed[0]["owner_label"] == "Ana"
+    assert listed[0]["sightings"] == 1 and listed[0]["last_seen"] == 10
+    view = listed[0]["views"][0]["id"]
+    assert r._thumbnail(view).startswith(b"\xff\xd8")
+    assert r._thumbnail("unknown") is None
+    assert not r._control(action, {"object": "../path", "view": view})
+    if action == "remove_view":
+        assert not r._control(action, {"object": ident, "view": "../path"})
+    def worker():  # the conversation worker: the same queue that writes sightings
+        job = r.jobs.get_nowait()
+        assert job[0] == "memory" and r.jobs.empty()
+        return r._memory_job(*job[1:])
+
+    assert r._control(action, {"object": ident, "view": view})
+    assert r.things.objects(), "queued behind earlier evidence writes, not run at once"
+    assert worker() == "Done."
+    assert not r.things.objects() and not r.memory.points([sighting])
+    assert not r.points and not r.window and not r.things.hidden_ids()
+    assert not list(r.things.thumbs.glob("*.jpg"))
+    assert r._control(action, {"object": ident, "view": view})
+    assert worker() == "That memory no longer exists."

@@ -259,7 +259,8 @@ def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
     assert all("test-only-secret" not in arg for arg in args)
 
 
-@pytest.mark.parametrize("path", ["/ignore", "/mute", "/volume", "/settings"])
+@pytest.mark.parametrize("path", ["/ignore", "/mute", "/volume", "/settings",
+                                  "/forget_object", "/remove_view"])
 def test_item_proxy_requires_cookie_and_forwards_bounded_body(path):
     from email.message import Message
     handler = talk.Handler.__new__(talk.Handler)
@@ -312,3 +313,24 @@ def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
     monkeypatch.setattr(instance, "cleanup_remote", lambda: "")
     instance.run()
     assert commands[0][-2:] == ["--camera-file", "/existing/private/fixture.avi"]
+
+
+@pytest.mark.parametrize("path", ["/memory", "/thumb?view=saved"])
+def test_memory_proxy_cookie_and_forwarding(path):
+    from email.message import Message
+    handler = talk.Handler.__new__(talk.Handler)
+    handler.origin, handler.token = "http://127.0.0.1:8765", "secret"
+    handler.path = path
+    handler.headers = Message()
+    handler.headers["Host"] = "127.0.0.1:8765"
+    replies, forwarded = [], []
+    handler.reply = lambda *args: replies.append(args)
+    handler.session = types.SimpleNamespace(open_view=lambda value: (
+        forwarded.append(value) or types.SimpleNamespace(close=lambda: None),
+        types.SimpleNamespace(status=404, headers={"Content-Type": "image/jpeg"},
+                              read=lambda: b"missing")))
+    handler.do_GET()
+    assert replies[-1][0] == 403 and not forwarded
+    handler.headers["Cookie"] = "edgy=secret"
+    handler.do_GET()
+    assert forwarded == [path] and replies[-1] == (404, b"missing", "image/jpeg")

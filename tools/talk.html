@@ -10,8 +10,11 @@
 @media(max-width:480px){header{flex-wrap:wrap}body{padding:12px}.audio{gap:12px;padding:14px}.actions button{padding:10px 17px}}
 @media(max-height:650px){body{padding-top:12px;padding-bottom:12px}header{margin-bottom:12px}.controls{padding:12px 16px;margin-bottom:12px}.transcript{padding:14px}}
 .recognition .cardhead{flex-wrap:wrap}.setting{padding:12px 20px;border-bottom:1px solid var(--line)}.setting small{display:block;margin:5px 0}.setting input{font:inherit;width:110px;max-width:100%;padding:8px;background:#243141;color:#eef3fa;border:1px solid var(--line);border-radius:8px}.setting button{margin-left:8px;padding:8px 16px}#learning{padding:0 20px;color:var(--dim)}
+[hidden]{display:none!important}.tabs{display:flex;gap:10px;margin-bottom:20px}.tabs button[aria-pressed="true"]{background:var(--accent)}.owner{margin-bottom:24px}.owner h2{font-size:19px;margin:0 0 12px}.memorycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}.objectcard{padding:20px}.objectcard h3{margin:0;overflow-wrap:anywhere}.objectcard p{color:var(--dim)}.views{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}.savedview{width:160px;max-width:100%;display:flex;flex-direction:column;gap:8px}.savedview img{width:100%;height:120px;object-fit:contain;background:#070b10;border-radius:8px}.savedview button{padding:8px}#memoryError{color:#ffb4bf}
 </style>
 <header><div class="brand"><div class="logo" aria-hidden="true">e</div><div><h1>Edgy</h1><p>Your robot's view, voice, and memory</p></div></div><div class="badge">On Jetson · Qdrant Edge</div></header>
+<nav class="tabs" aria-label="Page views"><button id="liveTab" aria-pressed="true" class="secondary">Live</button><button id="memoryTab" aria-pressed="false" class="secondary">Memory</button></nav>
+<div id="livePanel">
 <section class="controls" aria-label="Session controls"><div><div id="phase" role="status" aria-live="polite">Idle</div><p id="activity">Start attaches to the robot on the Jetson, or starts it.</p><p id="error" role="alert"></p></div><div class="actions"><button id="start" onclick="control('start')">Start</button><button id="mute" class="secondary" onclick="robot('mute',{on:!muted})" disabled>Mute</button><button id="stop" class="secondary" onclick="control('stop')" disabled>Stop</button></div></section>
 <main class="grid">
 <section class="card"><div class="cardhead"><h2>Live camera</h2><small id="cameraState">Session idle</small></div><div class="camera"><div id="placeholder" class="placeholder"><strong>Ready when you are</strong>Start to see the Jetson camera and its detection boxes.</div><img id="camera" alt="Live Jetson camera with person, object, and focus boxes" hidden></div><div class="camerafoot"><span>Green boxes name recognized objects. Person names appear only on their verified camera frame.</span><span>Focus boxes show the object Edgy can learn.</span></div><div class="camerafoot"><label for="item">Visible item</label><select id="item" aria-label="Item to ignore"></select><button id="ignore" class="secondary" disabled>Do not track that</button></div><div class="camerafoot"><label for="restoreItem">Ignored item</label><select id="restoreItem" aria-label="Ignored item to restore"></select><button id="restore" class="secondary" disabled>Restore</button></div><p id="itemMessage" role="status"></p><p id="viewerror" role="status"></p></section>
@@ -20,10 +23,63 @@
 <section class="card recognition"><div class="cardhead"><h2>Recognition settings</h2><button id="resetSettings" class="secondary" disabled>Reset to defaults</button></div><p id="learning" role="status"></p><div id="recognitionSettings"></div></section>
 </main>
 <footer>All models and Qdrant Edge run on the Jetson. The Mac stores no microphone recording or camera frames. The Jetson keeps its existing session logs and answer audio.
-<details><summary>Things you can say</summary>Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?” or “Forget my phone”. Choose an item in the camera card and press “Do not track that” to ignore it; “Restore” brings it back. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it. Follow-up questions stay open for about a minute after each answer finishes. Say “Track this” with no name and Edgy asks what to call it. The robot ignores its microphone while its speaker plays and while muted; Mute and the volume slider act on the robot’s own USB microphone and speaker. Stop stops the robot on the Jetson and clears this view. Closing this page or losing the connection leaves the robot running; Start attaches to it again.</details></footer>
+<details><summary>Things you can say</summary>Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?” or “Forget my phone”. Choose an item in the camera card and press “Do not track that” to ignore it; “Restore” brings it back. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it. Follow-up questions stay open for about a minute after each answer finishes. Say “Track this” with no name and Edgy asks what to call it. The robot ignores its microphone while its speaker plays and while muted; Mute and the volume slider act on the robot’s own USB microphone and speaker. Stop stops the robot on the Jetson and clears this view. Closing this page or losing the connection leaves the robot running; Start attaches to it again.</details></footer></div>
+<section id="memoryPanel" aria-label="Saved objects" hidden><p id="memoryError" role="alert"></p><div id="memoryList" aria-live="polite"></div></section>
 <script>
 const el=id=>document.getElementById(id);
 let muted=false, cameraActive=false, transcriptText='', itemControl={}, ignoredItems=[];
+function openTab(memory){
+  el('livePanel').hidden=memory;el('memoryPanel').hidden=!memory;
+  el('liveTab').setAttribute('aria-pressed',String(!memory));el('memoryTab').setAttribute('aria-pressed',String(memory));
+  if(memory)loadMemory();
+}
+el('liveTab').addEventListener('click',()=>openTab(false));
+el('memoryTab').addEventListener('click',()=>openTab(true));
+function relativeTime(time){
+  if(time===null)return 'never';
+  const seconds=Math.max(0,Math.floor(Date.now()/1000-time));
+  for(const [size,unit] of [[86400,'day'],[3600,'hour'],[60,'minute'],[1,'second']]){
+    if(seconds>=size||size===1){const n=Math.floor(seconds/size);return n+' '+unit+(n===1?'':'s')+' ago';}
+  }
+}
+async function memoryEdit(action,data,label,button){
+  if(!confirm(label+'?'))return;
+  button.disabled=true;el('memoryError').textContent='';
+  try{
+    const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(!response.ok)throw Error(response.status===409?'That memory has changed. Open Memory again.':'The robot could not edit this memory.');
+    // The robot applies edits in order with its other memory writes: re-read until done.
+    const gone=data.view||data.object;
+    for(let i=0;i<10&&(await loadMemory()).includes(gone);i++)await new Promise(r=>setTimeout(r,500));
+  }catch(error){el('memoryError').textContent=error.message;}
+  finally{button.disabled=false;}
+}
+async function loadMemory(){
+  el('memoryError').textContent='';
+  try{
+    const response=await fetch('/memory');if(!response.ok)throw Error('Memory unavailable. Start a session on Live first.');
+    const objects=await response.json();el('memoryList').replaceChildren();
+    if(!objects.length){const p=document.createElement('p');p.className='empty';p.textContent='Nothing remembered yet. Hold up an object and say: this is my mouse.';el('memoryList').append(p);return '';}
+    const owners=new Map();
+    for(const object of objects){
+      if(!owners.has(object.owner_label)){
+        const section=document.createElement('section');section.className='owner';const title=document.createElement('h2');title.textContent=object.owner_label;
+        const cards=document.createElement('div');cards.className='memorycards';section.append(title,cards);el('memoryList').append(section);owners.set(object.owner_label,cards);
+      }
+      const card=document.createElement('article');card.className='card objectcard';const title=document.createElement('h3');title.textContent=object.label;
+      const detail=document.createElement('p');detail.textContent='seen '+object.sightings+' times, last seen '+relativeTime(object.last_seen);
+      const views=document.createElement('div');views.className='views';
+      object.views.forEach((view,index)=>{
+        const saved=document.createElement('div');saved.className='savedview';const image=document.createElement('img');image.src='/thumb?view='+encodeURIComponent(view.id);image.alt=object.label+', view '+(index+1)+', '+view.source;
+        const remove=document.createElement('button');remove.className='secondary';remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+image.alt);
+        remove.addEventListener('click',()=>memoryEdit('remove_view',{object:object.id,view:view.id},'Remove '+image.alt,remove));saved.append(image,remove);views.append(saved);
+      });
+      const forget=document.createElement('button');forget.textContent='Forget '+object.label;
+      forget.addEventListener('click',()=>memoryEdit('forget_object',{object:object.id},forget.textContent,forget));card.append(title,detail,views,forget);owners.get(object.owner_label).append(card);
+    }
+    return JSON.stringify(objects);  // the caller checks whether an edited id is still listed
+  }catch(error){el('memoryError').textContent=error.message;return '';}
+}
 function clearLive(){
   el('camera').removeAttribute('src');el('camera').hidden=true;el('placeholder').hidden=false;cameraActive=false;
   el('cameraState').textContent='Session idle';el('viewerror').textContent='';el('answerPath').textContent='';

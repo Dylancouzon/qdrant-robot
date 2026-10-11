@@ -6,6 +6,7 @@ import hmac
 import json
 import threading
 import time
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -17,7 +18,8 @@ import numpy as np
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, or other
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
-ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings")  # POST paths the robot handles
+ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings",
+           "/forget_object", "/remove_view")
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."
 FONT, SMALL = cv2.FONT_HERSHEY_SIMPLEX, 0.5
@@ -99,6 +101,16 @@ def draw(frame: np.ndarray, screen: Screen, width: int, now: float) -> bytes:
     return cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 80])[1].tobytes()
 
 
+def valid_id(ident) -> bool:
+    """Accept only saved UUIDs, never request paths."""
+    if not isinstance(ident, str):
+        return False
+    try:
+        return str(uuid.UUID(ident)) == ident
+    except ValueError:
+        return False
+
+
 class _Handler(BaseHTTPRequestHandler):
     server: "_Server"
 
@@ -108,7 +120,19 @@ class _Handler(BaseHTTPRequestHandler):
         if not hmac.compare_digest(given.encode(), view.token):
             self.send_error(403)
             return
-        if urlparse(self.path).path == "/state":
+        parsed = urlparse(self.path)
+        if parsed.path == "/memory":
+            self._reply(json.dumps(view.memory()).encode(), "application/json")
+            return
+        if parsed.path == "/thumb":
+            ident = parse_qs(parsed.query).get("view", [""])[0]
+            data = view.thumb(ident) if valid_id(ident) else None
+            if data is None:
+                self.send_error(404)
+            else:
+                self._reply(data, "image/jpeg")
+            return
+        if parsed.path == "/state":
             _, screen = view.state()
             data = json.dumps({"status": screen.status, "transcript": screen.transcript,
                                "evidence": screen.evidence, "memory": screen.memory,
@@ -123,6 +147,14 @@ class _Handler(BaseHTTPRequestHandler):
             self.wfile.write(data)
             return
         self._stream(view)
+
+    def _reply(self, data, kind):
+        self.send_response(200)
+        self.send_header("Content-Type", kind)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def _stream(self, view):
         self.send_response(200)
@@ -204,9 +236,11 @@ class View:
     `source` returns the newest frame and what to draw over it."""
 
     def __init__(self, source: Source, port: int, token: str, host: str = "127.0.0.1",
-                 fps: float = 15, width: int = 960, action=None, state=None, wake=lambda: None):
+                 fps: float = 15, width: int = 960, action=None, state=None, wake=lambda: None,
+                 memory=lambda: [], thumb=lambda ident: None):
         if not token:
             raise ValueError("the view needs a token")
+        self.memory, self.thumb = memory, thumb
         self.action = action
         self.state = state or source
         self.wake = wake

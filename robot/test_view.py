@@ -407,3 +407,64 @@ def test_settings_endpoint_validates_and_publishes_live_settings(tmp_path, monke
     assert Settings(config.path).match == .9
     post(TOKEN, {"reset": True}, 202)
     assert config.snapshot() == DEFAULTS
+
+
+
+def test_memory_and_thumbnail_routes():
+    import io
+    import json
+    import uuid
+    from types import SimpleNamespace
+    from robot.view import _Handler
+    ident = str(uuid.uuid4())
+    objects = [{"id": ident, "label": "Ana's mouse", "owner_label": "Ana",
+                "views": [{"id": ident, "time": 1, "source": "taught"}],
+                "last_seen": None, "sightings": 0}]
+    looked_up = []
+    view = SimpleNamespace(token=TOKEN.encode(), memory=lambda: objects,
+        thumb=lambda value: looked_up.append(value) or (
+            b"\xff\xd8saved" if value == ident else None))
+    handler = _Handler.__new__(_Handler)
+    handler.server = SimpleNamespace(view=view)
+    codes, headers = [], {}
+    handler.send_response = codes.append
+    handler.send_error = codes.append
+    handler.send_header = lambda key, value: headers.update({key: value})
+    handler.end_headers = lambda: None
+    def get(path):
+        handler.path, handler.wfile = path, io.BytesIO()
+        handler.do_GET()
+        return codes[-1], handler.wfile.getvalue()
+    code, data = get(f"/memory?token={TOKEN}")
+    assert code == 200 and json.loads(data) == objects
+    assert get(f"/thumb?token={TOKEN}&view={ident}") == (200, b"\xff\xd8saved")
+    assert headers["Content-Type"] == "image/jpeg"
+    assert get(f"/thumb?token={TOKEN}&view={uuid.uuid4()}")[0] == 404
+    before = len(looked_up)
+    for value in ("../../secret.jpg", ""):
+        assert get(f"/thumb?token={TOKEN}&view={value}")[0] == 404
+    assert len(looked_up) == before, "Path-like IDs never reach the thumbnail lookup"
+    assert get("/memory")[0] == 403
+    assert get(f"/thumb?view={ident}")[0] == 403
+
+
+@pytest.mark.parametrize("action", ["forget_object", "remove_view"])
+def test_memory_post_routes(action):
+    import io
+    from types import SimpleNamespace
+    from robot.view import _Handler
+    calls = []
+    handler = _Handler.__new__(_Handler)
+    handler.server = SimpleNamespace(view=SimpleNamespace(
+        port=8090, token=TOKEN.encode(),
+        action=lambda name, data: calls.append((name, data)) or False))
+    handler.path = f"/{action}?token={TOKEN}"
+    handler.headers = {"Host": "127.0.0.1:8090", "Origin": "http://127.0.0.1:8090",
+                       "Content-Length": "2"}
+    handler.rfile = io.BytesIO(b"{}")
+    codes = []
+    handler.send_response = codes.append
+    handler.send_header = lambda *args: None
+    handler.end_headers = lambda: None
+    handler.do_POST()
+    assert calls == [(action, {})] and codes == [409]

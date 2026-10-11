@@ -72,7 +72,7 @@ from robot.things import (
     unmention,
 )
 from robot.tts import RATE, Speaker, phrases
-from robot.view import Screen, View
+from robot.view import valid_id, Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
@@ -283,7 +283,8 @@ class Robot:
         token = os.environ.get("ROBOT_VIEW_TOKEN")  # the booth video view (D59), off without one
         self.video = View(self._shown, int(os.environ.get("ROBOT_VIEW_PORT", "8090")), token,
                           os.environ.get("ROBOT_VIEW_HOST", "127.0.0.1"), action=self._control,
-                          state=lambda: self._shown(False), wake=self._wake_view) if token else None
+                          state=lambda: self._shown(False), wake=self._wake_view,
+                          memory=self._memory_list, thumb=self._thumbnail) if token else None
 
     def hear(self, chunk: np.ndarray) -> None:
         """Every audio input enters here. The robot does not hear itself (silence while its
@@ -849,6 +850,8 @@ class Robot:
                 self._remember_matches(frame, taken, tracks, hits, person)
             elif job[0] == "control":
                 self.control_message = self._item_control(*job[1:])
+            elif job[0] == "memory":
+                self.control_message = self._memory_job(*job[1:])
             elif job[0] == "describe":
                 self._describe_idle(job[1])
             elif (rows := self.memory.points([job[1]])) and \
@@ -1324,8 +1327,10 @@ class Robot:
 
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
-        if action in ("mute", "volume", "settings") and isinstance(data, dict):
-            return self._setting(action, data)
+        direct = {"mute": self._setting, "volume": self._setting, "settings": self._setting,
+                  "forget_object": self._memory_control, "remove_view": self._memory_control}
+        if action in direct and isinstance(data, dict):
+            return direct[action](action, data)
         if action not in ("ignore", "restore") or not isinstance(data, dict):
             return False
         with self.detecting:
@@ -1351,6 +1356,61 @@ class Robot:
                 return False
             self.control_message = message
         return message == "I will notice that item again."
+
+    def _memory_control(self, action, data):
+        """Queue a Memory tab edit on the conversation worker, which also writes sightings and
+        teaching crops, so a deletion can never race a write of the same object's evidence."""
+        if not valid_id(data.get("object")) or (action == "remove_view" and
+                not valid_id(data.get("view"))) or self.jobs.qsize() >= 8:
+            return False
+        self.jobs.put(("memory", action, data))
+        return True
+
+    def _memory_job(self, action, data):
+        done = self.recognition.call(lambda f, c: self._memory_edit(action, data), mutate=True)
+        return "Done." if done else "That memory no longer exists."
+
+    def _memory_list(self):
+        def read(f, c):
+            objects = []
+            for row in self.things.objects():
+                ident, payload = str(row.id), row.payload
+                label = self.things.label(ident)
+                sightings = self.memory.sightings(float("inf"), n=1000000, named=[ident])
+                objects.append({"id": ident, "label": label,
+                    "owner_label": label.removesuffix("'s " + payload["name"]),
+                    "views": [{k: v[k] for k in ("id", "time", "source")}
+                              for v in payload["views"]],
+                    "last_seen": sightings[0]["last_seen"] if sightings else None,
+                    "sightings": len(sightings)})
+            return sorted(objects, key=lambda obj: max(
+                v["time"] for v in obj["views"]), reverse=True)
+        return self.recognition.call(read)
+
+    def _thumbnail(self, ident):
+        def read(f, c):
+            for row in self.things.objects():
+                for view in row.payload["views"]:
+                    if view["id"] == ident:
+                        try:
+                            return (self.things.thumbs / view["thumbnail"]).read_bytes()
+                        except FileNotFoundError:
+                            return None
+            return None
+        return self.recognition.call(read)
+
+    def _memory_edit(self, action, data):
+        rows = self.things.shard.retrieve([data["object"]], True, False)
+        if not rows or rows[0].payload.get("type") != "object":
+            return False
+        named = {"id": str(rows[0].id), **rows[0].payload}
+        if action == "remove_view":
+            if data["view"] not in {v["id"] for v in named["views"]}:
+                return False
+            if len(named["views"]) > 1:
+                return self.things.remove_view(named["id"], data["view"])
+        self._forget_object(named)
+        return True
 
     def _ignore_vectors(self, crops, shot, chosen, gallery):
         """Borrow saved views only when the exact current crop verifies the chosen name."""
@@ -1538,9 +1598,14 @@ class Robot:
         """Delete evidence first, then thumbnails, the object, and its item Ignore rules."""
         if (named := self.things.named(owner, name, labels, include_ignored=True)) is None:
             return f"I don't know your {name}, so there is nothing to forget."
+        self.recognition.call(lambda f, c: self._forget_object(named), mutate=True)
+        return f"Done. I have forgotten your {named['name']}."
+
+    def _forget_object(self, named):
+        """Shared serial-owner deletion for speech and the Memory tab."""
         self.memory.forget(named["turns"])
         self.memory.forget_named(named["id"])
-        self.recognition.call(lambda f, c: self.things.forget(named["id"]), mutate=True)
+        self.things.forget(named["id"])
         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
         with self.detecting:
             if self.window and self.window["name"] == named["id"]:
@@ -1550,7 +1615,6 @@ class Robot:
             self.verified = None
             self.delivery.notify_all()
         self.named, self.looked = self.things.labels(), []
-        return f"Done. I have forgotten your {named['name']}."
 
     def named_evidence(self, turn: Turn, named: dict, this: bool = False
                        ) -> tuple[list[str], int | None, int, str]:

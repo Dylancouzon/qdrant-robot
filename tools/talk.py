@@ -123,12 +123,12 @@ class Session:
         connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
         try:
             connection.request("POST" if body is not None else "GET",
-                               f"{path}?token={token}", body=body,
+                               f"{path}{'&' if '?' in path else '?'}token={token}", body=body,
                                headers={"Host": "127.0.0.1:8090",
                                         "Origin": "http://127.0.0.1:8090",
                                         "Content-Type": "application/json"})
             response = connection.getresponse()
-            if response.status not in (200, 202, 409):
+            if response.status not in (200, 202, 404, 409):
                 raise RuntimeError("Jetson view is unavailable")
             return connection, response
         except Exception:
@@ -230,7 +230,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/":
             page = Path(__file__).with_suffix(".html").read_text().replace("TOKEN", self.token)
             self.reply(200, page.encode(), "text/html; charset=utf-8")
-        elif self.path in ("/camera", "/robot"):
+        elif self.path.split("?", 1)[0] in ("/camera", "/robot", "/memory", "/thumb"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")
@@ -244,10 +244,11 @@ class Handler(BaseHTTPRequestHandler):
     def proxy_view(self):
         connection = None
         try:
-            path = "/state" if self.path == "/robot" else "/"
+            path = "/state" if self.path == "/robot" else (
+                "/" if self.path == "/camera" else self.path)
             connection, response = self.session.open_view(path)
-            if self.path == "/robot":
-                self.reply(200, response.read())
+            if self.path != "/camera":
+                self.reply(response.status, response.read(), response.headers["Content-Type"])
                 return
             self.send_response(200)
             self.send_header("Content-Type", response.headers["Content-Type"])
@@ -268,7 +269,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
-        if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings"):
+        if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings",
+                         "/forget_object", "/remove_view"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")
