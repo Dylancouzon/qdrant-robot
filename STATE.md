@@ -12,19 +12,21 @@ Plan: [research/recognition-import.md](research/recognition-import.md) (design g
 4. Done: owner contract (D155), release `f84e54f81e55` deployed (not started). Live things shard migrated; old one in `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
 5. Done: Memory tab (Live and Memory tabs; object cards by owner with view thumbnails, Forget, Remove view; edits queued on the conversation worker).
 6. Done: voice near-match question (D156).
-7. Next: emoji stripping before speech, deploy, then a live check by Dylan.
-8. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
+7. Done: emoji stripped before speech. Final Jetson replay on release `39b2b07265da` (deployed, unit stopped): 42/47 judged, speech 45/47, first audio 1.43 s p50 (J).
+8. Next: Dylan's live check (Human checks below); tune settings on the page from what the real camera does.
+9. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
 
-## Human checks
+## Human checks (recognition import)
 
-- Teaching: hold an object, say "Hey Edgy, track this", answer the question with "my bottle". Then "Track this as my cup" in one line. Note any wrong object or person named, and whether a reply spoken during the robot's question is lost.
-- Follow-ups: wait 40 s between questions without the wake phrase; after 60 s the page should say "Say 'Hey Edgy'".
-- UI Ignore: an item stays in the list for 30 s after it was last focused; ignore it, restart, Restore it.
-- Volume slider and Mute; close the page and confirm the robot keeps answering.
+- Teach: "Hey Edgy, this is my mouse", then turn it slowly for 6 s. The page shows "Learning views". Later, show it from a new side: is it "Dylan's mouse"?
+- Near match: show it from an odd angle and stay quiet about 4 s: does the robot ask "Is this your mouse?" Answer yes once, no once. It should never ask during speech or more than three times.
+- Two owners: a second person (or "I'm Ana" in a new conversation) says "this is my mouse"; the labels must differ.
+- Memory tab: cards by owner, thumbnails, Remove view, Forget. "Forget me" removes your objects.
+- Settings card: raise or lower the threshold and watch the labels change.
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `f84e54f81e55` (D154–D155, deployed, not started); rollback target `2e3308d61e5b`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 2e3308d61e5b`, then open http://127.0.0.1:8765. The unit is stopped now.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `39b2b07265da` (D154–D156, deployed, not started); rollback target `2e3308d61e5b`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 39b2b07265da`, then open http://127.0.0.1:8765. The unit is stopped now.
 - Running jobs: none. WSL box: idle.
 
 ## Targets (floor, not ceiling)
