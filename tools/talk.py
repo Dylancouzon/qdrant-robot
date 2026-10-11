@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """Loopback monitor and controls for the robot. The robot hears and speaks through its own USB
-audio on the Jetson; `--mac-audio` uses MacBook audio instead, for remote development. All
-robot models run on the Jetson."""
+audio on the Jetson. All robot models run on the Jetson."""
 import argparse
 import contextlib
 import http.client
 import os
 import json
 import secrets
-import signal
 import socket
-import struct
 import subprocess
 import sys
 import threading
@@ -18,135 +15,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from http.cookies import SimpleCookie
 from pathlib import Path
 
-import numpy as np
-
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
-INPUT, OUTPUT = "MacBook Pro Microphone", "MacBook Pro Speakers"
-RATE_IN, RATE_OUT, CHUNK = 16000, 24000, 1280
-MAX_FRAME = RATE_OUT * 2 * 30  # At most 30 seconds of mono PCM per phrase.
 SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
 
 
-def frame(conn: socket.socket) -> np.ndarray:
-    """Read one bounded phrase, including fragmented headers and payloads."""
-    def exact(size):
-        data = bytearray()
-        while len(data) < size:
-            part = conn.recv(size - len(data))
-            if not part:
-                raise EOFError("Robot audio connection closed")
-            data.extend(part)
-        return data
-    size, = struct.unpack("<I", exact(4))
-    if not 0 < size <= MAX_FRAME or size % 2:
-        raise ValueError(f"Invalid robot audio frame size: {size}")
-    return np.frombuffer(exact(size), dtype="<i2")
-
-
-def devices(sd, microphone=True) -> tuple[int | None, int]:
-    found = sd.query_devices()
-    chosen = []
-    for name, direction in ((INPUT, "input"), (OUTPUT, "output")):
-        if direction == "input" and not microphone:
-            chosen.append(None)
-            continue
-        matches = [i for i, d in enumerate(found)
-                   if d["name"] == name and d[f"max_{direction}_channels"] > 0]
-        if len(matches) != 1:
-            raise RuntimeError(f"Expected one {name}; found {len(matches)}")
-        chosen.append(matches[0])
-    if microphone:
-        sd.check_input_settings(device=chosen[0], channels=1, dtype="int16", samplerate=RATE_IN)
-    sd.check_output_settings(device=chosen[1], channels=1, dtype="int16", samplerate=RATE_OUT)
-    return tuple(chosen)
-
-
-class NativeAudio:
-    """Capture and play one connected stream; the parent can reap native stalls."""
-
-    def __init__(self, fd, microphone=True):
-        import sounddevice as sd
-        self.sd = sd
-        self.microphone = microphone
-        self.conn = socket.socket(fileno=fd)
-        self.stopped = threading.Event()
-        self.failure = ""
-        self.streams = []
-        self.receiver = None
-
-    @staticmethod
-    def emit(**state):
-        sys.stdout.write(json.dumps(state) + "\n")
-        sys.stdout.flush()
-
-    def halt(self, *_):
-        self.stopped.set()
-        with contextlib.suppress(OSError):
-            self.conn.shutdown(socket.SHUT_RDWR)
-
-    def answers(self):
-        out = self.streams[0]
-        try:
-            while not self.stopped.is_set():
-                pcm = frame(self.conn)
-                out.write(pcm)
-        except (OSError, EOFError, ValueError, self.sd.PortAudioError) as exc:
-            if not self.stopped.is_set():
-                self.failure = str(exc)
-            self.halt()
-
-    def capture(self, mic):
-        while not self.stopped.is_set():
-            data, overflow = mic.read(CHUNK)
-            if overflow:
-                raise RuntimeError("Microphone overflow; stop and restart the session")
-            self.conn.sendall(data.tobytes())  # the robot silences its own voice and mute
-        if self.failure:
-            raise RuntimeError(self.failure)
-
-    def silence(self):
-        while not self.stopped.wait(CHUNK / RATE_IN):
-            self.conn.sendall(bytes(CHUNK * 2))
-        if self.failure:
-            raise RuntimeError(self.failure)
-
-    def run(self):
-        signal.signal(signal.SIGTERM, self.halt)
-        try:
-            self.emit(phase="Opening MacBook audio")
-            incoming, outgoing = devices(self.sd, self.microphone)
-            if self.stopped.is_set():
-                return
-            out = self.sd.OutputStream(device=outgoing, samplerate=RATE_OUT,
-                                       channels=1, dtype="int16")
-            self.streams.append(out)
-            out.start()
-            if self.microphone:
-                mic = self.sd.InputStream(device=incoming, samplerate=RATE_IN, channels=1,
-                                         dtype="int16", blocksize=CHUNK)
-                self.streams.append(mic)
-                mic.start()
-            self.emit(phase="Listening")
-            self.receiver = threading.Thread(target=self.answers, daemon=True)
-            self.receiver.start()
-            self.capture(mic) if self.microphone else self.silence()
-        finally:
-            self.halt()
-            for stream in reversed(self.streams):
-                with contextlib.suppress(Exception):
-                    stream.abort()
-                    stream.close()
-            if self.receiver:
-                self.receiver.join(2)
-            self.conn.close()
-
-
-def robot_args(mac_audio: bool, camera_file: str | None) -> list[str]:
-    """The `robot.main` arguments: its own USB audio, or a Mac client on port 7070."""
-    return ["-m", "robot.main", *(["--listen", "7070"] if mac_audio else []),
-            *(["--camera-file", camera_file] if camera_file else [])]
+def robot_args(camera_file: str | None) -> list[str]:
+    """The `robot.main` arguments; the robot uses its own USB audio."""
+    return ["-m", "robot.main", *(["--camera-file", camera_file] if camera_file else [])]
 
 
 def command(args: list[str], env=None) -> str:
@@ -177,16 +54,15 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Own one remote session and tunnel, and keep the page reusable after cleanup."""
 
-    def __init__(self, release: str, camera_file: str | None = None, mac_audio: bool = False):
+    def __init__(self, release: str, camera_file: str | None = None):
         self.release = release
-        self.camera_file, self.mac_audio = camera_file, mac_audio
+        self.camera_file = camera_file
         self.view_port = self.view_token = None
         self.lock = threading.Lock()
         self.stopped = threading.Event()
         self.worker = None
-        self.child = self.reader = self.unit = None
-        self.state = dict(phase="Idle", active=False, error="", view_ready=False,
-                          microphone=not (mac_audio and camera_file))
+        self.unit = None
+        self.state = dict(phase="Idle", active=False, error="", view_ready=False)
 
     def update(self, **state):
         with self.lock:
@@ -222,57 +98,16 @@ class Session:
             raise RuntimeError(f"Jetson session stopped: {report[-1500:]}")
         return report.splitlines()
 
-    def connect(self, tunnel, port):
-        self.update(phase="Waiting for Jetson audio")
-        while not self.stopped.wait(0.2):
-            if tunnel.poll() is not None:
-                message = tunnel.stderr.read().decode().strip()
-                raise RuntimeError(message or "SSH tunnel closed")
-            if "waiting for a client on port 7070" in self.report():
-                try:
-                    return socket.create_connection(("127.0.0.1", port), timeout=2)
-                except OSError:
-                    continue
-        return None
-
-    def listen(self, conn):
-        """Wait for the robot to warm up, then watch it. With `conn` (Mac audio), the MacBook
-        audio child runs meanwhile."""
-        if conn:
-            conn.settimeout(None)
-            conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    def listen(self, tunnel):
+        """Wait for the robot to warm up, then watch it and the tunnel until Stop."""
         self.update(phase="Warming up Jetson; microphone off")
-        while not self.stopped.wait(0.5):
-            if "listening" in self.report():
-                break
-        if self.stopped.is_set():
-            return
-        self.update(view_ready=True)
-        if conn:
-            return self.run_native(conn)
-        self.update(phase="Listening")
-        while not self.stopped.wait(2):
-            self.report()  # raises when the Jetson session stops
-
-    def run_native(self, conn):
-        child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
-                                  "--audio-fd", str(conn.fileno()),
-                                  *(["--no-microphone"] if self.camera_file else [])],
-                                 pass_fds=(conn.fileno(),), stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE, text=True)
-        with self.lock:
-            self.child = child
-
-        def updates():
-            for line in child.stdout:
-                self.update(**json.loads(line))
-
-        self.reader = threading.Thread(target=updates, daemon=True)
-        self.reader.start()
-        while not self.stopped.wait(0.1):
-            if child.poll() is not None:
-                message = child.stderr.read().strip()[-1500:]
-                raise RuntimeError(message or "Robot audio disconnected")
+        ready = False
+        while not self.stopped.wait(0.5 if not ready else 2):
+            if tunnel.poll() is not None:
+                raise RuntimeError(tunnel.stderr.read().decode().strip() or "SSH tunnel closed")
+            ready = ready or "listening" in self.report()  # raises when the Jetson session stops
+            if ready:
+                self.update(view_ready=True, phase="Listening")
 
     def open_view(self, path, body=None):
         with self.lock:
@@ -310,26 +145,14 @@ class Session:
         error = self.cleanup_remote()
         self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error)
 
-    def cleanup_local(self, conn, tunnel):
-        if conn:
-            with contextlib.suppress(OSError):
-                conn.shutdown(socket.SHUT_RDWR)
-        reap(self.child)
-        if self.reader:
-            self.reader.join(2)
-        if self.child:
-            self.child.stdout.close()
-            self.child.stderr.close()
-        self.child = self.reader = None
-        if conn:
-            conn.close()
+    def cleanup_local(self, tunnel):
         reap(tunnel)
         if tunnel:
             tunnel.stderr.close()
 
     def run(self):
         name = f"live-mac-{secrets.token_hex(6)}"
-        tunnel = conn = None
+        tunnel = None
         error = ""
         try:
             status = remote(f"readlink -f {BASE}/current; "
@@ -342,27 +165,22 @@ class Session:
             self.unit = f"qr-{name}.service"
             self.view_token = secrets.token_hex(32)
             command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
-                     "--", *robot_args(self.mac_audio, self.camera_file)],
+                     "--", *robot_args(self.camera_file)],
                     env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
-            with socket.socket() as reserve, socket.socket() as video_reserve:
+            with socket.socket() as reserve:
                 reserve.bind(("127.0.0.1", 0))
-                video_reserve.bind(("127.0.0.1", 0))
-                port, self.view_port = reserve.getsockname()[1], video_reserve.getsockname()[1]
+                self.view_port = reserve.getsockname()[1]
             tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes",
-                                       *(["-L", f"127.0.0.1:{port}:127.0.0.1:7070"]
-                                         if self.mac_audio else []),
                                        "-L", f"127.0.0.1:{self.view_port}:127.0.0.1:8090", "robot"],
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-            conn = self.connect(tunnel, port) if self.mac_audio else None
-            if conn or not self.mac_audio:
-                self.listen(conn)
+            self.listen(tunnel)
         except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
             if not self.stopped.is_set():
                 error = str(exc)
         finally:
             self.update(phase="Stopping", view_ready=False)
             self.view_port = self.view_token = None
-            self.cleanup_local(conn, tunnel)
+            self.cleanup_local(tunnel)
             cleanup_error = self.cleanup_remote()
             error = "\n".join(filter(None, (error, cleanup_error)))
             self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error)
@@ -460,9 +278,8 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int, release: str, camera_file: str | None = None,
-          mac_audio: bool = False) -> None:
-    session = Session(release, camera_file, mac_audio)
+def serve(port: int, release: str, camera_file: str | None = None) -> None:
+    session = Session(release, camera_file)
     token = secrets.token_urlsafe(32)
     Handler.session = session
     Handler.token = token
@@ -484,15 +301,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
     parser.add_argument("--release", help="exact Jetson release printed by tools/jetson.py deploy")
-    parser.add_argument("--audio-fd", type=int, help=argparse.SUPPRESS)
-    parser.add_argument("--no-microphone", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--camera-file", help="existing Jetson recorded camera fixture path")
-    parser.add_argument("--mac-audio", action="store_true",
-                        help="use MacBook audio, not the Jetson's USB audio (remote development)")
     args = parser.parse_args()
-    if args.audio_fd is not None:
-        NativeAudio(args.audio_fd, not args.no_microphone).run()
-    else:
-        if not args.release:
-            parser.error("--release is required for the deployed interface release")
-        serve(args.port, args.release, args.camera_file, args.mac_audio)
+    if not args.release:
+        parser.error("--release is required for the deployed interface release")
+    serve(args.port, args.release, args.camera_file)

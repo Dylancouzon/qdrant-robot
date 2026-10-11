@@ -3,7 +3,6 @@ and conversation. One process; the LLM runs in a supervised llama-server child.
 Every turn logs its stage times and saves its answer audio.
 
     python -m robot.main                       camera, USB microphone, USB speaker
-    python -m robot.main --listen 7070         microphone and speaker of a Mac client
 """
 import argparse
 import contextlib
@@ -1500,17 +1499,11 @@ class Robot:
 def main() -> None:
     from robot.camera import Camera, FileCamera
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--listen", type=int,
-                   help="TCP port for a Mac client (tools/talk.py --mac-audio), not the USB audio")
     p.add_argument("--camera-file", type=Path,
                    help="recorded camera fixture, in stored orientation")
     a = p.parse_args()
-    if a.listen:
-        print(f"waiting for a client on port {a.listen}", flush=True)
-        chunks, play = audio.serve(a.listen)
-    else:
-        audio.set_volume(audio.saved_volume())
-        chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
+    audio.set_volume(audio.saved_volume())
+    chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
     camera = FileCamera() if a.camera_file else Camera()
     robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
     if a.camera_file:

@@ -1,130 +1,15 @@
-"""Exercise Mac audio framing and owned session cleanup without microphone capture."""
+"""Exercise the session lifecycle, owned cleanup, and the page proxy without a Jetson."""
 import io
 import signal
-import socket
-import struct
 import subprocess
 import sys
 import threading
 import time
 import types
 from pathlib import Path
-
-import numpy as np
 import pytest
 
 import talk
-
-
-def test_fragmented_frames_preserve_phrase_order():
-    left, right = socket.socketpair()
-    phrases = [np.array([1, -2, 3], dtype="<i2"), np.array([4, -5], dtype="<i2")]
-
-    def send():
-        for pcm in phrases:
-            packet = struct.pack("<I", pcm.nbytes) + pcm.tobytes()
-            for byte in packet:
-                right.sendall(bytes([byte]))
-        right.close()
-
-    sender = threading.Thread(target=send)
-    sender.start()
-    with left:
-        for expected in phrases:
-            np.testing.assert_array_equal(talk.frame(left), expected)
-        with pytest.raises(EOFError):
-            talk.frame(left)
-    sender.join()
-
-
-@pytest.mark.parametrize("size", [0, 3, talk.MAX_FRAME + 2])
-def test_invalid_header_is_rejected_before_payload(size):
-    left, right = socket.socketpair()
-    with left, right:
-        right.sendall(struct.pack("<I", size))
-        with pytest.raises(ValueError):
-            talk.frame(left)
-
-
-@pytest.mark.parametrize("packet", [b"\x04", struct.pack("<I", 4) + b"\x00\x00"])
-def test_partial_eof(packet):
-    left, right = socket.socketpair()
-    with left:
-        right.sendall(packet)
-        right.close()
-        with pytest.raises(EOFError):
-            talk.frame(left)
-
-
-def peer_audio(right, phrases, sent):
-    with right:
-        for pcm in phrases:
-            right.sendall(struct.pack("<I", pcm.nbytes) + pcm.tobytes())
-        for _ in range(3):
-            data = bytearray()
-            while len(data) < talk.CHUNK * 2:
-                data.extend(right.recv(talk.CHUNK * 2 - len(data)))
-            sent.append(bytes(data))
-
-
-def native(monkeypatch):
-    """Fake PortAudio devices; the production audio loop still uses a real socket."""
-    opened, played, sent = [], [], []
-    playing = threading.Event()
-    left, right = socket.socketpair()
-
-    class Stream:
-        latency = 0.02
-
-        def __init__(self, **kwargs):
-            self.config = kwargs
-            self.closed = self.aborted = False
-            opened.append(self)
-
-        def start(self):
-            pass
-
-        def read(self, count):
-            playing.wait(1)
-            time.sleep(0.02)
-            return np.full((count, 1), 1000, np.int16), False
-
-        def write(self, pcm):
-            played.append(pcm.copy())
-            playing.set()
-
-        def abort(self):
-            self.aborted = True
-
-        def close(self):
-            self.closed = True
-
-    devices = [{"name": talk.INPUT, "max_input_channels": 1, "max_output_channels": 0},
-               {"name": talk.OUTPUT, "max_input_channels": 0, "max_output_channels": 2}]
-    sd = types.SimpleNamespace(query_devices=lambda: devices,
-                               check_input_settings=lambda **_: None,
-                               check_output_settings=lambda **_: None,
-                               InputStream=Stream, OutputStream=Stream, PortAudioError=RuntimeError)
-    monkeypatch.setitem(sys.modules, "sounddevice", sd)
-    monkeypatch.setattr(signal, "signal", lambda *_: None)
-    phrases = [np.full(240, 200, np.int16), np.full(240, 300, np.int16)]
-
-    thread = threading.Thread(target=peer_audio, args=(right, phrases, sent))
-    thread.start()
-    with pytest.raises((RuntimeError, BrokenPipeError)):
-        talk.NativeAudio(left.detach()).run()
-    thread.join(2)
-    assert not thread.is_alive()
-    assert [s.config["device"] for s in opened] == [1, 0]
-    assert all(s.closed and s.aborted for s in opened)
-    for actual, expected in zip(played, phrases, strict=True):
-        np.testing.assert_array_equal(actual, expected)
-    return sent
-
-
-def test_microphone_is_forwarded_unchanged_and_streams_released(monkeypatch):
-    sent = native(monkeypatch)  # the robot, not the Mac client, silences its own voice
-    assert all(np.frombuffer(block, np.int16).tolist() == [1000] * talk.CHUNK for block in sent)
 
 
 def wait_until(predicate, timeout=5):
@@ -137,13 +22,12 @@ def wait_until(predicate, timeout=5):
 
 
 def session_report(warm):
-    report = "active\nwaiting for a client on port 7070"
-    return report + "\nlistening" if warm.is_set() else report
+    return "active\nlistening" if warm.is_set() else "active"
 
 
 @pytest.fixture
 def session(monkeypatch):
-    commands, peers = [], []
+    commands = []
     popen = subprocess.Popen
     warm = threading.Event()
 
@@ -160,37 +44,23 @@ def session(monkeypatch):
     def launch(args, **kwargs):
         if args[0] == "ssh":
             return popen([sys.executable, "-c", "import time; time.sleep(30)"], **kwargs)
-        assert "--audio-fd" in args
-        return popen([sys.executable, "-u", "-c",
-                      'import time; print(\'{"phase":"Listening"}\', flush=True); time.sleep(30)'],
-                     **kwargs)
-
-    def connect(*_, **__):
-        with socket.create_server(("127.0.0.1", 0)) as listener:
-            left = socket.socket()
-            left.connect(listener.getsockname())
-            right, _ = listener.accept()
-        peers.append(right)
-        return left
+        raise AssertionError(args)
 
     monkeypatch.setattr(talk, "remote", remote)
     monkeypatch.setattr(talk, "command", lambda args, **_: commands.append(args) or "")
     monkeypatch.setattr(talk.subprocess, "Popen", launch)
-    monkeypatch.setattr(talk.socket, "create_connection", connect)
-    instance = talk.Session("test-release", mac_audio=True)
+    instance = talk.Session("test-release")
     yield instance, commands, warm
     instance.stop()
     if instance.worker:
         instance.worker.join(5)
-    for peer in peers:
-        peer.close()
 
 
-def test_stop_during_warmup_never_opens_audio(session):
+def test_stop_during_warmup_never_shows_the_view(session):
     instance, commands, _ = session
     instance.start()
     wait_until(lambda: instance.snapshot()["phase"].startswith("Warming"))
-    assert instance.child is None
+    assert not instance.snapshot()["view_ready"]
     instance.stop()
     instance.worker.join(5)
     assert not instance.worker.is_alive()
@@ -201,11 +71,9 @@ def test_stop_during_warmup_never_opens_audio(session):
 def test_repeated_start_stop_reaps_before_next_start(session):
     instance, commands, warm = session
     warm.set()
-    children = []
     for _ in range(2):
         instance.start()
         wait_until(lambda: instance.snapshot()["phase"] == "Listening")
-        children.append(instance.child)
         first_worker = instance.worker
         instance.start()
         assert instance.worker is first_worker
@@ -213,7 +81,6 @@ def test_repeated_start_stop_reaps_before_next_start(session):
         first_worker.join(5)
         assert not first_worker.is_alive()
         assert instance.snapshot()["phase"] == "Idle"
-    assert all(child.poll() is not None for child in children)
     starts = [c for c in commands if isinstance(c, list)]
     assert len(starts) == 2 and starts[0][3] != starts[1][3]
     assert sum("systemctl stop" in c for c in commands if isinstance(c, str)) == 2
@@ -349,7 +216,7 @@ def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
     calls = []
     monkeypatch.setenv("ROBOT_VIEW_TOKEN", "test-only-secret")
     monkeypatch.setattr(jetson, "remote", lambda script, **_: calls.append(script) or 0)
-    assert jetson.run("live-mac-test", ["-m", "robot.main", "--listen", "7070"], False) == 0
+    assert jetson.run("live-mac-test", ["-m", "robot.main", "--camera-file", "x"], False) == 0
     assert "--preserve-env=ROBOT_VIEW_TOKEN" in calls[0]
     assert "--setenv=ROBOT_VIEW_TOKEN" in calls[0] and "test-only-secret" not in calls[0]
     monkeypatch.undo()
@@ -395,42 +262,19 @@ def test_page_edits_item_lists_in_place_and_offers_no_spoken_ignore():
     assert "Ignore chairs" not in page and "Do not track that" in page
 
 
-def test_recorded_camera_never_opens_inputstream(monkeypatch):
-    conn, peer = socket.socketpair()
-    streams = []
-    class Out:
-        latency = 0
-        def __init__(self, **kwargs):
-            streams.append(self)
-        def start(self):
-            pass
-        def abort(self):
-            pass
-        def close(self):
-            pass
-        def write(self, data):
-            pass
-    sd = types.SimpleNamespace(query_devices=lambda: [{"name": talk.OUTPUT,
-        "max_output_channels": 2}], check_output_settings=lambda **kwargs: None,
-        OutputStream=Out, InputStream=lambda **kwargs: pytest.fail("opened unattended microphone"),
-        PortAudioError=RuntimeError)
-    monkeypatch.setitem(sys.modules, "sounddevice", sd)
-    monkeypatch.setattr(signal, "signal", lambda *_: None)
-    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
-    audio = talk.NativeAudio(conn.detach(), microphone=False)
-    monkeypatch.setattr(audio, "emit", lambda **kwargs: None)
-    thread = threading.Thread(target=audio.run)
-    thread.start()
-    peer.settimeout(2)
-    assert peer.recv(talk.CHUNK * 2) == bytes(talk.CHUNK * 2)
-    audio.halt()
-    thread.join(2)
-    peer.close()
-    assert len(streams) == 1 and not thread.is_alive()
+def test_robot_launch_uses_its_own_audio_and_forwards_only_the_view(session):
+    instance, commands, warm = session
+    warm.set()
+    instance.start()
+    wait_until(lambda: instance.snapshot()["phase"] == "Listening")
+    instance.stop()
+    instance.worker.join(5)
+    assert [c for c in commands if isinstance(c, list)][0][-2:] == ["-m", "robot.main"]
+    assert talk.robot_args("clip.avi") == ["-m", "robot.main", "--camera-file", "clip.avi"]
 
 
 def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
-    instance = talk.Session("release", "/existing/private/fixture.avi", mac_audio=True)
+    instance = talk.Session("release", "/existing/private/fixture.avi")
     commands = []
     monkeypatch.setattr(talk, "remote", lambda script: f"{talk.BASE}/releases/release")
     monkeypatch.setattr(talk, "command", lambda args, env=None: commands.append(args))
@@ -439,27 +283,3 @@ def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
     monkeypatch.setattr(instance, "cleanup_remote", lambda: "")
     instance.run()
     assert commands[0][-2:] == ["--camera-file", "/existing/private/fixture.avi"]
-    assert "--no-microphone" not in commands[0], "native capture flag stays local"
-    assert instance.snapshot()["microphone"] is False
-
-
-def test_default_launch_uses_jetson_audio_and_opens_no_mac_audio(monkeypatch):
-    assert talk.robot_args(False, None) == ["-m", "robot.main"]
-    assert talk.robot_args(True, "clip.avi") == ["-m", "robot.main", "--listen", "7070",
-                                                 "--camera-file", "clip.avi"]
-    instance = talk.Session("release")
-    commands, popen, real = [], [], subprocess.Popen
-    monkeypatch.setattr(talk, "remote", lambda script: f"{talk.BASE}/releases/release"
-                        if script.startswith("readlink") else "active\nlistening")
-    monkeypatch.setattr(talk, "command", lambda args, env=None: commands.append(args))
-    monkeypatch.setattr(instance, "cleanup_remote", lambda: "")
-    monkeypatch.setattr(talk.subprocess, "Popen", lambda args, **kw: popen.append(args) or
-                        real([sys.executable, "-c", "import time; time.sleep(30)"]))
-    worker = threading.Thread(target=instance.run)
-    worker.start()
-    wait_until(lambda: instance.snapshot()["phase"] == "Listening")
-    instance.stop()
-    worker.join(5)
-    assert commands[0][-2:] == ["-m", "robot.main"]
-    assert len(popen) == 1 and popen[0][0] == "ssh" and "7070" not in " ".join(popen[0])
-    assert instance.snapshot()["view_ready"] is False and instance.child is None

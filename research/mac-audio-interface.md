@@ -1,6 +1,6 @@
 # Robot interface and audio
 
-The robot hears and speaks through its own USB audio device on the Jetson (ALSA `plughw:CARD=Device,DEV=0`, constants in `robot/audio.py`). The Mac page is the monitor and control UI: Start, Stop, Mute, a speaker volume slider, the camera view, and the transcript. `python3 tools/talk.py --release RELEASE_ID --mac-audio` uses MacBook audio instead, for remote development.
+The robot hears and speaks through its own USB audio device on the Jetson (ALSA `plughw:CARD=Device,DEV=0`, constants in `robot/audio.py`). The Mac page is the monitor and control UI: Start, Stop, Mute, a speaker volume slider, the camera view, and the transcript.
 
 D147's accepted live release is `7f67670fa91e`. It keeps the selected "???" style through confidence dips on the same admitted object. Dylan accepted this checkpoint as good enough. [STATE.md](../STATE.md) owns current releases, processes, and the next action. [DECISIONS.md](../DECISIONS.md) and [lessons.md](lessons.md) retain the development history.
 
@@ -12,9 +12,9 @@ Say "Hey Edgy" to start a turn. Follow-up questions work for about 20 seconds af
 
 **Mute** and the **volume** slider act on the robot through the view's token-protected `/mute` and `/volume` endpoints, proxied by the local page. Mute silences the Jetson microphone input. Volume sets the USB `Speaker` mixer (0 to 100 percent), is saved in `shared/speaker-volume`, and is applied at robot startup. The default is 62 percent.
 
-The robot does not hear itself. `Robot.hear` replaces every input chunk with silence while the speaker plays and for `SELF_VOICE_TAIL_S` (0.3 s) after the last phrase, for the USB microphone, the Mac client, and replays alike. `Mouth` computes the end of playback from the sample count, because `aplay` returns before the audio is audible. With `--mac-audio`, the MacBook client only forwards its microphone and plays phrases; the robot does the muting.
+The robot does not hear itself. `Robot.hear` replaces every input chunk with silence while the speaker plays and for `SELF_VOICE_TAIL_S` (0.3 s) after the last phrase, for the USB microphone and replays alike. `Mouth` computes the end of playback from the sample count, because `aplay` returns before the audio is audible.
 
-All models and Qdrant Edge run on the Jetson. The Mac stores no recording. The Jetson retains session logs and generated answer WAVs. With `--mac-audio`, macOS can require microphone permission for the launching terminal.
+All models and Qdrant Edge run on the Jetson. The Mac stores no recording. The Jetson retains session logs and generated answer WAVs.
 
 Use one camera viewer. A second MJPEG subscriber replaces the first. Each session has a fresh view token, passed through environment and SSH stdin. The local page proxies camera/state access through its session cookie. Stop clears the live feed and transient conversation.
 
@@ -50,7 +50,7 @@ Each detected source enters one replaceable latest slot on the serial Recognitio
 
 `OBJECT_MIN_SIDE=120` refers to a 1280px source width and scales with frame width. Detector LOW/HIGH are 0.10/0.25; unknown teaching admission is 0.25. These raw gates remain unchanged by the "???" style fix. YuNet uses 640-width input and maps its face result to source coordinates.
 
-For recorded camera playback, add `--camera-file /existing/jetson/fixture.avi` to the launcher. FileCamera starts after warmup in stored orientation. With `--mac-audio`, this mode keeps the Mac microphone closed and sends paced silence. Stop and restart the server without that option for live capture. Use temporary memories for automated controls; keep private media outside git.
+For recorded camera playback, add `--camera-file /existing/jetson/fixture.avi` to the launcher. FileCamera starts after warmup in stored orientation. Stop and restart the server without that option for live capture. Use temporary memories for automated controls; keep private media outside git.
 
 ## Evidence and limits
 

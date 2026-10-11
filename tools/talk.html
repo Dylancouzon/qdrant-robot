@@ -75,7 +75,7 @@ el('ignore').addEventListener('click',()=>itemAction('ignore'));el('restore').ad
 async function status(){
   try{
     const response=await fetch('/status');if(!response.ok)throw Error('Page connection failed');const s=await response.json();
-    el('phase').textContent=s.phase;el('error').textContent=s.error;el('start').disabled=s.active;el('stop').disabled=!s.active;el('mute').disabled=!s.view_ready||s.microphone===false;el('volume').disabled=!s.view_ready;
+    el('phase').textContent=s.phase;el('error').textContent=s.error;el('start').disabled=s.active;el('stop').disabled=!s.active;el('mute').disabled=!s.view_ready;el('volume').disabled=!s.view_ready;
     el('activity').textContent=muted?'Microphone muted':s.phase==='Listening'?'Listening through the robot’s microphone':s.active?'Preparing the connection; please wait':'Start opens the camera and the robot’s own microphone and speaker.';
     if(!s.view_ready){if(cameraActive||transcriptText)clearLive();return;}
     if(!cameraActive){el('camera').src='/camera';el('camera').hidden=false;el('placeholder').hidden=true;cameraActive=true;}

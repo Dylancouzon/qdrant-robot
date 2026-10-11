@@ -1,12 +1,9 @@
-"""Audio in and out. In: the USB microphone through `arecord`, a Mac client over TCP
-(`tools/talk.py --mac-audio`), or a WAV played at real-time pace for scripted sessions. Out:
-phrases played in order on the USB speaker or sent back to the Mac client; every answer is
+"""Audio in and out. In: the USB microphone through `arecord`, or a WAV played at real-time
+pace for scripted sessions. Out: phrases played in order on the USB speaker; every answer is
 also saved as a WAV for scoring. The speaker volume is the USB `Speaker` mixer, saved in
 `shared/`.
 """
 import queue
-import socket
-import struct
 import subprocess
 import threading
 import time
@@ -87,25 +84,6 @@ def aplay(device: str, rate: int) -> Callable[[np.ndarray], None]:
     return play
 
 
-def serve(port: int) -> tuple[Iterator[np.ndarray], Callable[[np.ndarray], None]]:
-    """Wait for one Mac client: its microphone in (int16, 16 kHz, mono), and a sender for
-    answer audio out (each phrase: 4-byte little-endian length, then int16 samples)."""
-    with socket.create_server(("0.0.0.0", port)) as server:
-        conn, _ = server.accept()
-    conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-
-    def chunks() -> Iterator[np.ndarray]:
-        step = int(RATE_IN * CHUNK_S) * 2
-        with conn.makefile("rb") as f:
-            while data := f.read(step):
-                yield np.frombuffer(data, np.int16).astype(np.float32) / 32768
-
-    def send(audio: np.ndarray) -> None:
-        pcm = pcm16(audio)
-        conn.sendall(struct.pack("<I", len(pcm)) + pcm)
-    return chunks(), send
-
-
 class Mouth:
     """Plays phrases in order through `play` (None: no speaker); the turn keeps the audio.
     `until` is when the queued audio ends, from its sample count: `play` returns once the
@@ -140,10 +118,6 @@ class Mouth:
 
 
 if __name__ == "__main__":
-    import contextlib
-    with contextlib.closing(socket.socket()) as s:
-        s.bind(("127.0.0.1", 0))
-        port = s.getsockname()[1]
     mouth = Mouth(lambda _: None, 10)
     assert not mouth.playing(SELF_VOICE_TAIL_S)
     mouth.play(np.zeros(5, np.float32))  # 0.5 s of audio
@@ -151,19 +125,4 @@ if __name__ == "__main__":
     mouth.until = time.monotonic() - 0.1
     assert not mouth.playing() and mouth.playing(SELF_VOICE_TAIL_S), "the tail follows the end"
     mouth.close()
-    got: list = []
-    t = threading.Thread(target=lambda: got.append(serve(port)))
-    t.start()
-    for _ in range(50):  # until the server listens
-        with contextlib.suppress(OSError):
-            client = socket.create_connection(("127.0.0.1", port))
-            break
-        time.sleep(0.05)
-    t.join()
-    chunks, send = got[0]
-    client.sendall(np.full(int(RATE_IN * CHUNK_S), 16384, np.int16).tobytes())
-    assert abs(next(chunks)[0] - 0.5) < 1e-6, "microphone chunk in"
-    send(np.array([0.5, -0.5], np.float32))
-    head = client.recv(4)
-    assert struct.unpack("<I", head)[0] == 4 and len(client.recv(4)) == 4, "answer phrase out"
     print("selftest ok")
