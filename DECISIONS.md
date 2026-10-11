@@ -80,6 +80,8 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 
 **D153 2026-10-10: Booth interaction timing and two-step teaching** (Dylan's live session). Follow-ups need no wake phrase for 60 s after an answer ends (supersedes D65's 20 s; the page says "Say 'Hey Edgy'" once it lapses). Ignore offers last 30 s after their last eligible view (supersedes D151's 8 s). A nameless "Track this" pins the focus track and epoch from speech start and asks "What should I call it?"; a lost pin fails closed and person views never enter object memory. Volume is a UI control only.
 
+**D154 2026-10-11: Named-object views come from a teaching window.** After a naming turn, the robot adds views from the taught track while the tracker keeps its id (17 viewpoint videos, E: 530/816 later-view hits vs 397 fixed, 435 simulated confirmation; masking worse). Voice confirmation stays secondary; masking is not adopted. Recognition thresholds and timing are UI settings (Dylan). Refines D64/D141; `bench/results/2026-10-11-gallery-1791694947.json`.
+
 **D122–D126 2026-10-09: Mac interface.** `tools/talk.py` serves a loopback page with Start, Mute, and Stop over native audio and SSH. All models stay on the Jetson.
 
 ## Pending requirements

@@ -65,6 +65,8 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Track label voting and short-track merge | Off-majority labels 3 to 0 on the live clip | Current, frozen | D47, D56 |
 | Crop descriptors: HSV, SigLIP 2, DINOv2-small | DINOv2 at 0.822: zero false matches on 2,025 distractors | DINOv2 current | D57, D64 |
 | Three vs six object views | Phone 10/15 vs 11/15; six adds little | Three | D141; `bench/results/2026-10-10-d141-multiview.json` |
+| Gallery growth: fixed, simulated voice confirmation, track harvest (teaching window) | 17 viewpoint videos, scoring half: 397, 435, 530 of 816 at 0.822; false matches 41, 179, 116 of 36,918, all lookalike instances (two Sony cameras, two mugs) (E). Admissions clean on contact sheets | Teaching window current | D154; `bench/results/2026-10-11-gallery-1791694947.json` |
+| Threshold 0.822 on lookalike instances | Fixed galleries match lookalikes up to 0.874 (E); no threshold is safe for lookalikes, and the real camera differs | Thresholds are UI settings | D154 |
 | Changed cup viewpoints | 121/164 (73.8%) recognized (J) | Open gap | D145 |
 | Coordinate median, stock Kalman, gated Kalman | Lag 35–50 px, chair worse, motion rejected for 3 s (E) | Rejected | D147 |
 | Lucas-Kanade box tracking | Features stick to background; 429 px lag (E) | Rejected | D147 |

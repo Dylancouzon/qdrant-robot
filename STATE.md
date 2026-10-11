@@ -7,9 +7,8 @@ Updated 2026-10-11. Branch: `spike/recognition-import`. Read CLAUDE.md, this fil
 Plan: [research/recognition-import.md](research/recognition-import.md) (design gate GO WITH CHANGES). Dylan's rules: one point per (owner, name), same-owner reteach always appends; label "Dylan's mouse"; voice confirmation of near matches only in a conversation blank, never spammy; a memory tab like the course robot's; strict admission against false positives.
 
 1. Done: `bench/crop_arms.py` on the D145 cup video. Box 263/360, masked 241/360 (E); the detector found the cup on every frame, so the misses are descriptor scores under 0.822 during viewpoint changes. Masking is not adopted.
-2. Running: `bench/gallery.py`, gallery growth (fixed, voice-confirmed, track-harvested) on 17 viewpoint videos with cross-instance distractors.
-3. Next: owner and deletion contract (design gate), then crop choice, gallery cap, memory tab, voice confirmation.
-4. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
+2. Done: `bench/gallery.py` chose the teaching window (D154). Next: build it in the runtime with UI-tunable settings, then the owner contract (design gate), memory tab, voice confirmation.
+3. Earlier queue, after this task: the jumpy "???" focus box, command set v2, missed-face reset, physical latency by loopback.
 
 ## Human checks
 

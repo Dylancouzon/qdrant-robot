@@ -34,9 +34,9 @@ Before any change, sort each miss in the D145 replay (release `a9299a617f4c`) in
 
 ## Step 1: owner and deletion contract (design gate)
 
-- **Identity is separate from display.** The owner key is a stable id: an enrolled person's point id, or a guest id for this conversation. The display name ("Dylan") comes from the person record. A told name alone gives a guest display name; it never joins an existing enrolled person's gallery.
+- **Identity is separate from display.** Owner keys have three kinds. `person:<name>`: the speaker's face matched an enrolled person (`People` keys points by name). `told:<name>:<n>`: an unenrolled visitor told a name in this conversation (`Robot.told`), with the conversation's guest number, so two visitors who tell the same name stay apart; it is unverified, so it never equals `person:<name>`. `guest:<n>`: neither, with `n` from a persistent counter, one per conversation. Display names: "Ana", "Ana" (told), "Guest 3".
 - **Point.** One point per (owner id, normalized name): uuid5 of both. The same owner's reteach always appends, even for a different physical object (Dylan). Different owners get different points.
-- **Promotion.** When a guest enrolls by face consent in the same conversation, their guest points move to the person id. If the person already has a point with that name, the views merge up to the cap, oldest-out. A guest never promotes by told name alone.
+- **Promotion.** Points move to a stronger key only within the same conversation: `guest` to `told` when the visitor tells a name, and `guest` or `told` to `person` when the visitor enrolls by face consent. If the target already has a point with that name, the views merge up to the cap, oldest-out. Nothing ever moves to `person` without the enrollment.
 - **Rename.** Renaming onto a name the same owner already uses merges the two points the same way.
 - **Labels.** "Dylan's mouse" on the overlay and the memory tab. Speech says "your mouse" to the owner and "Dylan's mouse" to others. Guests show as "Guest 3's mouse".
 - **References everywhere.** Every caller that takes a bare name today takes an object reference (owner id, name): retrieval, sightings, Ignore exclusions, display associations, `Things.forget`, and `Memory.forget_named()`. "My mouse" resolves with the current visitor's owner id; "Dylan's mouse" with Dylan's.
@@ -83,6 +83,10 @@ The robot asks only when all of these hold:
 - **Pinned question.** The pending question stores the object reference, the copied masked crop, the visitor, the track epoch, and an expiry (the 60 s follow-up window). Before admission, code checks that all still hold. A "yes" after expiry, from another visitor, or after the track changed admits nothing.
 - **Reply.** "Yes", "yeah", "it is" accept; "no", "not mine" decline; any other line is an ordinary turn and drops the question. No wake phrase is needed inside the follow-up window.
 - **Measure.** Scripted replays: questions per minute in a long session, no question during speech, false confirmations (a "yes" meant for something else), and recognition of the same viewpoint after a "yes".
+
+## Tuning settings (Dylan, 2026-10-11)
+
+The real camera and room differ from the bench videos. Benches choose policies; values are live settings on the page, saved in `shared/` like the volume, with bench defaults: match threshold, near-match band, teaching-window floor and length, the minimum time between admissions, the view cap, and the question delay and rate limits. A change applies to the next query without a restart.
 
 ## Order and gates
 
