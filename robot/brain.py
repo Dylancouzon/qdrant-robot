@@ -70,7 +70,9 @@ CHANGED = "The view has changed since your last answer.\n"
 # "your memories" alone made the 2B ignore what the visitor told it (small-talk-3).
 PAST = "The visitor asks about the past: answer from the lines above.\n"
 # The image is an earlier frame (earlier_view): the 2B takes any image for the present.
-EARLIER = "The image is from {age}, not the present. It shows what the visitor showed you.\n"
+EARLIER = ("The image is from {age}, not the present: it is what the visitor showed you then. "
+           "Say what it was in the past tense, naming the main object, without mentioning the "
+           "image.\n")
 # Before the evidence, after the image, so the prefilled prefix holds (shape I, D74).
 EVIDENCE = "Answer from these memories; if one answers the question, use it.\n\n"
 # Main object first: recall answers with the first thing a caption names (prompt probes, D29).
