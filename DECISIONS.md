@@ -93,3 +93,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D148 2026-10-10: Same-name objects and crop backgrounds are parked.** Two objects with one name can leave neither recognized; crops keep background pixels. The policy is undecided.
 
 **Owner and location 2026-10-10 (Dylan): Bind places and people to object evidence.** A UI-set location on each sighting; an owner from the named introducer on the named object. Not built yet; see `research/owner-location.md`.
+
+**H1 2026-10-11: Dylan authorizes a rotating camera head.** This supersedes D61's no-motor requirement for head yaw only. Concept A keeps the Jetson and one speaker in the stationary body, uses removable press-fit component installation, and reserves the owned 7.4 V STS3215; final fit, power, and motion remain U.

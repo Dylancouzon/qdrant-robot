@@ -81,3 +81,8 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
 - The recorded knowledge-more-2 question splits into two answered lines (J). Keep the existing VAD/ASR implementation and score the split as a failure. Evidence: the same recorded replay; compare its occurrence across arms before drawing a model conclusion.
+
+## Enclosure packaging study, 2026-10-11
+
+- Cable clearance against stationary boxes checks curve vertices. Joint clearance bounds complete segments with conservative sampling. Apply the same complete-segment coverage to stationary components before final cable routing. Physical cable length, bending, and strain relief remain U. Evidence: reviews/20261011-112225-42413-review.md and hardware/concept-a/README.md.
+- The revised front drive leaves 1.6 mm beyond the nominal inner wall. The camera cable pocket leaves 1.1 mm vertically and 2.1 mm at the left wall. Model catches, housing, and corner geometry before freezing these dimensions. Physical plug shapes, fan orientation, servo mounting details, and adapter revision remain U.

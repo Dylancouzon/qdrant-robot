@@ -79,6 +79,12 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Camera at 15 fps to lower preview grain | Four paired captures: noise 7.34 at 15 fps vs 6.29 at 30 fps, same brightness; our preview encode adds no noise (J) | Rejected; add light instead | `research/objects.md` |
 | Hand detector or depth camera | Not tried; a reach can steal focus for about 3 s | Open | D67 |
 
+## Enclosure
+
+| Avenue | Outcome | Status | Ref |
+| --- | --- | --- | --- |
+| Concept A with body speaker and owned STS3215 | Repacked owned upright servo reduces modeled height from 255 to 230 mm; 391 Mac envelope checks and two closed-volume 3MF coupons pass (E). Physical fit, cable motion, thermal behavior, and slicer appearance remain U | Packaging study; prototype next | H1; `hardware/concept-a/README.md` |
+
 ## System and memory
 
 | Finding | Value | Ref |
