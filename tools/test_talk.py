@@ -21,10 +21,6 @@ def wait_until(predicate, timeout=5):
     pytest.fail("Session did not reach the expected state")
 
 
-def session_report(warm):
-    return "active\nlistening" if warm.is_set() else "active"
-
-
 @pytest.fixture
 def session(monkeypatch):
     commands = []
@@ -38,7 +34,8 @@ def session(monkeypatch):
         if "systemctl stop" in script:
             return ""
         if "journalctl" in script:
-            return session_report(warm)
+            # Journal output can include the previous invocation during cold start.
+            return "active\nlistening"
         raise AssertionError(script)
 
     def launch(args, **kwargs):
@@ -50,10 +47,43 @@ def session(monkeypatch):
     monkeypatch.setattr(talk, "command", lambda args, **_: commands.append(args) or "")
     monkeypatch.setattr(talk.subprocess, "Popen", launch)
     instance = talk.Session("test-release")
+    def open_view(path):
+        assert path == "/state"
+        commands.append("probe view")
+        if not warm.is_set():
+            raise ConnectionRefusedError("The new view server is still warming up")
+        return types.SimpleNamespace(close=lambda: None), types.SimpleNamespace(status=200)
+    monkeypatch.setattr(instance, "open_view", open_view)
     yield instance, commands, warm
     instance.stop()
     if instance.worker:
         instance.worker.join(5)
+
+
+def test_old_listening_log_cannot_publish_an_unreachable_video(session):
+    instance, commands, warm = session
+    instance.start()
+    wait_until(lambda: "probe view" in commands or instance.snapshot()["view_ready"])
+    assert not instance.snapshot()["view_ready"], "old logs cannot prove endpoint readiness"
+    warm.set()
+    wait_until(lambda: instance.snapshot()["view_ready"])
+
+
+def test_stop_during_endpoint_probe_cannot_show_the_video(session, monkeypatch):
+    instance, _, _ = session
+    entered, release, closed = threading.Event(), threading.Event(), threading.Event()
+    def open_view(path):
+        entered.set()
+        assert release.wait(2)
+        return types.SimpleNamespace(close=closed.set), types.SimpleNamespace(status=200)
+    monkeypatch.setattr(instance, "open_view", open_view)
+    instance.start()
+    assert entered.wait(2)
+    instance.stop()
+    release.set()
+    instance.worker.join(5)
+    assert closed.is_set() and not instance.worker.is_alive()
+    assert not instance.snapshot()["view_ready"] and instance.snapshot()["phase"] == "Idle"
 
 
 def test_stop_during_warmup_never_shows_the_view(session):

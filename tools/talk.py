@@ -111,13 +111,23 @@ class Session:
         while not self.stopped.wait(0.5 if not ready else 2):
             if tunnel.poll() is not None:
                 raise RuntimeError(tunnel.stderr.read().decode().strip() or "SSH tunnel closed")
-            ready = ready or "listening" in self.report()  # raises when the Jetson session stops
+            self.report()  # raises when the Jetson session stops; old logs cannot prove readiness
+            if not ready:
+                try:
+                    connection, response = self.open_view("/state")
+                    ready = response.status == 200
+                    connection.close()
+                except (OSError, RuntimeError, http.client.HTTPException):
+                    continue
             if ready:
-                self.update(view_ready=True, phase="Listening")
+                with self.lock:
+                    if self.stopped.is_set():
+                        return
+                    self.state.update(view_ready=True, phase="Listening")
 
     def open_view(self, path, body=None):
         with self.lock:
-            if self.stopped.is_set() or not self.state["view_ready"]:
+            if self.stopped.is_set() or not self.view_port or not self.view_token:
                 raise RuntimeError("Camera session is idle")
             port, token = self.view_port, self.view_token
         connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)

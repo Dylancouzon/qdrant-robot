@@ -1,0 +1,43 @@
+{
+  "what": "first-start video regression",
+  "revision": "318466cbee1019d9c2dae61c1744ad30e28aa203",
+  "revision_state": "uncommitted fix",
+  "source_sha256": {
+    "tools/talk.py": "657e9be0c723417fe36fd835069a82a72d6ac3c17331a3d3c6bd01d395466454",
+    "tools/talk.html": "152a4cdc5fd4d379f8dfc78e440e402ee19911458f9c8142e8caec97c3c9bb83",
+    "tools/test_talk.py": "6970e8749a0b919c5f0384f9c62125e3e88a687c274f68cc8a93abee8c78c8fb"
+  },
+  "baseline": {
+    "lifecycle": "FAIL: old listening logs publish readiness while the endpoint is unreachable",
+    "browser": "FAIL: first camera failure stays broken until reload"
+  },
+  "candidate": {
+    "lifecycle": "29 passed",
+    "browser": {
+      "what": "first camera request fails, followed by abort and failure; recover without reload",
+      "complete": true,
+      "machine": "Mac headless Chromium",
+      "requests": 4,
+      "page_loads": 1,
+      "starts": 1,
+      "stops": 1,
+      "html_sha256": "152a4cdc5fd4d379f8dfc78e440e402ee19911458f9c8142e8caec97c3c9bb83",
+      "elapsed_ms": 2866,
+      "command": "node build/first-start/browser.cjs"
+    },
+    "live_attachment": {
+      "what": "monitor attachment probes the running Jetson endpoint",
+      "machine": "dylans-macbook-pro.tail04131.ts.net",
+      "input": "live Jetson /state through a second SSH tunnel; no second camera subscriber",
+      "release": "56ce07810e7a",
+      "elapsed_s": 17.938249708036892,
+      "complete": true,
+      "status": "Say 'Hey Edgy'",
+      "source_sha256": "657e9be0c723417fe36fd835069a82a72d6ac3c17331a3d3c6bd01d395466454",
+      "camera_subscribers_added": 0,
+      "robot_restarts": 0
+    }
+  },
+  "browser_harness": "const {chromium}=require('/Users/dylanc/.npm/_npx/705bc6b22212b352/node_modules/playwright');\nconst fs=require('fs'),assert=require('assert'),crypto=require('crypto');\n(async()=>{\n  const browser=await chromium.launch({headless:true});\n  const page=await browser.newPage();\n  const source=fs.readFileSync('tools/talk.html','utf8');\n  const errors=[];page.on('pageerror',e=>errors.push(e.message));\n  let active=false, attempts=0, starts=0, stops=0;\n  const pixel=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aV2kAAAAASUVORK5CYII=','base64');\n  await page.route('http://127.0.0.1:8876/**',async route=>{\n    const path=new URL(route.request().url()).pathname;\n    if(path==='/')return route.fulfill({contentType:'text/html',body:source});\n    if(path==='/start'){active=true;starts++;return route.fulfill({json:{}});}\n    if(path==='/stop'){active=false;stops++;return route.fulfill({json:{}});}\n    if(path==='/status')return route.fulfill({json:{phase:active?'Listening':'Idle',active,view_ready:active,error:''}});\n    if(path==='/robot')return route.fulfill({json:{status:'Listening',settings:{},control:{targets:[]},transcript:[],evidence:{}}});\n    if(path==='/camera'){\n      attempts++;\n      if(attempts===2)return route.abort('connectionrefused');\n      if(attempts<4)return route.fulfill({status:503,body:'View unavailable'});\n      return route.fulfill({contentType:'image/png',body:pixel});\n    }\n    return route.fulfill({status:404,body:''});\n  });\n  const started=Date.now();\n  try{\n    await page.goto('http://127.0.0.1:8876');\n    await page.locator('#start').click();\n    await page.waitForFunction(()=>document.getElementById('camera').naturalWidth>0,{},{timeout:3000});\n    assert.equal(attempts,4);assert.equal(starts,1);\n    assert(await page.locator('#camera').isVisible());\n    await page.waitForTimeout(900);assert.equal(attempts,4,'healthy image is not repeatedly reopened');\n    await page.locator('#stop').click();\n    await page.waitForTimeout(700);assert.equal(attempts,4);assert.equal(stops,1);\n    assert(!(await page.locator('#camera').isVisible()));assert.equal(errors.length,0);\n    const result={what:'first camera request fails, followed by abort and failure; recover without reload',\n      complete:true,machine:'Mac headless Chromium',requests:attempts,page_loads:1,starts,stops,\n      html_sha256:crypto.createHash('sha256').update(source).digest('hex'),elapsed_ms:Date.now()-started,\n      command:'node build/first-start/browser.cjs'};\n    fs.writeFileSync('build/first-start/browser-result.json',JSON.stringify(result,null,2)+'\\n');\n    console.log(JSON.stringify(result));\n  }finally{await browser.close();}\n})().catch(e=>{console.error(e.message);process.exitCode=1;});\n",
+  "scope": "Mac monitor and page only; running Jetson source and models stay at the recorded release."
+}

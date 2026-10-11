@@ -151,8 +151,12 @@ async function loadMemory(){
     return JSON.stringify(objects);  // the caller checks whether an edited id is still listed
   }catch(error){el('memoryError').textContent=error.message;return '';}
 }
-function clearLive(){
+function clearCamera(){
   el('camera').removeAttribute('src');el('camera').hidden=true;el('placeholder').hidden=false;cameraActive=false;
+}
+el('camera').addEventListener('error',clearCamera);
+function clearLive(){
+  clearCamera();
   el('viewerror').textContent='';
   el('transcript').replaceChildren();const p=document.createElement('p');p.className='empty';p.textContent='Say “Hey Edgy”.';el('transcript').append(p);transcriptText='';evidenceText='';
   itemControl={};ignoredItems=[];muted=false;items();recognition({},false);

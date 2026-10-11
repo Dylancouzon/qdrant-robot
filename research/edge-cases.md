@@ -8,6 +8,7 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 
 | Case | Risk | Proposed fix | Source |
 | --- | --- | --- | --- |
+| A running view token becomes stale during monitor attachment | The page can stay warming because authentication failures retry | Surface permanent authentication rejection if observed | tools/talk.py; reviews/20261011-114305-67106-review.md |
 | Two visitors speak within the 20 s no-face window | A told name reaches the second visitor | Answer told names only with a face match at the booth | reviews/20261008-215107-4264-review.md |
 | "I'm tired" style lines read as names | A wrong name and a face offer | Listen for introductions only with a new unrecognized face (D70) | D70 |
 | A reach toward the background puts it inside the person box | Background object takes the focus for about 3 s | A hand class or a depth camera | D67 |

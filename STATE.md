@@ -2,11 +2,9 @@
 
 Updated 2026-10-11. Branch: `main`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Last task: bounded overlay persistence
+## Last task: first-start video
 
-The selected "???" and named-object outlines bridge missing detection for at most 200 ms (D159). Movement raises the shared object/face drawing blend, while small stationary jitter stays unchanged (E). All deterministic checks and the task review pass. The full-model live Jetson stream check passes during one oracle-text reply (J), with isolated empty face memory; named-face transitions remain runtime-test coverage.
-
-At the next human session, check smoother boxes while holding, moving, and removing an object. Also check two owners, yes/no near matches, and "Forget me". Face names still clear on a negative recognition result.
+The monitor waits for the live endpoint before showing video. Failed image requests retry through the existing poll. Lifecycle and browser recovery checks pass; review passes. The updated Mac monitor attaches to the running robot. Reload the page once to load the update.
 
 ## Next tasks (in order)
 
@@ -18,7 +16,7 @@ At the next human session, check smoother boxes while holding, moving, and remov
 
 - Jetson: `ssh robot`; MAXN_SUPER, boot `09b4bb27`. Current release `56ce07810e7a`; rollback target `7b53263969f1`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 56ce07810e7a`, then open http://127.0.0.1:8765.
 - Backups of the pre-owner things shard: `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
-- Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/overlay/page.log`. Jetson is idle until Start. WSL is unused.
+- Running jobs: Mac monitor `tools/talk.py` on port 8765, log `build/first-start/page.log`. Jetson unit `qr-robot` is active; its journal and tegrastats are under `shared/results/`. WSL is unused.
 
 ## Targets (floor, not ceiling)
 

@@ -6,7 +6,7 @@ D147's accepted live release is `7f67670fa91e`. It keeps the selected "???" styl
 
 ## Start and stop
 
-Run `.venv/bin/python tools/talk.py --release RELEASE_ID`, using the current release from STATE.md. Open `http://127.0.0.1:8765`, select **Start**, and wait for **Listening**. Start attaches to the Jetson unit `qr-robot` (token and release read from its environment), or starts it through `tools/jetson.py run robot`. Deployment alone starts no microphone or models.
+Run `.venv/bin/python tools/talk.py --release RELEASE_ID`, using the current release from STATE.md. Open `http://127.0.0.1:8765`, select **Start**, and wait for **Listening**. Start attaches to the Jetson unit `qr-robot` (token and release read from its environment), or starts it through `tools/jetson.py run robot`. Deployment alone starts no microphone or models. The monitor waits for a successful authenticated `/state` response before publishing readiness. Failed camera requests clear the image state, so the existing page poll retries automatically.
 
 Say "Hey Edgy" to start a turn. Follow-up questions work for about a minute after an answer finishes. **Stop** stops the `qr-robot` unit and closes the tunnel. Closing the page, Ctrl-C, or losing the tunnel leaves the robot running and listening; Start attaches again. The unit does not start at boot. The local page remains open for another Start.
 
