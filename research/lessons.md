@@ -40,7 +40,8 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Bounded evidence assembly (A/B contract) | Frozen, never built; the session moved to Granite | Open idea | D109, D110 |
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
-| Intent parsing (rules, BGE scores, linear head) | Planned. Of 8 current recorded misses, 4–5 are evidence selection | Next task | `answer-evidence.md` |
+| Intent parsing (rules, BGE scores, linear head) | Never built. The 8 recorded misses (39/47, J) include no wrong past or present choice: `about_past()` fired on every past question. Combined questions still lack earlier evidence | Not the bottleneck for this set; reopen with routing misses | `recall.md` |
+| Recall of unnamed objects shown earlier | 3 of 8 misses: no caption (D127) and earlier answers dropped after a scene change (D27) | Next task | `recall.md` |
 
 ## Voice
 

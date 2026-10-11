@@ -1,5 +1,7 @@
 # Intent and evidence testing plan
 
+The parser hypothesis is refuted for the current development set: none of the eight recorded misses is an evidence-selection error ([recall.md](recall.md)). The owner and location requirements and the session designs remain current.
+
 Keep the accepted Qwen runtime and test independent live, history, and knowledge selection before changing the prompt or model. Compare rules with similarity scores from the existing BGE question embedding. Consider a trained classifier only after those options fail unseen paraphrases. This session produces a plan and source audit only.
 
 All proposed parser costs and quality gains are U. J means measured on our Jetson, E means measured elsewhere, and U means unverified. The accepted source is `011f522`; the protected deployed release is `7f67670fa91e`.
