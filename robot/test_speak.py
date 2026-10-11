@@ -30,7 +30,6 @@ class FakeBrain:
 def robot(fail_at: int = 0) -> Robot:
     r = Robot.__new__(Robot)  # only what _tokens and _speak use
     r.brain, r.stream, said = FakeBrain(), None, []
-    r.ui_play_until = 0.0
 
     def say(text: str) -> np.ndarray:
         said.append(text)

@@ -63,7 +63,8 @@ def open_robot(root: Path) -> Robot:
     robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
     robot.panel, robot.ui_turn = None, None
     robot.ui_turns = deque(maxlen=8)
-    robot.ui_thinking, robot.ui_play_until, robot.speaking = False, 0, False
+    robot.ui_thinking, robot.speaking = False, False
+    robot.speaker, robot.muted, robot.volume = SimpleNamespace(playing=lambda: False), False, 62
     return robot
 
 

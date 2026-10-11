@@ -17,6 +17,7 @@ import numpy as np
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, or other
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
+ACTIONS = ("/ignore", "/restore", "/mute", "/volume")  # POST paths the robot handles
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."
 FONT, SMALL = cv2.FONT_HERSHEY_SIMPLEX, 0.5
@@ -169,7 +170,7 @@ class _Handler(BaseHTTPRequestHandler):
             return
         try:
             length = int(self.headers.get("Content-Length", "0"))
-            if not 0 < length <= 4096 or parsed.path not in ("/ignore", "/restore"):
+            if not 0 < length <= 4096 or parsed.path not in ACTIONS:
                 raise ValueError
             data = json.loads(self.rfile.read(length))
         except (ValueError, json.JSONDecodeError):

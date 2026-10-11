@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Reusable loopback controls for MacBook audio; all robot models run on the Jetson."""
+"""Loopback monitor and controls for the robot. The robot hears and speaks through its own USB
+audio on the Jetson; `--mac-audio` uses MacBook audio instead, for remote development. All
+robot models run on the Jetson."""
 import argparse
 import contextlib
 import http.client
@@ -12,7 +14,6 @@ import struct
 import subprocess
 import sys
 import threading
-import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from http.cookies import SimpleCookie
 from pathlib import Path
@@ -23,7 +24,6 @@ ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
 INPUT, OUTPUT = "MacBook Pro Microphone", "MacBook Pro Speakers"
 RATE_IN, RATE_OUT, CHUNK = 16000, 24000, 1280
-TAIL_S = 0.3
 MAX_FRAME = RATE_OUT * 2 * 30  # At most 30 seconds of mono PCM per phrase.
 SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
@@ -43,10 +43,6 @@ def frame(conn: socket.socket) -> np.ndarray:
     if not 0 < size <= MAX_FRAME or size % 2:
         raise ValueError(f"Invalid robot audio frame size: {size}")
     return np.frombuffer(exact(size), dtype="<i2")
-
-
-def level(pcm: np.ndarray) -> float:
-    return float(np.max(np.abs(pcm.astype(np.float32)), initial=0) / 32768)
 
 
 def devices(sd, microphone=True) -> tuple[int | None, int]:
@@ -76,8 +72,6 @@ class NativeAudio:
         self.microphone = microphone
         self.conn = socket.socket(fileno=fd)
         self.stopped = threading.Event()
-        self.manual = threading.Event()
-        self.muted_until = 0.0
         self.failure = ""
         self.streams = []
         self.receiver = None
@@ -92,24 +86,12 @@ class NativeAudio:
         with contextlib.suppress(OSError):
             self.conn.shutdown(socket.SHUT_RDWR)
 
-    def controls(self):
-        for line in sys.stdin:
-            if line.strip() == "mute":
-                self.manual.set()
-            else:
-                self.manual.clear()
-
     def answers(self):
-        played_until = 0.0
         out = self.streams[0]
         try:
             while not self.stopped.is_set():
                 pcm = frame(self.conn)
-                played_until = max(played_until, time.monotonic()) + len(pcm) / RATE_OUT
-                self.muted_until = played_until + float(out.latency) + TAIL_S
-                self.emit(output_level=level(pcm), playing=True)
                 out.write(pcm)
-                self.emit(output_level=0, playing=False)
         except (OSError, EOFError, ValueError, self.sd.PortAudioError) as exc:
             if not self.stopped.is_set():
                 self.failure = str(exc)
@@ -120,9 +102,7 @@ class NativeAudio:
             data, overflow = mic.read(CHUNK)
             if overflow:
                 raise RuntimeError("Microphone overflow; stop and restart the session")
-            suppressed = self.manual.is_set() or time.monotonic() < self.muted_until
-            self.emit(input_level=level(data), suppressed=suppressed)
-            self.conn.sendall(bytes(CHUNK * 2) if suppressed else data.tobytes())
+            self.conn.sendall(data.tobytes())  # the robot silences its own voice and mute
         if self.failure:
             raise RuntimeError(self.failure)
 
@@ -134,7 +114,6 @@ class NativeAudio:
 
     def run(self):
         signal.signal(signal.SIGTERM, self.halt)
-        threading.Thread(target=self.controls, daemon=True).start()
         try:
             self.emit(phase="Opening MacBook audio")
             incoming, outgoing = devices(self.sd, self.microphone)
@@ -149,8 +128,6 @@ class NativeAudio:
                                          dtype="int16", blocksize=CHUNK)
                 self.streams.append(mic)
                 mic.start()
-            else:
-                self.emit(muted=True)
             self.emit(phase="Listening")
             self.receiver = threading.Thread(target=self.answers, daemon=True)
             self.receiver.start()
@@ -164,6 +141,12 @@ class NativeAudio:
             if self.receiver:
                 self.receiver.join(2)
             self.conn.close()
+
+
+def robot_args(mac_audio: bool, camera_file: str | None) -> list[str]:
+    """The `robot.main` arguments: its own USB audio, or a Mac client on port 7070."""
+    return ["-m", "robot.main", *(["--listen", "7070"] if mac_audio else []),
+            *(["--camera-file", camera_file] if camera_file else [])]
 
 
 def command(args: list[str], env=None) -> str:
@@ -194,17 +177,16 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Own one remote session and tunnel, and keep the page reusable after cleanup."""
 
-    def __init__(self, release: str, camera_file: str | None = None):
+    def __init__(self, release: str, camera_file: str | None = None, mac_audio: bool = False):
         self.release = release
-        self.camera_file = camera_file
+        self.camera_file, self.mac_audio = camera_file, mac_audio
         self.view_port = self.view_token = None
         self.lock = threading.Lock()
         self.stopped = threading.Event()
         self.worker = None
         self.child = self.reader = self.unit = None
-        self.state = dict(phase="Idle", active=False, muted=False, error="",
-                          input=INPUT, output=OUTPUT, input_level=0, output_level=0,
-                          view_ready=False, microphone=not bool(camera_file))
+        self.state = dict(phase="Idle", active=False, error="", view_ready=False,
+                          microphone=not (mac_audio and camera_file))
 
     def update(self, **state):
         with self.lock:
@@ -219,8 +201,7 @@ class Session:
             if self.state["active"] or (self.worker and self.worker.is_alive()):
                 return
             self.stopped.clear()
-            self.state.update(phase="Connecting", active=True,
-                              muted=bool(self.camera_file), error="")
+            self.state.update(phase="Connecting", active=True, error="")
             self.worker = threading.Thread(target=self.run, daemon=True)
             self.worker.start()
 
@@ -233,19 +214,6 @@ class Session:
             self.update(phase="Stopping")
             self.worker = threading.Thread(target=self.retry_stop, daemon=True)
             self.worker.start()
-
-    def mute(self):
-        if self.camera_file:
-            return  # recorded-view qualification never enables microphone capture
-        with self.lock:
-            child = self.child
-            if child and child.poll() is None:
-                self.state["muted"] = not self.state["muted"]
-                try:
-                    child.stdin.write("mute\n" if self.state["muted"] else "unmute\n")
-                    child.stdin.flush()
-                except (BrokenPipeError, OSError):
-                    self.stopped.set()
 
     def report(self):
         report = remote(f"systemctl is-active {self.unit}; "
@@ -268,8 +236,11 @@ class Session:
         return None
 
     def listen(self, conn):
-        conn.settimeout(None)
-        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        """Wait for the robot to warm up, then watch it. With `conn` (Mac audio), the MacBook
+        audio child runs meanwhile."""
+        if conn:
+            conn.settimeout(None)
+            conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.update(phase="Warming up Jetson; microphone off")
         while not self.stopped.wait(0.5):
             if "listening" in self.report():
@@ -277,11 +248,17 @@ class Session:
         if self.stopped.is_set():
             return
         self.update(view_ready=True)
+        if conn:
+            return self.run_native(conn)
+        self.update(phase="Listening")
+        while not self.stopped.wait(2):
+            self.report()  # raises when the Jetson session stops
+
+    def run_native(self, conn):
         child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
                                   "--audio-fd", str(conn.fileno()),
                                   *(["--no-microphone"] if self.camera_file else [])],
-                                 pass_fds=(conn.fileno(),),
-                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 pass_fds=(conn.fileno(),), stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, text=True)
         with self.lock:
             self.child = child
@@ -341,7 +318,6 @@ class Session:
         if self.reader:
             self.reader.join(2)
         if self.child:
-            self.child.stdin.close()
             self.child.stdout.close()
             self.child.stderr.close()
         self.child = self.reader = None
@@ -366,19 +342,19 @@ class Session:
             self.unit = f"qr-{name}.service"
             self.view_token = secrets.token_hex(32)
             command([sys.executable, str(ROOT / "tools/jetson.py"), "run", name,
-                     "--", "-m", "robot.main", "--listen", "7070",
-                     *(["--camera-file", self.camera_file] if self.camera_file else [])],
+                     "--", *robot_args(self.mac_audio, self.camera_file)],
                     env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
             with socket.socket() as reserve, socket.socket() as video_reserve:
                 reserve.bind(("127.0.0.1", 0))
                 video_reserve.bind(("127.0.0.1", 0))
                 port, self.view_port = reserve.getsockname()[1], video_reserve.getsockname()[1]
             tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes",
-                                       "-L", f"127.0.0.1:{port}:127.0.0.1:7070",
+                                       *(["-L", f"127.0.0.1:{port}:127.0.0.1:7070"]
+                                         if self.mac_audio else []),
                                        "-L", f"127.0.0.1:{self.view_port}:127.0.0.1:8090", "robot"],
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-            conn = self.connect(tunnel, port)
-            if conn:
+            conn = self.connect(tunnel, port) if self.mac_audio else None
+            if conn or not self.mac_audio:
                 self.listen(conn)
         except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
             if not self.stopped.is_set():
@@ -389,8 +365,7 @@ class Session:
             self.cleanup_local(conn, tunnel)
             cleanup_error = self.cleanup_remote()
             error = "\n".join(filter(None, (error, cleanup_error)))
-            self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error,
-                        input_level=0, output_level=0, playing=False, suppressed=False)
+            self.update(phase="Error" if error else "Idle", active=bool(self.unit), error=error)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -455,7 +430,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
-        if self.path in ("/ignore", "/restore"):
+        if self.path in ("/ignore", "/restore", "/mute", "/volume"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")
@@ -474,11 +449,10 @@ class Handler(BaseHTTPRequestHandler):
                 if connection:
                     connection.close()
             return
-        if self.path not in ("/start", "/mute", "/stop"):
+        if self.path not in ("/start", "/stop"):
             self.reply(404, b"Not found")
             return
-        controls = {"/start": self.session.start, "/mute": self.session.mute,
-                    "/stop": self.session.stop}
+        controls = {"/start": self.session.start, "/stop": self.session.stop}
         controls[self.path]()
         self.reply(200, b"{}")
 
@@ -486,15 +460,16 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int, release: str, camera_file: str | None = None) -> None:
-    session = Session(release, camera_file)
+def serve(port: int, release: str, camera_file: str | None = None,
+          mac_audio: bool = False) -> None:
+    session = Session(release, camera_file, mac_audio)
     token = secrets.token_urlsafe(32)
     Handler.session = session
     Handler.token = token
     origin = Handler.origin = f"http://127.0.0.1:{port}"
 
     with ThreadingHTTPServer(("127.0.0.1", port), Handler) as server:
-        print(f"MacBook audio controls: {origin} (microphone off until Start)", flush=True)
+        print(f"Robot monitor: {origin} (nothing runs until Start)", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
@@ -512,10 +487,12 @@ if __name__ == "__main__":
     parser.add_argument("--audio-fd", type=int, help=argparse.SUPPRESS)
     parser.add_argument("--no-microphone", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--camera-file", help="existing Jetson recorded camera fixture path")
+    parser.add_argument("--mac-audio", action="store_true",
+                        help="use MacBook audio, not the Jetson's USB audio (remote development)")
     args = parser.parse_args()
     if args.audio_fd is not None:
         NativeAudio(args.audio_fd, not args.no_microphone).run()
     else:
         if not args.release:
             parser.error("--release is required for the deployed interface release")
-        serve(args.port, args.release, args.camera_file)
+        serve(args.port, args.release, args.camera_file, args.mac_audio)

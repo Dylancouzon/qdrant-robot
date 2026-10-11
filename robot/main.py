@@ -2,8 +2,7 @@
 and conversation. One process; the LLM runs in a supervised llama-server child.
 Every turn logs its stage times and saves its answer audio.
 
-    python -m robot.main                       camera, camera microphone, no speaker
-    python -m robot.main --speaker plughw:1,0  ... and an ALSA speaker
+    python -m robot.main                       camera, USB microphone, USB speaker
     python -m robot.main --listen 7070         microphone and speaker of a Mac client
 """
 import argparse
@@ -12,6 +11,7 @@ import json
 import os
 import queue
 import secrets
+import subprocess
 import re
 import threading
 import time
@@ -196,7 +196,8 @@ class Robot:
         self.scribe = Scribe()
         self.route = Router(self.embed)
         self.voice = Speaker()
-        self.speaker = audio.Mouth(play)
+        self.speaker = audio.Mouth(play, RATE)
+        self.muted, self.volume = False, audio.saved_volume()  # the page's controls
         self.brain = brain.Brain(model)
         self.detect, self.tracker = Detector(), Tracker()
         self.vocab = set(self.detect.names.values())  # the labels the detector can give
@@ -238,7 +239,7 @@ class Robot:
         self.last_line = 0.0  # when the answer to the last answered line ended
         self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
         self.ui_turn: Turn | None = None
-        self.ui_thinking, self.ui_play_until = False, 0.0
+        self.ui_thinking = False
         self.panel: dict | None = None  # the last retrieval, for the view's memory panel
         self.stream: Iterator[str] | None = None  # the brain's answer while a turn decodes
         self.detections = 0                     # frames detected so far
@@ -273,6 +274,10 @@ class Robot:
                           state=lambda: self._shown(False), wake=self._wake_view) if token else None
 
     def hear(self, chunk: np.ndarray) -> None:
+        """Every audio input enters here. The robot does not hear itself (silence while its
+        speaker plays and just after) and does not hear while muted."""
+        if self.muted or self.speaker.playing(audio.SELF_VOICE_TAIL_S):
+            chunk = np.zeros_like(chunk)
         self.ears.feed(chunk)
 
     def ask(self, text: str) -> None:
@@ -314,7 +319,7 @@ class Robot:
             self.crop_times.clear()
             self.matches_pending, self.control_message = False, ""
             self.ui_turns.clear()
-            self.ui_turn, self.ui_thinking, self.ui_play_until = None, False, 0.0
+            self.ui_turn, self.ui_thinking = None, False
             self.delivery.notify_all()
         self.recognition = Recognition(
             self._preview, self.recognition.faces, self.recognition.crops)
@@ -528,10 +533,11 @@ class Robot:
             screen = replace(screen, control={"session": self.session_id,
                 "targets": targets,
                 "gallery": self.recognition.epoch,
-                "message": self.control_message, "camera_source": self.camera_source},
+                "message": self.control_message, "camera_source": self.camera_source,
+                "muted": self.muted, "volume": self.volume},
                 ignored_items=self.things.preferences())
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
-                      "Speaking" if time.time() < self.ui_play_until else
+                      "Speaking" if self.speaker.playing() else
                       "Thinking" if self.ui_thinking else "Listening")
             turns = list(self.ui_turns)
             turn = self.ui_turn
@@ -1105,8 +1111,24 @@ class Robot:
                     data.get("epoch") == offer.epoch and
                     0 <= time.time() - offer.seen <= OFFER_HOLD_S)
 
+    def _setting(self, action, data):
+        """Mute the microphone or set the speaker volume, at once."""
+        if action == "mute":
+            if type(data.get("on")) is not bool:
+                return False
+            self.muted = data["on"]
+            return True
+        try:
+            audio.set_volume(data.get("percent"))
+        except (ValueError, OSError, subprocess.CalledProcessError):
+            return False
+        self.volume = data["percent"]
+        return True
+
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
+        if action in ("mute", "volume") and isinstance(data, dict):
+            return self._setting(action, data)
         if action not in ("ignore", "restore") or not isinstance(data, dict):
             return False
         with self.detecting:
@@ -1443,7 +1465,6 @@ class Robot:
                 turn.first_phrase = turn.first_phrase or time.time()
                 pcm = self.voice.say(text)
                 turn.first_audio = turn.first_audio or time.time()
-                self.ui_play_until = max(self.ui_play_until, time.time()) + len(pcm) / RATE
                 self.speaker.play(pcm)
                 audio_parts.append(pcm)
         finally:
@@ -1479,15 +1500,17 @@ class Robot:
 def main() -> None:
     from robot.camera import Camera, FileCamera
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--speaker", help="ALSA playback device")
-    p.add_argument("--listen", type=int, help="TCP port for a Mac client (tools/talk.py)")
+    p.add_argument("--listen", type=int,
+                   help="TCP port for a Mac client (tools/talk.py --mac-audio), not the USB audio")
     p.add_argument("--camera-file", type=Path,
                    help="recorded camera fixture, in stored orientation")
     a = p.parse_args()
-    chunks, play = audio.mic(), audio.aplay(a.speaker, RATE) if a.speaker else None
     if a.listen:
         print(f"waiting for a client on port {a.listen}", flush=True)
         chunks, play = audio.serve(a.listen)
+    else:
+        audio.set_volume(audio.saved_volume())
+        chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
     camera = FileCamera() if a.camera_file else Camera()
     robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
     if a.camera_file:
