@@ -73,6 +73,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Bounded object drawing through detector gaps | Existing state bridges at most 200 ms without action authority. Focus gaps fall from 111 to 102 of 675 development frames; 40 px/frame motion lag falls from 74 to zero, with unchanged small jitter (E). Full-model live stream receives 208 JPEGs, 172 ms source-age p95 (J) | Current; longer detector gaps remain | D159; `research/booth-ux.md` |
 | Coordinate median, stock Kalman, gated Kalman | Lag 35–50 px, chair worse, motion rejected for 3 s (E) | Rejected | D147 |
 | Lucas-Kanade box tracking | Features stick to background; 429 px lag (E) | Rejected | D147 |
+| Missed face on the speech-start frame | Ended the conversation (lost history, told name, visitor id). Person-track continuity now carries it; unit tests only, live check pending | Current | D161 |
 | Face delivery: four timer and cache prototypes | Failed 90% cadence or 200 ms hold | Rejected; completion-driven accepted | D139–D143 |
 | Face embedders: EdgeFace-S, SFace, MaxSim alone, mean vector | False matches at 40 px or as the gallery grows | Rejected; w600k_r50 two-shot | D45 |
 | Face blurring before storage | Each review found a new leak path | Rejected (Dylan); no frames in sightings | D53, D54 |

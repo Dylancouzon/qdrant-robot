@@ -223,9 +223,12 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("Nice to meet you, I'm Ana.", ana) == offer("Ana"), "a name: one offer (D69)"
         assert ask("What's my name?", ana) == "You told me you're Ana.", "no reply keeps the name"
         assert ask("I'm Ana, as I said.", ana) is None, "the offer is never repeated"
-        assert ask("What's my name?", frames(99, 1)) == NOT_MET, "her face is gone: unlinked"
+        assert ask("What's my name?", frames(99, 1)) == "You told me you're Ana.", \
+            "her face is missed on her own person track: the conversation goes on"
         assert ask("I'm Ana.", frames(99, 1)) is None, "told with no face: no offer"
         assert ask("What's my name?", frames(99, 1)) == "You told me you're Ana.", "a follow-up"
+        assert ask("What's my name?", frames(99, MAX_MISSED + CONFIRM, (0, 100, 300, 700))) \
+            == NOT_MET, "no face, another person track: a new conversation"
         for _ in range(main.CONVERSATION_S + 1):
             next(clock)  # a pause: whoever speaks now may be someone else
         assert ask("What's my name?", frames(99, 1)) == NOT_MET, "no face after a gap: dropped"
@@ -262,13 +265,18 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("Yes.", ben) == done("enroll", "Ben", True)
         assert ask("Great, thanks, robot.", ben) is None
         hidden = frames(99, 1)
-        assert ask("What's my name?", hidden) == NOT_MET, "no face to link Ben's told name"
+        assert ask("What's my name?", hidden) == "You told me you're Ben.", \
+            "face missed on his own track: the told name stays"
+        assert ask("Do you remember me?", hidden).startswith("I don't think we've met"), \
+            "but recognition still needs a face in the frame"
         frames(2, 3)
         frames(None, MAX_MISSED + 2)  # Ben leaves; Ana steps in nearby before his track ends
         ana = frames(1, CONFIRM + 1, near)
         assert robot._visitor() == track, "her new track continued his lost one"
         assert ask("What's my name?", ana) == "You're Ana. I remember your face."
         assert ask("Thanks!", ana) is None
+        assert ask("Missed face line.", frames(99, 1, near)) is None
+        assert "Missed face line." in said(), "stored for her though her face was missed"
         assert "Remember me, I'm Ben." in said() and "Nice to meet you, I'm Ana." in said()
         assert not list((root / "frames").iterdir()), "ordinary identity turns store text only"
         crop = robot.memory.add(ana[:80, :80], "Ana's selected source crop", ts=time.time())
@@ -286,6 +294,7 @@ def test_robot_identity(monkeypatch) -> None:
         assert not robot.memory.points([p["id"] for p in hers])
         assert not any((root / "frames" / p["frame"]).exists()
                        for p in hers if "frame" in p), "and frames"
+        assert "Missed face line." not in said(), "a missed-face turn of hers goes too"
         assert "Thanks!" not in said() and "Great, thanks, robot." in said(), \
             "her linked turns go, Ben's stay"
         frames(None, LOST + 2)  # the detector loses her: no person track at all

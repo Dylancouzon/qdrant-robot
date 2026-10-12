@@ -35,7 +35,7 @@ Targets are a floor, not the ceiling (D76). Change one only through a `DECISIONS
 | --- | --- |
 | Physical end of speech to first audible output (includes endpointing) | 1.2 s p50, 2.0 s p95 |
 | Answer correctness on held-out `eval/` fixtures | 90% or more per capability; zero false identity claims on strangers |
-| LLM decode (secondary to answer quality) | 30 tok/s or more |
+| LLM decode (soft, D160) | 30 tok/s or more |
 | Detection and tracking while talking | 15 fps or more, sustained |
 | Qdrant Edge query | 10 ms p99 per shard |
 | Peak RAM headroom with every component active | 500 MB minimum, aim for 1 GB; no swap during a turn |

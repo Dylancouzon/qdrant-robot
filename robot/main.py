@@ -239,9 +239,10 @@ class Robot:
         # identification: RAM only, never written, dropped when another face or no face for
         # CLEAR_S follows (or at a restart). Until then no turn showing that face is stored.
         self.hiding: tuple[np.ndarray, float] | None = None
-        # The conversation (D60, D70): the face it began with (RAM only, never written; None:
+        # The conversation (D60, D70): the face last seen (RAM only, never written; None:
         # no face), and the first point id stored in it (ids are microseconds, Memory._id).
         self.face: np.ndarray | None = None
+        self.face_track: int | None = None  # the largest person track when `face` was last seen
         self.since = time.time_ns() // 1000  # nothing from before a start is the speaker's
         # (name, offered) the visitor told in this conversation; offered: the robot offered
         # to remember their face (D69), once per conversation.
@@ -1281,15 +1282,22 @@ class Robot:
         return f"Nice to meet you, {told}! Want me to remember your face so I recognize you " \
                "next time?"
 
-    def _converse(self, turn: Turn, seen: tuple[np.ndarray, str | None] | None) -> bool:
+    def _converse(self, turn: Turn, seen: tuple[np.ndarray, str | None] | None,
+                  track: int | None) -> bool:
         """Go on with the conversation or start a new one (D60, D70); True for a new one. It
-        goes on while the face `seen` now matches the face it is held with; without a held
-        face, while this line started at most CONVERSATION_S after the last answer ended (a
-        face seen then joins it). A new one drops the told name and the earlier first-person
-        statements."""
+        goes on while the face `seen` now matches the face it is held with. A missed face goes
+        on only while the largest person track `track` is the one that was largest when the
+        held face was last seen, and the line started at most CONVERSATION_S after the last
+        answer ended. Without a held face, the same time limit applies (a face seen then joins
+        it). A new one drops the told name and the earlier first-person statements."""
         held = self.face
-        linked = (seen is not None and float(seen[0] @ held) >= THRESHOLD) if held is not None \
-            else turn.speech_start - self.last_line <= CONVERSATION_S
+        in_time = turn.speech_start - self.last_line <= CONVERSATION_S
+        if held is None:
+            linked = in_time
+        elif seen is not None:
+            linked = float(seen[0] @ held) >= THRESHOLD
+        else:
+            linked = track is not None and track == self.face_track and in_time
         if not self.conversation_started:
             linked = True
         self.conversation_started = True
@@ -1298,7 +1306,8 @@ class Robot:
             self.window = None
             self.told, self.since = None, time.time_ns() // 1000
             self.conversation_visitor = self.things.new_visitor()
-        self.face = seen[0] if seen else None
+        if seen is not None or not linked:  # a missed face in a conversation that goes on keeps it
+            self.face, self.face_track = (seen[0] if seen else None), track
         return not linked
 
     def _resolve_visitor(self, turn: Turn, frame: np.ndarray) -> bool:
@@ -1306,10 +1315,13 @@ class Robot:
         if turn.visitor:
             return False
         seen = self._whois(frame, turn)
-        new = self._converse(turn, seen)
+        new = self._converse(turn, seen, self._visitor())
         person = self.people.person(seen[1]) if seen and seen[1] else None
         self.turn_seen = seen
-        turn.visitor = person["visitor"] if person else self.conversation_visitor
+        # A missed face in a conversation that goes on stays with the previous turn's visitor.
+        missed = seen is None and not new and self.face is not None and bool(self.current_visitor)
+        turn.visitor = person["visitor"] if person else (
+            self.current_visitor if missed else self.conversation_visitor)
         if turn.visitor != self.current_visitor:
             self._clear_confirmation()
         self.current_visitor = turn.visitor

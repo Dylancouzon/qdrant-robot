@@ -1046,7 +1046,45 @@ def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
     robot.last_line = 1000.0
     for gap, goes_on in ((main.CONVERSATION_S, True), (main.CONVERSATION_S + 1, False)):
         robot.face = None
-        assert robot._converse(Turn(speech_start=1000.0 + gap), None) is not goes_on
+        assert robot._converse(Turn(speech_start=1000.0 + gap), None, None) is not goes_on
+
+
+def converse_after_miss(r, *, face=1, track=7, now_track=7, gap=1.0):
+    """A conversation held with face 0 on person track 7; the next line shows `face` (None:
+    missed) while `now_track` is the largest person track. Returns (new, told, visitor)."""
+    faces = np.eye(FACE_DIM, dtype=np.float32)
+    r.conversation_started, r.face, r.face_track = True, faces[0], track
+    r.told, r.last_line = ("Ana", False), 1000.0
+    visitor = r.conversation_visitor
+    seen = None if face is None else (faces[face], None)
+    new = r._converse(Turn(speech_start=1000.0 + gap), seen, now_track)
+    return new, r.told, visitor
+
+
+def test_missed_face_goes_on_with_the_same_person_track(robot):
+    r = robot
+    new, told, visitor = converse_after_miss(r, face=None)
+    assert not new and told == ("Ana", False) and r.conversation_visitor == visitor
+    assert r.face is not None and r.face_track == 7, "the held face survives the miss"
+    faces = np.eye(FACE_DIM, dtype=np.float32)
+    assert not r._converse(Turn(speech_start=1002.0), (faces[0], None), 7), "the face links again"
+
+
+def test_a_different_face_ends_the_conversation(robot):
+    new, told, _ = converse_after_miss(robot, face=1)
+    assert new and told is None
+
+
+@pytest.mark.parametrize("now_track", [8, None])
+def test_missed_face_on_another_or_no_person_track_starts_a_new_conversation(robot, now_track):
+    new, told, visitor = converse_after_miss(robot, face=None, now_track=now_track)
+    assert new and told is None and robot.conversation_visitor != visitor
+    assert robot.face is None
+
+
+def test_missed_face_after_the_window_starts_a_new_conversation(robot):
+    new, told, _ = converse_after_miss(robot, face=None, gap=main.CONVERSATION_S + 1)
+    assert new and told is None and robot.face is None
 
 
 def test_naming_uses_the_focus_from_speech_start(robot, monkeypatch):
