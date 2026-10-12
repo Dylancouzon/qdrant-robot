@@ -228,18 +228,18 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
     assert turn.selected == 0.0 and turn.caption == "", "a present question selects nothing"
     assert len(robot.looked) == main.HISTORY_TURNS, "the window of the conversation"
     n = len(sent)
-    turn = ask("Is this the same as what I showed you before?", night)
+    turn = ask("Compare this with what I showed you before.", night)
     assert len(sent) > n and not turn.verbatim, "the brain answers a comparison"
     prompt = sent[-1][-1]["content"]
     assert prompt[0] == brain.jpeg(shot(night)), "beside the present image"
     assert "Memories:\n- " in prompt[-1]["text"] and "you showed me a clock" in prompt[-1]["text"]
     assert turn.caption == "demand" and turn.selected > 0, "the newest look of another view"
     assert turn.delivered, "its line is in the request the brain answered"
-    turn = ask("Was it the same as what I showed you before?", night)
+    turn = ask("Compare it with what I showed you earlier.", night)
     assert sent[-1][-1]["content"][0] == brain.jpeg(shot(night)), "a comparison sees the present"
     robot.looked = [robot.looked[-1]]  # only the present view remains
     robot.looked[0].caption = None
-    turn = ask("Is this the same as what I showed you before?", night)
+    turn = ask("Compare this with what I showed you before.", night)
     assert turn.selected == 0.0, "nothing earlier to compare: no look"
     turn = ask("What did I show you yesterday?", night)
     assert turn.selected == 0.0, "a time the window cannot hold"
@@ -285,7 +285,7 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
     assert pending is robot.looked[-1]
     # A comparison answered by a fact never sends its Memories line: no delivery credit.
     robot.knowledge = Stub(search=lambda q: [(1.0, "Qdrant is a vector search engine.")])
-    turn = ask("Is this the same as what I showed you before?", night)
+    turn = ask("Compare this with what I showed you before.", night)
     assert turn.verbatim and turn.selected > 0 and not turn.delivered
     robot.knowledge = Stub(search=lambda q: [])
     pending.caption = None

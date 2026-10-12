@@ -35,11 +35,16 @@ from robot.memory import (
     Memory,
     about_past,
     compares,
+    different_kind,
     earlier_view,
     article,
     is_question,
     kind_of,
     main_object,
+    maxsim,
+    says_same,
+    same_question,
+    same_thing,
     shown,
     showed,
     sighting_answer,
@@ -149,6 +154,18 @@ class Offer:
 
 
 @dataclass
+class Held:
+    """The object a visitor held up at an answered turn: the label of its newest frame and up
+    to SHOTS crops (copies, from the frames that own the boxes) with their capture times. RAM
+    only."""
+    track: int
+    label: str
+    shots: list[np.ndarray]
+    taken: list[float]
+    point: int = 0  # the turn's stored text point: the evidence a later comparison cites
+
+
+@dataclass
 class Turn:
     """One exchange, with wall-clock stage times (time.time())."""
     question: str = ""
@@ -187,6 +204,8 @@ class Turn:
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
     resumed: bool = False         # decode paused at the first phrase and resumed (D66)
+    compared: dict = field(default_factory=dict)  # a same-object answer: capture times, labels,
+    #                                               and the MaxSim score (None: different kinds)
 
 
 class Robot:
@@ -272,6 +291,9 @@ class Robot:
         # shown gets one of these frames (earlier_view). Cleared wherever the history is, and by
         # a deletion, because a frame can show what was deleted.
         self.looked: list[Look] = []
+        # The object held up at each answered turn, for "Is this the same as before?": RAM only,
+        # cleared with `looked` and by every deletion, because a crop can show what was deleted.
+        self.held: deque[Held] = deque(maxlen=HISTORY_TURNS)
         self.exchanges = 0                      # counts every exchange; history is capped
         self.last_frame: np.ndarray | None = None  # the frame of the previous turn
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
@@ -333,6 +355,7 @@ class Robot:
             self.conversation_started = False
             self.named, self.ignored = self.things.labels(), self.things.ignored()
             self.history, self.looked, self.exchanges, self.ready = [], [], 0, None
+            self.held.clear()
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
@@ -1059,17 +1082,76 @@ class Robot:
             return None
         return showed(thing, ago) if thing else UNAVAILABLE
 
+    def _views(self, track: int) -> tuple[list, list]:
+        """The detected frames that own `track`'s box, newest first and accepted by the focus,
+        and those of them where it is not a person (earlier person views too). Call with
+        `self.detecting` held."""
+        views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
+                 if track in v[2] and self.focus.accepts(track, v[0])]
+        return views, [v for v in views if v[2][track][0] not in BODY]
+
+    def _hold(self, turn: Turn) -> Held | None:
+        """The object held up for this turn (`_target`), with crops from the detected frames
+        that own its boxes, taken as `_bind` takes them. None: no object, or a person."""
+        if (track := self._target(turn)) is None:
+            return None
+        with self.detecting:
+            views, objects = self._views(track)
+        if not views or views[0][2][track][0] in BODY:
+            return None
+        views = objects[:SHOTS]
+        return Held(track, views[0][2][track][0],
+                    [cut(f, v[track][1]).copy() for _, f, v in views],
+                    [taken for taken, _, _ in views])
+
+    def _same_answer(self, turn: Turn, now: Held | None) -> str | None:
+        """"Is this the same thing I showed you before?" answered from the crops of the object
+        held now and of those held at earlier turns: the brain says yes by default. Earlier
+        objects of the same kind, or on the same track (a swap in hand keeps it), are scored by
+        MaxSim and the best decides. With none of them, a question that says "same", "different",
+        or "similar" gets the kind answer; any other ("Have you seen this before?") is left to the
+        stored sightings. None: another question, or nothing earlier, so the usual paths answer."""
+        if not same_question(turn.question):
+            return None
+        if now is None:
+            return "Hold it up, and I will compare."
+        kin = [h for h in self.held
+               if h.track == now.track or kind_of(h.label) == kind_of(now.label)]
+        if not kin:
+            if not self.held or not says_same(turn.question):
+                return None
+            before, score = self.held[-1], None
+            said = different_kind(now.label, before.label)
+        else:
+            vectors = self.recognition.call(
+                lambda f, c: c([*now.shots, *(s for h in kin for s in h.shots)]))
+            here, scores, at = vectors[:len(now.shots)], [], len(now.shots)
+            for h in kin:
+                scores.append(maxsim(here, vectors[at:at + len(h.shots)]))
+                at += len(h.shots)
+            best = max(range(len(kin)), key=scores.__getitem__)
+            before, score = kin[best], scores[best]
+            said = same_thing(before.label, score, settings.same, settings.guess_band)
+        turn.compared = {"now": now.taken, "earlier": before.taken,
+                         "labels": [now.label, before.label], "score": score}
+        turn.memories = [before.point]
+        return said
+
     def _code_answer(self, turn: Turn, now: np.ndarray, track: int | None, look: Look,
-                     recalled: list[dict], memories: list[str]) -> str | None:
+                     recalled: list[dict], memories: list[str], held: Held | None
+                     ) -> str | None:
         """The answer given in code, or None for the brain: identity, then the visitor's things,
-        then what the selected earlier look showed (which alone decides the path: its answer, or
-        the brain with its Memories line), then stored shown objects and sightings."""
+        then a same-object comparison of crops, then what the selected earlier look showed (which
+        alone decides the path: its answer, or the brain with its Memories line), then stored
+        shown objects and sightings."""
         if not turn.visitor:
             self._resolve_visitor(turn, now)
         if answer := self._deletion_answer(turn) or self._confirmation_answer(turn):
             return answer
         teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
         if answer := self._identity(turn, now, track) or self._things(turn, teaching):
+            return answer
+        if answer := self._same_answer(turn, held):
             return answer
         if selected := earlier_view(turn.question, self.looked, look, differs):
             return self._look_back(turn, selected, memories)
@@ -1111,6 +1193,7 @@ class Robot:
             self.ui_turns.clear()
             self.ui_turns.append(turn)
             self.history, self.looked, self.teaching = [], [], None
+            self.held.clear()
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
         statements = self._told(question, turn)
@@ -1121,7 +1204,8 @@ class Robot:
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
                           (f"seen: {line}", None) for line in memories]}
         track = self._visitor()
-        recalled_answer = self._code_answer(turn, now, track, look, recalled, memories)
+        held = self._hold(turn)
+        recalled_answer = self._code_answer(turn, now, track, look, recalled, memories, held)
         turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
         turn.retrieved = time.time()
         self.last_frame, turn.looked = look.frame, look.taken
@@ -1163,6 +1247,9 @@ class Robot:
             if self.looked and not differs(self.looked[-1], look):
                 look.caption = self.looked[-1].caption  # one caption per view run
             self.looked = (self.looked + [look])[-HISTORY_TURNS:]
+            if held:
+                held.point = turn.frame_id
+                self.held.append(held)
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
@@ -1414,6 +1501,7 @@ class Robot:
             self.visitors[track] = Visitor(forgotten=True)
         self.hiding = (face_, time.time()) if face_ is not None else None
         self.told, self.looked, self.face, self.asking = None, [], None, None
+        self.held.clear()
         self.history, self.ready, self.exchanges = [], None, 0
         self.panel = None
         for turn in [*self.ui_turns, self.ui_turn]:
@@ -1672,6 +1760,7 @@ class Robot:
         ident = self.recognition.call(persist, mutate=True)
         if ident:
             self.looked = []  # a retained look may show the item
+            self.held.clear()
         return "Okay, I will ignore only that item." if ident else "That selection expired."
 
     def _settle(self, since: float) -> None:
@@ -1728,8 +1817,7 @@ class Robot:
         the focus epoch the track must still have (a track that left and returned is new)."""
         with self.detecting:
             self.window = None
-            views = [v for v in [(self.view_taken, *self.view), *reversed(self.views)]
-                     if track in v[2] and self.focus.accepts(track, v[0])]
+            views, objects = self._views(track)
             epoch = self.focus.epoch(track)
             gallery, session = self.recognition.epoch, self.session_id
         if not views or pinned not in (None, epoch):
@@ -1738,7 +1826,7 @@ class Robot:
         label, box = view[track]
         if label in BODY:
             return "I only track objects, not people."
-        views = [v for v in views if v[2][track][0] not in BODY]  # earlier person views too
+        views = objects
         old = self.things.named(turn.visitor, name, [])
         name = old["name"] if old else name
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
@@ -1821,6 +1909,7 @@ class Robot:
 
     def _clear_object_evidence(self, ident):
         """Discard displayed sources after any object edit, including thumbnail removal."""
+        self.held.clear()
         for turn in [*self.ui_turns, self.ui_turn]:
             if turn is not None:
                 turn.ui_evidence = [m for m in turn.ui_evidence if m.get("object") != ident]

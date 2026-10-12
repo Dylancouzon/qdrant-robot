@@ -4,13 +4,15 @@ Updated 2026-10-12. Branch: `main`. Read CLAUDE.md, this file, and [research/les
 
 ## Active tasks
 
-1. Same-object answers (builder, worktree): [research/same-object.md](research/same-object.md).
+None in flight. Done on main and deployed as `5242a7fe9624`: missed-face reset (D161), voice deletions ask first (D162), one start-anchored yes/no reader, and same-object answers (D163). Waiting on Dylan: whether the Codex answer judge may run this session (new answers need judging; reviews stay on Opus).
 
-Done on main, not yet deployed: missed-face reset (D161), voice deletions ask first (D162), and one start-anchored yes/no reader. After task 1: deploy, then a paired Jetson replay of `eval/dev/sessions.jsonl` against `56ce07810e7a` (must keep 42/47 with no new miss). Then "What am I holding?" and "a moment ago" recall. Physical latency by loopback is parked (D160); M4 still requires it.
+Human checks (live camera): hold a mug, ask "What is this?", show a different mug, ask "Is this the same thing I showed you before?" (expect no or not sure); show the first mug again (expect yes); show a phone (expect "No. Earlier you showed me a mug; this is a phone."). Also "forget my mug" then "yes", and "forget me" while looking away (expect "Please look at me...").
+
+Next: "What am I holding?" and "a moment ago" recall (held-out misses). Physical latency by loopback is parked (D160); M4 still requires it.
 
 ## Robot
 
-- Jetson: `ssh robot`; MAXN_SUPER, boot `938e1f9f` (rebooted 2026-10-12). Current release `56ce07810e7a`; rollback target `7b53263969f1`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 56ce07810e7a`, then open http://127.0.0.1:8765.
+- Jetson: `ssh robot`; MAXN_SUPER, boot `938e1f9f` (rebooted 2026-10-12). Current release `5242a7fe9624`; rollback target `0f676447a243`. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 5242a7fe9624`, then open http://127.0.0.1:8765.
 - Backups of the pre-owner things shard: `shared/memory/things-backup-20261011-024622` and `shared/memory-backup-20261011-things`.
 - Running jobs: no Mac monitor runs (start it with the command above). Jetson unit `qr-robot` is stopped. WSL is idle.
 

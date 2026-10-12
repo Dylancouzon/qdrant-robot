@@ -40,6 +40,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Bounded evidence assembly (A/B contract) | Frozen, never built; the session moved to Granite | Open idea | D109, D110 |
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
+| Same-object answers from crop MaxSim (D163) | The 2B said yes to every comparison; code now answers from DINOv2 crops (pairs E, replay J). Dev replays compare the closet chair because it holds the focus in every composite; validate live | Current; live check pending | D163; `research/same-object.md` |
 | Intent parsing (rules, BGE scores, linear head) | Never built. The 8 recorded misses (39/47, J) include no wrong past or present choice: `about_past()` fired on every past question. Combined questions still lack earlier evidence | Not the bottleneck for this set; reopen with routing misses | `recall.md` |
 | Recall: earlier frame labeled as past (B) | Right frame delivered; 2B answers in present tense or about the image. 38/47, 10/15 (J) | Rejected | D150 |
 | Recall: B plus a past-tense note (B-note) | 41/47, 11/15 (J); answers still wander ("the first thing I saw was...") | Rejected for B2 | D150 |
@@ -102,7 +103,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 - Synthetic voices overstate ASR quality. Real voices split at pauses (D36).
 - The same video decodes to different pixels on the Mac and the Jetson. Verify pixels with the deployed decoder (D93).
 - Small paired runs are noisy: llama-server answers differ on identical prompts. One question in 47 is about 2%.
-- FileCamera still images keep their original timestamp, so recognition goes stale in replays (edge-cases.md).
+- FileCamera still images used to keep their show-time stamp, so the focus never became steady (`STEADY_S`) and recognition went stale in replays. Fixed 2026-10-12: `latest()` stamps a still with `time.time()` on each call, like a live camera repeating an unchanged scene; videos keep frame-index stamps.
 - ONNX Runtime telemetry aborts pytest after the tests pass. `tools/gate.py` sets `ORT_DISABLE_TELEMETRY=1` (D89).
 
 ## Process pitfalls

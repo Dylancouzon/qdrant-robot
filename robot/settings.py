@@ -8,10 +8,10 @@ from pathlib import Path
 
 from robot.config import SHARED
 
-DEFAULTS = dict(match=.822, guess_band=.05, window_s=6.0, window_gap_s=1.0,
+DEFAULTS = dict(match=.822, same=.86, guess_band=.05, window_s=6.0, window_gap_s=1.0,
                 window_floor=.70, duplicate=.95, views_cap=24,
                 ask_delay_s=3., ask_blank_s=4., ask_max=3)
-RANGES = dict(match=(.6, .99), guess_band=(0., .2), window_s=(0., 30.),
+RANGES = dict(match=(.6, .99), same=(.6, .99), guess_band=(0., .2), window_s=(0., 30.),
               window_gap_s=(.2, 5.), window_floor=(0., .99), duplicate=(.8, 1.),
               views_cap=(3, 64), ask_delay_s=(1., 20.), ask_blank_s=(1., 30.),
               ask_max=(0, 10))

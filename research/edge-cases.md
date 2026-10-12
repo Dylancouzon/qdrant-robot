@@ -19,13 +19,17 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Detector or crop matching misses objects across motion or changed viewpoints | No box means no focus or teaching, even with label-free matching | D146 now defaults to 26s at 384x640. Keep detector proposals separate from descriptor matching; measure broader object coverage before another change | D43, D64, D77, D146; research/booth-ux.md |
 | A yes/no answer phrased as a question ("Sure, why not?") or a yes with a later "no" ("Yes, no problem") | Read as unclear: the robot asks again or drops the question | Accept these if visitors say them | robot/people.py consent() |
 | A question during a face-consent re-ask ("What do you see?") | Answered with the consent question again; the question goes unanswered | Drop the ask on a question and answer it | robot/main.py _consent() |
+| Dev composites keep the closet chair in view from the first frame | The chair holds the focus, so replayed comparisons and naming can bind the chair, not the pasted object | Use full-frame or held-object clips for comparison fixtures; check live | eval/dev/recall.jsonl; D163 |
 | Two of nine synthetic "Hey Edgy" lines missed ("Eti", "A ag") | The visitor repeats | Real booth voices before more aliases; arm B if needed | reviews/20261008-230525-97862-review.md |
 | Background speech within 20 s of an answer becomes a follow-up | The robot answers another speaker | Check on the live day; tie follow-ups to the facing person | same |
 | The follow-up clock uses queued WAV length, no speaker | The window boundary differs from playback | Measure with the speaker | same |
 | Lines without the wake phrase still trigger a prefill | GPU waste | Skip prefill until woken | V1-B report |
 | Focus not frozen at the naming turn's speech start | A wrong bind | Freeze at speech start | V1-B report |
 | Earlier-frame ordinals skip views that match the present, and "after that" means the newest view | "First" or "after that" can pick the wrong object after three or more objects | Count all retained view runs and track the last recalled frame if visitor use shows it | robot/memory.py earlier_view(); reviews/20261010-210536-87090-review.md |
-| A combined question ("Is this the same as what I showed you before?") gets no earlier frame | Past-versus-present comparisons fail (`rc-compare`) | Design a comparison path with both views, tested against D25 blending | research/recall.md |
+| A hand or the booth background sits in two crops of different objects held in one spot | The MaxSim score of two lookalike objects rises (black and silver laptop 0.835) and the answer says "not sure" at `same` 0.86; a closer lookalike scores above it | Treat as a limit; tune `same` in the Settings page | research/same-object.md |
+| A yes/no comparison of the scene ("Have you seen this before?", "Is this the same as before?") with nothing held up | The robot answers "Hold it up, and I will compare." when the visitor means the scene | Accept it for the booth; route scene questions to sightings if a visit shows it | research/same-object.md |
+| An object swapped in hand within about one second of the question | The pre-swap frames sit in `now.shots`, so the score mixes both objects | Take crops only after the focus settles; accept it for the booth | research/same-object.md |
+| Two lookalike instances (two mugs of one model) | MaxSim up to 0.874 (E, D154), so the answer says "looks like the same mug", which is true for lookalikes | None; the wording stays "looks like" | research/same-object.md |
 | Qualifiers outside the word lists ("last night", "at the office") still select the newest RAM frame | An answer from the wrong observation | Extend `_WHEN_WHERE` when observed | robot/memory.py; same review |
 | Speech during a caption prefill waits for the first generated token before it interrupts | A slower next turn | Measure foreground delay in the paired run | robot/brain.py caption(); reviews/20261010-215023-40827-review.md |
 | An interrupted or empty idle caption is retried on the next idle check | Wasted GPU work | Suppress unchanged retries until a new view or a question needs it | robot/main.py _describe_idle(); same |
@@ -81,7 +85,7 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 ## Full-stack model comparison observations, 2026-10-10
 
-- FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
+- FileCamera still images kept their original timestamp until 2026-10-12, so recognition rejected them after 0.75 seconds and the focus never became steady. `latest()` now stamps a still with the current time. Comparisons recorded before that change used recurring fixture timestamps; replays of stills after it exercise recognition and the focus as a live camera does. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
 - The recorded knowledge-more-2 question splits into two answered lines (J). Keep the existing VAD/ASR implementation and score the split as a failure. Evidence: the same recorded replay; compare its occurrence across arms before drawing a model conclusion.
 
 ## Compact UI

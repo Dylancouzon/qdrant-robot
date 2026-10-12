@@ -173,6 +173,7 @@ async function robot(action,data){
 }
 const recognitionFields=[
   ['match','Recognition threshold',0.6,0.99,0.001,'Higher values require a closer visual match.'],
+  ['same','Same-object threshold',0.6,0.99,0.001,'Higher values require a closer match before the robot says an object is the one shown before.'],
   ['guess_band','Near-match band',0,0.2,0.01,'Show a possible name within this distance below the threshold.'],
   ['window_s','Teaching window (seconds)',0,30,0.5,'Learn new views after naming; zero turns learning off.'],
   ['window_gap_s','Admission gap (seconds)',0.2,5,0.1,'Wait this long between stored views.'],

@@ -262,6 +262,48 @@ def _described(group: list[dict], now: set[int], visible: list[str],
     return f"{saw}; I do not see {'them' if s['label'].endswith('s') else 'it'} now."
 
 
+# "Is this the same thing I showed you before?" is answered from tracked crops, not by the brain.
+_YES_NO = re.compile(r"^\W*(is|are|was|were|do|does|did|have|has)\b", re.I)
+_SAME = re.compile(r"\b(same|different|similar|like the (one|thing))\b", re.I)
+_SAME_PAST = re.compile(r"\b(before|earlier|showed|again|first|last|just)\b", re.I)
+_THIS = re.compile(r"\b(this|that|it)\b", re.I)
+_THIS_PAST = re.compile(r"\b(before|earlier|again|seen|saw|show|showed)\b", re.I)
+
+
+def same_question(text: str) -> bool:
+    """Whether a yes/no question asks if the object held up now is one shown before: it names
+    the past and either compares ("the same", "different", "similar") or points at the object
+    ("Have you seen this before?"). "Did you just say that?" has no show or seen cue."""
+    return bool(_YES_NO.match(text)) and (
+        bool(_SAME.search(text) and _SAME_PAST.search(text)) or
+        bool(_THIS.search(text) and _THIS_PAST.search(text)))
+
+
+def says_same(text: str) -> bool:
+    """Whether a question compares ("same", "different", "similar", "like the one")."""
+    return bool(_SAME.search(text))
+
+
+def maxsim(a: np.ndarray, b: np.ndarray) -> float:
+    """MaxSim of two sets of unit vectors: each vector of `a` takes its best match in `b`, and
+    the best matches average (cosine, the scale of `settings.match`)."""
+    return float((a @ b.T).max(axis=1).mean())
+
+
+def different_kind(now: str, before: str) -> str:
+    return f"No. Earlier you showed me {article(before)}; this is {article(now)}."
+
+
+def same_thing(label: str, score: float, match: float, band: float) -> str:
+    """The answer for two objects of one kind, from their MaxSim score; `label` names the earlier
+    one, because a swap in hand can keep the old track and its voted label."""
+    if score >= match:
+        return f"Yes, it looks like the same {label}."
+    if score >= match - band:
+        return f"It looks similar, but I am not sure it is the same {label}."
+    return f"No, this looks different from the {label} you showed me."
+
+
 def about_past(question: str) -> bool:
     return bool(_PAST.search(question))
 
@@ -640,6 +682,23 @@ if __name__ == "__main__":
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
     assert is_question("is Qdrant written in Rust.") and is_question("Where am I from?")
+    for text in ("Is this the same thing I showed you before?", "Is this the same as what I just "
+                 "showed you?", "Is this the same laptop as before?", "Have you seen this before?",
+                 "Did I show you this earlier?", "Was that different from the last one?"):
+        assert same_question(text), text
+    for text in ("Does this look like a phone?", "Is this the same color as my shirt?",
+                 "Is it different from a cup?", "What did I show you just now?",
+                 "Did you just say that?", "What is this?", "Do you like these?",
+                 "Compare this with what I showed you before."):
+        assert not same_question(text), text
+    assert says_same("Is this the same laptop?") and not says_same("Have you seen this before?")
+    v = np.eye(3, dtype=np.float32)
+    assert maxsim(v[:2], v) == 1.0 and maxsim(v[:2], v[2:]) == 0.0 and maxsim(v[:2], v[1:]) == 0.5
+    assert different_kind("cup", "teddy bear") == "No. Earlier you showed me a teddy bear; this " \
+        "is a cup."
+    assert same_thing("mug", 0.9, 0.8, 0.05).startswith("Yes") and same_thing(
+        "mug", 0.77, 0.8, 0.05).startswith("It looks similar") and same_thing(
+        "mug", 0.5, 0.8, 0.05).startswith("No, this")
     mems = [{"caption": "Main object: a bus. Around it: a street."},
             {"caption": "Main object: green apples\nAround it: a bowl."}]
     ago = lambda m: "just now"  # noqa: E731

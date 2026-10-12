@@ -99,6 +99,8 @@ class FileCamera:
 
     def latest(self) -> tuple[np.ndarray | None, float]:
         with self._lock:
+            if self._cap is None and self._frame is not None:
+                self._stamp = time.time()  # a still: a live camera repeating an unchanged scene
             if self._cap is not None:
                 due = min(int(max(0, time.monotonic() - self._start) * self._fps),
                           self._count - 1)
