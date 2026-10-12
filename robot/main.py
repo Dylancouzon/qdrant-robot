@@ -203,6 +203,7 @@ class Turn:
     visitor: str = ""             # resolved once before object actions
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
+    deleted: bool = False         # a voice deletion ran: its content leaves the live UI too
     resumed: bool = False         # decode paused at the first phrase and resumed (D66)
     compared: dict = field(default_factory=dict)  # a same-object answer: capture times, labels,
     #                                               and the MaxSim score (None: different kinds)
@@ -632,7 +633,7 @@ class Robot:
                 turns.append(turn)
             evidence = {}
             if turn is not None:
-                if not turn.keep or self.hiding:
+                if turn.deleted or self.hiding:
                     turns = [turn]  # Deleted visitor/object content leaves the live UI, too.
                 evidence = {"knowledge": turn.facts if not turn.verbatim else
                             [turn.answer] if turn.answer in turn.facts else [],
@@ -1261,7 +1262,7 @@ class Robot:
 
     def _log(self, turn: Turn) -> None:
         self.ui_thinking = False
-        if not turn.keep or self.hiding:
+        if turn.deleted or self.hiding:
             turn.ui_evidence = []
             self.panel = None
             self.ui_turns.clear()
@@ -1383,7 +1384,9 @@ class Robot:
             return None
         if (yes := consent(turn.question)) is None:
             return None
-        turn.keep = False
+        turn.keep, turn.deleted = False, yes
+        if yes:  # statements and memories retrieved before the deletion may be what it removes
+            turn.told, turn.memories = [], []
         return pending[2]() if yes else KEPT
 
     def _offer(self, vec: np.ndarray | None) -> str | None:

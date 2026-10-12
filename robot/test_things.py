@@ -1081,6 +1081,34 @@ def test_spoken_ignore_that_acts_like_the_camera_card(robot, monkeypatch):
     assert r.things.excluded(stub_crops([np.full((10, 10, 3), GOLD)])[0]), "the item is ignored"
 
 
+def test_only_a_voice_deletion_clears_the_live_chat(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    assert ask(r, "This is my phone.")[0].startswith("Got it")
+    r.turns = queue.Queue()
+    earlier = Turn(question="Hello", answer="Hi there", line=1)
+    r.ui_turns.append(earlier)
+    for text in ("Ignore that.", "Forget my phone."):  # a command and a question, neither deletes
+        turn = ask(r, text)[1]
+        r.ui_turn = turn
+        r.ui_turns.append(turn)
+        r._log(turn)
+        assert earlier in r.ui_turns and r._shown(False)[1].transcript[0]["answer"] == "Hi there"
+    r.deleting = None  # the question is left unanswered
+    assert ask(r, "Forget my phone.")[0].startswith("Should I forget")
+    reply = Turn(question="Yes.", speech_start=time.time() + 1, visitor=r.conversation_visitor,
+                 told=["My phone is gold"], memories=[1])  # retrieved before the deletion ran
+    r.ui_turn = reply
+    r.ui_turns.append(reply)
+    assert r._deletion_answer(reply) == "Done. I have forgotten your phone."
+    r._log(reply)
+    assert list(r.ui_turns) == [reply]
+    shown = r._shown(False)[1]
+    assert [t["id"] for t in shown.transcript] == [str(reply.line)]
+    assert shown.evidence["statements"] == [] and shown.evidence["memory_ids"] == []
+
+
 def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
     robot.last_line = 1000.0
     for gap, goes_on in ((main.CONVERSATION_S, True), (main.CONVERSATION_S + 1, False)):

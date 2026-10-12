@@ -106,3 +106,8 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - Restore has no voice command; it stays in the camera card.
 - "When did you last see it?" with a pronoun goes to the brain, not the named-object path (live 2026-10-12).
 - If the speech-start focus object is unnamed, has lost the focus, and was never offered, "Ignore that" answers "I lost it." (review, D164).
+
+## Live chat (D165)
+
+- Speech without the wake word flips the status to "Hearing you", so the closed-conversation note can flicker in a noisy room. A short hold on the note would fix it.
+- While `hiding` is set after "forget me", `_log` still appends background (unwoken) turns to the chat, so overheard speech can appear on screen.
