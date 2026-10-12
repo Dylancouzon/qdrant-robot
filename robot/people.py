@@ -179,6 +179,7 @@ _YES = re.compile(r"\b(yes|yeah|yep|yup|sure|ok(ay)?|of course|go ahead|please d
                   r"absolutely|fine|you (may|can))\b", re.I)
 
 DECLINED = "All right, I won't remember your face."
+KEPT = "Okay, I will keep it."
 NO_FACE = "Please look at me and say it again, so I can learn your face."
 NOT_MET = "I don't think we've met yet. What's your name?"
 
@@ -251,6 +252,12 @@ def consent(text: str) -> bool | None:
     then says done("enroll", ...)."""
     yes, no = bool(_YES.search(text)), bool(_NO.search(text))
     return None if yes == no else yes
+
+
+def forget_question(name: str | None) -> str:
+    """The question before "forget me" deletes anything; the next line is read by consent()
+    (a yes runs the deletion, then done("forget", ...))."""
+    return f"Should I forget everything about you{f', {name}' if name else ''}? Say yes or no."
 
 
 def done(kind: str, name: str, ok: bool) -> str:

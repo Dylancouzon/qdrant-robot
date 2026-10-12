@@ -4,7 +4,7 @@ Updated 2026-10-12. Branch: `main`. Read CLAUDE.md, this file, and [research/les
 
 ## Active tasks
 
-1. Command set v2 (builder, worktree): spoken yes/no confirmation before every voice deletion, and a knowledge fact for "What can you do?".
+1. Command set v2: done on main (D162). Follow-up before deploy: one start-anchored yes/no reader for face consent, near-match, and deletion ("I'm not sure" reads as yes today), and a faceless "forget me" asks the visitor to look at the camera.
 2. Missed-face reset: done on main (D161); live check pending.
 
 Next: conversation quality (D160). Same-object answers ([research/same-object.md](research/same-object.md), design review GO) start after tasks 1 and 2 merge, since all three edit `robot/main.py`. Then "What am I holding?" and "a moment ago" recall. Physical latency by loopback is parked (Dylan: latency feels good live); M4 still requires it.

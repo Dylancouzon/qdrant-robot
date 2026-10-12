@@ -48,11 +48,13 @@ from robot.memory import (
 )
 from robot.people import (
     DECLINED,
+    KEPT,
     THRESHOLD,
     People,
     consent,
     done,
     face,
+    forget_question,
     located_face,
     name_in,
     reply,
@@ -253,6 +255,9 @@ class Robot:
         self.candidate = self.confirming = None
         self.confirm_count, self.confirm_last = 0, 0.0
         self.confirm_tracks = set()
+        # (visitor, expiry, delete) of a voice deletion asked about: delete() was resolved when
+        # asked, runs on a yes from the same visitor, and returns the done reply
+        self.deleting: tuple[str, float, Callable[[], str]] | None = None
         self.teaching: tuple[int, int] | None = None
         self.ui_turns: deque[Turn] = deque(maxlen=8)  # current session only, never written by UI
         self.ui_turn: Turn | None = None
@@ -795,7 +800,7 @@ class Robot:
         return recognized, excluded
 
     def _clear_confirmation(self):
-        self.candidate = self.confirming = None
+        self.candidate = self.confirming = self.deleting = None
         self.confirm_count, self.confirm_last = 0, 0.0
         self.confirm_tracks = set()
 
@@ -843,6 +848,7 @@ class Robot:
                     not self.speaking and not self.ui_thinking and self.jobs.empty() and
                     self.lines.unfinished_tasks == 0 and not self.speaker.playing() and
                     not self.teaching and not self.asking and not self.confirming and
+                    not self.deleting and
                     self.confirm_count < settings.ask_max and
                     now - self.confirm_last >= 60 and
                     candidate["visitor"] == self.current_visitor and
@@ -1062,7 +1068,7 @@ class Robot:
         the brain with its Memories line), then stored shown objects and sightings."""
         if not turn.visitor:
             self._resolve_visitor(turn, now)
-        if answer := self._confirmation_answer(turn):
+        if answer := self._deletion_answer(turn) or self._confirmation_answer(turn):
             return answer
         teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
         if answer := self._identity(turn, now, track) or self._things(turn, teaching):
@@ -1249,17 +1255,18 @@ class Robot:
         turn.identity["claimed"] = name
         self._hear_name(turn)
         if req and req[0] == "forget":
-            turn.keep = False
-            ok = self._forget(track, name, vec, turn.visitor)
-            return (
-                done("forget", name, ok)
-                if name
-                else (
-                    "Done. I have forgotten you."
-                    if ok
-                    else "I could not forget you. Please ask again."
+            def delete() -> str:
+                ok = self._forget(track, name, vec, turn.visitor)
+                return (
+                    done("forget", name, ok)
+                    if name
+                    else (
+                        "Done. I have forgotten you."
+                        if ok
+                        else "I could not forget you. Please ask again."
+                    )
                 )
-            )
+            return self._ask_deletion(turn, forget_question(name), delete)
         if req and req[0] == "enroll" and req[1] and not name and self.people.person(req[1]):
             return f"I already know someone called {req[1]}."
         if req is None:
@@ -1269,6 +1276,23 @@ class Robot:
         if action:
             self.asking = action[1], 1, [vec]
         return answer
+
+    def _ask_deletion(self, turn: Turn, question: str, delete: Callable[[], str]) -> str:
+        """Ask once before a voice deletion; the next line from this visitor answers it."""
+        turn.keep = False
+        self.deleting = turn.visitor, time.time() + CONVERSATION_S, delete
+        return question
+
+    def _deletion_answer(self, turn: Turn) -> str | None:
+        """Run or drop the asked deletion: yes deletes, no keeps, and any other line, another
+        visitor, or a late answer drops it and goes on as a normal turn."""
+        pending, self.deleting = self.deleting, None
+        if not pending or time.time() > pending[1] or turn.visitor != pending[0]:
+            return None
+        if (yes := consent(turn.question)) is None:
+            return None
+        turn.keep = False
+        return pending[2]() if yes else KEPT
 
     def _offer(self, vec: np.ndarray | None) -> str | None:
         """After a name told by an unknown face, offer once per linked visitor to remember
@@ -1437,7 +1461,7 @@ class Robot:
             owner, name, possessive = self._object_owner(turn, name)
             if owner is None:
                 return f"I don't know which {name} is {possessive}."
-            return self._forget_thing(owner, name, labels)
+            return self._forget_thing(turn, owner, name, labels)
         return self._thing_question(turn)
 
     def _thing_question(self, turn: Turn) -> str | None:
@@ -1765,12 +1789,17 @@ class Robot:
             "Turn it slowly so I can see all sides." if settings.window_s > 0 else
             "I will remember it.")
 
-    def _forget_thing(self, owner: str, name: str, labels: list[str]) -> str:
-        """Delete evidence first, then thumbnails, the object, and its item Ignore rules."""
+    def _forget_thing(self, turn: Turn, owner: str, name: str, labels: list[str]) -> str:
+        """Ask before deleting the object the visitor named, resolved now."""
         if (named := self.things.named(owner, name, labels, include_ignored=True)) is None:
             return f"I don't know your {name}, so there is nothing to forget."
-        self.recognition.call(lambda f, c: self._forget_object(named), mutate=True)
-        return f"Done. I have forgotten your {named['name']}."
+
+        def delete() -> str:
+            """Delete evidence first, then thumbnails, the object, and its item Ignore rules."""
+            self.recognition.call(lambda f, c: self._forget_object(named), mutate=True)
+            return f"Done. I have forgotten your {named['name']}."
+        return self._ask_deletion(turn, f"Should I forget your {named['name']}? Say yes or no.",
+                                  delete)
 
     def _forget_object(self, named):
         """Shared serial-owner deletion for speech and the Memory tab."""

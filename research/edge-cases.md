@@ -22,7 +22,6 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | The follow-up clock uses queued WAV length, no speaker | The window boundary differs from playback | Measure with the speaker | same |
 | Lines without the wake phrase still trigger a prefill | GPU waste | Skip prefill until woken | V1-B report |
 | Focus not frozen at the naming turn's speech start | A wrong bind | Freeze at speech start | V1-B report |
-| An imperative deletion followed by a condition or correction ("Forget my phone? No, do not delete it") | Deletes despite the correction | Reject qualified or corrected commands before dispatch if seen in visitor use | robot/memory.py deletion_target(); reviews/20261010-205013-70268-review.md |
 | Earlier-frame ordinals skip views that match the present, and "after that" means the newest view | "First" or "after that" can pick the wrong object after three or more objects | Count all retained view runs and track the last recalled frame if visitor use shows it | robot/memory.py earlier_view(); reviews/20261010-210536-87090-review.md |
 | A combined question ("Is this the same as what I showed you before?") gets no earlier frame | Past-versus-present comparisons fail (`rc-compare`) | Design a comparison path with both views, tested against D25 blending | research/recall.md |
 | Qualifiers outside the word lists ("last night", "at the office") still select the newest RAM frame | An answer from the wrong observation | Extend `_WHEN_WHERE` when observed | robot/memory.py; same review |

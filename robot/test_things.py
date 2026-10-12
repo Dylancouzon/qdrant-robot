@@ -130,6 +130,20 @@ def ask(robot: Robot, text: str) -> tuple[str | None, Turn]:
     return robot._things(turn, teaching), turn
 
 
+def forget(robot: Robot, text: str, answer: str = "Yes.") -> tuple[str | None, Turn]:
+    """A deletion command asks first; `answer` on the next line then runs or drops it."""
+    said, turn = ask(robot, text)
+    assert said.startswith("Should I forget your "), said
+    reply = Turn(question=answer, speech_start=time.time() + 1, visitor=turn.visitor)
+    return robot._deletion_answer(reply), turn
+
+
+def delete_thing(robot: Robot, owner: str, name: str) -> None:
+    """Ask for and confirm the deletion of `owner`'s `name`."""
+    robot._forget_thing(Turn(question="", visitor=owner), owner, name, [])
+    robot.deleting[2]()
+
+
 def test_things(monkeypatch) -> None:
     monkeypatch.setattr(main, "SETTLE_S", 0)  # the test's speech starts after its frames
     monkeypatch.setattr(main, "face", lambda faces, frame: None)
@@ -171,7 +185,7 @@ def test_things(monkeypatch) -> None:
         show(robot, [(GOLD, LEFT)])
         assert ask(robot, "Where is my phone?")[0] == "Yes, your phone is here now."
         assert ask(robot, "Do you remember my phone?")[0].startswith("Yes, I remember your phone.")
-        said, turn = ask(robot, "Forget my phone.")
+        said, turn = forget(robot, "Forget my phone.")
         assert said == "Done. I have forgotten your phone." and store(robot, turn) == 0, \
             "the forget turn is not stored: it would be a new statement about the phone"
         assert not robot.memory.points([naming]), "the naming turn's frame and words go too"
@@ -224,7 +238,7 @@ def test_things(monkeypatch) -> None:
                  for s in robot._track(frame, [Detection("phone", 0.9, CENTER)])]
         hold(robot, CENTER)
         assert ask(robot, "This is my phone.")[0].startswith("Got it")
-        assert ask(robot, "Forget my phone.")[0].startswith("Done")
+        assert forget(robot, "Forget my phone.")[0].startswith("Done")
         robot._sight(found)  # the track's sighting, queued behind those two turns
         assert not [
             x
@@ -353,7 +367,7 @@ def test_binding_saves_source_crop_and_forget_clears_pending(robot):
     assert r._shown()[1].boxes[0][4:] == ("Guest 1's wallet", "known")
     assert r.focus.named[next(iter(r.view[1]))].refreshed == r.view_taken
     assert r.jobs.queue[0][0] == "caption"
-    assert ask(r, "Forget my wallet")[0].startswith("Done")
+    assert forget(r, "Forget my wallet")[0].startswith("Done")
     assert not list(r.memory.frames.iterdir()) and r.verified is None and not r.focus.names()
     assert r.memory.shard.count(CountRequest()) == 0
     r.brain = SimpleNamespace(caption=lambda *args: pytest.fail("deleted crop was captioned"))
@@ -458,7 +472,7 @@ def test_ignore_rule_survives_restart_and_object_forget(tmp_path, monkeypatch):
     assert not r.focus.names(), "detector relabeling cannot restore an ignored name"
     assert ask(r, "This is my phone")[0].startswith("I am ignoring")
     assert ask(r, "Where is my phone?")[0].startswith("I am ignoring")
-    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert forget(r, "Forget my phone")[0].startswith("Done")
     assert r.things.ignored() == {"phone"}
     close_robot(r)
     fresh = open_robot(tmp_path)
@@ -855,7 +869,7 @@ def test_case_only_reteach_and_forget_all_evidence(robot):
     assert r.memory.points(turn.memories)[0]["named"] == object_id(
         r.things, r.conversation_visitor, "Dylan's smartphone"
     )
-    assert ask(r, "Forget my DYLAN'S SMARTPHONE")[0].startswith("Done")
+    assert forget(r, "Forget my DYLAN'S SMARTPHONE")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0
     assert not r.focus.names() and not list(r.memory.frames.iterdir())
 
@@ -1323,7 +1337,7 @@ def test_robot_reteach_appends_buffered_and_new_object_views(robot, monkeypatch)
         >= settings.match
     )
     assert len(r.things.named(r.conversation_visitor, 'phone', [])["turns"]) == 2
-    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert forget(r, "Forget my phone")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0 and not list(r.memory.frames.iterdir())
 
 
@@ -1355,7 +1369,7 @@ def test_robot_ignore_copies_all_verified_gallery_views_and_forget_deletes_links
     assert r._item_control("restore", {"id": preference["id"], "session": r.session_id,
                                        "gallery": r.recognition.epoch}).startswith("I will notice")
     assert all(r.things.excluded(v) is None for v in saved)
-    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert forget(r, "Forget my phone")[0].startswith("Done")
     assert r.memory.shard.count(CountRequest()) == 0 and not list(r.memory.frames.iterdir())
 
 
@@ -1448,7 +1462,7 @@ def test_chosen_name_reverified_after_display_expiry_and_wrong_instance(robot, m
         object_id(r.things, r.conversation_visitor, "Dylan's smartphone"),
         r.view_taken,
     )
-    ask(r, "Forget my Dylan's smartphone")
+    forget(r, "Forget my Dylan's smartphone")
     assert not r.focus.names()
     assert all(
         n.name != object_id(r.things, r.conversation_visitor, "Dylan's smartphone")
@@ -1519,7 +1533,7 @@ def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, m
         black = next(i for i, (_, b) in r.view[1].items() if b == RIGHT)
         assert gold in r.focus.excluded and black not in r.focus.excluded
         assert r.things.excluded(stub_crops([np.full((4, 4, 3), BLACK)])[0]) is None
-        assert ask(r, "Forget my Dylan's smartphone")[0].startswith("Done")
+        assert forget(r, "Forget my Dylan's smartphone")[0].startswith("Done")
         assert not r.things.preferences(), "deletion removes copied descriptors and title"
     finally:
         close_robot(r)
@@ -1978,7 +1992,7 @@ def test_retained_name_cannot_ignore_saved_object_after_same_track_replacement(r
     assert r.memory.points(turn.memories)[0]["named"] == object_id(
         r.things, r.conversation_visitor, "wallet"
     )
-    assert ask(r, "Forget my wallet")[0].startswith("Done")
+    assert forget(r, "Forget my wallet")[0].startswith("Done")
     assert not r.memory.points(turn.memories)
     assert r.things.named(r.conversation_visitor, 'wallet', []) is None
 
@@ -2460,7 +2474,7 @@ def test_teaching_window_admits_at_gap_and_stops_permanently(robot, monkeypatch,
     elif stop == "time":
         clock[0] += 6
     else:
-        r._forget_thing(r.conversation_visitor, "cup", [])
+        delete_thing(r, r.conversation_visitor, "cup")
     query()
     assert not r.window
     frame_of(r)
@@ -2661,12 +2675,53 @@ def test_guest_forget_me_deletes_objects_record_and_window(robot, monkeypatch):
     monkeypatch.setattr(r, "_whois", lambda frame, turn=None: None)
     turn = Turn(question="Forget me", visitor=owner)
     r.turn_seen = None
-    assert r._identity(turn, frame, None) == "Done. I have forgotten you."
-    assert not r.window and not r.told and not r.teaching and not turn.keep
+    assert r._identity(turn, frame, None) == "Should I forget everything about you? Say yes or no."
+    assert r.things.objects(owner) and not turn.keep, "nothing is deleted before the yes"
+    yes = Turn(question="Yes.", visitor=owner)
+    assert r._deletion_answer(yes) == "Done. I have forgotten you." and not yes.keep
+    assert not r.window and not r.told and not r.teaching
     assert not r.things.objects(owner) and r.things.visitor(owner) is None
     assert not list(r.things.thumbs.glob("*.jpg"))
     assert not r.memory.sightings(time.time() + 1, 99)
     assert r.memory.shard.count(CountRequest()) == 0
+
+
+def test_voice_deletion_asks_first(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    owner = r.conversation_visitor
+    named = r.things.named(owner, "phone", ["phone"])
+
+    def said(text: str, visitor: str = owner) -> str | None:
+        return r._deletion_answer(Turn(question=text, speech_start=time.time() + 1,
+                                       visitor=visitor))
+
+    assert ask(r, "Forget my phone")[0] == "Should I forget your phone? Say yes or no."
+    assert r.things.named(owner, "phone", ["phone"]), "the request deletes nothing"
+    assert said("No, keep it.") == "Okay, I will keep it."
+    assert r.things.named(owner, "phone", ["phone"]) and r.deleting is None, "no keeps it"
+    ask(r, "Forget my phone")
+    assert said("What do you see?") is None and r.deleting is None, "any other line drops it"
+    assert said("Yes.") is None and r.things.named(owner, "phone", ["phone"]), "once only"
+    ask(r, "Forget my phone")
+    assert said("Yes.", visitor="someone else") is None, "another visitor's yes"
+    assert r.things.named(owner, "phone", ["phone"]) and r.deleting is None
+    ask(r, "Forget my phone")
+    r.deleting = r.deleting[0], time.time() - 1, r.deleting[2]
+    assert said("Yes.") is None and r.things.named(owner, "phone", ["phone"]), "late yes"
+    ask(r, "Forget my phone")
+    r._clear_confirmation()  # a new conversation
+    assert r.deleting is None
+    said_ok, turn = ask(r, "Forget my phone? No, do not delete it.")
+    assert said_ok.startswith("Should I forget") and not turn.keep
+    assert said("No, do not delete it.") == "Okay, I will keep it."
+    assert r.things.named(owner, "phone", ["phone"]) == named
+    assert forget(r, "Forget my phone")[0] == "Done. I have forgotten your phone."
+    assert r.things.named(owner, "phone", ["phone"]) is None
+    assert ask(r, "Forget my phone")[0] == "I don't know your phone, so there is nothing to forget."
+    assert r.deleting is None
 
 
 def test_startup_sweeps_orphan_thumbnails(tmp_path):
@@ -2725,7 +2780,7 @@ def test_forget_object_removes_thumbnails_and_ignore_exclusions(robot):
     rule = r.things.ignore_item("phone", vectors)
     assert ident in r.things.hidden_ids()
     assert r.things.score(vectors[0]) is None
-    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert forget(r, "Forget my phone")[0].startswith("Done")
     assert not r.window and not list(r.things.thumbs.glob("*.jpg"))
     assert not r.things.add_view(ident, vectors[0], thumbnail_crops(vectors)[0])
     assert ident not in r.things.hidden_ids()
@@ -2865,10 +2920,10 @@ def test_forget_object_retry_after_store_interruption(robot, shard_name, fail_at
 
     store.shard = Interrupted()
     with pytest.raises(RuntimeError):
-        ask(r, "Forget my phone")
+        forget(r, "Forget my phone")
     assert r.things.objects(owner)
     store.shard = original
-    assert ask(r, "Forget my phone")[0].startswith("Done")
+    assert forget(r, "Forget my phone")[0].startswith("Done")
     assert not r.things.objects(owner)
     assert not r.memory.shard.count(CountRequest())
     assert not list(r.things.thumbs.glob("*.jpg"))
@@ -3170,7 +3225,7 @@ def test_readable_evidence_clears_on_deletion(robot, action):
     r.ui_turns.append(r.ui_turn)
     view = r.ui_turn.ui_evidence[0]["view"]
     if action == "speech":
-        r._forget_thing(OWNER, "mouse", [])
+        delete_thing(r, OWNER, "mouse")
     elif action == "visitor":
         assert r._forget(None, None, None, OWNER)
     else:
@@ -3189,7 +3244,7 @@ def test_readable_evidence_resolves_linked_teaching_statements(robot):
     r.ui_turns.append(r.ui_turn)
     assert r.ui_turn.ui_evidence[0]["object"] == ident
     assert r.ui_turn.ui_evidence[0]["label"] == "Ana's camera"
-    r._forget_thing(OWNER, "camera", [])
+    delete_thing(r, OWNER, "camera")
     assert not r.ui_turn.ui_evidence and not r.memory.points([pid])
 
 

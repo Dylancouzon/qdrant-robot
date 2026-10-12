@@ -55,6 +55,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Flat 0.6–0.7 s hangover; minimum line length | Adds latency to every turn; shortest question is 0.67 s | Rejected; length-scaled hangover | D38 |
 | Real voices with pauses | A pause splits a question; the turn merge is still open | Open | D36, D38 |
 | Hey Edgy from transcript (arm A) | 7/9 synthetic wake lines, 0/9 false (J) | Current; arm B (openWakeWord) if it misses | D65, D73 |
+| Spoken yes/no before voice deletions | Fixes deletion despite a correction ("Forget my phone? No..."); unit tests and dev fixtures (E) | Current | D162 |
 
 ## Perception, faces, and interface
 

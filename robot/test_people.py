@@ -155,7 +155,7 @@ def test_robot_identity(monkeypatch) -> None:
     from robot import main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection
     from robot.main import FIRST_PERSON, Robot, Turn
-    from robot.people import DECLINED, _id
+    from robot.people import DECLINED, KEPT, _id
     from robot.text_embed import DIM as TEXT_DIM
     from robot.test_things import open_robot
 
@@ -288,7 +288,20 @@ def test_robot_identity(monkeypatch) -> None:
             limit=999, with_payload=["frame"]))[0] if "frame" in r.payload}
         assert hers and {f.name for f in (root / "frames").iterdir()} == held, \
             "only the explicit linked source crop saves an image"
-        assert ask("Please forget me.", ana) == done("forget", "Ana", True)
+        assert ask("Please forget me.", ana) == "Should I forget everything about you, Ana? " \
+            "Say yes or no."
+        assert ask("No, keep me.", ana) == KEPT and robot.people.identify(np.eye(DIM)[1])
+        assert ask("Please forget me.", ana).startswith("Should I forget")
+        assert ask("What's my name?", ana) == "You're Ana. I remember your face.", \
+            "any other line drops the question and is answered"
+        assert ask("Yes.", ana) is None and robot.people.identify(np.eye(DIM)[1]), \
+            "a yes with no question pending deletes nothing"
+        assert ask("Please forget me.", ana).startswith("Should I forget")
+        assert ask("Yes.", frames(2, 1)) is None and robot.people.identify(np.eye(DIM)[1]), \
+            "another visitor's yes deletes nothing"
+        assert ask("Please forget me.", ana).startswith("Should I forget")
+        assert robot.deleting and turns[-1].keep is False, "the question is no evidence"
+        assert ask("Yes, please.", ana) == done("forget", "Ana", True)
         assert robot.people.identify(np.eye(DIM)[1]) is None
         assert robot.people.identify(np.eye(DIM)[2])[0] == "Ben", "only the face that asked"
         assert not robot.memory.points([p["id"] for p in hers])
@@ -311,7 +324,8 @@ def test_robot_identity(monkeypatch) -> None:
         monkeypatch.setattr(memory, "MAX_POINTS", 20_000)
         ben = frames(2, CONFIRM + 1)
         track = robot._visitor()
-        assert ask("Forget me too.", ben) == done("forget", "Ben", True)
+        assert ask("Forget me too.", ben).startswith("Should I forget")
+        assert ask("Yes.", ben) == done("forget", "Ben", True) and turns[-1].keep is False
         assert ask("Still me.", ben) is None and "Still me." not in said()
         cy = frames(3, 3)  # Cy steps into Ben's place: the same track id
         assert robot._visitor() == track
