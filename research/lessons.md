@@ -83,9 +83,9 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Concept A with body speaker and owned STS3215 | Tapered white shell uses a 22 mm base roll; 24 mm clips the expanded port reservation. Direct inset loft fixes invalid panel booleans from the offset cavity. CAD bounds must exclude cached triangulation. Bambu archive relationships need an unprefixed default namespace; validate the final archive after thumbnail rewriting. All 57 P1S projects slice and pass final geometry import (E). Physical retention, powered coupling, cables, and thermal behavior remain U | Current unpowered fit prototype | H2; `hardware/concept-a/README.md` |
-
-| Removable speaker and audio keys | Speaker capture and service pass 64 targeted checks; audio capture, tool access, and module service pass 118 (E). Upright audio and separate vertical key removal failed clearance. Flatter audio removes as one module after the speaker key. The complete casing passes 665 checks (E); physical contacts and flex remain U | Reviewed CAD prototype; physical tests pending | H3; `hardware/concept-a/RETENTION_BRIEF.md` |
+| Concept A with body speaker and owned STS3215 | Passed 665 CAD checks and sliced, but Dylan rejected it for printing and assembly (2026-10-12): 38 required parts, 25 of them printed pins, keys, and keepers that break; studs on cantilevers; 34,887 mm² overhang and 20 floating islands (E, `hardware/printcheck.py`). CAD clearance checks do not prove printability; score every part in print orientation | Rejected; tag `archive/concept-a-enclosure` | H2, H4 |
+| Removable speaker and audio keys | Bounded CAD capture and service checks passed (E), but the keys were small flexing printed parts. Loose pockets with walls, gravity, and one rib replace them | Rejected with Concept A | H3, H4 |
+| Simplified enclosure: one shell printed on its roof, base plate, direct servo drive | Nine printed parts, M2 and M3 screws into nut pockets with floors and detents. 719 mm² overhang (shell 392 mm², mostly the grille-window bridge and short nut-pocket floors), zero islands, zero thin; 13.4 h, 500 g; all slice without supports or warnings (E). In the bare-shell study, a 45° chamfer at the bed edge left zero overhang, while split shells left about 16,000 mm². Physical fit, cooling, acoustics, and powered motion remain U | Current; coupon print next | H4; `hardware/enclosure/README.md` |
 
 ## System and memory
 

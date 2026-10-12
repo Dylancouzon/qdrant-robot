@@ -2,11 +2,11 @@
 
 Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Active task: Press-fit electronics retention
+## Active task: Simplified enclosure (2026-10-12)
 
-The unpowered enclosure and [organized STL files](hardware/concept-a/output/Print-files/README.md) and [3MF projects](hardware/concept-a/output/Print-projects/README.md) are current: 38 required pieces and 19 optional tests. CAD and native import checks pass. Read the short [handoff](hardware/concept-a/HANDOFF.md) for current constraints and next steps. The [build log](hardware/concept-a/BUILD_LOG.md) preserves development history and evidence.
+Dylan rejected Concept A for printing and assembly (tagged `archive/concept-a-enclosure`, deleted). The [simplified enclosure](hardware/enclosure/README.md) has nine printed parts, 719 mm² overhang against Concept A's 34,887, zero floating islands, and zero thin walls (E). All parts slice on the P1S without supports or warnings: 13.4 h and 500 g. Builders and verifiers were Sonnet 5.5 for this session (Dylan), with Codex at the design gate and the final review.
 
-Jetson and camera retainers await safe contact measurements. Physical fit, latch life, cables, cooling, acoustics, and powered motion remain U. No print or powered test occurred.
+Next: Dylan prints the coupon plate, the hub with both bearings, and the horn disc on the real horn, then the full set ([assembly](hardware/enclosure/ASSEMBLY.md)). Physical fit, cooling, acoustics, and powered motion remain U ([edge cases](research/edge-cases.md)).
 
 ## Robot
 
@@ -30,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Confirm Jetson grip datum/usable length and camera contact lands before installed clips. Test printed dummy modules, release cycles, and enclosed cooling before powered use.
+After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md` and adjust clearances in `interface.py`, `body.py`, or `neck.py`.

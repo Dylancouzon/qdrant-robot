@@ -1,0 +1,1052 @@
+{
+ "meta": {
+  "revision": "9d240cf0dbeff4e1bc9699212e4cdc5574955c08",
+  "date": "2026-10-12",
+  "pitch_mm": 0.4,
+  "layer_mm": 0.2,
+  "thin_mm": 2.0,
+  "thin_samples": 20000
+ },
+ "totals": {
+  "Optional": {
+   "parts": 19,
+   "overhang_mm2": 107.0,
+   "floating_islands": 0,
+   "thin_mm2": 2121.1
+  },
+  "Required": {
+   "parts": 38,
+   "overhang_mm2": 34886.6,
+   "floating_islands": 20,
+   "thin_mm2": 11074.6
+  }
+ },
+ "parts": [
+  {
+   "part": "joint-adjustment_shim_0_2",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 265.1,
+   "min_thickness_mm": 0.2,
+   "volume_mm3": 27,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    0.2
+   ],
+   "face_count": 1008
+  },
+  {
+   "part": "joint-adjustment_shim_0_4",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 265.4,
+   "min_thickness_mm": 0.4,
+   "volume_mm3": 53,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    0.4
+   ],
+   "face_count": 1008
+  },
+  {
+   "part": "joint-horn_clearance_coupon",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 319.4,
+   "min_thickness_mm": 1.7,
+   "volume_mm3": 273,
+   "bbox_mm": [
+    23.0,
+    23.0,
+    2.4
+   ],
+   "face_count": 1008
+  },
+  {
+   "part": "joint-manual_drive_gear",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 971.6,
+   "min_thickness_mm": 0.88,
+   "volume_mm3": 5253,
+   "bbox_mm": [
+    35.9,
+    36.0,
+    6.0
+   ],
+   "face_count": 3768
+  },
+  {
+   "part": "joint-servo_housing_gauge",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.2,
+   "volume_mm3": 5970,
+   "bbox_mm": [
+    49.6,
+    29.1,
+    8.0
+   ],
+   "face_count": 68
+  },
+  {
+   "part": "casing-audio-case-gauge",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.0,
+   "volume_mm3": 4025,
+   "bbox_mm": [
+    58.6,
+    20.2,
+    8.0
+   ],
+   "face_count": 36
+  },
+  {
+   "part": "casing-jetson-gauge",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.0,
+   "volume_mm3": 11544,
+   "bbox_mm": [
+    96.1,
+    40.6,
+    8.0
+   ],
+   "face_count": 36
+  },
+  {
+   "part": "casing-panel-socket-coupon",
+   "group": "Optional",
+   "overhang_mm2": 51.6,
+   "ceiling_mm2": 51.6,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 60.5,
+   "min_thickness_mm": 0.85,
+   "volume_mm3": 9977,
+   "bbox_mm": [
+    65.0,
+    26.0,
+    6.0
+   ],
+   "face_count": 76
+  },
+  {
+   "part": "casing-panel-tongue-coupon",
+   "group": "Optional",
+   "overhang_mm2": 10.0,
+   "ceiling_mm2": 10.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.0,
+   "volume_mm3": 1260,
+   "bbox_mm": [
+    30.0,
+    25.0,
+    5.0
+   ],
+   "face_count": 32
+  },
+  {
+   "part": "casing-speaker-gauge",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.0,
+   "volume_mm3": 8658,
+   "bbox_mm": [
+    105.6,
+    26.6,
+    8.0
+   ],
+   "face_count": 36
+  },
+  {
+   "part": "retention-audio-dock-receiver",
+   "group": "Optional",
+   "overhang_mm2": 39.6,
+   "ceiling_mm2": 39.6,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 85.5,
+   "min_thickness_mm": 0.1,
+   "volume_mm3": 520,
+   "bbox_mm": [
+    11.4,
+    8.8,
+    7.6
+   ],
+   "face_count": 76
+  },
+  {
+   "part": "retention-audio-dock-release-foot",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 58.9,
+   "min_thickness_mm": 0.6,
+   "volume_mm3": 31,
+   "bbox_mm": [
+    4.0,
+    8.9,
+    3.4
+   ],
+   "face_count": 60
+  },
+  {
+   "part": "retention-jetson-11mm-dummy",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 8.0,
+   "volume_mm3": 881,
+   "bbox_mm": [
+    10.0,
+    11.0,
+    8.4
+   ],
+   "face_count": 284
+  },
+  {
+   "part": "retention-jetson-edge-clearance-coupon",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 7683,
+   "bbox_mm": [
+    20.2,
+    76.1,
+    8.4
+   ],
+   "face_count": 12258
+  },
+  {
+   "part": "retention-speaker-receiver-clearance-0.1",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 8.9,
+   "min_thickness_mm": 0.15,
+   "volume_mm3": 1829,
+   "bbox_mm": [
+    7.6,
+    21.4,
+    12.0
+   ],
+   "face_count": 56
+  },
+  {
+   "part": "retention-speaker-receiver-clearance-0.2",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 10.8,
+   "min_thickness_mm": 0.1,
+   "volume_mm3": 1821,
+   "bbox_mm": [
+    7.6,
+    21.4,
+    12.0
+   ],
+   "face_count": 56
+  },
+  {
+   "part": "retention-speaker-receiver-clearance-0.3",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 12.5,
+   "min_thickness_mm": 0.05,
+   "volume_mm3": 1812,
+   "bbox_mm": [
+    7.6,
+    21.4,
+    12.0
+   ],
+   "face_count": 56
+  },
+  {
+   "part": "retention-speaker-receiver-clearance-0.4",
+   "group": "Optional",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 1804,
+   "bbox_mm": [
+    7.6,
+    21.4,
+    12.0
+   ],
+   "face_count": 36
+  },
+  {
+   "part": "retention-speaker-release-foot",
+   "group": "Optional",
+   "overhang_mm2": 5.8,
+   "ceiling_mm2": 5.8,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 62.5,
+   "min_thickness_mm": 0.6,
+   "volume_mm3": 94,
+   "bbox_mm": [
+    2.4,
+    6.4,
+    19.2
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "casing-head-visor",
+   "group": "Required",
+   "overhang_mm2": 380.0,
+   "ceiling_mm2": 380.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 1604.1,
+   "min_thickness_mm": 1.19,
+   "volume_mm3": 7516,
+   "bbox_mm": [
+    98.0,
+    46.0,
+    8.2
+   ],
+   "face_count": 3278
+  },
+  {
+   "part": "casing-neck-cover",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 4944.4,
+   "min_thickness_mm": 1.2,
+   "volume_mm3": 4494,
+   "bbox_mm": [
+    54.0,
+    54.0,
+    19.5
+   ],
+   "face_count": 1040
+  },
+  {
+   "part": "casing-speaker-grille",
+   "group": "Required",
+   "overhang_mm2": 3480.6,
+   "ceiling_mm2": 3480.6,
+   "floating_islands": 1,
+   "island_max_mm2": 172.8,
+   "island_max_z_mm": 1.2,
+   "thin_mm2": 238.6,
+   "min_thickness_mm": 0.0,
+   "volume_mm3": 11292,
+   "bbox_mm": [
+    108.0,
+    42.0,
+    7.0
+   ],
+   "face_count": 83238
+  },
+  {
+   "part": "joint-closure_keeper_164_-19",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 33.7,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 14,
+   "bbox_mm": [
+    2.5,
+    5.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-closure_keeper_164_19",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 33.7,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 14,
+   "bbox_mm": [
+    2.5,
+    5.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-closure_keeper_170_-19",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 33.7,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 14,
+   "bbox_mm": [
+    2.5,
+    5.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-closure_keeper_170_19",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 33.7,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 14,
+   "bbox_mm": [
+    2.5,
+    5.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-closure_pin_164_-19",
+   "group": "Required",
+   "overhang_mm2": 2.4,
+   "ceiling_mm2": 2.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 110.2,
+   "min_thickness_mm": 0.7,
+   "volume_mm3": 83,
+   "bbox_mm": [
+    15.6,
+    4.0,
+    3.2
+   ],
+   "face_count": 44
+  },
+  {
+   "part": "joint-closure_pin_164_19",
+   "group": "Required",
+   "overhang_mm2": 2.4,
+   "ceiling_mm2": 2.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 110.2,
+   "min_thickness_mm": 0.7,
+   "volume_mm3": 83,
+   "bbox_mm": [
+    15.6,
+    4.0,
+    3.2
+   ],
+   "face_count": 44
+  },
+  {
+   "part": "joint-closure_pin_170_-19",
+   "group": "Required",
+   "overhang_mm2": 2.4,
+   "ceiling_mm2": 2.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 110.2,
+   "min_thickness_mm": 0.7,
+   "volume_mm3": 83,
+   "bbox_mm": [
+    15.6,
+    4.0,
+    3.2
+   ],
+   "face_count": 44
+  },
+  {
+   "part": "joint-closure_pin_170_19",
+   "group": "Required",
+   "overhang_mm2": 2.4,
+   "ceiling_mm2": 2.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 110.2,
+   "min_thickness_mm": 0.7,
+   "volume_mm3": 83,
+   "bbox_mm": [
+    15.6,
+    4.0,
+    3.2
+   ],
+   "face_count": 44
+  },
+  {
+   "part": "joint-gear_shaft",
+   "group": "Required",
+   "overhang_mm2": 148.3,
+   "ceiling_mm2": 148.3,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 131.3,
+   "min_thickness_mm": 1.0,
+   "volume_mm3": 8304,
+   "bbox_mm": [
+    36.0,
+    35.9,
+    40.0
+   ],
+   "face_count": 6154
+  },
+  {
+   "part": "joint-head_flange",
+   "group": "Required",
+   "overhang_mm2": 1234.0,
+   "ceiling_mm2": 1234.0,
+   "floating_islands": 1,
+   "island_max_mm2": 19.2,
+   "island_max_z_mm": 0.6,
+   "thin_mm2": 6.0,
+   "min_thickness_mm": 1.0,
+   "volume_mm3": 4772,
+   "bbox_mm": [
+    45.0,
+    44.0,
+    12.7
+   ],
+   "face_count": 1902
+  },
+  {
+   "part": "joint-head_key_-18",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 52.6,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 17,
+   "bbox_mm": [
+    2.3,
+    10.0,
+    1.2
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-head_key_18",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 52.6,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 17,
+   "bbox_mm": [
+    2.3,
+    10.0,
+    1.2
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-inner_spacer",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 1459,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    11.0
+   ],
+   "face_count": 1008
+  },
+  {
+   "part": "joint-roof_key_-21",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 63.0,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 26,
+   "bbox_mm": [
+    2.5,
+    10.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-roof_key_21",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 63.0,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 26,
+   "bbox_mm": [
+    2.5,
+    10.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-shaft_key",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 139.4,
+   "min_thickness_mm": 0.0,
+   "volume_mm3": 52,
+   "bbox_mm": [
+    21.4,
+    3.0,
+    1.6
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "joint-tower_left",
+   "group": "Required",
+   "overhang_mm2": 472.1,
+   "ceiling_mm2": 136.9,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 3.1,
+   "min_thickness_mm": 1.2,
+   "volume_mm3": 7366,
+   "bbox_mm": [
+    26.6,
+    50.1,
+    25.0
+   ],
+   "face_count": 2330
+  },
+  {
+   "part": "joint-tower_right",
+   "group": "Required",
+   "overhang_mm2": 475.0,
+   "ceiling_mm2": 130.2,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 140.6,
+   "min_thickness_mm": 0.87,
+   "volume_mm3": 7044,
+   "bbox_mm": [
+    26.6,
+    50.1,
+    25.0
+   ],
+   "face_count": 2350
+  },
+  {
+   "part": "casing-audio-cradle",
+   "group": "Required",
+   "overhang_mm2": 19.0,
+   "ceiling_mm2": 19.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 183.1,
+   "min_thickness_mm": 0.3,
+   "volume_mm3": 3799,
+   "bbox_mm": [
+    54.7,
+    31.1,
+    7.4
+   ],
+   "face_count": 174
+  },
+  {
+   "part": "casing-audio-retaining-key",
+   "group": "Required",
+   "overhang_mm2": 349.6,
+   "ceiling_mm2": 349.6,
+   "floating_islands": 2,
+   "island_max_mm2": 39.36,
+   "island_max_z_mm": 2.2,
+   "thin_mm2": 120.9,
+   "min_thickness_mm": 0.6,
+   "volume_mm3": 1081,
+   "bbox_mm": [
+    59.3,
+    27.0,
+    7.1
+   ],
+   "face_count": 326
+  },
+  {
+   "part": "casing-body-front",
+   "group": "Required",
+   "overhang_mm2": 6292.5,
+   "ceiling_mm2": 3355.1,
+   "floating_islands": 11,
+   "island_max_mm2": 32.0,
+   "island_max_z_mm": 7.0,
+   "thin_mm2": 377.0,
+   "min_thickness_mm": 1.02,
+   "volume_mm3": 116515,
+   "bbox_mm": [
+    143.6,
+    143.6,
+    122.8
+   ],
+   "face_count": 13718
+  },
+  {
+   "part": "casing-body-rear",
+   "group": "Required",
+   "overhang_mm2": 6232.0,
+   "ceiling_mm2": 1772.3,
+   "floating_islands": 2,
+   "island_max_mm2": 5.6,
+   "island_max_z_mm": 18.6,
+   "thin_mm2": 288.0,
+   "min_thickness_mm": 0.53,
+   "volume_mm3": 75588,
+   "bbox_mm": [
+    148.6,
+    136.0,
+    44.3
+   ],
+   "face_count": 10512
+  },
+  {
+   "part": "casing-body-right",
+   "group": "Required",
+   "overhang_mm2": 2690.8,
+   "ceiling_mm2": 666.2,
+   "floating_islands": 1,
+   "island_max_mm2": 2.56,
+   "island_max_z_mm": 18.2,
+   "thin_mm2": 90.9,
+   "min_thickness_mm": 1.01,
+   "volume_mm3": 27216,
+   "bbox_mm": [
+    136.2,
+    83.4,
+    32.9
+   ],
+   "face_count": 4640
+  },
+  {
+   "part": "casing-body-roof",
+   "group": "Required",
+   "overhang_mm2": 9495.0,
+   "ceiling_mm2": 6209.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 88.0,
+   "min_thickness_mm": 0.35,
+   "volume_mm3": 48398,
+   "bbox_mm": [
+    131.0,
+    112.5,
+    24.8
+   ],
+   "face_count": 11544
+  },
+  {
+   "part": "casing-camera-cradle",
+   "group": "Required",
+   "overhang_mm2": 4.4,
+   "ceiling_mm2": 4.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 60.8,
+   "min_thickness_mm": 0.31,
+   "volume_mm3": 1053,
+   "bbox_mm": [
+    41.8,
+    43.3,
+    3.2
+   ],
+   "face_count": 1136
+  },
+  {
+   "part": "casing-head-front",
+   "group": "Required",
+   "overhang_mm2": 968.5,
+   "ceiling_mm2": 91.3,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.81,
+   "volume_mm3": 64838,
+   "bbox_mm": [
+    116.0,
+    56.0,
+    73.0
+   ],
+   "face_count": 19300
+  },
+  {
+   "part": "casing-head-rear",
+   "group": "Required",
+   "overhang_mm2": 863.2,
+   "ceiling_mm2": 11.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 135.4,
+   "min_thickness_mm": 1.03,
+   "volume_mm3": 21155,
+   "bbox_mm": [
+    116.0,
+    56.0,
+    9.0
+   ],
+   "face_count": 18244
+  },
+  {
+   "part": "casing-jetson-cradle",
+   "group": "Required",
+   "overhang_mm2": 141.8,
+   "ceiling_mm2": 141.8,
+   "floating_islands": 1,
+   "island_max_mm2": 154.08,
+   "island_max_z_mm": 2.4,
+   "thin_mm2": 747.3,
+   "min_thickness_mm": 1.2,
+   "volume_mm3": 8532,
+   "bbox_mm": [
+    91.7,
+    38.2,
+    7.4
+   ],
+   "face_count": 118
+  },
+  {
+   "part": "casing-roof-bridge-keeper--1",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 30.2,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 8,
+   "bbox_mm": [
+    2.8,
+    6.0,
+    0.8
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "casing-roof-bridge-keeper-1",
+   "group": "Required",
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 30.2,
+   "min_thickness_mm": 0.8,
+   "volume_mm3": 8,
+   "bbox_mm": [
+    2.8,
+    6.0,
+    0.8
+   ],
+   "face_count": 52
+  },
+  {
+   "part": "casing-roof-bridge-pin--1",
+   "group": "Required",
+   "overhang_mm2": 2.0,
+   "ceiling_mm2": 2.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 18.8,
+   "min_thickness_mm": 0.4,
+   "volume_mm3": 180,
+   "bbox_mm": [
+    3.2,
+    5.0,
+    40.0
+   ],
+   "face_count": 48
+  },
+  {
+   "part": "casing-roof-bridge-pin-1",
+   "group": "Required",
+   "overhang_mm2": 2.0,
+   "ceiling_mm2": 2.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 19.1,
+   "min_thickness_mm": 0.4,
+   "volume_mm3": 180,
+   "bbox_mm": [
+    3.2,
+    5.0,
+    40.0
+   ],
+   "face_count": 48
+  },
+  {
+   "part": "casing-roof-bridge",
+   "group": "Required",
+   "overhang_mm2": 1190.2,
+   "ceiling_mm2": 873.4,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 30.5,
+   "min_thickness_mm": 0.2,
+   "volume_mm3": 5554,
+   "bbox_mm": [
+    37.6,
+    53.7,
+    19.8
+   ],
+   "face_count": 1466
+  },
+  {
+   "part": "casing-speaker-cradle",
+   "group": "Required",
+   "overhang_mm2": 151.8,
+   "ceiling_mm2": 151.8,
+   "floating_islands": 1,
+   "island_max_mm2": 165.12,
+   "island_max_z_mm": 2.4,
+   "thin_mm2": 781.4,
+   "min_thickness_mm": 1.2,
+   "volume_mm3": 6194,
+   "bbox_mm": [
+    106.4,
+    23.5,
+    7.4
+   ],
+   "face_count": 120
+  },
+  {
+   "part": "casing-speaker-retaining-key",
+   "group": "Required",
+   "overhang_mm2": 284.2,
+   "ceiling_mm2": 284.2,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 58.7,
+   "min_thickness_mm": 0.6,
+   "volume_mm3": 2376,
+   "bbox_mm": [
+    112.8,
+    53.0,
+    24.4
+   ],
+   "face_count": 256
+  }
+ ]
+}

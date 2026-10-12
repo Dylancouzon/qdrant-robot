@@ -82,9 +82,11 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - FileCamera still images keep their original timestamp. Recognition rejects sources older than 0.75 seconds, while repeated detection can continue. This main-runtime behavior stays unchanged. The private fit comparison supplies recurring fixture timestamps so it measures active recognition. Evidence: reviews/20261010-140209-99264-design.md and robot/camera.py FileCamera.latest().
 - The recorded knowledge-more-2 question splits into two answered lines (J). Keep the existing VAD/ASR implementation and score the split as a failure. Evidence: the same recorded replay; compare its occurrence across arms before drawing a model conclusion.
 
-## Enclosure manual prototype, 2026-10-11
+## Simplified enclosure, 2026-10-12
 
-- Printed barbs may bind or break. Bearing lands may bind or permit unwanted movement. Test spare keys and actual bearings before installing electronics. Physical retention remains U. See `hardware/concept-a/JOINT_ASSEMBLY.md`.
-- Automatic supports may obstruct transverse channels or damage bearing lands during removal. All 44 projects slice (E); native support inspection and physical removal remain U. See `hardware/concept-a/BAMBU_CHECK.md`.
-- External camera movement may load connectors or pinch the cable. Test the actual cable through manual travel before defining strain relief. The obsolete changing-length illustrative cable was removed. See `hardware/concept-a/CASING_ASSEMBLY.md`.
-- The separate power-exit trial uses provisional socket coordinates and an assumed elbow envelope. Test the connected plug and adjacent USB plugs before casing integration. Servo contact lands, horn hardware, adapter revision, fan orientation, and physical component retention remain U. See `hardware/DESIGN_REQUIREMENTS.md`.
+- Bearing seats (24.1 mm), the 14.9 mm journal, nut pockets, detents, and the horn hole pattern (from a public CAD model) are unprinted. Print the coupon plate, the hub, and the horn disc on the real horn before the full set. See `hardware/enclosure/README.md`.
+- The square drive between disc and shaft has about 4.7° of free play each way, and its section is borderline at full stall. Keep software limits inside ±70° so the servo never stalls on the ±80° stops.
+- The 60.6 mm lintel over the grille window may sag and block the grille. Inspect it on the first shell print and test-fit the grille; 0.6 mm of clearance absorbs small sag.
+- The external camera cable may load its connector or snag across ±80°. Test the loop by hand before powered motion.
+- Jetson port positions, the power elbow exit, and the microphone position (holes at Z 15) are unmeasured. The Jetson can slide up to 12 mm in X inside its pocket.
+- Cooling, fan noise, and speaker echo with the shell closed are unmeasured.

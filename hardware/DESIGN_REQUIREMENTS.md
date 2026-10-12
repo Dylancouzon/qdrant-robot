@@ -1,6 +1,6 @@
 # Robot enclosure design requirements
 
-Updated 2026-10-11 from Dylan's instructions. Read this file before continuing the enclosure design. Keep user requirements separate from proposed dimensions and untested fits.
+Updated 2026-10-12 from Dylan's instructions. Read this file before continuing the enclosure design. Keep user requirements separate from proposed dimensions and untested fits.
 
 ## Required outcome
 
@@ -11,7 +11,8 @@ Dylan requested the simplest practical design on 2026-10-11. Reduce parts and as
 - Provide printable 3MF files for the final enclosure and joint. Keep editable design sources and assembly instructions in this repository.
 - Make the robot compact, easy to print, assemble, and service.
 - Let the camera head turn horizontally to see other directions. Specify the actuator, joint, retention, mechanical connection, and cable routing.
-- Preserve press-fit component installation with removable catches. Test retention and release without bending populated circuit boards.
+- Preserve press-fit component installation with removable catches. Test retention and release without bending populated circuit boards. The camera board is the exception: it fastens with M2 screws through its own mounting holes (Dylan, 2026-10-12).
+- Dylan relaxed this on 2026-10-12: parts sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall; nothing is bolted except the camera.
 - Provide access and clearance for the Jetson power plug, USB plugs, and installed cables.
 - Provide an intake and exhaust path for the Jetson. Verify cooling with the assembled robot under its normal workload.
 - Keep the microphone openings clear. Check speaker echo, fan noise, and motor noise during listening.
@@ -24,48 +25,15 @@ Dylan clarified the appearance again on 2026-10-11. Use a neutral white body wit
 
 Dylan liked Concept A, with a visor camera head and a stationary body. The current study places one speaker in the body to reduce moving bulk. Speaker eyes were considered, and Dylan accepts using one speaker because the speakers are bulky.
 
-Dylan approved the updated [exterior concept](concept-a/output/exterior-concept.png) on 2026-10-11. Preserve its neutral white shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
+Dylan approved the updated [exterior concept](enclosure/exterior-concept.png) on 2026-10-11. Preserve its neutral white shell, matte black visor, smaller head, body speaker grille, and removable panel seams. The visor has one camera opening and a decorative right-hand circle. The picture sets the appearance target. CAD determines exact proportions, corner shapes, vents, and joints.
 
-Dylan rejected the actual CAD exterior on 2026-10-11 because it resembles a "1980s computer" and needs substantial refinement. The mechanical prototype remains a fit study. Its boxy shell is not an approved final appearance. In the next session, Dylan plans to use an Astra agent to refine the exterior. Preserve the approved concept as the appearance target, and reassess the mechanical interfaces where that refinement requires changes.
-
-Dylan identified servo height as a problem. Select a short servo with its output shaft pointing upward for head rotation. Restrict purchases to Amazon and favor inexpensive options. Dylan rejected the Hitec D145SW because of its cost and the direction of its thin dimension. Keep the owned STS3215 unless an alternative gives a substantial improvement. Dylan rejected replacing it for only 6 mm of height reduction. Prioritize rearranging the existing hardware; no replacement purchase has been authorized.
-
-## Owned equipment
-
-| Item | Confirmed information | Information still needed |
-| --- | --- | --- |
-| Printer | Bambu Lab P1S with the default 0.4 mm nozzle. Bambu Studio is set up. | Physical coupon results. |
-| Filament | PLA is preferred. PETG is available as an alternative. | Thermal suitability and retention after repeated assembly. |
-| Main computer | Jetson Orin Nano Super 8 GB. | Actual port coordinates, fan orientation, and complete installed plug shapes. |
-| Camera | Arducam IMX291 USB camera from the reference design. | Actual board thickness, connector dimensions, focus travel, and cable bend radius. |
-| Audio | Waveshare USB TO AUDIO with an 8 Ω, 5 W speaker. | Actual speaker size, microphone opening positions, and acoustic performance. |
-| Servos | STS3215 servos rated for 7.4 V. Parts from an Uno R3 super starter kit are also available. | Starter-kit servo model and exact STS3215 mounting geometry. |
-| Servo adapter | Dylan may have the adapter used in SO-ARM100. | Board identity, revision, supply requirements, and connector clearances. |
-| Power plug | Dylan reports an 11 mm outside diameter and 21 mm added connector length: 11 mm straight outward reach, followed by a 10 mm right-angle section. The elbow rotates in any direction. | Exact elbow shape and socket coordinates. |
-| USB cables | JUXINICE 4-inch, down-angle, 90° USB 2.0 A male-to-female flat extensions. Dylan reports 10 mm protrusion when plugged into the USB socket. | Full connector width and height, socket datums, and insertion travel. |
-
-## Cable installation and service access
-
-Dylan measured 10 mm installed USB cable protrusion on 2026-10-11 and reports that every cable is flexible. Apply this measurement to the measured USB connection. Verify other plug types separately. Flexibility does not establish a minimum bend radius or resistance to repeated head movement.
-
-- Separate installed plug clearance from the space needed to insert and remove the plug.
-- Use a removable panel on the Jetson port side so plugs can enter along the socket axis from outside the body.
-- Keep each plug accessible for gripping its housing during insertion and removal.
-- Close the panel after connecting cables. Provide clearance for the installed connector, cable turn, and strain relief.
-- Shape the power cable exit to follow its right-angle bend. Keep the rigid elbow clear of the case wall.
-- Split the exit at the removable panel edge so the rigid elbow can enter without threading through a closed hole.
-- Use edge-open cable exits or split covers where a cable passes through a removable panel. Avoid threading large plugs through small cable holes.
-- Make the camera connector accessible through the rear head cover. Use a split neck passage for assembled cable connectors.
-- Preserve slack for service and head rotation. Check the closed covers throughout the complete rotation range.
-- Keep the existing 24 mm combined USB/power reservation until the power connector and complete access geometry are verified.
-
-Dylan clarified the installed power plug on 2026-10-11. Its outside diameter is 11 mm. Its added connector length comprises an 11 mm straight section and a 10 mm right-angle section. The elbow rotates in any direction. Route the last section outside the case. Treat 21 mm as the described connector length, not a straight outward clearance requirement. Prototype an upward exit through an edge-open recessed insert. The wall position and exit dimensions remain U until the installed shape and socket position are checked.
+Dylan rejected the Concept A CAD exterior on 2026-10-11 because it resembled a "1980s computer". The simplified design of 2026-10-12 supersedes that shell and the planned exterior refinement. It keeps the appearance above: the tapered white body, the black visor head, the speaker grille, and the decorative circle.
 
 The removable port-side panel now has prototype geometry and checked casing clearances (E). Actual USB plug insertion remains U. The 10 mm protrusion informs its installed pocket after the complete connector shape is measured.
 
 ## Press-fit electronics retention
 
-Dylan requested press-fit retention for all electronics on 2026-10-11. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. These measurements describe the grip region, not the complete electronics and fan envelope. Use removable catches with accessible release. Preserve connector, fan, lens, and cable clearance. Printed fit and retention forces still require coupon tests.
+Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
 
 ## Component dimension references
 
@@ -81,7 +49,7 @@ These dimensions come from reference designs or manufacturers (E). Fit against D
 | Speaker | Reserve 100 × 45 × 21 mm. | [Waveshare speaker](https://www.waveshare.com/8ohm-5w-speaker.htm); its image gives smaller dimensions, so measure the owned speaker. |
 | STS3215 housing | 45.22 × 24.72 × 35 mm. | [Waveshare documentation](https://www.waveshare.com/wiki/ST3215_Servo); confirm the linked drawing against the owned servo. |
 
-The complete reference dimensions, connector envelopes, and proposed coordinates are documented in [the prototype](concept-a/README.md), its manifests, and its assembled STEP.
+The measured and sourced sizes are in [MEASUREMENTS.md](enclosure/MEASUREMENTS.md). The hardware boxes and their coordinates are in `enclosure/geometry.py`.
 
 ## Joint and electrical requirements
 
@@ -111,10 +79,8 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 
 ## Current delivery status
 
-The [Concept A mechanical prototype](concept-a/README.md) now includes an actual removable casing, four detachable gauge cradles, a split bearing tower, retained keys, manual gears, and solid stops. Its complete STEP and CAD-derived preview show the assembled design. An offline viewer uses actual triangles and provides head yaw and service-cover controls.
+The [simplified enclosure](enclosure/README.md) replaced Concept A on 2026-10-12. Concept A is tagged `archive/concept-a-enclosure`. The new design has nine printed parts, 17 M3 screws, four M2 screws, and 13 M3 nuts. It keeps the approved exterior and uses no printed pin, key, keeper, strap, or gear.
 
-There are 46 generic prototype 3MF files and 46 individually sliced P1S projects. Casing checks pass 582 checks, joint checks pass 286, and integrated checks pass 332 (E). The shared mesh exporter checks welded indexed seams, millimeter scale, and closed volumes. Physical fit remains U.
+All nine parts pass `printcheck.py` with zero floating islands and zero thin area, and 719.0 mm² of total overhang against 34,887 mm² for Concept A (E). Every part slices for the P1S in Bambu Studio and prints in 13.4 h with 500 g of PLA (E). The body and neck checks pass: hardware clearances, plug access, the vertical sweep of the populated base plate, and the head through ±80°. An [offline viewer](enclosure/output/robot-viewer.html) shows the assembled robot, turns the head, and lists the parts, fasteners, and steps.
 
-The roof uses a removable bridge to admit the assembled joint. The camera frame enters before the camera. The manual prototype uses an external camera cable loop. Both closed bearing bores must admit the complete connector before adopting a hidden cable route.
-
-Keep the servo separate until its contact lands, mounting ears, horn holes, and supplied retaining hardware are verified. Its housing gauge and drive gear are separate manual test pieces. The power-exit trial remains separate until socket positions and installed plug shapes are measured. Component retention, cable motion, strain relief, cooling, acoustics, and powered load tests remain U.
+The camera cable runs outside the robot in a loop from the head to a Jetson USB port. A coupon plate prints first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.

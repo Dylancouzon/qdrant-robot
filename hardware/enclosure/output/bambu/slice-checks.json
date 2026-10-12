@@ -1,0 +1,125 @@
+{
+  "settings": "Bambu Lab P1S, 0.4 mm nozzle, Bambu PLA Basic, 0.2 mm layers, 3 walls, supports off",
+  "parts": [
+    {
+      "part": "Coupons/coupon-plate",
+      "project": "output/bambu/Coupons/coupon-plate.3mf",
+      "sha256": "bd78a6bf68c0b63d1b4440e46a95951e476a079b9c40d46a6c9b2c3f6c2cf631",
+      "seconds": 1250.0106201171875,
+      "grams": 7.919105052947998,
+      "size_mm": [
+        40.0,
+        52.0,
+        11.2
+      ]
+    },
+    {
+      "part": "Required/Black/head-shaft",
+      "project": "output/bambu/Required/Black/head-shaft.3mf",
+      "sha256": "14212d3b43e707ed75385f89f3bf596b8653525b08952d9fbaa9e4936dce41e4",
+      "seconds": 1421.1690673828125,
+      "grams": 9.579972267150879,
+      "size_mm": [
+        50.0,
+        50.0,
+        21.3
+      ]
+    },
+    {
+      "part": "Required/Black/horn-disc",
+      "project": "output/bambu/Required/Black/horn-disc.3mf",
+      "sha256": "ec247da2bfcc0d2839820455045aec14e5775a1b1197594dce43da9d6ba1d9f4",
+      "seconds": 849.1920776367188,
+      "grams": 3.123610019683838,
+      "size_mm": [
+        31.0,
+        31.0,
+        7.8
+      ]
+    },
+    {
+      "part": "Required/Black/neck-hub",
+      "project": "output/bambu/Required/Black/neck-hub.3mf",
+      "sha256": "b00ebccfd37b72de100cb4c815675481977d78486d8231f665466d36d8a98ba4",
+      "seconds": 1483.68505859375,
+      "grams": 10.9842529296875,
+      "size_mm": [
+        50.3,
+        50.7,
+        17.1
+      ]
+    },
+    {
+      "part": "Required/Black/speaker-grille",
+      "project": "output/bambu/Required/Black/speaker-grille.3mf",
+      "sha256": "1bc622dbe229838fd09ceca3d564a6b0f5c7d895d146f2b5d9985b5d1261d435",
+      "seconds": 3619.8916015625,
+      "grams": 16.737953186035156,
+      "size_mm": [
+        101.2,
+        49.2,
+        4.3
+      ]
+    },
+    {
+      "part": "Required/Black/visor",
+      "project": "output/bambu/Required/Black/visor.3mf",
+      "sha256": "08716f6f66352bd7a950d6647d0c069e499f08fc9e660dd986d3ad8b48b98f86",
+      "seconds": 2476.10498046875,
+      "grams": 20.600080490112305,
+      "size_mm": [
+        112.0,
+        52.0,
+        23.5
+      ]
+    },
+    {
+      "part": "Required/White/base-plate",
+      "project": "output/bambu/Required/White/base-plate.3mf",
+      "sha256": "3216715c5b8b90cb52ee916f4864868fac9f0b43c62accbddf65f78276de54aa",
+      "seconds": 7204.62890625,
+      "grams": 94.67156219482422,
+      "size_mm": [
+        143.2,
+        116.5,
+        48.0
+      ]
+    },
+    {
+      "part": "Required/White/body-shell",
+      "project": "output/bambu/Required/White/body-shell.3mf",
+      "sha256": "c14c59a6cee296ca13c780f729d3106cb9470fea02fd47b1d791c740bcb8b15d",
+      "seconds": 23430.755859375,
+      "grams": 240.66014099121094,
+      "size_mm": [
+        148.6,
+        127.1,
+        152.4
+      ]
+    },
+    {
+      "part": "Required/White/head-shell",
+      "project": "output/bambu/Required/White/head-shell.3mf",
+      "sha256": "9687405ef417f8bfb67760e3c5d8e6349c06601ebef6f99bbc31748db13b18bd",
+      "seconds": 6492.72509765625,
+      "grams": 92.35848999023438,
+      "size_mm": [
+        116.0,
+        56.0,
+        77.0
+      ]
+    },
+    {
+      "part": "Required/White/port-panel",
+      "project": "output/bambu/Required/White/port-panel.3mf",
+      "sha256": "ad90c4e35290b1673f52e291d6d9d5f4152c827230502dce1b1b9e23d91d8d1e",
+      "seconds": 1324.694580078125,
+      "grams": 11.58000659942627,
+      "size_mm": [
+        91.9,
+        49.3,
+        8.2
+      ]
+    }
+  ]
+}

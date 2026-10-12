@@ -1,0 +1,227 @@
+{
+ "envelope": {
+  "max_outside_A1_bounds_mm": 0.0,
+  "A1_bounds_mm": [
+   148.6,
+   127.2
+  ]
+ },
+ "overlaps": {
+  "reservations_checked": 10,
+  "rib_volume_in_intake_mm3": 597,
+  "part_pairs_mm3": {
+   "body-shell / base-plate": 0.0,
+   "body-shell / port-panel": 0.0,
+   "body-shell / speaker-grille": 0.0,
+   "base-plate / port-panel": 0.0,
+   "base-plate / speaker-grille": 0.0,
+   "port-panel / speaker-grille": 0.0
+  }
+ },
+ "sweeps": {
+  "swept_boxes_vs_shell_mm3": {
+   "jetson pad": 0.0,
+   "jetson back wall": 0.0,
+   "audio side wall -": 0.0,
+   "audio side wall +": 0.0,
+   "audio and bus wall": 0.0,
+   "bus side wall -": 0.0,
+   "bus side wall +": 0.0,
+   "regulator front wall": 0.0,
+   "regulator right wall": 0.0,
+   "panel ear": 0.0,
+   "jetson end rib -": 0.0,
+   "jetson end rib +": 0.0,
+   "speaker rail -1": 0.0,
+   "speaker end wall -1": 0.0,
+   "speaker rear wall -1": 0.0,
+   "speaker rail 1": 0.0,
+   "speaker end wall 1": 0.0,
+   "speaker rear wall 1": 0.0,
+   "component Jetson": 0.0,
+   "component Speaker": 0.0,
+   "component USB audio case": 0.0,
+   "component Bus board": 0.0,
+   "component Servo regulator": 0.0
+  },
+  "skirt_rise_steps_mm": "0 to its height below seated, 2 mm"
+ },
+ "servo_pocket": {
+  "servo_to_shell_min_mm": 1.0,
+  "wall_to_servo_mm": 1.0,
+  "servo_wall_mm": 3.2,
+  "hub_boss_to_servo_mm": 4.24,
+  "horn_disc_r15.5_to_shell_mm": 0.7
+ },
+ "alignment": {
+  "plate_screws": "4 x M3 x 10",
+  "plate_screw_engagement_mm": 3.6,
+  "plate_screw_tip_past_nut_mm": 1.2,
+  "hub_screw_engagement_mm": 3.0,
+  "panel_screw": "1 x M3 x 12",
+  "panel_screw_engagement_mm": 3.6,
+  "panel_screw_y_z": [
+   -12.5,
+   32.1
+  ]
+ },
+ "nut_detents": {
+  "nut_channels": 7,
+  "ridge_mm": 0.3,
+  "nut_play_before_ridge_mm": 0.5
+ },
+ "openings": {
+  "intake_open_mm2": 2827,
+  "outlet_open_mm2": 1211,
+  "mic_holes": 2,
+  "grille_window_mm": [
+   96.0,
+   44.0
+  ],
+  "grille_holes": 107,
+  "mic_hole_to_window_mm": 8.7
+ },
+ "pockets": {
+  "wall_to_part_mm": {
+   "jetson back wall / Jetson": 1.0,
+   "jetson back wall / Bus board": 0.55,
+   "jetson back wall / Servo regulator": 1.0,
+   "audio side wall - / USB audio case": 1.0,
+   "audio side wall + / USB audio case": 1.0,
+   "audio and bus wall / USB audio case": 1.0,
+   "audio and bus wall / Bus board": 0.55,
+   "audio and bus wall / Servo regulator": 1.0,
+   "bus side wall - / Bus board": 1.0,
+   "bus side wall + / Bus board": 1.0,
+   "bus side wall + / Servo regulator": 1.0,
+   "regulator front wall / Servo regulator": 1.0,
+   "regulator right wall / Servo regulator": 1.0,
+   "jetson end rib - / Jetson": 1.0,
+   "jetson end rib + / Jetson": 1.0
+  },
+  "grille_to_speaker_mm": 1.81
+ },
+ "panel_removal": {
+  "panel_pull_out_steps_mm": "0 to 40, 2 mm",
+  "max_overlap_mm3": 0.0
+ },
+ "jetson_ribs": {
+  "rib_face_area_mm2": 136,
+  "share_of_jetson_face_pct": 1.5,
+  "rear_vent_area_blocked_mm2": 0.0,
+  "rear_vent_area_mm2": 2827
+ },
+ "plate_band": {
+  "band_half_x_y_mm": [
+   69.0,
+   58.3
+  ],
+  "a1_half_x_y_mm": [
+   74.3,
+   63.6
+  ],
+  "band_corner_beyond_rolled_a1_surface_mm": 5.6
+ },
+ "meshes": {
+  "Required/White/body-shell": {
+   "bbox_mm": [
+    148.6,
+    127.1,
+    152.4
+   ],
+   "watertight": true
+  },
+  "Required/White/base-plate": {
+   "bbox_mm": [
+    143.2,
+    116.5,
+    48.0
+   ],
+   "watertight": true
+  },
+  "Required/White/port-panel": {
+   "bbox_mm": [
+    91.9,
+    49.3,
+    8.2
+   ],
+   "watertight": true
+  },
+  "Required/Black/speaker-grille": {
+   "bbox_mm": [
+    101.2,
+    49.2,
+    4.3
+   ],
+   "watertight": true
+  }
+ },
+ "printcheck": {
+  "Required/White/body-shell": {
+   "overhang_mm2": 391.8,
+   "ceiling_mm2": 328.6,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.0,
+   "volume_mm3": 231957,
+   "bbox_mm": [
+    148.6,
+    127.1,
+    152.4
+   ],
+   "face_count": 13298
+  },
+  "Required/White/base-plate": {
+   "overhang_mm2": 96.3,
+   "ceiling_mm2": 96.3,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 163448,
+   "bbox_mm": [
+    143.2,
+    116.5,
+    48.0
+   ],
+   "face_count": 4218
+  },
+  "Required/White/port-panel": {
+   "overhang_mm2": 19.2,
+   "ceiling_mm2": 19.2,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.5,
+   "volume_mm3": 14411,
+   "bbox_mm": [
+    91.9,
+    49.3,
+    8.2
+   ],
+   "face_count": 844
+  },
+  "Required/Black/speaker-grille": {
+   "overhang_mm2": 0.0,
+   "ceiling_mm2": 0.0,
+   "floating_islands": 0,
+   "island_max_mm2": 0.0,
+   "island_max_z_mm": null,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 14825,
+   "bbox_mm": [
+    101.2,
+    49.2,
+    4.3
+   ],
+   "face_count": 28048
+  }
+ },
+ "printcheck_total_overhang_mm2": 507.3,
+ "runtime_s": 118.0
+}
