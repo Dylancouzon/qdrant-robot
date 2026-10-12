@@ -91,6 +91,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | --- | --- | --- |
 | Edge query p99, 1,000 points | 0.47–0.49 ms (J), target 10 ms | D36 |
 | Component RAM | bge 409, faces 297, DINOv2 172, YOLO 260, Parakeet 531, Kokoro 1,207 (640 MB CUDA kernels), llama 2B 1,921 MB (J) | D66, D68 |
+| Retention vs named objects | The 12 h window evicted naming turns and sightings of named objects despite D51; fixed by keeping them in `_retain` (live, 2026-10-12) | D164 |
 | Headroom with all components active | 558 MiB minimum; paging in 36/48 recorded turns, cause unattributed (J) | Gemma full stack |
 | Detection while speaking | 14.9 fps median, below 15 during synthesis (J) | D96, D143 |
 | MAXN_SUPER | Decode 22.9 to 35.3 tok/s, prefill 941 to 1,455 tok/s (J) | D31 |

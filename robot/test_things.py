@@ -785,6 +785,15 @@ def test_spoken_names_categories_case_and_restart(tmp_path):
     assert command("Forget my Dylan's smartphone", vocab)[:2] == ("forget", "Dylan's smartphone")
     assert command("Delete my red coffee mug from your memory", vocab)[:2] == (
         "forget", "red coffee mug")
+    for said in ["Ignore that", "ignore this.", "Ignore that thing",
+                 "Edgy, please ignore that object", "Don't track that", "Do not track this item",
+                 "Stop tracking that", "Ignore it", "Ignore this one.", "ignore that one",
+                 "Ignore this, please"]:
+        assert command(said, vocab) == ("ignore", "", []), said
+    for said in ["Ignore that, what do you see?", "Just ignore that question",
+                 "Ignore smartphones", "Why do you ignore that?", "Do not track my phone",
+                 "Can you ignore that?", "Ignore that phone", "Ignore it, what is it?"]:
+        assert command(said, vocab) is None, said
     for said in [
                  "Do not forget my phone",
                  "Don't delete my cup",
@@ -1054,6 +1063,22 @@ def test_ignore_offer_outlives_the_focus_moving_on(robot):
     assert [t["track"] for t in r._shown(False)[1].control["targets"]] == [first]
     r.focus.focus = second  # the focus jumps; the first item is still in view
     assert sorted(t["track"] for t in r._shown(False)[1].control["targets"]) == [first, second]
+
+
+def test_spoken_ignore_that_acts_like_the_camera_card(robot, monkeypatch):
+    r = robot
+    frame_of(r)
+    assert ask(r, "Ignore that")[0] == main.NOTHING_HELD, "nothing held up"
+    hold(r, CENTER)
+    assert not r.offers, "no viewer has polled the card"
+    clock = time.time()
+    monkeypatch.setattr(main.time, "time", lambda: clock + main.OFFER_HOLD_S + 1)
+    assert ask(r, "Ignore that")[0] == "I lost it. Hold it up and say it again."
+    monkeypatch.undo()
+    said, turn = ask(r, "Ignore that.")
+    assert said == "Okay, I will ignore that phone." and not turn.keep
+    assert [p["title"] for p in r.things.preferences()] == ["Phone"] and not r.offers
+    assert r.things.excluded(stub_crops([np.full((10, 10, 3), GOLD)])[0]), "the item is ignored"
 
 
 def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
@@ -3225,6 +3250,27 @@ def test_readable_evidence_expires_with_its_source(robot):
     assert r.ui_turn.ui_evidence
     r._retain(RETAIN_S + 2)
     assert not r.ui_turn.ui_evidence
+
+
+def test_retention_keeps_named_object_evidence_until_forgotten(robot):
+    r = robot
+    frame_of(r)
+    hold(r, CENTER)
+    said, turn = ask(r, "This is my phone.")
+    assert said.startswith("Got it")
+    ident = object_id(r.things, OWNER, "phone")
+    [naming] = turn.memories
+    [newest] = [s["id"] for s in r.memory.sightings(float("inf"), 1, named=[ident])]
+    older = r.memory.sighting("phone", "left", 5, ident)
+    unnamed = r.memory.sighting("chair", "left", 6)
+    show(r, [], LOST + 1)  # taken away, and 30 hours go by
+    later = time.time() + 30 * 3600
+    r._retain(later)
+    assert {p["id"] for p in r.memory.points([naming, newest, older, unnamed])} == {naming, newest}
+    turn = Turn(question="When did you last see my phone?", speech_start=later, visitor=OWNER)
+    assert r._things(turn) == "I last saw your phone 30 hours ago; I don't see it now."
+    delete_thing(r, OWNER, "phone")
+    assert not r.memory.points([naming, newest])
 
 
 @pytest.mark.parametrize("action", ["speech", "forget_object", "remove_view", "visitor"])

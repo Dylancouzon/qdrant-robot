@@ -87,7 +87,8 @@ def test_sightings(monkeypatch) -> None:
 
 def test_return_and_turnover(monkeypatch) -> None:
     """A cup that leaves and comes back is in view again; cups coming and going on the other
-    side never push the point count over the cap, and never evict the cup in view."""
+    side never push the point count over the cap (each named cup's newest sighting aside), and
+    never evict the cup in view."""
     monkeypatch.setattr(memory, "MAX_POINTS", 3)
     with tempfile.TemporaryDirectory() as tmp:
         robot = open_robot(Path(tmp))
@@ -101,7 +102,9 @@ def test_return_and_turnover(monkeypatch) -> None:
             robot._sight(robot._track(frame, dets, now))
             if selected:
                 fresh_sightings(robot, frame, now)
-            assert robot.memory.shard.count(memory.CountRequest()) <= memory.MAX_POINTS
+            # each named object keeps its newest sighting beyond the cap (D51)
+            assert robot.memory.shard.count(memory.CountRequest()) <= (
+                memory.MAX_POINTS + len(robot.things.objects()))
 
         cup = Detection("cup", 0.9, (100, 100, 240, 250))
         for _ in range(CONFIRM):

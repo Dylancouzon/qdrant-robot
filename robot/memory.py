@@ -345,6 +345,7 @@ class Memory:
             self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
         self.shard.update(UpdateOperation.create_field_index("frame", PayloadSchemaType.Keyword))
         self.shard.update(UpdateOperation.create_field_index("visitor", PayloadSchemaType.Keyword))
+        self.shard.update(UpdateOperation.create_field_index("named", PayloadSchemaType.Keyword))
         self.last_id = 0
         self.frame_bytes = self._sweep()  # the bytes MAX_FRAME_BYTES limits
 
@@ -435,7 +436,8 @@ class Memory:
 
     def retain(self, now: float, active: Collection[int]) -> list[int]:
         """Evict the evidence older than RETAIN_S, then the oldest points until the shard and
-        its frame files are under the caps, never the `active` points (tracks still in view).
+        its frame files are under the caps, never the `active` points (tracks still in view and
+        named-object evidence).
         Returns the evicted point ids."""
         keep, evicted = set(active), []
         while old := self._oldest(256, now - RETAIN_S, keep):

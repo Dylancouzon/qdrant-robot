@@ -402,6 +402,10 @@ _UNNAMED = re.compile(
     r"(?:this|that)(?: one)?(?:'s| is) mine)\W*$", re.I)
 _SLOT = re.compile(rf"^\W*(?:(?:as|call it|it's|it is|this is|that's|that is)\s+)?(?:my\s+)?"
                    rf"{_THING}\W*$", re.I)
+# "Ignore that" is the whole line: a longer line ("ignore that, what do you see?") is no command.
+_IGNORE = re.compile(r"^\W*(?:(?:edgy|please)\W+)*(?:ignore|(?:do not|don't|stop) track(?:ing)?)"
+                     r"\s+(?:(?:this|that)(?:\s+(?:thing|object|item|one))?|it)(?:\W+please)?\W*$",
+                     re.I)
 _DECLINE = re.compile(r"^\W*(?:no|nope|nothing|never ?mind|cancel|stop|skip|forget it)\b", re.I)
 _OWNED_NAMING = re.compile(rf"^\W*(?:this|that)(?:'s| is)\s+{_OWNED}\W*$", re.I)
 _FORGET = re.compile(rf"(?:about\s+)?my\s+{_REFERENCE}", re.I)  # after the deletion verb
@@ -430,8 +434,10 @@ def _identity(text: str) -> bool:
 
 def command(text: str, vocab: Collection[str]) -> tuple[str, str, list[str]] | None:
     """("name" | "forget", name, labels) for a command about the visitor's things, else None;
-    ("teach", "", []) for "track this" without a name."""
+    ("teach", "", []) for "track this" without a name; ("ignore", "", []) for "ignore that"."""
     text = text.replace("’", "'")
+    if _IGNORE.search(text):
+        return "ignore", "", []
     if _UNNAMED.search(text):
         return "teach", "", []
     if m := next((x for p in _NAMING if (x := p.search(text))), None):

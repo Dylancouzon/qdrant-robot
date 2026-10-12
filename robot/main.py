@@ -981,9 +981,14 @@ class Robot:
 
     def _retain(self, now: float) -> None:
         """Bound memory to the retention window and caps (Memory.retain) after each write,
-        never evicting the point of a track that is not gone."""
-        evicted = set(self.memory.retain(now, {
-            p for t, p in self.points.items() if t not in self.away}))
+        never evicting the point of a track that is not gone, the turns that named an object,
+        or the newest matched sighting of each named object (D51)."""
+        kept = {p for t, p in self.points.items() if t not in self.away}
+        for row in self.things.objects():
+            kept.update(row.payload["turns"])
+            kept.update(s["id"] for s in self.memory.sightings(
+                float("inf"), 1, named=[str(row.id)]))
+        evicted = set(self.memory.retain(now, kept))
         self.points = {t: p for t, p in self.points.items() if p not in evicted}
         for turn in [*self.ui_turns, self.ui_turn]:
             if turn is not None:
@@ -1542,6 +1547,8 @@ class Robot:
                 with self.detecting:
                     self.teaching = track, self.focus.epoch(track)
                 return "What should I call it?"
+            if kind == "ignore":
+                return self._ignore_that(turn)
             if kind == "name":
                 self._settle(turn.speech_start)
                 return self._name(turn, name, labels)
@@ -1727,15 +1734,22 @@ class Robot:
                 return "That selection expired. Select it again."
             restored = self.recognition.call(lambda f, c: self._restore_item(data), mutate=True)
             return "I will notice that item again." if restored else "That selection expired."
+        if self._ignore(data):
+            return "Okay, I will ignore only that item."
+        return "That selection expired. Select it again."
+
+    def _ignore(self, data) -> bool:
+        """Ignore the item offer `data` names, for the camera card and the spoken "ignore that".
+        False when the offer is gone or its source no longer matches."""
         with self.detecting:
             if not self._valid_item(data):
-                return "That selection expired. Select it again."
+                return False
             track, offer = data["track"], self.offers[data["track"]]
             title = offer.title if offer.chosen else offer.label
         vectors = self.recognition.call(
             lambda f, c: self._ignore_vectors(c, offer.shot, offer.chosen, data["gallery"]))
         if vectors is None:
-            return "That selection expired. Select it again."
+            return False
         # Mutation invalidates the gallery epoch before entering the owner. The source
         # epoch, session, and selected geometry still have to be current at persistence.
         def persist(faces, crops):
@@ -1761,7 +1775,24 @@ class Robot:
         if ident:
             self.looked = []  # a retained look may show the item
             self.held.clear()
-        return "Okay, I will ignore only that item." if ident else "That selection expired."
+        return bool(ident)
+
+    def _ignore_that(self, turn: Turn) -> str:
+        """"Ignore that": the camera card's Do not track that, for the object the visitor means
+        (naming's _target). A command, never evidence, so the turn is not stored."""
+        turn.keep = False
+        self._settle(turn.speech_start)
+        if (track := self._target(turn)) is None:
+            return NOTHING_HELD
+        with self.detecting:  # a viewer's polls refresh the offers, and there may be no viewer
+            self._offers([Track(*t) for t in self.tracker.scored()], self.things.label_map())
+            offer = self.offers.get(track)
+            data = offer and {"track": track, "epoch": offer.epoch, "session": self.session_id,
+                              "gallery": self.recognition.epoch}
+        if not data or not self._ignore(data):
+            return "I lost it. Hold it up and say it again."
+        return "Okay, I will ignore " + (
+            offer.title if offer.chosen else f"that {offer.label.lower()}") + "."
 
     def _settle(self, since: float) -> None:
         """Wait, at most SETTLE_S, until the view holds tracks confirmed after `since` (the

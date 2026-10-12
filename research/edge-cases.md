@@ -98,3 +98,11 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - A size dip followed by a detection gap can extend an undersized outline beyond its original size grace, for at most the 200 ms missing-detection grace. Action authority remains absent. If this becomes visible, also bound undersized carry by publication time minus admission time.
 - The paired recorded-detection benchmark uses confirmed tracks for overlap suppression. Production also checks unconfirmed replacements, so the reported nine-frame outline gain can overstate production behavior. Use all matched detections when this comparison next informs a decision.
+
+## Voice ignore (D164)
+
+- A bare "Ignore that." meant as "disregard what I said" ignores the focused object. Restore in the camera card undoes it. No fix for v1.
+- Anyone can say "Ignore that" over another visitor's named object and hide it for everyone, as the camera card already allows.
+- Restore has no voice command; it stays in the camera card.
+- "When did you last see it?" with a pronoun goes to the brain, not the named-object path (live 2026-10-12).
+- If the speech-start focus object is unnamed, has lost the focus, and was never offered, "Ignore that" answers "I lost it." (review, D164).

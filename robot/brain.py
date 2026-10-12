@@ -45,7 +45,7 @@ MAX_TOKENS = 64
 MAX_SENTENCES = 1   # one sentence: second sentences were where hedges and stale details crept in
 MIN_WORDS = 6       # shorter sentences ("Of course!", "I see it now.") do not count
 SYSTEM = (
-    "You are Edgy, a small robot at the Qdrant booth. Everything you do runs on the Jetson "
+    "You are Edgy, a small robot built by Qdrant. Everything you do runs on the Jetson "
     "board inside you: hearing, seeing, thinking, speaking, and your memory, which is "
     "Qdrant Edge. You see through a wide camera; left and right mean the left and right "
     "parts of the image.\n"
@@ -135,7 +135,9 @@ def age(seconds: float) -> str:
         return f"{round(seconds)} seconds ago"
     if seconds < 3600:
         return f"{round(seconds / 60)} minutes ago"
-    return f"{round(seconds / 3600)} hours ago"
+    if seconds < 48 * 3600:
+        return f"{round(seconds / 3600)} hours ago"
+    return f"{round(seconds / 86400)} days ago"
 
 
 def messages(history: list[dict], now: dict | None, memories: list[str] = (), facts: list[str] = (),
@@ -233,6 +235,7 @@ if __name__ == "__main__":
         args = server_args(sys.argv[2] if len(sys.argv) > 2 else MODEL)
         os.execv(args[0], args)
     assert age(30) == "30 seconds ago" and age(600) == "10 minutes ago"
+    assert age(30 * 3600) == "30 hours ago" and age(72 * 3600) == "3 days ago"
     assert list(unecho("Hi, I", ["Hi", ", I", " see", " a cup."])) == [" see", " a cup."]
     assert list(unecho("Hi, I", ["Hi, I s", "ee"])) == [" s", "ee"], "echo and text in one"
     assert list(unecho("Hi, I", [" see", " it."])) == [" see", " it."], "no echo: all kept"
