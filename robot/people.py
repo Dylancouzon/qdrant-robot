@@ -25,7 +25,7 @@ from qdrant_edge import (
 
 from robot.config import SHARED
 from robot.faces import Faces, align
-from robot.memory import deletion_target
+from robot.memory import deletion_target, is_question
 
 DIM = 512  # w600k_r50
 SHOTS = 5  # enrolled shots kept per person
@@ -174,13 +174,20 @@ _NOT_NAMES = {"a", "actually", "afraid", "again", "all", "also", "an", "and", "a
               "remember", "so", "sorry", "still", "sure", "that", "the", "there", "thinking",
               "this", "tired", "too", "trying", "very", "visiting", "waiting", "well",
               "wondering", "working", "you", "your"}
-_NO = re.compile(r"\b(no|nope|nah|don'?t|do not|rather not|not really|never)\b", re.I)
-_YES = re.compile(r"\b(yes|yeah|yep|yup|sure|ok(ay)?|of course|go ahead|please do|alright|"
-                  r"absolutely|fine|you (may|can))\b", re.I)
+_NO = (r"no(?!\s+(?:problem|worries))|nope|nah|don'?t|do not|rather not|not really|never|"
+       r"not mine|it isn't|it is not|it's not")
+_YES = (r"yes|yeah|yep|yup|sure|ok(?:ay)?|of course|go ahead|please do|alright|absolutely|fine|"
+        r"you (?:may|can)|correct|it is|that's (?:it|mine|right)|no (?:problem|worries)")
+_FILLER = r"^\W*(?:(?:um|uh|oh|well|hmm)\W+)*"
+_YES_FIRST = re.compile(rf"{_FILLER}(?:{_YES})\b(?!\s+not\b)", re.I)
+_NO_FIRST = re.compile(rf"{_FILLER}(?:{_NO})\b", re.I)
+_NO_ANY = re.compile(rf"\b(?:{_NO})\b", re.I)
+_YES_ANY = re.compile(rf"\b(?:{_YES})\b(?!\s+not\b)", re.I)
 
 DECLINED = "All right, I won't remember your face."
 KEPT = "Okay, I will keep it."
 NO_FACE = "Please look at me and say it again, so I can learn your face."
+NOT_YOU = "Please look at me and say it again, so I can check it is you."
 NOT_MET = "I don't think we've met yet. What's your name?"
 
 
@@ -247,11 +254,21 @@ def _known(kind: str, name: str | None, known: str) -> tuple[str | None, tuple[s
 
 
 def consent(text: str) -> bool | None:
-    """The answer to "May I remember your face?": True for a clear yes, False for a clear no
-    (say DECLINED), None when unclear (ask again). On yes the caller calls People.enroll and
-    then says done("enroll", ...)."""
-    yes, no = bool(_YES.search(text)), bool(_NO.search(text))
-    return None if yes == no else yes
+    """The answer to a yes or no question: face consent ("May I remember your face?"), near-match
+    confirmation ("Is this your mouse?"), and deletion ("Should I forget ...?"). True for a yes
+    or False for a no at the start of the line, after a filler such as "um"; None for anything
+    else (ask again or go on): a question, or a line with both, or a yes buried in a sentence
+    ("I'm not sure"). On a face yes the caller calls People.enroll, then says
+    done("enroll", ...)."""
+    text = text.replace("\u2019", "'")
+    if "?" in text or is_question(text):
+        return None
+    yes, no = bool(_YES_FIRST.match(text)), bool(_NO_FIRST.match(text))
+    if yes and not _NO_ANY.search(text):
+        return True
+    if no and not _YES_ANY.search(text):
+        return False
+    return None
 
 
 def forget_question(name: str | None) -> str:

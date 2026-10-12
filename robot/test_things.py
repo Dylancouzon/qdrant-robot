@@ -21,7 +21,7 @@ from robot.detect import CONFIRM, LOST, Detection, Tracker
 from robot.focus import SMOOTH, Track
 from robot.main import Robot, Turn
 from robot.memory import CountRequest, Memory, ScrollRequest
-from robot.people import DIM as FACE_DIM, People
+from robot.people import DIM as FACE_DIM, NOT_YOU, People
 from robot.recognition import Recognition
 from robot.text_embed import DIM as TEXT_DIM
 from robot.things import DIM, SHOTS, Things, command, add_vectors, name_slot
@@ -2684,6 +2684,18 @@ def test_guest_forget_me_deletes_objects_record_and_window(robot, monkeypatch):
     assert not list(r.things.thumbs.glob("*.jpg"))
     assert not r.memory.sightings(time.time() + 1, 99)
     assert r.memory.shard.count(CountRequest()) == 0
+
+
+def test_faceless_forget_me_with_a_held_face_deletes_nothing(robot):
+    r = robot
+    frame = frame_of(r)
+    hold(r, CENTER)
+    ask(r, "This is my phone")
+    owner = r.conversation_visitor
+    r.face, r.turn_seen = np.eye(FACE_DIM, dtype=np.float32)[0], None
+    turn = Turn(question="Forget me", visitor=owner)
+    assert r._identity(turn, frame, None) == NOT_YOU
+    assert r.deleting is None and r.things.objects(owner)
 
 
 def test_voice_deletion_asks_first(robot):

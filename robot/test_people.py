@@ -122,6 +122,13 @@ def test_answers() -> None:
     assert consent("Yeah, sure, why not.") is True
     assert consent("No, I'd rather not.") is False
     assert consent("Hmm, what for?") is None
+    for text, answer in [("I'm not sure", None), ("Okay, what do you see?", None),
+                         ("Sure, go ahead", True), ("Yes please", True), ("Um, yes", True),
+                         ("No, keep it", False), ("Nope", False), ("Of course", True),
+                         ("Of course not", None), ("No, it is not mine", False),
+                         ("No problem", True), ("That's right", True), ("That\u2019s mine", True),
+                         ("Not mine", False), ("Yes and no", None)]:
+        assert consent(text) is answer, text
 
 
 @pytest.mark.skipif(not (LFW.exists() and (MODELS / "faces/w600k_r50.onnx").exists()),

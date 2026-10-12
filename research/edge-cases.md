@@ -17,6 +17,8 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Identical prompts give different answers | Noisy comparisons | Paired runs, the judge cache, more turns | D56 |
 | Ignored statements filtered after retrieval | Relevant statements missed when the top hits are all ignored | Filter during retrieval | reviews/20261008-195032-46869-review.md |
 | Detector or crop matching misses objects across motion or changed viewpoints | No box means no focus or teaching, even with label-free matching | D146 now defaults to 26s at 384x640. Keep detector proposals separate from descriptor matching; measure broader object coverage before another change | D43, D64, D77, D146; research/booth-ux.md |
+| A yes/no answer phrased as a question ("Sure, why not?") or a yes with a later "no" ("Yes, no problem") | Read as unclear: the robot asks again or drops the question | Accept these if visitors say them | robot/people.py consent() |
+| A question during a face-consent re-ask ("What do you see?") | Answered with the consent question again; the question goes unanswered | Drop the ask on a question and answer it | robot/main.py _consent() |
 | Two of nine synthetic "Hey Edgy" lines missed ("Eti", "A ag") | The visitor repeats | Real booth voices before more aliases; arm B if needed | reviews/20261008-230525-97862-review.md |
 | Background speech within 20 s of an answer becomes a follow-up | The robot answers another speaker | Check on the live day; tie follow-ups to the facing person | same |
 | The follow-up clock uses queued WAV length, no speaker | The window boundary differs from playback | Measure with the speaker | same |

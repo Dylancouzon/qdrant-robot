@@ -49,6 +49,7 @@ from robot.memory import (
 from robot.people import (
     DECLINED,
     KEPT,
+    NOT_YOU,
     THRESHOLD,
     People,
     consent,
@@ -881,10 +882,7 @@ class Robot:
         pending, self.confirming = self.confirming, None
         if not pending:
             return None
-        reply = turn.question.lower().replace("’", "'")
-        yes = bool(re.match(r"\W*(yes|yeah|yep|yup|sure|correct|it is|that's (it|mine))\b", reply))
-        no = bool(re.match(r"\W*(no|nope|not mine|it isn't|it's not)\b", reply))
-        if not yes and not no:
+        if (yes := consent(turn.question)) is None:
             return None
         with self.detecting:
             valid = (time.time() <= pending["expiry"] and
@@ -1255,6 +1253,8 @@ class Robot:
         turn.identity["claimed"] = name
         self._hear_name(turn)
         if req and req[0] == "forget":
+            if seen is None and self.face is not None:  # D161 keeps the id through a missed face
+                return NOT_YOU
             def delete() -> str:
                 ok = self._forget(track, name, vec, turn.visitor)
                 return (
