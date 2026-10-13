@@ -154,9 +154,7 @@ BOXES = JETSON_PARTS | {
     # space above, which is the way down to a Jetson USB port.
     "Camera cable slack loop": placed((17, 47), (8, 38), (116, 146)),
     "Fan intake space": placed(HEAT_RANGE[0], (Y1, Y1 + 22), HEAT_RANGE[1]),
-    "Outlet space": placed(
-        (-63, -55), (Y0 + JETSON_STRIP_T + SLOT_GAP + SLOT_WALL, Y1), (Z0, Z1)
-    ),
+    "Outlet space": placed((-63, -55), (Y0 + JETSON_STRIP_T + SLOT_GAP + SLOT_WALL, Y1), (Z0, Z1)),
     "Camera rear cable space": ((43, 18, 43), (-24, 23, 208)),
 }
 

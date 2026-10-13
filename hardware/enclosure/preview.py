@@ -398,12 +398,12 @@ STEPS = (
     Step("Body", "Set the Jetson and the servo adapter board in the base plate.",
          "Slide the plastic strip of the Jetson down into the slot, with the fan facing the rear "
          "vents and the ports toward the port side. Stand the servo adapter board on its short end "
-         "in its pocket, with the USB port at the top. The barrel jack faces the Jetson side, and "
-         "the servo connector faces the other side.",
+         "in its pocket, with the USB port at the top. The barrel jack faces the port side, and "
+         "the servo connector faces the slot side, away from the port panel.",
          ("Jetson", "Bus board"), (40, 30, 650, (0, 0, 80)),
          "The Jetson strip is 6 mm thick, and the slot is 7 mm wide and grips 6 mm of the 8 mm "
-         "strip. Turn the board over or around until the three connectors match. Each pocket "
-         "leaves about 1 mm of clearance on each side.",
+         "strip. Keep the USB port at the top and turn the board around until the barrel "
+         "jack faces the port side. Each pocket leaves about 1 mm of clearance on each side.",
          ((("Jetson",), away(UP, 45)), (("Bus board",), away(UP, 40))), reset=("base-plate",)),
     Step("Body", "Set the USB sound card in its pocket and plug it in.",
          "Set the USB sound card in the front pocket. Plug an angled USB cable and the speaker "
@@ -420,17 +420,19 @@ STEPS = (
          ("Speaker",), (40, 35, 480, (0, -30, 40)),
          moves=((("Speaker",), away(UP, 55)),)),
     Step("Body", "Connect the servo adapter board.",
-         "Plug the USB-A to 5.5 × 2.1 mm barrel cable into the board from the Jetson side, and its "
-         "USB-A end into a Jetson USB port. Plug the board's USB data cable into the port at the "
-         "top of the board, and into a second Jetson USB port. Lead both cables along the open "
-         "band to the port side.",
+         "Plug the USB-A to 5.5 × 2.1 mm barrel cable into the board from the port side, and its"
+         " USB-A end into a Jetson USB port. Plug the board's USB data cable into the port at "
+         "the top of the board, and into a second Jetson USB port. Lead both cables along the "
+         "open band to the port side, over the sound card cable.",
          ("Bus board",), (40, 35, 480, (0, -30, 40)),
-         "The barrel cable gives the servo 5 V. The barrel plug needs 40 mm of room on the Jetson "
+         "Hold the top edge of the board with one finger while you push each plug in. "
+         "The barrel cable gives the servo 5 V. The barrel plug needs 40 mm of room on the port "
          "side, and the USB plug needs 20 mm above the board."),
     Step("Body", "Plug in the servo lead and the camera cable.",
          "Lay the shell on its rear face on the cloth next to the base plate, with its open "
-         "bottom toward the base plate. Plug the servo lead sideways into the servo connector on "
-         "the board's edge that faces away from the Jetson. Plug the camera USB cable into the "
+         "bottom toward the base plate. Hold the top edge of the board, and plug the servo lead "
+         "sideways into the servo connector on the board's slot-side edge. Plug the camera USB "
+         "cable into the "
          "last Jetson USB port.",
          ("servo case", "Bus board", "Jetson"), (60, 25, 900, (0, -80, 90)),
          "Both cables come out of the open bottom. The camera cable drops straight down from the "

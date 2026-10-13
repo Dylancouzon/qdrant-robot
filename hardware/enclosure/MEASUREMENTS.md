@@ -24,7 +24,7 @@ Parts sit in loose pockets with clearance, so reference sizes cover most of the 
 
 - Board: 42 × 32 × 13 mm (sold as 42 × 33 mm, the Waveshare Bus Servo Adapter (A)). It stands on a short edge in a 13 mm thick pocket, its long edges facing -X and +X (the band holds 17 mm).
 - Servo connector (U): top-left corner of Dylan's top view, its long axis along the top long edge, so the servo plug (about 8 × 6 mm, 15 mm long, plus a cable bend) enters through that edge. It faces -X here.
-- Barrel power jack (U): near the left end of the opposite long edge, so the 5.5 × 2.1 mm plug (about 10 mm across and 40 mm long with strain relief) enters from +X, the Jetson side.
+- Barrel power jack (U): near the left end of the opposite long edge, so the 5.5 × 2.1 mm plug (about 10 mm across and 40 mm long with strain relief) enters from +X, the port side.
 - USB data port (U): unknown, most likely a short end. The end that points up has 20 mm of plug room. Turn the board end for end if the port is on the other end; the jack and servo plugs then sit near the plate, and their rooms cover the full board height.
 - Dylan has angled USB cables for the internal connections.
 
