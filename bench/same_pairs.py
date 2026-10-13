@@ -21,7 +21,7 @@ import onnxruntime as ort
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from robot.detect import MODEL as DETECTOR, Detector, region  # noqa: E402
-from robot.memory import kind_of, maxsim, same_thing  # noqa: E402
+from robot.memory import maxsim, same_thing  # noqa: E402
 from robot.settings import DEFAULTS  # noqa: E402
 from robot.things import MODEL as DINOV2, Crops, cut  # noqa: E402
 
@@ -91,10 +91,9 @@ def crop(detector, frames, image, wanted):
     return cut(frame, boxes[0]).copy()
 
 
-def verdict(a_label, b_label, score):
-    if kind_of(a_label) != kind_of(b_label):
-        return "different"
-    said = same_thing("x", score, MATCH, BAND)
+def verdict(score):
+    """The robot's answer, by MaxSim alone, as `_same_answer` gives it."""
+    said = same_thing(score, MATCH, BAND)
     return "same" if said.startswith("Yes") else "unsure" if said.startswith("It looks") \
         else "different"
 
@@ -107,7 +106,7 @@ def main():
         score = maxsim(va[None], vb[None])
         rows.append({"category": category, "truth": truth, "a": a, "b": b, "labels": [
             a_label.split("@")[0], b_label.split("@")[0]], "score": round(score, 4),
-            "verdict": verdict(a_label.split("@")[0], b_label.split("@")[0], score)})
+            "verdict": verdict(score)})
         print(f"{category:6} {truth:9} {rows[-1]['verdict']:9} {score:.3f}  {a} | {b}")
     counts = {}
     for category in ("views", "class", "kinds"):

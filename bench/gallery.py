@@ -43,6 +43,10 @@ POLICIES = (
     "track-nofloor",
 )
 from robot.detect import Detection, Tracker  # noqa: E402
+from robot.settings import DEFAULTS  # noqa: E402
+from robot.things import MODEL as CROPS_MODEL  # noqa: E402
+
+BAND, FLOOR, DUPLICATE = DEFAULTS["guess_band"], DEFAULTS["window_floor"], DEFAULTS["duplicate"]
 
 OUTPUT = ROOT / "build/gallery"
 
@@ -342,7 +346,7 @@ def replay(policy, instance, pool, same, tags, sink):
         if teaching and candidate is not None and candidate["vectors"] is not None:
             vector = candidate["vectors"][arm]
             score = float(np.max(vector @ gallery.T))
-            near = MATCH - 0.05 <= score < MATCH
+            near = MATCH - BAND <= score < MATCH
             now = index / instance["fps"]
             if policy.startswith("confirm"):  # simulated: every eligible question gets a "yes"
                 eligible = (
@@ -350,15 +354,15 @@ def replay(policy, instance, pool, same, tags, sink):
                 )
             elif policy.startswith("track"):
                 eligible = (
-                    (policy == "track-nofloor" or score >= 0.70)
-                    and score < 0.95
+                    (policy == "track-nofloor" or score >= FLOOR)
+                    and score < DUPLICATE
                     and not candidate["ambiguous"]
                     and now - last >= 1
                 )
             else:
                 eligible = False
             near_previous = near
-            if eligible and score < 0.97:
+            if eligible and score < DUPLICATE:
                 if len(gallery) == 24:
                     gallery = np.delete(gallery, 1, axis=0)
                 gallery = np.vstack([gallery, vector])
@@ -635,7 +639,7 @@ def main():
         },
         "model_sha256": {
             str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in (MODEL, ROOT / "models/dinov2-small/model.onnx")
+            for p in (MODEL, CROPS_MODEL)
         },
         "machine": {"label": "E", "hostname": platform.node(), "platform": platform.platform()},
         "versions": {
@@ -649,7 +653,9 @@ def main():
         "limits": {
             "match": MATCH,
             "cap": 24,
-            "duplicate_cosine": 0.97,
+            "guess_band": BAND,
+            "window_floor": FLOOR,
+            "duplicate": DUPLICATE,
             "objectron_stride": 3,
             "d145_stride": 1,
             "tracker_stride": 1,

@@ -1,13 +1,19 @@
 # Named objects
 
-The robot recognizes objects a visitor names ("this is my mouse") by DINOv2-small crop vectors stored as a multivector in the things shard and matched by MaxSim (D57, D64). This file describes how teaching, matching, owners, and the Memory tab work now (D154 to D156). The plan that led here is in [archive/recognition-import-plan.md](archive/recognition-import-plan.md). Labels: J measured on our Jetson, E elsewhere.
+The robot recognizes objects a visitor names ("this is my mouse") by DINOv3-small crop vectors stored as a multivector in the things shard and matched by MaxSim (D57, D64, D168). This file describes how teaching, matching, owners, and the Memory tab work now (D154 to D156). The plan that led here is in [archive/recognition-import-plan.md](archive/recognition-import-plan.md). Labels: J measured on our Jetson, E elsewhere.
 
 ## Teaching
 
 - A naming turn stores the focused track's crops, then opens a teaching window: the robot says "Turn it slowly so I can see all sides" and adds views from that same track for `window_s` (6 s).
-- The window admits one view per `window_gap_s` (1 s), only above `window_floor` (0.70), and never while another same-label track overlaps the taught one. It ends on time, track loss, or a memory change.
-- `add_vectors` in `robot/things.py` skips a view whose cosine to a stored view is at least `duplicate` (0.95) and keeps at most `views_cap` (24) views, dropping the oldest except the first.
-- On 17 viewpoint videos the window recognized 530 of 816 later views, against 397 for fixed galleries (E, `bench/gallery.py`). Background masking lost hits (241 against 263 of 360) and is not used (`bench/crop_arms.py`).
+- The window admits one view per `window_gap_s` (1 s), only above `window_floor` (0.722), and never while another same-label track overlaps the taught one. It ends on time, track loss, or a memory change.
+- `add_vectors` in `robot/things.py` skips a view whose cosine to a stored view is at least `duplicate` (0.952) and keeps at most `views_cap` (24) views, dropping the oldest except the first.
+- On 17 viewpoint videos the window recognized 619 of 816 later views at 108 false matches, against 491 for fixed galleries at 64 (E, `bench/gallery.py`, DINOv3). DINOv2 recognized 530 at 108. Background masking lost hits and is not used (`bench/crop_arms.py`).
+
+## Crop encoder
+
+`models/dinov3-small/model.onnx` is `timm/vit_small_patch16_dinov3.lvd1689m` at revision 3bf4720a82ec2066db88137180ff1f83a675cef0 (DINOv3 License, text beside the model), exported from the pinned `dinov3-small/model.safetensors` (models.json) with `torch.onnx.export(model.forward_features, opset_version=17, dynamo=False)`; the ONNX sha256 is `746542d787d5ecfb2d2bc12254eb57bd1bfa490646a0fb12eb2a0ab1edcd57bd`. The input `pixel_values` has a dynamic batch of 3x224x224 images; the output `tokens` holds the CLS token, four register tokens, and 196 patch tokens. `Crops` pads the crop square, normalizes with the ImageNet mean and deviation, and concatenates the unit CLS token with the unit mean of the patch tokens, divided by sqrt(2). Exported and PyTorch descriptors agree at cosine 0.99999 on 20 crops, at batch 1, 3, and 20 (E). On the Jetson `Crops` takes 17.2 ms for one crop and 34.0 ms for three, and adds 272 MB of RSS (J, `bench/results/2026-10-12-dinov3-crops-jetson-dinov3-small.json`).
+
+The thresholds in `robot/settings.py` sit at the DINOv2 operating points on the viewpoint benchmark: the same false-match count at `match` and at `match - guess_band`, the same duplicate-skip rate for `duplicate`, the DINOv2 distractor count over `window_floor`, and no lookalike pair over `same` (`bench/embed_arms.py calibrate`, `bench/results/2026-10-12-dinov3-calibration.json`). The viewpoint set holds no candidate under 0.70, so its admission rate does not set the floor.
 
 ## Owners
 
@@ -18,7 +24,7 @@ The robot recognizes objects a visitor names ("this is my mouse") by DINOv2-smal
 
 ## Near-match question
 
-When the focused object scores within `guess_band` (0.05) under `match` (0.822) for `ask_delay_s` (3 s), the robot asks "Is this your mouse?" It asks only after `ask_blank_s` (4 s) of silence, at most `ask_max` (3) times per conversation, 60 s apart, and once per track. "Yes" adds that view if the track is still in focus; "no" mutes it.
+When the focused object scores within `guess_band` (0.036) under `match` (0.808) for `ask_delay_s` (3 s), the robot asks "Is this your mouse?" It asks only after `ask_blank_s` (4 s) of silence, at most `ask_max` (3) times per conversation, 60 s apart, and once per track. "Yes" adds that view if the track is still in focus; "no" mutes it.
 
 ## Page
 

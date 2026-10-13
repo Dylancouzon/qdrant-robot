@@ -1,0 +1,7442 @@
+{
+ "revision": "76be84c22ace",
+ "machine": "qdrant-robot",
+ "command": "/home/qdrant/qdrant-robot/releases/76be84c22ace/bench/camera_settings.py /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base0.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base1.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/plf60.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/sharp0.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base2.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/sharp1.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/backlight0.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base3.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/dynfps.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base4.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base5.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/man156g10.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/man333g8.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/man100g30.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base6.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080-sharp0.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080b.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/hw1080.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base7.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080c.mjpeg /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base5.mjpeg:median3 /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/base5.mjpeg:bilateral /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080b.mjpeg:linear /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080b.mjpeg:median3 /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080b.mjpeg:linear+median3 /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/hw1080.mjpeg:median3 /home/qdrant/qdrant-robot/shared/experiments/detect-quality/camera/p1080-sharp0.mjpeg:linear+median3 --out /home/qdrant/qdrant-robot/shared/results/2026-10-12-camera-bakeoff.json",
+ "tegrastats": "cam-final-20261012-191851.tegrastats",
+ "match": 0.822,
+ "reference_objects": [
+  {
+   "label": "microphone",
+   "box": [
+    1008.0,
+    302.0,
+    1186.0,
+    480.0
+   ],
+   "frames_seen": {
+    "base0": 351,
+    "p1080": 592,
+    "base1": 366,
+    "plf60": 370,
+    "sharp0": 412,
+    "base2": 356,
+    "sharp1": 368,
+    "backlight0": 393,
+    "base3": 392,
+    "dynfps": 267,
+    "base4": 459,
+    "base5": 343,
+    "man156g10": 395,
+    "man333g8": 382,
+    "man100g30": 492,
+    "base6": 391,
+    "p1080-sharp0": 598,
+    "p1080b": 589,
+    "hw1080": 611,
+    "base7": 328,
+    "p1080c": 587,
+    "base5:median3": 592,
+    "base5:bilateral": 434,
+    "p1080b:linear": 591,
+    "p1080b:median3": 598,
+    "p1080b:linear+median3": 598,
+    "hw1080:median3": 618,
+    "p1080-sharp0:linear+median3": 598
+   }
+  },
+  {
+   "label": "backpack",
+   "box": [
+    369.0,
+    266.0,
+    876.0,
+    718.0
+   ],
+   "frames_seen": {
+    "base0": 600,
+    "p1080": 600,
+    "base1": 600,
+    "plf60": 600,
+    "sharp0": 600,
+    "base2": 600,
+    "sharp1": 600,
+    "backlight0": 600,
+    "base3": 600,
+    "dynfps": 600,
+    "base4": 600,
+    "base5": 599,
+    "man156g10": 600,
+    "man333g8": 600,
+    "man100g30": 600,
+    "base6": 600,
+    "p1080-sharp0": 600,
+    "p1080b": 600,
+    "hw1080": 620,
+    "base7": 600,
+    "p1080c": 600,
+    "base5:median3": 598,
+    "base5:bilateral": 599,
+    "p1080b:linear": 600,
+    "p1080b:median3": 598,
+    "p1080b:linear+median3": 598,
+    "hw1080:median3": 618,
+    "p1080-sharp0:linear+median3": 598
+   }
+  },
+  {
+   "label": "hat",
+   "box": [
+    794.0,
+    177.0,
+    858.0,
+    284.0
+   ],
+   "frames_seen": {
+    "base0": 587,
+    "p1080": 586,
+    "base1": 584,
+    "plf60": 594,
+    "sharp0": 599,
+    "base2": 593,
+    "sharp1": 594,
+    "backlight0": 593,
+    "base3": 593,
+    "dynfps": 595,
+    "base4": 593,
+    "base5": 593,
+    "man156g10": 590,
+    "man333g8": 592,
+    "man100g30": 566,
+    "base6": 596,
+    "p1080-sharp0": 600,
+    "p1080b": 596,
+    "hw1080": 618,
+    "base7": 597,
+    "p1080c": 596,
+    "base5:median3": 598,
+    "base5:bilateral": 593,
+    "p1080b:linear": 597,
+    "p1080b:median3": 592,
+    "p1080b:linear+median3": 594,
+    "hw1080:median3": 618,
+    "p1080-sharp0:linear+median3": 595
+   }
+  },
+  {
+   "label": "hat",
+   "box": [
+    867.0,
+    128.0,
+    948.0,
+    263.0
+   ],
+   "frames_seen": {
+    "base0": 161,
+    "p1080": 475,
+    "base1": 145,
+    "plf60": 131,
+    "sharp0": 160,
+    "base2": 86,
+    "sharp1": 86,
+    "backlight0": 84,
+    "base3": 65,
+    "dynfps": 53,
+    "base4": 97,
+    "base5": 168,
+    "man156g10": 204,
+    "man333g8": 166,
+    "man100g30": 50,
+    "base6": 112,
+    "p1080-sharp0": 396,
+    "p1080b": 384,
+    "hw1080": 610,
+    "base7": 122,
+    "p1080c": 418,
+    "base5:median3": 547,
+    "base5:bilateral": 327,
+    "p1080b:linear": 426,
+    "p1080b:median3": 594,
+    "p1080b:linear+median3": 596,
+    "hw1080:median3": 618,
+    "p1080-sharp0:linear+median3": 589
+   }
+  },
+  {
+   "label": "clock",
+   "box": [
+    0.0,
+    88.0,
+    36.0,
+    280.0
+   ],
+   "frames_seen": {
+    "base0": 99,
+    "p1080": 474,
+    "base1": 83,
+    "plf60": 122,
+    "sharp0": 43,
+    "base2": 130,
+    "sharp1": 99,
+    "backlight0": 144,
+    "base3": 118,
+    "dynfps": 0,
+    "base4": 242,
+    "base5": 96,
+    "man156g10": 0,
+    "man333g8": 0,
+    "man100g30": 5,
+    "base6": 135,
+    "p1080-sharp0": 435,
+    "p1080b": 475,
+    "hw1080": 519,
+    "base7": 157,
+    "p1080c": 495,
+    "base5:median3": 149,
+    "base5:bilateral": 61,
+    "p1080b:linear": 454,
+    "p1080b:median3": 502,
+    "p1080b:linear+median3": 496,
+    "hw1080:median3": 514,
+    "p1080-sharp0:linear+median3": 510
+   }
+  }
+ ],
+ "limits": {
+  "fps": 30,
+  "lags_frames": [
+   30,
+   150,
+   450
+  ],
+  "embed_every": 3,
+  "object_iou": 0.5,
+  "present": 0.5
+ },
+ "versions": {
+  "python": "3.12.3",
+  "opencv": "5.0.0"
+ },
+ "results": [
+  {
+   "clip": "base0",
+   "frames": 600,
+   "brightness": 92.7,
+   "noise": 3.694,
+   "noise_raw": 4.198,
+   "flicker_std": 2.44,
+   "flicker_hf": 0.351,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.33,
+    "rotate_resize": 0.81,
+    "filter": 0.0
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.585,
+    "track_frac": 0.91,
+    "track_ids": 1,
+    "longest_gap": 7,
+    "conf_std": 0.111,
+    "conf_pct": [
+     0.258,
+     0.39,
+     0.627
+    ],
+    "jitter_px": 2.0,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 66,
+      "mean": 0.9144,
+      "p5": 0.8591,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 56,
+      "mean": 0.922,
+      "p5": 0.8779,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 17,
+      "mean": 0.9351,
+      "p5": 0.8915,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.607,
+    "det_frac_min": 0.202,
+    "track_frac_mean": 0.9,
+    "track_frac_min": 0.743,
+    "conf_std": 0.083,
+    "jitter_px": 1.794,
+    "track_ids": 1.0,
+    "label_flips": 27.0
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 460,
+     "mean": 0.9328,
+     "p5": 0.8714,
+     "below_0.822": 0.0022
+    },
+    "5s": {
+     "pairs": 361,
+     "mean": 0.9335,
+     "p5": 0.8775,
+     "below_0.822": 0.0083
+    },
+    "15s": {
+     "pairs": 118,
+     "mean": 0.9364,
+     "p5": 0.8838,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.585,
+     "track_frac": 0.91,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.111,
+     "conf_pct": [
+      0.258,
+      0.39,
+      0.627
+     ],
+     "jitter_px": 2.0,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 66,
+       "mean": 0.9144,
+       "p5": 0.8591,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 56,
+       "mean": 0.922,
+       "p5": 0.8779,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 17,
+       "mean": 0.9351,
+       "p5": 0.8915,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.082,
+     "conf_pct": [
+      0.48,
+      0.603,
+      0.742
+     ],
+     "jitter_px": 0.99,
+     "label_flips": 135,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9525,
+       "p5": 0.9255,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9521,
+       "p5": 0.9291,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9538,
+       "p5": 0.9232,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.978,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.118,
+     "conf_pct": [
+      0.319,
+      0.562,
+      0.703
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 180,
+       "mean": 0.9204,
+       "p5": 0.8604,
+       "below_0.822": 0.0056
+      },
+      "5s": {
+       "pairs": 143,
+       "mean": 0.9199,
+       "p5": 0.8628,
+       "below_0.822": 0.014
+      },
+      "15s": {
+       "pairs": 47,
+       "mean": 0.9225,
+       "p5": 0.8789,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.268,
+     "track_frac": 0.863,
+     "track_ids": 1,
+     "longest_gap": 18,
+     "conf_std": 0.057,
+     "conf_pct": [
+      0.253,
+      0.307,
+      0.439
+     ],
+     "jitter_px": 1.73,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 11,
+       "mean": 0.9072,
+       "p5": 0.8566,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 8,
+       "mean": 0.9087,
+       "p5": 0.8292,
+       "below_0.822": 0.125
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.8841,
+       "p5": 0.8312,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.202,
+     "track_frac": 0.743,
+     "track_ids": 1,
+     "longest_gap": 30,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.255,
+      0.292,
+      0.401
+     ],
+     "jitter_px": 3.7,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 13,
+       "mean": 0.9311,
+       "p5": 0.8682,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 4,
+       "mean": 0.9307,
+       "p5": 0.9128,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 1,
+       "mean": 0.9026,
+       "p5": 0.9026,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080",
+   "frames": 600,
+   "brightness": 92.9,
+   "noise": 3.563,
+   "noise_raw": 4.085,
+   "flicker_std": 2.455,
+   "flicker_hf": 0.346,
+   "noise_native": {
+    "brightness": 92.9,
+    "noise": 4.102,
+    "noise_raw": 4.555,
+    "flicker_std": 2.454,
+    "flicker_hf": 0.346
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.59,
+    "rotate_resize": 20.47,
+    "filter": 0.03
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.987,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 1,
+    "conf_std": 0.115,
+    "conf_pct": [
+     0.358,
+     0.596,
+     0.738
+    ],
+    "jitter_px": 1.58,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 184,
+      "mean": 0.9261,
+      "p5": 0.8841,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 146,
+      "mean": 0.9258,
+      "p5": 0.8778,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 48,
+      "mean": 0.9271,
+      "p5": 0.89,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.909,
+    "det_frac_min": 0.79,
+    "track_frac_mean": 0.986,
+    "track_frac_min": 0.97,
+    "conf_std": 0.089,
+    "jitter_px": 1.142,
+    "track_ids": 1.0,
+    "label_flips": 42.4
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 789,
+     "mean": 0.9351,
+     "p5": 0.8821,
+     "below_0.822": 0.0013
+    },
+    "5s": {
+     "pairs": 628,
+     "mean": 0.9348,
+     "p5": 0.8792,
+     "below_0.822": 0.0048
+    },
+    "15s": {
+     "pairs": 201,
+     "mean": 0.9325,
+     "p5": 0.8816,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.987,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.115,
+     "conf_pct": [
+      0.358,
+      0.596,
+      0.738
+     ],
+     "jitter_px": 1.58,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 184,
+       "mean": 0.9261,
+       "p5": 0.8841,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 146,
+       "mean": 0.9258,
+       "p5": 0.8778,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.9271,
+       "p5": 0.89,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.073,
+     "conf_pct": [
+      0.488,
+      0.589,
+      0.715
+     ],
+     "jitter_px": 0.76,
+     "label_flips": 212,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9556,
+       "p5": 0.9311,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.955,
+       "p5": 0.93,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9546,
+       "p5": 0.9279,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.977,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.127,
+     "conf_pct": [
+      0.311,
+      0.532,
+      0.709
+     ],
+     "jitter_px": 0.43,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 179,
+       "mean": 0.9227,
+       "p5": 0.8706,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 142,
+       "mean": 0.9232,
+       "p5": 0.8778,
+       "below_0.822": 0.0141
+      },
+      "15s": {
+       "pairs": 46,
+       "mean": 0.9179,
+       "p5": 0.8736,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.792,
+     "track_frac": 0.983,
+     "track_ids": 1,
+     "longest_gap": 4,
+     "conf_std": 0.071,
+     "conf_pct": [
+      0.261,
+      0.35,
+      0.494
+     ],
+     "jitter_px": 1.57,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 118,
+       "mean": 0.9107,
+       "p5": 0.8557,
+       "below_0.822": 0.0085
+      },
+      "5s": {
+       "pairs": 95,
+       "mean": 0.9096,
+       "p5": 0.8594,
+       "below_0.822": 0.0105
+      },
+      "15s": {
+       "pairs": 32,
+       "mean": 0.9048,
+       "p5": 0.8547,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.79,
+     "track_frac": 0.97,
+     "track_ids": 1,
+     "longest_gap": 10,
+     "conf_std": 0.06,
+     "conf_pct": [
+      0.262,
+      0.338,
+      0.45
+     ],
+     "jitter_px": 1.37,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 118,
+       "mean": 0.9589,
+       "p5": 0.9271,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 95,
+       "mean": 0.9592,
+       "p5": 0.9272,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 25,
+       "mean": 0.9607,
+       "p5": 0.9269,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base1",
+   "frames": 600,
+   "brightness": 92.8,
+   "noise": 3.709,
+   "noise_raw": 4.206,
+   "flicker_std": 2.43,
+   "flicker_hf": 0.347,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.15,
+    "rotate_resize": 0.84,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.61,
+    "track_frac": 0.903,
+    "track_ids": 1,
+    "longest_gap": 7,
+    "conf_std": 0.11,
+    "conf_pct": [
+     0.262,
+     0.398,
+     0.602
+    ],
+    "jitter_px": 1.9,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 70,
+      "mean": 0.9222,
+      "p5": 0.888,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 49,
+      "mean": 0.9249,
+      "p5": 0.8797,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 13,
+      "mean": 0.922,
+      "p5": 0.8853,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.604,
+    "det_frac_min": 0.193,
+    "track_frac_mean": 0.899,
+    "track_frac_min": 0.753,
+    "conf_std": 0.081,
+    "jitter_px": 1.66,
+    "track_ids": 1.2,
+    "label_flips": 26.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 460,
+     "mean": 0.933,
+     "p5": 0.8821,
+     "below_0.822": 0.0065
+    },
+    "5s": {
+     "pairs": 357,
+     "mean": 0.9345,
+     "p5": 0.8828,
+     "below_0.822": 0.0084
+    },
+    "15s": {
+     "pairs": 116,
+     "mean": 0.9336,
+     "p5": 0.8749,
+     "below_0.822": 0.0172
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.61,
+     "track_frac": 0.903,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.262,
+      0.398,
+      0.602
+     ],
+     "jitter_px": 1.9,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 70,
+       "mean": 0.9222,
+       "p5": 0.888,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 49,
+       "mean": 0.9249,
+       "p5": 0.8797,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 13,
+       "mean": 0.922,
+       "p5": 0.8853,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 2,
+     "longest_gap": 0,
+     "conf_std": 0.081,
+     "conf_pct": [
+      0.481,
+      0.606,
+      0.739
+     ],
+     "jitter_px": 0.74,
+     "label_flips": 131,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9505,
+       "p5": 0.9253,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9525,
+       "p5": 0.9232,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.953,
+       "p5": 0.9321,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.973,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 2,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.324,
+      0.546,
+      0.681
+     ],
+     "jitter_px": 0.5,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 180,
+       "mean": 0.9198,
+       "p5": 0.8598,
+       "below_0.822": 0.0167
+      },
+      "5s": {
+       "pairs": 142,
+       "mean": 0.9203,
+       "p5": 0.8583,
+       "below_0.822": 0.0211
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.9179,
+       "p5": 0.8413,
+       "below_0.822": 0.0417
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.242,
+     "track_frac": 0.853,
+     "track_ids": 1,
+     "longest_gap": 18,
+     "conf_std": 0.058,
+     "conf_pct": [
+      0.258,
+      0.316,
+      0.449
+     ],
+     "jitter_px": 1.69,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 14,
+       "mean": 0.91,
+       "p5": 0.8785,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 10,
+       "mean": 0.91,
+       "p5": 0.8699,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.8988,
+       "p5": 0.8783,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.193,
+     "track_frac": 0.753,
+     "track_ids": 1,
+     "longest_gap": 24,
+     "conf_std": 0.045,
+     "conf_pct": [
+      0.257,
+      0.301,
+      0.392
+     ],
+     "jitter_px": 3.47,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 6,
+       "mean": 0.951,
+       "p5": 0.9135,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 6,
+       "mean": 0.9398,
+       "p5": 0.9173,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 2,
+       "mean": 0.9505,
+       "p5": 0.9397,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "plf60",
+   "frames": 600,
+   "brightness": 92.9,
+   "noise": 3.9,
+   "noise_raw": 4.674,
+   "flicker_std": 3.122,
+   "flicker_hf": 0.393,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.27,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.617,
+    "track_frac": 0.913,
+    "track_ids": 1,
+    "longest_gap": 7,
+    "conf_std": 0.1,
+    "conf_pct": [
+     0.262,
+     0.376,
+     0.577
+    ],
+    "jitter_px": 1.86,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 64,
+      "mean": 0.9158,
+      "p5": 0.8776,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 51,
+      "mean": 0.9204,
+      "p5": 0.8722,
+      "below_0.822": 0.0196
+     },
+     "15s": {
+      "pairs": 15,
+      "mean": 0.9329,
+      "p5": 0.8959,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.612,
+    "det_frac_min": 0.218,
+    "track_frac_mean": 0.877,
+    "track_frac_min": 0.737,
+    "conf_std": 0.079,
+    "jitter_px": 1.716,
+    "track_ids": 1.0,
+    "label_flips": 28.6
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 457,
+     "mean": 0.9336,
+     "p5": 0.8813,
+     "below_0.822": 0.0022
+    },
+    "5s": {
+     "pairs": 354,
+     "mean": 0.934,
+     "p5": 0.8861,
+     "below_0.822": 0.0056
+    },
+    "15s": {
+     "pairs": 121,
+     "mean": 0.9352,
+     "p5": 0.8905,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.617,
+     "track_frac": 0.913,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.1,
+     "conf_pct": [
+      0.262,
+      0.376,
+      0.577
+     ],
+     "jitter_px": 1.86,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 64,
+       "mean": 0.9158,
+       "p5": 0.8776,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 51,
+       "mean": 0.9204,
+       "p5": 0.8722,
+       "below_0.822": 0.0196
+      },
+      "15s": {
+       "pairs": 15,
+       "mean": 0.9329,
+       "p5": 0.8959,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.083,
+     "conf_pct": [
+      0.473,
+      0.599,
+      0.74
+     ],
+     "jitter_px": 1.17,
+     "label_flips": 143,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9517,
+       "p5": 0.9216,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9509,
+       "p5": 0.9166,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9488,
+       "p5": 0.9149,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.99,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.316,
+      0.524,
+      0.672
+     ],
+     "jitter_px": 0.53,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 185,
+       "mean": 0.9223,
+       "p5": 0.8688,
+       "below_0.822": 0.0054
+      },
+      "5s": {
+       "pairs": 146,
+       "mean": 0.9215,
+       "p5": 0.8752,
+       "below_0.822": 0.0068
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.925,
+       "p5": 0.8769,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.218,
+     "track_frac": 0.747,
+     "track_ids": 1,
+     "longest_gap": 18,
+     "conf_std": 0.052,
+     "conf_pct": [
+      0.254,
+      0.306,
+      0.407
+     ],
+     "jitter_px": 1.75,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 9,
+       "mean": 0.9133,
+       "p5": 0.8774,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 1,
+       "mean": 0.931,
+       "p5": 0.931,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 5,
+       "mean": 0.9017,
+       "p5": 0.8897,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.235,
+     "track_frac": 0.737,
+     "track_ids": 1,
+     "longest_gap": 20,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.255,
+      0.307,
+      0.399
+     ],
+     "jitter_px": 3.27,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 9,
+       "mean": 0.9305,
+       "p5": 0.893,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 6,
+       "mean": 0.9313,
+       "p5": 0.9004,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.9393,
+       "p5": 0.9168,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "sharp0",
+   "frames": 600,
+   "brightness": 92.9,
+   "noise": 3.023,
+   "noise_raw": 3.432,
+   "flicker_std": 1.915,
+   "flicker_hf": 0.316,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.37,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.687,
+    "track_frac": 0.91,
+    "track_ids": 1,
+    "longest_gap": 6,
+    "conf_std": 0.126,
+    "conf_pct": [
+     0.267,
+     0.417,
+     0.664
+    ],
+    "jitter_px": 1.9,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 98,
+      "mean": 0.9215,
+      "p5": 0.872,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 73,
+      "mean": 0.9231,
+      "p5": 0.8722,
+      "below_0.822": 0.0137
+     },
+     "15s": {
+      "pairs": 26,
+      "mean": 0.932,
+      "p5": 0.8981,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.613,
+    "det_frac_min": 0.113,
+    "track_frac_mean": 0.875,
+    "track_frac_min": 0.667,
+    "conf_std": 0.081,
+    "jitter_px": 1.792,
+    "track_ids": 1.0,
+    "label_flips": 58.6
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 492,
+     "mean": 0.9338,
+     "p5": 0.8798,
+     "below_0.822": 0.002
+    },
+    "5s": {
+     "pairs": 388,
+     "mean": 0.9333,
+     "p5": 0.8797,
+     "below_0.822": 0.0103
+    },
+    "15s": {
+     "pairs": 132,
+     "mean": 0.9358,
+     "p5": 0.8798,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.687,
+     "track_frac": 0.91,
+     "track_ids": 1,
+     "longest_gap": 6,
+     "conf_std": 0.126,
+     "conf_pct": [
+      0.267,
+      0.417,
+      0.664
+     ],
+     "jitter_px": 1.9,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 98,
+       "mean": 0.9215,
+       "p5": 0.872,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 73,
+       "mean": 0.9231,
+       "p5": 0.8722,
+       "below_0.822": 0.0137
+      },
+      "15s": {
+       "pairs": 26,
+       "mean": 0.932,
+       "p5": 0.8981,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.068,
+     "conf_pct": [
+      0.458,
+      0.557,
+      0.677
+     ],
+     "jitter_px": 1.56,
+     "label_flips": 293,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9497,
+       "p5": 0.9256,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.951,
+       "p5": 0.9228,
+       "below_0.822": 0.0067
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9513,
+       "p5": 0.932,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.998,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.334,
+      0.502,
+      0.649
+     ],
+     "jitter_px": 0.56,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9247,
+       "p5": 0.8661,
+       "below_0.822": 0.0053
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9216,
+       "p5": 0.8482,
+       "below_0.822": 0.0133
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9243,
+       "p5": 0.8781,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.267,
+     "track_frac": 0.813,
+     "track_ids": 1,
+     "longest_gap": 15,
+     "conf_std": 0.06,
+     "conf_pct": [
+      0.255,
+      0.304,
+      0.439
+     ],
+     "jitter_px": 1.75,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 10,
+       "mean": 0.9121,
+       "p5": 0.8668,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 10,
+       "mean": 0.9155,
+       "p5": 0.8717,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 6,
+       "mean": 0.9193,
+       "p5": 0.9031,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.113,
+     "track_frac": 0.667,
+     "track_ids": 1,
+     "longest_gap": 41,
+     "conf_std": 0.048,
+     "conf_pct": [
+      0.253,
+      0.289,
+      0.39
+     ],
+     "jitter_px": 3.19,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 4,
+       "mean": 0.9581,
+       "p5": 0.9259,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 5,
+       "mean": 0.9422,
+       "p5": 0.9034,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base2",
+   "frames": 600,
+   "brightness": 92.7,
+   "noise": 3.609,
+   "noise_raw": 3.995,
+   "flicker_std": 2.107,
+   "flicker_hf": 0.343,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.28,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.593,
+    "track_frac": 0.907,
+    "track_ids": 1,
+    "longest_gap": 6,
+    "conf_std": 0.113,
+    "conf_pct": [
+     0.269,
+     0.399,
+     0.635
+    ],
+    "jitter_px": 1.94,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 71,
+      "mean": 0.9205,
+      "p5": 0.8711,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 51,
+      "mean": 0.9208,
+      "p5": 0.8796,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 17,
+      "mean": 0.9218,
+      "p5": 0.8846,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.6,
+    "det_frac_min": 0.143,
+    "track_frac_mean": 0.88,
+    "track_frac_min": 0.743,
+    "conf_std": 0.081,
+    "jitter_px": 1.744,
+    "track_ids": 1.0,
+    "label_flips": 27.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 466,
+     "mean": 0.9349,
+     "p5": 0.8776,
+     "below_0.822": 0.0043
+    },
+    "5s": {
+     "pairs": 368,
+     "mean": 0.9338,
+     "p5": 0.8813,
+     "below_0.822": 0.0082
+    },
+    "15s": {
+     "pairs": 116,
+     "mean": 0.9356,
+     "p5": 0.8937,
+     "below_0.822": 0.0086
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.593,
+     "track_frac": 0.907,
+     "track_ids": 1,
+     "longest_gap": 6,
+     "conf_std": 0.113,
+     "conf_pct": [
+      0.269,
+      0.399,
+      0.635
+     ],
+     "jitter_px": 1.94,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 71,
+       "mean": 0.9205,
+       "p5": 0.8711,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 51,
+       "mean": 0.9208,
+       "p5": 0.8796,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 17,
+       "mean": 0.9218,
+       "p5": 0.8846,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.487,
+      0.604,
+      0.732
+     ],
+     "jitter_px": 1.01,
+     "label_flips": 136,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9536,
+       "p5": 0.9282,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9537,
+       "p5": 0.935,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9511,
+       "p5": 0.9194,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.313,
+      0.527,
+      0.674
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 183,
+       "mean": 0.9199,
+       "p5": 0.8616,
+       "below_0.822": 0.0109
+      },
+      "5s": {
+       "pairs": 145,
+       "mean": 0.9171,
+       "p5": 0.8658,
+       "below_0.822": 0.0207
+      },
+      "15s": {
+       "pairs": 47,
+       "mean": 0.9242,
+       "p5": 0.8878,
+       "below_0.822": 0.0213
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.143,
+     "track_frac": 0.743,
+     "track_ids": 1,
+     "longest_gap": 29,
+     "conf_std": 0.052,
+     "conf_pct": [
+      0.252,
+      0.301,
+      0.413
+     ],
+     "jitter_px": 1.71,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 3,
+       "mean": 0.9154,
+       "p5": 0.8838,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 3,
+       "mean": 0.9338,
+       "p5": 0.9111,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.275,
+     "track_frac": 0.763,
+     "track_ids": 1,
+     "longest_gap": 31,
+     "conf_std": 0.051,
+     "conf_pct": [
+      0.257,
+      0.304,
+      0.421
+     ],
+     "jitter_px": 3.51,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 19,
+       "mean": 0.9484,
+       "p5": 0.905,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 19,
+       "mean": 0.9391,
+       "p5": 0.9027,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 2,
+       "mean": 0.9363,
+       "p5": 0.9319,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "sharp1",
+   "frames": 600,
+   "brightness": 92.6,
+   "noise": 3.488,
+   "noise_raw": 4.035,
+   "flicker_std": 2.432,
+   "flicker_hf": 0.347,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.48,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.613,
+    "track_frac": 0.907,
+    "track_ids": 1,
+    "longest_gap": 8,
+    "conf_std": 0.108,
+    "conf_pct": [
+     0.269,
+     0.403,
+     0.599
+    ],
+    "jitter_px": 1.8,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 77,
+      "mean": 0.9259,
+      "p5": 0.8768,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 62,
+      "mean": 0.9206,
+      "p5": 0.8738,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 20,
+      "mean": 0.917,
+      "p5": 0.8895,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.594,
+    "det_frac_min": 0.143,
+    "track_frac_mean": 0.857,
+    "track_frac_min": 0.687,
+    "conf_std": 0.076,
+    "jitter_px": 1.666,
+    "track_ids": 1.0,
+    "label_flips": 42.6
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 474,
+     "mean": 0.9353,
+     "p5": 0.876,
+     "below_0.822": 0.0063
+    },
+    "5s": {
+     "pairs": 377,
+     "mean": 0.9346,
+     "p5": 0.8841,
+     "below_0.822": 0.0053
+    },
+    "15s": {
+     "pairs": 125,
+     "mean": 0.9327,
+     "p5": 0.8656,
+     "below_0.822": 0.008
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.613,
+     "track_frac": 0.907,
+     "track_ids": 1,
+     "longest_gap": 8,
+     "conf_std": 0.108,
+     "conf_pct": [
+      0.269,
+      0.403,
+      0.599
+     ],
+     "jitter_px": 1.8,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 77,
+       "mean": 0.9259,
+       "p5": 0.8768,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 62,
+       "mean": 0.9206,
+       "p5": 0.8738,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 20,
+       "mean": 0.917,
+       "p5": 0.8895,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.075,
+     "conf_pct": [
+      0.472,
+      0.583,
+      0.715
+     ],
+     "jitter_px": 0.64,
+     "label_flips": 213,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9549,
+       "p5": 0.9343,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9541,
+       "p5": 0.9298,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9555,
+       "p5": 0.9329,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.99,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.104,
+     "conf_pct": [
+      0.326,
+      0.504,
+      0.65
+     ],
+     "jitter_px": 0.57,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9191,
+       "p5": 0.8575,
+       "below_0.822": 0.0158
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.921,
+       "p5": 0.8663,
+       "below_0.822": 0.0133
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9159,
+       "p5": 0.8497,
+       "below_0.822": 0.02
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.143,
+     "track_frac": 0.687,
+     "track_ids": 1,
+     "longest_gap": 24,
+     "conf_std": 0.048,
+     "conf_pct": [
+      0.258,
+      0.294,
+      0.395
+     ],
+     "jitter_px": 1.82,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 5,
+       "mean": 0.9058,
+       "p5": 0.8688,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 4,
+       "mean": 0.9009,
+       "p5": 0.8635,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 4,
+       "mean": 0.923,
+       "p5": 0.9079,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.225,
+     "track_frac": 0.707,
+     "track_ids": 1,
+     "longest_gap": 22,
+     "conf_std": 0.045,
+     "conf_pct": [
+      0.255,
+      0.29,
+      0.397
+     ],
+     "jitter_px": 3.5,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 12,
+       "mean": 0.9525,
+       "p5": 0.9223,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 11,
+       "mean": 0.9441,
+       "p5": 0.9031,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 1,
+       "mean": 0.9825,
+       "p5": 0.9825,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "backlight0",
+   "frames": 600,
+   "brightness": 92.8,
+   "noise": 3.699,
+   "noise_raw": 4.202,
+   "flicker_std": 2.433,
+   "flicker_hf": 0.346,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.11,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.655,
+    "track_frac": 0.903,
+    "track_ids": 1,
+    "longest_gap": 5,
+    "conf_std": 0.105,
+    "conf_pct": [
+     0.268,
+     0.401,
+     0.603
+    ],
+    "jitter_px": 2.01,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 84,
+      "mean": 0.9198,
+      "p5": 0.8713,
+      "below_0.822": 0.0119
+     },
+     "5s": {
+      "pairs": 57,
+      "mean": 0.924,
+      "p5": 0.8705,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 19,
+      "mean": 0.9183,
+      "p5": 0.8828,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.616,
+    "det_frac_min": 0.14,
+    "track_frac_mean": 0.878,
+    "track_frac_min": 0.723,
+    "conf_std": 0.078,
+    "jitter_px": 1.926,
+    "track_ids": 1.0,
+    "label_flips": 31.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 483,
+     "mean": 0.9329,
+     "p5": 0.8794,
+     "below_0.822": 0.0083
+    },
+    "5s": {
+     "pairs": 374,
+     "mean": 0.9346,
+     "p5": 0.8778,
+     "below_0.822": 0.0187
+    },
+    "15s": {
+     "pairs": 128,
+     "mean": 0.9328,
+     "p5": 0.8837,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.655,
+     "track_frac": 0.903,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.105,
+     "conf_pct": [
+      0.268,
+      0.401,
+      0.603
+     ],
+     "jitter_px": 2.01,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 84,
+       "mean": 0.9198,
+       "p5": 0.8713,
+       "below_0.822": 0.0119
+      },
+      "5s": {
+       "pairs": 57,
+       "mean": 0.924,
+       "p5": 0.8705,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 19,
+       "mean": 0.9183,
+       "p5": 0.8828,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.475,
+      0.6,
+      0.719
+     ],
+     "jitter_px": 1.49,
+     "label_flips": 159,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9555,
+       "p5": 0.9317,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.957,
+       "p5": 0.9407,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9528,
+       "p5": 0.9246,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.103,
+     "conf_pct": [
+      0.337,
+      0.537,
+      0.665
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9172,
+       "p5": 0.843,
+       "below_0.822": 0.016
+      },
+      "5s": {
+       "pairs": 148,
+       "mean": 0.916,
+       "p5": 0.834,
+       "below_0.822": 0.0473
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9173,
+       "p5": 0.8598,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.14,
+     "track_frac": 0.723,
+     "track_ids": 1,
+     "longest_gap": 24,
+     "conf_std": 0.055,
+     "conf_pct": [
+      0.254,
+      0.289,
+      0.424
+     ],
+     "jitter_px": 2.0,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 2,
+       "mean": 0.8962,
+       "p5": 0.886,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 0
+      },
+      "15s": {
+       "pairs": 2,
+       "mean": 0.9338,
+       "p5": 0.922,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.297,
+     "track_frac": 0.78,
+     "track_ids": 1,
+     "longest_gap": 16,
+     "conf_std": 0.047,
+     "conf_pct": [
+      0.255,
+      0.304,
+      0.389
+     ],
+     "jitter_px": 3.58,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 19,
+       "mean": 0.9227,
+       "p5": 0.8743,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 19,
+       "mean": 0.9346,
+       "p5": 0.8885,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 7,
+       "mean": 0.939,
+       "p5": 0.9049,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base3",
+   "frames": 600,
+   "brightness": 92.7,
+   "noise": 3.666,
+   "noise_raw": 4.074,
+   "flicker_std": 2.181,
+   "flicker_hf": 0.343,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.24,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.653,
+    "track_frac": 0.937,
+    "track_ids": 1,
+    "longest_gap": 5,
+    "conf_std": 0.11,
+    "conf_pct": [
+     0.266,
+     0.401,
+     0.625
+    ],
+    "jitter_px": 1.87,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 84,
+      "mean": 0.927,
+      "p5": 0.8768,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 67,
+      "mean": 0.9274,
+      "p5": 0.8884,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 23,
+      "mean": 0.9164,
+      "p5": 0.8697,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.603,
+    "det_frac_min": 0.108,
+    "track_frac_mean": 0.873,
+    "track_frac_min": 0.657,
+    "conf_std": 0.079,
+    "jitter_px": 1.79,
+    "track_ids": 1.2,
+    "label_flips": 33.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 475,
+     "mean": 0.9351,
+     "p5": 0.8769,
+     "below_0.822": 0.0105
+    },
+    "5s": {
+     "pairs": 374,
+     "mean": 0.9354,
+     "p5": 0.8856,
+     "below_0.822": 0.0053
+    },
+    "15s": {
+     "pairs": 121,
+     "mean": 0.9312,
+     "p5": 0.8686,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.653,
+     "track_frac": 0.937,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.266,
+      0.401,
+      0.625
+     ],
+     "jitter_px": 1.87,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 84,
+       "mean": 0.927,
+       "p5": 0.8768,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 67,
+       "mean": 0.9274,
+       "p5": 0.8884,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 23,
+       "mean": 0.9164,
+       "p5": 0.8697,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 2,
+     "longest_gap": 0,
+     "conf_std": 0.079,
+     "conf_pct": [
+      0.478,
+      0.59,
+      0.736
+     ],
+     "jitter_px": 1.32,
+     "label_flips": 169,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.953,
+       "p5": 0.9322,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9532,
+       "p5": 0.9276,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9511,
+       "p5": 0.9339,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.102,
+     "conf_pct": [
+      0.334,
+      0.517,
+      0.662
+     ],
+     "jitter_px": 0.56,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 184,
+       "mean": 0.9205,
+       "p5": 0.8513,
+       "below_0.822": 0.0272
+      },
+      "5s": {
+       "pairs": 146,
+       "mean": 0.9208,
+       "p5": 0.8678,
+       "below_0.822": 0.0137
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.9176,
+       "p5": 0.8543,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.108,
+     "track_frac": 0.657,
+     "track_ids": 1,
+     "longest_gap": 35,
+     "conf_std": 0.048,
+     "conf_pct": [
+      0.258,
+      0.294,
+      0.399
+     ],
+     "jitter_px": 1.76,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 3,
+       "mean": 0.9105,
+       "p5": 0.8863,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 1,
+       "mean": 0.9058,
+       "p5": 0.9058,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.265,
+     "track_frac": 0.783,
+     "track_ids": 1,
+     "longest_gap": 17,
+     "conf_std": 0.055,
+     "conf_pct": [
+      0.255,
+      0.302,
+      0.422
+     ],
+     "jitter_px": 3.44,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 14,
+       "mean": 0.9391,
+       "p5": 0.889,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 10,
+       "mean": 0.938,
+       "p5": 0.8952,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "dynfps",
+   "frames": 600,
+   "brightness": 103.7,
+   "noise": 3.627,
+   "noise_raw": 3.736,
+   "flicker_std": 1.142,
+   "flicker_hf": 0.246,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.3,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.445,
+    "track_frac": 0.873,
+    "track_ids": 1,
+    "longest_gap": 11,
+    "conf_std": 0.096,
+    "conf_pct": [
+     0.263,
+     0.36,
+     0.565
+    ],
+    "jitter_px": 1.8,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 36,
+      "mean": 0.9262,
+      "p5": 0.8917,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 33,
+      "mean": 0.924,
+      "p5": 0.8729,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 10,
+      "mean": 0.9198,
+      "p5": 0.8734,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.506,
+    "det_frac_min": 0.005,
+    "track_frac_mean": 0.706,
+    "track_frac_min": 0.053,
+    "conf_std": 0.074,
+    "jitter_px": 2.278,
+    "track_ids": 1.2,
+    "label_flips": 30.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 415,
+     "mean": 0.9348,
+     "p5": 0.8814,
+     "below_0.822": 0.0096
+    },
+    "5s": {
+     "pairs": 334,
+     "mean": 0.9365,
+     "p5": 0.8851,
+     "below_0.822": 0.006
+    },
+    "15s": {
+     "pairs": 111,
+     "mean": 0.9341,
+     "p5": 0.877,
+     "below_0.822": 0.009
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.445,
+     "track_frac": 0.873,
+     "track_ids": 1,
+     "longest_gap": 11,
+     "conf_std": 0.096,
+     "conf_pct": [
+      0.263,
+      0.36,
+      0.565
+     ],
+     "jitter_px": 1.8,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 36,
+       "mean": 0.9262,
+       "p5": 0.8917,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 33,
+       "mean": 0.924,
+       "p5": 0.8729,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 10,
+       "mean": 0.9198,
+       "p5": 0.8734,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 2,
+     "longest_gap": 0,
+     "conf_std": 0.09,
+     "conf_pct": [
+      0.41,
+      0.552,
+      0.708
+     ],
+     "jitter_px": 0.74,
+     "label_flips": 151,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9528,
+       "p5": 0.9308,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9535,
+       "p5": 0.9308,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9531,
+       "p5": 0.9305,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.992,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.105,
+     "conf_pct": [
+      0.336,
+      0.533,
+      0.67
+     ],
+     "jitter_px": 0.57,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9189,
+       "p5": 0.854,
+       "below_0.822": 0.0213
+      },
+      "5s": {
+       "pairs": 148,
+       "mean": 0.9232,
+       "p5": 0.8778,
+       "below_0.822": 0.0135
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9188,
+       "p5": 0.868,
+       "below_0.822": 0.02
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.088,
+     "track_frac": 0.617,
+     "track_ids": 1,
+     "longest_gap": 57,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.254,
+      0.309,
+      0.404
+     ],
+     "jitter_px": 1.82,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 1,
+       "mean": 0.8306,
+       "p5": 0.8306,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 3,
+       "mean": 0.8793,
+       "p5": 0.8625,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 1,
+       "mean": 0.891,
+       "p5": 0.891,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.005,
+     "track_frac": 0.053,
+     "track_ids": 1,
+     "longest_gap": 273,
+     "conf_std": 0.03,
+     "conf_pct": [
+      0.261,
+      0.267,
+      0.321
+     ],
+     "jitter_px": 6.46,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 0
+      },
+      "5s": {
+       "pairs": 0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base4",
+   "frames": 600,
+   "brightness": 91.5,
+   "noise": 3.467,
+   "noise_raw": 3.967,
+   "flicker_std": 2.334,
+   "flicker_hf": 0.398,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.21,
+    "rotate_resize": 0.86,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.765,
+    "track_frac": 0.947,
+    "track_ids": 1,
+    "longest_gap": 4,
+    "conf_std": 0.114,
+    "conf_pct": [
+     0.272,
+     0.415,
+     0.641
+    ],
+    "jitter_px": 1.79,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 115,
+      "mean": 0.9188,
+      "p5": 0.8571,
+      "below_0.822": 0.0087
+     },
+     "5s": {
+      "pairs": 94,
+      "mean": 0.9221,
+      "p5": 0.8722,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 31,
+      "mean": 0.9272,
+      "p5": 0.8838,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.669,
+    "det_frac_min": 0.162,
+    "track_frac_mean": 0.915,
+    "track_frac_min": 0.763,
+    "conf_std": 0.078,
+    "jitter_px": 1.628,
+    "track_ids": 1.0,
+    "label_flips": 33.4
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 529,
+     "mean": 0.9343,
+     "p5": 0.8771,
+     "below_0.822": 0.0095
+    },
+    "5s": {
+     "pairs": 421,
+     "mean": 0.9356,
+     "p5": 0.8852,
+     "below_0.822": 0.0024
+    },
+    "15s": {
+     "pairs": 141,
+     "mean": 0.9353,
+     "p5": 0.8792,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.765,
+     "track_frac": 0.947,
+     "track_ids": 1,
+     "longest_gap": 4,
+     "conf_std": 0.114,
+     "conf_pct": [
+      0.272,
+      0.415,
+      0.641
+     ],
+     "jitter_px": 1.79,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 115,
+       "mean": 0.9188,
+       "p5": 0.8571,
+       "below_0.822": 0.0087
+      },
+      "5s": {
+       "pairs": 94,
+       "mean": 0.9221,
+       "p5": 0.8722,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 31,
+       "mean": 0.9272,
+       "p5": 0.8838,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.485,
+      0.599,
+      0.736
+     ],
+     "jitter_px": 1.15,
+     "label_flips": 167,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.956,
+       "p5": 0.9337,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9555,
+       "p5": 0.9279,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9558,
+       "p5": 0.9314,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.098,
+     "conf_pct": [
+      0.331,
+      0.501,
+      0.649
+     ],
+     "jitter_px": 0.54,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 186,
+       "mean": 0.9202,
+       "p5": 0.8642,
+       "below_0.822": 0.0215
+      },
+      "5s": {
+       "pairs": 147,
+       "mean": 0.9234,
+       "p5": 0.8784,
+       "below_0.822": 0.0068
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9206,
+       "p5": 0.852,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.162,
+     "track_frac": 0.763,
+     "track_ids": 1,
+     "longest_gap": 31,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.252,
+      0.291,
+      0.396
+     ],
+     "jitter_px": 1.76,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 3,
+       "mean": 0.9111,
+       "p5": 0.8627,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 2,
+       "mean": 0.9207,
+       "p5": 0.9192,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 1,
+       "mean": 0.8792,
+       "p5": 0.8792,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.432,
+     "track_frac": 0.877,
+     "track_ids": 1,
+     "longest_gap": 11,
+     "conf_std": 0.05,
+     "conf_pct": [
+      0.255,
+      0.308,
+      0.406
+     ],
+     "jitter_px": 2.9,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 35,
+       "mean": 0.944,
+       "p5": 0.904,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 28,
+       "mean": 0.9386,
+       "p5": 0.8917,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 10,
+       "mean": 0.9357,
+       "p5": 0.8908,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base5",
+   "frames": 600,
+   "brightness": 92.0,
+   "noise": 4.251,
+   "noise_raw": 5.527,
+   "flicker_std": 4.235,
+   "flicker_hf": 0.447,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.31,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.572,
+    "track_frac": 0.9,
+    "track_ids": 1,
+    "longest_gap": 10,
+    "conf_std": 0.11,
+    "conf_pct": [
+     0.26,
+     0.373,
+     0.61
+    ],
+    "jitter_px": 1.79,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 54,
+      "mean": 0.918,
+      "p5": 0.8663,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 46,
+      "mean": 0.9249,
+      "p5": 0.8821,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 18,
+      "mean": 0.9149,
+      "p5": 0.8662,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.614,
+    "det_frac_min": 0.232,
+    "track_frac_mean": 0.89,
+    "track_frac_min": 0.75,
+    "conf_std": 0.08,
+    "jitter_px": 1.832,
+    "track_ids": 1.0,
+    "label_flips": 27.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 463,
+     "mean": 0.9347,
+     "p5": 0.8812,
+     "below_0.822": 0.0
+    },
+    "5s": {
+     "pairs": 364,
+     "mean": 0.934,
+     "p5": 0.8808,
+     "below_0.822": 0.0082
+    },
+    "15s": {
+     "pairs": 124,
+     "mean": 0.9304,
+     "p5": 0.8726,
+     "below_0.822": 0.0081
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.572,
+     "track_frac": 0.9,
+     "track_ids": 1,
+     "longest_gap": 10,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.26,
+      0.373,
+      0.61
+     ],
+     "jitter_px": 1.79,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 54,
+       "mean": 0.918,
+       "p5": 0.8663,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 46,
+       "mean": 0.9249,
+       "p5": 0.8821,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 18,
+       "mean": 0.9149,
+       "p5": 0.8662,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 0.998,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.077,
+     "conf_pct": [
+      0.482,
+      0.595,
+      0.728
+     ],
+     "jitter_px": 0.76,
+     "label_flips": 139,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9525,
+       "p5": 0.9296,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9507,
+       "p5": 0.9276,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9524,
+       "p5": 0.9217,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.108,
+     "conf_pct": [
+      0.343,
+      0.553,
+      0.689
+     ],
+     "jitter_px": 0.56,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9238,
+       "p5": 0.8786,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9197,
+       "p5": 0.8681,
+       "below_0.822": 0.0201
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9183,
+       "p5": 0.8633,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.28,
+     "track_frac": 0.813,
+     "track_ids": 1,
+     "longest_gap": 19,
+     "conf_std": 0.059,
+     "conf_pct": [
+      0.256,
+      0.304,
+      0.445
+     ],
+     "jitter_px": 1.85,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 16,
+       "mean": 0.9143,
+       "p5": 0.8728,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 9,
+       "mean": 0.918,
+       "p5": 0.8876,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 4,
+       "mean": 0.9063,
+       "p5": 0.8777,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.232,
+     "track_frac": 0.75,
+     "track_ids": 1,
+     "longest_gap": 17,
+     "conf_std": 0.044,
+     "conf_pct": [
+      0.256,
+      0.3,
+      0.391
+     ],
+     "jitter_px": 4.2,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 15,
+       "mean": 0.9265,
+       "p5": 0.8564,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 10,
+       "mean": 0.9519,
+       "p5": 0.9141,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.8839,
+       "p5": 0.8236,
+       "below_0.822": 0.3333
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "man156g10",
+   "frames": 600,
+   "brightness": 102.2,
+   "noise": 3.604,
+   "noise_raw": 3.603,
+   "flicker_std": 0.091,
+   "flicker_hf": 0.018,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.39,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.658,
+    "track_frac": 0.95,
+    "track_ids": 1,
+    "longest_gap": 7,
+    "conf_std": 0.108,
+    "conf_pct": [
+     0.262,
+     0.402,
+     0.598
+    ],
+    "jitter_px": 1.81,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 78,
+      "mean": 0.9222,
+      "p5": 0.8875,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 61,
+      "mean": 0.9211,
+      "p5": 0.865,
+      "below_0.822": 0.0164
+     },
+     "15s": {
+      "pairs": 20,
+      "mean": 0.9235,
+      "p5": 0.8897,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.606,
+    "det_frac_min": 0.047,
+    "track_frac_mean": 0.795,
+    "track_frac_min": 0.147,
+    "conf_std": 0.082,
+    "jitter_px": 1.384,
+    "track_ids": 1.2,
+    "label_flips": 24.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 473,
+     "mean": 0.9329,
+     "p5": 0.8798,
+     "below_0.822": 0.0085
+    },
+    "5s": {
+     "pairs": 374,
+     "mean": 0.9346,
+     "p5": 0.8767,
+     "below_0.822": 0.008
+    },
+    "15s": {
+     "pairs": 126,
+     "mean": 0.9276,
+     "p5": 0.8558,
+     "below_0.822": 0.0159
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.658,
+     "track_frac": 0.95,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.108,
+     "conf_pct": [
+      0.262,
+      0.402,
+      0.598
+     ],
+     "jitter_px": 1.81,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 78,
+       "mean": 0.9222,
+       "p5": 0.8875,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 61,
+       "mean": 0.9211,
+       "p5": 0.865,
+       "below_0.822": 0.0164
+      },
+      "15s": {
+       "pairs": 20,
+       "mean": 0.9235,
+       "p5": 0.8897,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 2,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.475,
+      0.597,
+      0.732
+     ],
+     "jitter_px": 0.93,
+     "label_flips": 124,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9523,
+       "p5": 0.9276,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9531,
+       "p5": 0.9296,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9528,
+       "p5": 0.9294,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.983,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.107,
+     "conf_pct": [
+      0.322,
+      0.565,
+      0.693
+     ],
+     "jitter_px": 0.49,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 180,
+       "mean": 0.9217,
+       "p5": 0.8685,
+       "below_0.822": 0.0222
+      },
+      "5s": {
+       "pairs": 141,
+       "mean": 0.9242,
+       "p5": 0.8683,
+       "below_0.822": 0.0142
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9065,
+       "p5": 0.8352,
+       "below_0.822": 0.0408
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.34,
+     "track_frac": 0.893,
+     "track_ids": 1,
+     "longest_gap": 20,
+     "conf_std": 0.071,
+     "conf_pct": [
+      0.254,
+      0.319,
+      0.482
+     ],
+     "jitter_px": 1.72,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 24,
+       "mean": 0.8967,
+       "p5": 0.8579,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 21,
+       "mean": 0.9097,
+       "p5": 0.8554,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 6,
+       "mean": 0.8976,
+       "p5": 0.8562,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.047,
+     "track_frac": 0.147,
+     "track_ids": 1,
+     "longest_gap": 58,
+     "conf_std": 0.046,
+     "conf_pct": [
+      0.255,
+      0.312,
+      0.389
+     ],
+     "jitter_px": 1.97,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 1,
+       "mean": 0.9765,
+       "p5": 0.9765,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 1,
+       "mean": 0.9664,
+       "p5": 0.9664,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 1,
+       "mean": 0.9641,
+       "p5": 0.9641,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "man333g8",
+   "frames": 600,
+   "brightness": 102.6,
+   "noise": 3.556,
+   "noise_raw": 3.556,
+   "flicker_std": 0.02,
+   "flicker_hf": 0.012,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.36,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.637,
+    "track_frac": 0.943,
+    "track_ids": 1,
+    "longest_gap": 4,
+    "conf_std": 0.097,
+    "conf_pct": [
+     0.266,
+     0.382,
+     0.581
+    ],
+    "jitter_px": 1.64,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 78,
+      "mean": 0.9198,
+      "p5": 0.8737,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 65,
+      "mean": 0.9254,
+      "p5": 0.8722,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 15,
+      "mean": 0.9267,
+      "p5": 0.8929,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.587,
+    "det_frac_min": 0.035,
+    "track_frac_mean": 0.773,
+    "track_frac_min": 0.067,
+    "conf_std": 0.083,
+    "jitter_px": 1.886,
+    "track_ids": 1.0,
+    "label_flips": 23.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 469,
+     "mean": 0.9346,
+     "p5": 0.8786,
+     "below_0.822": 0.0021
+    },
+    "5s": {
+     "pairs": 374,
+     "mean": 0.935,
+     "p5": 0.8745,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 119,
+     "mean": 0.9364,
+     "p5": 0.8731,
+     "below_0.822": 0.0084
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.637,
+     "track_frac": 0.943,
+     "track_ids": 1,
+     "longest_gap": 4,
+     "conf_std": 0.097,
+     "conf_pct": [
+      0.266,
+      0.382,
+      0.581
+     ],
+     "jitter_px": 1.64,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 78,
+       "mean": 0.9198,
+       "p5": 0.8737,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 65,
+       "mean": 0.9254,
+       "p5": 0.8722,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 15,
+       "mean": 0.9267,
+       "p5": 0.8929,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.082,
+     "conf_pct": [
+      0.465,
+      0.588,
+      0.721
+     ],
+     "jitter_px": 0.98,
+     "label_flips": 116,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9548,
+       "p5": 0.9303,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9553,
+       "p5": 0.9358,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9529,
+       "p5": 0.9349,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.987,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.354,
+      0.565,
+      0.676
+     ],
+     "jitter_px": 0.52,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 187,
+       "mean": 0.9215,
+       "p5": 0.8611,
+       "below_0.822": 0.0053
+      },
+      "5s": {
+       "pairs": 148,
+       "mean": 0.9204,
+       "p5": 0.8668,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.9265,
+       "p5": 0.84,
+       "below_0.822": 0.0208
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.277,
+     "track_frac": 0.867,
+     "track_ids": 1,
+     "longest_gap": 20,
+     "conf_std": 0.056,
+     "conf_pct": [
+      0.258,
+      0.307,
+      0.432
+     ],
+     "jitter_px": 1.75,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 14,
+       "mean": 0.9184,
+       "p5": 0.8971,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 11,
+       "mean": 0.9106,
+       "p5": 0.8863,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 6,
+       "mean": 0.9025,
+       "p5": 0.8529,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.035,
+     "track_frac": 0.067,
+     "track_ids": 1,
+     "longest_gap": 96,
+     "conf_std": 0.08,
+     "conf_pct": [
+      0.261,
+      0.274,
+      0.46
+     ],
+     "jitter_px": 4.54,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 0
+      },
+      "5s": {
+       "pairs": 0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "man100g30",
+   "frames": 600,
+   "brightness": 101.2,
+   "noise": 4.074,
+   "noise_raw": 4.074,
+   "flicker_std": 0.083,
+   "flicker_hf": 0.022,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.26,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.82,
+    "track_frac": 0.983,
+    "track_ids": 1,
+    "longest_gap": 3,
+    "conf_std": 0.124,
+    "conf_pct": [
+     0.272,
+     0.459,
+     0.679
+    ],
+    "jitter_px": 1.96,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 131,
+      "mean": 0.9273,
+      "p5": 0.8808,
+      "below_0.822": 0.0076
+     },
+     "5s": {
+      "pairs": 104,
+      "mean": 0.9214,
+      "p5": 0.8725,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 29,
+      "mean": 0.934,
+      "p5": 0.8929,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.582,
+    "det_frac_min": 0.062,
+    "track_frac_mean": 0.78,
+    "track_frac_min": 0.293,
+    "conf_std": 0.078,
+    "jitter_px": 2.594,
+    "track_ids": 1.0,
+    "label_flips": 32.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 493,
+     "mean": 0.9337,
+     "p5": 0.8724,
+     "below_0.822": 0.0122
+    },
+    "5s": {
+     "pairs": 393,
+     "mean": 0.9324,
+     "p5": 0.8715,
+     "below_0.822": 0.0025
+    },
+    "15s": {
+     "pairs": 124,
+     "mean": 0.9346,
+     "p5": 0.8785,
+     "below_0.822": 0.0161
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.82,
+     "track_frac": 0.983,
+     "track_ids": 1,
+     "longest_gap": 3,
+     "conf_std": 0.124,
+     "conf_pct": [
+      0.272,
+      0.459,
+      0.679
+     ],
+     "jitter_px": 1.96,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 131,
+       "mean": 0.9273,
+       "p5": 0.8808,
+       "below_0.822": 0.0076
+      },
+      "5s": {
+       "pairs": 104,
+       "mean": 0.9214,
+       "p5": 0.8725,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 29,
+       "mean": 0.934,
+       "p5": 0.8929,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.074,
+     "conf_pct": [
+      0.516,
+      0.622,
+      0.751
+     ],
+     "jitter_px": 0.85,
+     "label_flips": 161,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9546,
+       "p5": 0.9284,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.955,
+       "p5": 0.9317,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9553,
+       "p5": 0.9308,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.943,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 2,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.285,
+      0.457,
+      0.612
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 172,
+       "mean": 0.9154,
+       "p5": 0.8429,
+       "below_0.822": 0.0291
+      },
+      "5s": {
+       "pairs": 137,
+       "mean": 0.916,
+       "p5": 0.8541,
+       "below_0.822": 0.0073
+      },
+      "15s": {
+       "pairs": 45,
+       "mean": 0.9119,
+       "p5": 0.8329,
+       "below_0.822": 0.0444
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.083,
+     "track_frac": 0.637,
+     "track_ids": 1,
+     "longest_gap": 45,
+     "conf_std": 0.048,
+     "conf_pct": [
+      0.253,
+      0.292,
+      0.401
+     ],
+     "jitter_px": 1.66,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 0
+      },
+      "5s": {
+       "pairs": 1,
+       "mean": 0.897,
+       "p5": 0.897,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.062,
+     "track_frac": 0.293,
+     "track_ids": 1,
+     "longest_gap": 80,
+     "conf_std": 0.044,
+     "conf_pct": [
+      0.251,
+      0.28,
+      0.394
+     ],
+     "jitter_px": 7.95,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 0
+      },
+      "5s": {
+       "pairs": 1,
+       "mean": 0.9538,
+       "p5": 0.9538,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base6",
+   "frames": 600,
+   "brightness": 91.8,
+   "noise": 3.278,
+   "noise_raw": 3.285,
+   "flicker_std": 0.303,
+   "flicker_hf": 0.203,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.19,
+    "rotate_resize": 0.83,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.652,
+    "track_frac": 0.923,
+    "track_ids": 1,
+    "longest_gap": 5,
+    "conf_std": 0.113,
+    "conf_pct": [
+     0.266,
+     0.393,
+     0.642
+    ],
+    "jitter_px": 1.85,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 89,
+      "mean": 0.9216,
+      "p5": 0.8714,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 68,
+      "mean": 0.9222,
+      "p5": 0.8785,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 19,
+      "mean": 0.9272,
+      "p5": 0.8778,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.621,
+    "det_frac_min": 0.187,
+    "track_frac_mean": 0.884,
+    "track_frac_min": 0.727,
+    "conf_std": 0.08,
+    "jitter_px": 1.746,
+    "track_ids": 1.0,
+    "label_flips": 29.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 496,
+     "mean": 0.9336,
+     "p5": 0.8777,
+     "below_0.822": 0.0081
+    },
+    "5s": {
+     "pairs": 382,
+     "mean": 0.9347,
+     "p5": 0.8795,
+     "below_0.822": 0.0079
+    },
+    "15s": {
+     "pairs": 127,
+     "mean": 0.9338,
+     "p5": 0.8752,
+     "below_0.822": 0.0079
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.652,
+     "track_frac": 0.923,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.113,
+     "conf_pct": [
+      0.266,
+      0.393,
+      0.642
+     ],
+     "jitter_px": 1.85,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 89,
+       "mean": 0.9216,
+       "p5": 0.8714,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 68,
+       "mean": 0.9222,
+       "p5": 0.8785,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 19,
+       "mean": 0.9272,
+       "p5": 0.8778,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.081,
+     "conf_pct": [
+      0.478,
+      0.61,
+      0.737
+     ],
+     "jitter_px": 1.19,
+     "label_flips": 149,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9544,
+       "p5": 0.9322,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9551,
+       "p5": 0.9356,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9528,
+       "p5": 0.9285,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.993,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.105,
+     "conf_pct": [
+      0.343,
+      0.536,
+      0.667
+     ],
+     "jitter_px": 0.54,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9193,
+       "p5": 0.8532,
+       "below_0.822": 0.0211
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9209,
+       "p5": 0.8711,
+       "below_0.822": 0.02
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9189,
+       "p5": 0.8651,
+       "below_0.822": 0.02
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.187,
+     "track_frac": 0.727,
+     "track_ids": 1,
+     "longest_gap": 29,
+     "conf_std": 0.05,
+     "conf_pct": [
+      0.261,
+      0.297,
+      0.412
+     ],
+     "jitter_px": 1.74,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 8,
+       "mean": 0.9074,
+       "p5": 0.869,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 3,
+       "mean": 0.8984,
+       "p5": 0.8571,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.9029,
+       "p5": 0.8523,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.273,
+     "track_frac": 0.783,
+     "track_ids": 1,
+     "longest_gap": 15,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.257,
+      0.305,
+      0.401
+     ],
+     "jitter_px": 3.41,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 19,
+       "mean": 0.9366,
+       "p5": 0.8926,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 11,
+       "mean": 0.9304,
+       "p5": 0.8874,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 5,
+       "mean": 0.9363,
+       "p5": 0.8926,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080-sharp0",
+   "frames": 600,
+   "brightness": 92.3,
+   "noise": 2.926,
+   "noise_raw": 3.342,
+   "flicker_std": 1.913,
+   "flicker_hf": 0.346,
+   "noise_native": {
+    "brightness": 92.4,
+    "noise": 3.269,
+    "noise_raw": 3.645,
+    "flicker_std": 1.913,
+    "flicker_hf": 0.346
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.66,
+    "rotate_resize": 20.37,
+    "filter": 0.03
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.997,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 1,
+    "conf_std": 0.117,
+    "conf_pct": [
+     0.42,
+     0.648,
+     0.79
+    ],
+    "jitter_px": 1.4,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 190,
+      "mean": 0.9308,
+      "p5": 0.8894,
+      "below_0.822": 0.0053
+     },
+     "5s": {
+      "pairs": 150,
+      "mean": 0.9324,
+      "p5": 0.8929,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 50,
+      "mean": 0.9314,
+      "p5": 0.8961,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.877,
+    "det_frac_min": 0.66,
+    "track_frac_mean": 0.984,
+    "track_frac_min": 0.96,
+    "conf_std": 0.076,
+    "jitter_px": 1.102,
+    "track_ids": 1.0,
+    "label_flips": 58.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 782,
+     "mean": 0.9401,
+     "p5": 0.8896,
+     "below_0.822": 0.0038
+    },
+    "5s": {
+     "pairs": 611,
+     "mean": 0.939,
+     "p5": 0.8918,
+     "below_0.822": 0.0016
+    },
+    "15s": {
+     "pairs": 203,
+     "mean": 0.9382,
+     "p5": 0.8867,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.997,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.117,
+     "conf_pct": [
+      0.42,
+      0.648,
+      0.79
+     ],
+     "jitter_px": 1.4,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9308,
+       "p5": 0.8894,
+       "below_0.822": 0.0053
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9324,
+       "p5": 0.8929,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9314,
+       "p5": 0.8961,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.061,
+     "conf_pct": [
+      0.461,
+      0.541,
+      0.658
+     ],
+     "jitter_px": 0.61,
+     "label_flips": 291,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.956,
+       "p5": 0.936,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9544,
+       "p5": 0.9308,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9541,
+       "p5": 0.9289,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.091,
+     "conf_pct": [
+      0.372,
+      0.514,
+      0.663
+     ],
+     "jitter_px": 0.46,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9251,
+       "p5": 0.8761,
+       "below_0.822": 0.0105
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9237,
+       "p5": 0.8728,
+       "below_0.822": 0.0067
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9201,
+       "p5": 0.8749,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.66,
+     "track_frac": 0.96,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.064,
+     "conf_pct": [
+      0.258,
+      0.341,
+      0.463
+     ],
+     "jitter_px": 1.51,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 85,
+       "mean": 0.9187,
+       "p5": 0.8749,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 66,
+       "mean": 0.919,
+       "p5": 0.8696,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 25,
+       "mean": 0.9233,
+       "p5": 0.8811,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.728,
+     "track_frac": 0.98,
+     "track_ids": 1,
+     "longest_gap": 9,
+     "conf_std": 0.049,
+     "conf_pct": [
+      0.256,
+      0.329,
+      0.42
+     ],
+     "jitter_px": 1.53,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 127,
+       "mean": 0.9667,
+       "p5": 0.9454,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 95,
+       "mean": 0.9634,
+       "p5": 0.9325,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 28,
+       "mean": 0.9678,
+       "p5": 0.9483,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080b",
+   "frames": 600,
+   "brightness": 92.0,
+   "noise": 3.406,
+   "noise_raw": 3.712,
+   "flicker_std": 1.849,
+   "flicker_hf": 0.342,
+   "noise_native": {
+    "brightness": 92.1,
+    "noise": 3.949,
+    "noise_raw": 4.209,
+    "flicker_std": 1.848,
+    "flicker_hf": 0.342
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.52,
+    "rotate_resize": 19.88,
+    "filter": 0.03
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.982,
+    "track_frac": 0.99,
+    "track_ids": 1,
+    "longest_gap": 1,
+    "conf_std": 0.115,
+    "conf_pct": [
+     0.369,
+     0.601,
+     0.741
+    ],
+    "jitter_px": 1.5,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 187,
+      "mean": 0.923,
+      "p5": 0.8785,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 147,
+      "mean": 0.923,
+      "p5": 0.88,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 49,
+      "mean": 0.9263,
+      "p5": 0.8771,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.883,
+    "det_frac_min": 0.64,
+    "track_frac_mean": 0.987,
+    "track_frac_min": 0.97,
+    "conf_std": 0.082,
+    "jitter_px": 1.15,
+    "track_ids": 1.0,
+    "label_flips": 51.4
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 751,
+     "mean": 0.9358,
+     "p5": 0.8814,
+     "below_0.822": 0.0053
+    },
+    "5s": {
+     "pairs": 603,
+     "mean": 0.9361,
+     "p5": 0.8813,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 189,
+     "mean": 0.9377,
+     "p5": 0.8879,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.982,
+     "track_frac": 0.99,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.115,
+     "conf_pct": [
+      0.369,
+      0.601,
+      0.741
+     ],
+     "jitter_px": 1.5,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 187,
+       "mean": 0.923,
+       "p5": 0.8785,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 147,
+       "mean": 0.923,
+       "p5": 0.88,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9263,
+       "p5": 0.8771,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.071,
+     "conf_pct": [
+      0.477,
+      0.574,
+      0.71
+     ],
+     "jitter_px": 0.72,
+     "label_flips": 257,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9566,
+       "p5": 0.9342,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9571,
+       "p5": 0.9367,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9577,
+       "p5": 0.9384,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.993,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.1,
+     "conf_pct": [
+      0.319,
+      0.495,
+      0.633
+     ],
+     "jitter_px": 0.43,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9218,
+       "p5": 0.8661,
+       "below_0.822": 0.0106
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9213,
+       "p5": 0.8749,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9228,
+       "p5": 0.8787,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.64,
+     "track_frac": 0.97,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.061,
+     "conf_pct": [
+      0.258,
+      0.325,
+      0.456
+     ],
+     "jitter_px": 1.48,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 68,
+       "mean": 0.911,
+       "p5": 0.8625,
+       "below_0.822": 0.0294
+      },
+      "5s": {
+       "pairs": 58,
+       "mean": 0.913,
+       "p5": 0.8512,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 15,
+       "mean": 0.9214,
+       "p5": 0.8868,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.798,
+     "track_frac": 0.987,
+     "track_ids": 1,
+     "longest_gap": 8,
+     "conf_std": 0.064,
+     "conf_pct": [
+      0.263,
+      0.348,
+      0.473
+     ],
+     "jitter_px": 1.62,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 118,
+       "mean": 0.9594,
+       "p5": 0.9292,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 99,
+       "mean": 0.9598,
+       "p5": 0.9323,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 26,
+       "mean": 0.9587,
+       "p5": 0.9202,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "hw1080",
+   "frames": 620,
+   "brightness": 93.1,
+   "noise": 4.166,
+   "noise_raw": 4.584,
+   "flicker_std": 2.405,
+   "flicker_hf": 0.339,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 12.03,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.985,
+    "track_frac": 0.994,
+    "track_ids": 1,
+    "longest_gap": 2,
+    "conf_std": 0.114,
+    "conf_pct": [
+     0.335,
+     0.551,
+     0.714
+    ],
+    "jitter_px": 1.39,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 195,
+      "mean": 0.9291,
+      "p5": 0.8885,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 155,
+      "mean": 0.9274,
+      "p5": 0.8803,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 57,
+      "mean": 0.9254,
+      "p5": 0.8836,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.961,
+    "det_frac_min": 0.837,
+    "track_frac_mean": 0.99,
+    "track_frac_min": 0.981,
+    "conf_std": 0.087,
+    "jitter_px": 1.036,
+    "track_ids": 1.0,
+    "label_flips": 57.6
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 916,
+     "mean": 0.9347,
+     "p5": 0.8812,
+     "below_0.822": 0.0087
+    },
+    "5s": {
+     "pairs": 728,
+     "mean": 0.9343,
+     "p5": 0.8824,
+     "below_0.822": 0.0069
+    },
+    "15s": {
+     "pairs": 264,
+     "mean": 0.932,
+     "p5": 0.8733,
+     "below_0.822": 0.0038
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.985,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 2,
+     "conf_std": 0.114,
+     "conf_pct": [
+      0.335,
+      0.551,
+      0.714
+     ],
+     "jitter_px": 1.39,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 195,
+       "mean": 0.9291,
+       "p5": 0.8885,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 155,
+       "mean": 0.9274,
+       "p5": 0.8803,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 57,
+       "mean": 0.9254,
+       "p5": 0.8836,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.064,
+     "conf_pct": [
+      0.472,
+      0.566,
+      0.674
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 288,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 197,
+       "mean": 0.9542,
+       "p5": 0.9264,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 157,
+       "mean": 0.9538,
+       "p5": 0.9276,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 57,
+       "mean": 0.9513,
+       "p5": 0.925,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.997,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.116,
+     "conf_pct": [
+      0.394,
+      0.583,
+      0.762
+     ],
+     "jitter_px": 0.57,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 193,
+       "mean": 0.9226,
+       "p5": 0.8719,
+       "below_0.822": 0.0104
+      },
+      "5s": {
+       "pairs": 153,
+       "mean": 0.9252,
+       "p5": 0.8786,
+       "below_0.822": 0.0065
+      },
+      "15s": {
+       "pairs": 57,
+       "mean": 0.9189,
+       "p5": 0.8642,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.984,
+     "track_frac": 0.987,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.08,
+     "conf_pct": [
+      0.301,
+      0.439,
+      0.579
+     ],
+     "jitter_px": 1.54,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 194,
+       "mean": 0.9129,
+       "p5": 0.8524,
+       "below_0.822": 0.0309
+      },
+      "5s": {
+       "pairs": 154,
+       "mean": 0.9113,
+       "p5": 0.8503,
+       "below_0.822": 0.026
+      },
+      "15s": {
+       "pairs": 56,
+       "mean": 0.9121,
+       "p5": 0.8621,
+       "below_0.822": 0.0179
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.837,
+     "track_frac": 0.981,
+     "track_ids": 1,
+     "longest_gap": 10,
+     "conf_std": 0.062,
+     "conf_pct": [
+      0.265,
+      0.352,
+      0.46
+     ],
+     "jitter_px": 1.13,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 137,
+       "mean": 0.9626,
+       "p5": 0.9414,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 109,
+       "mean": 0.9616,
+       "p5": 0.9422,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 37,
+       "mean": 0.9624,
+       "p5": 0.9417,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base7",
+   "frames": 600,
+   "brightness": 92.5,
+   "noise": 3.695,
+   "noise_raw": 4.207,
+   "flicker_std": 2.45,
+   "flicker_hf": 0.353,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.31,
+    "rotate_resize": 0.82,
+    "filter": 0.01
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.547,
+    "track_frac": 0.913,
+    "track_ids": 1,
+    "longest_gap": 7,
+    "conf_std": 0.095,
+    "conf_pct": [
+     0.262,
+     0.363,
+     0.57
+    ],
+    "jitter_px": 1.76,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 61,
+      "mean": 0.9237,
+      "p5": 0.8695,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 44,
+      "mean": 0.9256,
+      "p5": 0.8817,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 17,
+      "mean": 0.9131,
+      "p5": 0.8636,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.611,
+    "det_frac_min": 0.203,
+    "track_frac_mean": 0.908,
+    "track_frac_min": 0.81,
+    "conf_std": 0.076,
+    "jitter_px": 1.684,
+    "track_ids": 1.0,
+    "label_flips": 33.0
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 475,
+     "mean": 0.9338,
+     "p5": 0.8684,
+     "below_0.822": 0.0084
+    },
+    "5s": {
+     "pairs": 377,
+     "mean": 0.9341,
+     "p5": 0.8759,
+     "below_0.822": 0.0027
+    },
+    "15s": {
+     "pairs": 124,
+     "mean": 0.9306,
+     "p5": 0.8737,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.547,
+     "track_frac": 0.913,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.095,
+     "conf_pct": [
+      0.262,
+      0.363,
+      0.57
+     ],
+     "jitter_px": 1.76,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 61,
+       "mean": 0.9237,
+       "p5": 0.8695,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 44,
+       "mean": 0.9256,
+       "p5": 0.8817,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 17,
+       "mean": 0.9131,
+       "p5": 0.8636,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.474,
+      0.589,
+      0.722
+     ],
+     "jitter_px": 0.91,
+     "label_flips": 165,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9529,
+       "p5": 0.9281,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9528,
+       "p5": 0.9282,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9536,
+       "p5": 0.9383,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.995,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.338,
+      0.53,
+      0.669
+     ],
+     "jitter_px": 0.52,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9185,
+       "p5": 0.8517,
+       "below_0.822": 0.0211
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9203,
+       "p5": 0.8711,
+       "below_0.822": 0.0067
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9164,
+       "p5": 0.8696,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.203,
+     "track_frac": 0.81,
+     "track_ids": 1,
+     "longest_gap": 26,
+     "conf_std": 0.054,
+     "conf_pct": [
+      0.253,
+      0.301,
+      0.42
+     ],
+     "jitter_px": 1.78,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 14,
+       "mean": 0.9116,
+       "p5": 0.8617,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 13,
+       "mean": 0.9119,
+       "p5": 0.8731,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 4,
+       "mean": 0.9008,
+       "p5": 0.8543,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.31,
+     "track_frac": 0.833,
+     "track_ids": 1,
+     "longest_gap": 12,
+     "conf_std": 0.051,
+     "conf_pct": [
+      0.258,
+      0.314,
+      0.408
+     ],
+     "jitter_px": 3.45,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 20,
+       "mean": 0.945,
+       "p5": 0.9159,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 20,
+       "mean": 0.931,
+       "p5": 0.8915,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 3,
+       "mean": 0.9205,
+       "p5": 0.8853,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080c",
+   "frames": 600,
+   "brightness": 92.7,
+   "noise": 3.558,
+   "noise_raw": 4.084,
+   "flicker_std": 2.455,
+   "flicker_hf": 0.344,
+   "noise_native": {
+    "brightness": 92.7,
+    "noise": 4.095,
+    "noise_raw": 4.552,
+    "flicker_std": 2.454,
+    "flicker_hf": 0.344
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.55,
+    "rotate_resize": 20.17,
+    "filter": 0.03
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.978,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 1,
+    "conf_std": 0.114,
+    "conf_pct": [
+     0.356,
+     0.555,
+     0.729
+    ],
+    "jitter_px": 1.51,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 182,
+      "mean": 0.9253,
+      "p5": 0.886,
+      "below_0.822": 0.0055
+     },
+     "5s": {
+      "pairs": 143,
+      "mean": 0.9257,
+      "p5": 0.8765,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 47,
+      "mean": 0.9254,
+      "p5": 0.8705,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.9,
+    "det_frac_min": 0.697,
+    "track_frac_mean": 0.987,
+    "track_frac_min": 0.977,
+    "conf_std": 0.084,
+    "jitter_px": 1.222,
+    "track_ids": 1.0,
+    "label_flips": 44.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 778,
+     "mean": 0.9361,
+     "p5": 0.8859,
+     "below_0.822": 0.0026
+    },
+    "5s": {
+     "pairs": 620,
+     "mean": 0.9364,
+     "p5": 0.8822,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 200,
+     "mean": 0.935,
+     "p5": 0.8786,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.978,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.114,
+     "conf_pct": [
+      0.356,
+      0.555,
+      0.729
+     ],
+     "jitter_px": 1.51,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 182,
+       "mean": 0.9253,
+       "p5": 0.886,
+       "below_0.822": 0.0055
+      },
+      "5s": {
+       "pairs": 143,
+       "mean": 0.9257,
+       "p5": 0.8765,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 47,
+       "mean": 0.9254,
+       "p5": 0.8705,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.072,
+     "conf_pct": [
+      0.478,
+      0.583,
+      0.712
+     ],
+     "jitter_px": 0.64,
+     "label_flips": 221,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9564,
+       "p5": 0.9354,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9562,
+       "p5": 0.9342,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.954,
+       "p5": 0.9266,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.993,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.324,
+      0.484,
+      0.639
+     ],
+     "jitter_px": 0.41,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9206,
+       "p5": 0.8735,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9239,
+       "p5": 0.8852,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9186,
+       "p5": 0.8731,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.697,
+     "track_frac": 0.98,
+     "track_ids": 1,
+     "longest_gap": 4,
+     "conf_std": 0.067,
+     "conf_pct": [
+      0.26,
+      0.333,
+      0.477
+     ],
+     "jitter_px": 1.48,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 100,
+       "mean": 0.9132,
+       "p5": 0.8552,
+       "below_0.822": 0.01
+      },
+      "5s": {
+       "pairs": 83,
+       "mean": 0.9109,
+       "p5": 0.8588,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 20,
+       "mean": 0.9056,
+       "p5": 0.858,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.833,
+     "track_frac": 0.977,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.064,
+     "conf_pct": [
+      0.264,
+      0.358,
+      0.476
+     ],
+     "jitter_px": 2.07,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 118,
+       "mean": 0.9641,
+       "p5": 0.9432,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 95,
+       "mean": 0.9632,
+       "p5": 0.9355,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 34,
+       "mean": 0.9614,
+       "p5": 0.9335,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base5:median3",
+   "frames": 598,
+   "brightness": 91.8,
+   "noise": 3.29,
+   "noise_raw": 4.586,
+   "flicker_std": 3.826,
+   "flicker_hf": 0.361,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.18,
+    "rotate_resize": 0.83,
+    "filter": 2.65
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.99,
+    "track_frac": 0.987,
+    "track_ids": 1,
+    "longest_gap": 2,
+    "conf_std": 0.098,
+    "conf_pct": [
+     0.4,
+     0.576,
+     0.705
+    ],
+    "jitter_px": 1.18,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 187,
+      "mean": 0.941,
+      "p5": 0.9036,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 147,
+      "mean": 0.9407,
+      "p5": 0.8943,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 47,
+      "mean": 0.94,
+      "p5": 0.8968,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.831,
+    "det_frac_min": 0.249,
+    "track_frac_mean": 0.98,
+    "track_frac_min": 0.94,
+    "conf_std": 0.071,
+    "jitter_px": 0.922,
+    "track_ids": 1.0,
+    "label_flips": 1.0
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 738,
+     "mean": 0.9444,
+     "p5": 0.9016,
+     "below_0.822": 0.0014
+    },
+    "5s": {
+     "pairs": 576,
+     "mean": 0.9435,
+     "p5": 0.8979,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 191,
+     "mean": 0.9396,
+     "p5": 0.888,
+     "below_0.822": 0.0052
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.99,
+     "track_frac": 0.987,
+     "track_ids": 1,
+     "longest_gap": 2,
+     "conf_std": 0.098,
+     "conf_pct": [
+      0.4,
+      0.576,
+      0.705
+     ],
+     "jitter_px": 1.18,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 187,
+       "mean": 0.941,
+       "p5": 0.9036,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 147,
+       "mean": 0.9407,
+       "p5": 0.8943,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 47,
+       "mean": 0.94,
+       "p5": 0.8968,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.069,
+     "conf_pct": [
+      0.496,
+      0.625,
+      0.716
+     ],
+     "jitter_px": 0.77,
+     "label_flips": 5,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9637,
+       "p5": 0.9448,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9635,
+       "p5": 0.9426,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9619,
+       "p5": 0.9351,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.074,
+     "conf_pct": [
+      0.495,
+      0.639,
+      0.715
+     ],
+     "jitter_px": 0.38,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.938,
+       "p5": 0.8886,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9371,
+       "p5": 0.8944,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9311,
+       "p5": 0.8796,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.915,
+     "track_frac": 0.987,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.071,
+     "conf_pct": [
+      0.278,
+      0.389,
+      0.52
+     ],
+     "jitter_px": 1.24,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 163,
+       "mean": 0.932,
+       "p5": 0.8949,
+       "below_0.822": 0.0061
+      },
+      "5s": {
+       "pairs": 123,
+       "mean": 0.9291,
+       "p5": 0.8792,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 44,
+       "mean": 0.9234,
+       "p5": 0.8503,
+       "below_0.822": 0.0227
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.249,
+     "track_frac": 0.94,
+     "track_ids": 1,
+     "longest_gap": 34,
+     "conf_std": 0.041,
+     "conf_pct": [
+      0.253,
+      0.284,
+      0.385
+     ],
+     "jitter_px": 1.04,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 8,
+       "mean": 0.9731,
+       "p5": 0.9643,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 6,
+       "mean": 0.9733,
+       "p5": 0.9652,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "base5:bilateral",
+   "frames": 600,
+   "brightness": 91.9,
+   "noise": 3.474,
+   "noise_raw": 4.979,
+   "flicker_std": 4.236,
+   "flicker_hf": 0.447,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 7.31,
+    "rotate_resize": 0.82,
+    "filter": 37.0
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.723,
+    "track_frac": 0.957,
+    "track_ids": 1,
+    "longest_gap": 10,
+    "conf_std": 0.11,
+    "conf_pct": [
+     0.268,
+     0.424,
+     0.62
+    ],
+    "jitter_px": 1.8,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 98,
+      "mean": 0.9189,
+      "p5": 0.8718,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 76,
+      "mean": 0.9219,
+      "p5": 0.878,
+      "below_0.822": 0.0132
+     },
+     "15s": {
+      "pairs": 25,
+      "mean": 0.9154,
+      "p5": 0.861,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.682,
+    "det_frac_min": 0.155,
+    "track_frac_mean": 0.906,
+    "track_frac_min": 0.64,
+    "conf_std": 0.078,
+    "jitter_px": 1.8,
+    "track_ids": 1.0,
+    "label_flips": 7.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 530,
+     "mean": 0.9353,
+     "p5": 0.8836,
+     "below_0.822": 0.0
+    },
+    "5s": {
+     "pairs": 415,
+     "mean": 0.9364,
+     "p5": 0.8862,
+     "below_0.822": 0.0024
+    },
+    "15s": {
+     "pairs": 136,
+     "mean": 0.9334,
+     "p5": 0.8644,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.723,
+     "track_frac": 0.957,
+     "track_ids": 1,
+     "longest_gap": 10,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.268,
+      0.424,
+      0.62
+     ],
+     "jitter_px": 1.8,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 98,
+       "mean": 0.9189,
+       "p5": 0.8718,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 76,
+       "mean": 0.9219,
+       "p5": 0.878,
+       "below_0.822": 0.0132
+      },
+      "15s": {
+       "pairs": 25,
+       "mean": 0.9154,
+       "p5": 0.861,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 0.998,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.069,
+     "conf_pct": [
+      0.533,
+      0.659,
+      0.764
+     ],
+     "jitter_px": 0.56,
+     "label_flips": 39,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9566,
+       "p5": 0.9354,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9556,
+       "p5": 0.9368,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9552,
+       "p5": 0.9259,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.988,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.098,
+     "conf_pct": [
+      0.329,
+      0.511,
+      0.644
+     ],
+     "jitter_px": 0.52,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 184,
+       "mean": 0.9291,
+       "p5": 0.8886,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 146,
+       "mean": 0.9295,
+       "p5": 0.8918,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 48,
+       "mean": 0.9228,
+       "p5": 0.8695,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.545,
+     "track_frac": 0.947,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.07,
+     "conf_pct": [
+      0.257,
+      0.331,
+      0.475
+     ],
+     "jitter_px": 1.57,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 53,
+       "mean": 0.9084,
+       "p5": 0.8644,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 38,
+       "mean": 0.913,
+       "p5": 0.8522,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 13,
+       "mean": 0.9239,
+       "p5": 0.8889,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.155,
+     "track_frac": 0.64,
+     "track_ids": 1,
+     "longest_gap": 29,
+     "conf_std": 0.043,
+     "conf_pct": [
+      0.252,
+      0.281,
+      0.392
+     ],
+     "jitter_px": 4.55,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 5,
+       "mean": 0.9564,
+       "p5": 0.9389,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 5,
+       "mean": 0.9625,
+       "p5": 0.9433,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080b:linear",
+   "frames": 600,
+   "brightness": 92.2,
+   "noise": 3.501,
+   "noise_raw": 3.8,
+   "flicker_std": 1.85,
+   "flicker_hf": 0.342,
+   "noise_native": {
+    "brightness": 92.1,
+    "noise": 3.949,
+    "noise_raw": 4.209,
+    "flicker_std": 1.848,
+    "flicker_hf": 0.342
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.49,
+    "rotate_resize": 6.88,
+    "filter": 0.03
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 0.985,
+    "track_frac": 0.99,
+    "track_ids": 1,
+    "longest_gap": 1,
+    "conf_std": 0.116,
+    "conf_pct": [
+     0.381,
+     0.615,
+     0.75
+    ],
+    "jitter_px": 1.52,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 187,
+      "mean": 0.9251,
+      "p5": 0.8886,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 147,
+      "mean": 0.9236,
+      "p5": 0.8762,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 49,
+      "mean": 0.9245,
+      "p5": 0.8786,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.89,
+    "det_frac_min": 0.71,
+    "track_frac_mean": 0.986,
+    "track_frac_min": 0.973,
+    "conf_std": 0.082,
+    "jitter_px": 1.144,
+    "track_ids": 1.0,
+    "label_flips": 54.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 762,
+     "mean": 0.9346,
+     "p5": 0.8819,
+     "below_0.822": 0.0026
+    },
+    "5s": {
+     "pairs": 613,
+     "mean": 0.9347,
+     "p5": 0.8773,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 192,
+     "mean": 0.9363,
+     "p5": 0.8859,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 0.985,
+     "track_frac": 0.99,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.116,
+     "conf_pct": [
+      0.381,
+      0.615,
+      0.75
+     ],
+     "jitter_px": 1.52,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 187,
+       "mean": 0.9251,
+       "p5": 0.8886,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 147,
+       "mean": 0.9236,
+       "p5": 0.8762,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9245,
+       "p5": 0.8786,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.067,
+     "conf_pct": [
+      0.478,
+      0.565,
+      0.699
+     ],
+     "jitter_px": 0.73,
+     "label_flips": 271,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9555,
+       "p5": 0.9341,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9558,
+       "p5": 0.9339,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9586,
+       "p5": 0.938,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.995,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.101,
+     "conf_pct": [
+      0.332,
+      0.492,
+      0.638
+     ],
+     "jitter_px": 0.44,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9195,
+       "p5": 0.8622,
+       "below_0.822": 0.0053
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9199,
+       "p5": 0.8554,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9215,
+       "p5": 0.8749,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.71,
+     "track_frac": 0.973,
+     "track_ids": 1,
+     "longest_gap": 5,
+     "conf_std": 0.066,
+     "conf_pct": [
+      0.26,
+      0.339,
+      0.469
+     ],
+     "jitter_px": 1.47,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 92,
+       "mean": 0.9127,
+       "p5": 0.8755,
+       "below_0.822": 0.0109
+      },
+      "5s": {
+       "pairs": 79,
+       "mean": 0.9139,
+       "p5": 0.8583,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 19,
+       "mean": 0.9164,
+       "p5": 0.8814,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.762,
+     "track_frac": 0.98,
+     "track_ids": 1,
+     "longest_gap": 8,
+     "conf_std": 0.061,
+     "conf_pct": [
+      0.262,
+      0.344,
+      0.466
+     ],
+     "jitter_px": 1.56,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 105,
+       "mean": 0.9596,
+       "p5": 0.9287,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 88,
+       "mean": 0.9608,
+       "p5": 0.9366,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 25,
+       "mean": 0.9587,
+       "p5": 0.9326,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080b:median3",
+   "frames": 598,
+   "brightness": 91.9,
+   "noise": 2.361,
+   "noise_raw": 2.66,
+   "flicker_std": 1.504,
+   "flicker_hf": 0.261,
+   "noise_native": {
+    "brightness": 92.0,
+    "noise": 3.821,
+    "noise_raw": 3.933,
+    "flicker_std": 1.224,
+    "flicker_hf": 0.308
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.55,
+    "rotate_resize": 20.17,
+    "filter": 5.21
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 1.0,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 0,
+    "conf_std": 0.068,
+    "conf_pct": [
+     0.582,
+     0.708,
+     0.79
+    ],
+    "jitter_px": 0.92,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 190,
+      "mean": 0.9539,
+      "p5": 0.9205,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 150,
+      "mean": 0.9536,
+      "p5": 0.9211,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 50,
+      "mean": 0.9529,
+      "p5": 0.9254,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.964,
+    "det_frac_min": 0.839,
+    "track_frac_mean": 0.992,
+    "track_frac_min": 0.987,
+    "conf_std": 0.077,
+    "jitter_px": 0.754,
+    "track_ids": 1.0,
+    "label_flips": 4.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 893,
+     "mean": 0.951,
+     "p5": 0.9098,
+     "below_0.822": 0.0
+    },
+    "5s": {
+     "pairs": 707,
+     "mean": 0.9512,
+     "p5": 0.9106,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 227,
+     "mean": 0.9491,
+     "p5": 0.9063,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.068,
+     "conf_pct": [
+      0.582,
+      0.708,
+      0.79
+     ],
+     "jitter_px": 0.92,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9539,
+       "p5": 0.9205,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9536,
+       "p5": 0.9211,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9529,
+       "p5": 0.9254,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.062,
+     "conf_pct": [
+      0.476,
+      0.587,
+      0.683
+     ],
+     "jitter_px": 0.59,
+     "label_flips": 24,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9645,
+       "p5": 0.947,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9645,
+       "p5": 0.9467,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9615,
+       "p5": 0.9421,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.99,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 2,
+     "conf_std": 0.12,
+     "conf_pct": [
+      0.304,
+      0.506,
+      0.656
+     ],
+     "jitter_px": 0.31,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9361,
+       "p5": 0.9003,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.937,
+       "p5": 0.8976,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9345,
+       "p5": 0.8979,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.993,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.079,
+     "conf_pct": [
+      0.295,
+      0.44,
+      0.567
+     ],
+     "jitter_px": 1.14,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9355,
+       "p5": 0.8995,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9349,
+       "p5": 0.8851,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9367,
+       "p5": 0.9052,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.839,
+     "track_frac": 0.987,
+     "track_ids": 1,
+     "longest_gap": 8,
+     "conf_std": 0.056,
+     "conf_pct": [
+      0.261,
+      0.342,
+      0.443
+     ],
+     "jitter_px": 0.81,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 133,
+       "mean": 0.9706,
+       "p5": 0.9523,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 107,
+       "mean": 0.9721,
+       "p5": 0.9545,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 27,
+       "mean": 0.9693,
+       "p5": 0.9505,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080b:linear+median3",
+   "frames": 598,
+   "brightness": 92.1,
+   "noise": 2.418,
+   "noise_raw": 2.712,
+   "flicker_std": 1.505,
+   "flicker_hf": 0.261,
+   "noise_native": {
+    "brightness": 92.0,
+    "noise": 3.821,
+    "noise_raw": 3.933,
+    "flicker_std": 1.224,
+    "flicker_hf": 0.308
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.44,
+    "rotate_resize": 6.88,
+    "filter": 6.38
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 1.0,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 0,
+    "conf_std": 0.069,
+    "conf_pct": [
+     0.581,
+     0.71,
+     0.791
+    ],
+    "jitter_px": 0.9,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 190,
+      "mean": 0.9543,
+      "p5": 0.9201,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 150,
+      "mean": 0.9536,
+      "p5": 0.9244,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 50,
+      "mean": 0.9522,
+      "p5": 0.9159,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.964,
+    "det_frac_min": 0.829,
+    "track_frac_mean": 0.99,
+    "track_frac_min": 0.98,
+    "conf_std": 0.077,
+    "jitter_px": 0.738,
+    "track_ids": 1.0,
+    "label_flips": 5.2
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 882,
+     "mean": 0.9506,
+     "p5": 0.9073,
+     "below_0.822": 0.0
+    },
+    "5s": {
+     "pairs": 699,
+     "mean": 0.9507,
+     "p5": 0.9048,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 226,
+     "mean": 0.949,
+     "p5": 0.9038,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.069,
+     "conf_pct": [
+      0.581,
+      0.71,
+      0.791
+     ],
+     "jitter_px": 0.9,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9543,
+       "p5": 0.9201,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9536,
+       "p5": 0.9244,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9522,
+       "p5": 0.9159,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.062,
+     "conf_pct": [
+      0.471,
+      0.578,
+      0.675
+     ],
+     "jitter_px": 0.56,
+     "label_flips": 26,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9653,
+       "p5": 0.9467,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9646,
+       "p5": 0.9498,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.962,
+       "p5": 0.9338,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.993,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.12,
+     "conf_pct": [
+      0.313,
+      0.519,
+      0.668
+     ],
+     "jitter_px": 0.3,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9337,
+       "p5": 0.8883,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9352,
+       "p5": 0.8907,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9341,
+       "p5": 0.8884,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.997,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.079,
+     "conf_pct": [
+      0.311,
+      0.454,
+      0.581
+     ],
+     "jitter_px": 1.14,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9352,
+       "p5": 0.8978,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9355,
+       "p5": 0.8934,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9355,
+       "p5": 0.9037,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.829,
+     "track_frac": 0.98,
+     "track_ids": 1,
+     "longest_gap": 8,
+     "conf_std": 0.054,
+     "conf_pct": [
+      0.262,
+      0.338,
+      0.439
+     ],
+     "jitter_px": 0.79,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 124,
+       "mean": 0.9712,
+       "p5": 0.9511,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 100,
+       "mean": 0.9712,
+       "p5": 0.9542,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 27,
+       "mean": 0.9706,
+       "p5": 0.9576,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "hw1080:median3",
+   "frames": 618,
+   "brightness": 92.9,
+   "noise": 2.885,
+   "noise_raw": 3.366,
+   "flicker_std": 2.137,
+   "flicker_hf": 0.246,
+   "noise_native": null,
+   "cost_ms_per_frame": {
+    "decode": 12.23,
+    "rotate_resize": 0.81,
+    "filter": 2.66
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 1.0,
+    "track_frac": 0.994,
+    "track_ids": 1,
+    "longest_gap": 0,
+    "conf_std": 0.074,
+    "conf_pct": [
+     0.523,
+     0.67,
+     0.759
+    ],
+    "jitter_px": 0.85,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 196,
+      "mean": 0.9416,
+      "p5": 0.9006,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 156,
+      "mean": 0.9401,
+      "p5": 0.9016,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 56,
+      "mean": 0.9478,
+      "p5": 0.9187,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.966,
+    "det_frac_min": 0.832,
+    "track_frac_mean": 0.993,
+    "track_frac_min": 0.99,
+    "conf_std": 0.065,
+    "jitter_px": 0.724,
+    "track_ids": 1.0,
+    "label_flips": 39.0
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 923,
+     "mean": 0.9473,
+     "p5": 0.8993,
+     "below_0.822": 0.0011
+    },
+    "5s": {
+     "pairs": 734,
+     "mean": 0.9465,
+     "p5": 0.8967,
+     "below_0.822": 0.0014
+    },
+    "15s": {
+     "pairs": 261,
+     "mean": 0.948,
+     "p5": 0.9058,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 1.0,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.074,
+     "conf_pct": [
+      0.523,
+      0.67,
+      0.759
+     ],
+     "jitter_px": 0.85,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 196,
+       "mean": 0.9416,
+       "p5": 0.9006,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 156,
+       "mean": 0.9401,
+       "p5": 0.9016,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 56,
+       "mean": 0.9478,
+       "p5": 0.9187,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.058,
+     "conf_pct": [
+      0.401,
+      0.485,
+      0.585
+     ],
+     "jitter_px": 0.55,
+     "label_flips": 195,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 196,
+       "mean": 0.9616,
+       "p5": 0.9385,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 156,
+       "mean": 0.9609,
+       "p5": 0.9364,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 56,
+       "mean": 0.9594,
+       "p5": 0.9323,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 1.0,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.078,
+     "conf_pct": [
+      0.519,
+      0.689,
+      0.779
+     ],
+     "jitter_px": 0.32,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 196,
+       "mean": 0.9399,
+       "p5": 0.8828,
+       "below_0.822": 0.0051
+      },
+      "5s": {
+       "pairs": 156,
+       "mean": 0.9402,
+       "p5": 0.8852,
+       "below_0.822": 0.0064
+      },
+      "15s": {
+       "pairs": 56,
+       "mean": 0.9419,
+       "p5": 0.9009,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 1.0,
+     "track_frac": 0.994,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.065,
+     "conf_pct": [
+      0.449,
+      0.569,
+      0.663
+     ],
+     "jitter_px": 1.26,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 196,
+       "mean": 0.9287,
+       "p5": 0.8875,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 156,
+       "mean": 0.9269,
+       "p5": 0.8818,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 56,
+       "mean": 0.928,
+       "p5": 0.8826,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.832,
+     "track_frac": 0.99,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.052,
+     "conf_pct": [
+      0.26,
+      0.324,
+      0.424
+     ],
+     "jitter_px": 0.64,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 139,
+       "mean": 0.9719,
+       "p5": 0.9527,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 110,
+       "mean": 0.9722,
+       "p5": 0.9567,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 37,
+       "mean": 0.9703,
+       "p5": 0.955,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "clip": "p1080-sharp0:linear+median3",
+   "frames": 598,
+   "brightness": 92.4,
+   "noise": 2.138,
+   "noise_raw": 2.53,
+   "flicker_std": 1.584,
+   "flicker_hf": 0.237,
+   "noise_native": {
+    "brightness": 92.3,
+    "noise": 3.14,
+    "noise_raw": 3.327,
+    "flicker_std": 1.314,
+    "flicker_hf": 0.314
+   },
+   "cost_ms_per_frame": {
+    "decode": 11.47,
+    "rotate_resize": 6.88,
+    "filter": 6.42
+   },
+   "headline": {
+    "label": "microphone",
+    "det_frac": 1.0,
+    "track_frac": 0.993,
+    "track_ids": 1,
+    "longest_gap": 0,
+    "conf_std": 0.066,
+    "conf_pct": [
+     0.576,
+     0.703,
+     0.783
+    ],
+    "jitter_px": 0.85,
+    "label_flips": 0,
+    "crop_cosine": {
+     "1s": {
+      "pairs": 190,
+      "mean": 0.9596,
+      "p5": 0.9254,
+      "below_0.822": 0.0
+     },
+     "5s": {
+      "pairs": 150,
+      "mean": 0.9607,
+      "p5": 0.9305,
+      "below_0.822": 0.0
+     },
+     "15s": {
+      "pairs": 50,
+      "mean": 0.958,
+      "p5": 0.9247,
+      "below_0.822": 0.0
+     }
+    }
+   },
+   "detector": {
+    "objects": 5,
+    "det_frac_mean": 0.967,
+    "det_frac_min": 0.853,
+    "track_frac_mean": 0.993,
+    "track_frac_min": 0.993,
+    "conf_std": 0.073,
+    "jitter_px": 0.73,
+    "track_ids": 1.2,
+    "label_flips": 12.8
+   },
+   "crop_cosine": {
+    "1s": {
+     "pairs": 892,
+     "mean": 0.9548,
+     "p5": 0.9169,
+     "below_0.822": 0.0022
+    },
+    "5s": {
+     "pairs": 705,
+     "mean": 0.9543,
+     "p5": 0.9143,
+     "below_0.822": 0.0
+    },
+    "15s": {
+     "pairs": 234,
+     "mean": 0.9536,
+     "p5": 0.9074,
+     "below_0.822": 0.0
+    }
+   },
+   "objects": [
+    {
+     "label": "microphone",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 0,
+     "conf_std": 0.066,
+     "conf_pct": [
+      0.576,
+      0.703,
+      0.783
+     ],
+     "jitter_px": 0.85,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9596,
+       "p5": 0.9254,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9607,
+       "p5": 0.9305,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.958,
+       "p5": 0.9247,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "backpack",
+     "det_frac": 1.0,
+     "track_frac": 0.993,
+     "track_ids": 2,
+     "longest_gap": 0,
+     "conf_std": 0.074,
+     "conf_pct": [
+      0.413,
+      0.534,
+      0.661
+     ],
+     "jitter_px": 0.58,
+     "label_flips": 64,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 190,
+       "mean": 0.9653,
+       "p5": 0.9508,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 150,
+       "mean": 0.9657,
+       "p5": 0.9495,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 50,
+       "mean": 0.9647,
+       "p5": 0.9479,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.995,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.11,
+     "conf_pct": [
+      0.331,
+      0.55,
+      0.663
+     ],
+     "jitter_px": 0.32,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 189,
+       "mean": 0.9367,
+       "p5": 0.8874,
+       "below_0.822": 0.0106
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9354,
+       "p5": 0.8949,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9297,
+       "p5": 0.8793,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "hat",
+     "det_frac": 0.985,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 1,
+     "conf_std": 0.07,
+     "conf_pct": [
+      0.299,
+      0.418,
+      0.535
+     ],
+     "jitter_px": 1.06,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 188,
+       "mean": 0.9431,
+       "p5": 0.9125,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 149,
+       "mean": 0.9417,
+       "p5": 0.9077,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 49,
+       "mean": 0.9457,
+       "p5": 0.9187,
+       "below_0.822": 0.0
+      }
+     }
+    },
+    {
+     "label": "clock",
+     "det_frac": 0.853,
+     "track_frac": 0.993,
+     "track_ids": 1,
+     "longest_gap": 7,
+     "conf_std": 0.044,
+     "conf_pct": [
+      0.261,
+      0.318,
+      0.413
+     ],
+     "jitter_px": 0.84,
+     "label_flips": 0,
+     "crop_cosine": {
+      "1s": {
+       "pairs": 135,
+       "mean": 0.9749,
+       "p5": 0.9594,
+       "below_0.822": 0.0
+      },
+      "5s": {
+       "pairs": 107,
+       "mean": 0.9735,
+       "p5": 0.9558,
+       "below_0.822": 0.0
+      },
+      "15s": {
+       "pairs": 36,
+       "mean": 0.9753,
+       "p5": 0.9621,
+       "below_0.822": 0.0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

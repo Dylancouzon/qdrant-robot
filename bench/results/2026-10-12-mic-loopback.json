@@ -1,0 +1,4989 @@
+{
+ "what": "USB speaker to USB microphone loopback, Ears on the Mac",
+ "machine_record": "robot",
+ "machine_analyze": "macOS-26.6.2-arm64-arm-64bit",
+ "python": "3.12.13",
+ "revision": "fda6df3",
+ "command": "python -m bench.mic_loopback analyze",
+ "constants_base": {
+  "HANGOVER_S": 0.35,
+  "START_FRAMES": 2,
+  "START_P": 0.5,
+  "PAD_S": 0.2,
+  "END_P": 0.35
+ },
+ "lines_played": 67,
+ "levels": {
+  "496": {
+   "noise_floor_dbfs": -37.7,
+   "noise_frame_p99_dbfs": -31.3,
+   "speech_rms_dbfs": -31.4,
+   "speech_peak_dbfs": -11.3,
+   "snr_db": 6.4,
+   "clipped_samples": 0,
+   "lag_at_start_s": 30.001,
+   "drift_ms_per_s": -0.478
+  },
+  "350": {
+   "noise_floor_dbfs": -53.1,
+   "noise_frame_p99_dbfs": -47.8,
+   "speech_rms_dbfs": -46.5,
+   "speech_peak_dbfs": -26.0,
+   "snr_db": 6.6,
+   "clipped_samples": 0,
+   "lag_at_start_s": 29.988,
+   "drift_ms_per_s": -0.43
+  },
+  "250": {
+   "noise_floor_dbfs": -62.1,
+   "noise_frame_p99_dbfs": -57.3,
+   "speech_rms_dbfs": -55.5,
+   "speech_peak_dbfs": -35.2,
+   "snr_db": 6.6,
+   "clipped_samples": 0,
+   "lag_at_start_s": 30.002,
+   "drift_ms_per_s": -0.361
+  },
+  "150": {
+   "noise_floor_dbfs": -70.7,
+   "noise_frame_p99_dbfs": -65.9,
+   "speech_rms_dbfs": -64.3,
+   "speech_peak_dbfs": -43.6,
+   "snr_db": 6.3,
+   "clipped_samples": 0,
+   "lag_at_start_s": 30.011,
+   "drift_ms_per_s": -0.468
+  }
+ },
+ "tegrastats": {
+  "samples": 1506,
+  "ram_mb_max": 3542,
+  "gr3d_pct_max": 99
+ },
+ "recorded_mixer": {
+  "mixer_before": {
+   "Mic Capture Volume": 496,
+   "Speaker Playback Volume": 625
+  },
+  "recordings": {
+   "496": {
+    "file": "rec-496.wav",
+    "mixer": {
+     "Mic Capture Volume": 496,
+     "Speaker Playback Volume": 625
+    }
+   },
+   "350": {
+    "file": "rec-350.wav",
+    "mixer": {
+     "Mic Capture Volume": 350,
+     "Speaker Playback Volume": 625
+    }
+   },
+   "250": {
+    "file": "rec-250.wav",
+    "mixer": {
+     "Mic Capture Volume": 250,
+     "Speaker Playback Volume": 625
+    }
+   },
+   "150": {
+    "file": "rec-150.wav",
+    "mixer": {
+     "Mic Capture Volume": 150,
+     "Speaker Playback Volume": 625
+    }
+   }
+  },
+  "mixer_after": {
+   "Mic Capture Volume": 496,
+   "Speaker Playback Volume": 625
+  }
+ },
+ "arms": [
+  {
+   "arm": "gain 496",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 26.593,
+    "p50": 260.184,
+    "p90": 900.724
+   },
+   "onset_lost_ms": {
+    "p50": 60.184,
+    "p90": 700.724,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6687,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "gain 350",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 34,
+   "split": 0,
+   "missed": 33,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 118.08,
+    "p50": 305.819,
+    "p90": 849.222
+   },
+   "onset_lost_ms": {
+    "p50": 105.819,
+    "p90": 649.222,
+    "over_100": 18
+   },
+   "end_err_ms": {
+    "p10": -501.375,
+    "p50": -110.868,
+    "p90": 6.366
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.7326,
+   "split_ids": [],
+   "missed_ids": [
+    "recall-stop-2",
+    "signs-1",
+    "sydney-2",
+    "intro-3",
+    "same-apples-1",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "knowledge-2",
+    "objects-4",
+    "m3-restart-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "intro-1",
+    "objects-1",
+    "scene-change-2",
+    "knowledge-1",
+    "long-question-1",
+    "knowledge-more-1",
+    "desk-1",
+    "recall-stop-1",
+    "m2-forget-two-5",
+    "small-talk-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "gain 250",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 6,
+   "split": 0,
+   "missed": 61,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 233.589,
+    "p50": 629.992,
+    "p90": 2644.486
+   },
+   "onset_lost_ms": {
+    "p50": 429.992,
+    "p90": 2444.486,
+    "over_100": 5
+   },
+   "end_err_ms": {
+    "p10": -4747.366,
+    "p50": -83.485,
+    "p90": -73.489
+   },
+   "delay_ms": {
+    "p50": 392.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.9876,
+   "split_ids": [],
+   "missed_ids": [
+    "desk-3",
+    "desk-2",
+    "objects-2",
+    "small-talk-3",
+    "joke-1",
+    "fruit-then-bus-3",
+    "left-1",
+    "recall-stop-2",
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "m2-restart-object-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "objects-5",
+    "same-laptop-2",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "m3-return-5",
+    "bus-red-1",
+    "rc-present-2",
+    "same-apples-2",
+    "hand-teddy-2",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m2-removed-cup-1",
+    "hand-teddy-3",
+    "knowledge-2",
+    "objects-4",
+    "visitor-server",
+    "m3-restart-4",
+    "m3-replace-enrolled-5",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "intro-1",
+    "recall-moto-1",
+    "objects-1",
+    "objects-3",
+    "hand-teddy-1",
+    "scene-change-2",
+    "scene-change-1",
+    "knowledge-1",
+    "knowledge-more-1",
+    "desk-1",
+    "recall-stop-1",
+    "m2-forget-two-5",
+    "small-talk-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "gain 150",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 2,
+   "split": 1,
+   "missed": 64,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 293.931,
+    "p50": 460.098,
+    "p90": 4864.781
+   },
+   "onset_lost_ms": {
+    "p50": 260.098,
+    "p90": 4664.781,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -5072.1,
+    "p50": -98.773,
+    "p90": 16.29
+   },
+   "delay_ms": {
+    "p50": 368.0,
+    "p95": 384.0
+   },
+   "wer_mean": 0.9869,
+   "split_ids": [
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "desk-3",
+    "desk-2",
+    "objects-2",
+    "small-talk-3",
+    "joke-1",
+    "fruit-then-bus-3",
+    "left-1",
+    "recall-stop-2",
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "m2-restart-object-1",
+    "m2-similar-teddy-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-evict-talk-2",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "m3-return-5",
+    "bus-red-1",
+    "rc-present-2",
+    "same-apples-2",
+    "hand-teddy-2",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m2-removed-cup-1",
+    "hand-teddy-3",
+    "knowledge-2",
+    "objects-4",
+    "visitor-server",
+    "m3-restart-4",
+    "m3-replace-enrolled-5",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "intro-1",
+    "recall-moto-1",
+    "objects-1",
+    "objects-3",
+    "m2-forget-phone-1",
+    "hand-teddy-1",
+    "scene-change-2",
+    "scene-change-1",
+    "knowledge-1",
+    "knowledge-more-1",
+    "desk-1",
+    "recall-stop-1",
+    "m2-forget-two-5",
+    "small-talk-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "clean playlist",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 12",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -16.544,
+    "p50": 20.759,
+    "p90": 85.715
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0438,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 496 snr 18",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 20.012,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 496 snr 24",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.778,
+    "p50": 9.055,
+    "p90": 54.147
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -21.35,
+    "p50": 29.063,
+    "p90": 95.234
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0266,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 1156
+  },
+  {
+   "arm": "mix gain 350 snr 12",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.452,
+    "p50": 16.0,
+    "p90": 106.742
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -86.003,
+    "p50": 15.257,
+    "p90": 102.14
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0292,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 350 snr 18",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -27.34,
+    "p50": 6.926,
+    "p90": 52.35
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -49.19,
+    "p50": 2.556,
+    "p90": 95.234
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0314,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 350 snr 24",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -27.34,
+    "p50": 0.789,
+    "p90": 27.993
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -36.543,
+    "p50": 2.556,
+    "p90": 87.172
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0314,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 250 snr 12",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -11.486,
+    "p50": 20.556,
+    "p90": 106.128
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -171.924,
+    "p50": -24.983,
+    "p90": 55.172
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0438,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 250 snr 18",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.778,
+    "p50": 9.938,
+    "p90": 46.809
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -94.308,
+    "p50": -16.345,
+    "p90": 69.525
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0343,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 250 snr 24",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -27.34,
+    "p50": 6.926,
+    "p90": 31.008
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -54.897,
+    "p50": -8.109,
+    "p90": 70.725
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0303,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 150 snr 12",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 57,
+   "split": 3,
+   "missed": 7,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 8.923,
+    "p50": 66.745,
+    "p90": 483.372
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 283.372,
+    "over_100": 9
+   },
+   "end_err_ms": {
+    "p10": -295.803,
+    "p50": -50.142,
+    "p90": 68.433
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.2389,
+   "split_ids": [
+    "sydney-2",
+    "conversation-1",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "knowledge-more-2",
+    "sydney-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "conversation-2",
+    "small-talk-1",
+    "fruit-then-bus-1"
+   ],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 150 snr 18",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -14.613,
+    "p50": 20.556,
+    "p90": 67.801
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -180.427,
+    "p50": -40.109,
+    "p90": 55.172
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0303,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "mix gain 150 snr 24",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.778,
+    "p50": 10.578,
+    "p90": 37.156
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -88.789,
+    "p50": -19.785,
+    "p90": 71.437
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0303,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [],
+   "clipped_samples": 0
+  },
+  {
+   "arm": "loopback gain 496 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 35,
+   "split": 2,
+   "missed": 30,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 93.055,
+    "p50": 287.647,
+    "p90": 826.744
+   },
+   "onset_lost_ms": {
+    "p50": 87.647,
+    "p90": 626.744,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -286.405,
+    "p50": -43.06,
+    "p90": 126.436
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.7247,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 35,
+   "split": 3,
+   "missed": 29,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 43.732,
+    "p50": 257.012,
+    "p90": 688.183
+   },
+   "onset_lost_ms": {
+    "p50": 57.012,
+    "p90": 488.183,
+    "over_100": 16
+   },
+   "end_err_ms": {
+    "p10": -216.8,
+    "p50": -40.498,
+    "p90": 170.146
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6697,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 33,
+   "split": 2,
+   "missed": 32,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 92.036,
+    "p50": 318.756,
+    "p90": 786.693
+   },
+   "onset_lost_ms": {
+    "p50": 118.756,
+    "p90": 586.693,
+    "over_100": 19
+   },
+   "end_err_ms": {
+    "p10": -292.673,
+    "p50": -37.936,
+    "p90": 134.653
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.7515,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "hand-teddy-1",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.5",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 2,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 26.593,
+    "p50": 260.184,
+    "p90": 900.724
+   },
+   "onset_lost_ms": {
+    "p50": 60.184,
+    "p90": 700.724,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 560.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.6669,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.5 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 35,
+   "split": 2,
+   "missed": 30,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 93.055,
+    "p50": 287.647,
+    "p90": 826.744
+   },
+   "onset_lost_ms": {
+    "p50": 87.647,
+    "p90": 626.744,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -224.952,
+    "p50": -37.936,
+    "p90": 176.499
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.7228,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.5 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 2,
+   "missed": 29,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 43.732,
+    "p50": 257.012,
+    "p90": 688.183
+   },
+   "onset_lost_ms": {
+    "p50": 57.012,
+    "p90": 488.183,
+    "over_100": 16
+   },
+   "end_err_ms": {
+    "p10": -216.8,
+    "p50": -40.498,
+    "p90": 170.146
+   },
+   "delay_ms": {
+    "p50": 552.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.6679,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.5 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 33,
+   "split": 2,
+   "missed": 32,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 92.036,
+    "p50": 318.756,
+    "p90": 786.693
+   },
+   "onset_lost_ms": {
+    "p50": 118.756,
+    "p90": 586.693,
+    "over_100": 19
+   },
+   "end_err_ms": {
+    "p10": -241.257,
+    "p50": -23.325,
+    "p90": 189.206
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.7497,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "hand-teddy-1",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 2,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 26.593,
+    "p50": 260.184,
+    "p90": 900.724
+   },
+   "onset_lost_ms": {
+    "p50": 60.184,
+    "p90": 700.724,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.6669,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.6 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 35,
+   "split": 2,
+   "missed": 30,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 93.055,
+    "p50": 287.647,
+    "p90": 826.744
+   },
+   "onset_lost_ms": {
+    "p50": 87.647,
+    "p90": 626.744,
+    "over_100": 17
+   },
+   "end_err_ms": {
+    "p10": -224.952,
+    "p50": -37.936,
+    "p90": 176.499
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.7228,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.6 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 2,
+   "missed": 29,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 43.732,
+    "p50": 257.012,
+    "p90": 688.183
+   },
+   "onset_lost_ms": {
+    "p50": 57.012,
+    "p90": 488.183,
+    "over_100": 16
+   },
+   "end_err_ms": {
+    "p10": -216.8,
+    "p50": -40.498,
+    "p90": 170.146
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.6679,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 hangover_s 0.6 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 33,
+   "split": 2,
+   "missed": 32,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 92.036,
+    "p50": 318.756,
+    "p90": 786.693
+   },
+   "onset_lost_ms": {
+    "p50": 118.756,
+    "p90": 586.693,
+    "over_100": 19
+   },
+   "end_err_ms": {
+    "p10": -241.257,
+    "p50": -23.325,
+    "p90": 189.206
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.7497,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "bus-red-2",
+    "hand-teddy-1",
+    "scene-change-2",
+    "recall-stop-1",
+    "fruit-then-bus-1",
+    "fruit-then-bus-4"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 26.593,
+    "p50": 260.184,
+    "p90": 900.724
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 500.724,
+    "over_100": 10
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6171,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 18.785,
+    "p50": 160.044,
+    "p90": 730.708
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 530.708,
+    "over_100": 12
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6584,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 18.785,
+    "p50": 160.044,
+    "p90": 730.708
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 330.708,
+    "over_100": 8
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.618,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 3,
+   "missed": 27,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 16.419,
+    "p50": 144.533,
+    "p90": 785.076
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 585.076,
+    "over_100": 10
+   },
+   "end_err_ms": {
+    "p10": -275.487,
+    "p50": -40.498,
+    "p90": 157.439
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6645,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 3,
+   "missed": 27,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 16.419,
+    "p50": 144.533,
+    "p90": 785.076
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 385.076,
+    "over_100": 6
+   },
+   "end_err_ms": {
+    "p10": -275.487,
+    "p50": -40.498,
+    "p90": 157.439
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6019,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 20.301,
+    "p50": 253.34,
+    "p90": 718.752
+   },
+   "onset_lost_ms": {
+    "p50": 53.34,
+    "p90": 518.752,
+    "over_100": 15
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.662,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 20.301,
+    "p50": 253.34,
+    "p90": 718.752
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 318.752,
+    "over_100": 10
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.62,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1 start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 18.785,
+    "p50": 147.546,
+    "p90": 596.245
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 396.245,
+    "over_100": 11
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6474,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1 start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 36,
+   "split": 3,
+   "missed": 28,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 18.785,
+    "p50": 147.546,
+    "p90": 596.245
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 196.245,
+    "over_100": 6
+   },
+   "end_err_ms": {
+    "p10": -208.647,
+    "p50": -37.936,
+    "p90": 163.793
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6161,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1 start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 3,
+   "missed": 27,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 13.624,
+    "p50": 136.852,
+    "p90": 612.276
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 412.276,
+    "over_100": 10
+   },
+   "end_err_ms": {
+    "p10": -275.487,
+    "p50": -40.498,
+    "p90": 157.439
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6506,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 start_frames 1 start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 37,
+   "split": 3,
+   "missed": 27,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 13.624,
+    "p50": 136.852,
+    "p90": 612.276
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 212.276,
+    "over_100": 6
+   },
+   "end_err_ms": {
+    "p10": -275.487,
+    "p50": -40.498,
+    "p90": 157.439
+   },
+   "delay_ms": {
+    "p50": 400.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5802,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "m3-strangers-4",
+    "same-laptop-1",
+    "bus-purple-1",
+    "recall-moto-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "fruit-then-bus-2",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "conversation-2",
+    "absent-1",
+    "m3-forget-2",
+    "scene-change-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "clean playlist start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.5",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.5 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.5 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.5 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.6 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.6 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -36.543,
+    "p50": -10.83,
+    "p90": 17.08
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "clean playlist hangover_s 0.6 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.238,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -11.543,
+    "p50": 23.543,
+    "p90": 68.084
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0354,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 12 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -16.544,
+    "p50": 20.759,
+    "p90": 85.715
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0461,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 12.669,
+    "p90": 74.007
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0438,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 12.669,
+    "p90": 74.007
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0432,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.79,
+    "p50": 10.055,
+    "p90": 74.007
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0413,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.79,
+    "p50": 10.055,
+    "p90": 74.007
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0481,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -16.544,
+    "p50": 20.759,
+    "p90": 78.578
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0438,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -16.544,
+    "p50": 20.759,
+    "p90": 78.578
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0461,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1 start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 12.669,
+    "p90": 69.823
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0438,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1 start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 12.669,
+    "p90": 69.823
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0432,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1 start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.79,
+    "p50": 10.055,
+    "p90": 68.662
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0413,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 start_frames 1 start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -21.79,
+    "p50": 10.055,
+    "p90": 68.662
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -24.077,
+    "p50": 49.496,
+    "p90": 197.791
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0481,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 18 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 23.891,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 21.123,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 27.923,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.5",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 20.012,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.5 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 23.891,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.5 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 21.123,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.5 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.5,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 27.923,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 544.0,
+    "p95": 576.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 20.012,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.6 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 2,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 23.891,
+    "p90": 86.619
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0341,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.6 start_frames 3",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -13.259,
+    "p50": 21.123,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "mix gain 496 snr 18 hangover_s 0.6 start_frames 3 start_p 0.6",
+   "consts": {
+    "HANGOVER_S": 0.6,
+    "START_FRAMES": 3,
+    "START_P": 0.6,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -8.512,
+    "p50": 27.923,
+    "p90": 95.78
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -10.955,
+    "p50": 34.621,
+    "p90": 108.265
+   },
+   "delay_ms": {
+    "p50": 640.0,
+    "p95": 672.0
+   },
+   "wer_mean": 0.0415,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 80 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 43,
+   "split": 3,
+   "missed": 21,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 19.926,
+    "p50": 210.325,
+    "p90": 692.607
+   },
+   "onset_lost_ms": {
+    "p50": 10.325,
+    "p90": 492.607,
+    "over_100": 15
+   },
+   "end_err_ms": {
+    "p10": -169.448,
+    "p50": -17.089,
+    "p90": 155.435
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.621,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "intro-3",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 44,
+   "split": 3,
+   "missed": 20,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 25.27,
+    "p50": 190.756,
+    "p90": 531.312
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 331.312,
+    "over_100": 13
+   },
+   "end_err_ms": {
+    "p10": -167.895,
+    "p50": -10.852,
+    "p90": 162.704
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6278,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 44,
+   "split": 3,
+   "missed": 20,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 25.27,
+    "p50": 190.756,
+    "p90": 531.312
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 131.312,
+    "over_100": 5
+   },
+   "end_err_ms": {
+    "p10": -167.895,
+    "p50": -10.852,
+    "p90": 162.704
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5069,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 47,
+   "split": 3,
+   "missed": 17,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 19.2,
+    "p50": 153.596,
+    "p90": 624.286
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 424.286,
+    "over_100": 13
+   },
+   "end_err_ms": {
+    "p10": -177.323,
+    "p50": -28.696,
+    "p90": 136.514
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.6058,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 47,
+   "split": 3,
+   "missed": 17,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 19.2,
+    "p50": 153.596,
+    "p90": 624.286
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 224.286,
+    "over_100": 8
+   },
+   "end_err_ms": {
+    "p10": -177.323,
+    "p50": -28.696,
+    "p90": 136.514
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.4998,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "conversation-1",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 49,
+   "split": 3,
+   "missed": 15,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 16.882,
+    "p50": 140.309,
+    "p90": 630.495
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 430.495,
+    "over_100": 15
+   },
+   "end_err_ms": {
+    "p10": -175.658,
+    "p50": -28.696,
+    "p90": 127.307
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5739,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 49,
+   "split": 3,
+   "missed": 15,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 16.882,
+    "p50": 140.309,
+    "p90": 630.495
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 230.495,
+    "over_100": 9
+   },
+   "end_err_ms": {
+    "p10": -175.658,
+    "p50": -28.696,
+    "p90": 127.307
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.4753,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 48,
+   "split": 3,
+   "missed": 16,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 28.417,
+    "p50": 172.072,
+    "p90": 748.83
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 548.83,
+    "over_100": 15
+   },
+   "end_err_ms": {
+    "p10": -177.211,
+    "p50": -23.325,
+    "p90": 127.783
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5954,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.5,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 48,
+   "split": 3,
+   "missed": 16,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 28.417,
+    "p50": 172.072,
+    "p90": 748.83
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 348.83,
+    "over_100": 9
+   },
+   "end_err_ms": {
+    "p10": -177.211,
+    "p50": -23.325,
+    "p90": 127.783
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.4884,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1 start_p 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 48,
+   "split": 3,
+   "missed": 16,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 19.3,
+    "p50": 159.647,
+    "p90": 655.386
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 455.386,
+    "over_100": 14
+   },
+   "end_err_ms": {
+    "p10": -177.211,
+    "p50": -23.325,
+    "p90": 127.783
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5954,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1 start_p 0.4 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.4,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 48,
+   "split": 3,
+   "missed": 16,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 19.3,
+    "p50": 159.647,
+    "p90": 655.386
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 255.386,
+    "over_100": 9
+   },
+   "end_err_ms": {
+    "p10": -177.211,
+    "p50": -23.325,
+    "p90": 127.783
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5005,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "bus-purple-1",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1 start_p 0.3",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 49,
+   "split": 3,
+   "missed": 15,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 13.969,
+    "p50": 89.127,
+    "p90": 630.495
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 430.495,
+    "over_100": 14
+   },
+   "end_err_ms": {
+    "p10": -175.658,
+    "p50": -28.696,
+    "p90": 127.307
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.571,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 100 Hz start_frames 1 start_p 0.3 pad_s 0.4",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 1,
+    "START_P": 0.3,
+    "PAD_S": 0.4
+   },
+   "played": 67,
+   "one_line": 49,
+   "split": 3,
+   "missed": 15,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 13.969,
+    "p50": 89.127,
+    "p90": 630.495
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 230.495,
+    "over_100": 9
+   },
+   "end_err_ms": {
+    "p10": -175.658,
+    "p50": -28.696,
+    "p90": 127.307
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.4694,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "intro-2",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 150 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 51,
+   "split": 3,
+   "missed": 13,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 22.911,
+    "p50": 172.688,
+    "p90": 733.888
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 533.888,
+    "over_100": 16
+   },
+   "end_err_ms": {
+    "p10": -162.66,
+    "p50": -22.876,
+    "p90": 179.588
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5933,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 200 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 52,
+   "split": 2,
+   "missed": 13,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 21.883,
+    "p50": 184.976,
+    "p90": 733.888
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 533.888,
+    "over_100": 15
+   },
+   "end_err_ms": {
+    "p10": -171.954,
+    "p50": -22.876,
+    "p90": 159.714
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5665,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "m2-similar-laptop-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 250 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 49,
+   "split": 2,
+   "missed": 16,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 28.417,
+    "p50": 204.546,
+    "p90": 631.285
+   },
+   "onset_lost_ms": {
+    "p50": 4.546,
+    "p90": 431.285,
+    "over_100": 13
+   },
+   "end_err_ms": {
+    "p10": -179.62,
+    "p50": -34.528,
+    "p90": 172.515
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5864,
+   "split_ids": [
+    "desk-3",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "m3-forget-2",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "loopback gain 496 + high-pass 300 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 46,
+   "split": 3,
+   "missed": 18,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": 28.039,
+    "p50": 218.687,
+    "p90": 545.15
+   },
+   "onset_lost_ms": {
+    "p50": 18.687,
+    "p90": 345.15,
+    "over_100": 12
+   },
+   "end_err_ms": {
+    "p10": -251.772,
+    "p50": -40.195,
+    "p90": 140.254
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.5973,
+   "split_ids": [
+    "desk-3",
+    "hand-teddy-2",
+    "long-question-1"
+   ],
+   "missed_ids": [
+    "signs-1",
+    "rc-order-4",
+    "sydney-2",
+    "same-apples-1",
+    "small-talk-2",
+    "knowledge-more-2",
+    "sydney-1",
+    "knowledge-more-3",
+    "objects-5",
+    "m2-similar-laptop-1",
+    "bus-red-1",
+    "m3-forget-4-yes",
+    "m3-restart-4",
+    "visitor-forget",
+    "knowledge-more-4",
+    "m3-forget-2",
+    "hand-teddy-1",
+    "fruit-then-bus-1"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 + high-pass 100 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -17.338,
+    "p50": 21.042,
+    "p90": 90.68
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 1
+   },
+   "end_err_ms": {
+    "p10": -19.58,
+    "p50": 51.15,
+    "p90": 197.805
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0439,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 + high-pass 200 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 20.487,
+    "p90": 110.639
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 2
+   },
+   "end_err_ms": {
+    "p10": -26.562,
+    "p50": 44.527,
+    "p90": 193.368
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.048,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "mix gain 496 snr 12 + high-pass 300 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 65,
+   "split": 1,
+   "missed": 1,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -19.831,
+    "p50": 18.572,
+    "p90": 110.639
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 3
+   },
+   "end_err_ms": {
+    "p10": -17.686,
+    "p50": 44.796,
+    "p90": 156.759
+   },
+   "delay_ms": {
+    "p50": 368.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0629,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": [
+    "m3-restart-4"
+   ]
+  },
+  {
+   "arm": "clean playlist + high-pass 200 Hz",
+   "consts": {
+    "HANGOVER_S": 0.35,
+    "START_FRAMES": 2,
+    "START_P": 0.5,
+    "PAD_S": 0.2
+   },
+   "played": 67,
+   "one_line": 66,
+   "split": 1,
+   "missed": 0,
+   "false_in_silence": 0,
+   "false_between": 0,
+   "start_err_ms": {
+    "p10": -33.687,
+    "p50": -4.077,
+    "p90": 18.488
+   },
+   "onset_lost_ms": {
+    "p50": 0.0,
+    "p90": 0.0,
+    "over_100": 0
+   },
+   "end_err_ms": {
+    "p10": -14.99,
+    "p50": 25.263,
+    "p90": 69.928
+   },
+   "delay_ms": {
+    "p50": 384.0,
+    "p95": 416.0
+   },
+   "wer_mean": 0.0332,
+   "split_ids": [
+    "knowledge-more-2"
+   ],
+   "missed_ids": []
+  }
+ ]
+}

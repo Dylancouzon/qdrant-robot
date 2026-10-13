@@ -1,0 +1,63 @@
+{
+ "machine": {
+  "label": "J",
+  "host": "robot",
+  "power_mode": "MAXN_SUPER",
+  "kernel": "6.8.12-1021-tegra",
+  "onnxruntime": "1.24.0",
+  "provider": "CUDAExecutionProvider (arena kSameAsRequested, fp32)"
+ },
+ "command": "flock shared/gpu.lock current/.venv/bin/python jetson_time.py MODEL (20 warm-up, 200 timed runs, random input 3x224x224)",
+ "tegrastats": "build/detect-quality/embed/jetson-timing.tegrastats",
+ "sha256": {
+  "shipped": "f22797eabf810a75e41de68d378541ebea372122b25c4ce3ef25ff618250c20a",
+  "dinov3-s": "3db042a9a2796cecf1f6d210b670b0935f74bbf3d05cb8fa12f4555f30437116"
+ },
+ "note": "rss_marginal_mb is RSS growth over a process holding only a CUDA context, so it includes the cuDNN/cuBLAS kernels the robot already has loaded; compare the two models with each other, not with the 172 MB in lessons. rss_after_batches_mb includes arena growth at batch 16.",
+ "models": [
+  {
+   "model": "model.onnx",
+   "providers": [
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+   ],
+   "rss_marginal_mb": 489.1,
+   "file_mb": 88.5,
+   "batch1_ms": {
+    "p50": 11.23,
+    "p95": 12.19
+   },
+   "batch3_ms": {
+    "p50": 28.51,
+    "p95": 29.47
+   },
+   "batch16_ms": {
+    "p50": 126.64,
+    "p95": 127.27
+   },
+   "rss_after_batches_mb": 972.8
+  },
+  {
+   "model": "dinov3-s.onnx",
+   "providers": [
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+   ],
+   "rss_marginal_mb": 502.6,
+   "file_mb": 86.6,
+   "batch1_ms": {
+    "p50": 12.82,
+    "p95": 13.24
+   },
+   "batch3_ms": {
+    "p50": 24.3,
+    "p95": 24.74
+   },
+   "batch16_ms": {
+    "p50": 111.06,
+    "p95": 111.89
+   },
+   "rss_after_batches_mb": 796.3
+  }
+ ]
+}

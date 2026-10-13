@@ -35,7 +35,6 @@ from robot.memory import (
     Memory,
     about_past,
     compares,
-    different_kind,
     earlier_view,
     article,
     is_question,
@@ -108,6 +107,7 @@ PREVIEW_TTL = 0.75  # source expiry for recognition writes
 OFFER_HOLD_S = 30.0
 OFFER_REFRESH_S = 1.0  # a visible item gets a new crop this often; an Ignore in flight can finish
 NOTHING_HELD = "I don't see an object held up. Hold it up and say it again."
+NOTHING_EARLIER = "I don't remember you showing me anything before, so I can't compare."
 SETTLE_S = 0.5  # how long a "my phone" turn waits for tracks confirmed after its speech start
 
 
@@ -133,6 +133,7 @@ class Look:
     exchanges: int
     changed: bool                 # the view differs from the previous turn's
     history: list[dict]           # the conversation as prefilled with this frame
+    objects: frozenset = frozenset()  # the non-person tracks in view
     caption: str | None = None    # what the brain made of this frame alone (brain.caption)
 
 
@@ -297,6 +298,7 @@ class Robot:
         self.held: deque[Held] = deque(maxlen=HISTORY_TURNS)
         self.exchanges = 0                      # counts every exchange; history is capped
         self.last_frame: np.ndarray | None = None  # the frame of the previous turn
+        self.last_objects: frozenset = frozenset()  # the non-person tracks in view at that turn
         self.jobs: queue.Queue = queue.Queue()  # GPU work for llama-server, in order
         self.lines: queue.Queue = queue.Queue()  # finished lines for the final transcript
         self.asked = 0                          # turns queued so far (one per heard line)
@@ -358,6 +360,7 @@ class Robot:
             self.history, self.looked, self.exchanges, self.ready = [], [], 0, None
             self.held.clear()
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
+            self.last_objects = frozenset()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
             self.teaching, self.start_target = None, None
@@ -1037,12 +1040,18 @@ class Robot:
             self.memory.set(job[1], caption=caption)
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
-        changed = self.last_frame is not None and scene_change(
-            self.last_frame, shot[0]) > SCENE_CHANGE
+        with self.detecting:
+            objects = frozenset(t for t, (label, _) in self.view[1].items() if label not in BODY)
+        # The tracks decide when either view has any: an object moving in the hand keeps its
+        # track but changes many pixels. Pixels decide only for views with no tracked objects.
+        changed = self.last_frame is not None and (
+            objects != self.last_objects if objects or self.last_objects else
+            scene_change(self.last_frame, shot[0]) > SCENE_CHANGE)
         # After the view changes, the brain's earlier answers describe a scene that is gone: keep
         # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
         history = [m for m in self.history if m["role"] == "user"] if changed else self.history
-        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history)
+        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history,
+                    objects)
         self.brain.prefill(brain.messages(history, look.image))
         self.ready = look
 
@@ -1112,36 +1121,38 @@ class Robot:
 
     def _same_answer(self, turn: Turn, now: Held | None) -> str | None:
         """"Is this the same thing I showed you before?" answered from the crops of the object
-        held now and of those held at earlier turns: the brain says yes by default. Earlier
-        objects of the same kind, or on the same track (a swap in hand keeps it), are scored by
-        MaxSim and the best decides. With none of them, a question that says "same", "different",
-        or "similar" gets the kind answer; any other ("Have you seen this before?") is left to the
-        stored sightings. None: another question, or nothing earlier, so the usual paths answer."""
+        held now, against those held at earlier turns and the visitor's named objects (a restart
+        clears the first): the brain says yes by default. MaxSim decides, never detector labels,
+        which are guesses outside the vocabulary (a game controller votes "book"). With nothing
+        earlier, a question that says "same" is told so; any other ("Have you seen this
+        before?") is left to the stored sightings. None: another question."""
         if not same_question(turn.question):
             return None
         if now is None:
             return "Hold it up, and I will compare."
-        kin = [h for h in self.held
-               if h.track == now.track or kind_of(h.label) == kind_of(now.label)]
-        if not kin:
-            if not self.held or not says_same(turn.question):
-                return None
-            before, score = self.held[-1], None
-            said = different_kind(now.label, before.label)
+        hidden = self.things.hidden_ids()
+        named = [r for r in self.things.objects(turn.visitor) if str(r.id) not in hidden
+                 ] if turn.visitor else []
+        if not self.held and not named:
+            return NOTHING_EARLIER if says_same(turn.question) else None
+        vectors = self.recognition.call(
+            lambda f, c: c([*now.shots, *(s for h in self.held for s in h.shots)]))
+        here, scores, at = vectors[:len(now.shots)], [], len(now.shots)
+        for h in self.held:
+            scores.append(maxsim(here, vectors[at:at + len(h.shots)]))
+            at += len(h.shots)
+        scores += [float(np.mean([self._score({"id": str(r.id)}, v) for v in here]))
+                   for r in named]
+        best = max(range(len(scores)), key=scores.__getitem__)
+        if best < len(self.held):
+            before = self.held[best]
+            earlier, label, turn.memories = before.taken, before.label, [before.point]
         else:
-            vectors = self.recognition.call(
-                lambda f, c: c([*now.shots, *(s for h in kin for s in h.shots)]))
-            here, scores, at = vectors[:len(now.shots)], [], len(now.shots)
-            for h in kin:
-                scores.append(maxsim(here, vectors[at:at + len(h.shots)]))
-                at += len(h.shots)
-            best = max(range(len(kin)), key=scores.__getitem__)
-            before, score = kin[best], scores[best]
-            said = same_thing(before.label, score, settings.same, settings.guess_band)
-        turn.compared = {"now": now.taken, "earlier": before.taken,
-                         "labels": [now.label, before.label], "score": score}
-        turn.memories = [before.point]
-        return said
+            row = named[best - len(self.held)].payload
+            earlier, label, turn.memories = [], row["name"], row["turns"][-1:]
+        turn.compared = {"now": now.taken, "earlier": earlier, "labels": [now.label, label],
+                         "score": scores[best]}
+        return same_thing(scores[best], settings.same, settings.guess_band)
 
     def _code_answer(self, turn: Turn, now: np.ndarray, track: int | None, look: Look,
                      recalled: list[dict], memories: list[str], held: Held | None
@@ -1214,7 +1225,7 @@ class Robot:
         recalled_answer = self._code_answer(turn, now, track, look, recalled, memories, held)
         turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
         turn.retrieved = time.time()
-        self.last_frame, turn.looked = look.frame, look.taken
+        self.last_frame, self.last_objects, turn.looked = look.frame, look.objects, look.taken
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
@@ -1950,16 +1961,17 @@ class Robot:
         self.panel = None
 
     def named_evidence(self, turn: Turn, named: dict, this: bool = False
-                       ) -> tuple[list[str], int | None, int, str]:
+                       ) -> tuple[list[str], int | None, dict[int, float], str]:
         """Retrieval for a question about the visitor's object `named`: evidence lines (what
         it looks like, when it was named, each object in view with its score, its latest
         matched sightings), the track in view that meets the recognition threshold (None: no
-        claim), how many tracks of its kind are in view, and when it was last seen ("20
-        seconds ago"). Every object in view is scored, whatever its label; `this`: only the
-        one nearest the center. Sets turn.memories to the evidence ids."""
+        claim), each track in view with its score, and when it was last seen ("20 seconds
+        ago"). Every object in view is scored, whatever its label, because an object outside
+        the detector's vocabulary gets a guessed one (a game controller votes "book"); `this`:
+        only the one nearest the center. Sets turn.memories to the evidence ids."""
         name = named["name"]
         if set(named["labels"]) & self.ignored:
-            return [], None, 0, ""
+            return [], None, {}, ""
         with self.detecting:
             frame, view = self.view
             here = {self.points[t] for t in self.tracker.in_view() if t in self.points}
@@ -1985,7 +1997,7 @@ class Robot:
             for t in found] + [
             f"Matched sighting: {x['label']}, last seen {ago(x['last_seen'])}" for x in past]
         last = ago(past[0]["last_seen"]) if past else ago(turns[-1]["ts"]) if turns else ""
-        return lines, mine, sum(view[t][0] in named["labels"] for t in found), last
+        return lines, mine, scores, last
 
     def _score(self, named: dict, v: np.ndarray) -> float:
         """A crop vector's MaxSim score against the requested object `named`."""
@@ -1995,15 +2007,15 @@ class Robot:
     def _mine(self, turn: Turn, mode: str, named: dict, possessive: str = "your") -> str:
         """A minimal code answer from named_evidence until those lines go to the brain."""
         name = named["name"]
-        _, mine, found, last = self.named_evidence(turn, named, mode == "this")
+        _, mine, scores, last = self.named_evidence(turn, named, mode == "this")
         if mode == "this":
-            return (f"I don't see {article(name)} right now." if not found else
+            return (f"I don't see {article(name)} right now." if not scores else
                     f"Yes, this is {possessive} {name}." if mine is not None else
                     f"No, I don't think this is {possessive} {name}.")
         said = f"Yes, I remember {possessive} {name}. " * (mode == "remember")
         if mine is not None:
             return said + f"Yes, {possessive} {name} is here now."
-        if found:
+        if any(s >= settings.match - settings.guess_band for s in scores.values()):
             owned = "yours" if possessive == "your" else possessive
             return said + f"I see {article(name)}, but I am not sure it is {owned}."
         return said + (f"I last saw {possessive} {name} {last}; I don't see it now." if last else

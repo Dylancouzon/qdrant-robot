@@ -8,8 +8,9 @@ from pathlib import Path
 
 from robot.config import SHARED
 
-DEFAULTS = dict(match=.822, same=.86, guess_band=.05, window_s=6.0, window_gap_s=1.0,
-                window_floor=.70, duplicate=.95, views_cap=24,
+# Cosine thresholds for DINOv3-small crop vectors, each at the DINOv2 operating point (D168).
+DEFAULTS = dict(match=.808, same=.857, guess_band=.036, window_s=6.0, window_gap_s=1.0,
+                window_floor=.722, duplicate=.952, views_cap=24,
                 ask_delay_s=3., ask_blank_s=4., ask_max=3)
 RANGES = dict(match=(.6, .99), same=(.6, .99), guess_band=(0., .2), window_s=(0., 30.),
               window_gap_s=(.2, 5.), window_floor=(0., .99), duplicate=(.8, 1.),
@@ -67,8 +68,8 @@ class Settings:
             fd, temporary = tempfile.mkstemp(
                 dir=self.path.parent, prefix="settings-", suffix=".tmp")
             try:
-                with os.fdopen(fd, "w") as stream:
-                    json.dump(updated, stream)
+                with os.fdopen(fd, "w") as stream:  # changed values only: new defaults apply
+                    json.dump({k: v for k, v in updated.items() if v != DEFAULTS[k]}, stream)
                 os.replace(temporary, self.path)
             finally:
                 Path(temporary).unlink(missing_ok=True)

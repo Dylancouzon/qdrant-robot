@@ -1,0 +1,38 @@
+{
+ "decode_720p_read": {
+  "wall_ms": 6.21,
+  "cpu_ms": 6.7
+ },
+ "decode_1080p_read": {
+  "wall_ms": 9.67,
+  "cpu_ms": 11.22
+ },
+ "rotate_720p": {
+  "wall_ms": 0.75,
+  "cpu_ms": 0.75
+ },
+ "rotate_1080p": {
+  "wall_ms": 1.98,
+  "cpu_ms": 1.97
+ },
+ "resize_1080p_area": {
+  "wall_ms": 2.77,
+  "cpu_ms": 15.46
+ },
+ "resize_1080p_linear": {
+  "wall_ms": 0.5,
+  "cpu_ms": 2.99
+ },
+ "linear_then_rotate": {
+  "wall_ms": 1.13,
+  "cpu_ms": 6.46
+ },
+ "area_then_rotate": {
+  "wall_ms": 3.39,
+  "cpu_ms": 16.59
+ },
+ "median3_720p": {
+  "wall_ms": 2.46,
+  "cpu_ms": 2.45
+ }
+}

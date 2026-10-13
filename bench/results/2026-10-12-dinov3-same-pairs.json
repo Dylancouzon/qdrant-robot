@@ -1,0 +1,392 @@
+{
+  "code_revision": "fda6df33e6e9871f75bc3e9b1b800797a0ca6d79",
+  "source_sha256": {
+    "bench/same_pairs.py": "b81dbd07b6f30c29ca370b2b6434e596e8274e3337bb2f5abc4861ebd332db69",
+    "robot/memory.py": "7239e98813fe0e9adc8bc95904fe70d7dcf3b93a04b15e32d4a82be90fdcd42a",
+    "robot/things.py": "d46c8b11bb1c86ab9247c7c3b951feeb7613e79308c30d9af0b7df60f30836e4"
+  },
+  "model_sha256": {
+    "yoloe-26s-booth-384x640.onnx": "edbad6fd9657c55dafee3b73902b188311c13ec2c03600c521cf9128b06d84c4",
+    "model.onnx": "746542d787d5ecfb2d2bc12254eb57bd1bfa490646a0fb12eb2a0ab1edcd57bd"
+  },
+  "machine": {
+    "label": "E",
+    "hostname": "dylans-macbook-pro.tail04131.ts.net",
+    "platform": "macOS-26.6.2-arm64-arm-64bit"
+  },
+  "versions": {
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.3.3",
+    "opencv": "5.0.0"
+  },
+  "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python bench/same_pairs.py",
+  "limits": {
+    "same": 0.836,
+    "guess_band": 0.036,
+    "crops_per_side": 1
+  },
+  "pairs": 27,
+  "counts": {
+    "views": {
+      "same": 12,
+      "unsure": 0,
+      "different": 0,
+      "pairs": 12,
+      "scores": [
+        0.8642,
+        0.9977
+      ]
+    },
+    "class": {
+      "same": 1,
+      "unsure": 0,
+      "different": 7,
+      "pairs": 8,
+      "scores": [
+        0.3484,
+        0.8821
+      ]
+    },
+    "kinds": {
+      "same": 0,
+      "unsure": 0,
+      "different": 7,
+      "pairs": 7,
+      "scores": [
+        0.2307,
+        0.3827
+      ]
+    }
+  },
+  "false_same": 1,
+  "false_different": 0,
+  "unsure_same": 0,
+  "unsure_different": 0,
+  "rows": [
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-cat-center",
+      "b": "live/closet-cat-left",
+      "labels": [
+        "cat",
+        "cat"
+      ],
+      "score": 0.9936,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-moto-center",
+      "b": "live/closet-moto-left",
+      "labels": [
+        "motorcycle",
+        "motorcycle"
+      ],
+      "score": 0.9846,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-stopsign-center",
+      "b": "live/closet-stopsign-left",
+      "labels": [
+        "stop sign",
+        "stop sign"
+      ],
+      "score": 0.9963,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-clock",
+      "b": "images/m2-clock-right",
+      "labels": [
+        "clock",
+        "clock"
+      ],
+      "score": 0.95,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-umbrella",
+      "b": "images/m2-umbrella-bag",
+      "labels": [
+        "umbrella",
+        "umbrella"
+      ],
+      "score": 0.8913,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-umbrella",
+      "b": "images/m2-bag-umbrella",
+      "labels": [
+        "umbrella",
+        "umbrella"
+      ],
+      "score": 0.9237,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-teddy-white",
+      "b": "images/m2-teddies",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.9394,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-teddy-brown",
+      "b": "images/m2-teddies",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.8642,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "images/m2-banana",
+      "b": "images/m2-snack",
+      "labels": [
+        "banana",
+        "banana"
+      ],
+      "score": 0.9977,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-cat-center",
+      "b": "images/coco-000000039769",
+      "labels": [
+        "cat",
+        "cat"
+      ],
+      "score": 0.967,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-apples-center",
+      "b": "images/coco-000000002149",
+      "labels": [
+        "apple",
+        "apple"
+      ],
+      "score": 0.9712,
+      "verdict": "same"
+    },
+    {
+      "category": "views",
+      "truth": "same",
+      "a": "live/closet-stopsign-center",
+      "b": "images/coco-000000000724",
+      "labels": [
+        "stop sign",
+        "stop sign"
+      ],
+      "score": 0.9958,
+      "verdict": "same"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "images/m2-teddy-white",
+      "b": "images/m2-teddy-brown",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.7213,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "images/m2-teddies",
+      "b": "images/m2-teddies",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.625,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "images/m2-laptop",
+      "b": "images/m2-laptop-silver",
+      "labels": [
+        "laptop",
+        "laptop"
+      ],
+      "score": 0.8821,
+      "verdict": "same"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "live/closet-teddy-center",
+      "b": "images/m2-teddy-white",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.6456,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "live/closet-teddy-center",
+      "b": "images/m2-teddy-brown",
+      "labels": [
+        "teddy bear",
+        "teddy bear"
+      ],
+      "score": 0.6965,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "live/closet-cat-center",
+      "b": "images/coco-000000039769",
+      "labels": [
+        "cat",
+        "cat"
+      ],
+      "score": 0.7428,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "images/m2-pepsi",
+      "b": "images/coco-000000001425",
+      "labels": [
+        "cup",
+        "cup"
+      ],
+      "score": 0.3484,
+      "verdict": "different"
+    },
+    {
+      "category": "class",
+      "truth": "different",
+      "a": "live/closet-moto-center",
+      "b": "images/coco-000000008211",
+      "labels": [
+        "motorcycle",
+        "motorcycle"
+      ],
+      "score": 0.5564,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "images/m2-clock",
+      "b": "images/m2-laptop",
+      "labels": [
+        "clock",
+        "laptop"
+      ],
+      "score": 0.315,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "images/m2-pepsi",
+      "b": "images/m2-banana",
+      "labels": [
+        "cup",
+        "banana"
+      ],
+      "score": 0.3827,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "live/closet-cat-center",
+      "b": "live/closet-moto-center",
+      "labels": [
+        "cat",
+        "motorcycle"
+      ],
+      "score": 0.2823,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "live/closet-apples-center",
+      "b": "live/closet-teddy-center",
+      "labels": [
+        "apple",
+        "teddy bear"
+      ],
+      "score": 0.2307,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "live/closet-stopsign-center",
+      "b": "images/m2-umbrella",
+      "labels": [
+        "stop sign",
+        "umbrella"
+      ],
+      "score": 0.3441,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "images/m2-umbrella-bag",
+      "b": "images/m2-banana",
+      "labels": [
+        "umbrella",
+        "banana"
+      ],
+      "score": 0.368,
+      "verdict": "different"
+    },
+    {
+      "category": "kinds",
+      "truth": "different",
+      "a": "images/m2-clock",
+      "b": "live/closet-cat-center",
+      "labels": [
+        "clock",
+        "cat"
+      ],
+      "score": 0.2666,
+      "verdict": "different"
+    }
+  ]
+}

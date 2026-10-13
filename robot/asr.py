@@ -18,7 +18,7 @@ FRAME = 512                  # Silero's frame at 16 kHz (32 ms), after 64 sample
 CONTEXT = 64
 START_P, END_P = 0.5, 0.35   # speech starts above START_P, ends below END_P (hysteresis)
 START_FRAMES = 2             # voiced frames in a row before a line starts (64 ms)
-HANGOVER_S = 0.35            # silence that ends a line; mid-sentence pauses are shorter
+HANGOVER_S = 0.6             # silence that ends a line: real 0.4-0.6 s pauses split at 0.35 (D166)
 LONG_S, LONG_HANGOVER_S = 4.0, 0.7  # long questions pause longer (0.58 s in dev, D37)
 MIN_SPEECH_S = 0.25          # shorter lines are noise
 MAX_LINE_S = 25.0            # under BUFFER_S; a 16 s fixture question split at 15 s
@@ -168,7 +168,8 @@ if __name__ == "__main__":
     ears.voiced, ears.start, ears.silence = 0, None, 0
     ears.fed, ears.buffer = RATE * 4, np.zeros(RATE * 4, np.float32)
     ears.arrivals = deque([(RATE * 4, 100.0)])
-    for k, p in enumerate([0.9] * 20 + [0.1] * 12, 1):  # 0.64 s of speech, 0.38 s of silence
+    quiet = int(HANGOVER_S * RATE / FRAME) + 1  # just past the hangover
+    for k, p in enumerate([0.9] * 20 + [0.1] * quiet, 1):  # 0.64 s of speech, then silence
         ears.step(p, k * FRAME)
     assert events[0] == "start" and len(events) == 2, events
     assert abs(events[1] - (100.0 - (RATE * 4 - 20 * FRAME) / RATE)) < 1e-6, "speech end time"

@@ -96,6 +96,12 @@
   "license": "Apache-2.0"
  },
  {
+  "path": "dinov3-small/model.safetensors",
+  "url": "https://huggingface.co/timm/vit_small_patch16_dinov3.lvd1689m/resolve/3bf4720a82ec2066db88137180ff1f83a675cef0/model.safetensors",
+  "sha256": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040",
+  "license": "DINOv3 License"
+ },
+ {
   "path": "parakeet-v2/config.json",
   "url": "https://huggingface.co/istupakov/parakeet-tdt-0.6b-v2-onnx/resolve/0bbb45a3365852604aef28b538a8f066f4ccaa85/config.json",
   "sha256": "666903c76b9798caf2c210afd4f6cd60b08a8dbf9800ec8d7a3bc0d2148ac466",

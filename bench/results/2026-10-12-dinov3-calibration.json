@@ -1,0 +1,87 @@
+{
+ "code_revision": "fda6df33e6e9871f75bc3e9b1b800797a0ca6d79",
+ "command": "/Users/dylanc/Documents/GitHub/qdrant-robot/.venv/bin/python bench/embed_arms.py calibrate",
+ "machine": "Mac, CPU (E)",
+ "arms": {
+  "dinov2-s": "viewpoint embeddings of the clean condition, pool cat, average 1",
+  "dinov3-s": "same crops, same pool"
+ },
+ "operating_points_dinov2": {
+  "match": 0.822,
+  "band_floor": 0.772,
+  "window_floor": 0.7,
+  "duplicate": 0.95,
+  "same": 0.86
+ },
+ "dinov2": {
+  "window": {
+   "eligible": 134,
+   "skipped": 100,
+   "admitted": 34
+  },
+  "rates": {
+   "skipped": 0.746268656716418,
+   "admitted": 0.2537313432835821
+  },
+  "false_and_recognized_at_match": [
+   108,
+   532
+  ],
+  "false_and_recognized_at_band_floor": [
+   377,
+   640
+  ],
+  "scored_views": 756
+ },
+ "dinov3": {
+  "window_floor": 0.722,
+  "distractors_over_floor": [
+   1096,
+   1084
+  ],
+  "duplicate": 0.952,
+  "window": {
+   "eligible": 130,
+   "skipped": 97,
+   "admitted": 33
+  },
+  "rates": {
+   "skipped": 0.7461538461538462,
+   "admitted": 0.25384615384615383
+  },
+  "match": 0.808,
+  "match_false_recognized": [
+   107,
+   620
+  ],
+  "guess_band": 0.036,
+  "band_floor": 0.772,
+  "band_floor_false_recognized": [
+   377,
+   665
+  ],
+  "same": 0.857,
+  "scored_views": 756,
+  "affine_for_comparison": {
+   "window_floor": 0.676,
+   "duplicate": 0.946
+  }
+ },
+ "same_pairs": {
+  "same_windows": 248,
+  "lookalike_windows": 768,
+  "dinov2": {
+   "false_same_at_0.86": 0,
+   "same_recognized_at_0.86": 88,
+   "lookalike_max": 0.8533245921134949,
+   "same_p10": 0.5897756338119506
+  },
+  "dinov3": {
+   "false_same_at_new": 0,
+   "same_recognized_at_new": 119,
+   "lookalike_max": 0.8564708828926086,
+   "same_p10": 0.6736572086811066
+  }
+ },
+ "false_budget_note": "false counts sum the distractor comparisons of 17 final galleries"
+}

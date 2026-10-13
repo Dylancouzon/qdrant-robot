@@ -2,6 +2,7 @@
 answers, on real Edge shards and the real tracker, with a stub crop embedder (one vector per
 color), including restarts."""
 import dataclasses
+import json
 import queue
 import tempfile
 import threading
@@ -175,8 +176,8 @@ def test_things(monkeypatch) -> None:
         show(robot, [], LOST + 1)
         show(robot, [(BLACK, CENTER)])
         assert ask(robot, "Is this my phone?")[0] == "No, I don't think this is your phone."
-        assert ask(robot, "Where is my phone?")[0] == "I see a phone, but I am not sure it " \
-            "is yours.", "a same-kind phone under MATCH is never called the visitor's"
+        assert ask(robot, "Where is my phone?")[0].startswith("I last saw your phone "), \
+            "another phone that scores far under MATCH is neither claimed nor half-claimed"
         show(robot, [], LOST + 1)
         assert ask(robot, "Where is my phone?")[0].startswith("I last saw your phone ")
         close_robot(robot)
@@ -2464,6 +2465,7 @@ def test_settings_validation_and_persistence(tmp_path):
         assert config.snapshot() == DEFAULTS and not path.exists()
     config.change({"name": "match", "value": .9})
     assert config.match == .9 and Settings(path).snapshot() == config.snapshot()
+    assert json.loads(path.read_text()) == {"match": .9}, "only changes: new defaults apply"
     config.change({"reset": True})
     assert Settings(path).snapshot() == DEFAULTS
 
@@ -2801,7 +2803,7 @@ def test_startup_sweeps_orphan_thumbnails(tmp_path):
         things.shard.close()
 
 
-def test_old_schema_backup_and_existing_people_visitors(tmp_path):
+def test_old_schema_deleted_and_existing_people_visitors(tmp_path):
     from qdrant_edge import (
         EdgeConfig,
         EdgeShard,
@@ -2825,14 +2827,39 @@ def test_old_schema_backup_and_existing_people_visitors(tmp_path):
     things = Things(tmp_path, people)
     try:
         assert people.person("Ana")["visitor"]
-        assert not things.objects()
-        backup, = tmp_path.glob("things-backup-*")
-        old = EdgeShard.load(str(backup))
-        assert old.retrieve([1], True, False)[0].payload["name"] == "old mouse"
-        old.close()
+        assert not things.objects() and not things.shard.retrieve([1], False, False)
+        assert [p.name for p in tmp_path.iterdir() if p.name.startswith("things")] == ["things"]
     finally:
         things.shard.close()
         people.shard.close()
+
+
+def test_dinov2_shard_keeps_only_records_without_vectors(tmp_path):
+    from qdrant_edge import Point, UpdateOperation
+    from robot.things import _id
+    visitor = "00000000-0000-4000-8000-0000000000aa"
+    things = Things(tmp_path)
+    things.name(visitor, "phone", ["phone"], np.eye(DIM, dtype=np.float32)[:1],
+                thumbnail_crops([0]), display="Ana")
+    things.ignore_item("phone", np.eye(DIM, dtype=np.float32)[:1])
+    things.ignore(["chair"], True)
+    guest = things._guest_number()
+    thumb, = things.thumbs.glob("*.jpg")
+    marker, old_marker = _id("schema:dinov3"), _id("schema:owners")
+    things.shard.update(UpdateOperation.delete_points([marker]))  # the shard a DINOv2 robot made
+    things.shard.update(UpdateOperation.upsert_points([Point(old_marker, {}, {"schema": 1})]))
+    things.shard.flush()
+    things.shard.close()
+    things = Things(tmp_path)
+    try:
+        assert not things.objects() and not things.items and not list(things.thumbs.glob("*.jpg"))
+        assert things.visitor(visitor)["display"] == "Ana" and things.ignored() == {"chair"}
+        assert things._guest_number() == guest + 1, "the guest counter carries over"
+        assert things.shard.retrieve([marker], False, False)
+        assert not things.shard.retrieve([old_marker], False, False)
+        assert not (things.thumbs / thumb.name).exists() and not list(tmp_path.glob("*backup*"))
+    finally:
+        things.shard.close()
 
 
 def test_forget_object_removes_thumbnails_and_ignore_exclusions(robot):
@@ -3064,7 +3091,7 @@ def test_screen_reuses_label_map_without_per_box_lookup(robot, monkeypatch):
 
 
 def test_third_person_answer_preserves_object_name(robot, monkeypatch):
-    monkeypatch.setattr(robot, "named_evidence", lambda *args: ([], 1, 1, ""))
+    monkeypatch.setattr(robot, "named_evidence", lambda *args: ([], 1, {1: 0.9}, ""))
     assert robot._mine(Turn(), "remember", {"name": "your mouse"}, "Ana's") == (
         "Yes, I remember Ana's your mouse. Yes, Ana's your mouse is here now.")
 

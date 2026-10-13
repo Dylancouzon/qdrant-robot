@@ -153,6 +153,17 @@ def test_target_is_the_held_object_even_when_named() -> None:
     assert f.focus is None and f.target([phone()]) == 1
 
 
+def test_target_prefers_the_held_object_over_an_unheld_focus() -> None:
+    f = Focus(W, H)
+    keyboard = phone((1100, 500, 1270, 700), 1, "keyboard")  # outside PERSON: on the desk
+    run(f, 0, 1.2, [keyboard])
+    assert f.focus == 1
+    held = phone(i=2)
+    run(f, 1.2, 2 * DT, [keyboard, held], recognized={2: ("Dylan's controller", 0.9)})
+    assert f.focus == 1 and f.target([keyboard, held]) == 2, "the named object in hand wins"
+    assert f.target([keyboard]) == 1, "with nothing held, the focus is the target"
+
+
 def test_steady_gate() -> None:
     f = Focus(W, H)
     t = 0.0

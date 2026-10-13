@@ -263,11 +263,13 @@ def _described(group: list[dict], now: set[int], visible: list[str],
 
 
 # "Is this the same thing I showed you before?" is answered from tracked crops, not by the brain.
-_YES_NO = re.compile(r"^\W*(is|are|was|were|do|does|did|have|has)\b", re.I)
+_YES_NO = re.compile(r"^\W*(is|are|am|was|were|do|does|did|have|has|can|could|will|would)\b",
+                     re.I)
 _SAME = re.compile(r"\b(same|different|similar|like the (one|thing))\b", re.I)
-_SAME_PAST = re.compile(r"\b(before|earlier|showed|again|first|last|just)\b", re.I)
+_SAME_PAST = re.compile(
+    r"\b(before|earlier|showed|shown|seen|again|first|last|just|still|already|one)\b", re.I)
 _THIS = re.compile(r"\b(this|that|it)\b", re.I)
-_THIS_PAST = re.compile(r"\b(before|earlier|again|seen|saw|show|showed)\b", re.I)
+_THIS_PAST = re.compile(r"\b(before|earlier|again|seen|saw|show|showed|shown)\b", re.I)
 
 
 def same_question(text: str) -> bool:
@@ -290,18 +292,15 @@ def maxsim(a: np.ndarray, b: np.ndarray) -> float:
     return float((a @ b.T).max(axis=1).mean())
 
 
-def different_kind(now: str, before: str) -> str:
-    return f"No. Earlier you showed me {article(before)}; this is {article(now)}."
-
-
-def same_thing(label: str, score: float, match: float, band: float) -> str:
-    """The answer for two objects of one kind, from their MaxSim score; `label` names the earlier
-    one, because a swap in hand can keep the old track and its voted label."""
+def same_thing(score: float, match: float, band: float) -> str:
+    """The answer to "is this the same one?" from the MaxSim score of the object held now against
+    an earlier one. It names no label: the detector guesses one for objects outside its
+    vocabulary (a game controller votes "book")."""
     if score >= match:
-        return f"Yes, it looks like the same {label}."
+        return "Yes, it looks like the same one."
     if score >= match - band:
-        return f"It looks similar, but I am not sure it is the same {label}."
-    return f"No, this looks different from the {label} you showed me."
+        return "It looks similar, but I am not sure it is the same one."
+    return "No, this looks different from the one you showed me."
 
 
 def about_past(question: str) -> bool:
@@ -686,7 +685,9 @@ if __name__ == "__main__":
     assert is_question("is Qdrant written in Rust.") and is_question("Where am I from?")
     for text in ("Is this the same thing I showed you before?", "Is this the same as what I just "
                  "showed you?", "Is this the same laptop as before?", "Have you seen this before?",
-                 "Did I show you this earlier?", "Was that different from the last one?"):
+                 "Did I show you this earlier?", "Was that different from the last one?",
+                 "Am I holding the same controller as I shown you before?", "Is this one the same?",
+                 "Am I still holding the same controller?", "Can you tell if it is the same one?"):
         assert same_question(text), text
     for text in ("Does this look like a phone?", "Is this the same color as my shirt?",
                  "Is it different from a cup?", "What did I show you just now?",
@@ -696,11 +697,9 @@ if __name__ == "__main__":
     assert says_same("Is this the same laptop?") and not says_same("Have you seen this before?")
     v = np.eye(3, dtype=np.float32)
     assert maxsim(v[:2], v) == 1.0 and maxsim(v[:2], v[2:]) == 0.0 and maxsim(v[:2], v[1:]) == 0.5
-    assert different_kind("cup", "teddy bear") == "No. Earlier you showed me a teddy bear; this " \
-        "is a cup."
-    assert same_thing("mug", 0.9, 0.8, 0.05).startswith("Yes") and same_thing(
-        "mug", 0.77, 0.8, 0.05).startswith("It looks similar") and same_thing(
-        "mug", 0.5, 0.8, 0.05).startswith("No, this")
+    assert same_thing(0.9, 0.8, 0.05).startswith("Yes") and same_thing(
+        0.77, 0.8, 0.05).startswith("It looks similar") and same_thing(
+        0.5, 0.8, 0.05).startswith("No, this")
     mems = [{"caption": "Main object: a bus. Around it: a street."},
             {"caption": "Main object: green apples\nAround it: a bowl."}]
     ago = lambda m: "just now"  # noqa: E731

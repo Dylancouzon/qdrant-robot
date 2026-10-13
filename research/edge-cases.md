@@ -111,3 +111,17 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - Speech without the wake word flips the status to "Hearing you", so the closed-conversation note can flicker in a noisy room. A short hold on the note would fix it.
 - While `hiding` is set after "forget me", `_log` still appends background (unwoken) turns to the chat, so overheard speech can appear on screen.
+
+## Camera and crop encoder (D167, D168)
+
+- DINOv3 weighs shape over color, in recognition and in same-object answers: the dev black and silver laptop pair scores 0.882 ("same" at 0.857), and live a black controller showed the green name of a taught white one. Parked for a test in better light (D169).
+- A gallery taught without the turning window (the visitor stops turning at once) gives 64 false matches against DINOv2's 31 on the viewpoint benchmark, at the same recognized-view gain. The window policy is unchanged at 108 false matches.
+- At 15 fps in dim light, 1080p decoding costs 0.33 more CPU cores than 720p; the grain is still visible in dim rooms, and more light remains the real fix.
+- The detector vocabulary has no game controller: a taught Xbox controller votes "book" and "camera" (live 2026-10-12). Names and crops still work; spoken answers avoid detector labels for same-object questions.
+- With two named objects in view and neither held, "this one" cannot be resolved; there is no pointing or hand detector.
+- A crash between deleting the old things shard and the new shard's first write loses the carried visitor records and Ignore rules (review, D168). A future encoder migration must also delete the sightings tagged with retired object ids: they have no visitor field, so "forget me" cannot reach them (done by hand on 2026-10-12).
+- An unheld object in the teaching zone loses the target to anything inside a person box, such as a bottle at the side; "Ignore that" aimed at an unheld focus picks the held object instead.
+- If the camera does not offer 1920x1080, OpenCV falls back to another size and the resize to 1280x720 distorts the aspect ratio.
+- A track lost and re-detected with a new id between two turns counts as a changed view and drops the robot's answers; a swap in hand that keeps one track counts as unchanged. An idle prefill reads the tracks when its job runs, so a queued image can carry newer track ids.
+- A same-object question embeds every earlier hold of the conversation in one batch; the largest batch and its effect on face cadence are unmeasured.
+- "Same one as before?" without a leading verb, "Do you recognize this?", and "Am I holding the same controller?" (no past cue) still go to the brain, which says yes.

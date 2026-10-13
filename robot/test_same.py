@@ -15,9 +15,10 @@ from robot.text_embed import DIM as TEXT_DIM
 from robot.things import DIM
 
 # What each pixel value embeds to: 200 and 30 are unrelated; 150 is 0.83 from 200, inside
-# settings.guess_band below settings.same (0.86).
+# settings.guess_band below settings.same.
 VECTORS = {200: (1, 0, 0), 150: (0.83, 0.5578, 0), 30: (0, 0, 1), 100: (0, 1, 0)}
 ASK = "Is this the same as before?"
+DIFFERENT = "No, this looks different from the one you showed me."
 
 
 def answer(msgs, **_):
@@ -25,7 +26,10 @@ def answer(msgs, **_):
 
 
 def embed(crops: list[np.ndarray]) -> np.ndarray:
-    return np.array([VECTORS[int(c.mean())] for c in crops], np.float32)
+    """Unit vectors of the shard's size: the pixel value's vector, zero-padded."""
+    v = np.zeros((len(crops), DIM), np.float32)
+    v[:, :3] = [VECTORS[int(c.mean())] for c in crops]
+    return v / np.linalg.norm(v, axis=1, keepdims=True)
 
 
 def held(label: str, value: int, track: int = 1, point: int = 7) -> Held:
@@ -80,38 +84,39 @@ def test_same_answers(robot) -> None:
     turn = Turn(question=ASK)
     assert robot._same_answer(turn, None) == "Hold it up, and I will compare."
     now = held("cup", 200, track=2)
-    assert robot._same_answer(turn, now) is None, "nothing earlier: the brain, as before"
+    assert robot._same_answer(turn, now) == main.NOTHING_EARLIER, "never the brain's default yes"
+    assert robot._same_answer(Turn(question="Have you seen this before?"), now) is None, \
+        "no word of comparing and nothing earlier: the stored sightings"
     robot.held.append(held("teddy bear", 30, track=1))
-    assert robot._same_answer(turn, now) == "No. Earlier you showed me a teddy bear; this is a cup."
-    assert turn.compared == {"now": [10.0, 10.4], "earlier": [10.0, 10.4], "score": None,
+    assert robot._same_answer(turn, now) == DIFFERENT, "labels never decide"
+    assert turn.compared == {"now": [10.0, 10.4], "earlier": [10.0, 10.4], "score": 0.0,
                              "labels": ["cup", "teddy bear"]} and turn.memories == [7]
     some = lambda *entries: (robot.held.clear(), robot.held.extend(entries))  # noqa: E731
     some(held("teddy bear", 30, track=1), held("mug", 200, track=3))
-    assert robot._same_answer(turn, now) == "Yes, it looks like the same mug.", "cup and mug"
+    assert robot._same_answer(turn, now) == "Yes, it looks like the same one.", "cup and mug"
     assert turn.compared["score"] == pytest.approx(1.0) and turn.compared["labels"][1] == "mug"
     some(held("mug", 150, track=1))
     assert robot._same_answer(turn, now) == \
-        "It looks similar, but I am not sure it is the same mug."
+        "It looks similar, but I am not sure it is the same one."
     some(held("mug", 30, track=1))
-    assert robot._same_answer(turn, now) == "No, this looks different from the mug you showed me."
+    assert robot._same_answer(turn, now) == "No, this looks different from the one you showed me."
     some(held("mug", 30, track=1), held("cup", 150, track=3), held("mug", 100, track=4))
     assert robot._same_answer(turn, now).startswith("It looks similar"), "the best kin decides"
     # A mug, a phone, then a mug again: every earlier object counts, not only the newest.
     some(held("mug", 200, track=1), held("phone", 30, track=2))
     turn = Turn(question="Have you seen this before?")
     assert robot._same_answer(turn, held("mug", 200, track=3)) == \
-        "Yes, it looks like the same mug." and turn.memories == [7]
+        "Yes, it looks like the same one." and turn.memories == [7]
     some(held("phone", 30, track=2))
     now = held("cup", 200, track=5)
-    assert robot._same_answer(turn, now) is None, "no word of comparing and no kin: sightings"
-    assert robot._same_answer(Turn(question=ASK), now) == \
-        "No. Earlier you showed me a phone; this is a cup."
+    assert robot._same_answer(turn, now) == "No, this looks different from the one you showed me."
+    assert robot._same_answer(Turn(question=ASK), now) == DIFFERENT
     # One track whose object was swapped in hand, even with another label: MaxSim decides.
     swap = held("phone", 200, track=1)
     some(held("mug", 30, track=1))
-    assert robot._same_answer(turn, swap) == "No, this looks different from the mug you showed me."
+    assert robot._same_answer(turn, swap) == "No, this looks different from the one you showed me."
     some(held("cat", 200, track=1))
-    assert robot._same_answer(turn, swap) == "Yes, it looks like the same cat."
+    assert robot._same_answer(turn, swap) == "Yes, it looks like the same one."
 
 
 def test_turns_compare_in_code_and_deletions_clear(robot) -> None:
@@ -137,17 +142,17 @@ def test_turns_compare_in_code_and_deletions_clear(robot) -> None:
     hold_up(robot, "cup", 100, RIGHT, at=110.0)
     asked = len(sent)
     turn = ask(ASK)
-    assert turn.answer == "No. Earlier you showed me a teddy bear; this is a cup."
+    assert turn.answer == "No, this looks different from the one you showed me."
     assert turn.verbatim and len(sent) == asked, "code, not the brain"
     assert turn.compared["labels"] == ["cup", "teddy bear"] and len(robot.held) == 2
-    turn = ask("Have you seen this before?")  # the cup again: the earlier cup is the kin
-    assert turn.answer == "Yes, it looks like the same cup.", "the same crops"
+    turn = ask("Have you seen this before?")  # the cup again: the earlier cup scores best
+    assert turn.answer == "Yes, it looks like the same one.", "the same crops"
     assert turn.compared["earlier"] == robot.held[1].taken
     robot.held.clear()
     ask("What is this?")
     hold_up(robot, "cup", 30, RIGHT, at=120.0)  # swapped in hand: one track, new object
     turn = ask("Is this the same cup as the one before?")
-    assert turn.answer == "No, this looks different from the cup you showed me." and turn.verbatim
+    assert turn.answer == "No, this looks different from the one you showed me." and turn.verbatim
     turn = ask("What did I show you just now?")
     assert not turn.compared, "a recall question keeps its path"
     robot.focus = None
@@ -161,3 +166,55 @@ def test_turns_compare_in_code_and_deletions_clear(robot) -> None:
     robot.held.append(held("cup", 200))
     assert robot._forget(None, "Ana", np.zeros(DIM, np.float32), robot.conversation_visitor)
     assert not robot.held, "'forget me'"
+
+
+def test_named_objects_compare_after_a_restart(robot) -> None:
+    """RAM holds are gone after a restart; the visitor's named objects still compare."""
+    visitor = "00000000-0000-4000-8000-0000000000aa"
+    white = [np.full((12, 20, 3), 200, np.uint8)]
+    robot.things.name(visitor, "controller", ["book"], embed(white), white, display="Dylan")
+    turn = Turn(question="Am I holding the same controller as I showed you before?",
+                visitor=visitor)
+    assert not robot.held
+    assert robot._same_answer(turn, held("camera", 200)) == "Yes, it looks like the same one."
+    assert turn.compared["labels"] == ["camera", "controller"]
+    assert robot._same_answer(turn, held("book", 30)) == \
+        "No, this looks different from the one you showed me.", "another controller"
+
+
+def test_a_held_object_moving_keeps_the_answers(robot) -> None:
+    """The robot keeps its own answers while the visitor moves the same object (one track); a
+    new object in view drops them, as any scene change does (D27)."""
+    sent = []
+
+    def counted(msgs, **_):
+        sent.append(msgs)
+        yield "Ok."
+
+    robot.brain.answer = counted
+    start = float(int(time.time()))
+
+    def ask(text: str, at: float, shot: np.ndarray) -> list[str]:
+        """The roles of the history in the turn's prompt (its first brain call)."""
+        first = len(sent)
+        robot._turn(Turn(question=text, speech_start=at, line=at, speech_end=at), (shot, at))
+        return [m["role"] for m in sent[first][1:-1]]
+
+    def frame(x: int, value: int = 200) -> np.ndarray:
+        f = np.zeros((720, 1280, 3), np.uint8)
+        f[300:600, x:x + 200] = value
+        return f
+
+    for k, x in enumerate(range(100, 181, 40)):
+        robot._track(frame(x), [Detection("cup", 0.9, (x, 300, x + 200, 600))], 100 + 0.4 * k)
+    ask("What is this?", start, frame(180))
+    for k, x in enumerate(range(220, 541, 40)):  # moved across the frame: the same track
+        robot._track(frame(x), [Detection("cup", 0.9, (x, 300, x + 200, 600))], 101 + 0.1 * k)
+    assert ask("Do you still see it?", start + 5, frame(540)) == ["user", "assistant"], \
+        "its answer stays"
+    robot._track(frame(900, 100), [], 103)
+    for k in range(CONFIRM + 16):  # the cup leaves; a book appears elsewhere
+        robot._track(frame(900, 100), [Detection("book", 0.9, (900, 300, 1100, 600))],
+                     103 + 0.1 * k)
+    assert ask("And this?", start + 10, frame(900, 100)) == ["user", "user"], \
+        "a new view drops the answers"

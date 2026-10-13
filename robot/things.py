@@ -1,6 +1,7 @@
 """Owner-scoped named objects, view thumbnails, visitors, and Ignore rules in Qdrant Edge.
 Object point IDs remain stable when the visitor tells a name or enrolls a face."""
 import re
+import shutil
 import uuid
 import time
 from collections.abc import Collection
@@ -33,14 +34,15 @@ from robot.memory import deletion_target, is_question, kind_of, kinds
 from robot.people import request
 from robot.settings import settings
 
-MODEL = MODELS / "dinov2-small/model.onnx"
-DIM = 768  # DINOv2-small CLS and mean patch token, each unit length, concatenated
+MODEL = MODELS / "dinov3-small/model.onnx"
+DIM = 768  # DINOv3-small CLS and mean patch token, each unit length, concatenated
+PREFIX = 5  # the CLS token and four register tokens come before the patch tokens
 SHOTS = 3  # crops of the named track, a third of a second apart
 _MEAN, _STD = np.array([0.485, 0.456, 0.406]), np.array([0.229, 0.224, 0.225])
 
 
 class Crops:
-    """Crop vectors: DINOv2-small at 224x224 on the GPU when present, the crop padded square."""
+    """Crop vectors: DINOv3-small at 224x224 on the GPU when present, the crop padded square."""
 
     def __init__(self):
         cuda = "CUDAExecutionProvider" in ort.get_available_providers()
@@ -51,7 +53,7 @@ class Crops:
     def __call__(self, crops: list[np.ndarray]) -> np.ndarray:
         x = np.stack([_square(c) for c in crops])
         t = self.sess.run(None, {"pixel_values": x})[0]
-        cls, patches = t[:, 0], t[:, 1:].mean(1)
+        cls, patches = t[:, 0], t[:, PREFIX:].mean(1)
         v = np.concatenate([_unit(cls), _unit(patches)], axis=1)
         return v / np.sqrt(2)
 
@@ -91,18 +93,21 @@ class Things:
     def __init__(self, root: Path = SHARED / "memory", people=None):
         self.people = people
         path = root / "things"
-        marker = _id("schema:owners")
+        marker = _id("schema:dinov3")  # names the encoder that made the shard's vectors
+        carried = []
         if path.exists():
             self.shard = EdgeShard.load(str(path))
             if not self.shard.retrieve([marker], False, False):
+                carried = _carried(self.shard)
                 self.shard.close()
-                path.rename(root / time.strftime("things-backup-%Y%m%d-%H%M%S"))
+                shutil.rmtree(path)  # unusable vectors; a copy would escape "forget me"
         if not path.exists():
             path.mkdir(parents=True)
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={"crops": EdgeVectorParams(
                 size=DIM, distance=Distance.Cosine,
                 multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))}))
-            self.shard.update(UpdateOperation.upsert_points([Point(marker, {}, {"schema": 1})]))
+            self.shard.update(UpdateOperation.upsert_points(
+                [Point(marker, {}, {"schema": 2}), *carried]))
         # Every filtered query needs these; unindexed, `type` alone cost 9 ms per score (J).
         # Created on every open, so a shard made before an index was added gets it too.
         for key in ("type", "owner", "key"):
@@ -379,6 +384,20 @@ class Things:
         self.shard.flush()
         self.items = [r for r in self.items if str(r.id) != ident]
         return True
+
+
+def _carried(shard: EdgeShard) -> list[Point]:
+    """The records of an old shard that hold no crop vectors: visitors, their guest counter, and
+    category Ignore rules. Objects and item rules hold the old encoder's vectors and stay behind."""
+    rows, offset = [], None
+    while True:
+        page, offset = shard.scroll(ScrollRequest(offset=offset, limit=1000, with_payload=True))
+        rows.extend(page)
+        if offset is None:
+            break
+    counter = _id("visitor-counter")
+    return [Point(r.id, {}, r.payload) for r in rows
+            if r.payload.get("type") == "visitor" or "ignore" in r.payload or str(r.id) == counter]
 
 
 def _id(key: str) -> str:

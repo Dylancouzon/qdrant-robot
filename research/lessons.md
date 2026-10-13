@@ -40,6 +40,8 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Bounded evidence assembly (A/B contract) | Frozen, never built; the session moved to Granite | Open idea | D109, D110 |
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
+| Same-object color veto (mean Lab, middle half) | Same-object windows Delta E p50 11.3, p99 27.1; vetoes 38% of lookalike windows; lightness alone 5.6% (E). Never fired live: the failing question lacked a past cue, and recognition shows the same shape bias | Parked (Dylan); retest in better light | D169; `bench/color_pairs.py` |
+| Scene change by tracked objects instead of pixels | Dev closet pairs differ 11.4–15.3 against the 8.0 pixel threshold, the same range as a held object moving, so pixels cannot separate them (E) | Current | D170 |
 | Same-object answers from crop MaxSim (D163) | The 2B said yes to every comparison; code now answers from DINOv2 crops (pairs E, replay J). Dev replays compare the closet chair because it holds the focus in every composite; validate live | Current; live check pending | D163; `research/same-object.md` |
 | Intent parsing (rules, BGE scores, linear head) | Never built. The 8 recorded misses (39/47, J) include no wrong past or present choice: `about_past()` fired on every past question. Combined questions still lack earlier evidence | Not the bottleneck for this set; reopen with routing misses | `recall.md` |
 | Recall: earlier frame labeled as past (B) | Right frame delivered; 2B answers in present tense or about the image. 38/47, 10/15 (J) | Rejected | D150 |
@@ -53,7 +55,9 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Moonshine Tiny / Small / Medium | Heard "Qdrant" as "current"; Small and Medium slower | Rejected | D22, D24 |
 | Parakeet int8 on CPU | 0.8% WER, 0.22 s per line, 531 MB (J) | Current | D24 |
 | Parakeet fp32 | 3,152 MB | Rejected | D24 |
-| Flat 0.6–0.7 s hangover; minimum line length | Adds latency to every turn; shortest question is 0.67 s | Rejected; length-scaled hangover | D38 |
+| Flat 0.6–0.7 s hangover; minimum line length | Adds latency to every turn; shortest question is 0.67 s | Rejected 2026-10-08; reopened by D166 | D38 |
+| Hangover 0.35 vs 0.5 / 0.6 / 0.8 s; Smart Turn v3.2; transcript word check | Dylan's real lines with inserted pauses: 0.6 s pauses split 80%, 48%, 12%, 3%; +160, +272, +448 ms per turn. Smart Turn calls 84% of fragments complete (156 ms on the Jetson CPU). The word check's gain is circular (E) | 0.6 s current | D166; `bench/endpoint_arms.py` |
+| Mic capture gain 496 vs 350 / 250 / 150 (speaker-to-mic loopback) | Noise and speech fall together; lower gain only misses more lines. No false lines in silence; a 177 Hz room tone (J) | Keep 496 | `bench/mic_loopback.py` |
 | Real voices with pauses | A pause splits a question; the turn merge is still open | Open | D36, D38 |
 | Hey Edgy from transcript (arm A) | 7/9 synthetic wake lines, 0/9 false (J) | Current; arm B (openWakeWord) if it misses | D65, D73 |
 | Spoken yes/no before voice deletions | Fixes deletion despite a correction ("Forget my phone? No..."); unit tests and dev fixtures (E) | Current | D162 |
@@ -65,7 +69,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | YOLOE-26n vocabulary | Misses held phone and off-vocabulary objects | Fallback | D43, D146 |
 | YOLOE-26s TensorRT | Phone movement 91.4%, Restore 91.5% (J) | Current | D146 |
 | Track label voting and short-track merge | Off-majority labels 3 to 0 on the live clip | Current, frozen | D47, D56 |
-| Crop descriptors: HSV, SigLIP 2, DINOv2-small | DINOv2 at 0.822: zero false matches on 2,025 distractors | DINOv2 current | D57, D64 |
+| Crop descriptors: HSV, SigLIP 2, DINOv2-small | DINOv2 at 0.822: zero false matches on 2,025 distractors | Superseded by DINOv3 (D168) | D57, D64 |
 | Three vs six object views | Phone 10/15 vs 11/15; six adds little | Three | D141; `bench/results/2026-10-10-d141-multiview.json` |
 | Gallery growth: fixed, simulated voice confirmation, track harvest (teaching window) | 17 viewpoint videos, scoring half: 397, 435, 530 of 816 at 0.822; false matches 41, 179, 116 of 36,918, all lookalike instances (two Sony cameras, two mugs) (E). Admissions clean on contact sheets | Teaching window current | D154; `bench/results/2026-10-11-gallery-1791694947.json` |
 | Unindexed payload filter on the things shard | `type` filter unindexed: things.score 10.7 ms p50 vs 1.65 ms indexed at 200 objects x 24 views (J) | Fixed: index every filtered field on open | D155; `bench/results/2026-10-11-edge-1791703351.jsonl` |
@@ -82,6 +86,11 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Background masking of crops (YOLOE-26s masks, grey fill) | D145 cup video, Mac CPU: masked 241/360 vs box 263/360, zero false matches in both; masks correct, misses are viewpoint changes; the video has no background change (E) | Not adopted; background change untested | D148; `bench/results/2026-10-11-crop-arms-1791693406.json` |
 | Compact UI and readable recall | Three-view carousels, sliders, simple auto-scroll, and the camera-first Qdrant theme pass desktop/mobile checks (E). Jetson fixture-image/oracle-text check passes recall thumbnails, settings, and deletion (J). Teaching statements link through object turns, not only point payloads | Current | D157, D158 |
 | UI Ignore validated against the live track | Ignore failed with 409 within about 1 s of an item leaving view; the page rebuilt the list every poll | Replaced by held 30 s offers | D151 |
+| Camera controls: 60 Hz, sharpness 0/1, backlight 0, manual exposure, dynamic frame rate | Microphone detected frames stay inside the 720p baseline spread (0.55–0.77); dynamic frame rate drops it to 0.45 (J) | Rejected | D167; `bench/camera_settings.py` |
+| 1080p capture scaled to 720p | Microphone detected frames about 0.62 to 0.98, confidence p50 0.39 to 0.62, +0.33 CPU cores (J) | Current | D167 |
+| Temporal denoise before detection (3-frame median; motion-masked 50/50 blend) | Microphone 0.84 to 0.97 (blend, 720p) and 0.98 to 1.00 (median on 1080p); static clips only, a median can erase fast motion | Not adopted; reopen if 1080p still blinks live | D167; `bench/detect_stability.py` |
+| YOLOE-26m 384x640; YOLOE-26s at 480x864 or 544x960; tracker constants | Microphone matched 0.84 to 0.40, 0.46; constants change nothing; HIGH 0.30 only removes junk tracks (E) | Rejected | D167 |
+| Crop encoders: DINOv3 ViT-S/16, DINOv2-base, DINOv2 with registers; margins, sizes, pooling, denoise, 3-frame averaging | Views at <=10 / <=116 false: DINOv2-small 257/534, DINOv3-S 456/607, DINOv2-base 340/645 (4x compute), registers 282/537; others within the ~15-view noise; margins leak scene (E) | DINOv3-S current | D168; `bench/embed_arms.py` |
 | Camera at 15 fps to lower preview grain | Four paired captures: noise 7.34 at 15 fps vs 6.29 at 30 fps, same brightness; our preview encode adds no noise (J) | Rejected; add light instead | `research/objects.md` |
 | Hand detector or depth camera | Not tried; a reach can steal focus for about 3 s | Open | D67 |
 
@@ -105,6 +114,7 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 - The same video decodes to different pixels on the Mac and the Jetson. Verify pixels with the deployed decoder (D93).
 - Small paired runs are noisy: llama-server answers differ on identical prompts. One question in 47 is about 2%.
 - FileCamera still images used to keep their show-time stamp, so the focus never became steady (`STEADY_S`) and recognition went stale in replays. Fixed 2026-10-12: `latest()` stamps a still with `time.time()` on each call, like a live camera repeating an unchanged scene; videos keep frame-index stamps.
+- `eval/replay.py` `ok()` matches keywords as substrings: "no" matches "now", so `hand-teddy-3` ("Yes, I see them in the image now.", the bears are gone) has passed on every release since 2026-10-11. Fix it with whole-word matching in its own task, and count the score change (design review 20261012-214258).
 - ONNX Runtime telemetry aborts pytest after the tests pass. `tools/gate.py` sets `ORT_DISABLE_TELEMETRY=1` (D89).
 
 ## Process pitfalls

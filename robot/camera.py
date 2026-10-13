@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 
 DEVICE = "/dev/video0"
+CAPTURE = (1920, 1080)  # scaled to SIZE, which averages out grain (D167)
 SIZE = (1280, 720)
 ROTATE = cv2.ROTATE_180  # the camera is mounted upside down (STATE.md, Robot facts)
 
@@ -16,8 +17,8 @@ class Camera:
     def __init__(self, device: str = DEVICE):
         self.cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, SIZE[0])
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, SIZE[1])
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE[0])
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE[1])
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         if not self.cap.isOpened():
             raise RuntimeError(f"cannot open {device}")
@@ -34,7 +35,7 @@ class Camera:
             if not ok:
                 time.sleep(0.05)
                 continue
-            frame = cv2.rotate(frame, ROTATE)
+            frame = cv2.rotate(cv2.resize(frame, SIZE, interpolation=cv2.INTER_LINEAR), ROTATE)
             with self._lock:
                 self._frame, self._stamp = frame, time.time()
 

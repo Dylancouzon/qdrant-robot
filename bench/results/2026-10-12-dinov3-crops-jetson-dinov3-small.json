@@ -1,0 +1,25 @@
+{
+ "machine": "qdrant-robot",
+ "release": "08c519626219",
+ "tegrastats": "crops-dinov3-small-20261012-200041.tegrastats",
+ "onnxruntime": "1.24.0",
+ "command": "python -c <crops timing>, 20 warm-up and 300 timed calls per batch size",
+ "dinov3-small": {
+  "providers": [
+   "CUDAExecutionProvider",
+   "CPUExecutionProvider"
+  ],
+  "rss_added_mb": 272.4,
+  "batch1_ms": {
+   "p50": 17.2,
+   "p95": 17.41,
+   "p99": 17.62
+  },
+  "batch3_ms": {
+   "p50": 33.97,
+   "p95": 34.43,
+   "p99": 34.8
+  },
+  "rss_after_batches_mb": 313.1
+ }
+}

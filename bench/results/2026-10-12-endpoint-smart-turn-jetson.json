@@ -1,0 +1,2 @@
+{"machine": "qdrant-robot", "threads": 1, "call_ms_p50": 156.5, "call_ms_p95": 162.8, "features_ms": 14.1}
+{"machine": "qdrant-robot", "threads": 2, "call_ms_p50": 122.4, "call_ms_p95": 137.3, "features_ms": 17.2}
