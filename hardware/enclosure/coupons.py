@@ -1,8 +1,8 @@
-"""Fit coupons for the first print. coupon-plate.stl has a hub-style and a corner-style M3 nut
-channel and the four M2 camera posts at 32.3 mm on a 40 x 40 frame. slot-coupon.stl is 15 mm of the
-Jetson slot: slide it onto the plastic strip of the real Jetson. Run with
-build/hardware-layout/venv/bin/python; it writes both STLs to output/print/Coupons/ and asserts the
-printcheck numbers.
+"""Test pieces for the first print. fit-test-plate.stl has a hub-style and a corner-style M3 nut
+channel and the four M2 camera posts at 32.3 mm on a 40 x 40 frame. slot-test-piece.stl is 15 mm
+of the Jetson slot: slide it onto the plastic strip of the real Jetson. Run with
+build/hardware-layout/venv/bin/python; it writes both STLs to output/print/Test pieces/ and
+asserts the printcheck numbers.
 """
 
 import sys
@@ -17,7 +17,7 @@ from body import (  # noqa: E402
 )  # fmt: skip
 from geometry import JETSON_STRIP_T, SLOT_GAP, SLOT_WALL  # noqa: E402
 
-OUT = Path(__file__).resolve().parent / "output" / "print" / "Coupons"
+OUT = Path(__file__).resolve().parent / "output" / "print" / "Test pieces"
 PLATE_T, EDGE_Y = 3.2, 32.0  # plate thickness (the roof thickness); channel mouths sit at EDGE_Y
 SEAT, CHANNEL_H = 3.8, NUT_T + 0.4  # mouth to nut centre (hub and corner); channel height
 LENGTH = SEAT + 3.29 + 2.7  # block length: behind the pocket stays 2.7 mm thick
@@ -102,10 +102,10 @@ def export(solid, name):
 def main():
     plate = build()
     check(plate)
-    export(plate, "coupon-plate.stl")
+    export(plate, "fit-test-plate.stl")
     slot = build_slot()
     check_slot(slot)
-    export(slot, "slot-coupon.stl")
+    export(slot, "slot-test-piece.stl")
 
 
 if __name__ == "__main__":

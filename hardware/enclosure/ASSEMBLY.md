@@ -1,6 +1,6 @@
 # Assembly
 
-Assemble the robot from nine printed parts, 17 M3 screws, four M2 screws, and 13 M3 nuts. The servo kit also supplies its own horn screw. The fastener list is in [README.md](README.md). Physical fit stays U (unverified) until you print and test the coupon plate.
+Assemble the robot from nine printed parts, 17 M3 screws, four M2 screws, and 13 M3 nuts. The servo kit also supplies its own horn screw. The fastener list is in [README.md](README.md). Physical fit stays U (unverified) until you print and test the test pieces.
 
 The viewer in [output/robot-viewer.html](output/robot-viewer.html) shows each step as a 3D picture. It fits the parts in the same order as this list, draws the new parts in orange, and moves them along the direction you push them in. `preview.py` writes the two generated blocks in this file (what each part is, and the steps) from one list, so the text here and in the viewer is the same.
 
@@ -8,9 +8,10 @@ Tools: a 2.5 mm hex key, a 2.5 mm ball-end hex key, and a 2.5 mm short-arm L-key
 
 ## Before you start
 
-- Print the slot coupon and the coupon plate first. Slide the slot coupon over the plastic strip on the edge of the Jetson. Fit one M3 nut in each channel of the coupon plate. Each nut must snap past the 0.3 mm ridge and stay.
-- Thread one M3 screw through each coupon hole. Thread an M2 screw into each camera post.
-- The hub is the bearing coupon. The horn disc is the horn coupon. Test both before you print the large parts.
+- Print the test pieces first (`output/bambu/Test pieces/Test pieces.3mf`). Test pieces are small prints that check the fits before the large parts. They are not part of the robot.
+- Slide the slot test piece over the plastic strip on the edge of the Jetson. Fit one M3 nut in each channel of the fit test plate. Each nut must snap past the 0.3 mm ridge and stay.
+- Thread one M3 screw through each test hole. Thread an M2 screw into each camera post.
+- Print `Black.3mf` next. Its neck hub shows whether the bearings fit, and its horn disc shows whether the servo horn fits. Test both before you print `White.3mf`.
 
 ## What each part is
 

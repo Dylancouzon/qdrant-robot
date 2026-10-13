@@ -97,6 +97,6 @@ Choose A. It removes both gears and the gear mount. In print orientation, the se
 - `printcheck.py`: zero floating islands and zero thin area under 2 mm on every required part. The checker skips a 1 mm band along sharp edges, except on parts that are mostly edges. Total overhang under 10% of the Concept A baseline (3,489 mm²) in `hardware/printcheck-baseline.json`. Each remaining exception is named.
 - Every Concept A clearance check that applies still passes: hardware and reservations, plug access, fan and outlet paths, camera focus travel, microphone holes, and the head through ±80°. The vertical sweep of the populated base plate through the opening also passes.
 - All parts slice in Bambu Studio on the P1S with 0.4 mm nozzle, PLA, 0.2 mm layers.
-- A coupon set prints first: one M3 nut pocket and screw boss, one catch, the hub with its bearing seats, and the horn disc on the horn.
+- Test pieces print first: one M3 nut pocket and screw boss, one catch, the hub with its bearing seats, and the horn disc on the horn.
 
 Concept A outputs are tagged for archive and deleted once this design passes. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.

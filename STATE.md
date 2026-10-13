@@ -4,9 +4,9 @@ Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, 
 
 ## Active task: Print and fit the revised enclosure (2026-10-13)
 
-The enclosure revision after Dylan's review is done and ready to print (final Codex gpt-6.1-sol review PASS at 9a9574a, after three guide walkthroughs against the CAD). The Jetson is a flat board held by its 6 mm plastic strip in a 7 mm slot; the servo takes 5 V from a Jetson USB port (H5); the camera cable runs through the neck holes (H6); the servo adapter board stands on a short end with plug rooms on both sides; the guide is 27 steps generated from one list in `preview.py` into the viewer and [ASSEMBLY.md](hardware/enclosure/ASSEMBLY.md). Prints take 13.3 h and 490 g. Builders were Sonnet 5.5, and Codex reviews each change.
+The enclosure revision after Dylan's review is done and ready to print (final Codex gpt-6.1-sol review PASS at 9a9574a, after three guide walkthroughs against the CAD). The Jetson is a flat board held by its 6 mm plastic strip in a 7 mm slot; the servo takes 5 V from a Jetson USB port (H5); the camera cable runs through the neck holes (H6); the servo adapter board stands on a short end with plug rooms on both sides; the guide is 27 steps generated from one list in `preview.py` into the viewer and [ASSEMBLY.md](hardware/enclosure/ASSEMBLY.md). Prints are one Bambu project per color (`White.3mf` with two plates, `Black.3mf` with one) plus a separate test-piece project; the final parts take 12.6 h and 490 g. Builders were Sonnet 5.5, and Codex reviews each change.
 
-Next: Dylan prints the coupon plate, the slot coupon, the neck hub with both bearings, and the horn disc on the real servo horn, then the full set. Physical unknowns are in [edge cases](research/edge-cases.md). Head calibration software is pending for first power-on.
+Next: Dylan prints the test pieces (`output/bambu/Test pieces/`), then the White and Black projects; the neck hub and horn disc show whether the bearings and the servo horn fit. Physical unknowns are in [edge cases](research/edge-cases.md). Head calibration software is pending for first power-on.
 
 ## Robot
 
@@ -30,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md`, adjust clearances in `geometry.py`, `body.py`, or `neck.py`, and rerun `body.py`, `head.py`, `coupons.py`, `bambu.py`, and `preview.py`.
+After the test-piece print, record fit results in `hardware/enclosure/MEASUREMENTS.md`, adjust clearances in `geometry.py`, `body.py`, or `neck.py`, and rerun `body.py`, `head.py`, `coupons.py`, `bambu.py`, and `preview.py`.

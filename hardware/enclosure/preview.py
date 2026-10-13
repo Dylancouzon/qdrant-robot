@@ -1,7 +1,8 @@
 """Offline robot viewer and assembly guide. STEPS below is the single list of assembly steps. This
 script writes the parts and steps into ASSEMBLY.md and builds output/robot-viewer.html, which shows
-each step as a 3D picture next to its text. Run bambu.py first (it supplies times and grams), then
-run this with build/hardware-layout/venv/bin/python. Check the page with check-viewer.cjs.
+each step as a 3D picture next to its text. Run bambu.py first (it supplies sizes, times, and
+grams), then run this with build/hardware-layout/venv/bin/python. Check the page with
+check-viewer.cjs.
 """
 
 import base64
@@ -504,24 +505,28 @@ def step_data(meshes):
 
 
 def parts_table():
-    slices = {
-        Path(r["part"]).name: r
-        for r in json.loads((HERE / "output" / "bambu" / "slice-checks.json").read_text())["parts"]
-        if r["part"].startswith("Required")
-    }
-    assert set(slices) == set(PARTS), set(slices) ^ set(PARTS)
-    rows = ""
+    "Return the part rows, the plate rows, and the total time and PLA of the nine printed parts."
+    plates = json.loads((HERE / "output" / "bambu" / "slice-checks.json").read_text())["plates"]
+    final = [p for p in plates if not p["project"].startswith("output/bambu/Test pieces")]
+    where = {stem: p["name"].split(":")[0] for p in final for stem in p["parts"]}
+    sizes = {stem: size for p in final for stem, size in p["parts"].items()}
+    assert set(sizes) == set(PARTS), set(sizes) ^ set(PARTS)
+    part_rows = ""
     for stem, (color, orientation, name, what) in PARTS.items():
-        s = slices[stem]
-        size = " × ".join(f"{v:g}" for v in s["size_mm"])
+        size = " × ".join(f"{v:g}" for v in sizes[stem])
         button = f'<button type="button" data-part="{stem}">{name}</button>'
-        rows += (
-            f"<tr><td>{button}</td><td>{color}</td><td>{what}</td><td>{orientation}</td><td>{size}</td>"
-            f"<td>{s['seconds'] / 3600:.1f} h</td><td>{s['grams']:.0f} g</td></tr>"
+        part_rows += (
+            f"<tr><td>{button}</td><td>{color}</td><td>{what}</td><td>{orientation}</td>"
+            f"<td>{size}</td><td>{where[stem]}</td></tr>"
         )
-    hours = sum(s["seconds"] for s in slices.values()) / 3600
-    grams = sum(round(s["grams"]) for s in slices.values())  # the sum of the rows shown
-    return rows, f"{hours:.1f} h and {grams} g of PLA in total"
+    plate_rows = "".join(
+        f"<tr><td>{Path(p['project']).name}</td><td>{p['name']}</td>"
+        f"<td>{p['seconds'] / 3600:.1f} h</td><td>{p['grams']:.0f} g</td></tr>"
+        for p in plates
+    )
+    hours = sum(p["seconds"] for p in final) / 3600
+    grams = sum(round(p["grams"]) for p in final)  # the sum of the rows shown
+    return part_rows, plate_rows, f"{hours:.1f} h and {grams} g of PLA in total"
 
 
 def hardware_html():
@@ -610,7 +615,7 @@ def main():
     data = scene()
     rows = step_data(data)
     write_guide(rows)
-    part_rows, print_total = parts_table()
+    part_rows, plate_rows, print_total = parts_table()
     write_readme_total(print_total.removesuffix(" in total"))
     fastener_rows_html, fastener_total = fastener_table()
     html = (
@@ -619,6 +624,7 @@ def main():
         .replace("__STEP_COUNT__", str(len(rows)))
         .replace("__HARDWARE_ROWS__", hardware_html())
         .replace("__PART_ROWS__", part_rows)
+        .replace("__PLATE_ROWS__", plate_rows)
         .replace("__PRINT_TOTAL__", print_total)
         .replace("__FASTENER_ROWS__", fastener_rows_html)
         .replace("__FASTENER_TOTAL__", fastener_total)
@@ -675,8 +681,9 @@ li{margin:10px 0}.note{font-size:14px;color:var(--muted)}#error{color:#b03030}
 <div class="wrap"><table><caption class="note">Everything the robot needs that is not printed</caption><thead><tr><th scope="col">Part</th><th scope="col">What it is</th><th scope="col">What it connects to</th></tr></thead><tbody>__HARDWARE_ROWS__</tbody></table></div></section>
 <section id="printed-parts"><h2>Printed parts</h2>
 <p>Select a part name to see it in orange. All parts print in PLA with a 0.4 mm nozzle, 0.2 mm layers, and no supports.</p>
-<div class="wrap"><table><caption class="note">What each part is, its print orientation, size, and the Bambu Studio estimate for the P1S</caption><thead><tr><th scope="col">Part</th><th scope="col">Color</th><th scope="col">What it is</th><th scope="col">Orientation</th><th scope="col">Size (mm)</th><th scope="col">Time</th><th scope="col">PLA</th></tr></thead><tbody>__PART_ROWS__</tbody></table></div>
-<p class="note">Estimate: __PRINT_TOTAL__. Print the coupon plate first.</p></section>
+<div class="wrap"><table><caption class="note">What each part is, its print orientation, its size, and the plate it prints on</caption><thead><tr><th scope="col">Part</th><th scope="col">Color</th><th scope="col">What it is</th><th scope="col">Orientation</th><th scope="col">Size (mm)</th><th scope="col">Plate</th></tr></thead><tbody>__PART_ROWS__</tbody></table></div>
+<div class="wrap"><table><caption class="note">The Bambu Studio projects: one per color, plus the test pieces. Time and PLA are estimates for the P1S</caption><thead><tr><th scope="col">Project</th><th scope="col">Plate</th><th scope="col">Time</th><th scope="col">PLA</th></tr></thead><tbody>__PLATE_ROWS__</tbody></table></div>
+<p class="note">Estimate for the nine parts: __PRINT_TOTAL__. Print the test pieces first. Test pieces are small prints that check the fits (nut snaps, screw bite, the Jetson slot) before the large parts. They are not part of the robot.</p></section>
 <section id="fasteners"><h2>Fasteners</h2>
 <div class="wrap"><table><caption class="note">__FASTENER_TOTAL__</caption><thead><tr><th scope="col">Screw</th><th scope="col">Length</th><th scope="col">M3 nut</th><th scope="col">Holds</th><th scope="col">Tool</th></tr></thead><tbody>__FASTENER_ROWS__</tbody></table></div></section>
 <section id="assembly"><h2>All steps</h2>

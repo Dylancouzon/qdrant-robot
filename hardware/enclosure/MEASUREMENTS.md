@@ -39,4 +39,4 @@ Parts sit in loose pockets with clearance, so reference sizes cover most of the 
 
 ## Taken from references
 
-USB audio case 53 × 23.5 × 14.6 mm, the power plug and USB plug sizes in `hardware/DESIGN_REQUIREMENTS.md`, and standard M2 and M3 nuts. The first coupon print checks the nut pockets and the horn holes.
+USB audio case 53 × 23.5 × 14.6 mm, the power plug and USB plug sizes in `hardware/DESIGN_REQUIREMENTS.md`, and standard M2 and M3 nuts. The first test piece print checks the nut pockets and the horn holes.

@@ -32,7 +32,7 @@ The removable port-side panel now has prototype geometry and checked casing clea
 
 ## Electronics retention
 
-Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 6 mm thick and extends 8 mm inward from that edge, as measured by Dylan. It slides straight down into a vertical slot that grips 6 mm of that strip. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
+Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 6 mm thick and extends 8 mm inward from that edge, as measured by Dylan. It slides straight down into a vertical slot that grips 6 mm of that strip. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require test pieces.
 
 ## Component dimension references
 
@@ -67,7 +67,7 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 ## Printing and release checks
 
 - Design parts for the P1S bed and 0.4 mm nozzle. Prefer flat print bases and simple orientations with little support material.
-- Select pocket clearances from physical coupons printed with the intended filament and settings.
+- Select pocket clearances from physical test pieces printed with the intended filament and settings.
 - Verify each final 3MF has correct millimeter scale, closed meshes, and the intended part orientation.
 - Inspect and slice each final part in Bambu Studio before marking it ready to print.
 - Check component insertion, removal, connector access, and bearing retention on a joint prototype.
@@ -82,4 +82,4 @@ The [simplified enclosure](enclosure/README.md) replaced Concept A on 2026-10-12
 
 All nine parts pass `printcheck.py` with zero floating islands and zero thin area, and 719.0 mm² of total overhang against 34,887 mm² for Concept A (E). Every part slices for the P1S in Bambu Studio and prints in 13.3 h with 490 g of PLA (E). The body and neck checks pass: hardware clearances, plug access, the vertical sweep of the populated base plate, and the head through ±80°. An [offline viewer](enclosure/output/robot-viewer.html) shows the assembled robot, turns the head, and lists the parts, fasteners, and steps.
 
-The camera cable runs through the neck gap from a head floor hole to a roof hole, then through a slack loop to a Jetson USB port. A coupon plate and a Jetson slot coupon print first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.
+The camera cable runs through the neck gap from a head floor hole to a roof hole, then through a slack loop to a Jetson USB port. A fit test plate and a Jetson slot test piece print first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.

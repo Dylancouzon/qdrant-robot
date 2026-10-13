@@ -1,137 +1,100 @@
 {
   "settings": "Bambu Lab P1S, 0.4 mm nozzle, Bambu PLA Basic, 0.2 mm layers, 3 walls, supports off",
-  "parts": [
+  "plates": [
     {
-      "part": "Coupons/coupon-plate",
-      "project": "output/bambu/Coupons/coupon-plate.3mf",
-      "sha256": "bfb37576ea7f3299e20b9f7e004daefa255d060096b22b7516b1aee08b7f6246",
-      "seconds": 1248.69384765625,
-      "grams": 7.919105052947998,
-      "size_mm": [
-        40.0,
-        52.0,
-        11.2
-      ]
+      "project": "output/bambu/Test pieces/Test pieces.3mf",
+      "plate": 1,
+      "name": "Test pieces: fit plate and Jetson slot",
+      "sha256": "2f7b9d265d74cad61cc07c803702913dab65b03031819408e67652694fd5ab67",
+      "seconds": 1447.078857421875,
+      "grams": 9.336634635925293,
+      "parts": {
+        "fit-test-plate": [
+          40.0,
+          52.0,
+          11.2
+        ],
+        "slot-test-piece": [
+          9.5,
+          13.0,
+          15.0
+        ]
+      }
     },
     {
-      "part": "Coupons/slot-coupon",
-      "project": "output/bambu/Coupons/slot-coupon.3mf",
-      "sha256": "d33deb193a47ebce715feb11c4ca9c22be3ee36b04cbd8baf2f7baab11b4a61f",
-      "seconds": 721.7279052734375,
-      "grams": 1.5126925706863403,
-      "size_mm": [
-        9.5,
-        13.0,
-        15.0
-      ]
+      "project": "output/bambu/White.3mf",
+      "plate": 1,
+      "name": "White 1: body shell and port panel",
+      "sha256": "4b4fbae66cbefe3d64cf4556bd1e8ecdc72f65a96dcb13906939cab6ddb28474",
+      "seconds": 24307.515625,
+      "grams": 251.89935302734375,
+      "parts": {
+        "body-shell": [
+          148.6,
+          127.1,
+          152.4
+        ],
+        "port-panel": [
+          91.9,
+          49.3,
+          8.2
+        ]
+      }
     },
     {
-      "part": "Required/Black/head-shaft",
-      "project": "output/bambu/Required/Black/head-shaft.3mf",
-      "sha256": "aa6bd326c52e1906f3311dc44ddebbfd215b5d3f7c0f0ea5aa2be927002eed01",
-      "seconds": 1426.4998779296875,
-      "grams": 9.581656455993652,
-      "size_mm": [
-        50.0,
-        50.0,
-        21.3
-      ]
+      "project": "output/bambu/White.3mf",
+      "plate": 2,
+      "name": "White 2: base plate and head shell",
+      "sha256": "4b4fbae66cbefe3d64cf4556bd1e8ecdc72f65a96dcb13906939cab6ddb28474",
+      "seconds": 12782.8974609375,
+      "grams": 176.75643920898438,
+      "parts": {
+        "base-plate": [
+          143.2,
+          116.5,
+          48.0
+        ],
+        "head-shell": [
+          116.0,
+          56.0,
+          77.0
+        ]
+      }
     },
     {
-      "part": "Required/Black/horn-disc",
-      "project": "output/bambu/Required/Black/horn-disc.3mf",
-      "sha256": "dc70dc8eb30755042fc87d46c865597c85026d900d5f76c1c4f10d9d294f2216",
-      "seconds": 849.681884765625,
-      "grams": 3.1241748332977295,
-      "size_mm": [
-        31.0,
-        31.0,
-        7.8
-      ]
-    },
-    {
-      "part": "Required/Black/neck-hub",
-      "project": "output/bambu/Required/Black/neck-hub.3mf",
-      "sha256": "461bcf7d890f5d1301ad7bcbb35b844d18dfea9c25953a9a07e54232b2ae3bee",
-      "seconds": 1485.9056396484375,
-      "grams": 10.98425006866455,
-      "size_mm": [
-        50.3,
-        50.7,
-        17.1
-      ]
-    },
-    {
-      "part": "Required/Black/speaker-grille",
-      "project": "output/bambu/Required/Black/speaker-grille.3mf",
-      "sha256": "2a755af534c1b24b9c28bbe6e7ee8b78a792c712844efa6325b057a9378f971e",
-      "seconds": 3619.593505859375,
-      "grams": 16.737947463989258,
-      "size_mm": [
-        101.2,
-        49.2,
-        4.3
-      ]
-    },
-    {
-      "part": "Required/Black/visor",
-      "project": "output/bambu/Required/Black/visor.3mf",
-      "sha256": "c63eafd49709df3ce5993ca8adf87c04ac5296fb6f8a4d2666f146a4401a5bda",
-      "seconds": 2476.695068359375,
-      "grams": 20.601160049438477,
-      "size_mm": [
-        112.0,
-        52.0,
-        23.5
-      ]
-    },
-    {
-      "part": "Required/White/base-plate",
-      "project": "output/bambu/Required/White/base-plate.3mf",
-      "sha256": "ff8ebab60ae4e852ab4c05676d461d647040dc6d63f595ce1ac31f68028eee9f",
-      "seconds": 6724.29248046875,
-      "grams": 84.8167724609375,
-      "size_mm": [
-        143.2,
-        116.5,
-        48.0
-      ]
-    },
-    {
-      "part": "Required/White/body-shell",
-      "project": "output/bambu/Required/White/body-shell.3mf",
-      "sha256": "a205539ad41eba8c457de3932388679c29eb41771c04307f9ba6c1fdc143ad49",
-      "seconds": 23422.75,
-      "grams": 240.4153289794922,
-      "size_mm": [
-        148.6,
-        127.1,
-        152.4
-      ]
-    },
-    {
-      "part": "Required/White/head-shell",
-      "project": "output/bambu/Required/White/head-shell.3mf",
-      "sha256": "c8e8914758c91c1fe6ce2fadf054f22eb4392c54514ed7df44ad144826072704",
-      "seconds": 6473.33056640625,
-      "grams": 92.03482818603516,
-      "size_mm": [
-        116.0,
-        56.0,
-        77.0
-      ]
-    },
-    {
-      "part": "Required/White/port-panel",
-      "project": "output/bambu/Required/White/port-panel.3mf",
-      "sha256": "3581b0a8d3fb3fa92af1506aa586676ab3b03b739e9bef32e88459fa14662566",
-      "seconds": 1324.694580078125,
-      "grams": 11.58000659942627,
-      "size_mm": [
-        91.9,
-        49.3,
-        8.2
-      ]
+      "project": "output/bambu/Black.3mf",
+      "plate": 1,
+      "name": "Black: visor, speaker grille, neck hub, head shaft and horn disc",
+      "sha256": "903db7b02c87b2ae5141dede4b0981dac059a667d1ca1e99bbfa9b2f581c98ea",
+      "seconds": 8105.64892578125,
+      "grams": 60.6485481262207,
+      "parts": {
+        "visor": [
+          112.0,
+          52.0,
+          23.5
+        ],
+        "speaker-grille": [
+          101.2,
+          49.2,
+          4.3
+        ],
+        "neck-hub": [
+          50.3,
+          50.7,
+          17.1
+        ],
+        "head-shaft": [
+          50.0,
+          50.0,
+          21.3
+        ],
+        "horn-disc": [
+          31.0,
+          31.0,
+          7.8
+        ]
+      }
     }
   ]
 }
