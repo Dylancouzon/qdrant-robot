@@ -43,7 +43,7 @@ assert(tilted.length >= 2 && tilted.every(s => Math.abs(s.tilt) > 90 && /rear fa
 assert(new Set(steps.flatMap(s => s.show)).size === parts.length, 'some mesh never appears in a step');
 assert(steps.some(s => /rear of the head floor/.test(s.text) && /roof hole/.test(s.text)), 'camera cable route');
 assert(steps.some(s => /3 × M3 × 16 screw/.test(s.text)) && steps.some(s => /4 × M2 × 8 screw/.test(s.text)));
-assert(/software/.test(steps.at(-1).text) && /^Calibrate/.test(steps.at(-1).title), 'the last step calibrates in software');
+assert(/^Check the head turn/.test(steps.at(-1).title), 'the last step checks the head turn by hand');
 assert(steps.some(s => /USB-A to 5\.5 × 2\.1 mm barrel cable/.test(s.text)));
 
 // Lists: hardware, printed parts, fasteners, and one list item per step.

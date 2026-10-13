@@ -302,10 +302,10 @@ STEPS = (
                 (("hub screw",), away(UP, 55)))),
     Step("Neck", "Fit the servo horn.",
          "Set the servo horn on the servo output shaft so the head will point forward. Fix it with "
-         "the screw from the servo kit. Calibration at the end of the guide sets the exact middle.",
+         "the screw from the servo kit. Calibration at first power-on sets the exact middle.",
          ("servo case", "servo horn"), (30, 20, 200, (-10, 0, 140)),
          "The servo horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until "
-         "you calibrate.",
+         "calibration.",
          ((("servo horn",), away(UP, 20)),), reset=()),
     Step("Neck", "Set the horn disc on the servo horn.",
          "Press {center_nut} into the pocket on the underside of the horn disc. Set the horn disc "
@@ -451,13 +451,11 @@ STEPS = (
          ("port-panel", "panel screw"), (90, 10, 420, (60, 0, 70)),
          "Use the 2.5 mm hex key from outside.",
          ((("port-panel",), away(OUT_X, 30)), (("panel screw",), away(OUT_X, 55)))),
-    Step("Body", "Calibrate the head.",
-         "This is a software step that the robot software will provide. Power the robot, and turn "
-         "the servo torque off. Turn the head forward by hand, and save that position as the "
-         "servo's middle.",
+    Step("Body", "Check the head turn by hand.",
+         "Keep the power off. Turn the head slowly from one stop to the other. The camera cable "
+         "must slide freely through both holes, and nothing may rub.",
          ("head-shell", "visor"), (0, 10, 520, (0, 0, 150)),
-         "This is the LeRobot calibration approach. It makes up for the 14.4° steps of the horn "
-         "spline."),
+         "The unpowered servo resists a little, so turn the head gently. The stops are at ±80°."),
 )  # fmt: skip
 
 

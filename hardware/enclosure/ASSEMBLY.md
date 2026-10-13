@@ -54,7 +54,7 @@ Tools: a 2.5 mm hex key, a 2.5 mm ball-end hex key, and a 2.5 mm short-arm L-key
 1. **Press the two bearings into the neck hub.** Press one bearing into each side of the hub, by its outer ring. Each bearing stops on the center shoulder.
 2. **Fit three nuts into the roof.** Stand the body shell roof up on four 60 mm blocks. Take 3 × M3 nut. Hold each nut in tweezers, lower it through the roof hole to just under the roof, and push it outward into its channel until it clicks. Details: Each channel has a 0.3 mm ridge. The nut must click past it and stay. A nut that is let go falls through the hole. The blocks leave room to reach under the roof.
 3. **Screw the neck hub to the roof.** Set the hub, with its bearings, over the roof hole, so its three screw holes sit over the nuts. The holes lie at the port side, the rear, and the front, and the stop post stands between the rear hole and the side with no hole. Drive 3 × M3 × 16 screw down through the hub into the roof nuts. Details: The hub fits one way only. The side with no hole faces away from the port side. Use the 2.5 mm hex key from above.
-4. **Fit the servo horn.** Set the servo horn on the servo output shaft so the head will point forward. Fix it with the screw from the servo kit. Calibration at the end of the guide sets the exact middle. Details: The servo horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until you calibrate.
+4. **Fit the servo horn.** Set the servo horn on the servo output shaft so the head will point forward. Fix it with the screw from the servo kit. Calibration at first power-on sets the exact middle. Details: The servo horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until calibration.
 5. **Set the horn disc on the servo horn.** Press 1 × M3 nut into the pocket on the underside of the horn disc. Set the horn disc on the servo horn with the nut pocket down. Turn it until its four holes line up with the holes in the servo horn. Details: Press the nut in until it snaps past the two lips. It must stay when you turn the horn disc over.
 6. **Screw the horn disc to the servo horn.** Drive 4 × M3 × 6 screw through the horn disc into the servo horn. Use the 2.5 mm hex key.
 7. **Slide the servo into the shell.** Lay the shell on its rear face on the cloth. Slide the servo into its pocket through the open bottom, with the horn disc entering the roof hole. The servo rests on the long pocket wall under it. Details: The two long pocket walls stop the servo from turning. The rear face of the shell is flat, so the shell lies steady.
@@ -83,7 +83,7 @@ Tools: a 2.5 mm hex key, a 2.5 mm ball-end hex key, and a 2.5 mm short-arm L-key
 24. **Screw the shell to the base plate.** Tip the robot onto its back on the cloth. Drive 4 × M3 × 10 screw up through the base plate into the corner nuts. Use the 2.5 mm hex key from the plate side. Details: The heads sit in counterbores, so none stands below the base plate.
 25. **Connect the Jetson power cable.** Plug the cable of the Jetson power supply into the Jetson through the open port window. Route it out through the notch in the bottom edge of the window.
 26. **Fit the port panel.** Drop 1 × M3 nut into the slot in the base plate ear. Set the port panel in the port window. Drive 1 × M3 × 12 screw through the panel into the nut. Details: Use the 2.5 mm hex key from outside.
-27. **Calibrate the head.** This is a software step that the robot software will provide. Power the robot, and turn the servo torque off. Turn the head forward by hand, and save that position as the servo's middle. Details: This is the LeRobot calibration approach. It makes up for the 14.4° steps of the horn spline.
+27. **Check the head turn by hand.** Keep the power off. Turn the head slowly from one stop to the other. The camera cable must slide freely through both holes, and nothing may rub. Details: The unpowered servo resists a little, so turn the head gently. The stops are at ±80°.
 <!-- steps:end -->
 
 ## Service
@@ -105,5 +105,5 @@ Service is the same steps in reverse. Remove the head first, then the shaft, the
 - The reach of the servo lead and the camera cable with the shell lying beside the base plate stays U. Check it on the first build.
 - The fit of the servo kit's horn screw under the horn disc stays U until you test the horn disc.
 - USB port current for the servo at 5 V stays U until the first powered test.
-- Pending: the robot software has no head calibration command yet. The last step stays a placeholder until the software provides it.
+- Pending: head calibration happens at first power-on, in software that does not exist yet. With torque off, you turn the head forward by hand and save that position as the servo's middle (the LeRobot approach). It makes up for the 14.4° spline steps of the servo horn.
 - Cooling, acoustics, and powered motion stay U until printed tests.

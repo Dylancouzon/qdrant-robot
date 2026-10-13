@@ -39,7 +39,7 @@ The robot uses 17 M3 screws, four M2 screws, and 13 M3 nuts. Lengths are stock s
 
 The M2 screws cut their own thread in 1.7 mm pilot holes in the visor posts. The servo kit supplies its own horn screw, which this list does not count. M3 lengths: four of 6 mm, four of 8 mm, four of 10 mm, one of 12 mm, and four of 16 mm.
 
-The plate and panel screws sit in counterbores (6.5 mm and 6.0 mm wide) that take socket, button, pan, or flat M3 heads. The plate counterbore is 3.2 mm deep, so no head stands below the plate. Engagement is 3.6 mm past the nut's first face for both screws, measured from the counterbore floor.
+Use socket-head (hex) M3 screws, so the 2.5 mm hex keys fit every screw. The plate and panel screws sit in counterbores (6.5 mm and 6.0 mm wide). The plate counterbore is 3.2 mm deep, so no head stands below the plate. Engagement is 3.6 mm past the nut's first face for both screws, measured from the counterbore floor.
 
 ## Print settings
 
