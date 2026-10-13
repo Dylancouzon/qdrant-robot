@@ -20,8 +20,8 @@ import interface as ifc  # noqa: E402
 import neck  # noqa: E402
 import printcheck  # noqa: E402
 from geometry import (  # noqa: E402
-    BAND_Y, BODY_SECTIONS, BUS_T, JETSON_PARTS, PLUG_FLOOR_Z, SLOT_GAP, SLOT_WALL, WALL,
-    body_envelopes, hardware,
+    AUDIO_NOTCH, BAND_Y, BODY_SECTIONS, BUS_T, JETSON_PARTS, PLUG_FLOOR_Z, POCKET_GAP, POCKET_WALL,
+    SLOT_GAP, SLOT_WALL, WALL, body_envelopes, hardware,
 )  # fmt: skip
 
 OUT = Path(__file__).resolve().parent / "output"
@@ -55,7 +55,6 @@ PANEL_CB_D, PANEL_CB_DEPTH = (
 WALL_FRONT, WALL_SIDE = (0.0, -65.0), (76.0, 0.0)  # outer wall planes at Z 0 (front -Y, side +X)
 LEAN_FRONT = degrees(atan((BODY_SECTIONS[0][2] - BODY_SECTIONS[-1][2]) / 2 / HEIGHT))
 LEAN_SIDE = degrees(atan((BODY_SECTIONS[0][1] - BODY_SECTIONS[-1][1]) / 2 / HEIGHT))
-POCKET_GAP, POCKET_WALL = 1.0, 2.4
 NUT_AF_MAX = 5.5  # M3 nut across flats
 RIDGE_H, RIDGE_BACK = 0.3, 2.2  # detent height; crest this far behind the seated nut's centre
 WINDOW_Y, WINDOW_TOP, PANEL_GAP = (-18.0, 30.0), 117.0, 0.5  # port window, inner top in wall frame
@@ -71,6 +70,10 @@ PANEL_NUT_X, PANEL_SCREW_LEN = (59.4, 62.2), 12.0  # nut slot in the plate ear; 
 GRILLE_WINDOW, GRILLE_RECESS = (96.0, 44.0), (102.0, 50.0)  # rounded-end window and its seat
 GRILLE_FLANGE, GRILLE_PLUG = (101.2, 49.2), (94.8, 42.8)  # insert: rear flange; plug 0.6 mm clear
 SEAT_D, FACE_D, BACK_D = 2.4, 0.5, 4.8  # depths from the outer face: seat, grille face, flange back
+GRILLE_RIDGE, RIDGE_BASE = 1.5, 4.0  # ridge height and base width
+RIDGE_X, RIDGE_DEPTH = (-18.0, -6.0, 6.0, 18.0), (0.2, 2.4)  # on the window's straight top wall
+GRILLE_PRESS_MM3 = 10.0  # plug and shell overlap in the ridges only (0.9 mm deep with the plug
+# centered; it shifts 0.6 mm down, which leaves the 0.3 mm of grip)
 SLOT_GRIP, SLOT_TOP = 8.0, 48.0  # slot grips 8 of the strip's 10 mm (Dylan); walls reach Z 48
 RIM_H = 10.0  # the shallow pocket's far wall rises this far above the Jetson's bottom edge
 
@@ -365,10 +368,26 @@ def in_front_frame(solid, d0):
     return front_to_world(local)
 
 
+def grille_ridges():
+    """Four ridges on the window's top wall (the floor of the window in print orientation, so
+    they print without support), in the window frame: it runs from local z 0 to 4, which is depth
+    -1 to 3. The plug is 1.2 mm shorter than the window, so ridges 1.5 mm tall wedge it against
+    the bottom wall with 0.3 mm of grip until the speaker sits behind it."""
+    h = GRILLE_WINDOW[1] / 2  # local +y is down in the assembly, so the top wall is at -h
+    wp = cq.Workplane("XY", origin=(0, 0, RIDGE_DEPTH[0] + 1.0))
+    return [
+        wp.polyline([(x - RIDGE_BASE / 2, -h), (x + RIDGE_BASE / 2, -h), (x, -h + GRILLE_RIDGE)])
+        .close()
+        .extrude(RIDGE_DEPTH[1] - RIDGE_DEPTH[0])
+        .val()
+        for x in RIDGE_X
+    ]
+
+
 def grille_cutters():
     """Front window (one bridge across its top edge in print orientation, the single named
     overhang) and the seat behind it, which widens toward the cavity so it needs no support."""
-    window = stadium(*GRILLE_WINDOW, 0, 4.0)
+    window = stadium(*GRILLE_WINDOW, 0, 4.0).cut(*grille_ridges())
     w, h = GRILLE_RECESS
     lo = cq.Workplane(obj=stadium(w, h, 0, 1)).faces("<Z").val().outerWire()
     hi = cq.Workplane(obj=stadium(w + 4.5, h + 4.5, 0, 1)).faces("<Z").val().outerWire()
@@ -409,7 +428,7 @@ def components():
     sx0, sx1, sy0, sy1, sz0, sz1 = res["One speaker"]
     return {n: res[n] for n in JETSON_PARTS} | {
         "Speaker": (sx0, sx1, sy0 + SPEAKER_SHIFT, sy1 + SPEAKER_SHIFT, sz0, sz1),
-        "USB audio case": (-26.5, 26.5, -54.9, -31.4, CUT_Z, CUT_Z + 14.6),
+        "USB audio case": res["USB audio case"],
         "Bus board": res["Bus interface"],  # 42 x 13 x 32 on a long edge, on the plate
     }
 
@@ -424,6 +443,8 @@ def risers():
     back_x, grip_x = t[0] - SLOT_GAP, t[0] + SLOT_GRIP  # slot: inside of its back wall, open end
     y_out = (t[2] - SLOT_GAP - SLOT_WALL, t[3] + SLOT_GAP + SLOT_WALL)  # slot walls' outer faces
     front = (a[0] - g - w, a[1] + g + w, a[3] + g, a[3] + g + w)  # wall behind the audio case
+    mid = (a[2] + a[3]) / 2
+    notch = (mid - AUDIO_NOTCH / 2, mid + AUDIO_NOTCH / 2)  # open to the plate, for the plug
     out = {
         "jetson sill": (t[0], t[1], t[2], t[3], z, t[4]),
         "jetson slot back wall": (back_x - SLOT_WALL, back_x, y_out[0], y_out[1], z, SLOT_TOP),
@@ -431,8 +452,10 @@ def risers():
         "jetson slot wall +": (back_x, grip_x, t[3] + SLOT_GAP, y_out[1], z, SLOT_TOP),
         "jetson back wall": (grip_x, bus_r, y_out[0], t[2] - g, z, SLOT_TOP),  # bus rear wall too
         "jetson rim": (grip_x, ports[0] - g, t[3] + g, y_out[1], z, t[4] + RIM_H),
-        "audio side wall -": (a[0] - g - w, a[0] - g, a[2], front[3], z, z + 12.0),
-        "audio side wall +": (a[1] + g, a[1] + g + w, a[2], front[3], z, z + 12.0),
+        "audio end wall - front": (a[0] - g - w, a[0] - g, a[2], notch[0], z, z + 12.0),
+        "audio end wall - rear": (a[0] - g - w, a[0] - g, notch[1], front[3], z, z + 12.0),
+        "audio end wall + front": (a[1] + g, a[1] + g + w, a[2], notch[0], z, z + 12.0),
+        "audio end wall + rear": (a[1] + g, a[1] + g + w, notch[1], front[3], z, z + 12.0),
         "audio and bus wall": (*front, z, z + 30.0),
         "bus end rib -": (bus_l, bus[0] - g, front[3], y_out[0], z, PLUG_FLOOR_Z),
         "bus end rib +": (bus[1] + g, bus_r, front[3], y_out[0], z, PLUG_FLOOR_Z),
@@ -440,7 +463,7 @@ def risers():
     }
     for side in (-1, 1):
         edge, outer = side * (s[1] + g), side * (s[1] + g + w)
-        x0, x1 = sorted((side * (s[1] - 11.0), outer))
+        x0, x1 = sorted((side * (s[1] - 3.0), outer))  # rails stop short of the card's plug room
         out[f"speaker rail {side}"] = (x0, x1, s[2] + 6.0, s[3], z, s[4])
         out[f"speaker end wall {side}"] = (
             *sorted((edge, outer)),
@@ -559,11 +582,13 @@ def build_all():
 # Each check asserts and returns the numbers that go into body-checks.json.
 
 KEEP_RESERVATIONS = {  # geometry.py items that stay where they are; the others are placed above
-    *JETSON_PARTS, "Bus interface", "Bus power plug space",
+    *JETSON_PARTS, "USB audio case", "Audio plug space -", "Audio plug space +", "Bus interface",
+    "Bus power plug space",
     "Bus USB plug space -", "Bus USB plug space +", "Jetson USB/power plugs", "Fan intake space",
     "Camera cable slack loop", "Outlet space", "Camera rear cable space",
 }  # fmt: skip
 TOL_MM3 = 1e-3
+GRILLE_PAIR = {"body-shell", "speaker-grille"}
 
 
 def vol(a, b):
@@ -578,8 +603,8 @@ def vol(a, b):
 
 def reservations():
     boxes = {i["name"]: box(*reservation(i)) for i in hardware() if i["name"] in KEEP_RESERVATIONS}
-    moved = ("Speaker", "USB audio case")  # the two reservations that body.py moves
-    return boxes | {f"{k} (placed)": box(*v) for k, v in components().items() if k in moved}
+    placed = components()["Speaker"]  # the one reservation that body.py moves
+    return boxes | {"Speaker (placed)": box(*placed)}
 
 
 def check_meshes(meshes):
@@ -608,7 +633,7 @@ def check_envelope(parts, outer):
 
 
 def check_overlaps(parts):
-    "No part touches a reservation, and no two parts touch each other."
+    "No part touches a reservation, and no two parts touch, except the grille in its ridges."
     res, out = reservations(), {}
     for name, solid in parts.items():
         for rname, rbox in res.items():
@@ -618,7 +643,7 @@ def check_overlaps(parts):
     for i, a in enumerate(names):
         for b in names[i + 1 :]:
             v = vol(parts[a], parts[b])
-            assert v < TOL_MM3, (a, b, v)
+            assert v < (GRILLE_PRESS_MM3 if {a, b} == GRILLE_PAIR else TOL_MM3), (a, b, v)
             out[f"{a} / {b}"] = round(v, 4)
     return {"reservations_checked": len(res), "part_pairs_mm3": out}
 
@@ -683,6 +708,59 @@ def check_cable(shell):
         "bus_rear_gap_mm": round(rear, 2),
         "bus_front_gap_most_mm": round(BAND_Y[1] - BAND_Y[0] - BUS_T - POCKET_GAP, 2),
     }
+
+
+def check_grille(shell, grille):
+    """The four window ridges stay in the shell and wedge the plug against the bottom wall by
+    0.3 mm; they are the only contact between the grille and the shell."""
+    ridges = [in_front_frame(r, -1.0) for r in grille_ridges()]
+    for r in ridges:
+        assert abs(vol(r, shell) - r.Volume()) < 0.01 * r.Volume()  # the ridge is solid shell
+    grip = sum(vol(r, grille) for r in ridges)
+    assert 0.05 < grip < GRILLE_PRESS_MM3, grip
+    assert abs(vol(shell, grille) - grip) < 0.05  # the ridges are the only contact
+    return {
+        "window_ridges": len(ridges),
+        "ridge_height_mm": GRILLE_RIDGE,
+        "grip_on_plug_mm": round(GRILLE_RIDGE - (GRILLE_WINDOW[1] - GRILLE_PLUG[1]), 2),
+        "ridge_overlap_with_plug_mm3": round(grip, 3),
+    }
+
+
+def audio_routes():
+    """Cable centerlines (x, y, z) from each end of the sound card. A cable leaves the plug room
+    at |X| 36, rises at Y -30.5 along the speaker's rear face, crosses above the audio wall and
+    the bus board's plug rooms at Z 44, and ends in the Jetson plug space."""
+    y0 = (components()["USB audio case"][2] + components()["USB audio case"][3]) / 2
+    rise, cross = -30.5, 44.0
+    out = {}
+    for sign, end in ((1, "+X"), (-1, "-X")):
+        along = [(36.0 * sign, y0, 14.9), (36.0 * sign, rise, 14.9)]
+        over = [(36.0 * sign, rise, cross), (36.0, rise, cross)]
+        tail = [(36.0, -10.5, cross), (41.5, -10.5, cross), (41.5, 6.0, cross)]
+        out[f"USB end {end}, to a Jetson port"] = along + over + tail
+        out[f"speaker lead end {end}"] = along + [(36.0 * sign, rise, 40.0)]
+    return out
+
+
+def check_audio_routes(parts):
+    """Every cable route clears every printed part and every placed component, so a cable can
+    leave each card end and reach the Jetson plug space without crossing a wall."""
+    solids = parts | {k: box(*v) for k, v in components().items()}
+    plugs = {i["name"]: reservation(i) for i in hardware() if i["name"].startswith("Audio plug")}
+    out = {}
+    for name, points in audio_routes().items():
+        for seg in neck.cable_solid(points).Solids():
+            for what, solid in solids.items():
+                assert vol(seg, solid) < TOL_MM3, (name, what)
+        x, y, z = points[0]
+        room = plugs["Audio plug space " + ("+" if x > 0 else "-")]
+        assert room[0] < x < room[1] and room[2] < y < room[3] and room[4] < z < room[5]
+        out[name] = {
+            "length_mm": round(neck.path_length(points)),
+            "waypoints_xyz": [[round(v, 1) for v in p] for p in points],
+        }
+    return out
 
 
 def check_servo(shell):
@@ -878,8 +956,10 @@ WALL_GAPS = {  # wall: {part: smallest gap}. The bus band holds 17 mm for the 13
     "jetson slot wall +": {"Jetson tray and board": SLOT_GAP},
     "jetson back wall": {"Jetson tray and board": POCKET_GAP, "Bus board": POCKET_GAP},
     "jetson rim": {"Jetson tray and board": POCKET_GAP},
-    "audio side wall -": {"USB audio case": POCKET_GAP},
-    "audio side wall +": {"USB audio case": POCKET_GAP},
+    "audio end wall - front": {"USB audio case": POCKET_GAP},
+    "audio end wall - rear": {"USB audio case": POCKET_GAP},
+    "audio end wall + front": {"USB audio case": POCKET_GAP},
+    "audio end wall + rear": {"USB audio case": POCKET_GAP},
     "audio and bus wall": {"USB audio case": POCKET_GAP, "Bus board": POCKET_GAP},
     "bus end rib -": {"Bus board": POCKET_GAP},
     "bus end rib +": {"Bus board": POCKET_GAP},
@@ -1103,6 +1183,8 @@ def main():
         "sweeps": check_sweeps(shell, built["skirt"]),
         "servo_pocket": check_servo(shell),
         "camera_cable": check_cable(shell),
+        "grille_ridges": check_grille(shell, parts["speaker-grille"]),
+        "audio_cables": check_audio_routes(parts),
         "alignment": check_alignment(shell, parts["base-plate"], parts["port-panel"]),
         "nut_detents": check_detents(shell),
         "openings": check_openings(shell),

@@ -66,13 +66,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.39,
-   "volume_mm3": 22572,
+   "volume_mm3": 22574,
    "bbox_mm": [
     112.0,
     52.0,
     23.5
    ],
-   "face_count": 9050,
+   "face_count": 9098,
    "file": "enclosure/output/print/Required/Black/visor.stl"
   },
   "hub": {
@@ -100,13 +100,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.39,
-   "volume_mm3": 12721,
+   "volume_mm3": 12723,
    "bbox_mm": [
     50.0,
     50.0,
     21.3
    ],
-   "face_count": 5156,
+   "face_count": 5204,
    "file": "enclosure/output/print/Required/Black/head-shaft.stl"
   },
   "horn disc": {

@@ -11,7 +11,7 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | Part | Color | Orientation | Size (mm) | Time | PLA |
 | --- | --- | --- | --- | --- | --- |
 | `body-shell` | White | Upside down, roof on the bed | 148.6 × 127.1 × 152.4 | 6.5 h | 240 g |
-| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 2.0 h | 93 g |
+| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 1.9 h | 88 g |
 | `port-panel` | White | Outside face on the bed | 91.9 × 49.3 × 8.2 | 0.4 h | 12 g |
 | `head-shell` | White | Rear face on the bed | 116 × 56 × 77 | 1.8 h | 92 g |
 | `visor` | Black | Front face on the bed | 112 × 52 × 23.5 | 0.7 h | 21 g |
@@ -20,7 +20,7 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | `head-shaft` | Black | Flange on the bed | 50 × 50 × 21.3 | 0.4 h | 10 g |
 | `horn-disc` | Black | Flat on the bed | 31 × 31 × 7.8 | 0.2 h | 3 g |
 
-The nine parts take 13.4 h and 498 g of PLA. The shell is the largest part and fits the 256 mm bed.
+The nine parts take 13.3 h and 494 g of PLA. The shell is the largest part and fits the 256 mm bed. Four 1.5 mm ridges on the grille window's top wall wedge the grille 0.3 mm tight (U) until the speaker sits behind it. To remove it, press it inward from outside.
 
 ## Fasteners
 
@@ -31,9 +31,9 @@ The robot uses 17 M3 screws, four M2 screws, and 13 M3 nuts. Lengths are stock s
 | M3 | 3 | 16 mm | yes | Hub to the roof | 2.5 mm hex key from above |
 | M3 | 1 | 16 mm | yes | Shaft to the horn disc | 2.5 mm hex key from above |
 | M3 | 4 | 6 mm | no | Horn disc to the servo horn | 2.5 mm hex key through the disc |
-| M3 | 2 | 8 mm | yes | Head to the shaft flange | 2.5 mm ball-end key through the front opening, about 20° |
+| M3 | 2 | 8 mm | yes | Head to the shaft flange | 2.5 mm ball-end key through the front opening, about 25° |
 | M3 | 2 | 8 mm | yes | Visor to the head | 2.5 mm short-arm L-key from below |
-| M3 | 4 | 10 mm | yes | Base plate to the shell | 2.5 mm hex key from below |
+| M3 | 4 | 10 mm | yes | Base plate to the shell | 2.5 mm hex key from the plate side |
 | M3 | 1 | 12 mm | yes | Port panel to the plate ear | 2.5 mm hex key from outside |
 | M2 | 4 | 8 mm | no | Camera to the visor posts | Driver for the M2 head |
 

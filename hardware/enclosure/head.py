@@ -255,6 +255,14 @@ def head_checks(parts, neck_parts):
         and nuts["flange nut 0"].distance(neck_parts["head shaft"]) < 1e-6
     )
     assert nuts["disc nut"].distance(neck_parts["horn disc"]) < 1e-6
+    angles = {
+        f"flange nut {i}": ("head shaft", atan2(xy[1], xy[0]))
+        for i, xy in enumerate(HEAD_SCREWS_XY)
+    }
+    angles |= {f"tab nut {i}": ("visor", radians(90)) for i in range(len(VISOR_SCREWS_XY))}
+    for name, (owner, angle) in angles.items():  # 1 mm toward the mouth meets a ridge
+        back = nuts[name].translate(cq.Vector(cos(angle), sin(angle), 0))
+        assert neck.overlap(back, everything[owner]) > 0.01, name
     out["visor retention"] = (
         "two M3 x 8 screws up through the floor lip into nut slots in two visor tabs; the "
         "spigot ring locates the visor; no flexing part"

@@ -7,11 +7,11 @@
   ]
  },
  "overlaps": {
-  "reservations_checked": 14,
+  "reservations_checked": 16,
   "part_pairs_mm3": {
    "body-shell / base-plate": 0.0,
    "body-shell / port-panel": 0.0,
-   "body-shell / speaker-grille": 0.0,
+   "body-shell / speaker-grille": 8.208,
    "base-plate / port-panel": 0.0,
    "base-plate / speaker-grille": 0.0,
    "port-panel / speaker-grille": 0.0
@@ -25,8 +25,10 @@
    "jetson slot wall +": 0.0,
    "jetson back wall": 0.0,
    "jetson rim": 0.0,
-   "audio side wall -": 0.0,
-   "audio side wall +": 0.0,
+   "audio end wall - front": 0.0,
+   "audio end wall - rear": 0.0,
+   "audio end wall + front": 0.0,
+   "audio end wall + rear": 0.0,
    "audio and bus wall": 0.0,
    "bus end rib -": 0.0,
    "bus end rib +": 0.0,
@@ -70,6 +72,134 @@
   "bus_rear_gap_mm": 2.0,
   "bus_front_gap_most_mm": 3.0
  },
+ "grille_ridges": {
+  "window_ridges": 4,
+  "ridge_height_mm": 1.5,
+  "grip_on_plug_mm": 0.3,
+  "ridge_overlap_with_plug_mm3": 8.208
+ },
+ "audio_cables": {
+  "USB end +X, to a Jetson port": {
+   "length_mm": 84,
+   "waypoints_xyz": [
+    [
+     36.0,
+     -43.1,
+     14.9
+    ],
+    [
+     36.0,
+     -30.5,
+     14.9
+    ],
+    [
+     36.0,
+     -30.5,
+     44.0
+    ],
+    [
+     36.0,
+     -30.5,
+     44.0
+    ],
+    [
+     36.0,
+     -10.5,
+     44.0
+    ],
+    [
+     41.5,
+     -10.5,
+     44.0
+    ],
+    [
+     41.5,
+     6.0,
+     44.0
+    ]
+   ]
+  },
+  "speaker lead end +X": {
+   "length_mm": 38,
+   "waypoints_xyz": [
+    [
+     36.0,
+     -43.1,
+     14.9
+    ],
+    [
+     36.0,
+     -30.5,
+     14.9
+    ],
+    [
+     36.0,
+     -30.5,
+     40.0
+    ]
+   ]
+  },
+  "USB end -X, to a Jetson port": {
+   "length_mm": 156,
+   "waypoints_xyz": [
+    [
+     -36.0,
+     -43.1,
+     14.9
+    ],
+    [
+     -36.0,
+     -30.5,
+     14.9
+    ],
+    [
+     -36.0,
+     -30.5,
+     44.0
+    ],
+    [
+     36.0,
+     -30.5,
+     44.0
+    ],
+    [
+     36.0,
+     -10.5,
+     44.0
+    ],
+    [
+     41.5,
+     -10.5,
+     44.0
+    ],
+    [
+     41.5,
+     6.0,
+     44.0
+    ]
+   ]
+  },
+  "speaker lead end -X": {
+   "length_mm": 38,
+   "waypoints_xyz": [
+    [
+     -36.0,
+     -43.1,
+     14.9
+    ],
+    [
+     -36.0,
+     -30.5,
+     14.9
+    ],
+    [
+     -36.0,
+     -30.5,
+     40.0
+    ]
+   ]
+  }
+ },
  "alignment": {
   "plate_screws": "4 x M3 x 10",
   "plate_screw_engagement_mm": 3.6,
@@ -106,8 +236,10 @@
    "jetson back wall / Jetson tray and board": 1.0,
    "jetson back wall / Bus board": 2.0,
    "jetson rim / Jetson tray and board": 1.0,
-   "audio side wall - / USB audio case": 1.0,
-   "audio side wall + / USB audio case": 1.0,
+   "audio end wall - front / USB audio case": 1.0,
+   "audio end wall - rear / USB audio case": 1.0,
+   "audio end wall + front / USB audio case": 1.0,
+   "audio end wall + rear / USB audio case": 1.0,
    "audio and bus wall / USB audio case": 1.0,
    "audio and bus wall / Bus board": 2.0,
    "bus end rib - / Bus board": 1.0,
@@ -181,13 +313,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.0,
-   "volume_mm3": 231384,
+   "volume_mm3": 231410,
    "bbox_mm": [
     148.6,
     127.1,
     152.4
    ],
-   "face_count": 13326
+   "face_count": 13374
   },
   "Required/White/base-plate": {
    "overhang_mm2": 96.3,
@@ -196,14 +328,14 @@
    "island_max_mm2": 0.0,
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
-   "min_thickness_mm": 2.01,
-   "volume_mm3": 157343,
+   "min_thickness_mm": 2.3,
+   "volume_mm3": 150810,
    "bbox_mm": [
     143.2,
     116.5,
     48.0
    ],
-   "face_count": 3974
+   "face_count": 4006
   },
   "Required/White/port-panel": {
    "overhang_mm2": 19.2,
@@ -239,5 +371,5 @@
   }
  },
  "printcheck_total_overhang_mm2": 507.3,
- "runtime_s": 135.5
+ "runtime_s": 142.8
 }

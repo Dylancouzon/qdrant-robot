@@ -52,6 +52,7 @@ DISC_RING_R, DISC_RING_H = (7.6, 8.6), 0.8  # inside the 17.5 mm inner race OD, 
 DISC_RING_TOP_Z = ROOF_TOP_Z - PLAY
 DISC_TOP_Z = DISC_RING_TOP_Z - DISC_RING_H
 NUT_AF, NUT_T = 5.7, 2.5  # M3 nut pocket across flats, depth
+RIDGE_AT = 2.2  # nut channel ridge crest, past the seated nut's center
 LIP_H, LIP_IN = 0.4, 0.3  # the pocket mouth: two lips on opposite flats keep the nut in (U)
 DISC_NUT_DEPTH = 3.0  # deeper in the disc, so the center screw tip stops above the horn
 NUT_CEILING_Z = DISC_BOTTOM_Z + DISC_NUT_DEPTH
@@ -101,9 +102,22 @@ def hexprism(af, z0, z1, xy=(0.0, 0.0), rot=0.0):
 
 
 def nut_slot(xy, z0, z1, angle, length):
-    """M3 nut trap opening toward `angle` (degrees): a hex end at xy plus a channel to `length`."""
+    """M3 nut trap opening toward `angle` (degrees): a hex end at xy plus a channel to `length`.
+    A 0.3 mm ridge on each channel wall, 2.2 mm past the seated nut's center where the nut is
+    still narrow, makes the nut snap in and stay, as the shell's nut channels do."""
+    half, a = NUT_AF / 2, RIDGE_AT
+    ridges = [
+        cq.Workplane("XY")
+        .workplane(offset=z0)
+        .polyline([(a - 0.5, s * half), (a + 0.5, s * half), (a, s * (half - 0.3))])
+        .close()
+        .extrude(z1 - z0)
+        .val()
+        for s in (-1, 1)
+    ]
     base = hexprism(NUT_AF, z0, z1).fuse(box(length, NUT_AF, z0, z1, (length / 2, 0)))
-    return base.rotate((0, 0, 0), (0, 0, 1), angle).translate(cq.Vector(xy[0], xy[1], 0))
+    turned_ = base.cut(*ridges).rotate((0, 0, 0), (0, 0, 1), angle)
+    return turned_.translate(cq.Vector(xy[0], xy[1], 0))
 
 
 def nut_ghost(xy, z0, angle):

@@ -57,6 +57,9 @@ HARDWARE = (
     ("Jetson (Jetson Orin Nano Super developer kit)", "The computer. It runs the robot.",
      "Its four USB ports take the camera, the USB sound card, and the servo adapter board (data "
      "and power). Its own power cable leaves through the port window."),
+    ("Jetson power supply (comes with the Jetson kit)",
+     "Powers the Jetson from the wall.",
+     "Its cable plugs into the Jetson power jack and leaves through the port window."),
     ("USB sound card (Waveshare USB to Audio)",
      "The small box that the speaker plugs into. It holds the microphone.",
      "Plugs into a Jetson USB port with an angled USB cable. The speaker lead plugs into it."),
@@ -77,9 +80,17 @@ HARDWARE = (
      "plugs into a Jetson USB port."),
     ("Bearings (two, 15 × 24 × 5 mm)", "Let the head shaft turn.",
      "Press into the neck hub, one on each side."),
-    ("Angled USB cables",
+    ("Servo adapter board USB data cable",
+     "A USB cable that carries data between the servo adapter board and the Jetson.",
+     "Joins the data port of the servo adapter board to a Jetson USB port."),
+    ("USB-A to 5.5 × 2.1 mm barrel cable",
+     "A cable that carries 5 V power to the servo adapter board.",
+     "The barrel plug goes into the servo adapter board. The USB-A end goes into a second "
+     "Jetson USB port."),
+    ("Angled USB cables (three)",
      "USB cables with a right-angle plug. They fit the tight gaps inside the body.",
-     "Join the camera and the USB sound card to the Jetson."),
+     "One joins the USB sound card to the Jetson, one joins the servo adapter board data port, "
+     "and the camera cable ends in the third."),
 )  # fmt: skip
 # Hardware boxes from body.components() and head.ghost_solids(): name prefix, label, color. The
 # first prefix that matches names the box, so a prefix covers every box that starts with it.
@@ -100,9 +111,9 @@ SCREWS = {
     "hub": ("Hub to the roof", True, "2.5 mm hex key from above"),
     "center": ("Shaft to the horn disc", True, "2.5 mm hex key from above"),
     "horn": ("Horn disc to the servo horn", False, "2.5 mm hex key through the disc"),
-    "head": ("Head to the shaft flange", True, "2.5 mm ball-end key through the front, about 20°"),
+    "head": ("Head to the shaft flange", True, "2.5 mm ball-end key through the front, about 25°"),
     "visor": ("Visor to the head", True, "2.5 mm short-arm L-key from below"),
-    "plate": ("Base plate to the shell", True, "2.5 mm hex key from below"),
+    "plate": ("Base plate to the shell", True, "2.5 mm hex key from the plate side"),
     "panel": ("Port panel to the plate ear", True, "2.5 mm hex key from outside"),
 }
 SHELLS = {"body-shell", "port-panel", "head-shell", "visor"}  # hidden by the cutaway control
@@ -272,69 +283,79 @@ STEPS = (
          moves=((("bearing lower",), away(DOWN, 28)), (("bearing upper",), away(UP, 28))),
          reset=("neck-hub",)),
     Step("Neck", "Fit three nuts into the roof.",
-         "Stand the body shell roof up on four 60 mm blocks. Drop {hub_nut} through the roof hole, "
-         "and push each nut sideways into its channel until it clicks.",
+         "Stand the body shell roof up on four 60 mm blocks. Take {hub_nut}. Hold each nut in "
+         "tweezers, lower it through the roof hole to just under the roof, and push it outward "
+         "into its channel until it clicks.",
          ("hub nut",), (0, -80, 260, (0, 0, 140)),
-         "Each channel has a 0.3 mm ridge. The nut must click past it and stay. The blocks leave "
-         "room to reach under the roof.",
+         "Each channel has a 0.3 mm ridge. The nut must click past it and stay. A nut that is "
+         "let go falls through the hole. The blocks leave room to reach under the roof.",
          ((("hub nut",), radial(-10)),), reset=("body-shell",)),
     Step("Neck", "Screw the neck hub to the roof.",
-         "Set the hub, with its bearings, over the roof hole. Drive {hub} down through the hub "
-         "into the roof nuts. Use the 2.5 mm hex key from above.",
-         ("neck-hub", "bearing lower", "bearing upper", "hub screw"), (30, 25, 340, (0, 0, 168)),
+         "Set the hub, with its bearings, over the roof hole, so its three screw holes sit over "
+         "the nuts. The holes lie at the port side, the rear, and the front, and the stop post "
+         "stands between the rear hole and the side with no hole. Drive {hub} down through the "
+         "hub into the roof nuts.",
+         ("neck-hub", "bearing lower", "bearing upper", "hub screw"), (0, 50, 300, (0, 0, 168)),
+         "The hub fits one way only. The side with no hole faces away from the port side. Use the "
+         "2.5 mm hex key from above.",
          moves=((("neck-hub", "bearing lower", "bearing upper"), away(UP, 30)),
                 (("hub screw",), away(UP, 55)))),
     Step("Neck", "Fit the servo horn.",
-         "Set the horn on the servo output shaft so the head will point forward. Fix it with the "
-         "screw from the servo kit. Calibration at the end of the guide sets the exact middle.",
+         "Set the servo horn on the servo output shaft so the head will point forward. Fix it with "
+         "the screw from the servo kit. Calibration at the end of the guide sets the exact middle.",
          ("servo case", "servo horn"), (30, 20, 200, (-10, 0, 140)),
-         "The horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until you "
-         "calibrate.",
+         "The servo horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until "
+         "you calibrate.",
          ((("servo horn",), away(UP, 20)),), reset=()),
     Step("Neck", "Set the horn disc on the servo horn.",
-         "Press {center_nut} into the pocket on the underside of the horn disc. Set the disc on "
-         "the horn with the nut pocket down. Turn the disc until its four holes line up with the "
-         "horn holes.",
+         "Press {center_nut} into the pocket on the underside of the horn disc. Set the horn disc "
+         "on the servo horn with the nut pocket down. Turn it until its four holes line up with "
+         "the holes in the servo horn.",
          ("horn-disc", "disc nut"), (30, 20, 200, (0, 0, 150)),
-         "Press the nut in until it snaps past the two lips. It must stay when you turn the disc "
-         "over.",
+         "Press the nut in until it snaps past the two lips. It must stay when you turn the horn "
+         "disc over.",
          ((("horn-disc", "disc nut"), away(UP, 30)),), reset=("servo case", "servo horn")),
-    Step("Neck", "Screw the disc to the horn.",
-         "Drive {horn} through the disc into the horn. Use the 2.5 mm hex key.",
+    Step("Neck", "Screw the horn disc to the servo horn.",
+         "Drive {horn} through the horn disc into the servo horn. Use the 2.5 mm hex key.",
          ("horn screw",), (30, 20, 200, (0, 0, 150)),
          moves=((("horn screw",), away(UP, 22)),)),
     Step("Neck", "Slide the servo into the shell.",
          "Lay the shell on its rear face on the cloth. Slide the servo into its pocket through the "
-         "open bottom, with the disc entering the roof hole. The servo rests on the long pocket "
-         "wall under it.",
+         "open bottom, with the horn disc entering the roof hole. The servo rests on the long "
+         "pocket wall under it.",
          SERVO, (-25, 25, 460, (0, 60, -5)),
          "The two long pocket walls stop the servo from turning. The rear face of the shell is "
          "flat, so the shell lies steady.",
          ((SERVO, away(DOWN, 45)),), reset=NECK, tilt=LYING),
     Step("Neck", "Insert the head shaft and drive the center screw.",
-         "Push the shaft in through both bearings until its square socket meets the disc. Drive "
-         "{center} down the shaft bore into the disc nut. Stand the shell on the four blocks "
-         "again.",
+         "Turn the shaft until the two nut channels in its flange face the front. Push the shaft "
+         "in through both bearings, so the hub post enters the arc slot under the flange. Drive "
+         "{center} down the shaft bore into the nut in the horn disc.",
          ("head-shaft", "center screw"), (140, 25, 480, (0, 150, -5)),
-         "Use the 2.5 mm hex key. A square boss on the disc fits the socket in the shaft. Do not "
-         "overtighten: the shaft keeps 0.5 mm of axial play.",
+         "Use the 2.5 mm hex key. The shaft clears the hub post only within about 60° of the "
+         "front. A square boss on the horn disc fits the socket in the shaft. Do not overtighten: "
+         "the shaft keeps 0.5 mm of axial play.",
          ((("head-shaft",), away(UP, 45)), (("center screw",), away(UP, 80))), tilt=LYING),
     Step("Head", "Slide two nuts into the shaft flange.",
-         "Take {head_nut}. Slide one nut into each channel in the rim of the flange, and push "
-         "until it clicks.",
+         "Stand the shell upright on the four blocks, and take {head_nut}. Slide each nut to the "
+         "end of its channel in the flange rim, until it clicks past the ridge.",
          ("flange nut",), (0, 25, 260, (0, 0, 178)),
-         moves=((("flange nut",), radial(12)),)),
+         "",
+         ((("flange nut",), radial(12)),)),
     Step("Head", "Screw the head shell to the flange.",
-         "Set the head shell on the flange, with the front open and the visor off. Drive {head} "
-         "down through the head floor into the nuts. Use the 2.5 mm ball-end key through the front"
-         " opening.",
+         "Set the head shell on the flange, with the front opening toward you and the visor off. "
+         "Drive {head} down through the head floor into the nuts. Use the 2.5 mm ball-end key "
+         "through the front opening.",
          ("head-shell", "head screw"), (0, 40, 430, (0, -10, 195)),
-         "Tilt the key about 20° so it reaches the screws.",
+         "Tilt the key about 25° so it clears the top rim of the front opening and reaches the "
+         "screws.",
          ((("head-shell",), away(UP, 40)), (("head screw",), away(UP, 65)))),
     Step("Head", "Slide two nuts into the visor tabs.",
-         "Take {visor_nut}. Slide one nut into each tab slot from the rear of the visor.",
+         "Take {visor_nut}. Slide one nut into each tab slot from the rear of the visor, until it "
+         "clicks past the ridge.",
          ("tab nut",), (160, 25, 260, (0, -25, 208)),
-         moves=((("tab nut",), away(REAR, 15)),), reset=("visor",)),
+         "",
+         ((("tab nut",), away(REAR, 15)),), reset=("visor",)),
     Step("Head", "Screw the camera to the visor posts.",
          "Set the camera board on the four posts, with the lens in the round hole. Drive {camera} "
          "through the board into the posts. Use a driver that fits the M2 head.",
@@ -355,8 +376,8 @@ STEPS = (
          "loop absorbs the ±80° head turn.",
          ((VISOR, away(FRONT, 45)),), reset=NECK + SERVO + SHAFT + VISOR, cut=True),
     Step("Head", "Fit the visor to the head.",
-         "Press the visor into the head front. Keep the cable slack and out of the pinch points. "
-         "Drive {visor} up through the head floor lip into the tab nuts.",
+         "Press the visor into the front opening of the head. Keep the cable slack and out of the "
+         "pinch points. Drive {visor} up through the head floor lip into the tab nuts.",
          ("visor", "visor screw"), (20, -35, 330, (0, -20, 195)),
          "The ring on the visor locates it in the head opening. Use the 2.5 mm short-arm L-key "
          "from below.",
@@ -369,7 +390,8 @@ STEPS = (
          "channel walls.",
          ((("corner nut",), radial(-7, corner=True)),)),
     Step("Body", "Fit the speaker grille.",
-         "Reach into the shell from below. Set the grille into the front window from the inside.",
+         "Reach into the shell from below. Press the grille into the front window from the inside "
+         "until it snaps.",
          ("speaker-grille",), (20, -35, 380, (0, -45, 50)),
          "The flange of the grille covers the window edge from behind.",
          ((("speaker-grille",), away(REAR, 25)),)),
@@ -380,43 +402,47 @@ STEPS = (
          ("Jetson", "Bus board"), (40, 30, 650, (0, 0, 80)),
          "Each pocket leaves about 1 mm of clearance on each side. Nothing presses in.",
          ((("Jetson",), away(UP, 45)), (("Bus board",), away(UP, 40))), reset=("base-plate",)),
-    Step("Body", "Set the USB sound card and the speaker in their pockets.",
-         "Set the USB sound card in the front pocket. Lower the speaker onto the two rails above "
-         "the card, and face it toward the front.",
-         ("USB audio case", "Speaker"), (40, 35, 480, (0, -30, 40)),
-         "Set the card first, because the speaker rails sit above it.",
-         ((("USB audio case",), away(UP, 40)), (("Speaker",), away(UP, 55)))),
-    Step("Body", "Connect the USB sound card.",
-         "Plug the USB sound card into a Jetson USB port with an angled USB cable. Plug the "
-         "speaker lead into the sound card.",
-         ("USB audio case", "Speaker"), (40, 35, 480, (0, -30, 40)),
-         "Plug every internal cable now, while the base plate is open."),
+    Step("Body", "Set the USB sound card in its pocket and plug it in.",
+         "Set the USB sound card in the front pocket. Plug an angled USB cable and the speaker "
+         "lead into the card. Lead the USB cable up over the pocket walls and along the open band "
+         "to a Jetson USB port on the port side.",
+         ("USB audio case",), (40, 35, 480, (0, -30, 40)),
+         "Do this before the speaker goes in, because the gap above the card is only 2.8 mm. Plug "
+         "the Jetson end of the cable too, while the base plate is open.",
+         ((("USB audio case",), away(UP, 40)),)),
+    Step("Body", "Set the speaker on its rails.",
+         "Lower the speaker onto the two rails above the card, and face it toward the front. Keep "
+         "the speaker lead and the USB cable clear of the rails.",
+         ("Speaker",), (40, 35, 480, (0, -30, 40)),
+         moves=((("Speaker",), away(UP, 55)),)),
     Step("Body", "Connect the servo adapter board.",
          "Plug the board's USB data cable into a Jetson USB port. Plug the USB-A to 5.5 × 2.1 mm "
-         "barrel cable into the board, and its USB-A end into a second Jetson USB port. This cable"
-         " gives the servo 5 V.",
-         ("Bus board",), (40, 35, 480, (0, -30, 40))),
-    Step("Body", "Plug the servo and the camera cable into the base plate.",
+         "barrel cable into the board, and its USB-A end into a second Jetson USB port. Lead both "
+         "cables up over the pocket walls and along the open band to the port side.",
+         ("Bus board",), (40, 35, 480, (0, -30, 40)),
+         "The barrel cable gives the servo 5 V."),
+    Step("Body", "Plug in the servo lead and the camera cable.",
          "Lay the shell on its rear face on the cloth next to the base plate, with its open "
-         "bottom toward the plate. Plug the servo lead into the servo adapter board. Plug the "
-         "camera USB cable into the last Jetson USB port.",
+         "bottom toward the base plate. Plug the servo lead into the servo adapter board. Plug "
+         "the camera USB cable into the last Jetson USB port.",
          ("servo case", "Bus board", "Jetson"), (60, 25, 900, (0, -80, 90)),
-         "Both cables come out of the open bottom. The picture shows the shell upright and moved "
-         "aside. Leave enough slack to lift the shell over the plate.",
+         "Both cables come out of the open bottom. Lead the camera cable the same way as the "
+         "others, over the pocket walls and along the open band. The picture shows the shell "
+         "upright and moved aside. Leave enough slack to lift the shell over the base plate.",
          moves=((UPPER, away(FRONT, 170)),), reset=ON_PLATE + UPPER, cut=True),
     Step("Body", "Lower the shell onto the base plate.",
-         "Lift the shell over the plate, and lower it straight down. Keep the servo lead and the "
-         "camera cable clear of the plate edge and the pockets.",
+         "Lift the shell over the base plate, and lower it straight down. Keep the servo lead and "
+         "the camera cable clear of the base plate edge and the pockets.",
          ("body-shell",), (35, 15, 700, (0, 0, 110)), moves=LIFT),
     Step("Body", "Screw the shell to the base plate.",
          "Tip the robot onto its back on the cloth. Drive {plate} up through the base plate into "
-         "the corner nuts. Use the 2.5 mm hex key from below.",
+         "the corner nuts. Use the 2.5 mm hex key from the plate side.",
          ("plate screw",), (0, -60, 430, (0, 0, 40)),
-         "The heads sit in counterbores, so none stands below the plate.",
+         "The heads sit in counterbores, so none stands below the base plate.",
          ((("plate screw",), away(DOWN, 25)),)),
     Step("Body", "Connect the Jetson power cable.",
-         "Plug the power cable into the Jetson through the open port window. Route it out through "
-         "the notch in the bottom edge of the window.",
+         "Plug the cable of the Jetson power supply into the Jetson through the open port "
+         "window. Route it out through the notch in the bottom edge of the window.",
          ("Jetson",), (90, 15, 480, (45, 10, 70)), cut=True),
     Step("Body", "Fit the port panel.",
          "Drop {panel_nut} into the slot in the base plate ear. Set the port panel in the port "
@@ -486,8 +512,8 @@ def parts_table():
             f"<td>{s['seconds'] / 3600:.1f} h</td><td>{s['grams']:.0f} g</td></tr>"
         )
     hours = sum(s["seconds"] for s in slices.values()) / 3600
-    grams = sum(s["grams"] for s in slices.values())
-    return rows, f"{hours:.1f} h and {grams:.0f} g of PLA in total"
+    grams = sum(round(s["grams"]) for s in slices.values())  # the sum of the rows shown
+    return rows, f"{hours:.1f} h and {grams} g of PLA in total"
 
 
 def hardware_html():
@@ -564,11 +590,20 @@ def write_guide(rows):
     GUIDE.write_text(text)
 
 
+def write_readme_total(total):
+    "Keep the print total in README.md equal to the sum of the table rows."
+    pattern = r"The nine parts take [\d.]+ h and \d+ g of PLA"
+    text, found = re.subn(pattern, f"The nine parts take {total}", (HERE / "README.md").read_text())
+    assert found == 1, "README.md needs the sentence 'The nine parts take ... of PLA'"
+    (HERE / "README.md").write_text(text)
+
+
 def main():
     data = scene()
     rows = step_data(data)
     write_guide(rows)
     part_rows, print_total = parts_table()
+    write_readme_total(print_total.removesuffix(" in total"))
     fastener_rows_html, fastener_total = fastener_table()
     html = (
         TEMPLATE.replace("__DATA__", json.dumps(data, separators=(",", ":")))

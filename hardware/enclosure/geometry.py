@@ -104,6 +104,15 @@ JETSON_PARTS = {
     "Jetson heatsink": placed(HEAT_RANGE[0], (SLAB_Y, Y1), HEAT_RANGE[1]),
 }
 
+# USB sound card on the plate. Its USB-A plug is on one short end and the speaker connector and
+# audio jack on the other (U, which end is unknown), so both end walls have a notch and both ends
+# keep plug room up to the speaker's underside (Z 25) for an angled USB-A extension (U).
+POCKET_GAP, POCKET_WALL = 1.0, 2.4  # loose pockets: clearance each side, and wall thickness
+AUDIO_X, AUDIO_Y, AUDIO_Z = (-26.5, 26.5), (-54.9, -31.4), (7.6, 22.2)
+AUDIO_NOTCH, AUDIO_PLUG = 16.0, 16.0  # notch width in each end wall (U); plug room past the wall
+AUDIO_MID_Y = sum(AUDIO_Y) / 2
+AUDIO_END = AUDIO_X[1] + POCKET_GAP + POCKET_WALL + AUDIO_PLUG  # plug room reaches this |X|
+
 # Servo adapter board (Dylan): 42 x 32 x 13 mm, standing on a long edge in the band between the
 # audio case and the Jetson. Its barrel jack takes a plug straight up from the top edge, near the
 # -X end (U). Its USB data port is on an unknown end, so both short ends keep plug room (U).
@@ -118,7 +127,17 @@ PLUG_FLOOR_Z = BUS_Z[0] + 3.2  # the end stop ribs are 3.2 mm tall
 # Speaker: Waveshare 8 ohm 5 W. The rest are unmeasured (U).
 BOXES = JETSON_PARTS | {
     "One speaker": ((100, 21, 45), (0, -45.5, 47.5)),
-    "USB audio case": ((53, 23.5, 14.6), (-27, -40, 88)),
+    "USB audio case": placed(AUDIO_X, AUDIO_Y, AUDIO_Z),
+    "Audio plug space -": placed(
+        (-AUDIO_END, AUDIO_X[0]),
+        (AUDIO_MID_Y - AUDIO_NOTCH / 2, AUDIO_MID_Y + AUDIO_NOTCH / 2),
+        (AUDIO_Z[0], 25.0),
+    ),
+    "Audio plug space +": placed(
+        (AUDIO_X[1], AUDIO_END),
+        (AUDIO_MID_Y - AUDIO_NOTCH / 2, AUDIO_MID_Y + AUDIO_NOTCH / 2),
+        (AUDIO_Z[0], 25.0),
+    ),
     "Bus interface": placed((-BUS_X / 2, BUS_X / 2), (BUS_Y - BUS_T / 2, BUS_Y + BUS_T / 2), BUS_Z),
     "Bus power plug space": placed(
         (-BUS_X / 2, -BUS_X / 2 + PLUG_POWER[0]), BAND_Y, (BUS_Z[1], BUS_Z[1] + PLUG_POWER[1])
