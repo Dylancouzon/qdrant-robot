@@ -2,11 +2,11 @@
 
 Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Active task: Enclosure revision after Dylan's review (2026-10-13)
+## Active task: Print and fit the revised enclosure (2026-10-13)
 
-Dylan found the assembly guide unreadable, part names unclear, and the Jetson modeled as a solid box. Fixed: the Jetson is a flat board with a heatsink block, held by its plastic strip in a vertical slot (slot coupon added); the servo takes 5 V from a Jetson USB port (H5, no regulator); the camera cable runs through holes in the head floor and roof (H6); the guide is 27 steps with a part glossary, generated from one list in `preview.py` into the viewer and [ASSEMBLY.md](hardware/enclosure/ASSEMBLY.md). Codex review passed. Builders are Sonnet 5.5; Codex gpt-6.1-sol reviews each change, and Dylan wants back-and-forth until Codex and the lead agree the design is ready.
+The enclosure revision after Dylan's review is done and ready to print (final Codex gpt-6.1-sol review PASS at 9a9574a, after three guide walkthroughs against the CAD). The Jetson is a flat board held by its 6 mm plastic strip in a 7 mm slot; the servo takes 5 V from a Jetson USB port (H5); the camera cable runs through the neck holes (H6); the servo adapter board stands on a short end with plug rooms on both sides; the guide is 27 steps generated from one list in `preview.py` into the viewer and [ASSEMBLY.md](hardware/enclosure/ASSEMBLY.md). Prints take 13.3 h and 490 g. Builders were Sonnet 5.5, and Codex reviews each change.
 
-Waiting on Dylan: the Jetson plastic strip thickness (`JETSON_STRIP_T`, 11.0 U) and whether the servo lead plugs into the adapter board face or edge (`BUS_FACE_GAP`, 2.0 U). Next: an independent walkthrough of the guide against the CAD, then a final Codex readiness review.
+Next: Dylan prints the coupon plate, the slot coupon, the neck hub with both bearings, and the horn disc on the real servo horn, then the full set. Physical unknowns are in [edge cases](research/edge-cases.md). Head calibration software is pending for first power-on.
 
 ## Robot
 
@@ -30,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Apply Dylan's two measurements in `geometry.py`, rerun `body.py`, `head.py`, `coupons.py`, `bambu.py`, and `preview.py`, then run the final review. After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md`.
+After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md`, adjust clearances in `geometry.py`, `body.py`, or `neck.py`, and rerun `body.py`, `head.py`, `coupons.py`, `bambu.py`, and `preview.py`.
