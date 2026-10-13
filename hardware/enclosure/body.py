@@ -20,8 +20,8 @@ import interface as ifc  # noqa: E402
 import neck  # noqa: E402
 import printcheck  # noqa: E402
 from geometry import (  # noqa: E402
-    AUDIO_NOTCH, BAND_Y, BODY_SECTIONS, BUS_T, JETSON_PARTS, PLUG_FLOOR_Z, POCKET_GAP, POCKET_WALL,
-    SLOT_GAP, SLOT_WALL, WALL, body_envelopes, hardware,
+    AUDIO_NOTCH, BAND_Y, BODY_SECTIONS, BUS_RIB_TOP_Z, JETSON_PARTS, JETSON_STRIP_D, POCKET_GAP,
+    POCKET_WALL, SLOT_GAP, SLOT_WALL, WALL, body_envelopes, hardware,
 )  # fmt: skip
 
 OUT = Path(__file__).resolve().parent / "output"
@@ -74,7 +74,7 @@ GRILLE_RIDGE, RIDGE_BASE = 1.5, 4.0  # ridge height and base width
 RIDGE_X, RIDGE_DEPTH = (-18.0, -6.0, 6.0, 18.0), (0.2, 2.4)  # on the window's straight top wall
 GRILLE_PRESS_MM3 = 10.0  # plug and shell overlap in the ridges only (0.9 mm deep with the plug
 # centered; it shifts 0.6 mm down, which leaves the 0.3 mm of grip)
-SLOT_GRIP, SLOT_TOP = 8.0, 48.0  # slot grips 8 of the strip's 10 mm (Dylan); walls reach Z 48
+SLOT_GRIP, SLOT_TOP = JETSON_STRIP_D - 2.0, 48.0  # the slot grips all but 2 mm of the strip; Z 48
 RIM_H = 10.0  # the shallow pocket's far wall rises this far above the Jetson's bottom edge
 
 
@@ -436,7 +436,7 @@ def components():
 def risers():
     "Everything that stands on the plate above CUT_Z, as named boxes (x0, x1, y0, y1, z0, z1)."
     comp = components()
-    t, ports = comp["Jetson tray and board"], comp["Jetson ports"]
+    t, slab, ports = comp["Jetson tray strip"], comp["Jetson tray and board"], comp["Jetson ports"]
     s, a, bus = comp["Speaker"], comp["USB audio case"], comp["Bus board"]
     g, w, z = POCKET_GAP, POCKET_WALL, CUT_Z
     bus_l, bus_r = bus[0] - g - w, bus[1] + g + w  # bus end ribs' outer X
@@ -446,19 +446,19 @@ def risers():
     mid = (a[2] + a[3]) / 2
     notch = (mid - AUDIO_NOTCH / 2, mid + AUDIO_NOTCH / 2)  # open to the plate, for the plug
     out = {
-        "jetson sill": (t[0], t[1], t[2], t[3], z, t[4]),
+        "jetson sill": (t[0], slab[1], t[2], t[3], z, t[4]),
         "jetson slot back wall": (back_x - SLOT_WALL, back_x, y_out[0], y_out[1], z, SLOT_TOP),
         "jetson slot wall -": (back_x, grip_x, y_out[0], t[2] - SLOT_GAP, z, SLOT_TOP),
         "jetson slot wall +": (back_x, grip_x, t[3] + SLOT_GAP, y_out[1], z, SLOT_TOP),
         "jetson back wall": (grip_x, bus_r, y_out[0], t[2] - g, z, SLOT_TOP),  # bus rear wall too
-        "jetson rim": (grip_x, ports[0] - g, t[3] + g, y_out[1], z, t[4] + RIM_H),
+        "jetson rim": (grip_x, ports[0] - g, slab[3] + g, slab[3] + g + w, z, t[4] + RIM_H),
         "audio end wall - front": (a[0] - g - w, a[0] - g, a[2], notch[0], z, z + 12.0),
         "audio end wall - rear": (a[0] - g - w, a[0] - g, notch[1], front[3], z, z + 12.0),
         "audio end wall + front": (a[1] + g, a[1] + g + w, a[2], notch[0], z, z + 12.0),
         "audio end wall + rear": (a[1] + g, a[1] + g + w, notch[1], front[3], z, z + 12.0),
         "audio and bus wall": (*front, z, z + 30.0),
-        "bus end rib -": (bus_l, bus[0] - g, front[3], y_out[0], z, PLUG_FLOOR_Z),
-        "bus end rib +": (bus[1] + g, bus_r, front[3], y_out[0], z, PLUG_FLOOR_Z),
+        "bus end rib -": (bus_l, bus[0] - g, front[3], y_out[0], z, BUS_RIB_TOP_Z),
+        "bus end rib +": (bus[1] + g, bus_r, front[3], y_out[0], z, BUS_RIB_TOP_Z),
         "panel ear": (56.0, 64.8, -19.9, -7.1, z, 40.0),
     }
     for side in (-1, 1):
@@ -583,8 +583,8 @@ def build_all():
 
 KEEP_RESERVATIONS = {  # geometry.py items that stay where they are; the others are placed above
     *JETSON_PARTS, "USB audio case", "Audio plug space -", "Audio plug space +", "Bus interface",
-    "Bus power plug space",
-    "Bus USB plug space -", "Bus USB plug space +", "Jetson USB/power plugs", "Fan intake space",
+    "Bus barrel plug space", "Bus servo plug space", "Bus USB plug space",
+    "Jetson USB/power plugs", "Fan intake space",
     "Camera cable slack loop", "Outlet space", "Camera rear cable space",
 }  # fmt: skip
 TOL_MM3 = 1e-3
@@ -704,9 +704,7 @@ def check_cable(shell):
         "slack_loop_mm": [round(lb.xlen), round(lb.ylen), round(lb.zlen)],
         "hole_center_to_loop_edge_mm": round(margin, 1),
         "loop_to_plug_space_shared_face_mm2": round(shared),
-        "bus_front_gap_mm": round(bus[2] - BAND_Y[0], 2),
-        "bus_rear_gap_mm": round(rear, 2),
-        "bus_front_gap_most_mm": round(BAND_Y[1] - BAND_Y[0] - BUS_T - POCKET_GAP, 2),
+        "bus_gap_mm_each_face": [round(bus[2] - BAND_Y[0], 2), round(rear, 2)],
     }
 
 
@@ -730,9 +728,9 @@ def check_grille(shell, grille):
 def audio_routes():
     """Cable centerlines (x, y, z) from each end of the sound card. A cable leaves the plug room
     at |X| 36, rises at Y -30.5 along the speaker's rear face, crosses above the audio wall and
-    the bus board's plug rooms at Z 44, and ends in the Jetson plug space."""
+    the servo adapter board's plug rooms at Z 54, and ends in the Jetson plug space."""
     y0 = (components()["USB audio case"][2] + components()["USB audio case"][3]) / 2
-    rise, cross = -30.5, 44.0
+    rise, cross = -30.5, 54.0
     out = {}
     for sign, end in ((1, "+X"), (-1, "-X")):
         along = [(36.0 * sign, y0, 14.9), (36.0 * sign, rise, 14.9)]
@@ -759,6 +757,55 @@ def check_audio_routes(parts):
         out[name] = {
             "length_mm": round(neck.path_length(points)),
             "waypoints_xyz": [[round(v, 1) for v in p] for p in points],
+        }
+    return out
+
+
+def room_margin(room, axis, sign, others, limit=30.0):
+    """How far `room` (x0, x1, y0, y1, z0, z1) could grow along an axis (0, 1 or 2) in direction
+    `sign` before touching one of `others`, to 0.5 mm; `limit` when nothing is in reach."""
+
+    def blocked(d):
+        r = list(room)
+        r[2 * axis + (sign > 0)] += sign * d
+        grown = box(*r)
+        return any(vol(grown, o) > TOL_MM3 for o in others)
+
+    if not blocked(limit):
+        return limit
+    lo, hi = 0.0, limit
+    for _ in range(6):
+        mid = (lo + hi) / 2
+        lo, hi = (lo, mid) if blocked(mid) else (mid, hi)
+    return round(lo * 2) / 2
+
+
+def check_bus_plugs(parts):
+    """The servo adapter board's plug rooms (barrel, servo, USB on the end that points up) are
+    free of every part, component, other reservation, and cable route, so the plugs go in with
+    the shell off. Each room reports how far it could still grow."""
+    rooms = {
+        i["name"]: reservation(i) for i in hardware() if i["name"].endswith("plug space")
+        and i["name"].startswith("Bus ")
+    }  # fmt: skip
+    others = parts | {k: box(*v) for k, v in components().items() if k != "Bus board"}
+    others |= {i["name"]: box(*reservation(i)) for i in hardware() if i["name"] not in rooms}
+    others.pop("Bus interface")
+    routes = {
+        f"{name} #{n}": seg
+        for name, pts in audio_routes().items()
+        for n, seg in enumerate(neck.cable_solid(pts).Solids())
+    }
+    grow = {"Bus barrel plug space": (0, 1), "Bus servo plug space": (0, -1)}
+    out = {}
+    for name, room in rooms.items():
+        rbox = box(*room)
+        for what, solid in (others | routes).items():
+            assert vol(rbox, solid) < TOL_MM3, (name, what)
+        axis, sign = grow.get(name, (2, 1))
+        out[name] = {
+            "size_mm": [round(room[i + 1] - room[i], 1) for i in (0, 2, 4)],
+            "spare_room_beyond_mm": room_margin(room, axis, sign, (others | routes).values()),
         }
     return out
 
@@ -951,9 +998,9 @@ def check_openings(shell):
 
 
 WALL_GAPS = {  # wall: {part: smallest gap}. The bus band holds 17 mm for the 13 mm board.
-    "jetson slot back wall": {"Jetson tray and board": SLOT_GAP},
-    "jetson slot wall -": {"Jetson tray and board": SLOT_GAP},
-    "jetson slot wall +": {"Jetson tray and board": SLOT_GAP},
+    "jetson slot back wall": {"Jetson tray strip": SLOT_GAP},
+    "jetson slot wall -": {"Jetson tray strip": SLOT_GAP},
+    "jetson slot wall +": {"Jetson tray strip": SLOT_GAP},
     "jetson back wall": {"Jetson tray and board": POCKET_GAP, "Bus board": POCKET_GAP},
     "jetson rim": {"Jetson tray and board": POCKET_GAP},
     "audio end wall - front": {"USB audio case": POCKET_GAP},
@@ -986,7 +1033,8 @@ def check_jetson_slot(plate, shell):
     """The Jetson slides straight down into its slot and up out of it without touching the plate.
     With the shell on, it cannot rise far enough to leave the slot when the robot tips."""
     comp = components()
-    t = comp["Jetson tray and board"]
+    t, slab = comp["Jetson tray strip"], comp["Jetson tray and board"]
+    assert abs(t[2] - slab[2]) < 1e-9 and abs(t[1] - slab[0]) < 1e-9  # strip: the tray's outer face
     boxes = [comp[n] for n in JETSON_PARTS]
     walls = [box(*b) for b in risers().values()]
     for dz in range(0, 61, 2):  # 60 mm covers the slot height
@@ -999,6 +1047,8 @@ def check_jetson_slot(plate, shell):
         assert probe(plate, x, y + step * (SLOT_WALL - 0.05), z)
         assert not probe(plate, x, y + step * (SLOT_WALL + 0.05), z)
     engage = SLOT_TOP - t[4]  # strip length in the slot at rest
+    pcb_clear = slab[0] - (t[0] + SLOT_GRIP)  # slot end to the board's edge
+    assert pcb_clear >= 2.0 - 1e-6, pcb_clear
 
     def blocked(lift):
         prisms = (box(b[0], b[1], b[2], b[3], b[5], b[5] + lift) for b in boxes)
@@ -1012,6 +1062,8 @@ def check_jetson_slot(plate, shell):
     return {
         "slot_width_mm": round(t[3] - t[2] + 2 * SLOT_GAP, 2),
         "slot_grip_mm": SLOT_GRIP,
+        "strip_mm_thick_deep": [round(t[3] - t[2], 2), round(t[1] - t[0], 2)],
+        "slot_end_to_board_edge_mm": round(pcb_clear, 2),
         "slot_height_above_plate_mm": round(SLOT_TOP - CUT_Z, 1),
         "slot_engagement_at_rest_mm": round(engage, 1),
         "max_lift_with_shell_mm": round(hi, 1),
@@ -1185,6 +1237,7 @@ def main():
         "camera_cable": check_cable(shell),
         "grille_ridges": check_grille(shell, parts["speaker-grille"]),
         "audio_cables": check_audio_routes(parts),
+        "bus_plugs": check_bus_plugs(parts),
         "alignment": check_alignment(shell, parts["base-plate"], parts["port-panel"]),
         "nut_detents": check_detents(shell),
         "openings": check_openings(shell),

@@ -11,7 +11,7 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | Part | Color | Orientation | Size (mm) | Time | PLA |
 | --- | --- | --- | --- | --- | --- |
 | `body-shell` | White | Upside down, roof on the bed | 148.6 × 127.1 × 152.4 | 6.5 h | 240 g |
-| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 1.9 h | 88 g |
+| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 1.9 h | 85 g |
 | `port-panel` | White | Outside face on the bed | 91.9 × 49.3 × 8.2 | 0.4 h | 12 g |
 | `head-shell` | White | Rear face on the bed | 116 × 56 × 77 | 1.8 h | 92 g |
 | `visor` | Black | Front face on the bed | 112 × 52 × 23.5 | 0.7 h | 21 g |
@@ -20,7 +20,7 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | `head-shaft` | Black | Flange on the bed | 50 × 50 × 21.3 | 0.4 h | 10 g |
 | `horn-disc` | Black | Flat on the bed | 31 × 31 × 7.8 | 0.2 h | 3 g |
 
-The nine parts take 13.3 h and 494 g of PLA. The shell is the largest part and fits the 256 mm bed. Four 1.5 mm ridges on the grille window's top wall wedge the grille 0.3 mm tight (U) until the speaker sits behind it. To remove it, press it inward from outside.
+The nine parts take 13.3 h and 491 g of PLA. The shell is the largest part and fits the 256 mm bed. Four 1.5 mm ridges on the grille window's top wall wedge the grille 0.3 mm tight (U) until the speaker sits behind it. To remove it, press it inward from outside.
 
 ## Fasteners
 
@@ -49,7 +49,7 @@ Use a Bambu Lab P1S with a 0.4 mm nozzle and PLA. Set 0.2 mm layers, three walls
 
 ## Print the coupons first
 
-`output/print/Coupons/slot-coupon.stl` (11.5 × 18 × 15 mm, 12 min, 2 g) is 15 mm of the Jetson slot. Slide it over the plastic strip on the edge of the real Jetson, opposite the connectors. It must slide on with a small, even gap on each side (0.5 mm, U). If the strip is not 11 mm thick, set `JETSON_STRIP_T` in `geometry.py` and rebuild before you print the base plate.
+`output/print/Coupons/slot-coupon.stl` (9.5 × 13 × 15 mm, 12 min, 2 g) is 15 mm of the Jetson slot. Slide it over the plastic strip on the edge of the real Jetson, opposite the connectors. The strip is 6 mm thick and 8 mm deep (Dylan, measured), so the slot is 7 mm wide and 6 mm deep. It must slide on with a small, even gap on each side (0.5 mm, U). If your strip differs, set `JETSON_STRIP_T` and `JETSON_STRIP_D` in `geometry.py` and rebuild before you print the base plate.
 
 `output/print/Coupons/coupon-plate.stl` (40 × 52 × 11.2 mm, 21 min, 8 g) holds the three fits that can fail:
 

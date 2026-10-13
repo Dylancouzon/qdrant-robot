@@ -396,11 +396,14 @@ STEPS = (
          "The flange of the grille covers the window edge from behind.",
          ((("speaker-grille",), away(REAR, 25)),)),
     Step("Body", "Set the Jetson and the servo adapter board in the base plate.",
-         "Take the base plate. Slide the plastic strip of the Jetson down into the slot, with the "
-         "fan facing the rear vents and the ports toward the port side. Set the servo adapter "
-         "board on its long edge in the pocket between the Jetson and the front pockets.",
+         "Slide the plastic strip of the Jetson down into the slot, with the fan facing the rear "
+         "vents and the ports toward the port side. Stand the servo adapter board on its short end "
+         "in its pocket, with the USB port at the top. The barrel jack faces the Jetson side, and "
+         "the servo connector faces the other side.",
          ("Jetson", "Bus board"), (40, 30, 650, (0, 0, 80)),
-         "Each pocket leaves about 1 mm of clearance on each side. Nothing presses in.",
+         "The Jetson strip is 6 mm thick, and the slot is 7 mm wide and grips 6 mm of the 8 mm "
+         "strip. Turn the board over or around until the three connectors match. Each pocket "
+         "leaves about 1 mm of clearance on each side.",
          ((("Jetson",), away(UP, 45)), (("Bus board",), away(UP, 40))), reset=("base-plate",)),
     Step("Body", "Set the USB sound card in its pocket and plug it in.",
          "Set the USB sound card in the front pocket. Plug an angled USB cable and the speaker "
@@ -408,7 +411,8 @@ STEPS = (
          "to a Jetson USB port on the port side.",
          ("USB audio case",), (40, 35, 480, (0, -30, 40)),
          "Do this before the speaker goes in, because the gap above the card is only 2.8 mm. Plug "
-         "the Jetson end of the cable too, while the base plate is open.",
+         "the Jetson end of the cable too, while the base plate is open. The cable crosses the "
+         "walls about 54 mm above the bottom of the base plate.",
          ((("USB audio case",), away(UP, 40)),)),
     Step("Body", "Set the speaker on its rails.",
          "Lower the speaker onto the two rails above the card, and face it toward the front. Keep "
@@ -416,15 +420,18 @@ STEPS = (
          ("Speaker",), (40, 35, 480, (0, -30, 40)),
          moves=((("Speaker",), away(UP, 55)),)),
     Step("Body", "Connect the servo adapter board.",
-         "Plug the board's USB data cable into a Jetson USB port. Plug the USB-A to 5.5 × 2.1 mm "
-         "barrel cable into the board, and its USB-A end into a second Jetson USB port. Lead both "
-         "cables up over the pocket walls and along the open band to the port side.",
+         "Plug the USB-A to 5.5 × 2.1 mm barrel cable into the board from the Jetson side, and its "
+         "USB-A end into a Jetson USB port. Plug the board's USB data cable into the port at the "
+         "top of the board, and into a second Jetson USB port. Lead both cables along the open "
+         "band to the port side.",
          ("Bus board",), (40, 35, 480, (0, -30, 40)),
-         "The barrel cable gives the servo 5 V."),
+         "The barrel cable gives the servo 5 V. The barrel plug needs 40 mm of room on the Jetson "
+         "side, and the USB plug needs 20 mm above the board."),
     Step("Body", "Plug in the servo lead and the camera cable.",
          "Lay the shell on its rear face on the cloth next to the base plate, with its open "
-         "bottom toward the base plate. Plug the servo lead into the servo adapter board. Plug "
-         "the camera USB cable into the last Jetson USB port.",
+         "bottom toward the base plate. Plug the servo lead sideways into the servo connector on "
+         "the board's edge that faces away from the Jetson. Plug the camera USB cable into the "
+         "last Jetson USB port.",
          ("servo case", "Bus board", "Jetson"), (60, 25, 900, (0, -80, 90)),
          "Both cables come out of the open bottom. The camera cable drops straight down from the "
          "roof hole on the port side to the last free Jetson USB port. Keep it clear of the other "

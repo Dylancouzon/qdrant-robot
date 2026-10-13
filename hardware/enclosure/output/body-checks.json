@@ -7,7 +7,7 @@
   ]
  },
  "overlaps": {
-  "reservations_checked": 16,
+  "reservations_checked": 17,
   "part_pairs_mm3": {
    "body-shell / base-plate": 0.0,
    "body-shell / port-panel": 0.0,
@@ -39,6 +39,7 @@
    "speaker rail 1": 0.0,
    "speaker end wall 1": 0.0,
    "speaker rear wall 1": 0.0,
+   "component Jetson tray strip": 0.0,
    "component Jetson tray and board": 0.0,
    "component Jetson ports": 0.0,
    "component Jetson heatsink": 0.0,
@@ -68,9 +69,10 @@
   ],
   "hole_center_to_loop_edge_mm": 5.6,
   "loop_to_plug_space_shared_face_mm2": 176,
-  "bus_front_gap_mm": 2.0,
-  "bus_rear_gap_mm": 2.0,
-  "bus_front_gap_most_mm": 3.0
+  "bus_gap_mm_each_face": [
+   2.0,
+   2.0
+  ]
  },
  "grille_ridges": {
   "window_ridges": 4,
@@ -80,7 +82,7 @@
  },
  "audio_cables": {
   "USB end +X, to a Jetson port": {
-   "length_mm": 84,
+   "length_mm": 94,
    "waypoints_xyz": [
     [
      36.0,
@@ -95,27 +97,27 @@
     [
      36.0,
      -30.5,
-     44.0
+     54.0
     ],
     [
      36.0,
      -30.5,
-     44.0
+     54.0
     ],
     [
      36.0,
      -10.5,
-     44.0
+     54.0
     ],
     [
      41.5,
      -10.5,
-     44.0
+     54.0
     ],
     [
      41.5,
      6.0,
-     44.0
+     54.0
     ]
    ]
   },
@@ -140,7 +142,7 @@
    ]
   },
   "USB end -X, to a Jetson port": {
-   "length_mm": 156,
+   "length_mm": 166,
    "waypoints_xyz": [
     [
      -36.0,
@@ -155,27 +157,27 @@
     [
      -36.0,
      -30.5,
-     44.0
+     54.0
     ],
     [
      36.0,
      -30.5,
-     44.0
+     54.0
     ],
     [
      36.0,
      -10.5,
-     44.0
+     54.0
     ],
     [
      41.5,
      -10.5,
-     44.0
+     54.0
     ],
     [
      41.5,
      6.0,
-     44.0
+     54.0
     ]
    ]
   },
@@ -198,6 +200,32 @@
      40.0
     ]
    ]
+  }
+ },
+ "bus_plugs": {
+  "Bus barrel plug space": {
+   "size_mm": [
+    40.0,
+    17.0,
+    39.6
+   ],
+   "spare_room_beyond_mm": 11.5
+  },
+  "Bus servo plug space": {
+   "size_mm": [
+    25.0,
+    17.0,
+    39.6
+   ],
+   "spare_room_beyond_mm": 13.5
+  },
+  "Bus USB plug space": {
+   "size_mm": [
+    32.0,
+    17.0,
+    20.0
+   ],
+   "spare_room_beyond_mm": 30.0
   }
  },
  "alignment": {
@@ -230,9 +258,9 @@
  },
  "pockets": {
   "wall_to_part_mm": {
-   "jetson slot back wall / Jetson tray and board": 0.5,
-   "jetson slot wall - / Jetson tray and board": 0.5,
-   "jetson slot wall + / Jetson tray and board": 0.5,
+   "jetson slot back wall / Jetson tray strip": 0.5,
+   "jetson slot wall - / Jetson tray strip": 0.5,
+   "jetson slot wall + / Jetson tray strip": 0.5,
    "jetson back wall / Jetson tray and board": 1.0,
    "jetson back wall / Bus board": 2.0,
    "jetson rim / Jetson tray and board": 1.0,
@@ -252,8 +280,13 @@
   "max_overlap_mm3": 0.0
  },
  "jetson_slot": {
-  "slot_width_mm": 12.0,
-  "slot_grip_mm": 8.0,
+  "slot_width_mm": 7.0,
+  "slot_grip_mm": 6.0,
+  "strip_mm_thick_deep": [
+   6.0,
+   8.0
+  ],
+  "slot_end_to_board_edge_mm": 2.0,
   "slot_height_above_plate_mm": 40.4,
   "slot_engagement_at_rest_mm": 38.0,
   "max_lift_with_shell_mm": 29.7,
@@ -328,14 +361,14 @@
    "island_max_mm2": 0.0,
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
-   "min_thickness_mm": 2.3,
-   "volume_mm3": 150810,
+   "min_thickness_mm": 2.04,
+   "volume_mm3": 147036,
    "bbox_mm": [
     143.2,
     116.5,
     48.0
    ],
-   "face_count": 4006
+   "face_count": 4010
   },
   "Required/White/port-panel": {
    "overhang_mm2": 19.2,
@@ -371,5 +404,5 @@
   }
  },
  "printcheck_total_overhang_mm2": 507.3,
- "runtime_s": 142.8
+ "runtime_s": 166.3
 }

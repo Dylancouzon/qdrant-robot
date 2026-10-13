@@ -14,18 +14,19 @@ Parts sit in loose pockets with clearance, so reference sizes cover most of the 
 
 - Envelope: 103 × 90.5 × 34.77 mm. The carrier board is 100 × 79 × 1.57 mm, and the I/O connectors run along a 100 mm edge (O, NVIDIA).
 - Tray: a flat black plastic tray under the board overhangs it by about 11.5 mm on the edge opposite the I/O (E, derived from 90.5 − 79), and about 1.5 mm on each short end (E, derived from 103 − 100).
-- Strip (Dylan, 2026-10-13): the flat tray and board are 11 mm thick, and the edge opposite the connectors has 10 mm of plastic to grab. The 11 mm is U while Dylan measures it. It is the constant `JETSON_STRIP_T` in `geometry.py`, and the slot derives from it.
+- Strip (Dylan, measured 2026-10-13): the plastic strip on the edge opposite the connectors is 6.0 mm thick and 8 mm deep, on the tray's outer face (the -Y face). The flat tray and board beside it are 11 mm thick. The constants `JETSON_STRIP_T`, `JETSON_STRIP_D` and `JETSON_SLAB_T` in `geometry.py` set them, and the slot derives from them: 7 mm wide, gripping 6 of the 8 mm so 2 mm stay clear of the board edge.
 - Sources: the [Carrier Board Specification SP-11324-001 v1.3](https://developer.nvidia.com/downloads/assets/embedded/secure/jetson/orin_nano/docs/jetson_orin_nano_devkit_carrier_board_specification_sp.pdf) (Figures 4-1 and 4-2) and the [Super Developer Kit datasheet](https://dam-cdn.nvd.orangelogic.com/AssetLink/2ug686w80406gxf6q8uv7r3l7265m2n8.pdf).
 - Heights above the board top: USB-A stacks and the RJ45 stand 16.7 mm (O) along the I/O edge, about 20 mm deep (E). The heatsink and fan top is about 25 mm (E).
 - Heatsink: about 58 × 39 mm footprint near the board center (E, about ±4 mm). The reservation is 47 mm along X and 66 mm along Z.
-- Split of the 11 mm plus the 24 mm above it: tray and feet about 7.6 mm (E), then the board, then components.
+- Split of the 11 mm plus the 24 mm above it: tray and feet about 7.6 mm (E), then the board, then components. The board edge is 8 mm from the tray's outer edge, so the heatsink block sits 1.75 mm farther toward -X than with the earlier 11.5 mm estimate (E).
 
 ## Servo adapter board (Dylan, 2026-10-13)
 
-- Board: 42 × 32 × 13 mm, standing on a long edge in a 13 mm wide pocket (the band holds 17 mm).
-- Servo connector: top face, one corner.
-- Barrel power jack: near one end of a long edge. It takes a 5.5 × 2.1 mm plug about 10 mm across and 40 mm long with strain relief. The jack is U for position, so the plug zone is 14 × 40 mm above the board's -X end.
-- USB data port: position unknown, so each short end keeps 20 mm of plug room (U). Dylan has angled USB cables.
+- Board: 42 × 32 × 13 mm (sold as 42 × 33 mm, the Waveshare Bus Servo Adapter (A)). It stands on a short edge in a 13 mm thick pocket, its long edges facing -X and +X (the band holds 17 mm).
+- Servo connector (U): top-left corner of Dylan's top view, its long axis along the top long edge, so the servo plug (about 8 × 6 mm, 15 mm long, plus a cable bend) enters through that edge. It faces -X here.
+- Barrel power jack (U): near the left end of the opposite long edge, so the 5.5 × 2.1 mm plug (about 10 mm across and 40 mm long with strain relief) enters from +X, the Jetson side.
+- USB data port (U): unknown, most likely a short end. The end that points up has 20 mm of plug room. Turn the board end for end if the port is on the other end; the jack and servo plugs then sit near the plate, and their rooms cover the full board height.
+- Dylan has angled USB cables for the internal connections.
 
 ## Speaker
 

@@ -32,7 +32,7 @@ The removable port-side panel now has prototype geometry and checked casing clea
 
 ## Electronics retention
 
-Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. It slides straight down into a vertical slot that grips 8 mm of that strip. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
+Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 6 mm thick and extends 8 mm inward from that edge, as measured by Dylan. It slides straight down into a vertical slot that grips 6 mm of that strip. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
 
 ## Component dimension references
 
@@ -40,7 +40,7 @@ These dimensions come from reference designs or manufacturers (E). Fit against D
 
 | Component | Reference envelope | Source and qualification |
 | --- | --- | --- |
-| Jetson | 103 × 90.5 × 34.77 mm, as a flat 11 mm tray and board (U), an I/O band, and a heatsink block. | NVIDIA kit drawing (O) and Dylan; the body holds the 10 mm plastic strip opposite the connectors in a slot. |
+| Jetson | 103 × 90.5 × 34.77 mm, as a 6 × 8 mm tray strip, an 11 mm flat board, an I/O band, and a heatsink block. | NVIDIA kit drawing (O) and Dylan; the body holds the strip opposite the connectors in a slot. |
 | Camera board | 37 × 37 mm; nominal thickness 1.6 mm, reference range 1.4–1.8 mm. | Original Claude design. |
 | Camera optics | Holder diameter 26 mm; lens length 26–27.5 mm; about 100° diagonal field of view. | Original Claude design; verify aperture clearance throughout focus travel. |
 | Camera rear heatsink | 26 × 26 × 10 mm. | Original Claude design; include both rear connector envelopes as well. |
@@ -80,6 +80,6 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 
 The [simplified enclosure](enclosure/README.md) replaced Concept A on 2026-10-12. Concept A is tagged `archive/concept-a-enclosure`. The new design has nine printed parts, 17 M3 screws, four M2 screws, and 13 M3 nuts. It keeps the approved exterior and uses no printed pin, key, keeper, strap, or gear.
 
-All nine parts pass `printcheck.py` with zero floating islands and zero thin area, and 719.0 mm² of total overhang against 34,887 mm² for Concept A (E). Every part slices for the P1S in Bambu Studio and prints in 13.4 h with 500 g of PLA (E). The body and neck checks pass: hardware clearances, plug access, the vertical sweep of the populated base plate, and the head through ±80°. An [offline viewer](enclosure/output/robot-viewer.html) shows the assembled robot, turns the head, and lists the parts, fasteners, and steps.
+All nine parts pass `printcheck.py` with zero floating islands and zero thin area, and 719.0 mm² of total overhang against 34,887 mm² for Concept A (E). Every part slices for the P1S in Bambu Studio and prints in 13.3 h with 490 g of PLA (E). The body and neck checks pass: hardware clearances, plug access, the vertical sweep of the populated base plate, and the head through ±80°. An [offline viewer](enclosure/output/robot-viewer.html) shows the assembled robot, turns the head, and lists the parts, fasteners, and steps.
 
 The camera cable runs through the neck gap from a head floor hole to a roof hole, then through a slack loop to a Jetson USB port. A coupon plate and a Jetson slot coupon print first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.

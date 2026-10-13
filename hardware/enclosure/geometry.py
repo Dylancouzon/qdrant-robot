@@ -76,15 +76,16 @@ def head_envelopes():
 # Jetson standing on edge: 90.5 along X, 35 along Y, 103 along Z. Its I/O edge faces +X (the port
 # panel), the flat black tray faces -Y, and the heatsink faces +Y. The tray overhangs the carrier
 # board on the edge opposite the I/O only, so a plastic strip along -X is what the body holds.
-# Sizes come from NVIDIA's kit drawing (O) and estimates (E); the strip thickness is Dylan's (U).
-JETSON_STRIP_T = 11.0  # U: thickness of the flat tray and board; Dylan is measuring it
+# Sizes come from NVIDIA's kit drawing (O), estimates (E), and Dylan's measurements (2026-10-13).
+JETSON_STRIP_T, JETSON_STRIP_D = 6.0, 8.0  # strip thickness and depth; the strip is the tray's
+JETSON_SLAB_T = 11.0  # outer face. The flat board with its tray is 11 mm thick, beyond the strip
 SLOT_GAP, SLOT_WALL = 0.5, 3.0  # slot clearance per side of the strip (U) and slot wall thickness
 X0, Y0, Z0 = -52.75, -7.5, 10.0  # lowest corner of the 90.5 x 35 x 103 envelope
 X1, Y1, Z1 = X0 + 90.5, Y0 + 35.0, Z0 + 103.0
-SLAB_Y = Y0 + JETSON_STRIP_T  # top face of the flat tray and board
+SLAB_Y = Y0 + JETSON_SLAB_T  # top face of the flat tray and board
 PORT_TOP_Y = Y0 + 7.6 + 1.57 + 16.7  # tray and feet (E), carrier board (O), USB and RJ45 stack (O)
 PORT_X0 = X1 - 20.0  # the I/O band is about 20 mm deep (E)
-HEAT_X = ((X0 + 11.5) + PORT_X0) / 2  # between the board's far edge (90.5 - 79) and the I/O band
+HEAT_X = ((X0 + JETSON_STRIP_D) + PORT_X0) / 2  # between the board's far edge and the I/O band
 HEAT_XZ = (47.0, 66.0)  # 39 x 58 mm footprint (E) plus 4 mm each way for the position error
 MID_Z = (Z0 + Z1) / 2
 
@@ -99,7 +100,8 @@ HEAT_RANGE = (  # X and Z ranges of the heatsink block
     (MID_Z - HEAT_XZ[1] / 2, MID_Z + HEAT_XZ[1] / 2),
 )
 JETSON_PARTS = {
-    "Jetson tray and board": placed((X0, X1), (Y0, SLAB_Y), (Z0, Z1)),
+    "Jetson tray strip": placed((X0, X0 + JETSON_STRIP_D), (Y0, Y0 + JETSON_STRIP_T), (Z0, Z1)),
+    "Jetson tray and board": placed((X0 + JETSON_STRIP_D, X1), (Y0, SLAB_Y), (Z0, Z1)),
     "Jetson ports": placed((PORT_X0, X1), (SLAB_Y, PORT_TOP_Y), (MID_Z - 50, MID_Z + 50)),
     "Jetson heatsink": placed(HEAT_RANGE[0], (SLAB_Y, Y1), HEAT_RANGE[1]),
 }
@@ -113,15 +115,20 @@ AUDIO_NOTCH, AUDIO_PLUG = 16.0, 16.0  # notch width in each end wall (U); plug r
 AUDIO_MID_Y = sum(AUDIO_Y) / 2
 AUDIO_END = AUDIO_X[1] + POCKET_GAP + POCKET_WALL + AUDIO_PLUG  # plug room reaches this |X|
 
-# Servo adapter board (Dylan): 42 x 32 x 13 mm, standing on a long edge in the band between the
-# audio case and the Jetson. Its barrel jack takes a plug straight up from the top edge, near the
-# -X end (U). Its USB data port is on an unknown end, so both short ends keep plug room (U).
-BUS_X, BUS_T, BUS_Z = 42.0, 13.0, (7.6, 39.6)
+# Servo adapter board (Dylan: 42 x 32 x 13 mm; sold as 42 x 33). It stands on a short edge in the
+# band between the audio case and the Jetson, its long edges facing -X and +X. The servo plug
+# enters one long edge and the barrel plug the other (U, both near the same short end, so turn the
+# board to put that end up or down as the USB port needs). The USB data port is on an unknown short
+# end (U); the end that points up has plug room, and the board turns end for end if it is the other.
+BUS_L, BUS_W, BUS_T = 42.0, 32.0, 13.0
+BUS_CX = -12.0  # board center X: 12 mm for plug rooms beyond the barrel side's 40 mm
 BAND_Y = (-28.0, -11.0)  # pocket interior between the audio wall and the Jetson wall
-BUS_FACE_GAP = 2.0  # U: room before the servo connector face (-Y); 3.0 mm is the most here
-BUS_Y = BAND_Y[0] + BUS_FACE_GAP + BUS_T / 2
-PLUG_USB_X, PLUG_POWER = 20.0, (14.0, 40.0)  # USB plug room per end; barrel plug zone width, length
-PLUG_FLOOR_Z = BUS_Z[0] + 3.2  # the end stop ribs are 3.2 mm tall
+BUS_Y = sum(BAND_Y) / 2
+BUS_Z = (7.6, 7.6 + BUS_L)
+BUS_RIB_TOP_Z = BUS_Z[0] + 2.4  # end stop ribs; plug rooms start above them
+PLUG_BARREL, PLUG_SERVO, PLUG_USB = 40.0, 25.0, 20.0  # room: 10 x 40 plug; 8 x 6 x 15 plus a bend
+
+_bx0, _bx1 = BUS_CX - BUS_W / 2, BUS_CX + BUS_W / 2
 
 # name: (size X, Y, Z, center X, Y, Z). Boxes are external envelopes, reservations included.
 # Speaker: Waveshare 8 ohm 5 W. The rest are unmeasured (U).
@@ -138,22 +145,18 @@ BOXES = JETSON_PARTS | {
         (AUDIO_MID_Y - AUDIO_NOTCH / 2, AUDIO_MID_Y + AUDIO_NOTCH / 2),
         (AUDIO_Z[0], 25.0),
     ),
-    "Bus interface": placed((-BUS_X / 2, BUS_X / 2), (BUS_Y - BUS_T / 2, BUS_Y + BUS_T / 2), BUS_Z),
-    "Bus power plug space": placed(
-        (-BUS_X / 2, -BUS_X / 2 + PLUG_POWER[0]), BAND_Y, (BUS_Z[1], BUS_Z[1] + PLUG_POWER[1])
-    ),
-    "Bus USB plug space -": placed(
-        (-BUS_X / 2 - PLUG_USB_X, -BUS_X / 2), BAND_Y, (PLUG_FLOOR_Z, BUS_Z[1])
-    ),
-    "Bus USB plug space +": placed(
-        (BUS_X / 2, BUS_X / 2 + PLUG_USB_X), BAND_Y, (PLUG_FLOOR_Z, BUS_Z[1])
-    ),
+    "Bus interface": placed((_bx0, _bx1), (BUS_Y - BUS_T / 2, BUS_Y + BUS_T / 2), BUS_Z),
+    "Bus barrel plug space": placed((_bx1, _bx1 + PLUG_BARREL), BAND_Y, (BUS_RIB_TOP_Z, BUS_Z[1])),
+    "Bus servo plug space": placed((_bx0 - PLUG_SERVO, _bx0), BAND_Y, (BUS_RIB_TOP_Z, BUS_Z[1])),
+    "Bus USB plug space": placed((_bx0, _bx1), BAND_Y, (BUS_Z[1], BUS_Z[1] + PLUG_USB)),
     "Jetson USB/power plugs": ((24, 34, 108), (49.75, 10, 62)),
     # 30 x 30 x 30 mm of slack for the camera cable, under the roof hole and on top of the plug
     # space above, which is the way down to a Jetson USB port.
     "Camera cable slack loop": placed((17, 47), (8, 38), (116, 146)),
     "Fan intake space": placed(HEAT_RANGE[0], (Y1, Y1 + 22), HEAT_RANGE[1]),
-    "Outlet space": placed((-63, -55), (SLAB_Y + SLOT_GAP + SLOT_WALL, Y1), (Z0, Z1)),
+    "Outlet space": placed(
+        (-63, -55), (Y0 + JETSON_STRIP_T + SLOT_GAP + SLOT_WALL, Y1), (Z0, Z1)
+    ),
     "Camera rear cable space": ((43, 18, 43), (-24, 23, 208)),
 }
 
