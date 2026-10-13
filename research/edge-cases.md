@@ -95,3 +95,4 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 - The robot software has no head calibration command yet. The last assembly step (turn the head forward by hand with torque off, then save that position as the servo's middle) is pending until the software provides it.
 - The servo lead and the camera cable must reach the servo adapter board and a Jetson port with the shell lying beside the open base plate (U). The shell and plate share one outline at the joint, and only 5 mm squares of flat plate lie under the shell rim at the corners, so no four 60 mm blocks can hold the shell above the plate.
 - Cooling, fan noise, and speaker echo with the shell closed are unmeasured.
+- The speaker rests on 3 mm rail ledges at each end (measured 100 mm speaker). Check that it sits firmly on the first print. The sound card cables pass 0.25 mm behind the speaker, so hold them back while you lower it.

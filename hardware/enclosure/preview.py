@@ -426,8 +426,9 @@ STEPS = (
          "bottom toward the base plate. Plug the servo lead into the servo adapter board. Plug "
          "the camera USB cable into the last Jetson USB port.",
          ("servo case", "Bus board", "Jetson"), (60, 25, 900, (0, -80, 90)),
-         "Both cables come out of the open bottom. Lead the camera cable the same way as the "
-         "others, over the pocket walls and along the open band. The picture shows the shell "
+         "Both cables come out of the open bottom. The camera cable drops straight down from the "
+         "roof hole on the port side to the last free Jetson USB port. Keep it clear of the other "
+         "cables. The picture shows the shell "
          "upright and moved aside. Leave enough slack to lift the shell over the base plate.",
          moves=((UPPER, away(FRONT, 170)),), reset=ON_PLATE + UPPER, cut=True),
     Step("Body", "Lower the shell onto the base plate.",
