@@ -11,8 +11,7 @@ Dylan requested the simplest practical design on 2026-10-11. Reduce parts and as
 - Provide printable 3MF files for the final enclosure and joint. Keep editable design sources and assembly instructions in this repository.
 - Make the robot compact, easy to print, assemble, and service.
 - Let the camera head turn horizontally to see other directions. Specify the actuator, joint, retention, mechanical connection, and cable routing.
-- Preserve press-fit component installation with removable catches. Test retention and release without bending populated circuit boards. The camera board is the exception: it fastens with M2 screws through its own mounting holes (Dylan, 2026-10-12).
-- Dylan relaxed this on 2026-10-12: parts sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall; nothing is bolted except the camera.
+- Electronics sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall (Dylan, 2026-10-12). Nothing is bolted except the camera board, which fastens with M2 screws through its own mounting holes.
 - Provide access and clearance for the Jetson power plug, USB plugs, and installed cables.
 - Provide an intake and exhaust path for the Jetson. Verify cooling with the assembled robot under its normal workload.
 - Keep the microphone openings clear. Check speaker echo, fan noise, and motor noise during listening.
@@ -31,7 +30,7 @@ Dylan rejected the Concept A CAD exterior on 2026-10-11 because it resembled a "
 
 The removable port-side panel now has prototype geometry and checked casing clearances (E). Actual USB plug insertion remains U. The 10 mm protrusion informs its installed pocket after the complete connector shape is measured.
 
-## Press-fit electronics retention
+## Electronics retention
 
 Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
 
@@ -54,7 +53,7 @@ The measured and sourced sizes are in [MEASUREMENTS.md](enclosure/MEASUREMENTS.m
 ## Joint and electrical requirements
 
 - Support the head with a defined bearing and retention arrangement. Avoid placing the head's entire structural load on the servo output.
-- Keep the servo horn mechanically retained. Press-fit component installation does not imply a friction-only horn connection.
+- Keep the servo horn mechanically retained. Loose component pockets do not imply a friction-only horn connection.
 - Provide mechanical travel limits and controlled acceleration. Verify clearance through the complete permitted movement.
 - Admit the complete camera connectors during assembly. Provide cable strain relief, bend clearance, and accessible release features.
 - Use limited rotation with a cable loop unless a different cable interface is selected and validated.
@@ -68,7 +67,7 @@ The study proposes ±70° normal travel and ±80° mechanical limits. These angl
 ## Printing and release checks
 
 - Design parts for the P1S bed and 0.4 mm nozzle. Prefer flat print bases and simple orientations with little support material.
-- Select press-fit clearances from physical coupons printed with the intended filament and settings.
+- Select pocket clearances from physical coupons printed with the intended filament and settings.
 - Verify each final 3MF has correct millimeter scale, closed meshes, and the intended part orientation.
 - Inspect and slice each final part in Bambu Studio before marking it ready to print.
 - Check component insertion, removal, connector access, and bearing retention on a joint prototype.
