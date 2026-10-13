@@ -32,7 +32,7 @@ The removable port-side panel now has prototype geometry and checked casing clea
 
 ## Electronics retention
 
-Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
+Dylan requested press-fit retention for all electronics on 2026-10-11, and relaxed it on 2026-10-12. Parts now sit in loose pockets with clearance, held by walls, gravity, and a rib where they could fall. Most component housings are rectangular. The Jetson plastic edge opposite its connectors is 11 mm thick and extends 10 mm inward from that edge, as confirmed by Dylan. It slides straight down into a vertical slot that grips 8 mm of that strip. Preserve connector, fan, lens, and cable clearance. Printed pocket clearances still require coupon tests.
 
 ## Component dimension references
 
@@ -40,7 +40,7 @@ These dimensions come from reference designs or manufacturers (E). Fit against D
 
 | Component | Reference envelope | Source and qualification |
 | --- | --- | --- |
-| Jetson | 103 × 90.5 × 35 mm. | Original Claude design; include separate plug and airflow spaces. |
+| Jetson | 103 × 90.5 × 34.77 mm, as a flat 11 mm tray and board (U), an I/O band, and a heatsink block. | NVIDIA kit drawing (O) and Dylan; the body holds the 10 mm plastic strip opposite the connectors in a slot. |
 | Camera board | 37 × 37 mm; nominal thickness 1.6 mm, reference range 1.4–1.8 mm. | Original Claude design. |
 | Camera optics | Holder diameter 26 mm; lens length 26–27.5 mm; about 100° diagonal field of view. | Original Claude design; verify aperture clearance throughout focus travel. |
 | Camera rear heatsink | 26 × 26 × 10 mm. | Original Claude design; include both rear connector envelopes as well. |
@@ -56,7 +56,7 @@ The measured and sourced sizes are in [MEASUREMENTS.md](enclosure/MEASUREMENTS.m
 - Keep the servo horn mechanically retained. Loose component pockets do not imply a friction-only horn connection.
 - Provide mechanical travel limits and controlled acceleration. Verify clearance through the complete permitted movement.
 - Admit the complete camera connectors during assembly. Provide cable strain relief, bend clearance, and accessible release features.
-- Use limited rotation with a cable loop unless a different cable interface is selected and validated.
+- Route the camera cable through the neck gap with a slack loop in the body (H6). Limit rotation to ±80°.
 - Select the controller after selecting the actuator. STS3215 uses a TTL serial bus; PCA9685 controls PWM servos.
 - Prefer Jetson control through a compatible interface without a separately programmed Uno when practical.
 - Give the servo a compatible power supply. Identify the adapter revision before specifying its input voltage.
@@ -82,4 +82,4 @@ The [simplified enclosure](enclosure/README.md) replaced Concept A on 2026-10-12
 
 All nine parts pass `printcheck.py` with zero floating islands and zero thin area, and 719.0 mm² of total overhang against 34,887 mm² for Concept A (E). Every part slices for the P1S in Bambu Studio and prints in 13.4 h with 500 g of PLA (E). The body and neck checks pass: hardware clearances, plug access, the vertical sweep of the populated base plate, and the head through ±80°. An [offline viewer](enclosure/output/robot-viewer.html) shows the assembled robot, turns the head, and lists the parts, fasteners, and steps.
 
-The camera cable runs outside the robot in a loop from the head to a Jetson USB port. A coupon plate prints first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.
+The camera cable runs through the neck gap from a head floor hole to a roof hole, then through a slack loop to a Jetson USB port. A coupon plate and a Jetson slot coupon print first. Physical fit, cooling, acoustics, and powered motion stay U until printed tests.

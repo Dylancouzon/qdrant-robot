@@ -4,8 +4,8 @@
     {
       "part": "Coupons/coupon-plate",
       "project": "output/bambu/Coupons/coupon-plate.3mf",
-      "sha256": "bd78a6bf68c0b63d1b4440e46a95951e476a079b9c40d46a6c9b2c3f6c2cf631",
-      "seconds": 1250.0106201171875,
+      "sha256": "7f020121a0a44613e70805b2d43563d9c3106d97d042c4660605726d441e53e5",
+      "seconds": 1250.9010009765625,
       "grams": 7.919105052947998,
       "size_mm": [
         40.0,
@@ -14,11 +14,23 @@
       ]
     },
     {
+      "part": "Coupons/slot-coupon",
+      "project": "output/bambu/Coupons/slot-coupon.3mf",
+      "sha256": "4da04104fcca138f053da34e5d251de885ffc94f07f1621eb27c4df661ce61ae",
+      "seconds": 729.081787109375,
+      "grams": 2.00498366355896,
+      "size_mm": [
+        11.5,
+        18.0,
+        15.0
+      ]
+    },
+    {
       "part": "Required/Black/head-shaft",
       "project": "output/bambu/Required/Black/head-shaft.3mf",
-      "sha256": "14212d3b43e707ed75385f89f3bf596b8653525b08952d9fbaa9e4936dce41e4",
-      "seconds": 1421.1690673828125,
-      "grams": 9.579972267150879,
+      "sha256": "de1565822171d8fc6491fe4518e71e9bfb66936fd45d41cd38f13219a1dd66d8",
+      "seconds": 1419.0115966796875,
+      "grams": 9.579864501953125,
       "size_mm": [
         50.0,
         50.0,
@@ -28,9 +40,9 @@
     {
       "part": "Required/Black/horn-disc",
       "project": "output/bambu/Required/Black/horn-disc.3mf",
-      "sha256": "ec247da2bfcc0d2839820455045aec14e5775a1b1197594dce43da9d6ba1d9f4",
-      "seconds": 849.1920776367188,
-      "grams": 3.123610019683838,
+      "sha256": "4234dd51d6972d623c34f67ba3ade325e32632b9f85a43159d09c72e3f52d52e",
+      "seconds": 849.8880615234375,
+      "grams": 3.1241745948791504,
       "size_mm": [
         31.0,
         31.0,
@@ -40,7 +52,7 @@
     {
       "part": "Required/Black/neck-hub",
       "project": "output/bambu/Required/Black/neck-hub.3mf",
-      "sha256": "b00ebccfd37b72de100cb4c815675481977d78486d8231f665466d36d8a98ba4",
+      "sha256": "4c5a6f38b526a4914c3bc63b3e806d74a7f63abd2541074cdc10c1badc98d118",
       "seconds": 1483.68505859375,
       "grams": 10.9842529296875,
       "size_mm": [
@@ -52,9 +64,9 @@
     {
       "part": "Required/Black/speaker-grille",
       "project": "output/bambu/Required/Black/speaker-grille.3mf",
-      "sha256": "1bc622dbe229838fd09ceca3d564a6b0f5c7d895d146f2b5d9985b5d1261d435",
-      "seconds": 3619.8916015625,
-      "grams": 16.737953186035156,
+      "sha256": "de9c6b21ba35027042366a36fdb7aa9da5cd95a42f8faaa66252b65eb91402e6",
+      "seconds": 3619.93408203125,
+      "grams": 16.737951278686523,
       "size_mm": [
         101.2,
         49.2,
@@ -64,7 +76,7 @@
     {
       "part": "Required/Black/visor",
       "project": "output/bambu/Required/Black/visor.3mf",
-      "sha256": "08716f6f66352bd7a950d6647d0c069e499f08fc9e660dd986d3ad8b48b98f86",
+      "sha256": "05ae638c344bc4be697aea2996e89329f544632536f8e1b5867e34da8ee13d39",
       "seconds": 2476.10498046875,
       "grams": 20.600080490112305,
       "size_mm": [
@@ -76,9 +88,9 @@
     {
       "part": "Required/White/base-plate",
       "project": "output/bambu/Required/White/base-plate.3mf",
-      "sha256": "3216715c5b8b90cb52ee916f4864868fac9f0b43c62accbddf65f78276de54aa",
-      "seconds": 7204.62890625,
-      "grams": 94.67156219482422,
+      "sha256": "f8d65757011f6a02036fc25cbab8fc2f2b7ab60788ce4fe577a857ed1b195f6f",
+      "seconds": 7105.1572265625,
+      "grams": 92.94349670410156,
       "size_mm": [
         143.2,
         116.5,
@@ -88,9 +100,9 @@
     {
       "part": "Required/White/body-shell",
       "project": "output/bambu/Required/White/body-shell.3mf",
-      "sha256": "c14c59a6cee296ca13c780f729d3106cb9470fea02fd47b1d791c740bcb8b15d",
-      "seconds": 23430.755859375,
-      "grams": 240.66014099121094,
+      "sha256": "d4f0a1cba3252b5fff3320b514293aad56e04d1f5f091ba1aedda1e1ec03cf69",
+      "seconds": 23409.412109375,
+      "grams": 240.38453674316406,
       "size_mm": [
         148.6,
         127.1,
@@ -100,9 +112,9 @@
     {
       "part": "Required/White/head-shell",
       "project": "output/bambu/Required/White/head-shell.3mf",
-      "sha256": "9687405ef417f8bfb67760e3c5d8e6349c06601ebef6f99bbc31748db13b18bd",
-      "seconds": 6492.72509765625,
-      "grams": 92.35848999023438,
+      "sha256": "afe50e2d800553ea1d142932ed5949d2e544b14584b879fd1324139e0520c135",
+      "seconds": 6473.33056640625,
+      "grams": 92.03482818603516,
       "size_mm": [
         116.0,
         56.0,
@@ -112,7 +124,7 @@
     {
       "part": "Required/White/port-panel",
       "project": "output/bambu/Required/White/port-panel.3mf",
-      "sha256": "ad90c4e35290b1673f52e291d6d9d5f4152c827230502dce1b1b9e23d91d8d1e",
+      "sha256": "d41c7e37dd8cff539c5394ad3f4f88c46db99419ba23c6b4531616ff79b83562",
       "seconds": 1324.694580078125,
       "grams": 11.58000659942627,
       "size_mm": [

@@ -2,11 +2,18 @@
 Run head.py with build/hardware-layout/venv/bin/python; it calls these builders and checks.
 """
 
-from math import atan2, cos, degrees, hypot, radians, sin, sqrt
+from itertools import pairwise
+from math import acos, atan2, cos, degrees, dist, hypot, radians, sin, sqrt, tan
 
 import cadquery as cq
 import trimesh
 from interface import (
+    CABLE_D,
+    CABLE_DEG,
+    CABLE_FLARE,
+    CABLE_HOLE,
+    CABLE_R,
+    CABLE_XY,
     HEAD_FLOOR_Z,
     HEAD_SCREWS_XY,
     HUB_OD,
@@ -45,6 +52,7 @@ DISC_RING_R, DISC_RING_H = (7.6, 8.6), 0.8  # inside the 17.5 mm inner race OD, 
 DISC_RING_TOP_Z = ROOF_TOP_Z - PLAY
 DISC_TOP_Z = DISC_RING_TOP_Z - DISC_RING_H
 NUT_AF, NUT_T = 5.7, 2.5  # M3 nut pocket across flats, depth
+LIP_H, LIP_IN = 0.4, 0.3  # the pocket mouth: two lips on opposite flats keep the nut in (U)
 DISC_NUT_DEPTH = 3.0  # deeper in the disc, so the center screw tip stops above the horn
 NUT_CEILING_Z = DISC_BOTTOM_Z + DISC_NUT_DEPTH
 # Square drive: a boss on the disc rises into a socket in the shaft bottom. Its flats face the
@@ -64,6 +72,9 @@ POST_R0, POST_R1, POST_HALF_DEG = 19.8, 22.2, 12.0  # post 2.4 wide, 0.4 mm clea
 POST_TOP_Z = FLANGE_BOTTOM_Z + SLOT_DEPTH - 0.5  # never reaches the slot ceiling
 STOP_DEG = 80.0
 STOP_CENTER_DEG = 120.0  # clear of the hub screws at 0, 90, and 270 degrees
+HUB_R = max(HUB_OD / 2, *(hypot(*xy) + HUB_CB_R + MIN_SECTION for xy in HUB_SCREWS_XY))  # bulges
+CABLE_CLEAR = 0.5  # the cable stays this far from the hub and flange
+WRAP_R = HUB_R + CABLE_D / 2 + CABLE_CLEAR  # radius of the cable's centerline round the hub
 
 
 def cyl(r, z0, z1, xy=(0.0, 0.0)):
@@ -155,10 +166,70 @@ def disc():
     solid = solid.fuse(box(BOSS_AF, BOSS_AF, DISC_TOP_Z - 0.1, BOSS_TOP_Z))
     solid = solid.cut(cyl(1.7, DISC_BOTTOM_Z - 1, BOSS_TOP_Z + 1))
     solid = solid.cut(hexprism(NUT_AF, DISC_BOTTOM_Z - 1, NUT_CEILING_Z, rot=30))
+    for side in (-1, 1):  # the nut snaps past these 0.3 mm lips, then sits above them
+        x = side * (NUT_AF / 2 - LIP_IN / 2)
+        lip = box(LIP_IN, NUT_AF / sqrt(3), DISC_BOTTOM_Z, DISC_BOTTOM_Z + LIP_H, (x, 0))
+        solid = solid.fuse(lip)
     for xy in HORN_HOLES:  # head recesses also trim the boss corners
         solid = solid.cut(cyl(1.7, DISC_BOTTOM_Z - 1, DISC_TOP_Z + 1, xy))
         solid = solid.cut(cyl(HORN_CB_R, HORN_CB_FLOOR_Z, BOSS_TOP_Z + 1, xy))
     return solid.clean()
+
+
+def cable_hole(z0, z1, surface_z, material_below):
+    """Cutter for one camera cable hole: a rectangle from z0 to z1 with a 46 degree flare on the
+    face at surface_z, so the cable meets a chamfer and not an edge."""
+    w, h = CABLE_HOLE
+    flare_dz = (-1 if material_below else 1) * CABLE_FLARE * tan(radians(46))
+    flare = (
+        cq.Workplane("XY")
+        .workplane(offset=surface_z)
+        .rect(w + 2 * CABLE_FLARE, h + 2 * CABLE_FLARE)
+        .workplane(offset=flare_dz)
+        .rect(w, h)
+        .loft(combine=True)
+        .val()
+    )
+    hole = box(w, h, z0, z1).fuse(flare)
+    return hole.rotate((0, 0, 0), (0, 0, 1), CABLE_DEG + 90).translate((*CABLE_XY, 0))
+
+
+def cable_path(yaw):
+    """Taut camera cable centerline at `yaw` degrees, from the roof hole plane to the head floor
+    hole plane: vertical for CABLE_D in each hole, then straight if that clears the hub and
+    otherwise wrapped around it. Points are (x, y, z)."""
+    polar = lambda deg, r: (r * cos(radians(deg)), r * sin(radians(deg)))  # noqa: E731
+    start, end = CABLE_DEG, CABLE_DEG + yaw
+    reach = degrees(acos(WRAP_R / CABLE_R))  # angle from a hole to the wrap circle's tangent point
+    flat = [polar(start, CABLE_R), polar(end, CABLE_R)]
+    if abs(yaw) > 2 * reach:
+        a0, a1 = start + reach * (1 if yaw > 0 else -1), end - reach * (1 if yaw > 0 else -1)
+        steps = int(abs(a1 - a0) / 2) + 1
+        arc = [polar(a0 + (a1 - a0) * i / steps, WRAP_R) for i in range(steps + 1)]
+        flat = [flat[0], *arc, flat[1]]
+    along = [0.0]
+    for p, q in pairwise(flat):
+        along.append(along[-1] + hypot(q[0] - p[0], q[1] - p[1]))
+    z0, z1 = ROOF_TOP_Z + CABLE_D, HEAD_FLOOR_Z - CABLE_D
+    mid = [
+        (x, y, z0 + (z1 - z0) * s / (along[-1] or 1.0))
+        for (x, y), s in zip(flat, along, strict=True)
+    ]
+    return [(*flat[0], ROOF_TOP_Z), *mid, (*flat[-1], HEAD_FLOOR_Z)]
+
+
+def path_length(points):
+    return sum(dist(p, q) for p, q in pairwise(points))
+
+
+def cable_solid(points):
+    "The cable as a chain of cylinders along `points`."
+    segments = []
+    for p, q in pairwise(points):
+        v = cq.Vector(*q) - cq.Vector(*p)
+        if v.Length > 1e-9:
+            segments.append(cq.Solid.makeCylinder(CABLE_D / 2, v.Length, cq.Vector(*p), v))
+    return cq.Compound.makeCompound(segments)
 
 
 def bearing(z0):
@@ -307,4 +378,43 @@ def neck_checks(parts):
     sections["disc boss wall at the screw bore (exception)"] = boss
     out["sections"] = {k: round(v, 2) for k, v in sections.items()}
     out["drive"] = f"square drive, {DRIVE_ENGAGE} mm engagement, disc ring {DISC_RING_H} mm tall"
+    nut = nut_ghost((0, 0), NUT_CEILING_Z - 2.4, 30)
+    assert overlap(disc_, nut) < 1e-3
+    assert overlap(disc_, nut.translate(cq.Vector(0, 0, -0.5))) > 0.01
+    out["disc nut"] = (
+        f"two {LIP_IN} mm lips at the pocket mouth hold the seated nut; a nut pushed down 0.5 mm "
+        "meets them"
+    )
+    out |= cable_checks(hub_, shaft_, disc_)
     return out
+
+
+def cable_checks(hub_, shaft_, disc_):
+    """The two cable holes clear the neck parts, and the taut cable clears them at every yaw."""
+    column = cable_hole(ROOF_BOTTOM_Z - 1, HEAD_FLOOR_Z + 8, ROOF_TOP_Z, True).fuse(
+        cable_hole(ROOF_BOTTOM_Z - 1, HEAD_FLOOR_Z + 8, HEAD_FLOOR_Z, False)
+    )
+    nearest = min(column.distance(p) for p in (hub_, shaft_, disc_))
+    assert nearest >= 1.0 - 1e-6, nearest
+    flat = 2 * degrees(acos(WRAP_R / CABLE_R))
+    worst = 9.0
+    for yaw in range(-80, 81, 10):
+        cable = cable_solid(cable_path(yaw))
+        moving = (turned(shaft_, yaw), turned(disc_, yaw))
+        worst = min(worst, cable.distance(hub_), *(cable.distance(m) for m in moving))
+    assert worst >= CABLE_CLEAR - 0.01, worst
+    base = path_length(cable_path(0))
+    turn = max(path_length(cable_path(d)) for d in (-80, 80))
+    return {
+        "cable holes": (
+            f"{CABLE_HOLE[0]:.0f} x {CABLE_HOLE[1]:.0f} mm at radius {CABLE_R:.0f}, "
+            f"{CABLE_DEG:.0f} deg from +X, 1 mm 46 deg flare; {nearest:.1f} mm from the hub, "
+            "flange, disc, and posts"
+        ),
+        "cable path": (
+            f"taut {CABLE_D} mm cable, straight to +-{flat:.0f} deg of yaw and wrapped round the "
+            f"hub beyond, stays {worst:.2f} mm from every neck part over -80 to +80 deg in 10 deg "
+            f"steps; length {base:.1f} mm at yaw 0 and {turn:.1f} mm at 80 deg, {turn - base:.1f} "
+            "mm more"
+        ),
+    }

@@ -84,9 +84,13 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 ## Simplified enclosure, 2026-10-12
 
-- Bearing seats (24.1 mm), the 14.9 mm journal, nut pockets, detents, and the horn hole pattern (from a public CAD model) are unprinted. Print the coupon plate, the hub, and the horn disc on the real horn before the full set. See `hardware/enclosure/README.md`.
+- Bearing seats (24.1 mm), the 14.9 mm journal, nut pockets, detents, and the horn hole pattern (from a public CAD model) are unprinted. Print the coupon plate, the slot coupon, the hub, and the horn disc on the real horn before the full set. See `hardware/enclosure/README.md`.
 - The square drive between disc and shaft has about 4.7° of free play each way, and its section is borderline at full stall. Keep software limits inside ±70° so the servo never stalls on the ±80° stops.
 - The 60.6 mm lintel over the grille window may sag and block the grille. Inspect it on the first shell print and test-fit the grille; 0.6 mm of clearance absorbs small sag.
-- The external camera cable may load its connector or snag across ±80°. Test the loop by hand before powered motion.
-- Jetson port positions, the power elbow exit, and the microphone position (holes at Z 15) are unmeasured. The Jetson can slide up to 12 mm in X inside its pocket.
+- The camera cable crosses the 20 mm neck gap and needs 32.2 mm more length at ±80° than at yaw 0 (E, taut model). Its bend radius at the 4.5 mm cable's two bends is U, because the gap leaves about 15 mm. The USB-A plug size (16 × 9 mm) is U. Test the loop by hand before powered motion.
+- The Jetson hangs by its plastic strip in a 12 mm slot (U: Dylan is measuring the 11 mm strip, and the 0.5 mm clearance per side needs the slot coupon). The heatsink position is E (±4 mm), and the shell lets the Jetson rise 29.7 mm at most, which leaves 8.3 mm of the 38 mm slot engaged. Port positions, the power elbow exit, and the microphone position (holes at Z 15) are unmeasured.
+- The servo adapter board (42 × 32 × 13 mm) stands in a 17 mm band. The barrel jack position (near one end of a long edge) and the USB data port end are U, so the pocket keeps a 14 × 40 mm plug zone above its -X end and 20 mm of plug room at each end, with only 3.2 mm end ribs. Servo lead and USB cable routing are untested. The room in front of the servo connector face is 2.0 mm (U) and can grow to 3.0 mm; a face plug needs about 12 mm, which needs a wall notch or a moved part.
+- The USB sound card plugs into a Jetson port through an angled cable. Its plug end is U, and each end has about 9 mm between the audio side wall and the speaker rail, so an end wall may need a notch.
+- The robot software has no head calibration command yet. The last assembly step (turn the head forward by hand with torque off, then save that position as the servo's middle) is pending until the software provides it.
+- The servo lead and the camera cable must reach the servo adapter board and a Jetson port with the shell lying beside the open base plate (U). The shell and plate share one outline at the joint, and only 5 mm squares of flat plate lie under the shell rim at the corners, so no four 60 mm blocks can hold the shell above the plate.
 - Cooling, fan noise, and speaker echo with the shell closed are unmeasured.

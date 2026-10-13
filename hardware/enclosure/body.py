@@ -17,8 +17,12 @@ import trimesh
 HARDWARE = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(HARDWARE)]
 import interface as ifc  # noqa: E402
+import neck  # noqa: E402
 import printcheck  # noqa: E402
-from geometry import BODY_SECTIONS, WALL, body_envelopes, hardware  # noqa: E402
+from geometry import (  # noqa: E402
+    BAND_Y, BODY_SECTIONS, BUS_T, JETSON_PARTS, PLUG_FLOOR_Z, SLOT_GAP, SLOT_WALL, WALL,
+    body_envelopes, hardware,
+)  # fmt: skip
 
 OUT = Path(__file__).resolve().parent / "output"
 HEIGHT = BODY_SECTIONS[-1][0]
@@ -58,7 +62,7 @@ WINDOW_Y, WINDOW_TOP, PANEL_GAP = (-18.0, 30.0), 117.0, 0.5  # port window, inne
 SIDE_TAPER, TOP_TAPER = tan(radians(20)), 0.0  # window wider outside; the top edge is straight
 SPEAKER_SHIFT = 2.0  # the 100 x 45 x 21 speaker front (Y -56) is deeper than the 110.3 mm opening
 GRILLE_ZC = 47.5 / cos(radians(LEAN_FRONT))
-WALL_BOTTOM = 124.0  # servo pocket walls end here, 11 mm above the Jetson
+WALL_BOTTOM = 124.0  # servo pocket walls end here
 SKIRT_TOP = 24.5  # the roll of the +X wall below this height belongs to the plate (port skirt)
 PORT_NOTCH = (-1.5, 22.5)  # power and cable exit in the skirt top edge, Y range
 PANEL_SCREW = (-12.5, 32.0 / cos(radians(LEAN_SIDE)))  # y and z in the side wall frame
@@ -67,13 +71,8 @@ PANEL_NUT_X, PANEL_SCREW_LEN = (59.4, 62.2), 12.0  # nut slot in the plate ear; 
 GRILLE_WINDOW, GRILLE_RECESS = (96.0, 44.0), (102.0, 50.0)  # rounded-end window and its seat
 GRILLE_FLANGE, GRILLE_PLUG = (101.2, 49.2), (94.8, 42.8)  # insert: rear flange; plug 0.6 mm clear
 SEAT_D, FACE_D, BACK_D = 2.4, 0.5, 4.8  # depths from the outer face: seat, grille face, flange back
-FAN_SQUARE = (
-    -27.5,
-    12.5,
-    41.5,
-    81.5,
-)  # assumed 40 x 40 fan footprint on the Jetson face, X and Z (U)
-RIB_W, RIB_Y, RIB_H = 3.0, (28.5, 32.9), 25.0  # Jetson end ribs inside the intake zone
+SLOT_GRIP, SLOT_TOP = 8.0, 48.0  # slot grips 8 of the strip's 10 mm (Dylan); walls reach Z 48
+RIM_H = 10.0  # the shallow pocket's far wall rises this far above the Jetson's bottom edge
 
 
 # Helpers shared with study.py ----------------------------------------------------------------
@@ -377,6 +376,11 @@ def grille_cutters():
     return [in_front_frame(window, -1.0), in_front_frame(recess, SEAT_D)]
 
 
+def roof_hole():
+    "Camera cable hole through the roof behind the hub, flared on the outside."
+    return neck.cable_hole(ifc.ROOF_BOTTOM_Z - 1, ifc.ROOF_TOP_Z + 1, ifc.ROOF_TOP_Z, True)
+
+
 def build_shell():
     outer = outer_shell()
     adds = (
@@ -387,7 +391,7 @@ def build_shell():
     pre = shell_blank().fuse(*adds).cut(cyl(0, 0, NECK_R, -1, HEIGHT + 1))
     rear, left = vent_cutters()
     cuts = hub_cuts() + corner_cuts() + rear + left + grille_cutters()
-    cuts += [mic_hole(x, MIC_Z) for x in MIC_X] + [window_cutter()]
+    cuts += [mic_hole(x, MIC_Z) for x in MIC_X] + [window_cutter(), roof_hole()]
     return pre, pre.cut(*cuts)
 
 
@@ -403,37 +407,36 @@ def components():
     "Placed hardware boxes (x0, x1, y0, y1, z0, z1), from geometry.py or moved to the plate here."
     res = {i["name"]: reservation(i) for i in hardware()}
     sx0, sx1, sy0, sy1, sz0, sz1 = res["One speaker"]
-    return {
-        "Jetson": res["Jetson"],
+    return {n: res[n] for n in JETSON_PARTS} | {
         "Speaker": (sx0, sx1, sy0 + SPEAKER_SHIFT, sy1 + SPEAKER_SHIFT, sz0, sz1),
         "USB audio case": (-26.5, 26.5, -54.9, -31.4, CUT_Z, CUT_Z + 14.6),
-        "Bus board": res["Bus interface"],  # 62 x 16 x 43 reservation, standing on the plate
-        "Servo regulator": res["Servo regulator"],  # 15 x 20 x 35 on its end, on the plate
+        "Bus board": res["Bus interface"],  # 42 x 13 x 32 on a long edge, on the plate
     }
 
 
 def risers():
     "Everything that stands on the plate above CUT_Z, as named boxes (x0, x1, y0, y1, z0, z1)."
     comp = components()
-    j, s, a = comp["Jetson"], comp["Speaker"], comp["USB audio case"]
-    bus, reg = comp["Bus board"], comp["Servo regulator"]
+    t, ports = comp["Jetson tray and board"], comp["Jetson ports"]
+    s, a, bus = comp["Speaker"], comp["USB audio case"], comp["Bus board"]
     g, w, z = POCKET_GAP, POCKET_WALL, CUT_Z
-    bus_l, bus_r = bus[0] - g - w, bus[1] + g + w  # bus pocket outer X, shared with its neighbours
-    back = (j[0], bus_r, j[2] - g - w, j[2] - g, z, 48.0)  # Jetson back wall is the bus rear wall
+    bus_l, bus_r = bus[0] - g - w, bus[1] + g + w  # bus end ribs' outer X
+    back_x, grip_x = t[0] - SLOT_GAP, t[0] + SLOT_GRIP  # slot: inside of its back wall, open end
+    y_out = (t[2] - SLOT_GAP - SLOT_WALL, t[3] + SLOT_GAP + SLOT_WALL)  # slot walls' outer faces
     front = (a[0] - g - w, a[1] + g + w, a[3] + g, a[3] + g + w)  # wall behind the audio case
     out = {
-        "jetson pad": (j[0], j[1], j[2] - g, j[3], z, j[4]),
-        "jetson back wall": back,
+        "jetson sill": (t[0], t[1], t[2], t[3], z, t[4]),
+        "jetson slot back wall": (back_x - SLOT_WALL, back_x, y_out[0], y_out[1], z, SLOT_TOP),
+        "jetson slot wall -": (back_x, grip_x, y_out[0], t[2] - SLOT_GAP, z, SLOT_TOP),
+        "jetson slot wall +": (back_x, grip_x, t[3] + SLOT_GAP, y_out[1], z, SLOT_TOP),
+        "jetson back wall": (grip_x, bus_r, y_out[0], t[2] - g, z, SLOT_TOP),  # bus rear wall too
+        "jetson rim": (grip_x, ports[0] - g, t[3] + g, y_out[1], z, t[4] + RIM_H),
         "audio side wall -": (a[0] - g - w, a[0] - g, a[2], front[3], z, z + 12.0),
         "audio side wall +": (a[1] + g, a[1] + g + w, a[2], front[3], z, z + 12.0),
-        "audio and bus wall": (bus_l, bus_r, front[2], front[3], z, z + 30.0),
-        "bus side wall -": (bus_l, bus[0] - g, front[3], back[2], z, z + 30.0),
-        "bus side wall +": (bus[1] + g, bus_r, front[2], reg[3], z, z + 30.0),  # regulator's left
-        "regulator front wall": (bus_r, s[1] - 11.0, reg[2] - g - w, reg[2] - g, z, z + 30.0),
-        "regulator right wall": (reg[1] + g, reg[1] + g + w, reg[2] - g - w, reg[3], z, z + 30.0),
+        "audio and bus wall": (*front, z, z + 30.0),
+        "bus end rib -": (bus_l, bus[0] - g, front[3], y_out[0], z, PLUG_FLOOR_Z),
+        "bus end rib +": (bus[1] + g, bus_r, front[3], y_out[0], z, PLUG_FLOOR_Z),
         "panel ear": (56.0, 64.8, -19.9, -7.1, z, 40.0),
-        "jetson end rib -": (j[0], j[0] + RIB_W, *RIB_Y, z, z + RIB_H),
-        "jetson end rib +": (j[1] - RIB_W, j[1], *RIB_Y, z, z + RIB_H),
     }
     for side in (-1, 1):
         edge, outer = side * (s[1] + g), side * (s[1] + g + w)
@@ -556,8 +559,9 @@ def build_all():
 # Each check asserts and returns the numbers that go into body-checks.json.
 
 KEEP_RESERVATIONS = {  # geometry.py items that stay where they are; the others are placed above
-    "Jetson", "Audio USB extension", "Bus interface", "Servo regulator", "Jetson USB/power plugs",
-    "Fan intake space", "Outlet space", "Camera rear cable space",
+    *JETSON_PARTS, "Bus interface", "Bus power plug space",
+    "Bus USB plug space -", "Bus USB plug space +", "Jetson USB/power plugs", "Fan intake space",
+    "Camera cable slack loop", "Outlet space", "Camera rear cable space",
 }  # fmt: skip
 TOL_MM3 = 1e-3
 
@@ -604,27 +608,19 @@ def check_envelope(parts, outer):
 
 
 def check_overlaps(parts):
-    """No part touches a reservation, except the two Jetson end ribs, which the lead allowed
-    inside the fan intake space (checked below to be the only plate volume there)."""
+    "No part touches a reservation, and no two parts touch each other."
     res, out = reservations(), {}
-    ribs = [box(*b) for n, b in risers().items() if "end rib" in n]
-    allowed = sum(vol(r, res["Fan intake space"]) for r in ribs)
     for name, solid in parts.items():
         for rname, rbox in res.items():
             v = vol(solid, rbox)
-            extra = allowed if (name, rname) == ("base-plate", "Fan intake space") else 0.0
-            assert abs(v - extra) < TOL_MM3, (name, rname, v)
+            assert v < TOL_MM3, (name, rname, v)
     names = list(parts)
     for i, a in enumerate(names):
         for b in names[i + 1 :]:
             v = vol(parts[a], parts[b])
             assert v < TOL_MM3, (a, b, v)
             out[f"{a} / {b}"] = round(v, 4)
-    return {
-        "reservations_checked": len(res),
-        "rib_volume_in_intake_mm3": round(allowed),
-        "part_pairs_mm3": out,
-    }
+    return {"reservations_checked": len(res), "part_pairs_mm3": out}
 
 
 def check_sweeps(shell, skirt):
@@ -643,6 +639,49 @@ def check_sweeps(shell, skirt):
     return {
         "swept_boxes_vs_shell_mm3": worst,
         "skirt_rise_steps_mm": "0 to its height below seated, 2 mm",
+    }
+
+
+def check_cable(shell):
+    """The roof hole clears the hub bosses, their nut channels and the servo pocket walls, with
+    solid roof round it. The slack loop sits under it and touches the plug space, which leads to
+    the Jetson USB ports. The bus pocket band matches the walls that bound it."""
+    cutter = roof_hole()
+    near = {
+        "hub bosses": hub_bosses(),
+        "hub nut channels and screw holes": hub_cuts(),
+        "servo pocket walls": servo_walls(),
+    }
+    gaps = {k: min(cutter.distance(s) for s in v) for k, v in near.items()}
+    assert min(gaps.values()) >= 1.0, gaps
+    hx, hy = ifc.CABLE_XY
+    w, h = neck.CABLE_HOLE
+    assert not probe(shell, hx, hy, 158.4)  # open at the middle of the roof
+    tx, ty = -sin(radians(ifc.CABLE_DEG)), cos(radians(ifc.CABLE_DEG))  # the hole's long side
+    for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)):  # solid roof 1 mm outside the straight hole
+        along, across = a * (w / 2 + 1.0), b * (h / 2 + 1.0)
+        assert probe(shell, hx + tx * along + ty * across, hy + ty * along - tx * across, 158.4)
+    res = {i["name"]: box(*reservation(i)) for i in hardware()}
+    loop, plugs = res["Camera cable slack loop"], res["Jetson USB/power plugs"]
+    lb = loop.BoundingBox()
+    margin = min(hx - lb.xmin, lb.xmax - hx, hy - lb.ymin, lb.ymax - hy)
+    assert margin >= neck.CABLE_D and ifc.ROOF_BOTTOM_Z - lb.zmax >= 10.0, margin
+    shared = vol(loop.translate((0, 0, -0.5)), plugs) / 0.5  # mm2 of face the two spaces share
+    assert shared >= 100.0, shared
+    risers_ = risers()
+    front, back = risers_["audio and bus wall"], risers_["jetson back wall"]
+    assert abs(front[3] - BAND_Y[0]) < 1e-6 and abs(back[2] - BAND_Y[1]) < 1e-6, (front, back)
+    bus = components()["Bus board"]
+    rear = BAND_Y[1] - bus[3]
+    assert bus[2] - BAND_Y[0] >= POCKET_GAP and rear >= POCKET_GAP, (bus, BAND_Y)
+    return {
+        "roof_hole_to_nearest_mm": {k: round(v, 2) for k, v in gaps.items()},
+        "slack_loop_mm": [round(lb.xlen), round(lb.ylen), round(lb.zlen)],
+        "hole_center_to_loop_edge_mm": round(margin, 1),
+        "loop_to_plug_space_shared_face_mm2": round(shared),
+        "bus_front_gap_mm": round(bus[2] - BAND_Y[0], 2),
+        "bus_rear_gap_mm": round(rear, 2),
+        "bus_front_gap_most_mm": round(BAND_Y[1] - BAND_Y[0] - BUS_T - POCKET_GAP, 2),
     }
 
 
@@ -780,6 +819,12 @@ def check_alignment(shell, plate, panel):
     }
 
 
+def jetson_envelope():
+    "Bounds of the three Jetson boxes (x0, x1, y0, y1, z0, z1)."
+    boxes = [components()[n] for n in JETSON_PARTS]
+    return tuple(f(b[i] for b in boxes) for i, f in enumerate((min, max) * 3))
+
+
 def slot_area(solids):
     "Total open area of vent slots, from the cutter volumes (each is 30 mm deep)."
     return sum(v.Volume() for v in solids) / 30.0
@@ -787,7 +832,7 @@ def slot_area(solids):
 
 def check_openings(shell):
     "Vent slots sit over their reservations and are open; the mic holes are open and clear."
-    jet = components()["Jetson"]
+    jet = jetson_envelope()
     rear, left = vent_cutters()
     r = [v.BoundingBox() for v in rear]
     assert min(b.xmin for b in r) >= jet[0] and max(b.xmax for b in r) <= jet[1]
@@ -827,17 +872,17 @@ def check_openings(shell):
     }
 
 
-WALL_GAPS = {  # wall: {part: smallest gap}. The bus Y gap is 0.5 mm: the band holds 17.1 mm.
-    "jetson back wall": {"Jetson": 1.0, "Bus board": 0.5, "Servo regulator": 1.0},
-    "jetson end rib -": {"Jetson": 1.0},
-    "jetson end rib +": {"Jetson": 1.0},
-    "audio side wall -": {"USB audio case": 1.0},
-    "audio side wall +": {"USB audio case": 1.0},
-    "audio and bus wall": {"USB audio case": 1.0, "Bus board": 0.5, "Servo regulator": 1.0},
-    "bus side wall -": {"Bus board": 1.0},
-    "bus side wall +": {"Bus board": 1.0, "Servo regulator": 1.0},
-    "regulator front wall": {"Servo regulator": 1.0},
-    "regulator right wall": {"Servo regulator": 1.0},
+WALL_GAPS = {  # wall: {part: smallest gap}. The bus band holds 17 mm for the 13 mm board.
+    "jetson slot back wall": {"Jetson tray and board": SLOT_GAP},
+    "jetson slot wall -": {"Jetson tray and board": SLOT_GAP},
+    "jetson slot wall +": {"Jetson tray and board": SLOT_GAP},
+    "jetson back wall": {"Jetson tray and board": POCKET_GAP, "Bus board": POCKET_GAP},
+    "jetson rim": {"Jetson tray and board": POCKET_GAP},
+    "audio side wall -": {"USB audio case": POCKET_GAP},
+    "audio side wall +": {"USB audio case": POCKET_GAP},
+    "audio and bus wall": {"USB audio case": POCKET_GAP, "Bus board": POCKET_GAP},
+    "bus end rib -": {"Bus board": POCKET_GAP},
+    "bus end rib +": {"Bus board": POCKET_GAP},
 }
 
 
@@ -857,24 +902,40 @@ def check_pockets(grille):
     return {"wall_to_part_mm": gaps, "grille_to_speaker_mm": round(speaker_gap, 2)}
 
 
-def check_ribs():
-    "End ribs stay out of the assumed fan footprint; report the area they cover and block."
-    jet = components()["Jetson"]
-    face = (jet[1] - jet[0]) * (jet[5] - jet[4])
-    rear, _ = vent_cutters()
-    covered = blocked = 0.0
-    for name, b in risers().items():
-        if "end rib" not in name:
-            continue
-        assert b[1] <= FAN_SQUARE[0] - 10 or b[0] >= FAN_SQUARE[1] + 10, name  # 10 mm clear in X
-        covered += (b[1] - b[0]) * (b[5] - jet[4])
-        shadow = box(b[0], b[1], b[2], 80, b[4], b[5])  # the rib's shadow along Y onto the vents
-        blocked += sum(vol(shadow, v) for v in rear) / 30.0
+def check_jetson_slot(plate, shell):
+    """The Jetson slides straight down into its slot and up out of it without touching the plate.
+    With the shell on, it cannot rise far enough to leave the slot when the robot tips."""
+    comp = components()
+    t = comp["Jetson tray and board"]
+    boxes = [comp[n] for n in JETSON_PARTS]
+    walls = [box(*b) for b in risers().values()]
+    for dz in range(0, 61, 2):  # 60 mm covers the slot height
+        for b in boxes:
+            moved = box(b[0], b[1], b[2], b[3], b[4] + dz, b[5] + dz)
+            assert all(vol(moved, w) < TOL_MM3 for w in walls), dz
+    x, z = t[0] + SLOT_GRIP / 2, CUT_Z + 20.0  # probes in the finished plate, inside the slot
+    for y, step in ((t[2] - SLOT_GAP, -1), (t[3] + SLOT_GAP, 1)):
+        assert not probe(plate, x, y - 0.05 * step, z) and probe(plate, x, y + 0.05 * step, z)
+        assert probe(plate, x, y + step * (SLOT_WALL - 0.05), z)
+        assert not probe(plate, x, y + step * (SLOT_WALL + 0.05), z)
+    engage = SLOT_TOP - t[4]  # strip length in the slot at rest
+
+    def blocked(lift):
+        prisms = (box(b[0], b[1], b[2], b[3], b[5], b[5] + lift) for b in boxes)
+        return any(vol(prism, shell) > TOL_MM3 for prism in prisms)
+
+    lo, hi = 0.0, engage
+    assert blocked(hi), "the Jetson could lift out of its slot"
+    for _ in range(7):
+        mid = (lo + hi) / 2
+        lo, hi = (lo, mid) if blocked(mid) else (mid, hi)
     return {
-        "rib_face_area_mm2": round(covered),
-        "share_of_jetson_face_pct": round(100 * covered / face, 1),
-        "rear_vent_area_blocked_mm2": round(blocked, 1),
-        "rear_vent_area_mm2": round(slot_area(rear)),
+        "slot_width_mm": round(t[3] - t[2] + 2 * SLOT_GAP, 2),
+        "slot_grip_mm": SLOT_GRIP,
+        "slot_height_above_plate_mm": round(SLOT_TOP - CUT_Z, 1),
+        "slot_engagement_at_rest_mm": round(engage, 1),
+        "max_lift_with_shell_mm": round(hi, 1),
+        "engagement_left_at_max_lift_mm": round(engage - hi, 1),
     }
 
 
@@ -937,8 +998,7 @@ def write_step(parts):
         asm.add(solid, name=name, color=cq.Color(*colors.get(name, WHITE)))
     asm.save(str(OUT / "body-assembly.step"))
     hw = cq.Assembly(name="hardware")
-    reserved = reservations() | {"Jetson": box(*components()["Jetson"])}
-    for name, solid in reserved.items():
+    for name, solid in reservations().items():
         hw.add(solid, name=name, color=cq.Color(0.4, 0.55, 0.8, 0.5))
     hw.save(str(OUT / "body-hardware.step"))
 
@@ -1042,12 +1102,13 @@ def main():
         "overlaps": check_overlaps(parts),
         "sweeps": check_sweeps(shell, built["skirt"]),
         "servo_pocket": check_servo(shell),
+        "camera_cable": check_cable(shell),
         "alignment": check_alignment(shell, parts["base-plate"], parts["port-panel"]),
         "nut_detents": check_detents(shell),
         "openings": check_openings(shell),
         "pockets": check_pockets(parts["speaker-grille"]),
         "panel_removal": check_panel_removal(parts),
-        "jetson_ribs": check_ribs(),
+        "jetson_slot": check_jetson_slot(parts["base-plate"], shell),
         "plate_band": check_band(parts["base-plate"], built["outer"]),
     }
     meshes = {n: to_print_mesh(s) for n, s in built["print"].items()}

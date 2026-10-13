@@ -7,8 +7,7 @@
   ]
  },
  "overlaps": {
-  "reservations_checked": 10,
-  "rib_volume_in_intake_mm3": 597,
+  "reservations_checked": 14,
   "part_pairs_mm3": {
    "body-shell / base-plate": 0.0,
    "body-shell / port-panel": 0.0,
@@ -20,29 +19,30 @@
  },
  "sweeps": {
   "swept_boxes_vs_shell_mm3": {
-   "jetson pad": 0.0,
+   "jetson sill": 0.0,
+   "jetson slot back wall": 0.0,
+   "jetson slot wall -": 0.0,
+   "jetson slot wall +": 0.0,
    "jetson back wall": 0.0,
+   "jetson rim": 0.0,
    "audio side wall -": 0.0,
    "audio side wall +": 0.0,
    "audio and bus wall": 0.0,
-   "bus side wall -": 0.0,
-   "bus side wall +": 0.0,
-   "regulator front wall": 0.0,
-   "regulator right wall": 0.0,
+   "bus end rib -": 0.0,
+   "bus end rib +": 0.0,
    "panel ear": 0.0,
-   "jetson end rib -": 0.0,
-   "jetson end rib +": 0.0,
    "speaker rail -1": 0.0,
    "speaker end wall -1": 0.0,
    "speaker rear wall -1": 0.0,
    "speaker rail 1": 0.0,
    "speaker end wall 1": 0.0,
    "speaker rear wall 1": 0.0,
-   "component Jetson": 0.0,
+   "component Jetson tray and board": 0.0,
+   "component Jetson ports": 0.0,
+   "component Jetson heatsink": 0.0,
    "component Speaker": 0.0,
    "component USB audio case": 0.0,
-   "component Bus board": 0.0,
-   "component Servo regulator": 0.0
+   "component Bus board": 0.0
   },
   "skirt_rise_steps_mm": "0 to its height below seated, 2 mm"
  },
@@ -52,6 +52,23 @@
   "servo_wall_mm": 3.2,
   "hub_boss_to_servo_mm": 4.24,
   "horn_disc_r15.5_to_shell_mm": 0.7
+ },
+ "camera_cable": {
+  "roof_hole_to_nearest_mm": {
+   "hub bosses": 7.26,
+   "hub nut channels and screw holes": 10.0,
+   "servo pocket walls": 21.59
+  },
+  "slack_loop_mm": [
+   30,
+   30,
+   30
+  ],
+  "hole_center_to_loop_edge_mm": 5.6,
+  "loop_to_plug_space_shared_face_mm2": 176,
+  "bus_front_gap_mm": 2.0,
+  "bus_rear_gap_mm": 2.0,
+  "bus_front_gap_most_mm": 3.0
  },
  "alignment": {
   "plate_screws": "4 x M3 x 10",
@@ -83,21 +100,18 @@
  },
  "pockets": {
   "wall_to_part_mm": {
-   "jetson back wall / Jetson": 1.0,
-   "jetson back wall / Bus board": 0.55,
-   "jetson back wall / Servo regulator": 1.0,
+   "jetson slot back wall / Jetson tray and board": 0.5,
+   "jetson slot wall - / Jetson tray and board": 0.5,
+   "jetson slot wall + / Jetson tray and board": 0.5,
+   "jetson back wall / Jetson tray and board": 1.0,
+   "jetson back wall / Bus board": 2.0,
+   "jetson rim / Jetson tray and board": 1.0,
    "audio side wall - / USB audio case": 1.0,
    "audio side wall + / USB audio case": 1.0,
    "audio and bus wall / USB audio case": 1.0,
-   "audio and bus wall / Bus board": 0.55,
-   "audio and bus wall / Servo regulator": 1.0,
-   "bus side wall - / Bus board": 1.0,
-   "bus side wall + / Bus board": 1.0,
-   "bus side wall + / Servo regulator": 1.0,
-   "regulator front wall / Servo regulator": 1.0,
-   "regulator right wall / Servo regulator": 1.0,
-   "jetson end rib - / Jetson": 1.0,
-   "jetson end rib + / Jetson": 1.0
+   "audio and bus wall / Bus board": 2.0,
+   "bus end rib - / Bus board": 1.0,
+   "bus end rib + / Bus board": 1.0
   },
   "grille_to_speaker_mm": 1.81
  },
@@ -105,11 +119,13 @@
   "panel_pull_out_steps_mm": "0 to 40, 2 mm",
   "max_overlap_mm3": 0.0
  },
- "jetson_ribs": {
-  "rib_face_area_mm2": 136,
-  "share_of_jetson_face_pct": 1.5,
-  "rear_vent_area_blocked_mm2": 0.0,
-  "rear_vent_area_mm2": 2827
+ "jetson_slot": {
+  "slot_width_mm": 12.0,
+  "slot_grip_mm": 8.0,
+  "slot_height_above_plate_mm": 40.4,
+  "slot_engagement_at_rest_mm": 38.0,
+  "max_lift_with_shell_mm": 29.7,
+  "engagement_left_at_max_lift_mm": 8.3
  },
  "plate_band": {
   "band_half_x_y_mm": [
@@ -165,13 +181,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.0,
-   "volume_mm3": 231957,
+   "volume_mm3": 231384,
    "bbox_mm": [
     148.6,
     127.1,
     152.4
    ],
-   "face_count": 13298
+   "face_count": 13326
   },
   "Required/White/base-plate": {
    "overhang_mm2": 96.3,
@@ -180,14 +196,14 @@
    "island_max_mm2": 0.0,
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
-   "min_thickness_mm": 2.4,
-   "volume_mm3": 163448,
+   "min_thickness_mm": 2.01,
+   "volume_mm3": 157343,
    "bbox_mm": [
     143.2,
     116.5,
     48.0
    ],
-   "face_count": 4218
+   "face_count": 3974
   },
   "Required/White/port-panel": {
    "overhang_mm2": 19.2,
@@ -223,5 +239,5 @@
   }
  },
  "printcheck_total_overhang_mm2": 507.3,
- "runtime_s": 118.0
+ "runtime_s": 135.5
 }

@@ -10,8 +10,8 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 
 | Part | Color | Orientation | Size (mm) | Time | PLA |
 | --- | --- | --- | --- | --- | --- |
-| `body-shell` | White | Upside down, roof on the bed | 148.6 × 127.1 × 152.4 | 6.5 h | 241 g |
-| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 2.0 h | 95 g |
+| `body-shell` | White | Upside down, roof on the bed | 148.6 × 127.1 × 152.4 | 6.5 h | 240 g |
+| `base-plate` | White | Flat, underside on the bed | 143.2 × 116.5 × 48 | 2.0 h | 93 g |
 | `port-panel` | White | Outside face on the bed | 91.9 × 49.3 × 8.2 | 0.4 h | 12 g |
 | `head-shell` | White | Rear face on the bed | 116 × 56 × 77 | 1.8 h | 92 g |
 | `visor` | Black | Front face on the bed | 112 × 52 × 23.5 | 0.7 h | 21 g |
@@ -20,7 +20,7 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | `head-shaft` | Black | Flange on the bed | 50 × 50 × 21.3 | 0.4 h | 10 g |
 | `horn-disc` | Black | Flat on the bed | 31 × 31 × 7.8 | 0.2 h | 3 g |
 
-The nine parts take 13.4 h and 500 g of PLA. The shell is the largest part and fits the 256 mm bed.
+The nine parts take 13.4 h and 498 g of PLA. The shell is the largest part and fits the 256 mm bed.
 
 ## Fasteners
 
@@ -47,7 +47,9 @@ Use a Bambu Lab P1S with a 0.4 mm nozzle and PLA. Set 0.2 mm layers, three walls
 
 `printcheck.py` reports zero floating islands and zero thin area (under 2 mm) on all nine parts. The total overhang is 719.0 mm² (E), against 34,887 mm² for Concept A. All of it is flat bridges over pockets and openings, except 63 mm² of gently sloped faces in `body-shell`. Three bridges are long: the 60.6 × 2.4 mm lintel above the grille window in `body-shell`, the 24 mm bearing seat roof in `neck-hub`, and the 22 mm eye ring in `visor`. Watch these three on the first print.
 
-## Print the coupon plate first
+## Print the coupons first
+
+`output/print/Coupons/slot-coupon.stl` (11.5 × 18 × 15 mm, 12 min, 2 g) is 15 mm of the Jetson slot. Slide it over the plastic strip on the edge of the real Jetson, opposite the connectors. It must slide on with a small, even gap on each side (0.5 mm, U). If the strip is not 11 mm thick, set `JETSON_STRIP_T` in `geometry.py` and rebuild before you print the base plate.
 
 `output/print/Coupons/coupon-plate.stl` (40 × 52 × 11.2 mm, 21 min, 8 g) holds the three fits that can fail:
 
@@ -55,7 +57,7 @@ Use a Bambu Lab P1S with a 0.4 mm nozzle and PLA. Set 0.2 mm layers, three walls
 - **Corner-style pocket:** the same channel, with the screw hole blind above the nut, as in the shell's corner bosses.
 - **Camera posts:** four posts, 7 mm across and 7 mm tall, at 32.3 mm spacing on a 40 × 40 mm frame, with 1.7 mm pilot holes. An M2 screw must bite without splitting the post.
 
-The hub is the bearing coupon, because its seats take both bearings. The horn disc is the horn coupon, because it fits the servo horn. Press the bearings in and set the disc on the horn before you print the large parts.
+The hub is the bearing coupon, because its seats take both bearings. The horn disc is the horn coupon, because it fits the servo horn. Its nut pocket also tests the two 0.3 mm lips: an M3 nut must snap in and stay when the pocket faces down. Press the bearings in and set the disc on the horn before you print the large parts.
 
 ## Regenerate
 
@@ -72,7 +74,7 @@ Use the pinned environment (`requirements.lock`, Python 3.12) at `build/hardware
 
 ## Files
 
-- `geometry.py`: tapered body and head envelopes, and the hardware boxes.
+- `geometry.py`: tapered body and head envelopes, and the hardware boxes, including the Jetson's real shape and its strip thickness.
 - `interface.py`: positions shared by the body and the neck.
 - `body.py`, `neck.py`, `head.py`: the printed parts and their checks.
 - `coupons.py`, `bambu.py`, `preview.py`, `check-viewer.cjs`: coupon, slicing, and viewer.

@@ -101,3 +101,7 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **H3 2026-10-11: Use removable speaker and audio retaining keys.** Speaker service removes its key through the right opening. The flatter audio housing, tray, and key leave rearward as one module after the speaker key is removed. Jetson and camera clips await verified contact regions; printed retention and thermal behavior remain U.
 
 **H4 2026-10-12: Use the simplified nine-part enclosure.** This supersedes H2 construction and H3. One shell prints on its roof over a base plate with loose pockets; a hub holds both bearings, and the servo drives the head shaft directly. Fasteners are M2 and M3 screws into nut pockets; camera on M2 screws (Dylan). Printability is scored by `hardware/printcheck.py`; physical fit remains U.
+
+**H5 2026-10-13: Power the servo at 5 V from a Jetson USB-A port (Dylan).** A USB-A to 5.5 × 2.1 mm barrel cable feeds the SO-ARM100 bus servo adapter, the LeRobot setup for 7.4 V STS3215. This removes the servo regulator from H4. Software limits torque and acceleration; USB port current stays U until the first powered test.
+
+**H6 2026-10-13: Route the camera cable through the neck gap (Dylan).** The cable leaves a hole in the rear of the head floor, crosses the neck gap behind the hub, and enters the body through a smooth roof hole to a Jetson USB port. A slack loop inside the body absorbs the ±80° turn. This replaces the external loop; Dylan chose it over a hollow shaft with gears.

@@ -1,5 +1,5 @@
 {
- "date": "2026-10-12",
+ "date": "2026-10-13",
  "checks": {
   "neck bearing contact": "shoulder touches both outer races (inner races 2.0 mm away); shaft ring touches the upper inner race only (outer race 2.25 mm away); lifted 0.6 mm, the disc ring reaches the lower inner race and the outer race stays 1.3 mm away",
   "neck axial play": "0.50 mm, ring on race, disc ring below",
@@ -13,6 +13,9 @@
    "disc boss wall at the screw bore (exception)": 2.06
   },
   "neck drive": "square drive, 3.1 mm engagement, disc ring 0.8 mm tall",
+  "neck disc nut": "two 0.3 mm lips at the pocket mouth hold the seated nut; a nut pushed down 0.5 mm meets them",
+  "neck cable holes": "17 x 10 mm at radius 32, 45 deg from +X, 1 mm 46 deg flare; 1.0 mm from the hub, flange, disc, and posts",
+  "neck cable path": "taut 4.5 mm cable, straight to +-57 deg of yaw and wrapped round the hub beyond, stays 0.50 mm from every neck part over -80 to +80 deg in 10 deg steps; length 20.0 mm at yaw 0 and 52.2 mm at 80 deg, 32.2 mm more",
   "head no overlap": "five parts against each other and 27 ghosts (bearing races, servo, camera, every screw, every nut): all below 0.001 mm3",
   "head seating": "visor sits on the shell rim, its tabs on the floor, the shaft flange on the head floor",
   "screws": [
@@ -26,7 +29,7 @@
   "head second eye": "22 mm circle groove at X 22, 1.2 wide, 0.6 deep: 28 mm from camera",
   "head camera view": "100 deg cone from the lens front clears visor, shell, and shaft; lens tip 0.5 mm behind the visor face, opening 19.0 mm",
   "head camera mount": "4 M2 x 8 screws into 7 mm posts with 1.7 mm pilots, 32.3 mm square; board center Y -15.7, 11.7 mm in front of the geometry.py position (X and Z unchanged)",
-  "head cable slot": "14 x 7 mm notch through the rear wall at the floor, behind the camera",
+  "head cable hole": "17 x 10 mm through the floor at (22.6, 22.6), 1 mm of floor all round the 1 mm flare on the underside; it replaces the old rear slot",
   "head envelope": "116 x 80 x 56 mm; 444 mm3 of the shell lies outside the approved head (the rear chamfer)",
   "head sections": {
    "floor under the flange screw recess": 2.4,
@@ -46,13 +49,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.4,
-   "volume_mm3": 105118,
+   "volume_mm3": 104484,
    "bbox_mm": [
     116.0,
     56.0,
     77.0
    ],
-   "face_count": 4576,
+   "face_count": 4584,
    "file": "enclosure/output/print/Required/White/head-shell.stl"
   },
   "visor": {
@@ -114,13 +117,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.05,
-   "volume_mm3": 3214,
+   "volume_mm3": 3215,
    "bbox_mm": [
     31.0,
     31.0,
     7.8
    ],
-   "face_count": 5656,
+   "face_count": 5680,
    "file": "enclosure/output/print/Required/Black/horn-disc.stl"
   }
  },

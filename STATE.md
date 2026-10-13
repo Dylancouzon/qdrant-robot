@@ -2,11 +2,11 @@
 
 Updated 2026-10-11. Branch: `codex/robot-enclosure`. Read CLAUDE.md, this file, and [research/lessons.md](research/lessons.md) first. Builders: Codex `gpt-6.1-sol` at low effort (Dylan, 2026-10-11): `codex exec --model gpt-6.1-sol -c model_reasoning_effort=low -s workspace-write`, stdin closed. Land incremental changes, each measured.
 
-## Active task: Simplified enclosure (2026-10-12)
+## Active task: Enclosure revision after Dylan's review (2026-10-13)
 
-Dylan rejected Concept A for printing and assembly (tagged `archive/concept-a-enclosure`, deleted). The [simplified enclosure](hardware/enclosure/README.md) has nine printed parts, 719 mm² overhang against Concept A's 34,887, zero floating islands, and zero thin walls (E). All parts slice on the P1S without supports or warnings: 13.4 h and 500 g. Builders and verifiers were Sonnet 5.5 for this session (Dylan), with Codex at the design gate and the final review.
+Dylan found the assembly guide unreadable, part names unclear, and the Jetson modeled as a solid box. Fixed: the Jetson is a flat board with a heatsink block, held by its plastic strip in a vertical slot (slot coupon added); the servo takes 5 V from a Jetson USB port (H5, no regulator); the camera cable runs through holes in the head floor and roof (H6); the guide is 27 steps with a part glossary, generated from one list in `preview.py` into the viewer and [ASSEMBLY.md](hardware/enclosure/ASSEMBLY.md). Codex review passed. Builders are Sonnet 5.5; Codex gpt-6.1-sol reviews each change, and Dylan wants back-and-forth until Codex and the lead agree the design is ready.
 
-Next: Dylan prints the coupon plate, the hub with both bearings, and the horn disc on the real horn, then the full set ([assembly](hardware/enclosure/ASSEMBLY.md)). Physical fit, cooling, acoustics, and powered motion remain U ([edge cases](research/edge-cases.md)).
+Waiting on Dylan: the Jetson plastic strip thickness (`JETSON_STRIP_T`, 11.0 U) and whether the servo lead plugs into the adapter board face or edge (`BUS_FACE_GAP`, 2.0 U). Next: an independent walkthrough of the guide against the CAD, then a final Codex readiness review.
 
 ## Robot
 
@@ -30,4 +30,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md` and adjust clearances in `interface.py`, `body.py`, or `neck.py`.
+Apply Dylan's two measurements in `geometry.py`, rerun `body.py`, `head.py`, `coupons.py`, `bambu.py`, and `preview.py`, then run the final review. After the coupon print, record fit results in `hardware/enclosure/MEASUREMENTS.md`.

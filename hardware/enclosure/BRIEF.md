@@ -12,10 +12,10 @@ Dylan rejected Concept A for printing and assembly on 2026-10-12. It has too man
 ## Fixed inputs
 
 - Exterior: `hardware/enclosure/geometry.py` body and head envelopes (152 × 130 mm base, 128 × 110 mm shoulders at Z 160, head 116 × 80 × 56 mm at Z 180 to 236). Approved concept image and colors stay. Envelope stays at or under 148.6 × 127.2 × 236 mm.
-- Hardware reservations: `hardware/enclosure/geometry.py` (Jetson standing on edge, speaker, audio case, plug side, fan intake, outlet, camera, bus, regulator).
+- Hardware reservations: `hardware/enclosure/geometry.py` (Jetson standing on edge, speaker, audio case, plug side, fan intake, outlet, camera, bus).
 - Owned parts: two 15 × 24 × 5 mm bearings; M2 and M3 screws (4 to 16 mm) with nuts; STS3215 servo. No heat-set inserts.
 - Measured and sourced sizes: `hardware/enclosure/MEASUREMENTS.md` (camera 38 × 38 mm with a 15 mm lens holder, speaker 100 × 45 × 21 mm, servo horn holes).
-- Requirements: `hardware/DESIGN_REQUIREMENTS.md` (press-fit electronics with removable catches, port-side plug access, external camera cable loop, ±80° yaw with hard stops, cooling path, microphone holes).
+- Requirements: `hardware/DESIGN_REQUIREMENTS.md` (press-fit electronics with removable catches, port-side plug access, camera cable through the neck gap (H6), ±80° yaw with hard stops, cooling path, microphone holes).
 
 ## Proposed design
 
@@ -68,7 +68,7 @@ Service is the same steps in reverse.
 
 ### Head and camera
 
-The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (32.3 mm square, 2.6 mm holes). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a slot in the head's lower rear edge and runs outside the robot to a Jetson USB port.
+The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (32.3 mm square, 2.6 mm holes). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a 17 × 10 mm hole in the head floor, crosses the neck gap behind the hub, and enters the body through a matching roof hole. A 30 × 30 × 30 mm slack loop inside the body absorbs the ±80° turn, and the Jetson plug space below it leads to a USB port. The horn disc holds its nut with two 0.3 mm lips at the pocket mouth.
 
 ## Measured alternatives
 

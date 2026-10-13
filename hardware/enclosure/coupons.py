@@ -1,6 +1,8 @@
-"""Fit coupon plate for the first print: a hub-style and a corner-style M3 nut channel, and the
-four M2 camera posts at 32.3 mm on a 40 x 40 frame. Run with build/hardware-layout/venv/bin/python;
-it writes output/print/Coupons/coupon-plate.stl and asserts the printcheck numbers.
+"""Fit coupons for the first print. coupon-plate.stl has a hub-style and a corner-style M3 nut
+channel and the four M2 camera posts at 32.3 mm on a 40 x 40 frame. slot-coupon.stl is 15 mm of the
+Jetson slot: slide it onto the plastic strip of the real Jetson. Run with
+build/hardware-layout/venv/bin/python; it writes both STLs to output/print/Coupons/ and asserts the
+printcheck numbers.
 """
 
 import sys
@@ -10,14 +12,17 @@ HARDWARE = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(HARDWARE)]
 import printcheck  # noqa: E402
 from body import (  # noqa: E402
-    M3_CLEAR, NUT_AF, NUT_FLOOR, NUT_T, box, cyl, detent_ridges, hex_pocket, probe, to_print_mesh,
+    M3_CLEAR, NUT_AF, NUT_FLOOR, NUT_T, SLOT_GRIP, box, cyl, detent_ridges, hex_pocket, probe,
+    to_print_mesh,
 )  # fmt: skip
+from geometry import JETSON_STRIP_T, SLOT_GAP, SLOT_WALL  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "output" / "print" / "Coupons"
 PLATE_T, EDGE_Y = 3.2, 32.0  # plate thickness (the roof thickness); channel mouths sit at EDGE_Y
 SEAT, CHANNEL_H = 3.8, NUT_T + 0.4  # mouth to nut centre (hub and corner); channel height
 LENGTH = SEAT + 3.29 + 2.7  # block length: behind the pocket stays 2.7 mm thick
 PITCH, POST_D, POST_H, PILOT_D = 32.3, 7.0, 7.0, 1.7  # camera posts as in head.py
+SLOT_COUPON_H = 15.0  # height of the slot coupon
 # name: (block width, solid below the channel, blind hole depth above the nut); channel and
 # floor heights land on 0.2 mm layer boundaries
 BLOCKS = {"hub": (12.0, PLATE_T, 0.0), "corner": (10.6, PLATE_T + 3.2, 2.1)}
@@ -65,15 +70,42 @@ def check(plate):
             assert not probe(plate, sx * PITCH / 2, sy * PITCH / 2, PLATE_T + 3.0)  # camera pilot
 
 
-def main():
-    plate = build()
-    check(plate)
-    mesh = to_print_mesh(plate)
+def build_slot():
+    "The slot's U (back wall and two side walls, open at +X and top), 15 mm tall, on the bed."
+    width = JETSON_STRIP_T + 2 * SLOT_GAP
+    y = width / 2 + SLOT_WALL
+    blank = box(0, SLOT_WALL + SLOT_GAP + SLOT_GRIP, -y, y, 0, SLOT_COUPON_H)
+    open_end = blank.BoundingBox().xmax + 1
+    slot = box(SLOT_WALL, open_end, -width / 2, width / 2, -1, SLOT_COUPON_H + 1)
+    return blank.cut(slot)
+
+
+def check_slot(coupon):
+    "The slot is the strip's width plus 0.5 mm a side, with 3 mm walls all round."
+    mid = SLOT_WALL + SLOT_GAP + SLOT_GRIP / 2
+    half = JETSON_STRIP_T / 2 + SLOT_GAP
+    assert not probe(coupon, mid, half - 0.05, 7.0) and probe(coupon, mid, half + 0.05, 7.0)
+    assert probe(coupon, mid, half + SLOT_WALL - 0.05, 7.0)
+    assert not probe(coupon, mid, half + SLOT_WALL + 0.05, 7.0)
+    assert probe(coupon, SLOT_WALL - 0.05, 0, 7.0) and not probe(coupon, SLOT_WALL + 0.05, 0, 7.0)
+
+
+def export(solid, name):
+    mesh = to_print_mesh(solid)
     row = printcheck.analyze(mesh)
     assert row["floating_islands"] == 0 and row["thin_mm2"] == 0, row
     OUT.mkdir(parents=True, exist_ok=True)
-    mesh.export(OUT / "coupon-plate.stl")
-    print("coupon plate ok", [round(float(v), 1) for v in mesh.extents], row)
+    mesh.export(OUT / name)
+    print(name, "ok", [round(float(v), 1) for v in mesh.extents], row)
+
+
+def main():
+    plate = build()
+    check(plate)
+    export(plate, "coupon-plate.stl")
+    slot = build_slot()
+    check_slot(slot)
+    export(slot, "slot-coupon.stl")
 
 
 if __name__ == "__main__":

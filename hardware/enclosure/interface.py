@@ -2,6 +2,8 @@
 Assembly frame: X toward the Jetson ports, Y rearward, Z up, head yaw axis at X 0, Y 0.
 """
 
+from math import cos, radians, sin
+
 # Roof: part of the body shell. The neck enters through its center opening.
 ROOF_TOP_Z = 160.0
 ROOF_BOTTOM_Z = 156.8
@@ -19,6 +21,16 @@ SERVO_CASE_CENTER_XY = (-10.11, 0.0)  # output shaft on the yaw axis
 SERVO_CASE_TOP_Z = 148.0
 SERVO_HORN_TOP_Z = 154.0
 POCKET_CLEARANCE = 1.0  # each side and vertically; the pocket stops rotation only
+
+# Camera cable: it leaves the head through a hole in the head floor, crosses the neck gap behind
+# the hub, and enters the body through a hole in the roof. A USB-A plug overmold (16 x 9 mm, U)
+# passes both holes, which line up at yaw 0. Both are 45 degrees off the Y axis so no hole wall
+# is a flat bridge in print orientation.
+CABLE_R, CABLE_DEG = 32.0, 45.0  # polar position of both hole centers
+CABLE_XY = (CABLE_R * cos(radians(CABLE_DEG)), CABLE_R * sin(radians(CABLE_DEG)))
+CABLE_HOLE = (17.0, 10.0)  # the plug plus 1 mm; the long side is tangent to the yaw circle
+CABLE_FLARE = 1.0  # 46 degree chamfer on the rim the cable bends over
+CABLE_D = 4.5  # cable diameter
 
 # Head: its floor screws to the shaft flange with two M3 screws.
 HEAD_FLOOR_Z = 180.0

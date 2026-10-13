@@ -6,14 +6,14 @@ runs every check, and writes STLs, a STEP, the checks JSON, and two PNGs to outp
 import datetime
 import json
 import sys
-from math import atan2, degrees, radians, sqrt, tan
+from math import atan2, cos, degrees, radians, sin, sqrt, tan
 from pathlib import Path
 
 import cadquery as cq
 import matplotlib
 import numpy as np
 import trimesh
-from interface import HEAD_FLOOR_Z, HEAD_SCREWS_XY
+from interface import CABLE_DEG, CABLE_XY, HEAD_FLOOR_Z, HEAD_SCREWS_XY
 
 import neck
 
@@ -118,8 +118,11 @@ def head_shell():
     for xy in VISOR_SCREWS_XY:  # visor screws: hole and counterbore, reached from below the head
         solid = solid.cut(teardrop(1.7, xy, HEAD_Z0 - 1, CAVITY_Z0 + 1))
         solid = solid.cut(teardrop(3.2, xy, HEAD_Z0 - 1, HEAD_Z0 + VISOR_CB_DEPTH))
-    slot = neck.box(14, 8, CAVITY_Z0, CAVITY_Z0 + 7, (CAMERA_XZ[0], REAR_Y - WALL + 3))
-    return solid.cut(slot).clean()  # camera cable exit at the lower rear edge
+    return solid.cut(cable_hole()).clean()  # the camera cable leaves through the floor
+
+
+def cable_hole():
+    return neck.cable_hole(HEAD_Z0 - 1, CAVITY_Z0 + 1, HEAD_Z0, False)
 
 
 def standoff_xz():
@@ -283,9 +286,22 @@ def head_checks(parts, neck_parts):
         f"center Y {BOARD_FRONT_Y + BOARD_T / 2:.1f}, {-4 - BOARD_FRONT_Y - BOARD_T / 2:.1f} mm in "
         "front of the geometry.py position (X and Z unchanged)"
     )
-    assert not shell.isInside(cq.Vector(CAMERA_XZ[0], 38, CAVITY_Z0 + 3), 1e-3)
-    assert shell.isInside(cq.Vector(-5, 38, CAVITY_Z0 + 3), 1e-3)
-    out["cable slot"] = "14 x 7 mm notch through the rear wall at the floor, behind the camera"
+    hx, hy = CABLE_XY
+    ux, uy = -sin(radians(CABLE_DEG)), cos(radians(CABLE_DEG))  # tangent; the radial is (uy, -ux)
+    w, h = neck.CABLE_HOLE
+    for a, b in ((0, 0), (0.45, 0.45), (-0.45, 0.45), (0.45, -0.45), (-0.45, -0.45)):
+        x = hx + ux * a * w + uy * b * h  # points inside the hole, at the floor's mid height
+        y = hy + uy * a * w - ux * b * h
+        assert not shell.isInside(cq.Vector(x, y, HEAD_Z0 + FLOOR / 2), 1e-3)
+    rim = 1.0 + neck.CABLE_FLARE  # a ring 1 mm outside the flare is still solid floor
+    for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+        x = hx + ux * a * (w / 2 + rim) + uy * b * (h / 2 + rim)
+        y = hy + uy * a * (w / 2 + rim) - ux * b * (h / 2 + rim)
+        assert shell.isInside(cq.Vector(x, y, HEAD_Z0 + 0.3), 1e-3), (x, y)
+    out["cable hole"] = (
+        f"{w:.0f} x {h:.0f} mm through the floor at ({hx:.1f}, {hy:.1f}), 1 mm of floor all round "
+        "the 1 mm flare on the underside; it replaces the old rear slot"
+    )
     outside = shell.cut(head_envelopes()[0]).Volume()
     assert outside < 0.01 * shell.Volume()
     bb = shell.fuse(vis).BoundingBox()
