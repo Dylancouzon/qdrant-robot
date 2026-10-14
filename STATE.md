@@ -12,6 +12,8 @@ Human checks (live camera): hold a mug, ask "What is this?", show a different mu
 
 Next: "What am I holding?" and "a moment ago" recall (held-out misses). Physical latency by loopback is parked (D160); M4 still requires it.
 
+Parked ideas (Dylan, 2026-10-13; not now, rows in [research/lessons.md](research/lessons.md)): spill the oldest half of the conversation window into Qdrant Edge instead of dropping it, so "What did we talk about?" works an hour later; greet a returning visitor by name when the face match returns.
+
 ## Robot
 
 - Jetson: `ssh robot`; MAXN_SUPER, boot `938e1f9f` (rebooted 2026-10-12). Current release `64d7d3fbe413`; rollback target `54ce3b0eb510` (`previous`). A rollback renames the DINOv3 things shard aside and starts empty, so taught objects and visitor records must be made again. The robot runs as unit `qr-robot` when started from the Mac page: `python3 tools/talk.py --release 63f207bb5e03`, then open http://127.0.0.1:8765.
