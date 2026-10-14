@@ -38,6 +38,8 @@ Read this before you propose an experiment. Each avenue has one row; reopen one 
 | Floors from three direct questions | Supporting recall 12/18 to 5/18 (E) | Rejected | D98 |
 | Calibrated floors 0.53 / 0.55 | Controlled 22/32 to 30/32; integrated recorded audio 42 to 39/47 (J) | Rejected for runtime | D100–D108 |
 | Bounded evidence assembly (A/B contract) | Frozen, never built; the session moved to Granite | Open idea | D109, D110 |
+| Spill the oldest half of the conversation window into Qdrant Edge when it fills, instead of dropping it (idea from the Reachy demo: 1,000-token cap) | Not tried. Fits "What did we talk about?" an hour later; the 1,800 s baseline scored 0/24 on older-memory questions (J). Needs a design brief with two alternatives and a D127 decision (new writes) | Open idea (Dylan, 2026-10-13); not now | D96, D127 |
+| Greet a returning visitor by name when the face match comes back into view | Not tried. Face match and consent already exist; the greeting does not (Reachy demo idea). Must keep zero false identity claims on strangers | Open idea (Dylan, 2026-10-13); not now | `faces.md` |
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
 | Same-object color veto (mean Lab, middle half) | Same-object windows Delta E p50 11.3, p99 27.1; vetoes 38% of lookalike windows; lightness alone 5.6% (E). Never fired live: the failing question lacked a past cue, and recognition shows the same shape bias | Parked (Dylan); retest in better light | D169; `bench/color_pairs.py` |
