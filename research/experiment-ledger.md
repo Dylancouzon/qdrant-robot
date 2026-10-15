@@ -8,7 +8,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 | --- | --- | --- | --- |
 | Qwen3-VL-2B on llama.cpp | 39/47 recorded judged, 29 tok/s, 1.59 s first WAV p50 (J) | Current brain | D27, D35, Gemma full stack |
 | Qwen3-VL-4B | 29/39 and 37/47 vs 2B 32/39 and 41/47; leaves 190 MB, swaps about 900 MB (J) | Rejected until RAM frees | D27, D35, D66, D68 |
-| Qwen3.5-2B / 4B | 24/39; recurrent layers defeat prefix caching (1.63 s first token). 4B OOM at load (J) | Rejected | D27 |
+| Qwen3.5-2B / 4B | Historical visual score: 24/39 in D27, 25/39 in its sidecar; recurrent layers lost prefix reuse. The current pipeline scored 6/18 dialogue and 2/6 transfer, with response-overlapping paging (J). 4B OOMed at load (J) | Rejected again on the current pipeline | D27; [conversation comparison](conversation.md) |
 | Gemma 4 E2B omni on llama.cpp | 14/21 then 26/39; weak sight (stop sign called a rack); 3.5 GB (J) | Rejected | D22, D29 |
 | Gemma 3 4B, LFM2-VL-3B, MiniCPM-V 4 | Out of memory, or image tiling overflows 2K context | Rejected | D30, D74 |
 | Gemma E2B LiteRT 0.18 (Vulkan) | Screen 9/12 (J) vs WSL Qwen 7/12 (E); full stack 31/47 vs 39/47, first WAV 4.9 s p50 (J) | Rejected | Gemma full stack; `archive/gemma-fit.md`; `bench/results/2026-10-10-gemma-full-stack.json` |
@@ -31,6 +31,9 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
+| Preserve nonvisual replies across scene changes | Actual generated Jetson conversations fell from 7/18 to 6/18 judged passes across six topics. Useful source invalidation checks passed, but replies became repetitive (J) | Rejected | `bench/results/2026-10-15-conversation-baseline-replay-1792104230.jsonl`; `bench/results/2026-10-15-conversation-candidate-replay-1792104457.jsonl`; `archive/conversation-history.patch` |
+| Usefulness-first system instruction | Development rose from 7/18 to 9/18 judged passes, but transfer fell from 2/6 to 1/6. It also lost a corrected indoor preference (J) | Rejected | `bench/results/2026-10-15-conversation-prompt-replay-1792105173.jsonl`; `bench/results/2026-10-15-conversation-transfer-prompt-replay-1792105381.jsonl`; `archive/conversation-prompt.patch` |
+| Two counted spoken statements, with captions kept at one | Judged development rose from 7/18 to 12/18, transfer stayed 2/6, and a new reply violated an indoor preference (J). The 64-token budget and caption limit remained unchanged | Rejected; recorded judged 44/47 and speech 46/47 did not reverse the correction failure | `conversation.md`; `archive/conversation-budget.patch` |
 | Stored frame in every recall prompt | 2B blended past and present ("the cat is still sleeping") | Rejected; captions instead | D25 |
 | Recent captions in every prompt | Pulled the 2B to the previous scene | Rejected; past-tense gate | D27 |
 | Retrieval into the brain ("one voice") | 34 vs 41/74, then 38 vs 44/74 (J) | Rejected twice; patch saved | D73, D75; `archive/one-voice.patch` |

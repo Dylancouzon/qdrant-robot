@@ -2546,3 +2546,150 @@
 {"key": "9673c0967c391c05", "pass": false, "why": "Does not identify teddy bears now and apples before.", "votes": [false, false, false]}
 {"key": "920ccb238bd1689d", "pass": true, "why": "Greets the visitor warmly by name.", "votes": [true, true, true]}
 {"key": "fa118d1b1690cffb", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "368918a9f8b53c69", "pass": false, "why": "Offers no meal idea.", "votes": [false, false, false]}
+{"key": "378fc70c54cf4f78", "pass": false, "why": "Gives no practical way to cook dinner.", "votes": [false, false, false]}
+{"key": "8f2b089808a49654", "pass": false, "why": "Does not acknowledge the eggs-and-rice dinner.", "votes": [false, false, false]}
+{"key": "61ef9bb8179acfc0", "pass": true, "why": "Suggests sensible flavor additions.", "votes": [true, true, true]}
+{"key": "31a468be1fa3319b", "pass": false, "why": "Continues dinner planning instead of addressing the talk.", "votes": [false, false, false]}
+{"key": "0aff519fa973a01b", "pass": true, "why": "Suggests brief speech practice.", "votes": [true, true, true]}
+{"key": "def1c8a20aee6a10", "pass": true, "why": "Suggests quieter places to explore.", "votes": [true, true, true]}
+{"key": "6cc0556f020b1523", "pass": true, "why": "Suggests inexpensive ways to explore.", "votes": [true, true, true]}
+{"key": "5b4a1700f752a5de", "pass": false, "why": "Suggests no indoor activity.", "votes": [false, false, false]}
+{"key": "9f0ac9f087c47a62", "pass": true, "why": "Suggests indoor stops suited to an hour.", "votes": [true, true, true]}
+{"key": "f94e23d3fe98c5d2", "pass": false, "why": "Falsely claims plants came up earlier.", "votes": [false, false, false]}
+{"key": "bbc64c7597c56e22", "pass": true, "why": "Suggests reminders for watering plants.", "votes": [true, true, true]}
+{"key": "03cfa6a5dd699673", "pass": false, "why": "Does not address the difficulty changing chords.", "votes": [false, false, false]}
+{"key": "8a80b2be1819b4a1", "pass": false, "why": "Offers reassurance but no practice method.", "votes": [false, false, false]}
+{"key": "961b0e820eaba75e", "pass": false, "why": "Does not address the five-minute limit.", "votes": [false, false, false]}
+{"key": "8cd56eaa0e5e9332", "pass": true, "why": "Suggests focused, slow chord practice.", "votes": [true, true, true]}
+{"key": "f3d857bc3ba8ec37", "pass": false, "why": "Suggests no genre and asks no preference question.", "votes": [false, false, false]}
+{"key": "9f64ca9f1c1719bc", "pass": false, "why": "Gives no useful comparison or clarification.", "votes": [false, false, false]}
+{"key": "3ac3767b2072e842", "pass": true, "why": "Suggests a stovetop approach for the dinner.", "votes": [true, true, true]}
+{"key": "57fcb414b7f6bbb2", "pass": true, "why": "Accepts the correction and refers to the available ingredients.", "votes": [true, true, false]}
+{"key": "8d9083887c062c1a", "pass": true, "why": "Suggests sensible seasonings for eggs and rice.", "votes": [true, true, true]}
+{"key": "8fbcce21545b3157", "pass": true, "why": "Responds to the visitor's nerves about speaking.", "votes": [true, true, true]}
+{"key": "ca5ff343c669c69d", "pass": false, "why": "Claims the visitor is already doing the suggested action.", "votes": [false, false, false]}
+{"key": "60379e6f21ede4d5", "pass": false, "why": "Offers no way to reduce the outing's cost.", "votes": [false, false, false]}
+{"key": "5cbd07d2ae00abf0", "pass": true, "why": "Accepts the indoor preference and suggests a cafe.", "votes": [true, true, true]}
+{"key": "51f8a4fec2e48e03", "pass": false, "why": "Does not adapt the outing to one hour.", "votes": [false, false, false]}
+{"key": "cc9e58d7d568887f", "pass": false, "why": "Continues travel planning instead of addressing houseplants.", "votes": [false, false, false]}
+{"key": "196d0f8e8cf51f4e", "pass": false, "why": "Gives travel commentary instead of a plant-care habit.", "votes": [false, false, false]}
+{"key": "02d71d0c3a0c15c2", "pass": false, "why": "Offers no practice method or way to reduce frustration.", "votes": [false, false, false]}
+{"key": "a1c44276e31834a6", "pass": false, "why": "Does not acknowledge the five-minute limit.", "votes": [false, false, false]}
+{"key": "bdc2ca53f01013f0", "pass": false, "why": "Suggests no focus for the five-minute session.", "votes": [false, false, false]}
+{"key": "c0963f9581c3ca0c", "pass": false, "why": "Suggests no genre and asks no useful question.", "votes": [false, false, false]}
+{"key": "8cfbf13b72aa3627", "pass": false, "why": "Explains no difference and asks for no clarification.", "votes": [false, false, false]}
+{"key": "783388e70c8f0d43", "pass": false, "why": "Invents a workspace and gives no practical starting step.", "votes": [false, false, false]}
+{"key": "36ebbb83de8634d0", "pass": false, "why": "Gives no way to prevent clutter from returning.", "votes": [false, false, false]}
+{"key": "e209eaa1e9ae0fc8", "pass": false, "why": "Acknowledges sharing but offers neither advice nor a useful question.", "votes": [false, false, false]}
+{"key": "20cdafd42a765588", "pass": false, "why": "Repeats an unsupported scene description instead of adapting the advice.", "votes": [false, false, false]}
+{"key": "c3a63c703f3ef744", "pass": true, "why": "Suggests useful beginner phrases for the trip.", "votes": [true, true, true]}
+{"key": "71d36af834374251", "pass": true, "why": "Suggests a manageable daily language-learning habit.", "votes": [true, true, true]}
+{"key": "71e0842917c98750", "pass": true, "why": "Suggests vegetables, seasoning, and a one-pot approach.", "votes": [true, true, true]}
+{"key": "9d10f893b6480259", "pass": true, "why": "Suggests cooking the rice and chickpeas on a stovetop.", "votes": [true, true, true]}
+{"key": "fb1d28ddfafba23d", "pass": false, "why": "Ignores the correction and still suggests chickpeas.", "votes": [false, false, false]}
+{"key": "5a2a514847433ba6", "pass": true, "why": "Suggests herbs, spices, and lemon for the meal.", "votes": [true, true, true]}
+{"key": "9f7913059a2e5ef1", "pass": true, "why": "Offers brief support about feeling nervous.", "votes": [true, true, true]}
+{"key": "a23efba14ace17bb", "pass": true, "why": "Suggests rehearsing before the talk.", "votes": [true, true, true]}
+{"key": "fd71c698558d7bd1", "pass": true, "why": "Suggests quieter places to explore.", "votes": [true, true, true]}
+{"key": "65d76f6900f3d267", "pass": false, "why": "Gives no way to reduce the outing's cost.", "votes": [false, false, false]}
+{"key": "59b5669a5e0cdde4", "pass": false, "why": "Suggests no indoor activity for the city visit.", "votes": [false, false, false]}
+{"key": "bb035b17e7b9f1fb", "pass": false, "why": "Suggests outdoor activities despite the indoor preference.", "votes": [false, false, false]}
+{"key": "04be778967a274a3", "pass": false, "why": "Continues the weather topic without a useful watering habit.", "votes": [false, false, false]}
+{"key": "cb6fb14fb12b1ff7", "pass": true, "why": "Suggests reminders for watering the plants.", "votes": [true, true, true]}
+{"key": "f11f68f3ae71e7a9", "pass": true, "why": "Encourages the beginner about learning chords.", "votes": [true, true, true]}
+{"key": "3b70c6a0722e6298", "pass": false, "why": "Offers sympathy but no manageable practice method.", "votes": [false, false, false]}
+{"key": "92cb771c517b74ac", "pass": false, "why": "Does not address the five-minute limit.", "votes": [false, false, false]}
+{"key": "54173bb9ae638ed4", "pass": true, "why": "Focuses the short session on a simple chord progression.", "votes": [true, true, true]}
+{"key": "f4037c58d2d5d295", "pass": false, "why": "Suggests another mystery instead of a different kind of book.", "votes": [false, false, false]}
+{"key": "96c1ada79fd1a16d", "pass": false, "why": "Gives no useful distinction or clarification.", "votes": [false, false, false]}
+{"key": "f5395c6b5904bac7", "pass": false, "why": "Offers no practical starting step.", "votes": [false, false, false]}
+{"key": "56591c2416e0e4fe", "pass": false, "why": "Offers no way to prevent clutter.", "votes": [false, false, false]}
+{"key": "0209525561450dbe", "pass": false, "why": "Acknowledges sharing but offers neither advice nor a useful question.", "votes": [false, false, false]}
+{"key": "8d7874c0654e89aa", "pass": false, "why": "Offers no practical suggestion for the shared desk.", "votes": [false, false, false]}
+{"key": "3b719331fa8bdd20", "pass": true, "why": "Switches topics and asks which language.", "votes": [true, true, true]}
+{"key": "3dca92dda6055d83", "pass": false, "why": "Offers neither a daily habit nor a clarification question.", "votes": [false, false, false]}
+{"key": "2b69a61f76a1ef5d", "pass": true, "why": "Suggests a simple rice and chickpea dish with spices.", "votes": [true, true, true]}
+{"key": "392bc78ce8354d76", "pass": true, "why": "Gives a stove-based approach using rice and chickpeas.", "votes": [true, true, true]}
+{"key": "bb7ececdacfba045", "pass": true, "why": "Accepts eggs and rice without requiring chickpeas.", "votes": [true, true, true]}
+{"key": "b74cbf41894d6148", "pass": true, "why": "Suggests sensible additions for the eggs and rice.", "votes": [true, true, true]}
+{"key": "512dad5ec30e3afc", "pass": false, "why": "Continues dinner advice instead of addressing the talk.", "votes": [false, false, false]}
+{"key": "320e5898b7633bd1", "pass": true, "why": "Offers practical preparation before the talk.", "votes": [true, true, true]}
+{"key": "9469128dfb88f96b", "pass": true, "why": "Suggests quiet places and asks a relevant question.", "votes": [true, true, true]}
+{"key": "3aae34a2bc4e2f61", "pass": true, "why": "Suggests inexpensive ways to explore the city.", "votes": [true, true, true]}
+{"key": "7ce3b4e9e4b4f165", "pass": true, "why": "Suggests indoor places despite also mentioning a park.", "votes": [true, true, true]}
+{"key": "29357c9146d256f5", "pass": false, "why": "Suggests a park after the visitor chose to stay indoors.", "votes": [false, false, true]}
+{"key": "f1c9aa0abcb711cc", "pass": false, "why": "Suggests checking now without addressing the recurring problem.", "votes": [false, true, false]}
+{"key": "9fa6d2eed23a63d9", "pass": true, "why": "Suggests reminders for watering the houseplants.", "votes": [true, true, true]}
+{"key": "2ab7edd6dc3a6066", "pass": true, "why": "Encourages patience with difficult chord changes.", "votes": [true, true, true]}
+{"key": "caeb868c89deedd0", "pass": true, "why": "Suggests slow practice on one chord change.", "votes": [true, true, true]}
+{"key": "b8a7da697364f769", "pass": false, "why": "Does not adapt the advice to five-minute sessions.", "votes": [false, false, false]}
+{"key": "0a2e91036ebfb6b3", "pass": true, "why": "Suggests slow, focused practice when time is short.", "votes": [true, true, true]}
+{"key": "30283009e65645de", "pass": false, "why": "Continues music advice instead of discussing books.", "votes": [false, false, false]}
+{"key": "4e35f5b760451efd", "pass": false, "why": "Neither compares book genres nor clarifies the ambiguous suggestion.", "votes": [false, false, false]}
+{"key": "3665f1d908018eb4", "pass": false, "why": "Invents visible objects and offers no desk organization step.", "votes": [false, false, false]}
+{"key": "de3d790066cdc714", "pass": false, "why": "Resets the conversation by claiming it cannot recall the topic.", "votes": [false, false, true]}
+{"key": "3e3e5b6f4420c3f9", "pass": false, "why": "Acknowledges sharing but offers no advice or useful question.", "votes": [false, false, false]}
+{"key": "61b15067413c3f4c", "pass": false, "why": "Repeats unrelated advice and invents visible objects.", "votes": [false, false, false]}
+{"key": "6380cf6fda34541e", "pass": true, "why": "Suggests flashcards for beginner language learning.", "votes": [true, true, true]}
+{"key": "eb610193f3afefc8", "pass": true, "why": "Suggests a daily reminder and manageable vocabulary practice.", "votes": [true, true, true]}
+{"key": "6e16713a7d1262c2", "pass": true, "why": "Identifies a stop sign.", "votes": [true, true, true]}
+{"key": "7cbd10c7d35c16b3", "pass": true, "why": "Recalls the stop sign.", "votes": [true, true, true]}
+{"key": "66c77234782df271", "pass": true, "why": "Identifies a motorcycle.", "votes": [true, true, true]}
+{"key": "0626dd31fae133f3", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "3d5943d90b58ae7b", "pass": true, "why": "Identifies the cat on a pink blanket.", "votes": [true, true, true]}
+{"key": "40851540587db34c", "pass": true, "why": "Describes the room without claiming the cat remains.", "votes": [true, false, true]}
+{"key": "9c4f65793ac9e9cf", "pass": true, "why": "Says it cannot remember yesterday.", "votes": [true, true, true]}
+{"key": "8c891ec59381a5c9", "pass": true, "why": "Identifies a stop sign image on the left.", "votes": [true, true, true]}
+{"key": "ddc1329df1a2ab05", "pass": true, "why": "Greets Dylan and responds to his interest in espresso.", "votes": [true, true, true]}
+{"key": "9a4a03f34076ab40", "pass": true, "why": "Recalls espresso.", "votes": [true, true, true]}
+{"key": "ddbfa343761a708c", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "f212d407f19ad583", "pass": true, "why": "Gives route 15.", "votes": [true, true, true]}
+{"key": "cad5df1e98321e82", "pass": true, "why": "Counts two planes.", "votes": [true, true, true]}
+{"key": "dc548681ef518e0e", "pass": true, "why": "Identifies Sydney.", "votes": [true, true, true]}
+{"key": "7cbe0a2abc41f361", "pass": true, "why": "Identifies green apples.", "votes": [true, true, true]}
+{"key": "53e292ad0ed50013", "pass": false, "why": "Invents a second bus; the first image showed apples.", "votes": [false, false, false]}
+{"key": "5a0dd388a79c8bba", "pass": true, "why": "Recalls apples as the first item.", "votes": [true, true, true]}
+{"key": "77096a66067c608a", "pass": true, "why": "Recalls the bus as the second item.", "votes": [true, true, true]}
+{"key": "5e199cec1f9ebf16", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "e02d9aa4652d91bd", "pass": true, "why": "Identifies zebras.", "votes": [true, true, true]}
+{"key": "4fe2691e3e01e843", "pass": true, "why": "Identifies stand-up paddleboarding.", "votes": [true, true, true]}
+{"key": "fd783398f3eb29bc", "pass": true, "why": "Identifies a phone.", "votes": [true, true, true]}
+{"key": "b3bc88c57329d7c6", "pass": true, "why": "Says Hello Kitty.", "votes": [true, true, true]}
+{"key": "90eb70b37006cde8", "pass": true, "why": "Identifies an Apple computer.", "votes": [true, true, true]}
+{"key": "945bcaf45a7648c7", "pass": true, "why": "Identifies a cake with berries.", "votes": [true, true, true]}
+{"key": "948de1c07053a5c3", "pass": true, "why": "Says there is a bookshelf.", "votes": [true, true, true]}
+{"key": "e45ff1e875526e32", "pass": true, "why": "Places Qdrant Edge shards on the robot's disk.", "votes": [true, true, true]}
+{"key": "bf930a1d325e5ae5", "pass": true, "why": "Responds conversationally to the visitor.", "votes": [true, true, true]}
+{"key": "33ece7a4fdd67803", "pass": true, "why": "Says Paris.", "votes": [true, true, true]}
+{"key": "fe28d688426f2e4a", "pass": true, "why": "Recalls Berlin.", "votes": [true, true, true]}
+{"key": "8cadb93eb2d86516", "pass": true, "why": "Suggests the person is enjoying the waves.", "votes": [true, true, true]}
+{"key": "3a6506e6aa1e9f74", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "bee04dcc9f03ccd3", "pass": true, "why": "Recalls stuffed animals.", "votes": [true, true, true]}
+{"key": "e2c17813ae7b2218", "pass": false, "why": "Claims the teddy bears are still there.", "votes": [false, false, false]}
+{"key": "148caeaddab3552a", "pass": true, "why": "Responds about the green apples.", "votes": [true, true, true]}
+{"key": "6a1869856eedbb16", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}
+{"key": "d3d4be05f661acbe", "pass": false, "why": "Offers no meal idea.", "votes": [false, false, false]}
+{"key": "e76cc98ed7e7d139", "pass": true, "why": "Suggests cooking rice and chickpeas on the stove.", "votes": [true, true, true]}
+{"key": "8f956579357ec3bd", "pass": true, "why": "Accepts eggs and rice for tonight without requiring chickpeas.", "votes": [true, true, true]}
+{"key": "60a77294f410fe76", "pass": false, "why": "Gives no addition and falsely claims to lack context.", "votes": [false, false, false]}
+{"key": "0a8a86a62c17ae60", "pass": false, "why": "Continues dinner planning instead of addressing the talk.", "votes": [false, false, false]}
+{"key": "028b442dfc1574bf", "pass": false, "why": "Invents past nervousness about dinner planning.", "votes": [false, false, false]}
+{"key": "c394a0ef10bd355f", "pass": true, "why": "Suggests quiet outdoor activities without inventing a city.", "votes": [true, true, true]}
+{"key": "56262b94c9231b24", "pass": true, "why": "Walking is a sensible way to reduce outing costs.", "votes": [true, true, true]}
+{"key": "b92b8a672a3ac0b2", "pass": false, "why": "Accepts staying indoors but offers no indoor activity.", "votes": [true, false, false]}
+{"key": "5d44482f061b24c3", "pass": false, "why": "Gives no one-hour indoor plan.", "votes": [false, false, false]}
+{"key": "4df4b8f001e16899", "pass": false, "why": "Gives no plant advice or relevant question.", "votes": [false, false, false]}
+{"key": "72724ee8b15dc5d7", "pass": false, "why": "Gives no habit or reminder and misstates the conversation.", "votes": [false, false, false]}
+{"key": "575b25ac27b58da1", "pass": true, "why": "Offers beginner practice advice without claiming to see a guitar.", "votes": [true, true, true]}
+{"key": "0e39072bc98aac08", "pass": false, "why": "Gives no chord practice advice and adds unrelated camera commentary.", "votes": [false, false, false]}
+{"key": "43d596e12d1de279", "pass": true, "why": "Adapts chord practice to brief weekday sessions.", "votes": [true, true, true]}
+{"key": "07999d5580405486", "pass": false, "why": "Suggests no focused use of the five minutes.", "votes": [false, false, false]}
+{"key": "18fce73366a02648", "pass": false, "why": "Ignores reading and describes an unrelated image.", "votes": [false, false, false]}
+{"key": "f17eafbd3b5b2b59", "pass": false, "why": "Neither clarifies the book type nor explains a difference.", "votes": [false, false, false]}
+{"key": "83586bdf9aeada97", "pass": true, "why": "Suggests a practical storage step without claiming to see the desk.", "votes": [true, true, true]}
+{"key": "b165b1266fc73615", "pass": false, "why": "Falsely promises the desk will never get messy again.", "votes": [false, false, false]}
+{"key": "26d414a8065ec642", "pass": true, "why": "Suggests separating items for a shared desk.", "votes": [true, true, true]}
+{"key": "308399356df20044", "pass": false, "why": "Falsely promises the shared desk will never get messy again.", "votes": [false, false, false]}
+{"key": "095e76d88eac6539", "pass": false, "why": "Claims the visitor has memories showing facts about Qdrant Edge.", "votes": [false, false, false]}
+{"key": "54dcc48650d4bc54", "pass": false, "why": "Suggests reminders every 10 minutes, rather than daily practice.", "votes": [false, false, false]}

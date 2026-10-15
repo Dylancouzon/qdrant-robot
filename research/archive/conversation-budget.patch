@@ -1,0 +1,131 @@
+diff --git a/robot/brain.py b/robot/brain.py
+index 29bfe89..807b721 100644
+--- a/robot/brain.py
++++ b/robot/brain.py
+@@ -42,14 +42,14 @@ MODEL = "qwen3vl-2b"
+ _SENTENCE = re.compile(r"[^.!?]+[.!?](?=\s|$)")
+ IMAGE_WIDTH = 672   # frames are downscaled before encoding; the server caps tokens anyway
+ MAX_TOKENS = 64
+-MAX_SENTENCES = 1   # one sentence: second sentences were where hedges and stale details crept in
++MAX_SENTENCES = 2   # spoken replies; captions keep one counted statement
+ MIN_WORDS = 6       # shorter sentences ("Of course!", "I see it now.") do not count
+ SYSTEM = (
+     "You are Edgy, a small robot built by Qdrant. Everything you do runs on the Jetson "
+     "board inside you: hearing, seeing, thinking, speaking, and your memory, which is "
+     "Qdrant Edge. You see through a wide camera; left and right mean the left and right "
+     "parts of the image.\n"
+-    "Answer in one short spoken sentence: no lists, no markdown, no emojis. "
++    "Answer in one or two short spoken sentences: no lists, no markdown, no emojis. "
+     "Answer the question directly, starting with the answer itself, never with filler such "
+     "as 'great question'; do not describe the whole scene unless asked. "
+     "When the visitor tells you something about themselves, reply to that, warmly, "
+@@ -194,12 +194,12 @@ class Brain:
+         with urllib.request.urlopen(req, timeout=10) as r:
+             return len(json.load(r)["tokens"])
+ 
+-    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
+-               ) -> Iterator[str]:
+-        """Stream the answer text, at most MAX_SENTENCES sentences and `max_tokens` tokens.
++    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = "",
++               max_sentences: int = MAX_SENTENCES) -> Iterator[str]:
++        """Stream the answer text, at most max_sentences counted statements and `max_tokens` tokens.
+         Closing the generator early stops generation; `prior` resumes it: the answer so far,
+         as an assistant prefill, counts against `max_tokens`."""
+-        if sentences(prior) >= MAX_SENTENCES:  # paused right after the last sentence
++        if sentences(prior) >= max_sentences:  # paused right after the last sentence
+             return
+         if prior:
+             msgs = msgs + [{"role": "assistant", "content": prior}]
+@@ -211,7 +211,7 @@ class Brain:
+             for delta in unecho(prior, _content(r)):
+                 yield delta
+                 text += delta
+-                if sentences(text) >= MAX_SENTENCES:
++                if sentences(text) >= max_sentences:
+                     return
+ 
+     def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
+@@ -219,7 +219,7 @@ class Brain:
+         is evidence of what was seen; None if `stop` interrupts it."""
+         msgs = [{"role": "user", "content": [image, {"type": "text", "text": CAPTION}]}]
+         text = ""
+-        for delta in self.answer(msgs, max_tokens=48):
++        for delta in self.answer(msgs, max_tokens=48, max_sentences=1):
+             if stop():
+                 return None
+             text += delta
+diff --git a/robot/test_brain.py b/robot/test_brain.py
+new file mode 100644
+index 0000000..76eafbb
+--- /dev/null
++++ b/robot/test_brain.py
+@@ -0,0 +1,69 @@
++"""Reply length and decode resume retain the same total token budget."""
++import contextlib
++import json
++
++import pytest
++
++from robot.brain import Brain, MAX_TOKENS
++
++FIRST = "Here is a useful first reply."
++SECOND = "Here is another useful detail for you."
++THIRD = "This last sentence must never be spoken."
++
++
++def streamed(parts):
++    return [b"data: " + json.dumps({"choices": [{"delta": {"content": part}}]}).encode()
++            for part in parts]
++
++
++def test_reply_stops_after_two_complete_statements():
++    brain = Brain.__new__(Brain)
++    requests = []
++
++    @contextlib.contextmanager
++    def post(body):
++        requests.append(body)
++        yield streamed([FIRST, " ", SECOND, " ", THIRD])
++
++    brain._post = post
++    assert "".join(brain.answer([])) == FIRST + " " + SECOND
++    assert requests[0]["max_tokens"] == MAX_TOKENS
++
++
++def test_resume_finishes_the_second_statement_with_the_remaining_budget():
++    brain = Brain.__new__(Brain)
++    requests = []
++    brain.tokens = lambda text: len(text.split())
++
++    @contextlib.contextmanager
++    def post(body):
++        requests.append(body)
++        yield streamed([FIRST, " ", SECOND, " ", THIRD])
++
++    brain._post = post
++    assert "".join(brain.answer([], prior=FIRST)) == " " + SECOND
++    assert requests[0]["max_tokens"] == MAX_TOKENS - len(FIRST.split())
++    assert requests[0]["messages"][-1] == {"role": "assistant", "content": FIRST}
++    requests.clear()
++    assert list(brain.answer([], prior=FIRST + " " + SECOND)) == []
++    assert not requests, "a completed reply must not start another decode"
++
++
++def test_resume_never_exceeds_its_total_token_budget():
++    brain = Brain.__new__(Brain)
++    brain.tokens = lambda text: MAX_TOKENS
++    brain._post = lambda body: pytest.fail("decode started with no token budget remaining")
++    assert list(brain.answer([], prior=FIRST)) == []
++
++
++def test_captions_keep_their_one_statement_limit():
++    brain = Brain.__new__(Brain)
++    requests = []
++
++    def answer(msgs, **limits):
++        requests.append(limits)
++        yield "Main object: a cup."
++
++    brain.answer = answer
++    assert brain.caption({}, lambda: False) == "Main object: a cup."
++    assert requests == [{"max_tokens": 48, "max_sentences": 1}]

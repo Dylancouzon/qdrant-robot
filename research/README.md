@@ -8,6 +8,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Operating rules, reviews, evaluation, deployment, and recovery | [Workflow](workflow.md) |
 | Previous experiments and failure pitfalls | [Lessons index](lessons.md) |
 | Current tasks and known gaps | [Remaining work](edge-cases.md#current-priorities-after-the-project-review-2026-10-15) |
+| General conversation and cross-topic evaluation | [Conversation](conversation.md) |
 | Monitor, audio controls, and session lifecycle | [Robot interface](mac-audio-interface.md) |
 | Focus, overlays, and visitor interaction | [Booth behavior](booth-ux.md) |
 | Detector models and preprocessing | [Detector](detector.md) |

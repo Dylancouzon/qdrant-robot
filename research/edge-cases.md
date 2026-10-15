@@ -8,7 +8,7 @@ The review covered runtime and thread ownership, speech, tracking, recognition, 
 
 | Order | Remaining task | Finish when |
 | --- | --- | --- |
-| One | Improve held-object answers and recent recall. The latest recorded development replay scored 43/47 judged answers and 44/47 keyword checks; the earlier recall replay scored 16/21 (J). | Use held-object clips, rather than chair-dominated composites. Compare answer judgments and supplied evidence before changing runtime behavior. |
+| One | Improve general conversation, including held-object answers and recent recall. The [cross-topic comparison](conversation.md) found no qualifying change. | Measure useful follow-ups, corrections, and topic changes across varied dialogues. Use held-object clips for visual claims, and compare answers with supplied evidence before changing runtime behavior. |
 | Two | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
 | Three | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
 | Four | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
@@ -26,6 +26,8 @@ Injected transcription and answer-worker exceptions reproduced incomplete queue 
 The full Jetson probe passed a typed question with synthesized speech and both injected failures with isolated memories (J). Failures reached the caller within 0.17 s, and shutdown took about 0.72 s. Each subsequent case reopened the same test memory folder. Evidence: [worker-failure results](../bench/results/2026-10-15-worker-failure-1792101431.jsonl). Run `python -m bench.worker_failure --revision SHA` through `tools/jetson.py` to reproduce it.
 
 The original live listening incident has no confirmed traceback. A native call that stops returning needs separate diagnosis if the stall returns. Automatic worker recovery remains outside this fix.
+
+Dylan reported that the subsequent live tests passed on 2026-10-15, after reconnecting the USB speaker/microphone and restarting the session.
 
 The [task review](../reviews/20261015-175840-62876-review.md) carries three caller-cleanup gaps under D71:
 

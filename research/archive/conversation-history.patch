@@ -1,0 +1,168 @@
+diff --git a/robot/brain.py b/robot/brain.py
+index 29bfe89..494f570 100644
+--- a/robot/brain.py
++++ b/robot/brain.py
+@@ -156,7 +156,8 @@ def messages(history: list[dict], now: dict | None, memories: list[str] = (), fa
+         note = (CHANGED if changed and history else "") + (PAST if past else "")
+         lead = EVIDENCE if memories or told else ""
+         content.append({"type": "text", "text": f"{lead}{text}{note}Visitor: {question}"})
+-    return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
++    dialogue = [{"role": m["role"], "content": m["content"]} for m in history]
++    return [{"role": "system", "content": SYSTEM}, *dialogue, {"role": "user", "content": content}]
+ 
+ 
+ class Brain:
+diff --git a/robot/main.py b/robot/main.py
+index c6e5cfe..b151ad5 100644
+--- a/robot/main.py
++++ b/robot/main.py
+@@ -175,6 +175,7 @@ class Turn:
+     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
+     ui_evidence: list[dict] = field(default_factory=list)  # readable sources, never logged
+     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
++    view_dependent: bool = False  # this answer can become stale when the current view changes
+     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
+     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
+     prompt: list = field(default_factory=list)  # the brain's messages without images or system
+@@ -1099,9 +1100,12 @@ class Robot:
+         changed = self.last_frame is not None and (
+             objects != self.last_objects if objects or self.last_objects else
+             scene_change(self.last_frame, shot[0]) > SCENE_CHANGE)
+-        # After the view changes, the brain's earlier answers describe a scene that is gone: keep
+-        # only what the visitor said, which a 2B brain otherwise trusts over the image (D27).
+-        history = [m for m in self.history if m["role"] == "user"] if changed else self.history
++        # Remove old visual claims permanently, while keeping ordinary dialogue (D27).
++        # Untagged replies are conservatively treated as visual.
++        if changed:
++            self.history = [m for m in self.history if m["role"] != "assistant"
++                            or not m.get("view_dependent", True)]
++        history = self.history
+         look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history,
+                     objects)
+         self.brain.prefill(brain.messages(history, look.image))
+@@ -1213,6 +1217,7 @@ class Robot:
+         then a same-object comparison of crops, then what the selected earlier look showed (which
+         alone decides the path: its answer, or the brain with its Memories line), then stored
+         shown objects and sightings."""
++        turn.view_dependent = True  # identity, actions, crops, and sightings can use the live view
+         if not turn.visitor:
+             self._resolve_visitor(turn, now)
+         if answer := self._deletion_answer(turn) or self._confirmation_answer(turn):
+@@ -1223,9 +1228,13 @@ class Robot:
+         if answer := self._same_answer(turn, held):
+             return answer
+         if selected := earlier_view(turn.question, self.looked, look, differs):
++            turn.view_dependent = False  # the answer explicitly describes an earlier observation
+             return self._look_back(turn, selected, memories)
+-        return shown(turn.question, recalled, lambda m: brain.age(turn.speech_start - m["ts"])
+-                     ) or self._sighted(turn)
++        if answer := shown(turn.question, recalled,
++                           lambda m: brain.age(turn.speech_start - m["ts"])):
++            turn.view_dependent = False
++            return answer
++        return self._sighted(turn)
+ 
+     def _turn(self, turn: Turn, shot: tuple[np.ndarray | None, float]) -> None:
+         """Answer about the frame shown when this line's speech started, or about an earlier
+@@ -1293,9 +1302,11 @@ class Robot:
+             turn.verbatim = True
+             tokens = self._said(recalled_answer, turn)
+         elif turn.verbatim:
++            turn.view_dependent = False  # this executed path reads a stored knowledge fact
+             turn.delivered = False  # a fact answered: a comparison's line was not sent
+             tokens = self._said(turn.facts[0], turn)
+         else:
++            turn.view_dependent = image is not None
+             tokens = self._tokens(msgs, turn)
+         audio_parts = self._speak(tokens, turn)
+         turn.done = time.time()
+@@ -1305,7 +1316,8 @@ class Robot:
+         turn.audio_s = len(spoken) / RATE
+         audio.write_wav(self.out / turn.wav, spoken, RATE)
+         self.history = (self.history + [{"role": "user", "content": turn.question},
+-                                        {"role": "assistant", "content": turn.answer}]
++                                        {"role": "assistant", "content": turn.answer,
++                                         "view_dependent": turn.view_dependent}]
+                         )[-2 * HISTORY_TURNS:]
+         self.exchanges += 1
+         # Findable later; a command ("this is my phone") is an action, never evidence of
+diff --git a/robot/test_same.py b/robot/test_same.py
+index e93fa9e..a521b26 100644
+--- a/robot/test_same.py
++++ b/robot/test_same.py
+@@ -218,3 +218,61 @@ def test_a_held_object_moving_keeps_the_answers(robot) -> None:
+                      103 + 0.1 * k)
+     assert ask("And this?", start + 10, frame(900, 100)) == ["user", "user"], \
+         "a new view drops the answers"
++
++
++@pytest.mark.parametrize("kind,verbatim", [
++    ("social", False), ("knowledge", False), ("sight", False), ("sight", True),
++])
++def test_scene_change_keeps_nonvisual_dialogue_and_removal_persists(robot, kind, verbatim):
++    robot.route = lambda question: kind
++    robot.knowledge.search = lambda question: [(1.0, "This is a stored fact.")] if verbatim else []
++    replies = []
++
++    def answer(msgs, **_):
++        reply = f"This is response number {len(replies) + 1}."
++        replies.append(reply)
++        yield reply
++
++    robot.brain.answer = answer
++    hold_up(robot, "cup", 200, LEFT)
++    now = time.time()
++    first = Turn(question="Tell me something.", speech_start=now, line=now, speech_end=now)
++    robot._turn(first, (robot.view[0], now))
++    visual = kind == "sight" and not verbatim
++    assert first.view_dependent is visual
++    hold_up(robot, "book", 100, RIGHT, at=200)
++    for k in (1, 2):
++        at = now + 5 * k
++        turn = Turn(question="Tell me more.", speech_start=at, line=at, speech_end=at)
++        robot._turn(turn, (robot.view[0], at))
++        prior = [m for m in robot.ready.history if m["role"] == "assistant"]
++        assert any(m["content"] == first.answer for m in prior) is not visual
++        assert len(prior) == (k if not visual else k - 1)
++    assert len(robot.history) <= 2 * main.HISTORY_TURNS
++
++
++@pytest.mark.parametrize("path,visual", [
++    ("_identity", True), ("_things", True), ("_same_answer", True),
++    ("_look_back", False), ("shown", False), ("_sighted", True),
++])
++def test_code_answer_tags_its_executed_source(robot, monkeypatch, path, visual):
++    for name in ("_deletion_answer", "_confirmation_answer", "_identity", "_things",
++                 "_same_answer", "_look_back", "_sighted"):
++        monkeypatch.setattr(robot, name, lambda *args: None)
++    monkeypatch.setattr(main, "earlier_view",
++                        lambda *args: object() if path == "_look_back" else None)
++    monkeypatch.setattr(main, "shown", lambda *args: "Stored answer." if path == "shown" else None)
++    if path != "shown":
++        monkeypatch.setattr(robot, path, lambda *args: "Code answer.")
++    turn = Turn(question="A question.", visitor=robot.conversation_visitor)
++    assert robot._code_answer(turn, None, None, None, [], [], None)
++    assert turn.view_dependent is visual
++
++
++def test_model_messages_exclude_history_annotations():
++    history = [{"role": "user", "content": "Hello."},
++               {"role": "assistant", "content": "Hi!", "view_dependent": False}]
++    messages = main.brain.messages(history, None, question="How are you?")
++    assert messages[1:3] == [{"role": "user", "content": "Hello."},
++                            {"role": "assistant", "content": "Hi!"}]
++    assert history[1]["view_dependent"] is False, "the source metadata stays in robot history"
+diff --git a/robot/test_things.py b/robot/test_things.py
+index 29cecee..21c5857 100644
+--- a/robot/test_things.py
++++ b/robot/test_things.py
+@@ -2965,7 +2965,8 @@ def test_forget_visitor_retry_after_store_interruption(robot, shard_name, fail_a
+     ident = object_id(r.things, owner, "phone")
+     rule = r.things.ignore_item("Ana's phone", r.things.descriptors(ident))
+     r.things.ignore(["chair"], True)
+-    r.history = [{"role": "user", "content": "I like tea"}]
++    r.history = [{"role": "user", "content": "I like tea"},
++                 {"role": "assistant", "content": "Which kind?", "view_dependent": False}]
+     r.ready = object()
+     store = getattr(r, shard_name)
+     original = store.shard
