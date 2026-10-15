@@ -100,6 +100,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 
 | Finding | Value | Ref |
 | --- | --- | --- |
+| Transcription and answer-worker exceptions | Before the fix, an injected exception skipped queue completion (E). After the fix, both failures were reported within 0.17 s and shutdown took about 0.72 s with real models; subsequent cases reopened isolated test memories (J). The original live incident remains unattributed | `bench/results/2026-10-15-worker-failure-1792101431.jsonl`; `research/edge-cases.md#worker-exceptions-2026-10-15` |
 | Edge query p99, 1,000 points | 0.47–0.49 ms (J), target 10 ms | D36 |
 | Component RAM | bge 409, faces 297, DINOv2 172, YOLO 260, Parakeet 531, Kokoro 1,207 (640 MB CUDA kernels), llama 2B 1,921 MB (J) | D66, D68 |
 | Retention vs named objects | The 12 h window evicted naming turns and sightings of named objects despite D51; fixed by keeping them in `_retain` (live, 2026-10-12) | D164 |

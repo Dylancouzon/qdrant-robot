@@ -288,6 +288,7 @@ class Robot:
         self.stream: Iterator[str] | None = None  # the brain's answer while a turn decodes
         self.detections = 0                     # frames detected so far
         self.detect_failed: Exception | None = None  # set when detection stopped for good
+        self.worker_failed: tuple[str, Exception] | None = None
         self.history: list[dict] = []
         # What each exchange of `history` looked at, in RAM only: a past question about something
         # shown gets one of these frames (earlier_view). Cleared wherever the history is, and by
@@ -326,12 +327,14 @@ class Robot:
     def hear(self, chunk: np.ndarray) -> None:
         """Every audio input enters here. The robot does not hear itself (silence while its
         speaker plays and just after) and does not hear while muted."""
+        self.check_health()
         if self.muted or self.speaker.playing(audio.SELF_VOICE_TAIL_S):
             chunk = np.zeros_like(chunk)
         self.ears.feed(chunk)
 
     def ask(self, text: str) -> None:
         """A typed line, entering where a transcript would (oracle replays, debugging)."""
+        self.check_health()
         self._heard_start()
         t = time.time()
         self.speaking = False
@@ -340,12 +343,36 @@ class Robot:
                                     speech_start=self.speech_start, target=self.start_target),
                           self.start_frame))
 
+    def check_health(self) -> None:
+        """Raise the saved failure instead of accepting input after a worker stopped."""
+        if self.worker_failed is not None:
+            name, error = self.worker_failed
+            raise RuntimeError(f"{name} stopped") from error
+        if self.detect_failed is not None:
+            raise RuntimeError("detection stopped") from self.detect_failed
+
+    def next_turn(self, timeout: float = 60) -> Turn:
+        """Wait for an answer while checking for failed workers."""
+        deadline = time.monotonic() + timeout
+        while True:
+            self.check_health()
+            try:
+                turn = self.turns.get(timeout=min(0.1, max(0, deadline - time.monotonic())))
+            except queue.Empty:
+                if time.monotonic() >= deadline:
+                    raise
+            else:
+                self.check_health()
+                return turn
+
     def reset(self, memory: Path) -> None:
         """Start over with an empty memory and conversation (scripted sessions). Detection
         pauses so no sighting of the old session reaches the new memory, and the tracker starts
         over so objects still in view are sighted again."""
+        self.check_health()
         self.recognition.pause()  # stop background publications before draining their consumer
         self.jobs.join()  # turns may still make priority model requests
+        self.check_health()
         self.recognition.close()
         with self.detecting:
             self.memory.shard.close()
@@ -399,15 +426,34 @@ class Robot:
 
     def _transcribe(self) -> None:
         # Its own thread: the final transcript overlaps a prefill instead of queuing behind it.
-        while (line := self.lines.get()) is not None:  # None: close() stops the thread
-            speech, t_line, speech_end, speech_start, shot, target = line
-            if text := self.scribe(speech):  # empty: noise the VAD took for speech
-                self.asked += 1
-                turn = Turn(question=text, line=t_line, transcribed=time.time(),
-                            speech_end=speech_end, speech_start=speech_start, target=target)
-                self.ui_turn, self.ui_thinking = turn, True
-                self.jobs.put(("turn", turn, shot))
-            self.lines.task_done()
+        self._consume(self.lines, self._line)
+
+    def _line(self, line: tuple) -> None:
+        speech, t_line, speech_end, speech_start, shot, target = line
+        if text := self.scribe(speech):  # empty: noise the VAD took for speech
+            self.asked += 1
+            turn = Turn(question=text, line=t_line, transcribed=time.time(),
+                        speech_end=speech_end, speech_start=speech_start, target=target)
+            self.ui_turn, self.ui_thinking = turn, True
+            self.jobs.put(("turn", turn, shot))
+
+    def _consume(self, pending: queue.Queue, perform: Callable[[tuple], None]) -> None:
+        """Account for every queued item, including failures and the stop signal."""
+        while True:
+            item = pending.get()
+            try:
+                if item is None:
+                    return
+                if self.worker_failed is None:
+                    perform(item)
+            except Exception as error:
+                with self.detecting:
+                    if self.worker_failed is None:
+                        self.worker_failed = threading.current_thread().name, error
+                self.closing.set()  # stop producers; consumers discard work until close signals
+                traceback.print_exc()
+            finally:
+                pending.task_done()
 
     def _watch(self) -> None:
         # The same worker does bounded idle recognition and prefill; speech takes priority.
@@ -1010,32 +1056,33 @@ class Robot:
 
     def _work(self) -> None:
         # One worker: llama-server jobs run in order, and a turn reuses the last look.
-        while (job := self.jobs.get()) is not None:  # None: close() stops the thread
-            if job[0] == "look":
-                self._look(job[1])
-            elif job[0] == "turn":
-                self._turn(*job[1:])
-            elif job[0] == "confirm":
-                self._confirm(job[1])
-            elif job[0] == "sight":
-                self._sight(*job[1:])
-            elif job[0] == "matches":
-                self.matches_pending = False
-                _, frame, taken, tracks, hits, person, epochs, session, gallery = job
-                with self.detecting:
-                    hits = {i: hit for i, hit in hits.items() if session == self.session_id
-                            and gallery == self.recognition.epoch and self.focus.accepts(i, taken)
-                            and self.focus.epoch(i) == epochs[i] and i not in self.focus.excluded}
-                self._remember_matches(frame, taken, tracks, hits, person)
-            elif job[0] == "control":
-                self.control_message = self._item_control(*job[1:])
-            elif job[0] == "memory":
-                self.control_message = self._memory_job(*job[1:])
-            elif job[0] == "describe":
-                self._describe_idle(job[1])
-            else:
-                self._caption_job(job)
-            self.jobs.task_done()
+        self._consume(self.jobs, self._job)
+
+    def _job(self, job: tuple) -> None:
+        if job[0] == "look":
+            self._look(job[1])
+        elif job[0] == "turn":
+            self._turn(*job[1:])
+        elif job[0] == "confirm":
+            self._confirm(job[1])
+        elif job[0] == "sight":
+            self._sight(*job[1:])
+        elif job[0] == "matches":
+            self.matches_pending = False
+            _, frame, taken, tracks, hits, person, epochs, session, gallery = job
+            with self.detecting:
+                hits = {i: hit for i, hit in hits.items() if session == self.session_id
+                        and gallery == self.recognition.epoch and self.focus.accepts(i, taken)
+                        and self.focus.epoch(i) == epochs[i] and i not in self.focus.excluded}
+            self._remember_matches(frame, taken, tracks, hits, person)
+        elif job[0] == "control":
+            self.control_message = self._item_control(*job[1:])
+        elif job[0] == "memory":
+            self.control_message = self._memory_job(*job[1:])
+        elif job[0] == "describe":
+            self._describe_idle(job[1])
+        else:
+            self._caption_job(job)
 
     def _caption_job(self, job):
         if (rows := self.memory.points([job[1]])) and \
@@ -2193,6 +2240,7 @@ class Robot:
         self.things.shard.close()
         self.knowledge.shard.close()
         self.brain.close()
+        self.check_health()
 
 
 def main() -> None:
@@ -2205,17 +2253,17 @@ def main() -> None:
         audio.set_volume(audio.saved_volume())
     chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
     camera = FileCamera() if a.camera_file else Camera()
-    robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
-    if a.camera_file:
-        camera.show(a.camera_file)  # begin the clip after model warmup
-        robot.camera_source = "Recorded camera"
-    print("listening", flush=True)
-    for chunk in chunks:
-        robot.hear(chunk)
-        if robot.detect_failed:
-            raise RuntimeError("detection stopped") from robot.detect_failed
-    robot.close()
-    camera.close()
+    with contextlib.closing(camera), contextlib.closing(chunks):
+        robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
+        try:
+            if a.camera_file:
+                camera.show(a.camera_file)  # begin the clip after model warmup
+                robot.camera_source = "Recorded camera"
+            print("listening", flush=True)
+            for chunk in chunks:
+                robot.hear(chunk)
+        finally:
+            robot.close()
 
 
 if __name__ == "__main__":

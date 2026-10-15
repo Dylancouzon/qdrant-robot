@@ -5,6 +5,8 @@ import threading
 import time
 from pathlib import Path
 
+import pytest
+
 from eval import replay
 from robot.main import Turn
 
@@ -32,6 +34,12 @@ class FakeRobot:
     def close(self) -> None:
         self.log.append(("close", self.memory))
 
+    def check_health(self) -> None:
+        pass
+
+    def next_turn(self) -> Turn:
+        return self.turns.get_nowait()
+
 
 def test_steps(monkeypatch) -> None:
     monkeypatch.setattr(replay, "REACT_S", 0)
@@ -49,6 +57,21 @@ def test_steps(monkeypatch) -> None:
     memory = log[2][1]  # the session's folder, set by reset
     assert log[1:] == [("show", "a.jpg"), ("close", memory), ("start", memory),
                        ("close", memory)]
+
+
+def test_failure_closes_replay(monkeypatch):
+    log = []
+    error = RuntimeError("injected replay failure")
+
+    def fail(*args):
+        raise error
+
+    monkeypatch.setattr(replay, "converse", fail)
+    with pytest.raises(RuntimeError) as raised:
+        replay.run([{"steps": [{"say": "hello", "id": "s1"}]}],
+                   lambda memory: FakeRobot(memory, log), Path("eval/dev/x"), True, "audio")
+    assert raised.value is error
+    assert [entry[0] for entry in log] == ["start", "close"]
 
 
 def test_statement_evidence() -> None:

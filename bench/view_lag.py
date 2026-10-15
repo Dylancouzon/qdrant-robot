@@ -68,7 +68,8 @@ def main() -> None:
         for chunk in paced(read_wav(ROOT / f"eval/dev/audio/{q}.wav"), 1.5):
             robot.hear(chunk)
         robot.lines.join()
-        turns += [robot.turns.get(timeout=60) for _ in range(robot.asked - asked)]
+        robot.check_health()
+        turns += [robot.next_turn() for _ in range(robot.asked - asked)]
         time.sleep(turns[-1].audio_s + 1 if turns else 1)
     stop.set()
     robot.close()

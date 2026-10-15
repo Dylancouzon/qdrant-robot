@@ -4,13 +4,13 @@ Updated 2026-10-15. Branch: `main`. Architecture is settled; use the [topic inde
 
 ## Active task
 
-Cleanup is reviewed. Startup notes now index settled architecture, workflow, and experiment history. Code checks and Jetson validation are saved in bench/results and reviews. All existing tests remain. The enclosure branch, worktree, and pre-existing result.json stay untouched.
+Worker-exception handling is complete and reviewed. Full checks passed, including 393 tests. The Jetson probe passed a typed question with generated audio and both failure cases with isolated memories. The original live stall remains unattributed. The enclosure branch, worktree, and pre-existing result.json stay untouched.
 
 Next work is indexed in [remaining priorities](research/edge-cases.md#current-priorities-after-the-project-review-2026-10-15). Conversation spill and returning-visitor greetings stay parked.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `9c5cc14a`, current release `78d67ad5e10d`, previous `94a07aadc5dc`; earlier live release `64d7d3fbe413` remains available. No robot or benchmark job is running. Production memories were separate from validation. WSL is idle for this task.
+Jetson `robot`: boot `9c5cc14a`, current release `f9b90b958023`, previous `78d67ad5e10d`; earlier live release `64d7d3fbe413` remains available. No robot or benchmark job is running. Production memories were separate from validation. WSL is idle for this task.
 
 ## Targets
 
@@ -28,4 +28,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-For a live check, run `.venv/bin/python tools/talk.py --release 78d67ad5e10d`. Diagnose the listening stall before adding worker recovery.
+Continue with held-object answer and recent-recall evidence. Keep existing Wi-Fi for later lighting tests. The monitor command is `.venv/bin/python tools/talk.py --release f9b90b958023`.

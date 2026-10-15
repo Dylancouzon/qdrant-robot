@@ -8,17 +8,30 @@ The review covered runtime and thread ownership, speech, tracking, recognition, 
 
 | Order | Remaining task | Finish when |
 | --- | --- | --- |
-| One | Diagnose the reported listening stall. `_transcribe` and `_work` can exit on an exception and leave queue joins waiting (U). | Capture a recurrence or inject worker failures. Surface the failure and stop cleanly without losing its log. |
-| Two | Improve held-object answers and recent recall. The latest recorded development replay scored 43/47 judged answers and 44/47 keyword checks; the earlier recall replay scored 16/21 (J). | Use held-object clips, rather than chair-dominated composites. Compare answer judgments and supplied evidence before changing runtime behavior. |
-| Three | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
-| Four | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
-| Five | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
+| One | Improve held-object answers and recent recall. The latest recorded development replay scored 43/47 judged answers and 44/47 keyword checks; the earlier recall replay scored 16/21 (J). | Use held-object clips, rather than chair-dominated composites. Compare answer judgments and supplied evidence before changing runtime behavior. |
+| Two | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
+| Three | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
+| Four | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
 
 The cleanup fixes explicit result handoff, failed collection handling, full fixture coverage checks, persistent file-camera errors, settings-save failure responses, and mute-state reset. It also corrects stale setup guidance. The acceptance runner remains the entry point. Keep exploratory benchmarks available for reproducibility; split the large robot test file only when a focused change needs it.
 
 Further harness work is bounded: preserve partial replay evidence on interruption, reject empty standalone judge input, propagate bake-off judge failures, and preserve locally enriched historical records during collection. `eval/replay.py` writes its rows only after `run` returns; `eval/judge.py` accepts an empty row list; `bench/brain_bakeoff.py` ignores the judge's exit code. `tools/jetson.py collect` overwrote added metadata in two old local results during this task; their committed versions were restored, and collected originals remain under `build/cleanup-collected-originals/`. The acceptance runner now rejects missing or incomplete results before judging.
 
 The recorded replay's speech check passed 46/47 (J). Its remaining failure is a spelling difference: "Metrocentre via Bens" became "Metro Center via Benz" in independent transcription. Keep the failure visible until the checker handles equivalent spelling without weakening content or truncation checks. The four judged failures concern unprompted image commentary, the beach question, bears reported present after removal, and an incomplete same-object answer. No keyword result changed from the previous recorded run. Evidence: `bench/results/2026-10-15-243f49ff-replay-1792095965{,.judged}.jsonl`.
+
+## Worker exceptions, 2026-10-15
+
+Injected transcription and answer-worker exceptions reproduced incomplete queue accounting locally (E). Both workers now preserve the traceback, stop producers, and discard queued work. Input and answer waits report the failure, and shutdown releases the threads, shards, and model server. Live and replay failure paths close their resources.
+
+The full Jetson probe passed a typed question with synthesized speech and both injected failures with isolated memories (J). Failures reached the caller within 0.17 s, and shutdown took about 0.72 s. Each subsequent case reopened the same test memory folder. Evidence: [worker-failure results](../bench/results/2026-10-15-worker-failure-1792101431.jsonl). Run `python -m bench.worker_failure --revision SHA` through `tools/jetson.py` to reproduce it.
+
+The original live listening incident has no confirmed traceback. A native call that stops returning needs separate diagnosis if the stall returns. Automatic worker recovery remains outside this fix.
+
+The [task review](../reviews/20261015-175840-62876-review.md) carries three caller-cleanup gaps under D71:
+
+- A failing `Robot.close()` skips camera cleanup and drawing restoration in `bench/overlay.py`. Use a nested `finally` when this path needs repair.
+- A health exception skips viewer, robot, camera, and temporary-directory cleanup in `bench/view_lag.py`. Wrap its benchmark body in `try/finally`.
+- `eval/replay.py` retains its caller-owned `FileCamera` after completion or failure. Close it around `run()` when addressing replay resource cleanup.
 
 ## Earlier recorded backlog
 

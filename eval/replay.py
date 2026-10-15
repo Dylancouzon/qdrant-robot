@@ -51,8 +51,9 @@ def converse(robot: Robot, step: dict, wav: Path | None) -> list:
         for chunk in paced(read_wav(wav), SILENCE_S):
             robot.hear(chunk)
         robot.lines.join()  # every line of this step is transcribed
+    robot.check_health()
     # A pause inside a question can split it into several lines, each answered.
-    turns = [robot.turns.get(timeout=60) for _ in range(robot.asked - asked)]
+    turns = [robot.next_turn() for _ in range(robot.asked - asked)]
     idle(robot, (turns[-1].audio_s if turns else 0) + REACT_S, wav is None)
     return turns
 
@@ -137,42 +138,46 @@ def run(sessions: list[dict], start: Callable[[Path], Robot], cases: Path, oracl
     """Play each session from an empty memory and return the scored rows. A restart closes the
     robot and starts a new one on the session's memory folder, as after a power cycle."""
     robot, rows = None, []
-    for s in sessions:
-        memory = Path(tempfile.mkdtemp())
-        if robot is None:
-            robot = start(memory)
-        else:
-            robot.reset(memory)
-        frames: dict[str, Shown] = {}
-        shown = time.time()  # when the frame in view was shown
-        for step in s["steps"]:
-            if "show" in step:
-                robot.camera.show(cases.parent / step["show"])
-                shown = time.time()
-            elif "wait" in step:  # the frame stays in view
-                idle(robot, step["wait"], oracle)
-                if "id" in step:
-                    robot.jobs.join()  # the sightings queued while it waited are stored
-                    found = robot.memory.sightings(before=time.time(), n=50)
-                    with robot.detecting:
-                        in_view = {robot.points.get(t) for t in robot.tracker.in_view()}
-                    frames[step["id"]] = Shown(
-                        sighted(found, (shown, time.time()), step, in_view), None, 0.0)
-            elif "restart" in step:
-                t = time.time()
-                robot.close()
-                del robot
-                gc.collect()  # free the old models before the new ones load
-                closed = time.time()
+    try:
+        for s in sessions:
+            memory = Path(tempfile.mkdtemp())
+            if robot is None:
                 robot = start(memory)
-                print(f"restart: closed in {closed - t:.1f}s, "
-                      f"started in {time.time() - closed:.1f}s", flush=True)
             else:
-                wav = None if oracle else cases.parent / audio / f"{step['id']}.wav"
-                rows.append(reported(step, converse(robot, step, wav), frames, oracle))
-            if robot.detect_failed:  # answers without sightings would score a different robot
-                raise RuntimeError("detection stopped") from robot.detect_failed
-    robot.close()
+                robot.reset(memory)
+            frames: dict[str, Shown] = {}
+            shown = time.time()  # when the frame in view was shown
+            for step in s["steps"]:
+                if "show" in step:
+                    robot.camera.show(cases.parent / step["show"])
+                    shown = time.time()
+                elif "wait" in step:  # the frame stays in view
+                    idle(robot, step["wait"], oracle)
+                    if "id" in step:
+                        robot.jobs.join()  # the sightings queued while it waited are stored
+                        robot.check_health()
+                        found = robot.memory.sightings(before=time.time(), n=50)
+                        with robot.detecting:
+                            in_view = {robot.points.get(t) for t in robot.tracker.in_view()}
+                        frames[step["id"]] = Shown(
+                            sighted(found, (shown, time.time()), step, in_view), None, 0.0)
+                elif "restart" in step:
+                    t = time.time()
+                    previous, robot = robot, None
+                    previous.close()
+                    del previous
+                    gc.collect()  # free the old models before the new ones load
+                    closed = time.time()
+                    robot = start(memory)
+                    print(f"restart: closed in {closed - t:.1f}s, "
+                          f"started in {time.time() - closed:.1f}s", flush=True)
+                else:
+                    wav = None if oracle else cases.parent / audio / f"{step['id']}.wav"
+                    rows.append(reported(step, converse(robot, step, wav), frames, oracle))
+                robot.check_health()
+    finally:
+        if robot is not None:
+            robot.close()
     return rows
 
 

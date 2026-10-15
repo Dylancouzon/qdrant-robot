@@ -18,6 +18,7 @@ TAIL = 0.2
 
 def gated_robot(sink) -> tuple[Robot, list]:
     fed, r = [], Robot.__new__(Robot)
+    r.worker_failed, r.detect_failed = None, None
     r.ears, r.muted, r.speaker = Stub(feed=fed.append), False, audio.Mouth(sink)
     return r, fed
 

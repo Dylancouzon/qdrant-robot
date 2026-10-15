@@ -10,6 +10,10 @@ Run `.venv/bin/python tools/talk.py --release RELEASE_ID`, using the current rel
 
 Say "Hey Edgy" to start a turn. Follow-up questions work for about a minute after an answer finishes. **Stop** stops the `qr-robot` unit and closes the tunnel. Closing the page, Ctrl-C, or losing the tunnel leaves the robot running and listening; Start attaches again. The unit does not start at boot. The local page remains open for another Start.
 
+A transcription or answer-worker exception stops the session and preserves its traceback in the Jetson journal. Pending work is discarded before resources close. Start launches another session after the failed unit stops.
+
+The Mac and Jetson can use the existing Wi-Fi network wherever its coverage reaches. All model inference and robot audio remain on the Jetson. The interface uses the Mac launcher and its SSH tunnel. An isolated hotspot needs another uplink for Internet access. Hotspot setup must use a separate control connection.
+
 **Mute** and the **volume** slider act on the robot through the view's token-protected `/mute` and `/volume` endpoints, proxied by the local page. Mute silences the Jetson microphone input. Volume sets the USB `Speaker` mixer (0 to 100 percent), is saved in `shared/speaker-volume`, and is applied at robot startup. The default is 62 percent, also used when the saved level is unreadable or out of range. If saving fails after the mixer changed, the page shows that the level is set but not saved.
 
 The robot does not hear itself. `Robot.hear` replaces every input chunk with silence while the speaker plays and for `SELF_VOICE_TAIL_S` (0.3 s) after the last phrase, for the USB microphone and replays alike. `Mouth` keeps the gate closed while a phrase is queued or its `aplay` runs, because `aplay` exits after the audio drains, then for the tail after the last sink call returns. A failed `aplay` is logged and the gate reopens.

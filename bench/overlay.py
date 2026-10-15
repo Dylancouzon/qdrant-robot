@@ -134,7 +134,7 @@ def live(seconds):
             viewer.start()
             start, detections = time.time(), robot.detections
             robot.ask('What is Qdrant Edge?')
-            turn = robot.turns.get(timeout=90)
+            turn = robot.next_turn(timeout=90)
             while time.time() - start < seconds:
                 time.sleep(.1)
             elapsed = time.time() - start
