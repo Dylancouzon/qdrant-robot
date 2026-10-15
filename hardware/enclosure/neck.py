@@ -8,6 +8,8 @@ from math import acos, atan2, cos, degrees, dist, hypot, radians, sin, sqrt, tan
 import cadquery as cq
 import trimesh
 from interface import (
+    NUT_AF,
+    RIDGE_H,
     CABLE_D,
     CABLE_DEG,
     CABLE_FLARE,
@@ -51,9 +53,9 @@ DISC_D, DISC_BOTTOM_Z = 31.0, SERVO_HORN_TOP_Z  # 0.7 mm per side in the roof op
 DISC_RING_R, DISC_RING_H = (7.6, 8.6), 0.8  # inside the 17.5 mm inner race OD, outside the bore
 DISC_RING_TOP_Z = ROOF_TOP_Z - PLAY
 DISC_TOP_Z = DISC_RING_TOP_Z - DISC_RING_H
-NUT_AF, NUT_T = 5.7, 2.5  # M3 nut pocket across flats, depth
+NUT_T = 2.5  # M3 nut pocket depth
 RIDGE_AT = 2.2  # nut channel ridge crest, past the seated nut's center
-LIP_H, LIP_IN = 0.4, 0.3  # the pocket mouth: two lips on opposite flats keep the nut in (U)
+LIP_H, LIP_IN = 0.4, RIDGE_H  # the pocket mouth: two lips on opposite flats keep the nut in (U)
 DISC_NUT_DEPTH = 3.0  # deeper in the disc, so the center screw tip stops above the horn
 NUT_CEILING_Z = DISC_BOTTOM_Z + DISC_NUT_DEPTH
 # Square drive: a boss on the disc rises into a socket in the shaft bottom. Its flats face the
@@ -103,13 +105,13 @@ def hexprism(af, z0, z1, xy=(0.0, 0.0), rot=0.0):
 
 def nut_slot(xy, z0, z1, angle, length):
     """M3 nut trap opening toward `angle` (degrees): a hex end at xy plus a channel to `length`.
-    A 0.3 mm ridge on each channel wall, 2.2 mm past the seated nut's center where the nut is
+    A RIDGE_H ridge on each channel wall, 2.2 mm past the seated nut's center where the nut is
     still narrow, makes the nut snap in and stay, as the shell's nut channels do."""
     half, a = NUT_AF / 2, RIDGE_AT
     ridges = [
         cq.Workplane("XY")
         .workplane(offset=z0)
-        .polyline([(a - 0.5, s * half), (a + 0.5, s * half), (a, s * (half - 0.3))])
+        .polyline([(a - 0.5, s * half), (a + 0.5, s * half), (a, s * (half - RIDGE_H))])
         .close()
         .extrude(z1 - z0)
         .val()
@@ -180,7 +182,7 @@ def disc():
     solid = solid.fuse(box(BOSS_AF, BOSS_AF, DISC_TOP_Z - 0.1, BOSS_TOP_Z))
     solid = solid.cut(cyl(1.7, DISC_BOTTOM_Z - 1, BOSS_TOP_Z + 1))
     solid = solid.cut(hexprism(NUT_AF, DISC_BOTTOM_Z - 1, NUT_CEILING_Z, rot=30))
-    for side in (-1, 1):  # the nut snaps past these 0.3 mm lips, then sits above them
+    for side in (-1, 1):  # the nut snaps past these lips, then sits above them
         x = side * (NUT_AF / 2 - LIP_IN / 2)
         lip = box(LIP_IN, NUT_AF / sqrt(3), DISC_BOTTOM_Z, DISC_BOTTOM_Z + LIP_H, (x, 0))
         solid = solid.fuse(lip)

@@ -21,7 +21,7 @@ import neck  # noqa: E402
 import printcheck  # noqa: E402
 from geometry import (  # noqa: E402
     AUDIO_NOTCH, BAND_Y, BODY_SECTIONS, BUS_RIB_TOP_Z, JETSON_PARTS, JETSON_STRIP_D, POCKET_GAP,
-    POCKET_WALL, SLOT_GAP, SLOT_WALL, WALL, body_envelopes, hardware,
+    POCKET_WALL, SLOT_BACK_GAP, SLOT_GAP, SLOT_WALL, WALL, body_envelopes, hardware,
 )  # fmt: skip
 
 OUT = Path(__file__).resolve().parent / "output"
@@ -38,7 +38,7 @@ K_SUPPORT = tan(radians(SUPPORT_DEG))
 CUT_Z = 7.6
 CORNER = (52.5, 41.8)  # centre of the plan corner arcs, measured on the body sections (mm)
 SCREW_RHO = 9.5  # plate screw distance from the corner centre, on the diagonal
-M3_CLEAR, NUT_AF, NUT_T = 3.4, 5.7, 2.4  # M3 nut: 5.5 mm across flats in a 5.7 mm pocket
+M3_CLEAR, NUT_AF, NUT_T = 3.4, ifc.NUT_AF, 2.4  # M3 clearance hole, nut pocket, nut thickness
 HUB_BOSS_Z, NUT_FLOOR = 152.0, 2.0  # hub boss bottom; the nut sits on a 2 mm floor above it
 HUB_NUT_Z = (HUB_BOSS_Z + NUT_FLOOR, ifc.ROOF_BOTTOM_Z)  # nut channel floor and ceiling
 CORNER_NUT_Z = (CUT_Z + NUT_FLOOR, CUT_Z + NUT_FLOOR + NUT_T + 0.4)
@@ -56,7 +56,7 @@ WALL_FRONT, WALL_SIDE = (0.0, -65.0), (76.0, 0.0)  # outer wall planes at Z 0 (f
 LEAN_FRONT = degrees(atan((BODY_SECTIONS[0][2] - BODY_SECTIONS[-1][2]) / 2 / HEIGHT))
 LEAN_SIDE = degrees(atan((BODY_SECTIONS[0][1] - BODY_SECTIONS[-1][1]) / 2 / HEIGHT))
 NUT_AF_MAX = 5.5  # M3 nut across flats
-RIDGE_H, RIDGE_BACK = 0.3, 2.2  # detent height; crest this far behind the seated nut's centre
+RIDGE_H, RIDGE_BACK = ifc.RIDGE_H, 2.2  # detent height; crest this far behind the nut centre
 WINDOW_Y, WINDOW_TOP, PANEL_GAP = (-18.0, 30.0), 117.0, 0.5  # port window, inner top in wall frame
 SIDE_TAPER, TOP_TAPER = tan(radians(20)), 0.0  # window wider outside; the top edge is straight
 SPEAKER_SHIFT = 2.0  # the 100 x 45 x 21 speaker front (Y -56) is deeper than the 110.3 mm opening
@@ -440,7 +440,7 @@ def risers():
     s, a, bus = comp["Speaker"], comp["USB audio case"], comp["Bus board"]
     g, w, z = POCKET_GAP, POCKET_WALL, CUT_Z
     bus_l, bus_r = bus[0] - g - w, bus[1] + g + w  # bus end ribs' outer X
-    back_x, grip_x = t[0] - SLOT_GAP, t[0] + SLOT_GRIP  # slot: inside of its back wall, open end
+    back_x, grip_x = t[0] - SLOT_BACK_GAP, t[0] + SLOT_GRIP  # slot back wall inside, open end
     y_out = (t[2] - SLOT_GAP - SLOT_WALL, t[3] + SLOT_GAP + SLOT_WALL)  # slot walls' outer faces
     front = (a[0] - g - w, a[1] + g + w, a[3] + g, a[3] + g + w)  # wall behind the audio case
     mid = (a[2] + a[3]) / 2
@@ -998,7 +998,7 @@ def check_openings(shell):
 
 
 WALL_GAPS = {  # wall: {part: smallest gap}. The bus band holds 17 mm for the 13 mm board.
-    "jetson slot back wall": {"Jetson tray strip": SLOT_GAP},
+    "jetson slot back wall": {"Jetson tray strip": SLOT_BACK_GAP},
     "jetson slot wall -": {"Jetson tray strip": SLOT_GAP},
     "jetson slot wall +": {"Jetson tray strip": SLOT_GAP},
     "jetson back wall": {"Jetson tray and board": POCKET_GAP, "Bus board": POCKET_GAP},

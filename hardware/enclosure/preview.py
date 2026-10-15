@@ -288,7 +288,7 @@ STEPS = (
          "tweezers, lower it through the roof hole to just under the roof, and push it outward "
          "into its channel until it clicks.",
          ("hub nut",), (0, -80, 260, (0, 0, 140)),
-         "Each channel has a 0.3 mm ridge. The nut must click past it and stay. A nut that is "
+         "Each channel has a 0.4 mm ridge. The nut must click past it and stay. A nut that is "
          "let go falls through the hole. The blocks leave room to reach under the roof.",
          ((("hub nut",), radial(-10)),), reset=("body-shell",)),
     Step("Neck", "Screw the neck hub to the roof.",
@@ -361,7 +361,7 @@ STEPS = (
          "Set the camera board on the four posts, with the lens in the round hole. Drive {camera} "
          "through the board into the posts. Use a driver that fits the M2 head.",
          ("camera", "camera connector", "camera screw"), (160, 20, 300, (-10, -25, 208)),
-         "The screws cut their own thread in the 1.7 mm pilot holes.",
+         "The screws cut their own thread in the 1.9 mm pilot holes.",
          ((("camera", "camera connector"), away(REAR, 25)), (("camera screw",), away(REAR, 50)))),
     Step("Head", "Plug the USB cable into the camera.",
          "Plug the camera USB cable into the connector on the back of the camera board. The free "
@@ -402,7 +402,7 @@ STEPS = (
          "in its pocket, with the USB port at the top. The barrel jack faces the port side, and "
          "the servo connector faces the slot side, away from the port panel.",
          ("Jetson", "Bus board"), (40, 30, 650, (0, 0, 80)),
-         "The Jetson strip is 6 mm thick, and the slot is 7 mm wide and grips 6 mm of the 8 mm "
+         "The Jetson strip is 6 mm thick, and the slot is 6.2 mm wide and grips 6 mm of the 8 mm "
          "strip. Keep the USB port at the top and turn the board around until the barrel "
          "jack faces the port side. Each pocket leaves about 1 mm of clearance on each side.",
          ((("Jetson",), away(UP, 45)), (("Bus board",), away(UP, 40))), reset=("base-plate",)),

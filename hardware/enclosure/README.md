@@ -46,7 +46,7 @@ The robot uses 17 M3 screws, four M2 screws, and 13 M3 nuts. Lengths are stock s
 | M3 | 1 | 12 mm | yes | Port panel to the plate ear | 2.5 mm hex key from outside |
 | M2 | 4 | 8 mm | no | Camera to the visor posts | Driver for the M2 head |
 
-The M2 screws cut their own thread in 1.7 mm pilot holes in the visor posts. The servo kit supplies its own horn screw, which this list does not count. M3 lengths: four of 6 mm, four of 8 mm, four of 10 mm, one of 12 mm, and four of 16 mm.
+The M2 screws cut their own thread in 1.9 mm pilot holes in the visor posts. The servo kit supplies its own horn screw, which this list does not count. M3 lengths: four of 6 mm, four of 8 mm, four of 10 mm, one of 12 mm, and four of 16 mm.
 
 Use socket-head (hex) M3 screws, so the 2.5 mm hex keys fit every screw. The plate and panel screws sit in counterbores (6.5 mm and 6.0 mm wide). The plate counterbore is 3.2 mm deep, so no head stands below the plate. Engagement is 3.6 mm past the nut's first face for both screws, measured from the counterbore floor.
 
@@ -60,15 +60,15 @@ Use a Bambu Lab P1S with a 0.4 mm nozzle and PLA. Set 0.2 mm layers, three walls
 
 Test pieces are small prints that check the fits (nut snaps, screw bite, the Jetson slot) before the large parts. They are not part of the robot. Print `Test pieces/Test pieces.3mf` first. Then print `Black.3mf`, then `White.3mf`. The neck hub and the horn disc in the Black project also show whether the bearings and the servo horn fit, so print that project early.
 
-`output/print/Test pieces/slot-test-piece.stl` (9.5 × 13 × 15 mm) is 15 mm of the Jetson slot. Slide it over the plastic strip on the edge of the real Jetson, opposite the connectors. The strip is 6 mm thick and 8 mm deep (Dylan, measured), so the slot is 7 mm wide and 6 mm deep. It must slide on with a small, even gap on each side (0.5 mm, U). If your strip differs, set `JETSON_STRIP_T` and `JETSON_STRIP_D` in `geometry.py` and rebuild before you print the base plate.
+`output/print/Test pieces/slot-test-piece.stl` (40.4 × 13 × 9.9 mm, printed on its back) is the full height of the Jetson slot. Slide it over the plastic strip on the edge of the real Jetson, opposite the connectors. The strip is 6 mm thick and 8 mm deep (Dylan, measured), so the slot is 6.2 mm wide and 6 mm deep. The first 7 mm slot held the Jetson loosely, so the slot is about 1 mm tighter and should grip the strip (Dylan, 2026-10-15). It must slide on by hand along its whole height. If your strip differs, set `JETSON_STRIP_T` and `JETSON_STRIP_D` in `geometry.py` and rebuild before you print the base plate.
 
-`output/print/Test pieces/fit-test-plate.stl` (40 × 52 × 11.2 mm) holds the three fits that can fail:
+`output/print/Test pieces/fit-test-plate.stl` (42.8 × 53.4 × 11.2 mm) holds the three fits that can fail:
 
-- **Hub-style nut channel:** a nut channel with a 2 mm floor, the 0.3 mm ridge, and a screw hole that passes through. Slide an M3 nut in from the open end. It must click past the ridge and stay.
+- **Hub-style nut channel:** a nut channel with a 2 mm floor, the 0.4 mm ridge, and a screw hole that passes through. Slide an M3 nut in from the open end. It must click past the ridge and stay.
 - **Corner-style pocket:** the same channel, with the screw hole blind above the nut, as in the shell's corner bosses.
-- **Camera posts:** four posts, 7 mm across and 7 mm tall, at 32.3 mm spacing on a 40 × 40 mm frame, with 1.7 mm pilot holes. An M2 screw must bite without splitting the post.
+- **Camera posts:** four posts, 7 mm across and 7 mm tall, at 33.76 mm spacing, with 1.9 mm pilot holes. An M2 screw must bite without splitting the post.
 
-The hub seats take both bearings, and the horn disc fits the servo horn. Its nut pocket also tests the two 0.3 mm lips: an M3 nut must snap in and stay when the pocket faces down. Press the bearings in and set the disc on the horn before you print the large parts.
+The hub seats take both bearings, and the horn disc fits the servo horn. Its nut pocket also tests the two 0.4 mm lips: an M3 nut must snap in and stay when the pocket faces down. Press the bearings in and set the disc on the horn before you print the large parts.
 
 ## Regenerate
 

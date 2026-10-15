@@ -79,7 +79,10 @@ def head_envelopes():
 # Sizes come from NVIDIA's kit drawing (O), estimates (E), and Dylan's measurements (2026-10-13).
 JETSON_STRIP_T, JETSON_STRIP_D = 6.0, 8.0  # strip thickness and depth; the strip is the tray's
 JETSON_SLAB_T = 11.0  # outer face. The flat board with its tray is 11 mm thick, beyond the strip
-SLOT_GAP, SLOT_WALL = 0.5, 3.0  # slot clearance per side of the strip (U) and slot wall thickness
+# Slot gap per side of the strip: 0.5 mm held the Jetson loosely on the test piece, and Dylan asked
+# for about 1 mm tighter (2026-10-15). 0.1 mm leaves room for print shrink over the 38 mm slide; the
+# full-height slot test piece confirms it. The back wall keeps 0.5 mm from the strip's edge.
+SLOT_GAP, SLOT_BACK_GAP, SLOT_WALL = 0.1, 0.5, 3.4  # walls grow so the outer faces stay in place
 X0, Y0, Z0 = -52.75, -7.5, 10.0  # lowest corner of the 90.5 x 35 x 103 envelope
 X1, Y1, Z1 = X0 + 90.5, Y0 + 35.0, Z0 + 103.0
 SLAB_Y = Y0 + JETSON_SLAB_T  # top face of the flat tray and board

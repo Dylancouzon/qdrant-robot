@@ -38,7 +38,10 @@ WALL, FLOOR = 3.2, 5.4
 REAR_CHAMFER = (2.93, 2.83)  # 46 degrees: tangent to the approved 5 mm rear fillet, prints clean
 FLOOR_CB_DEPTH = 3.0
 CAMERA_XZ = (-24.0, HEAD_CZ)  # camera position in geometry.py
-BOARD, BOARD_T, LENS_D, LENS_L, STANDOFF_PITCH = 38.0, 1.6, 15.0, 23.0, 32.3
+BOARD, BOARD_T, LENS_D, LENS_L = 38.0, 1.6, 15.0, 23.0
+# Camera holes sit 3 mm from each board corner along the diagonal (Dylan, test piece 2026-10-15).
+STANDOFF_PITCH = BOARD - 2 * 3.0 / sqrt(2)  # 33.76 mm square
+PILOT_D = 1.9  # M2 pilot; 1.7 printed too small on the test piece
 VISOR_T, LENS_RECESS, LENS_HOLE_D = 3.0, 0.5, 19.0
 LENS_TIP_Y = FRONT_Y + LENS_RECESS
 BOARD_FRONT_Y = LENS_TIP_Y + LENS_L
@@ -154,7 +157,7 @@ def visor():
         )
         solid = solid.fuse(post)
         pilot = cq.Vector(x, BOARD_FRONT_Y - PILOT_DEPTH, z)
-        solid = solid.cut(cq.Solid.makeCylinder(0.85, PILOT_DEPTH + 0.5, pilot, along_y))
+        solid = solid.cut(cq.Solid.makeCylinder(PILOT_D / 2, PILOT_DEPTH + 0.5, pilot, along_y))
     lens_hole = cq.Vector(CAMERA_XZ[0], FRONT_Y - 1, CAMERA_XZ[1])
     solid = solid.cut(cq.Solid.makeCylinder(LENS_HOLE_D / 2, 5, lens_hole, along_y))
     solid = solid.cut(eye_groove())
@@ -290,7 +293,8 @@ def head_checks(parts, neck_parts):
     m2_tip = BOARD_FRONT_Y - (M2_LENGTH - BOARD_T)  # tip depth in the post, measured along Y
     assert BOARD_FRONT_Y - m2_tip >= 5 and m2_tip >= BOARD_FRONT_Y - PILOT_DEPTH
     out["camera mount"] = (
-        f"4 M2 x {M2_LENGTH} screws into 7 mm posts with 1.7 mm pilots, 32.3 mm square; board "
+        f"4 M2 x {M2_LENGTH} screws into 7 mm posts with {PILOT_D} mm pilots, "
+        f"{STANDOFF_PITCH:.2f} mm square; board "
         f"center Y {BOARD_FRONT_Y + BOARD_T / 2:.1f}, {-4 - BOARD_FRONT_Y - BOARD_T / 2:.1f} mm in "
         "front of the geometry.py position (X and Z unchanged)"
     )

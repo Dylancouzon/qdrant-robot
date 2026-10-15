@@ -68,7 +68,7 @@ Service is the same steps in reverse.
 
 ### Head and camera
 
-The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (32.3 mm square, 2.6 mm holes). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a 17 × 10 mm hole in the head floor, crosses the neck gap behind the hub, and enters the body through a matching roof hole. A 30 × 30 × 30 mm slack loop inside the body absorbs the ±80° turn, and the Jetson plug space below it leads to a USB port. The horn disc holds its nut with two 0.3 mm lips at the pocket mouth.
+The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (33.76 mm square). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a 17 × 10 mm hole in the head floor, crosses the neck gap behind the hub, and enters the body through a matching roof hole. A 30 × 30 × 30 mm slack loop inside the body absorbs the ±80° turn, and the Jetson plug space below it leads to a USB port. The horn disc holds its nut with two 0.4 mm lips at the pocket mouth.
 
 ## Measured alternatives
 

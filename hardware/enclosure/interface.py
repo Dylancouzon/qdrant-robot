@@ -4,6 +4,11 @@ Assembly frame: X toward the Jetson ports, Y rearward, Z up, head yaw axis at X 
 
 from math import cos, radians, sin
 
+# M3 nut pocket across flats, for a 5.5 mm nut. 5.7 printed too tight on the test piece (Dylan,
+# 2026-10-15), so it is 5.9.
+NUT_AF = 5.9
+RIDGE_H = (NUT_AF - 5.5) / 2 + 0.2  # detent ridges and lips overlap a 5.5 mm nut by 0.2 mm
+
 # Roof: part of the body shell. The neck enters through its center opening.
 ROOF_TOP_Z = 160.0
 ROOF_BOTTOM_Z = 156.8
