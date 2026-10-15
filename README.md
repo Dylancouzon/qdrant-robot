@@ -6,6 +6,8 @@ Start with [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and [research/lessons.m
 
 The current brain is Qwen3-VL-2B with CUDA Kokoro. The active task is in [STATE.md](STATE.md). Controls and limits are in [Mac audio interface](research/mac-audio-interface.md) and [booth behavior](research/booth-ux.md).
 
+Use the [servo control guide](hardware/SERVO.md) to check the STS3215 through its USB adapter and external 5 V supply.
+
 ## Read evidence without running models
 
 ```sh

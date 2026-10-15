@@ -105,3 +105,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **H5 2026-10-13: Power the servo at 5 V from a Jetson USB-A port (Dylan).** A USB-A to 5.5 × 2.1 mm barrel cable feeds the SO-ARM100 bus servo adapter, the LeRobot setup for 7.4 V STS3215. This removes the servo regulator from H4. Software limits torque and acceleration; USB port current stays U until the first powered test.
 
 **H6 2026-10-13: Route the camera cable through the neck gap (Dylan).** The cable leaves a hole in the rear of the head floor, crosses the neck gap behind the hub, and enters the body through a smooth roof hole to a Jetson USB port. A slack loop inside the body absorbs the ±80° turn. This replaces the external loop; Dylan chose it over a hollow shaft with gears.
+
+**H7 2026-10-15: Use the Feetech SDK for isolated servo bench control.** A standalone helper uses pinned SDK and serial packages, an external 5 V 4 A supply, checked RAM writes, and small relative movements. This avoids a full LeRobot installation or a custom packet implementation; see [the tested guide](hardware/SERVO.md). H5's Jetson USB power and mounted-head calibration remain unverified (U).
