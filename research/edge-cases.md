@@ -2,6 +2,24 @@
 
 Some evidence paths below exist only in archive tags; see [archive/README.md](archive/README.md) to read them.
 
+## Current priorities after the project review, 2026-10-15
+
+The review covered runtime and thread ownership, speech, tracking, recognition, memory deletion, the monitor, deployment, evaluation, and result reporting. The enclosure branch and its worktree remain outside this task. Existing tests, fixtures, rubrics, thresholds, and model choices stay intact.
+
+| Order | Remaining task | Finish when |
+| --- | --- | --- |
+| One | Diagnose the reported listening stall. `_transcribe` and `_work` can exit on an exception and leave queue joins waiting (U). | Capture a recurrence or inject worker failures. Surface the failure and stop cleanly without losing its log. |
+| Two | Improve held-object answers and recent recall. The latest recorded development replay scored 43/47 judged answers and 44/47 keyword checks; the earlier recall replay scored 16/21 (J). | Use held-object clips, rather than chair-dominated composites. Compare answer judgments and supplied evidence before changing runtime behavior. |
+| Three | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
+| Four | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
+| Five | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
+
+The cleanup fixes explicit result handoff, failed collection handling, full fixture coverage checks, persistent file-camera errors, settings-save failure responses, and mute-state reset. It also corrects stale setup guidance. The acceptance runner remains the entry point. Keep exploratory benchmarks available for reproducibility; split the large robot test file only when a focused change needs it.
+
+Further harness work is bounded: preserve partial replay evidence on interruption, reject empty standalone judge input, propagate bake-off judge failures, and preserve locally enriched historical records during collection. `eval/replay.py` writes its rows only after `run` returns; `eval/judge.py` accepts an empty row list; `bench/brain_bakeoff.py` ignores the judge's exit code. `tools/jetson.py collect` overwrote added metadata in two old local results during this task; their committed versions were restored, and collected originals remain under `build/cleanup-collected-originals/`. The acceptance runner now rejects missing or incomplete results before judging.
+
+The recorded replay's speech check passed 46/47 (J). Its remaining failure is a spelling difference: "Metrocentre via Bens" became "Metro Center via Benz" in independent transcription. Keep the failure visible until the checker handles equivalent spelling without weakening content or truncation checks. The four judged failures concern unprompted image commentary, the beach question, bears reported present after removal, and an incomplete same-object answer. No keyword result changed from the previous recorded run. Evidence: `bench/results/2026-10-15-243f49ff-replay-1792095965{,.judged}.jsonl`.
+
 ## Earlier recorded backlog
 
 As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot first, in case the architecture changes. Each entry: trigger, risk, candidate fix, and source. D77 also permits revisiting verified limitations with a concrete intervention and paired validation. Foundational retrieval and conversation questions are in research/archive/grounding.md, object perception in research/booth-ux.md, and memory candidates in research/stack.md.
@@ -53,11 +71,12 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Two visitors with the same display name | The Memory tab groups their objects under one heading (edits stay distinct by id) | Group by owner id | reviews/20261011-034135-6848-review.md |
 | A Memory tab edit waits behind a long turn | The card stays after 5 s of polling with no message | Show "Saving..." when polling ends | same |
 | A lookalike that appears during a teaching window, or carries another label, is not yet a confirmed same-label track | Its overlapping crop can enter the taught gallery (D154) | Check current detections instead of confirmed tracks for the overlap guard | reviews/20261011-013812-81300-review.md |
-| Saving settings fails (disk full, permissions) | The page sees a dropped connection; the old settings stay active | Catch OSError and return a control failure | same |
 
-## File source decode errors (F0b review, 2026-10-09)
+## File source decode errors (fixed during cleanup, 2026-10-15)
 
-A later video decoding or seeking error raises from FileCamera.latest(). The detector loop can exit without setting detect_failed, so a replay may continue with stopped detection. Carry under D71; before relying on failure propagation in a continuous challenge, set detect_failed on source errors and make the evaluator fail. F0b source qualification completed without a decoding error. Evidence: reviews/20261009-030935-4181-review.md, robot/main.py _detect().
+A later video decoding or seeking error stays set in FileCamera until a new source is shown. Every reader receives that error, and the detector publishes it through `detect_failed`. Regression checks cover both failures after another reader receives the error first. The evaluator therefore rejects a failed source instead of scoring a frozen frame.
+
+Recorded-camera qualification also stops on a decode or seek failure, including an overstated AVI frame count. Replace the damaged recording and restart the session. This strict behavior keeps a frozen frame from appearing healthy; live USB capture uses a different source.
 
 - Continuous paging attribution (D93): progress activity labels describe one instant, while page deltas span the previous sample interval. Report active-labelled totals, and use full recorded turn intervals before attributing paging to active turns. Source decoder compatibility: Mac and Jetson OpenCV5.0.0 use FFmpeg avcodec61.19.101 and62.28.101. Identical smoke AVI bytes produce0/90 matching cross-platform pixel hashes; four Jetson switch/hold probes match their Jetson oracle. Record decoder builds and requalify under the deployed decoder after environment changes. Evidence: reviews/20261009-042113-94477-review.md and bench/results/2026-10-09-f0d-operations.jsonl.
 
@@ -92,7 +111,7 @@ A later video decoding or seeking error raises from FileCamera.latest(). The det
 
 - Removing a view reloads the gallery, resets its scroll position, and collapses Edit memory. Preserve the affected card state if repeated removal becomes disruptive.
 - Evidence ages update when evidence changes. After a long idle period, the relative time can become stale. Refresh time labels if visitors encounter this.
-- Stop or disconnect disables the microphone button but can leave its last mute icon and accessible state. Reset these in `clearLive()` if this causes confusion. The next connection publishes the correct state.
+- Stop and disconnect now reset the mute icon, accessible state, and disabled audio controls in `clearLive()`.
 
 ## Bounded overlay persistence
 

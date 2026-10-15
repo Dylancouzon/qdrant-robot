@@ -2523,3 +2523,26 @@
 {"key": "a5e3ec7d47a8f84f", "pass": true, "why": "Identifies an apple as the first thing shown.", "votes": [true, true, true]}
 {"key": "08854499ba052efd", "pass": false, "why": "Does not say the earlier image showed apples.", "votes": [false, false, false]}
 {"key": "acb1ec97d5d671e9", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}
+{"key": "d9a635a0cf5c7901", "pass": true, "why": "Says the visitor showed a stop sign.", "votes": [true, true, true]}
+{"key": "48c9c0e9daea4390", "pass": true, "why": "Identifies a motorcycle.", "votes": [true, true, true]}
+{"key": "3f0fba0645c93fbf", "pass": true, "why": "Recalls the motorcycle.", "votes": [true, true, true]}
+{"key": "26ae0ec1f12fa5ab", "pass": true, "why": "Describes the room without claiming the cat remains.", "votes": [true, true, true]}
+{"key": "63b508c28d6d573e", "pass": true, "why": "Says the bus is red.", "votes": [true, true, true]}
+{"key": "12c1adc6a312d963", "pass": true, "why": "Reads route 15.", "votes": [true, true, true]}
+{"key": "fbb484c594de7cf9", "pass": true, "why": "Identifies Sydney.", "votes": [true, true, true]}
+{"key": "92d1455fda537516", "pass": true, "why": "Identifies a red double-decker bus.", "votes": [true, true, true]}
+{"key": "74b4cfa6a1db6886", "pass": true, "why": "Recalls the apple before the bus.", "votes": [true, true, true]}
+{"key": "30a95d6742d2b9b9", "pass": true, "why": "Recalls the bus after the apple.", "votes": [true, true, true]}
+{"key": "a0b8169dba0d217f", "pass": true, "why": "Identifies teddy bears.", "votes": [true, true, true]}
+{"key": "f49861b5c7d734e7", "pass": true, "why": "Identifies Hello Kitty.", "votes": [true, true, true]}
+{"key": "d25e28b38e03f58a", "pass": true, "why": "Identifies an Apple computer.", "votes": [true, true, true]}
+{"key": "bfb4f412fb6e8ae8", "pass": false, "why": "Adds an unprompted image description.", "votes": [false, false, false]}
+{"key": "5ef4c1c99051796e", "pass": true, "why": "Tells a short, coherent joke.", "votes": [true, true, true]}
+{"key": "02dcb93d97fbea6f", "pass": false, "why": "Does not say he looks like he is having fun.", "votes": [false, false, false]}
+{"key": "387fa46564b6423f", "pass": true, "why": "Names the teddy bears.", "votes": [true, true, true]}
+{"key": "5cfa6dbc42b4425e", "pass": true, "why": "Recalls stuffed animals, which the rubric accepts.", "votes": [true, true, true]}
+{"key": "180815ece9b1f87e", "pass": false, "why": "Claims the bears remain when they are gone.", "votes": [false, false, false]}
+{"key": "c439ef4321189b18", "pass": true, "why": "Describes the green apples.", "votes": [true, true, true]}
+{"key": "9673c0967c391c05", "pass": false, "why": "Does not identify teddy bears now and apples before.", "votes": [false, false, false]}
+{"key": "920ccb238bd1689d", "pass": true, "why": "Greets the visitor warmly by name.", "votes": [true, true, true]}
+{"key": "fa118d1b1690cffb", "pass": true, "why": "Briefly says how its day is going.", "votes": [true, true, true]}

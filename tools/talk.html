@@ -157,6 +157,7 @@ function clearCamera(){
 el('camera').addEventListener('error',clearCamera);
 function clearLive(){
   clearCamera();
+  el('mute').disabled=true;el('mute').classList.remove('muted');el('mute').setAttribute('aria-pressed','false');el('mute').setAttribute('aria-label','Mute');el('mute').title='Mute';el('volume').disabled=true;
   el('viewerror').textContent='';
   el('transcript').replaceChildren();const p=document.createElement('p');p.className='empty';p.textContent='Say “Hey Edgy”.';el('transcript').append(p);setClosed('');transcriptText='';evidenceText='';
   itemControl={};ignoredItems=[];muted=false;items();recognition({},false);
@@ -169,7 +170,7 @@ async function control(action){
 }
 async function robot(action,data){
   try{const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw Error('The robot did not apply that control');return true;}
-  catch(error){el('error').textContent=error.message;}
+  catch(error){el('error').textContent=error.message;return false;}
 }
 const recognitionFields=[
   ['match','Recognition threshold',0.6,0.99,0.001,'Higher values require a closer visual match.'],

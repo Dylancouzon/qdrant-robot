@@ -31,3 +31,4 @@ explicit = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+testpaths = ["robot", "eval", "tools"]

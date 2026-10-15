@@ -181,7 +181,9 @@ def p50(rows: list[dict], k: str) -> float | None:
     return statistics.median(v) if v else None
 
 
-def main(path: Path, model: str, oracle: bool, audio: str) -> int:
+def main(path: Path, model: str, oracle: bool, audio: str, output: str | None = None) -> int:
+    if output is not None and (Path(output).name != output or not output.endswith(".jsonl")):
+        raise ValueError("output must be a JSONL filename")
     sessions = [json.loads(line) for line in path.read_text().splitlines()]
     stamp = time.strftime("%Y-%m-%d")
     out = SHARED / "sessions" / f"replay-{int(time.time())}"
@@ -212,7 +214,7 @@ def main(path: Path, model: str, oracle: bool, audio: str) -> int:
                "note": ("oracle: latencies start when the text is submitted (text to audio)"
                         if oracle else
                         "first_audio = first phrase synthesized and queued; no speaker yet")}
-    results = SHARED / "results" / f"{stamp}-replay-{int(time.time())}.jsonl"
+    results = SHARED / "results" / (output or f"{stamp}-replay-{int(time.time())}.jsonl")
     results.write_text("".join(json.dumps(r) + "\n" for r in [*rows, summary]))
     # Preserve the full prompt in the evidence file, keep the console summary readable.
     print(json.dumps({k: v for k, v in summary.items() if k != "system"}, indent=1))
@@ -226,7 +228,8 @@ if __name__ == "__main__":
     ap.add_argument("--model", default=MODEL, choices=MODELS)
     ap.add_argument("--oracle", action="store_true", help="fixture text instead of audio")
     ap.add_argument("--audio", default="audio", help="audio-real: Dylan's recorded voice")
+    ap.add_argument("--output", help="result filename inside shared/results")
     a = ap.parse_args()
     if a.oracle and a.audio != "audio":
         ap.error("--oracle replays text, so --audio does not apply")
-    sys.exit(main(a.cases, a.model, a.oracle, a.audio))
+    sys.exit(main(a.cases, a.model, a.oracle, a.audio, a.output))

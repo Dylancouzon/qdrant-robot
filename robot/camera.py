@@ -61,6 +61,7 @@ class FileCamera:
         self._lock = threading.Lock()
         self._cap = None
         self._frame = None
+        self._error = None
         self._stamp = time.time()
         if path is not None:
             self.show(path)
@@ -74,6 +75,7 @@ class FileCamera:
         with self._lock:
             self._release()
             self._frame = None
+            self._error = None
             self._stamp = time.time()
             frame = cv2.imread(str(path))
             if frame is not None:
@@ -100,6 +102,8 @@ class FileCamera:
 
     def latest(self) -> tuple[np.ndarray | None, float]:
         with self._lock:
+            if self._error is not None:
+                raise self._error
             if self._cap is None and self._frame is not None:
                 self._stamp = time.time()  # a still: a live camera repeating an unchanged scene
             if self._cap is not None:
@@ -109,11 +113,13 @@ class FileCamera:
                     if (due != self._index + 1
                             and not self._cap.set(cv2.CAP_PROP_POS_FRAMES, due)):
                         self._release()
-                        raise RuntimeError(f"cannot seek fixture frame {due}")
+                        self._error = RuntimeError(f"cannot seek fixture frame {due}")
+                        raise self._error
                     ok, frame = self._cap.read()
                     if not ok or frame is None:
                         self._release()
-                        raise RuntimeError(f"cannot decode fixture frame {due}")
+                        self._error = RuntimeError(f"cannot decode fixture frame {due}")
+                        raise self._error
                     self._frame, self._index = frame, due
                     self._stamp = self._anchor + due / self._fps
             return self._frame, self._stamp

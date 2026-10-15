@@ -427,7 +427,12 @@ class Robot:
         due, failures = time.time(), 0
         while not self.closing.wait(max(0.0, due - time.time())):
             due = max(due + 1 / DETECT_FPS, time.time())
-            frame, taken = self.camera.latest()
+            try:
+                frame, taken = self.camera.latest()
+            except Exception as error:
+                self.detect_failed = error
+                traceback.print_exc()
+                return
             if frame is None:
                 continue
             try:
@@ -1606,7 +1611,10 @@ class Robot:
     def _setting(self, action, data):
         """Apply live microphone, volume, or recognition settings."""
         if action == "settings":
-            settings.change(data)
+            try:
+                settings.change(data)
+            except OSError:
+                return False
             return True
         if action == "mute":
             if type(data.get("on")) is not bool:

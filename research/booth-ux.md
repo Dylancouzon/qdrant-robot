@@ -31,7 +31,7 @@ Qdrant Edge stores explicitly named objects as crop multivectors. The [Mac inter
 
 YOLOE-26s at 384x640 with TensorRT FP16 is the development default; nano remains the fallback. Detector-paced sources use one Recognition owner and replaceable latest slot. Object crop work stays bounded to three per second. View has one 15fps pacing deadline and validates source age, session, gallery, epochs, and viewer before emission.
 
-The wake phrase is "Hey Edgy". The Mac client suppresses microphone input during playback. The view shows status, streamed answers, and supplied evidence. This session made no voice behavior changes.
+The wake phrase is "Hey Edgy". The Jetson suppresses its microphone input during playback and the following 0.3 s. The view shows status, streamed answers, and supplied evidence.
 
 The interface can still blink after detection losses longer than 200 ms or size expiry. Face names still require positive recognition on the exact displayed source; negative results clear them immediately. Similar objects, changed viewpoints, occasional conversation stalls, and paging remain limits. External cup recognition reaches 73.78%; this does not establish general viewpoint coverage. Physical audible latency and the broader milestone targets remain open in STATE.md.
 

@@ -2452,6 +2452,18 @@ def test_face_drawing_history_resets_on_changed_source_authority(robot, monkeypa
     assert r.verified[3][1] == (*raw[0], 'Ana', 'known')
 
 
+def test_settings_write_failure_keeps_active_values(tmp_path, monkeypatch):
+    local = Settings(tmp_path / "settings.json")
+    monkeypatch.setattr(main, "settings", local)
+    def full_disk(*args, **kwargs):
+        raise OSError("No space left on device")
+    monkeypatch.setattr("robot.settings.os.replace", full_disk)
+    robot = Robot.__new__(Robot)
+    assert not robot._control("settings", {"name": "match", "value": .9})
+    assert local.snapshot() == DEFAULTS
+    assert not list(tmp_path.glob("*.tmp"))
+
+
 def test_settings_validation_and_persistence(tmp_path):
     path = tmp_path / "settings.json"
     config = Settings(path)

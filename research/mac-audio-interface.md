@@ -24,7 +24,7 @@ The camera shows known object names, one orange "???" teaching focus, and admitt
 
 The Qdrant Edge strip shows readable sources and saved object thumbnails. Selecting an object opens its Memory card. Details keeps search results and source IDs expandable. The retrieval-preparation timer includes work beyond Edge queries. Answer correctness still needs separate verification.
 
-Focus assignments change at most once per three seconds. The selected admitted object keeps its "???" style while a matched detection continues at the existing LOW threshold. Source admission, visibility, Ignore, and pending preference checks still gate drawing. Actual detection gaps remove outlines. The existing 200ms size grace can expire during undersized observations.
+Focus assignments change at most once per three seconds. The selected admitted object keeps its "???" style while a matched detection continues at the existing LOW threshold. Source admission, visibility, Ignore, and pending preference checks still gate drawing. Object outlines bridge detection gaps for at most 200 ms (D159). The existing 200 ms size grace can expire during undersized observations.
 
 Drawing coordinates use source snapshots and smoothing. Raw detector geometry remains authoritative for selection, crops, actions, and writes. Large raw motion, gaps, merges, and Ignore reset drawing history. A displayed "???" can remain visible while its current crop is ineligible for teaching.
 
@@ -32,7 +32,7 @@ Drawing coordinates use source snapshots and smoothing. Raw detector geometry re
 
 Say "Track this as my wallet" or "This is my phone" while showing one eligible object. Held-object and teaching-zone cues raise priority; another stable eligible object can also be selected. Explicit names preserve the visitor's wording independently of detector categories.
 
-Each named Qdrant Edge point keeps at most three distinct crop vectors. Explicit reteaching merges diverse views only when the current crop matches that exact existing name. Otherwise, the current crop replaces the old gallery. Original/current anchors, aliases, and deletion links remain preserved. Automatic self-training is absent.
+Each named Qdrant Edge point belongs to a visitor. Naming starts a learning window that adds distinct views from the taught track. The default limit is 24 views, with the first view preserved. Explicit reteaching appends distinct views to that visitor's object. Recognition alone does not add views. Settings controls the learning window, view limit, and recognition thresholds (D154, D155).
 
 A weak preferred-name match can make one additional global Edge query using the same crop vector. Competing claims abstain. Strong labels require agreeing queries; skipped queries preserve associations. Three actual below-SURE queries remove retained green confidence; below-GUESS misses also clear the verification preference. Weak descriptor and detector evidence together suppress a displayed name. Fresh query scores, source checks, and duplicate protection separately govern writes.
 
