@@ -73,6 +73,12 @@ The helper attempts torque release on errors and Ctrl-C. If it prints **"Torque 
 
 ## How the control works
 
+### Mounted-head travel limits
+
+The enclosure specifies **±70° from straight ahead for normal movement**, or **140° total travel**. Its mechanical stops are at **±80°**. Keep the 10° margin on each side; powered movement must stop before contact with a mechanical stop. These design limits come from [the enclosure requirements](https://github.com/Dylancouzon/qdrant-robot/blob/241aacc/hardware/DESIGN_REQUIREMENTS.md) and still need physical cable-clearance checks.
+
+The mounted-head controller must enforce these absolute limits relative to a calibrated forward position. Repeated relative nudges accumulate, so the bench helper's per-command limit does not protect an assembled neck. Use this helper only with the loose servo until mounted-head calibration and travel enforcement exist.
+
 The SDK opens the serial port with `PortHandler` and uses `PacketHandler(0)`. The helper calls its register read/write methods and checks both communication results and servo error flags. Two-byte STS values use little-endian order; the SDK handles packet construction and checksums. The helper replaces the SDK's unbounded serial drain with an input-buffer reset and clears its busy flag after failed requests. This lets cleanup attempt another packet after a serial exception.
 
 These addresses come from [LeRobot's STS control table at revision 297774f](https://github.com/huggingface/lerobot/blob/297774fca4e3ad0aa34e7425fbf937111637e77b/src/lerobot/motors/feetech/tables.py).
