@@ -1,0 +1,10 @@
+{
+  "release": "cc2f75b64107",
+  "machine": "Jetson",
+  "mode": "service-SIGTERM",
+  "status": "interrupted",
+  "cause": "Repeated SIGTERM interrupted torque-off acknowledgement in cleanup.",
+  "torque_release": "Unconfirmed during interrupted cleanup; a separate named servo-release job subsequently confirmed torque off.",
+  "raw_journal": "build/head-evidence/shutdown-repeated-sigterm.log",
+  "remote_journal": "journalctl -u qr-head-shutdown --since 2026-10-16T10:13:49 --until 2026-10-16T10:13:53"
+}

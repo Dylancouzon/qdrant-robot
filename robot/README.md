@@ -7,6 +7,7 @@ Read [architecture](../research/architecture.md) first. All inference and Edge s
 | Turn lifecycle, actions, evidence, worker ownership, and shutdown | [main.py](main.py) |
 | Camera and file-source timestamps | [camera.py](camera.py) |
 | Detection, tracking, focus, and drawing continuity | [detect.py](detect.py), [focus.py](focus.py) |
+| Active visitor, bounded following, and calibrated USB servo | [attention.py](attention.py), [head.py](head.py), [servo.py](servo.py) |
 | Face vectors, consent, and visitor identity | [faces.py](faces.py), [people.py](people.py) |
 | Serialized crop and face model owner | [recognition.py](recognition.py) |
 | Named objects, multivector views, and Ignore rules | [things.py](things.py) |
@@ -25,6 +26,7 @@ Read [architecture](../research/architecture.md) first. All inference and Edge s
 | Drawing and source authority | [test_focus.py](test_focus.py), [test_recognition.py](test_recognition.py) |
 | Identity, observations, and comparisons | [test_people.py](test_people.py), [test_sightings.py](test_sightings.py), [test_same.py](test_same.py) |
 | Speech, audio, and failures | [test_speak.py](test_speak.py), [test_audio.py](test_audio.py), [test_workers.py](test_workers.py) |
+| Shared selection, movement, calibration, and motor failures | [test_attention.py](test_attention.py), [test_head.py](test_head.py), [test_servo.py](test_servo.py) |
 | Camera and authenticated HTTP routes | [test_camera.py](test_camera.py), [test_view.py](test_view.py) |
 
 Use `rg -n '^    def |^def test_' robot/main.py robot/test_things.py` to locate a focused section. These large integration files share lifecycle fixtures; split them when a concrete change needs separation. Browser DOM checks live in [tools/ui](../tools/README.md#ui-development).

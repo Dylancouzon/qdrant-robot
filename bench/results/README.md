@@ -11,6 +11,7 @@ Keep result bytes, judgments, failure records, and resource traces. Historical r
 | Crop, gallery, camera, and detector records | Read [objects](../../research/objects.md), [same-object](../../research/same-object.md), and [detector](../../research/detector.md). |
 | Speech, runtime, memory, and model comparisons | Read [stack](../../research/stack.md) and [lessons](../../research/lessons.md). |
 | `.tegrastats`, `.paging`, `.vmstat`, `.free`, and other resource samples | Match the exact filename recorded by the run. Separate whole-run and response-overlapping counters. |
+| `*head-sim*`, `*head-hardware*`, `*head-voltage*`, and `*head-speech*` | Read [head control](../../research/servo.md). Keep simulated camera, real servo, and independent speech checks separate. |
 | Other component JSON/JSONL | Use the named [benchmark](../README.md) and the corresponding ledger row. The replay reader intentionally rejects unsupported formats. |
 
 ```sh

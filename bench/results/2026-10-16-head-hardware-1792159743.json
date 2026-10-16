@@ -1,0 +1,38 @@
+{
+  "release": "008b65309bf2",
+  "machine": "Jetson",
+  "mode": "service-shutdown",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 853,
+    "direction": 1,
+    "limit": 8
+  },
+  "external_supply": "5 V / 4 A",
+  "tegrastats": "head-shutdown-20261016-100903.tegrastats",
+  "trace": [],
+  "before": {
+    "id": 1,
+    "position": 911,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "status": "failed",
+  "error": "RuntimeError('Require a 5 V supply and temperature below 60 C')",
+  "head_error": "Require a 5 V supply and temperature below 60 C",
+  "after": {
+    "id": 1,
+    "position": 911,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true
+}

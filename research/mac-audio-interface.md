@@ -10,6 +10,8 @@ Run `.venv/bin/python tools/talk.py --release RELEASE_ID`, using the current rel
 
 Say "Hey Edgy" to start a turn. Follow-up questions work for about a minute after an answer finishes. **Stop** stops the `qr-robot` unit and closes the tunnel. Closing the page, Ctrl-C, or losing the tunnel leaves the robot running and listening; Start attaches again. The unit does not start at boot. The local page remains open for another Start.
 
+**Talking to** shows the selected visitor. **Stop head** cancels head movement and following while the robot keeps running. Servo startup requires the explicit calibration procedure in the [hardware guide](../hardware/SERVO.md). After that unit starts, the monitor attaches through its existing Start flow.
+
 A transcription or answer-worker exception stops the session and preserves its traceback in the Jetson journal. Pending work is discarded before resources close. Start launches another session after the failed unit stops.
 
 The Mac and Jetson can use the existing Wi-Fi network wherever its coverage reaches. All model inference and robot audio remain on the Jetson. The interface uses the Mac launcher and its SSH tunnel. An isolated hotspot needs another uplink for Internet access. Hotspot setup must use a separate control connection.

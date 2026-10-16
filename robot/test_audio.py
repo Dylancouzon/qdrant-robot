@@ -10,6 +10,7 @@ import pytest
 
 from robot import audio
 from robot.main import Robot
+from robot.head import Head
 
 LOUD = np.full(4, 0.5, np.float32)
 PHRASE = np.zeros(10, np.float32)
@@ -18,7 +19,7 @@ TAIL = 0.2
 
 def gated_robot(sink) -> tuple[Robot, list]:
     fed, r = [], Robot.__new__(Robot)
-    r.worker_failed, r.detect_failed = None, None
+    r.worker_failed, r.detect_failed, r.head = None, None, Head()
     r.ears, r.muted, r.speaker = Stub(feed=fed.append), False, audio.Mouth(sink)
     return r, fed
 

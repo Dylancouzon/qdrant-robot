@@ -264,3 +264,59 @@ def test_inspection_uses_settled_view_and_returns_before_following(
         worker.join()
         head.close()
         close_robot(robot)
+
+
+def test_inspection_without_source_keeps_camera_error_and_never_uses_center(tmp_path):
+    robot = speaking_robot(tmp_path)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    robot._look((frame, time.time()))
+    robot.brain.answer = lambda *args, **kwargs: pytest.fail("Center view reached the brain")
+    try:
+        turn = answer(robot, "What is on your left?", None)
+        assert turn.answer == "I need a camera image before turning."
+        assert not turn.keep and turn.selection_error and not turn.prompt
+    finally:
+        close_robot(robot)
+
+
+def test_wake_rejected_queued_command_cannot_override_later_stop(tmp_path):
+    robot = speaking_robot(tmp_path)
+    robot.wake_word, robot.last_line = True, 0
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    turn = Turn(question="Look right.", speech_start=time.time())
+    try:
+        robot._motion_request(turn)
+        assert turn.motion == -1
+        stop = robot.head.request("stop")
+        robot.last_line = turn.speech_start
+        robot._turn(turn, (frame, time.time()))
+        assert turn.kind == "background" and robot.head.generation == stop
+        assert not robot.head.following
+    finally:
+        close_robot(robot)
+
+
+def test_recall_keeps_other_angles_but_does_not_claim_visible_labels_missing(tmp_path):
+    robot = speaking_robot(tmp_path)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    robot.head.angle = 3
+    stamp = time.time()
+    try:
+        from robot.things import DIM as OBJECT_DIM
+        vectors = np.eye(OBJECT_DIM, dtype=np.float32)[[0]]
+        ident = robot.things.name(robot.conversation_visitor, "book", ["book"], vectors,
+                                  [frame[:12, :20]])
+        robot.memory.sighting("book", "left", stamp - 1, named=ident, view_angle=0)
+        _, lines = robot._recall(Turn(question="What did you see?", speech_start=stamp), frame)
+        assert any("book" in line for line in lines)
+        robot.view = frame, {1: ("book", (10, 10, 100, 100))}
+        _, lines = robot._recall(Turn(question="What did you see?", speech_start=stamp), frame)
+        assert not any("book" in line and "not in view" in line for line in lines)
+        robot.head = Head(SimMotor())
+        robot.head.moving = True
+        robot.view = frame, {}
+        _, lines = robot._recall(Turn(question="What did you see?", speech_start=stamp), frame)
+        assert not any("not in view" in line for line in lines)
+        robot.head.close()
+    finally:
+        close_robot(robot)

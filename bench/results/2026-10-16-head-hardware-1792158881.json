@@ -1,0 +1,975 @@
+{
+  "release": "04bcaf35e0e3",
+  "machine": "Jetson",
+  "mode": "loose-servo",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 853,
+    "direction": 1,
+    "limit": 8
+  },
+  "external_supply": "5 V / 4 A",
+  "tegrastats": "head-hardware-20261016-095441.tegrastats",
+  "trace": [
+    {
+      "kind": "inspection",
+      "time": 1792158882.3236818,
+      "angle": 4.74609375,
+      "goal": 5,
+      "moving": false,
+      "error": ""
+    },
+    {
+      "kind": "inspection",
+      "time": 1792158883.919504,
+      "angle": -4.74609375,
+      "goal": -5,
+      "moving": false,
+      "error": ""
+    },
+    {
+      "kind": "inspection",
+      "time": 1792158884.583032,
+      "angle": -0.439453125,
+      "goal": 0,
+      "moving": false,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.58312,
+      "angle": -0.439453125,
+      "goal": 2.560546875,
+      "moving": false,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.6532288,
+      "angle": -0.439453125,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.7233193,
+      "angle": 0.087890625,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.7934022,
+      "angle": 0.791015625,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.8635285,
+      "angle": 1.58203125,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158884.9336596,
+      "angle": 1.669921875,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.0039825,
+      "angle": 2.28515625,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.074303,
+      "angle": 2.28515625,
+      "goal": 2.560546875,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.144662,
+      "angle": 2.28515625,
+      "goal": 5.28515625,
+      "moving": false,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.214795,
+      "angle": 2.28515625,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.2851138,
+      "angle": 2.373046875,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.3552248,
+      "angle": 3.251953125,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.4253302,
+      "angle": 4.306640625,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.4954252,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.5655186,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.6356113,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.7057092,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.775803,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.8458955,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.917698,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158885.9877918,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.0578747,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.127953,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.198038,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.2681491,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.3382587,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.4083679,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.4784708,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.5485654,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.6186433,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.690718,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.7607954,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.8308704,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.9009438,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158886.9710276,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.0411096,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.1112156,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.1824865,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.2526088,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.3227246,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.392837,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.462962,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.53305,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.6031268,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.6761518,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.746228,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.8163338,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.8864202,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158887.9564981,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.0265844,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.0966692,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.1697888,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.2398684,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.3100007,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.380135,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.4502277,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.5203118,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.590393,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.6604722,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.730551,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.8006318,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.8707128,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158888.94387,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.013949,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.0840297,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.1541092,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.2241852,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.2942884,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.3644001,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.4375663,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.5076451,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.5777247,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.647803,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.7178795,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.7879567,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.8580306,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158889.9307456,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.0008216,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.0708997,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.1409757,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.2110505,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.281127,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.3512363,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.4246178,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.4947019,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.5647795,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.634856,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.7049303,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.7750068,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.8450809,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.9179158,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158890.9880102,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.0580893,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.1281688,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.1982446,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.2683213,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.3384287,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.4108214,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.4808943,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.5509784,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.6210613,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.6911366,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.761212,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.8313236,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.90383,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158891.9739156,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.0439973,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.1140742,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.1841505,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.254226,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.3243022,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.397241,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.4673417,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    },
+    {
+      "kind": "following",
+      "time": 1792158892.5374324,
+      "angle": 4.74609375,
+      "goal": 5.28515625,
+      "moving": true,
+      "error": ""
+    }
+  ],
+  "before": {
+    "id": 1,
+    "position": 853,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.6,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "status": "failed",
+  "error": "AssertionError('Following never reached bench limit')",
+  "head_error": "",
+  "after": {
+    "id": 1,
+    "position": 907,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true
+}

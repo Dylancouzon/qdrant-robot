@@ -20,12 +20,12 @@ Raise the capability ceiling for perception, sustained conversation, useful retr
 | "Do you remember me?" | Face match against people (one point per person, face shots as a multivector, MaxSim) |
 | "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with question phrasings as a multivector) |
 
-Priority when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. [Head control](servo.md) shares one active visitor with conversation and ownership. Finite-speed simulation passes the functional scenario; physical runtime control awaits calibration and its serial adapter. A Wikipedia shard is an add-on after M4.
+Priority when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. [Head control](servo.md) shares one active visitor with conversation and ownership. Finite-speed simulation passes the functional scenario. The serial runtime requires an explicit calibration file; mounted qualification remains next. A Wikipedia shard is an add-on after M4.
 
 ## Hardware and machines
 
 
 - **Robot:** Jetson Orin Nano Super 8 GB, NVMe, USB camera (Arducam IMX291, about 100°), and a USB speaker with microphone (ALSA card `Device`, connected 2026-10-10). Never run the course robot's hotspot setup over the active Wi-Fi link.
-- **Allowed additions:** anything the Jetson drives over USB, I2C, SPI, or GPIO. D175 and D176 implement shared visitor selection and bounded simulated head control. The loose STS3215 helper is separate from the pending mounted runtime adapter. Arms remain outside scope.
+- **Allowed additions:** anything the Jetson drives over USB, I2C, SPI, or GPIO. D175 and D176 implement shared visitor selection and bounded head control. The STS3215 runtime and loose-servo helper share one checked transport. Arms remain outside scope.
 - **Mac:** development, tests, data preparation, and training. **WSL 3080 box:** bake-offs and heavy preparation. Build Jetson engines on the Jetson; measure every acceptance number on the Jetson.
 - Access details and pitfalls are in [the machine notes](experiment-ledger.md#machines).

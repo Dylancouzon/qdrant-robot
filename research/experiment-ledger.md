@@ -71,7 +71,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 
 | Avenue | Outcome | Status | Ref |
 | --- | --- | --- | --- |
-| Shared active visitor and bounded head control | Nine oracle-text turns pass with real Jetson models and finite-speed camera rotation. Unknown introduction, consent, following, position swap, loss, Stop, both inspections, and deletion pass (J). Nine saved WAVs have zero transcription errors on the Mac (E). Body-track admission and conversational inspection were rejected after measured failures | Simulation current; physical adapter, mounting, latency, and broader acceptance pending | D175, D176; [head control](servo.md) |
+| Shared active visitor and bounded head control | Nine oracle-text turns pass with real Jetson models and finite-speed camera rotation. Unknown introduction, consent, following, position swap, loss, Stop, both inspections, and deletion pass (J). Nine saved WAVs have zero transcription errors on the Mac (E). At 10°/s, physical Stop dispatch was 4.40 ms, sampled excursion 1.230°, and settlement 0.554 s; service SIGTERM passed (J). The provisional 0.3 s Stop goal remains unmet. Body-track admission and conversational inspection were rejected after measured failures | Simulation and loose-servo runtime pass; mounted power, stopping, latency, and broader acceptance pending | D175, D176, D177; [head control](servo.md) |
 | YOLOE-26n vocabulary | Misses held phone and off-vocabulary objects | Fallback | D43, D146 |
 | YOLOE-26s TensorRT | Phone movement 91.4%, Restore 91.5% (J) | Current | D146 |
 | Track label voting and short-track merge | Off-majority labels 3 to 0 on the live clip | Current, frozen | D47, D56 |
@@ -138,7 +138,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 ## Machines
 
 - **Jetson:** `ssh robot`, `/home/qdrant/qdrant-robot`, releases under `releases/`, data under `shared/`. GPU jobs take `shared/gpu.lock`. No `rg`; use `grep`. JetPack 7, TensorRT 10.16, OpenCV 5; no Torch or Ultralytics. Never run the course robot's hotspot setup over Wi-Fi.
-- **Servo access:** the Jetson's `qdrant` user belongs to `dialout`. Systemd jobs can read the adapter at `/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00`. Existing login sessions may need renewed group membership. The runtime serial adapter and mounted calibration remain pending.
+- **Servo access:** the Jetson's `qdrant` user belongs to `dialout`. Systemd jobs can read the adapter at `/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00`. Existing login sessions may need renewed group membership. The runtime serial adapter requires explicit calibration. Mounted calibration and qualification remain next.
 - **WSL box:** `ssh dylan@192.168.1.74`, `/home/dylan/qdrant-robot-box`, `gpu.lock`. Preserve other owners' jobs and Docker or Ollama services. LiteRT GPU on WSL picks software Vulkan; use CPU there.
 - **Mac:** shared `.venv` (Python 3.12); system Python 3.9 lacks modules. The preview needs the exact current release; a second MJPEG subscriber replaces the first.
 - Edge stores are sparse files: use `rsync -aS`. The Jetson kernel lacks `/proc/PID/task/TID/children`; walk PPid in `/proc/*/stat`.

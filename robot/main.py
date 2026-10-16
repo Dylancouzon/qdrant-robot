@@ -10,6 +10,7 @@ import json
 import os
 import queue
 import secrets
+import signal
 import subprocess
 import re
 import threading
@@ -24,7 +25,7 @@ import numpy as np
 
 from robot import audio, brain
 from robot.attention import Candidate, choose, handover
-from robot.head import Head, INSPECT, Interrupted, command as head_command
+from robot.head import Head, INSPECT, Interrupted, interrupt, command as head_command
 from robot.asr import Ears, Scribe, woken
 from robot.config import SHARED
 from robot.settings import settings
@@ -213,7 +214,7 @@ class Turn:
     identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
     visitor: str = ""             # resolved once before object actions
     selection_error: str = ""     # ambiguous or missing active visitor: no personal writes
-    motion: int = 0               # accepted head request, before entering the answer queue
+    motion: int = 0               # 0: unchecked; -1: wake rejected; positive: head generation
     view_angle: float = 0.0       # measured angle of the sight source
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
@@ -288,7 +289,8 @@ class Robot:
         # (name, offered) the visitor told in this conversation; offered: the robot offered
         # to remember their face (D69), once per conversation.
         self.told: tuple[str, bool] | None = None
-        self.last_line = 0.0  # when the answer to the last answered line ended
+        self.last_line = 0.0  # when the last answer playback ended
+        self.last_input = 0.0  # accepted input keeps queued follow-ups eligible
         # (track, focus epoch) that "Track this" asked a name for
         self.current_visitor = ""
         self.candidate = self.confirming = None
@@ -370,6 +372,8 @@ class Robot:
             raise RuntimeError(f"{name} stopped") from error
         if self.detect_failed is not None:
             raise RuntimeError("detection stopped") from self.detect_failed
+        if self.head.error:
+            raise RuntimeError(f"head stopped: {self.head.error}")
 
     def next_turn(self, timeout: float = 60) -> Turn:
         """Wait for an answer while checking for failed workers."""
@@ -410,7 +414,7 @@ class Robot:
             self.last_frame, self.points, self.tracker = None, {}, Tracker()
             self.last_objects = frozenset()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
-            self.told, self.last_line, self.face = None, 0.0, None
+            self.told, self.last_line, self.last_input, self.face = None, 0.0, 0.0, None
             self.face_track, self.turn_seen = None, None
             self.teaching, self.start_target = None, None
             self.current_visitor = ""
@@ -463,8 +467,11 @@ class Robot:
     def _motion_request(self, turn):
         text = woken(turn.question)
         if self.wake_word and text is None and \
-                turn.speech_start - self.last_line > CONVERSATION_S:
+                turn.speech_start - max(self.last_line, self.last_input) > CONVERSATION_S:
+            turn.motion = -1
             return
+        # Accepted input keeps follow-ups eligible while an answer is still queued.
+        self.last_input = max(self.last_input, turn.speech_end)
         text = text or turn.question
         kind = head_command(text)
         if kind or handover(text) or name_in(text):
@@ -1082,7 +1089,7 @@ class Robot:
 
     def _whois(self, frame: np.ndarray, turn: Turn | None = None
                ) -> tuple[np.ndarray, str | None] | None:
-        """The visitor's face in the whole `frame` (people.face) and the enrolled person it
+        """The selected visitor's face in the whole `frame` and the enrolled person it
         matches by the two-shot rule, or None without a usable face. An identity turn logs
         the face width, the step time, and the two best people's scores, never the face."""
         started = time.time()
@@ -1321,14 +1328,13 @@ class Robot:
         answered only after the wake phrase, or as a follow-up within CONVERSATION_S of the
         last answer (D65); the wake phrase is not part of the question."""
         heard = woken(turn.question)
-        if self.wake_word and heard is None and \
-                turn.speech_start - self.last_line > CONVERSATION_S:
+        if not turn.motion:
+            self._motion_request(turn)
+        if turn.motion == -1:
             turn.kind = "background"  # logged for false-accept checks, never answered or stored
             self.ui_turn = None
             self._log(turn)
             return
-        if not turn.motion:
-            self._motion_request(turn)
         turn.question = heard or turn.question
         identity_shot, previous = shot, None
         self.head.paused = True
@@ -1384,7 +1390,7 @@ class Robot:
         if shot[0] is None:
             turn.selection_error, turn.keep = "I need a camera image before turning.", False
             return shot, None
-        if shot[0] is not None and self._resolve_visitor(turn, shot[0]):
+        if self._resolve_visitor(turn, shot[0]):
             self._clear_dialogue()
         if turn.selection_error:
             return shot, None
@@ -1523,7 +1529,7 @@ class Robot:
                 held.point = turn.frame_id
                 self.held.append(held)
         # The answer ends when its audio does (the speech end in tests without audio).
-        self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
+        self.last_line = max(self.last_line, turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
 
     def _remember_dialogue(self, turn):
@@ -1705,7 +1711,7 @@ class Robot:
 
     def _resolve_visitor(self, turn: Turn, frame: np.ndarray) -> bool:
         """Resolve the speaker once before identity or object actions."""
-        if turn.visitor:
+        if turn.visitor or turn.selection_error:
             return False
         seen = self._whois(frame, turn)
         if turn.selection_error:
@@ -1779,9 +1785,9 @@ class Robot:
             seen = self.turn_seen
             if not seen or seen[1] != name:
                 return f"I already know someone called {name}."
-        return done("enroll", name, self._enroll(name, shots, frame, turn)) if yes else DECLINED
+        return done("enroll", name, self._enroll(name, shots, turn)) if yes else DECLINED
 
-    def _enroll(self, name: str, shots: list[np.ndarray], frame: np.ndarray, turn: Turn) -> bool:
+    def _enroll(self, name: str, shots: list[np.ndarray], turn: Turn) -> bool:
         """Enroll `name` after consent from the face that asked and the face that said yes
         (two frames, one person): face vectors in the people shard, no image."""
         if (seen := self.turn_seen) is None or any(
@@ -2377,10 +2383,12 @@ class Robot:
                         m["thumb"] - thumb(frame).astype(np.float32)).mean() > SCENE_CHANGE]
         with self.detecting:  # a consistent snapshot of the tracks
             in_view = {self.points[t] for t in self.tracker.in_view() if t in self.points}
+            labels_in_view = {label for label, _ in self.view[1].values()}
+            settled_view = self.head.valid(self.view_taken)
         newest: dict[str, dict] = {}  # kind -> its newest sighting: one line per object
         for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored,
                                        named=selected):
-            if self._same_view(s):
+            if self._same_view(s) or (settled_view and s["label"] not in labels_in_view):
                 newest.setdefault(kind_of(s["label"]), s)
         sights = list(newest.values())[:LINES]
         turn.memories = [m["id"] for m in recalled + sights]
@@ -2543,13 +2551,22 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--camera-file", type=Path,
                    help="recorded camera fixture, in stored orientation")
+    p.add_argument("--servo-calibration", type=Path,
+                   help="explicit STS3215 port, forward encoder, direction, and travel JSON")
     a = p.parse_args()
+    signal.signal(signal.SIGTERM, interrupt)
     with contextlib.suppress(audio.VolumeNotSaved):  # the level is set; saving can wait
         audio.set_volume(audio.saved_volume())
-    chunks, play = audio.mic(), audio.aplay(audio.SPEAKER, RATE)
-    camera = FileCamera() if a.camera_file else Camera()
-    with contextlib.closing(camera), contextlib.closing(chunks):
-        robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"), play=play)
+    from robot.servo import SerialMotor
+    with contextlib.ExitStack() as cleanup:
+        head = cleanup.enter_context(contextlib.closing(Head(
+            SerialMotor.open(a.servo_calibration) if a.servo_calibration else None)))
+        camera = cleanup.enter_context(contextlib.closing(
+            FileCamera() if a.camera_file else Camera()))
+        chunks = cleanup.enter_context(contextlib.closing(audio.mic()))
+        play = audio.aplay(audio.SPEAKER, RATE)
+        robot = Robot(camera, SHARED / "sessions" / time.strftime("%Y%m%d-%H%M%S"),
+                      play=play, head=head)
         try:
             if a.camera_file:
                 camera.show(a.camera_file)  # begin the clip after model warmup

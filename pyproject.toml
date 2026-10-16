@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "A desktop robot whose models and memory (Qdrant Edge) all run on one Jetson Orin Nano."
 requires-python = "==3.12.*"
 dependencies = [
+    "feetech-servo-sdk==1.0.0",
+    "pyserial==3.5",
     "numpy==2.3.3",
     "onnx-asr==0.12.0",
     "opencv-python-headless==5.0.0.93",

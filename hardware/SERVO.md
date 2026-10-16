@@ -59,7 +59,7 @@ build/servo-venv/bin/python tools/servo.py --port "$SERVO_PORT" nudge -3
 
 Each nudge moves relative to the measured position, waits for arrival, and releases torque. The shaft can move freely afterward. A nudge accepts at most 10° in either direction. It uses 100 steps/s, acceleration value five, and at most 20% torque. These conservative settings remain in RAM after the test.
 
-The helper first disables torque, sets speed and torque limits, and replaces any old goal with the current position. It verifies each write before enabling torque. It then sends the new goal. Arrival requires two stopped samples within five steps of the target. Movement has a three-second timeout, and serial writes have a half-second timeout.
+The helper first disables torque, sets speed and torque limits, and replaces any old goal with the current position. It verifies each write before enabling torque. It then sends the new goal. Arrival requires two stopped samples within five steps of the target. Movement has a three-second timeout, and serial writes have a 100 ms timeout.
 
 The helper refuses moves across the saved position limits or encoder zero. For example, a negative five-degree move from position 55 would cross zero. Small position errors also mean equal positive and negative commands may not return exactly to the start. Read the reported `start`, `target`, and `reached` values; choose a smaller move if necessary.
 
@@ -77,7 +77,7 @@ The helper attempts torque release on errors and Ctrl-C. If it prints **"Torque 
 
 The enclosure specifies **±70° from straight ahead for normal movement**, or **140° total travel**. Its mechanical stops are at **±80°**. Keep the 10° margin on each side; powered movement must stop before contact with a mechanical stop. These design limits come from [the enclosure requirements](https://github.com/Dylancouzon/qdrant-robot/blob/241aacc/hardware/DESIGN_REQUIREMENTS.md) and still need physical cable-clearance checks.
 
-The mounted-head controller must enforce these absolute limits relative to a calibrated forward position. Repeated relative nudges accumulate, so the bench helper's per-command limit does not protect an assembled neck. Use this helper only with the loose servo until mounted-head calibration and travel enforcement exist.
+The mounted-head controller must enforce these absolute limits relative to a calibrated forward position. Repeated relative nudges accumulate, so the bench helper's per-command limit does not protect an assembled neck. Use this helper only with the loose servo. The runtime controller enforces absolute travel from explicit calibration.
 
 The SDK opens the serial port with `PortHandler` and uses `PacketHandler(0)`. The helper calls its register read/write methods and checks both communication results and servo error flags. Two-byte STS values use little-endian order; the SDK handles packet construction and checksums. The helper replaces the SDK's unbounded serial drain with an input-buffer reset and clears its busy flag after failed requests. This lets cleanup attempt another packet after a serial exception.
 
@@ -105,23 +105,52 @@ All helper writes target RAM registers. It leaves EEPROM settings, including the
 - **No serial port:** check the USB data cable and computer USB connection.
 - **No status response:** check external power, both jumpers at B, the servo lead, and the known servo ID. Close other programs using the port.
 - **Linux permission denied:** give your user access through the serial device's group, commonly `dialout`, then sign in again.
-- **Movement refused:** read status. The helper requires position mode, no fault, a stationary motor, 4.5–5.5 V reported voltage, and temperature below 60°C. It refuses unsupported position readings instead of changing calibration.
+- **Movement refused:** read status. The helper requires position mode, no fault, a stationary motor, 4.5–6.0 V reported voltage, and temperature below 60°C. It refuses unsupported position readings instead of changing calibration.
 - **Movement timed out:** disconnect power and check for obstruction or insufficient power. The helper retains conservative torque limits.
 
-## Verified scope and main-branch handoff
+## Verified scope
 
 On 2026-10-15, this Mac read ID one, model 777, firmware 3.10, position mode, and 5.3–5.4 V servo feedback (E). With the reviewed helper, three successive moves reached targets 60, 21, and three at positions 55, 22, and seven (E). Every completed move confirmed torque off. The final position was four encoder steps, approximately 0.35°, from that run's starting position three. Saved registers zero through 39 were identical before and after. The [final-source run](../bench/results/2026-10-15-servo-bench-1792102797.jsonl) contains the commands, versions, source checksum, and readbacks. The [first run](../bench/results/2026-10-15-servo-bench-1792102525.jsonl) records the correctly rejected boundary crossing. An [intermediate run](../bench/results/2026-10-15-servo-bench-1792102553.jsonl) verified motion before the SDK transport fixes.
 
-For main, take this guide, `tools/servo.py`, `tools/test_servo.py`, the three linked run records, and the README link. These files have no enclosure-code dependency. Run the offline checks without connecting hardware:
+The Jetson runtime uses the same transport in [robot/servo.py](../robot/servo.py). Its [current checks and qualification limits](../research/servo.md#physical-runtime-checks) distinguish physical servo motion from simulated camera tests.
+
+## Enable the runtime after calibration
+
+`--servo-calibration PATH` enables the USB motor in `robot.main`. Startup without that option leaves head motion disabled. The file contains exactly `port`, `zero`, `direction`, and `limit`. Servo ID one and model 777 remain fixed.
+
+- `port` identifies the adapter under `/dev/serial/by-id/`.
+- `zero` is the measured forward encoder integer, from zero through 4,095.
+- `direction` is one or minus one, verified against the mounted camera's rightward view.
+- `limit` sets symmetric software travel in degrees, from one through 70. Start mounted checks at 10°.
+
+The runtime rejects encoder-boundary crossings, saved-limit conflicts, and initial positions outside this range. It requires position mode, torque off, no reported fault, and a stationary servo. Feedback must report 4.5–6.0 V and temperature below 60°C.
+
+The runtime readback window is 4.5–6.0 V. A known-good bench supply reported 5.6 V, above the original 5.5 V software ceiling. The 6 V ceiling remains within the confirmed 7.4 V variant's [manufacturer operating range](https://www.feetechrc.com/74v-19-kgcm-plastic-case-metal-tooth-magnetic-code-double-axis-ttl-series-steering-gear.html). The manufacturer specifies 6–7.4 V; our 5 V unloaded trial does not qualify mounted operation. Keep temperature, mode, fault, and unsafe-voltage checks immediate.
+
+Startup preserves the measured position and primes its goal before enabling torque. It caps RAM torque at 20%, speed at 10°/s, and acceleration at five. The provisional arrival tolerance is 1°. Normal SIGTERM, faults, and shutdown attempt torque release. USB loss can prevent confirmation.
+
+Keep temporary loose-servo calibration in `shared/experiments/`. After assembly, create `/home/qdrant/qdrant-robot/shared/servo-mounted.json` from measured forward position and direction. Follow [assembled testing](../research/servo.md#next-session-assembled-robot-testing) before enabling normal movement.
+
+After calibration, launch from the Mac through the project workflow. The fresh token lets the existing monitor attach.
 
 ```sh
-.venv/bin/python -m pytest -q tools/test_servo.py
+.venv/bin/python - <<'PYTHON'
+import os
+import secrets
+from tools.jetson import run
+
+os.environ["ROBOT_VIEW_TOKEN"] = secrets.token_hex(32)
+raise SystemExit(run("robot", [
+    "-m", "robot.main", "--servo-calibration",
+    "/home/qdrant/qdrant-robot/shared/servo-mounted.json",
+], False))
+PYTHON
 ```
 
-To include the regression check against the real SDK, run:
+Then open the normal monitor for the deployed release and select **Start**. Stop the robot unit before changing calibration. A fault requires an explicit restart after its cause is resolved.
+
+Run offline safety checks with the pinned SDK:
 
 ```sh
-uv run --no-project --with pytest --with feetech-servo-sdk==1.0.0 --with pyserial==3.5 pytest -q tools/test_servo.py
+uv run --no-project --with pytest --with feetech-servo-sdk==1.0.0 --with pyserial==3.5 pytest -q robot/test_head.py robot/test_servo.py tools/test_servo.py
 ```
-
-Jetson control, USB-port power, loaded motion, and mounted-head travel remain unverified (U). Before runtime integration, establish the head's forward position, direction, software travel limits, and cable clearance. The bench helper provides no mounted-head calibration.

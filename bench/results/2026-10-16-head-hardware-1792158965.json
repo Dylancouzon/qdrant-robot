@@ -1,0 +1,1209 @@
+{
+  "release": "cf01e621a994",
+  "machine": "Jetson",
+  "mode": "loose-servo",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 853,
+    "direction": 1,
+    "limit": 8
+  },
+  "external_supply": "5 V / 4 A",
+  "tegrastats": "head-hardware-20261016-095605.tegrastats",
+  "trace": [
+    {
+      "kind": "inspection",
+      "time": 1792158965.9778466,
+      "angle": 4.658203125,
+      "goal": 5.009765625,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.0050399129977449775,
+      "goal_write_s": 0.0013585499982582405
+    },
+    {
+      "kind": "inspection",
+      "time": 1792158966.919174,
+      "angle": -4.74609375,
+      "goal": -5.009765625,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.00472930799878668,
+      "goal_write_s": 0.0013239239997346886
+    },
+    {
+      "kind": "inspection",
+      "time": 1792158967.638482,
+      "angle": -0.17578125,
+      "goal": 0.0,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.004273097998520825,
+      "goal_write_s": 0.0012472169983084314
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.6385815,
+      "angle": -0.17578125,
+      "goal": 2.82421875,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.004273097998520825,
+      "goal_write_s": 0.0012472169983084314
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.7089398,
+      "angle": -0.17578125,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004608759001712315,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.7790482,
+      "angle": -0.087890625,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004818943998543546,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.8493688,
+      "angle": 0.703125,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.005151883997314144,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.919556,
+      "angle": 1.669921875,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.0046723769992240705,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158967.9898813,
+      "angle": 2.28515625,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004384270003356505,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.060213,
+      "angle": 2.28515625,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004413198999827728,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.1305382,
+      "angle": 2.28515625,
+      "goal": 2.8125,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.0044075990008423105,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.200709,
+      "angle": 2.28515625,
+      "goal": 5.28515625,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.004406159001518972,
+      "goal_write_s": 0.0012402729989844374
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.271032,
+      "angle": 2.28515625,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004396750002342742,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.341363,
+      "angle": 2.900390625,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004426671999681275,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.4116945,
+      "angle": 3.515625,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.005156876999535598,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.4818332,
+      "angle": 4.482421875,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004718299998785369,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.5519361,
+      "angle": 4.74609375,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004729979998955969,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.6220288,
+      "angle": 4.74609375,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004370189999463037,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.6923523,
+      "angle": 4.74609375,
+      "goal": 5.2734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004390734000480734,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.763107,
+      "angle": 4.74609375,
+      "goal": 7.74609375,
+      "moving": false,
+      "error": "",
+      "feedback_s": 0.004369037997093983,
+      "goal_write_s": 0.0012701309969997965
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.833426,
+      "angle": 4.74609375,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004994311006157659,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.9035609,
+      "angle": 5.361328125,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004426480001711752,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158968.9738815,
+      "angle": 5.888671875,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004388014000141993,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.0442042,
+      "angle": 7.03125,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004426318999321666,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.1145334,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004450864995305892,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.1846888,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004976037998858374,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.255026,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004491987005167175,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.3253503,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004312746998039074,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.3954952,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.005380277994845528,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.4658303,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.00450209900009213,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.5364814,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004531475999101531,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.606588,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004408943001180887,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.6769254,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004530771002464462,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.7472537,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004472433996852487,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.8175867,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004501265997532755,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.887724,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004781021998496726,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158969.9578593,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.004360524995718151,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.0300038,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "",
+      "feedback_s": 0.005039367999415845,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.100328,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.170659,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.240873,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.311208,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.381364,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.4517102,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.5218673,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.5922186,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.6623857,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.7327347,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.8030858,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.873441,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158970.943788,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.0141363,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.084487,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.1548433,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.225009,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.2953606,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.365526,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.4356394,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.505801,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.5759332,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.646272,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.7164009,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.7867494,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.8571033,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.9272716,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158971.9974213,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.0677762,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.1381316,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.2084827,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.2786498,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.349005,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.4191673,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.4893303,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.5594723,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.629639,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.699807,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.7701547,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.840514,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.9108667,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158972.981008,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.0513554,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.1215274,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.1916916,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.2618525,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.3321981,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.4023576,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.472472,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.5426207,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.6127362,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.6830847,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.7532496,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.8236036,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.8939586,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158973.9641304,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.0342922,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.1046448,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.174998,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.2451115,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.315293,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.385646,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.4559999,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.5261643,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.5962772,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.666624,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.7369754,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.807321,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.8776755,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158974.9480274,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.0183508,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.0886881,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.1590385,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.2293923,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.2997437,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.369909,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.4402602,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.510375,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    },
+    {
+      "kind": "following",
+      "time": 1792158975.5805306,
+      "angle": 7.119140625,
+      "goal": 7.734375,
+      "moving": true,
+      "error": "Servo movement stalled",
+      "feedback_s": 0.0044171670015202835,
+      "goal_write_s": 0.0012468970016925596
+    }
+  ],
+  "before": {
+    "id": 1,
+    "position": 906,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "status": "failed",
+  "error": "AssertionError('Following never reached bench limit')",
+  "head_error": "Servo movement stalled",
+  "after": {
+    "id": 1,
+    "position": 934,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true
+}

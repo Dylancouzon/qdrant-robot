@@ -20,6 +20,7 @@ def test_known_and_unknown_introduction_and_explicit_handover():
     known, unknown = candidate(0, "Dylan"), candidate(1)
     assert choose([known, unknown])[0] is known
     assert choose([known, unknown], known.vector, "My name is Sam.")[0] is unknown
+    assert choose([known, unknown], known.vector, "My name is Dylan.")[0] is unknown
     assert choose([known, unknown], unknown.vector, "This is my phone.")[0] is unknown
     assert choose([unknown, known], unknown.vector, "Talk to Dylan.")[0] is known
     assert choose([unknown], unknown.vector, "Talk to Dylan.")[0] is None
@@ -147,3 +148,48 @@ def test_stop_and_turn_cleanup_are_atomic():
         head.finish(token)
         worker.join()
         assert not head.paused and not head.following
+
+
+def test_repeated_service_signal_cannot_interrupt_cleanup():
+    import signal
+    import subprocess
+    import sys
+    code = """
+import signal, time
+from robot.head import interrupt
+signal.signal(signal.SIGTERM, interrupt)
+try:
+    print('ready', flush=True)
+    while True:
+        time.sleep(.1)
+except KeyboardInterrupt:
+    pass
+finally:
+    print('closing', flush=True)
+    time.sleep(.15)
+    print('closed', flush=True)
+"""
+    child = subprocess.Popen([sys.executable, "-u", "-c", code], stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, text=True)
+    try:
+        assert child.stdout.readline().strip() == "ready"
+        child.send_signal(signal.SIGTERM)
+        assert child.stdout.readline().strip() == "closing"
+        child.send_signal(signal.SIGTERM)
+        output, error = child.communicate(timeout=5)
+        assert child.returncode == 0 and output.strip() == "closed" and not error
+    finally:
+        if child.poll() is None:
+            child.kill()
+            child.communicate()
+
+
+def test_stop_discards_even_a_small_unsent_goal():
+    motor = SimMotor()
+    head = Head(motor)
+    drive(head)
+    token = head.request("right")
+    head.move(.05, token)
+    head.request("stop")
+    head.tick(101.)
+    assert head.goal == head.angle == 0 and motor.goals == [0]

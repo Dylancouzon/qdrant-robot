@@ -1,9 +1,8 @@
-"""Bounded head following and inspection, with a finite-speed simulated motor.
-
-Runtime hardware enablement waits for mounted calibration. Only this controller owns its motor.
-"""
+"""Bounded following and inspection. Only this controller owns its motor."""
 import math
 import re
+import signal
+import sys
 import threading
 import time
 
@@ -12,6 +11,12 @@ INSPECT = 45.0
 FRESH_S = 0.3
 SETTLE_S = 0.1
 PERIOD_S = 0.05
+
+
+def interrupt(signum, _frame):
+    """Let normal cleanup release the motor on service SIGTERM."""
+    signal.signal(signum, signal.SIG_IGN)
+    raise KeyboardInterrupt
 
 
 class Interrupted(RuntimeError):
@@ -57,6 +62,8 @@ class SimMotor:
 class Head:
     def __init__(self, motor=None, blocked=lambda: False):
         self.motor, self.blocked = motor, blocked
+        self.limit = min(LIMIT, getattr(motor, "limit", LIMIT))
+        self.tolerance = getattr(motor, "tolerance", .1)
         self.condition = threading.Condition(threading.RLock())
         self.angle = self.goal = 0.0
         self.generation = self.view = 0
@@ -105,27 +112,27 @@ class Head:
                 self._tick(now)
             except Exception as error:
                 self.error, self.following, self.inspecting = str(error), False, False
-                self.motor.close()
+                self._close_motor()
             self.condition.notify_all()
 
     def _tick(self, now):
         angle, moving = self.motor.read(now)
-        if not math.isfinite(angle) or abs(angle) > LIMIT + .1:
+        if not math.isfinite(angle) or abs(angle) > self.limit + .1:
             raise RuntimeError("Head feedback exceeds calibrated travel")
         if self.sent is None:
             self.goal = angle
         self.angle = angle
         blocked = self.blocked()
-        if self.halt or (blocked and not self.inspecting):
-            self.goal, self.halt = angle, False
-        target = angle if blocked else self.goal
+        target = self._target(angle, moving, blocked)
         if target != self.sent:
-            if not math.isfinite(target) or abs(target) > LIMIT:
+            if not math.isfinite(target) or abs(target) > self.limit:
                 raise RuntimeError("Head goal exceeds calibrated travel")
-            self.motor.move(target)
-            self.sent = target
+            actual = self.motor.move(target)
+            self.sent = target if actual is None else actual
+            if self.goal == target:
+                self.goal = self.sent
             moving = True
-        if moving or abs(self.goal - angle) > .1:
+        if moving or abs(self.goal - angle) > self.tolerance:
             if not self.moving:
                 self.view += 1
                 self.changed = now
@@ -135,6 +142,16 @@ class Head:
             if self.moving and now - self.stationary >= SETTLE_S:
                 self.moving, self.settled = False, now
 
+    def _target(self, angle, moving, blocked):
+        pending = self.goal != self.sent
+        if self.halt or (blocked and not self.inspecting):
+            if pending or moving or abs(self.goal - angle) > self.tolerance:
+                self.goal = angle
+            self.halt = False
+        braking = blocked and (pending or moving or abs(self.goal - angle) > self.tolerance)
+        target = angle if braking else self.goal
+        return target
+
     def follow(self, box, width, taken, now=None):
         """Use only a uniquely verified source after the previous correction settled."""
         now = time.time() if now is None else now
@@ -143,9 +160,14 @@ class Head:
                 return reason
             error = (box[0] + box[2]) / (2 * width) - .5
             if abs(error) > .06:
-                self.goal = max(-LIMIT, min(LIMIT, self.angle + max(-3., min(3., 24 * error))))
+                delta = max(-3., min(3., 24 * error))
+                goal = max(-self.limit, min(self.limit, self.angle + delta))
+                if (abs(goal - self.angle) <= self.tolerance or
+                        abs(goal - self.goal) < getattr(self.motor, "resolution", 0.)):
+                    return "limit"
+                self.goal = goal
                 self.condition.notify_all()
-                return "goal" if self.goal != self.angle else "limit"
+                return "goal"
             return "centered"
 
     def _follow_hold(self, taken, now):
@@ -167,11 +189,11 @@ class Head:
                 raise ValueError("Head goal must be finite")
             if self.motor is None:
                 raise RuntimeError("Head movement is disabled until calibration.")
-            self.goal, self.halt = max(-LIMIT, min(LIMIT, angle)), False
+            self.goal, self.halt = max(-self.limit, min(self.limit, angle)), False
             self.inspecting = True
             self.condition.notify_all()
 
-    def wait(self, generation, timeout=12):
+    def wait(self, generation, timeout=20):
         deadline = time.monotonic() + timeout
         with self.condition:
             while True:
@@ -217,4 +239,11 @@ class Head:
         if self.thread:
             self.thread.join()
         if self.motor:
+            self._close_motor()
+
+    def _close_motor(self):
+        try:
             self.motor.close()
+        except Exception as error:
+            self.error = f"{self.error}; {error}".strip("; ")
+            print(self.error, file=sys.stderr, flush=True)

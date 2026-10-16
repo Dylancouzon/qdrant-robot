@@ -2,11 +2,11 @@
 
 ## Next steps
 
-**Physical servo qualification.** Shared visitor selection, ownership, following, and left/right inspection pass the [finite-speed simulation](servo.md). The normal runtime keeps motor output disabled. Implement the calibrated serial adapter, then verify mounted direction, travel, cable clearance, power, and stopping. Keep models, memory, consent, and deletion behavior intact.
+**Physical servo qualification.** Shared visitor selection, ownership, following, and left/right inspection pass the [finite-speed simulation](servo.md). The serial runtime requires an explicit calibration file. After assembly, verify mounted direction, travel, cable clearance, power, and stopping. Keep models, memory, consent, and deletion behavior intact.
 
 | Priority | Task | Finish when |
 | --- | --- | --- |
-| Next | Calibrated servo adapter and mounted qualification. | Verify bounded physical movement, stopping, cable clearance, and power behavior. |
+| Next | Assembled-head calibration and qualification. | Verify bounded physical movement, stopping, cable clearance, and power behavior. |
 | Parked | General conversation and recent recall. | A changed mechanism improves varied topics while preserving passing privacy, visual, correction, and transfer cases. See [conversation](conversation.md#next-steps). |
 | Parked | Booth acceptance. | Meet the targets and M4 checks in [CLAUDE.md](../CLAUDE.md). Physical latency remains parked under D160. |
 
@@ -17,6 +17,7 @@ The enclosure worktree remains outside this task. Existing models, thresholds, f
 | Area | Remaining issue | Detail |
 | --- | --- | --- |
 | Conversation | Broad past cues and incomplete history caused regressions in archived stored-reply prototypes. General answer quality remains below target. | [Conversation](conversation.md#broader-stored-exchange-regression-2026-10-15) |
+| Servo qualification | Mounted direction, load, cable clearance, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal need assembly testing. | [Head control](servo.md#next-session-assembled-robot-testing) |
 | Identity and privacy | Stranger acceptance and multi-visitor handoffs still need whole-robot qualification. | [Faces](faces.md), [recorded backlog](archive/edge-case-records-2026-10-15.md#earlier-recorded-backlog) |
 | Perception | Lookalike objects, changed viewpoints, small objects, and tracking gaps can limit recognition. | [Objects](objects.md), [camera and encoder records](archive/edge-case-records-2026-10-15.md#camera-and-crop-encoder-d167-d168) |
 | Resources and latency | Paging, sustained detection, and physical audible latency remain unresolved targets. | [STATE.md](../STATE.md), [stack](stack.md) |

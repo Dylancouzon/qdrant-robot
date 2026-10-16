@@ -1,0 +1,1007 @@
+{
+  "release": "008b65309bf2",
+  "mode": "read-only",
+  "samples": [
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 911,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 29,
+      "fault": 0,
+      "moving": 0
+    }
+  ],
+  "tegrastats": "servo-voltage-20261016-101004.tegrastats"
+}

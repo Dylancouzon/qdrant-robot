@@ -4,7 +4,9 @@ from unittest.mock import Mock
 
 import pytest
 
-import servo
+from robot import servo
+from tools import servo as cli
+import sys
 
 
 class Packet:
@@ -195,12 +197,28 @@ def test_sdk_setup_avoids_unbounded_serial_drain(monkeypatch):
     packet.read1ByteTxRx.return_value = (0, 0, 0)
     packet.read2ByteTxRx.return_value = (0, 0, 0)
     sdk = SimpleNamespace(PortHandler=lambda _: port, PacketHandler=lambda _: packet)
-    monkeypatch.setitem(servo.sys.modules, "scservo_sdk", sdk)
+    monkeypatch.setitem(sys.modules, "scservo_sdk", sdk)
     # The main entry point imports list_ports even for an explicit device.
-    monkeypatch.setitem(servo.sys.modules, "serial", SimpleNamespace())
-    monkeypatch.setitem(servo.sys.modules, "serial.tools", SimpleNamespace(list_ports=Mock()))
-    monkeypatch.setattr(servo.sys, "argv", ["servo.py", "--port", "unused", "status"])
-    servo.main()
-    assert port.ser.write_timeout == 0.5
+    monkeypatch.setitem(sys.modules, "serial", SimpleNamespace())
+    monkeypatch.setitem(sys.modules, "serial.tools", SimpleNamespace(list_ports=Mock()))
+    monkeypatch.setattr(sys, "argv", ["servo.py", "--port", "unused", "status"])
+    cli.main()
+    assert port.ser.write_timeout == 0.1
     port.ser.reset_input_buffer.assert_called_once()
     port.ser.flush.assert_not_called()
+
+
+def test_nudge_uses_position_after_torque_release(device, monkeypatch):
+    motor, packet = device
+    packet.memory.update({40: 1, 42: 2048})
+    original = packet.write1ByteTxRx
+    def release(port, ident, address, value):
+        old = packet.memory[40]
+        result = original(port, ident, address, value)
+        if address == 40 and old and not value:
+            packet.memory[56] -= 10
+        return result
+    monkeypatch.setattr(packet, "write1ByteTxRx", release)
+    result = motor.nudge(5)
+    assert result["start"] == 2038 and packet.positions[0] == 2038
+    assert packet.memory[40] == 0

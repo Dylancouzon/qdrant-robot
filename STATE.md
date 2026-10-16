@@ -4,15 +4,15 @@ Updated 2026-10-16. Branch: `spike/conversation-context`. Architecture is settle
 
 ## Active task
 
-Shared visitor selection and bounded simulated head control are implemented and reviewed. The nine-turn Jetson scenario and all nine saved speech outputs pass. An introduction selects the sole unknown beside a known visitor. Conversation, ownership, and following share that selection. Physical runtime integration remains next; the enclosure worktree stays untouched.
+Physical runtime control and shared visitor selection are complete. Opus reviewed both feature scopes, and its blocking findings are fixed. Loose-servo motion, service shutdown, and mandatory regression checks pass. The next task is assembled-head qualification. The enclosure worktree stays untouched.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `809470ff`; current release `31866696ff60`. The `qr-robot` unit is stopped, and no benchmark unit is active. Previous points to accepted `f9b90b958023`; baseline `83dd4fb999f5` remains available. Validated simulation: `shared/experiments/head-sim-1792152537/session`. The Mac monitor serves port 8765 for the current release.
+Jetson `robot`: boot `809470ff`; current release `7cd0c52ce424`. Hardware checks passed on `e9471078186d`; the final follow-up fix has host regression coverage. The robot and benchmark units are stopped. Previous points to accepted `f9b90b958023`; baseline `83dd4fb999f5` remains available. The Mac monitor is stopped.
 
-Motor output stays disabled. The connected Jetson adapter passes read-only status after adding the robot user to `dialout`.
+Motor output is opt-in through explicit calibration. Temporary ±8° calibration lives under `shared/experiments/head-hardware/`; it must not be reused after assembly. Mounted calibration remains absent.
 
-The broad acceptance measurements below precede servo work. Current simulation measurements and gaps are in [head control](research/servo.md).
+The broad acceptance measurements below precede servo work. Current evidence and gaps are in [head control](research/servo.md).
 
 ## Targets
 
@@ -30,6 +30,8 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next step
 
-**Calibrated servo adapter and mounted qualification.** Establish forward position, direction, encoder limits, and cable clearance with Dylan. Implement the runtime serial adapter before enabling motion. Inspection latency, sustained performance, and broader acceptance remain open. See [head control](research/servo.md#remaining-qualification).
+**Test the assembled head.** Follow [mounted calibration and checks](research/servo.md#next-session-assembled-robot-testing): forward encoder, direction, small initial travel, cable clearance, gradual limits, two-person ownership, inspection, Stop, shutdown, and loaded power.
 
-Next: read `hardware/SERVO.md`, then plan the calibrated runtime adapter against the connected controller's readback.
+The provisional Stop settlement target of 0.3 s remains unmet at 0.553 s (J). Qualify loaded power and stationary feedback before unattended use. Inspection latency and broad acceptance remain open.
+
+Next: read `research/servo.md` and perform the assembled-head checklist after mounting.

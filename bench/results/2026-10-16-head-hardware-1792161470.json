@@ -1,0 +1,48 @@
+{
+  "release": "b7af50d11ef9",
+  "machine": "Jetson",
+  "mode": "service-shutdown",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 853,
+    "direction": 1,
+    "limit": 8
+  },
+  "external_supply": "5 V / 4 A",
+  "configured_speed_deg_s": 10,
+  "tegrastats": "head-shutdown-20261016-103749.tegrastats",
+  "trace": [],
+  "before": {
+    "id": 1,
+    "position": 860,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "status": "passed",
+  "fault_status": {
+    "id": 1,
+    "position": 860,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "head_error": "",
+  "after": {
+    "id": 1,
+    "position": 860,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 29,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true
+}

@@ -18,7 +18,7 @@ def bare_robot():
     robot.closing, robot.detecting = threading.Event(), threading.Lock()
     robot.worker_failed, robot.detect_failed = None, None
     robot.asked = 0
-    robot.head, robot.wake_word, robot.last_line = Head(), False, 0.
+    robot.head, robot.wake_word, robot.last_line, robot.last_input = Head(), False, 0., 0.
     return robot
 
 
@@ -72,7 +72,8 @@ def test_healthy_worker_drains(worker):
     assert robot.asked == 2 if worker == "transcribe" else len(calls) == 2
 
 
-def test_close_after_worker_failure():
+@pytest.mark.parametrize("fault", ["worker", "head"])
+def test_close_after_worker_failure(fault):
     robot = bare_robot()
     closed = []
 
@@ -89,7 +90,10 @@ def test_close_after_worker_failure():
 
     def fail(shot):
         failed.set()
-        raise RuntimeError("injected shutdown failure")
+        if fault == "head":
+            robot.head.error = "injected head fault"
+        else:
+            raise RuntimeError("injected shutdown failure")
 
     robot._look, robot.scribe = fail, lambda speech: ""
     robot.threads = [threading.Thread(target=target, daemon=True) for target in (
@@ -163,7 +167,65 @@ def test_live_failure_closes_resources(monkeypatch):
     monkeypatch.setattr(main.audio, "mic", chunks)
     monkeypatch.setattr(main.audio, "set_volume", lambda value: None)
     monkeypatch.setattr(main, "argparse", Stub(ArgumentParser=lambda **_kwargs: Stub(
-        add_argument=lambda *args, **_kwargs: None, parse_args=lambda: Stub(camera_file=None))))
+        add_argument=lambda *args, **_kwargs: None, parse_args=lambda: Stub(
+            camera_file=None, servo_calibration=None))))
     with pytest.raises(RuntimeError) as raised:
         main.main()
     assert raised.value is error and closed == ["robot", "microphone", "camera"]
+
+
+def test_live_model_startup_failure_releases_motor(monkeypatch):
+    from robot import camera, servo
+    closed, handlers = [], []
+    error = RuntimeError("injected model startup failure")
+    monkeypatch.setattr(servo.SerialMotor, "open", lambda _path:
+                        Stub(close=lambda: closed.append("motor")))
+    monkeypatch.setattr(main, "Robot", lambda *args, **kwargs:
+                        (_ for _ in ()).throw(error))
+    monkeypatch.setattr(camera, "Camera", lambda: Stub(close=lambda: closed.append("camera")))
+    monkeypatch.setattr(main.audio, "mic", lambda: Stub(close=lambda: closed.append("microphone")))
+    monkeypatch.setattr(main.audio, "set_volume", lambda value: None)
+    monkeypatch.setattr(main.signal, "signal", lambda *args: handlers.append(args))
+    monkeypatch.setattr(main, "argparse", Stub(ArgumentParser=lambda **kwargs: Stub(
+        add_argument=lambda *args, **kwargs: None, parse_args=lambda: Stub(
+            camera_file=None, servo_calibration="bench.json"))))
+    with pytest.raises(RuntimeError) as raised:
+        main.main()
+    assert raised.value is error and closed == ["microphone", "camera", "motor"]
+    assert handlers == [(main.signal.SIGTERM, main.interrupt)]
+
+
+def test_head_fault_rejects_input_instead_of_silently_disabling_vision():
+    robot = bare_robot()
+    robot.head.error = "Torque off is UNCONFIRMED. Disconnect servo power."
+    with pytest.raises(RuntimeError, match="head stopped.*UNCONFIRMED"):
+        robot.hear(np.zeros(160, np.float32))
+    with pytest.raises(RuntimeError, match="head stopped.*UNCONFIRMED"):
+        robot.next_turn(timeout=1)
+
+
+def test_accepted_wake_opens_followup_window_before_answer_finishes():
+    robot = bare_robot()
+    robot.wake_word, robot.last_line = True, 0.
+    woke = main.Turn(question="Hey Edgy, what is this?", speech_start=100., speech_end=101.)
+    robot._motion_request(woke)
+    followup = main.Turn(question="Look right.", speech_start=102., speech_end=103.)
+    robot._motion_request(followup)
+    assert robot.last_input == 103. and robot.last_line == 0. and followup.motion > 0
+    stop = robot.head.request("stop")
+    with pytest.raises(main.Interrupted):
+        robot.head.move(45, followup.motion)
+    assert robot.head.generation == stop and not robot.head.following
+
+
+def test_accepted_followup_extends_window_while_previous_answer_is_pending():
+    robot = bare_robot()
+    robot.wake_word, robot.last_line = True, 100.
+    first = main.Turn(question="What is this?", speech_start=150., speech_end=151.)
+    robot._motion_request(first)
+    second = main.Turn(question="Look left.", speech_start=161., speech_end=162.)
+    robot._motion_request(second)
+    assert robot.last_input == 162. and robot.last_line == 100. and second.motion > 0
+    rejected = main.Turn(question="Look right.", speech_start=223., speech_end=224.)
+    robot._motion_request(rejected)
+    assert rejected.motion == -1 and robot.last_input == 162. and robot.last_line == 100.

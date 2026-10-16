@@ -54,7 +54,7 @@ def open_robot(root: Path) -> Robot:
     robot.things = Things(root, robot.people)
     robot.conversation_visitor = OWNER
     robot.conversation_started = True
-    robot.head, robot.head_view = Head(), 0
+    robot.head, robot.head_view, robot.last_input = Head(), 0, 0.
     robot.turn_seen, robot.face_track = None, None
     robot.current_visitor = OWNER
     robot._clear_confirmation()
@@ -1577,7 +1577,6 @@ def drain_matches(r):
 
 def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
-    monkeypatch.setattr(main, "located_faces", lambda f, image: [])
     monkeypatch.setattr(main, "located_faces", lambda f, image: [])
     r = open_robot(tmp_path)
     try:

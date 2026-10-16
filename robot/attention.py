@@ -38,9 +38,10 @@ def choose(candidates, active=None, text=""):
         matches = [c for c in candidates if c.name and c.name.casefold() == target.casefold()]
         return _unique(matches, f"I cannot uniquely recognize {target} in this view.")
     if introduced := name_in(text):
+        # Introductions select the sole unknown, even when its name matches another face.
         unknown = [c for c in candidates if not c.names]
         if unknown:
-            return _unique(unknown, "Please introduce yourselves one at a time.")
+            return _unique(unknown, "Please have one new person stand in view at a time.")
         matches = [c for c in candidates if c.name and c.name.casefold() == introduced.casefold()]
         if matches:
             return _unique(matches, "Please introduce yourselves one at a time.")

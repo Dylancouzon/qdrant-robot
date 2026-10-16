@@ -4,7 +4,7 @@ Edgy sees, listens, talks, and remembers on one Jetson Orin Nano Super 8 GB. Qdr
 
 Read [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [lessons index](research/lessons.md) before work. [Research topics](research/README.md) explain current behavior. [Decisions](DECISIONS.md) preserve binding choices.
 
-**Next step: Servo motor control and voice commands.** The [handoff](STATE.md#next-step) defines the starting point. Conversation experiments and broader acceptance remain parked.
+**Next step: Test the assembled head.** Shared visitor selection and servo runtime control are implemented. The [handoff](STATE.md#next-step) links the mounted calibration and test sequence. Conversation experiments and broader acceptance remain parked.
 
 ## Run the interface
 
@@ -21,6 +21,7 @@ Live shows the camera, conversation, retrieved text and images, stored memory po
 
 | Area | Index |
 | --- | --- |
+| Servo wiring, calibration, and runtime startup | [Hardware guide](hardware/SERVO.md) |
 | Runtime components and regression tests | [robot](robot/README.md) |
 | Deployment, monitor, models, checks, and result tools | [tools](tools/README.md) |
 | Acceptance, fixture splits, speech checks, and judging | [eval](eval/README.md) |

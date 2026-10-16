@@ -12,7 +12,7 @@
 | [record.py](record.py) | Record real fixture speech on the Mac. |
 | [servo.py](servo.py) | Read or gently nudge the loose STS3215. Follow [the hardware guide](../hardware/SERVO.md). |
 | [githooks/pre-commit](githooks/pre-commit) | Run required checks before commits. |
-| [test_gate.py](test_gate.py), [test_results.py](test_results.py), [test_talk.py](test_talk.py) | Exercise gates, evidence reporting, lifecycle, and proxies. |
+| [test_gate.py](test_gate.py), [test_results.py](test_results.py), [test_talk.py](test_talk.py), [test_servo.py](test_servo.py) | Exercise gates, evidence reporting, lifecycle, proxies, and the servo transport. |
 
 `collect` copies the complete remote results directory. Preserve locally enriched history before collection and reconcile it before staging. Never discard raw benchmark evidence.
 
