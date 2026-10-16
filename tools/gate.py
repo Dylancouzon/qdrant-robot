@@ -75,6 +75,8 @@ def checks() -> int:
     tests = [f for f in py if Path(f).name.startswith("test_")]
     if tests:
         steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
+    steps += [["npm", "--prefix", "tools/ui", "ci", "--ignore-scripts", "--no-audit", "--no-fund"],
+              ["npm", "--prefix", "tools/ui", "test"]]
     # One interpreter shares expensive dependency imports across all existing assertions.
     steps += [[str(ROOT / ".venv/bin/python"), str(ROOT / "tools/gate.py"), "modules"]]
     steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",

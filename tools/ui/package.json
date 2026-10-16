@@ -1,0 +1,10 @@
+{
+  "name": "edgy-ui-checks",
+  "private": true,
+  "scripts": {
+    "test": "node test_talk.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "29.1.1"
+  }
+}

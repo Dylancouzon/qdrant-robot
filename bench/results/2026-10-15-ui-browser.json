@@ -1,0 +1,38 @@
+{
+  "run": "ui-browser",
+  "date": "2026-10-15",
+  "machine": "Mac",
+  "input": "Synthetic UI fixtures with the development clock photo; no visitor memories",
+  "desktop": {
+    "viewport_css_width": 1274,
+    "sources_px": 587,
+    "map_px": 252,
+    "horizontal_overflow": false,
+    "shared_panel_px": 841.7,
+    "conversation_height_px": 587.6,
+    "camera_height_px": 341.6,
+    "shared_panel_height_px": 230
+  },
+  "mobile": {
+    "viewport_css_width": 390,
+    "panel_width_px": 361,
+    "horizontal_overflow": false,
+    "layout": "camera, conversation, shared retrieval panel with memories and map stacked"
+  },
+  "checks": {
+    "all_16_fixture_thumbnails_loaded": true,
+    "keyboard_enter_expands_management": true,
+    "refresh_retains_views_4_through_6": true,
+    "refresh_retains_open_management": true,
+    "automatic_tip_rotation_observed": true,
+    "expandable_retrieval_entries": true,
+    "consecutive_deletion_events_and_carousel_cleanup": "Passed in tracked DOM regression checks",
+    "full_height_conversation": true,
+    "shared_retrieval_panel": true,
+    "headings_and_helper_text_removed": true,
+    "pinned_tip_without_buttons": true,
+    "focus_and_reduced_motion_pause": "Passed in tracked DOM regression checks"
+  },
+  "dom_regressions": "npm --prefix tools/ui test",
+  "limits": "Browser fixtures establish presentation and controls. Jetson source contracts are checked in the paired ui-refresh results."
+}

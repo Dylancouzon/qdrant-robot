@@ -10,9 +10,15 @@ import urllib.request
 import numpy as np
 import pytest
 
-from robot.view import Screen, View
+from robot.view import Screen, View, draw
 
 TOKEN = "s3cret"
+
+
+def test_retrieval_evidence_stays_out_of_the_camera_image():
+    frame = np.zeros((200, 320, 3), np.uint8)
+    memory = {"shards": ["seen"], "ms": 12.3, "hits": [("A stored fact", .9)]}
+    assert draw(frame, Screen(memory=memory), 320, 0) == draw(frame, Screen(), 320, 0)
 
 
 def parts(conn: http.client.HTTPResponse, seconds: float) -> list[bytes]:

@@ -9,15 +9,21 @@ The review covered runtime and thread ownership, speech, tracking, recognition, 
 | Order | Remaining task | Finish when |
 | --- | --- | --- |
 | One | Improve general conversation and recent recall. Stored replies gained recall but introduced [two topic-change regressions](conversation.md#broader-stored-exchange-regression-2026-10-15). | Check past-question eligibility and duplicate history with varied recall requests, future plans, corrections, and topic changes. Preserve passing visual, privacy, and transfer cases. |
-| Two | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
-| Three | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
-| Four | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
+| Two | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
 
 The cleanup fixes explicit result handoff, failed collection handling, full fixture coverage checks, persistent file-camera errors, settings-save failure responses, and mute-state reset. It also corrects stale setup guidance. The acceptance runner remains the entry point. Keep exploratory benchmarks available for reproducibility; split the large robot test file only when a focused change needs it.
 
 Further harness work is bounded: preserve partial replay evidence on interruption, reject empty standalone judge input, propagate bake-off judge failures, and preserve locally enriched historical records during collection. `eval/replay.py` writes its rows only after `run` returns; `eval/judge.py` accepts an empty row list; `bench/brain_bakeoff.py` ignores the judge's exit code. `tools/jetson.py collect` overwrote added metadata in two old local results during this task; their committed versions were restored, and collected originals remain under `build/cleanup-collected-originals/`. The acceptance runner now rejects missing or incomplete results before judging.
 
 The recorded replay's speech check passed 46/47 (J). Its remaining failure is a spelling difference: "Metrocentre via Bens" became "Metro Center via Benz" in independent transcription. Keep the failure visible until the checker handles equivalent spelling without weakening content or truncation checks. The four judged failures concern unprompted image commentary, the beach question, bears reported present after removal, and an incomplete same-object answer. No keyword result changed from the previous recorded run. Evidence: `bench/results/2026-10-15-243f49ff-replay-1792095965{,.judged}.jsonl`.
+
+## Interface refresh, 2026-10-15
+
+The Live tab uses a pinned command bubble, full-height conversation, and a shared 70/30 panel for retrieved evidence, the search map, and measured latency. Memory cards group by visitor ID. Edits preserve gallery position and open controls, and queued operations retain visible feedback. Confirmed voice deletion clears cached cards and rejects stale reads. [Interface notes](mac-audio-interface.md#ui-refresh-checks-2026-10-15) retain the checks and their limits.
+
+## Lookalike recognition in good light, 2026-10-15
+
+Dylan reported that the lookalike recognition bug is gone under good light. The good-light retest is closed on that report. The color veto stays parked. Earlier benchmark results remain unchanged.
 
 ## Current conversation regressions
 
@@ -87,8 +93,8 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Commands stored before V1-E come back as told lines in old shards | False ownership in old memory | Retention expires them (12 h) | V1-E report |
 | Many conversations without an object | Each keeps a pending guest number in RAM until restart | Drop abandoned entries when a conversation ends | reviews/20261011-024631-51048-review.md |
 | More than 1,000 item Ignore records | Restart loads only the first 1,000, so cleanup can miss later copies | Page the load | same |
-| Two visitors with the same display name | The Memory tab groups their objects under one heading (edits stay distinct by id) | Group by owner id | reviews/20261011-034135-6848-review.md |
-| A Memory tab edit waits behind a long turn | The card stays after 5 s of polling with no message | Show "Saving..." when polling ends | same |
+| Two visitors with the same display name | Their objects previously shared a Memory heading | Fixed: group by visitor ID | reviews/20261011-034135-6848-review.md |
+| A Memory tab edit waits behind a long turn | The card previously stayed after polling ended with no message | Fixed: keep polling and show pending status | same |
 | A lookalike that appears during a teaching window, or carries another label, is not yet a confirmed same-label track | Its overlapping crop can enter the taught gallery (D154) | Check current detections instead of confirmed tracks for the overlap guard | reviews/20261011-013812-81300-review.md |
 
 ## File source decode errors (fixed during cleanup, 2026-10-15)
@@ -128,7 +134,9 @@ Recorded-camera qualification also stops on a decode or seek failure, including 
 
 ## Compact UI
 
-- Removing a view reloads the gallery, resets its scroll position, and collapses Edit memory. Preserve the affected card state if repeated removal becomes disruptive.
+- The pinned example resumes rotation when keyboard focus leaves it. Visitors can retain focus or use reduced motion for stable text. A persistent pause after deliberate focus remains a possible follow-up without visible controls.
+
+- The interface refresh preserves gallery position and open management controls after view removal. This closes the earlier reset issue.
 - Evidence ages update when evidence changes. After a long idle period, the relative time can become stale. Refresh time labels if visitors encounter this.
 - Stop and disconnect now reset the mute icon, accessible state, and disabled audio controls in `clearLive()`.
 

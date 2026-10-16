@@ -29,8 +29,8 @@ When the focused object scores within `guess_band` (0.036) under `match` (0.808)
 ## Page
 
 - **Settings** tab: sliders save when released. Recognition threshold, teaching time, and question count stay visible; other values are under Advanced. Values are validated and saved to `shared/settings.json`; a change applies to the next query.
-- **Memory** tab: object cards grouped by owner show three thumbnails at a time, or one on a phone. Arrows and native scrolling reach every view. Edit memory exposes Remove view and Forget. Thumbnails are 160 px JPEGs in `shared/memory/things/thumbs`. Edits run on the conversation worker.
-- **Live** tab: the camera fills most of the page. Four voice examples sit under it; session controls overlay the camera, and conversation bubbles use a scrollbar without visible speaker headings. The Qdrant Edge strip shows saved object thumbnails and readable sources. Details exposes search results and the retrieval-preparation timer, which includes work beyond Edge queries. Summaries resolve once per turn, stay out of logs, and clear when their sources expire or are deleted.
+- **Memory** tab: object cards grouped by visitor ID show three thumbnails at a time, or one on a phone. Arrows and native scrolling reach every view. Edit memory exposes Remove view and Forget. Thumbnails are 160 px JPEGs in `shared/memory/things/thumbs`. Edits run on the conversation worker. Pending edits stay visible, and refresh preserves the open controls and gallery position. Search filters object and visitor names.
+- **Live** tab: the camera fills most of the page. One pinned command bubble rotates examples above the full-height conversation; session controls overlay the camera, and conversation bubbles use a scrollbar without visible speaker headings. The shared Qdrant Edge panel beneath the camera shows retrieved text and images beside a search map and measured turn timings. Details exposes search results and the retrieval-preparation timer, which includes work beyond Edge queries. Summaries resolve once per turn, stay out of logs, and clear when their sources expire or are deleted.
 
 ## Camera
 

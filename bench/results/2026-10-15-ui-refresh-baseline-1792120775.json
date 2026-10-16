@@ -1,0 +1,32 @@
+{
+  "run": "ui-refresh",
+  "arm": "baseline",
+  "machine": "qdrant-robot",
+  "release": "f9b90b958023",
+  "input": "oracle text and repeated fixture image; isolated memories",
+  "tegrastats": "ui-baseline-20261015-231934.tegrastats",
+  "checks": {
+    "evidence_and_thumbnail": true,
+    "queued_view_removal": true,
+    "forget_clears_evidence": true,
+    "forget_last_object": true
+  },
+  "complete": true,
+  "timing_fields": null,
+  "owner_fields": false,
+  "answers": [
+    "Got it, that is your clock. Turn it slowly so I can see all sides.",
+    "Yes, your clock is here now."
+  ],
+  "elapsed_s": 32.33034157752991,
+  "checks_passed": true,
+  "command": [
+    "tools.jetson.run",
+    "ui-baseline",
+    "-c",
+    "import json, os, platform, secrets, tempfile, time, urllib.error, urllib.request\nfrom pathlib import Path\nfrom types import SimpleNamespace\nimport cv2\nimport numpy as np\nfrom robot import main\nfrom robot.config import SHARED\nfrom robot.settings import Settings\nfrom robot.things import DIM\narm = 'baseline'\nresult = {'run':'ui-refresh', 'arm':arm, 'machine':platform.node(), 'release':os.environ['ROBOT_RELEASE'],\n          'input':'oracle text and repeated fixture image; isolated memories',\n          'tegrastats':os.environ['ROBOT_TEGRASTATS'], 'checks':{}, 'complete':False}\nstarted=time.time()\nos.environ['ROBOT_VIEW_TOKEN']=secrets.token_urlsafe(24)\nwith tempfile.TemporaryDirectory(dir=SHARED) as temp:\n    root=Path(temp)\n    main.settings=Settings(root/'settings.json')\n    frame=cv2.imread('eval/dev/images/m2-clock.jpg');assert frame is not None\n    camera=SimpleNamespace(latest=lambda:(frame,time.time()))\n    robot=main.Robot(camera,root/'audio',memory=root/'memory',wake_word=False)\n    try:\n        time.sleep(2)\n        def ask(text):\n            robot.ask(text);turn=robot.next_turn(timeout=90);assert turn.answer;return turn\n        taught=ask('Track this as my clock');assert taught.named,taught.answer\n        recalled=ask('Where is my clock?')\n        url=f'http://127.0.0.1:{robot.video.port}';token=os.environ['ROBOT_VIEW_TOKEN']\n        def get(path):\n            with urllib.request.urlopen(url+path+(' & ' if '?' in path else '?').replace(' & ','&')+'token='+token,timeout=10) as response:return json.load(response)\n        def post(path,data):\n            request=urllib.request.Request(url+path+'?token='+token,data=json.dumps(data).encode(),headers={'Origin':url,'Content-Type':'application/json'})\n            with urllib.request.urlopen(request,timeout=10) as response:assert response.status==202\n        state=get('/state');item=next(m for m in state['evidence']['memories'] if m.get('object')==taught.named)\n        with urllib.request.urlopen(url+'/thumb?view='+item['view']+'&token='+token) as response:assert response.read().startswith(b'\\xff\\xd8')\n        result['checks']['evidence_and_thumbnail']=True\n        timing=state['evidence'].get('timing');result['timing_fields']=timing\n        if arm=='candidate':\n            assert timing['first_text_ms']==round(1000*(recalled.first_token-recalled.speech_end),1)\n            assert timing['speech_ready_ms']==round(1000*(recalled.first_audio-recalled.speech_end),1)\n            result['checks']['turn_timings']=True\n        def seed(faces,crops):\n            owner=robot.things.shard.retrieve([taught.named],True,False)[0].payload['owner']\n            robot.things.tell(owner,'Sam');other=robot.things.new_visitor()\n            probe=robot.things.name(other,'probe',['camera'],np.eye(DIM,dtype=np.float32)[:3],[frame]*3,'Sam')\n            return owner,other,probe\n        owner,other,probe=robot.recognition.call(seed,mutate=True)\n        objects=get('/memory');assert len(objects)==2\n        assert all(obj['owner_label']=='Sam' for obj in objects)\n        result['owner_fields']=all('owner' in obj for obj in objects)\n        if arm=='candidate':\n            assert {obj['owner'] for obj in objects}=={owner,other};result['checks']['independent_visitors']=True\n        saved=next(obj for obj in objects if obj['id']==probe);removed=saved['views'][1]['id']\n        post('/remove_view',{'object':probe,'view':removed});robot.jobs.join()\n        after=next(obj for obj in get('/memory') if obj['id']==probe)\n        assert len(after['views'])==len(saved['views'])-1 and removed not in [v['id'] for v in after['views']]\n        result['checks']['queued_view_removal']=True\n        post('/forget_object',{'object':taught.named});robot.jobs.join()\n        assert all(obj['id']!=taught.named for obj in get('/memory'))\n        assert not get('/state')['evidence']['memories']\n        result['checks']['forget_clears_evidence']=True\n        post('/forget_object',{'object':probe});robot.jobs.join();assert not get('/memory')\n        result['checks']['forget_last_object']=True\n        result['answers']=[taught.answer,recalled.answer]\n    finally:robot.close()\nresult['elapsed_s']=time.time()-started;result['complete']=True;result['checks_passed']=all(result['checks'].values())\npath=SHARED/'results'/f'{time.strftime(\"%Y-%m-%d\")}-ui-refresh-{arm}-{int(started)}.json'\npath.write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result),flush=True)\n"
+  ],
+  "revision": "release:f9b90b958023",
+  "scope": "Two oracle-text turns with a repeated development image and temporary memories. This checks the interface contract, not answer acceptance or physical audible latency.",
+  "runtime": "Pinned project dependencies in the release ENV.txt."
+}

@@ -17,7 +17,7 @@
 ## Calibration
 
 - `same` sits at DINOv2's 0.86 operating point on the viewpoint benchmark, scored in the robot's direction (each crop held now against the earlier crops): no lookalike window reaches it (maximum 0.856), and 119 of 248 same-instance windows do, against 88 for DINOv2 at 0.86 (`bench/embed_arms.py calibrate`, E).
-- A color veto (mean CIELAB of the middle half, Delta E 27) kept 99% of same-instance windows and vetoed 38% of lookalike windows (`bench/color_pairs.py`, E). It is parked: DINOv3's shape bias also shows in recognition, so the fix belongs there, after a test in better light.
+- A color veto (mean CIELAB of the middle half, Delta E 27) kept 99% of same-instance windows and vetoed 38% of lookalike windows (`bench/color_pairs.py`, E). It stays parked following the [good-light retest](edge-cases.md#lookalike-recognition-in-good-light-2026-10-15).
 - `bench/same_pairs.py` on dev stills is a check only: 12 of 12 same-object pairs answer "same".
 
 ## Measured (J)

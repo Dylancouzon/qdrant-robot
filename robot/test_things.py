@@ -1109,6 +1109,19 @@ def test_only_a_voice_deletion_clears_the_live_chat(robot):
     shown = r._shown(False)[1]
     assert [t["id"] for t in shown.transcript] == [str(reply.line)]
     assert shown.evidence["statements"] == [] and shown.evidence["memory_ids"] == []
+    assert shown.evidence["deleted"] and shown.evidence["turn_id"] == str(reply.line)
+
+
+def test_live_latency_uses_current_turn_milestones(robot):
+    frame_of(robot)
+    robot.ui_turn = Turn(speech_end=100, first_token=100.1234, first_audio=101.2345)
+    timing = robot._shown(False)[1].evidence["timing"]
+    assert timing == {"first_text_ms": 123.4, "speech_ready_ms": 1234.5}
+    robot.ui_turn = Turn(speech_end=200)
+    assert robot._shown(False)[1].evidence["timing"] == {
+        "first_text_ms": None, "speech_ready_ms": None}
+    robot.ui_turn = Turn(first_token=100, first_audio=101)
+    assert all(value is None for value in robot._shown(False)[1].evidence["timing"].values())
 
 
 def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
@@ -3125,6 +3138,16 @@ def test_interrupted_forget_me_keeps_the_face_to_visitor_link_for_a_retry(robot,
     assert not r.things.objects(visitor) and r.people.person("Ana") is None
 
 
+def test_memory_list_keeps_visitors_with_the_same_name_distinct(robot):
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    visitors = [OWNER, "00000000-0000-4000-8000-000000000002"]
+    for visitor in visitors:
+        robot.things.name(visitor, "mouse", ["mouse"], vectors, thumbnail_crops(vectors), "Sam")
+    listed = robot._memory_list()
+    assert {item["owner"] for item in listed} == set(visitors)
+    assert [item["owner_label"] for item in listed] == ["Sam", "Sam"]
+
+
 def test_remove_view_vector_metadata_file_and_final_object(tmp_path):
     things = Things(tmp_path)
     try:
@@ -3157,6 +3180,7 @@ def test_memory_controls_delete_evidence_like_speech(robot, action):
     listed = r._memory_list()
     assert listed[0]["label"] == "Ana's mouse"
     assert listed[0]["owner_label"] == "Ana"
+    assert listed[0]["owner"] == OWNER
     assert listed[0]["sightings"] == 1 and listed[0]["last_seen"] == 10
     view = listed[0]["views"][0]["id"]
     assert r._thumbnail(view).startswith(b"\xff\xd8")

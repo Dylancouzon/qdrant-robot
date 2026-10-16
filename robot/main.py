@@ -693,6 +693,11 @@ class Robot:
                             [turn.answer] if turn.answer in turn.facts else [],
                             "statements": turn.told if not turn.verbatim else [],
                             "memory_ids": turn.memories, "memories": turn.ui_evidence,
+                            "deleted": bool(turn.deleted or self.hiding), "turn_id": str(turn.line),
+                            "timing": {name: round(1000 * (end - turn.speech_end), 1)
+                                       if turn.speech_end and end >= turn.speech_end else None
+                                       for name, end in (("first_text_ms", turn.first_token),
+                                                         ("speech_ready_ms", turn.first_audio))},
                             "answer_path": ("Code" if turn.verbatim else "Generated")
                             if turn.first_token else ""}
             transcript = [{"id": str(t.line), "question": t.question, "answer": t.answer}
@@ -948,6 +953,7 @@ class Robot:
             return
         turn = Turn(question="", line=now, answer=text)
         self.ui_turn = turn
+        self.panel = None
         self.ui_turns.append(turn)
         self.speaker.play(pcm)
         self.last_line = time.time() + len(pcm) / RATE
@@ -1241,6 +1247,7 @@ class Robot:
             return
         turn.question = heard or turn.question  # "Hey Edgy." alone: the brain greets back
         self.ui_turn, self.ui_thinking = turn, True
+        self.panel = None
         self.ui_turns.append(turn)
         if self._stale(shot[0]):  # the scene changed after the last look
             self._look(shot)
@@ -1734,6 +1741,7 @@ class Robot:
                 label = self.things.label(ident)
                 sightings = self.memory.sightings(float("inf"), n=1000000, named=[ident])
                 objects.append({"id": ident, "label": label,
+                    "owner": payload["owner"],
                     "owner_label": label.removesuffix("'s " + payload["name"]),
                     "views": [{k: v[k] for k in ("id", "time", "source")}
                               for v in payload["views"]],

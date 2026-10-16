@@ -30,7 +30,7 @@ python3 tools/gate.py checks
 python3 tools/gate.py review "Task scope, changed paths, and evidence"
 ```
 
-Checks report stage timings and stop on failure or a 300 s stage timeout. Module assertions share one interpreter. Review gates remain bounded and read-only; a tree changed during review cannot receive its stamp. The pre-commit hook blocks only deterministic failures and reminds about missing reviews.
+UI checks use Node.js and locked jsdom development dependencies. Checks report stage timings and stop on failure or a 300 s stage timeout. Module assertions share one interpreter. Review gates remain bounded and read-only; a tree changed during review cannot receive its stamp. The pre-commit hook blocks only deterministic failures and reminds about missing reviews.
 
 Deployment and remote acceptance use [tools/jetson.py](tools/jetson.py) and [eval/run.py](eval/run.py). Read STATE.md before starting remote work. Topic evidence is indexed in [research/lessons.md](research/lessons.md); raw runs live in `bench/results/`, and reviews live in `reviews/`.
 

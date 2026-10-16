@@ -26,7 +26,13 @@ Use one camera viewer. A second MJPEG subscriber replaces the first. Each sessio
 
 The camera shows known object names, one orange "???" teaching focus, and admitted grey object outlines. Person detection supplies internal cues; the page draws verified face outlines instead of body boxes. Face identity uses only the current verified result on its exact source pixels. The status and transcript show Listening, Hearing you, Thinking, and Speaking.
 
-The Qdrant Edge strip shows readable sources and saved object thumbnails. Selecting an object opens its Memory card. Details keeps search results and source IDs expandable. The retrieval-preparation timer includes work beyond Edge queries. Answer correctness still needs separate verification.
+A shared panel beneath the camera gives roughly 70% of its width to retrieved text and image cards. The remaining space shows a Qdrant Edge search map and the current turn's timings. Conversation spans the full height beside the camera and shared panel. Visible pane headings and empty-state explanations are omitted. The map shows reported collections and displayed retrieval entries. Its connections describe the search flow, rather than vector positions or every raw hit. Entry counts can include summarized recall lines and filtered statements. Selecting an object opens its Memory card. Search entries and source IDs stay expandable.
+
+A pinned conversation-style bubble rotates command examples every 12 seconds. It shows the wake phrase as part of each example and uses no extra controls. Tips pause during hover, keyboard focus, hidden tabs, and reduced-motion preferences. Map connections animate when retrieval changes. Ordinary status polls preserve the map and expanded details. Retrieval text stays off the camera image.
+
+The latency values are retrieval preparation, speech-end to first text, and speech-end to the first synthesized phrase. Retrieval preparation includes work beyond Edge queries. Speech-ready time measures the synthesis handoff, rather than physical audible latency. Missing measurements show a dash. Each new turn clears the previous retrieval panel.
+
+The Memory tab groups cards by visitor ID and shows object, view, and visitor counts. Search filters object and visitor names. Refresh reloads the stored objects. Editing preserves the open management controls, gallery position, keyboard focus, and page position. Queued edits keep a visible status and continue polling until their result appears. Confirmed voice deletion clears cached cards and rejects older in-flight reads.
 
 Focus assignments change at most once per three seconds. The selected admitted object keeps its "???" style while a matched detection continues at the existing LOW threshold. Source admission, visibility, Ignore, and pending preference checks still gate drawing. Object outlines bridge detection gaps for at most 200 ms (D159). The existing 200 ms size grace can expire during undersized observations.
 
@@ -65,3 +71,15 @@ For recorded camera playback, add `--camera-file /existing/jetson/fixture.avi` t
 - [External cup](../bench/results/2026-10-10-d145-external-cup.json): 73.78% recognition across changed viewpoints. This remains a development gap, not a cue for scene-specific rules.
 
 These bounded recordings and Dylan's live acceptance establish a usable checkpoint. They do not establish perfect smoothness, general instance recognition, sustained 15fps conversation, zero paging, or final milestone acceptance. Historical D134–D139 designs and rejected filters remain linked from DECISIONS.md and lessons.md, not current implementation guidance.
+
+## UI refresh checks, 2026-10-15
+
+The brief compared the earlier expandable evidence strip with a dedicated evidence row and search map. The shared panel follows Dylan's requested 70/30 split and leaves conversation at full height. The existing models, storage, retrieval policy, consent, and deletion paths remain in place. The additive API fields expose visitor IDs, deletion events, and existing timing milestones.
+
+The design review requires truthful entry counts, tracked DOM checks, current browser checks, and a paired isolated Jetson smoke test. The DOM harness is `tools/ui/test_talk.cjs`. Run `npm --prefix tools/ui ci --ignore-scripts`, then `npm --prefix tools/ui test`. `tools/gate.py checks` also runs it. jsdom is a pinned development dependency. The robot uses no Node runtime.
+
+The task reviews passed. The deterministic checks passed, including Python regressions, the DOM harness, and module assertions (E). Browser checks cover desktop and 390 px phone layouts, loaded thumbnails, keyboard expansion, gallery retention after changing data, and automatic tips (E). Evidence: [browser checks](../bench/results/2026-10-15-ui-browser.json).
+
+The [accepted baseline](../bench/results/2026-10-15-ui-refresh-baseline-1792120775.json) and [candidate](../bench/results/2026-10-15-ui-refresh-candidate-1792121429.json) pass the same isolated naming, recall, thumbnail, queued view-removal, and deletion checks (J). The candidate also verifies separate visitor IDs and exact turn timing fields. Both runs use two typed turns, a repeated development image, and temporary memories. These checks establish interface behavior, rather than held-out answer quality or physical audible latency.
+
+Live attachment on `b78d48ec189e` opens the camera and loads five existing objects with 15 saved views (J). The final local monitor refinements use singular counts and full-width images for objects with one saved view. These presentation changes keep the Jetson runtime unchanged.

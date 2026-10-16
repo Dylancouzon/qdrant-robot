@@ -15,6 +15,7 @@ cert/
 .firecrawl/
 .pytest_cache/
 build/
+node_modules/
 dist/
 *.safetensors
 *.pt

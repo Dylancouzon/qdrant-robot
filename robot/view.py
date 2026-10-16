@@ -31,7 +31,7 @@ STYLE = {"known": ((80, 200, 60), 2), "guess": (ORANGE, 1), "focus": (ORANGE, 4)
 @dataclass
 class Screen:
     """What the view draws over a frame. `memory`: {"shards": [names], "hits": [(text, score
-    or None)], "ms": query time} of the last search, or None."""
+    or None)], "ms": retrieval preparation time} of the last search, or None."""
     boxes: list[Box] = field(default_factory=list)
     status: str = ""  # Listening, Hearing you, Thinking, or Speaking
     events: list[tuple[float, str]] = field(default_factory=list)  # (time.time(), text)
@@ -78,12 +78,6 @@ def _lines(img: np.ndarray, lines: list[str], x: int, y: int) -> None:
         cv2.putText(img, t, (x + 8, y + 20 * k + 20), FONT, SMALL, WHITE, 1, cv2.LINE_AA)
 
 
-def _memory(memory: dict) -> list[str]:
-    head = f"Qdrant Edge: {', '.join(memory['shards'])}  {memory['ms']:.1f} ms"
-    return [head, *(f"{'  -- ' if score is None else f'{score:.2f}'}  {text[:48]}"
-                    for text, score in memory["hits"][:3])]
-
-
 def draw(frame: np.ndarray, screen: Screen, width: int, now: float) -> bytes:
     """The frame scaled down to `width` with `screen` drawn over it, as JPEG bytes; events
     older than EVENT_S at `now` are left out."""
@@ -95,9 +89,6 @@ def draw(frame: np.ndarray, screen: Screen, width: int, now: float) -> bytes:
     strip = "   ".join([screen.status, *events]).strip()
     if strip:
         _lines(img, [strip], 0, 0)
-    if screen.memory:
-        lines = _memory(screen.memory)
-        _lines(img, lines, 0, img.shape[0] - 20 * len(lines) - 8)
     return cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 80])[1].tobytes()
 
 

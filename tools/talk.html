@@ -5,21 +5,24 @@
 <title>Edgy · Robot interface</title>
 <style>
 @font-face{font-family:'Mona Sans';src:url('/mona-sans.woff2') format('woff2');font-weight:400 700;font-display:swap}
-:root{color-scheme:dark;font:14px 'Mona Sans',system-ui,sans-serif;background:#0b0f19;color:#fff;--dim:#a3acc2;--line:#242b40;--accent:#dc244c;--violet:#6047ff}
-*{box-sizing:border-box}body{max-width:1800px;margin:0 auto;padding:24px 32px;background:radial-gradient(ellipse at 30% 0%,#6047ff0d,transparent 55%)}[hidden]{display:none!important}.sr-only{position:absolute;top:0;left:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:20px}.brand svg{width:112px;height:30px;display:block}.brand h1{font-size:18px;font-weight:500;margin:0;padding-left:20px;border-left:1px solid var(--line);letter-spacing:.06em}.badge{font-size:11px;color:var(--dim);letter-spacing:.04em}.badge::before{content:'';display:inline-block;width:6px;height:6px;background:var(--violet);border-radius:50%;box-shadow:0 0 10px #6047ff;margin-right:8px}.tabs{display:flex;gap:5px;padding:4px;background:#111625;border:1px solid var(--line);border-radius:12px}.tabs button{padding:8px 20px;background:transparent;color:var(--dim);font-weight:500}.tabs button[aria-pressed=true]{background:#252139;color:#fff;box-shadow:inset 0 0 0 1px #6047ff55}
-button{font:inherit;font-weight:500;border:0;border-radius:8px;padding:10px 18px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s}button:hover{background:#ed315a}button.secondary{background:#242b40}button.secondary:hover{background:#313a53}button:disabled{opacity:.3;cursor:default}button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--violet);outline-offset:4px}button svg{width:18px;height:18px;display:block}select{font:inherit;min-width:0;max-width:100%;background:#20273a;color:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}small{color:var(--dim);font-size:11px}h2{font-size:15px;font-weight:500;margin:0}label{color:var(--dim);font-size:12px}details summary{cursor:pointer;color:var(--dim);font-size:12px}code{color:#e3dfff}
-.grid{display:grid;grid-template-columns:minmax(0,3fr) minmax(300px,1fr);grid-template-rows:minmax(0,1fr) auto;gap:16px;height:calc(100dvh - 154px);min-height:530px;max-height:1100px}.card{background:#111625;border:1px solid var(--line);border-radius:16px;overflow:hidden}.cameraCard{position:relative;display:flex;flex-direction:column;border-color:#6047ff44;box-shadow:0 0 30px #6047ff08}.camera{flex:1;min-height:0;background:#080b12;position:relative;display:grid;place-items:center}.camera::after{content:'';pointer-events:none;position:absolute;inset:14px;border-top:1px solid #6047ff55;border-left:1px solid #6047ff55;border-radius:6px;width:32px;height:32px}.camera img{width:100%;height:100%;object-fit:contain;position:absolute}.placeholder{text-align:center;color:var(--dim);padding:24px}.placeholder strong{display:block;font-size:24px;font-weight:500;color:#fff;margin:16px 0 8px}.placeholder svg{width:72px;height:72px;margin:auto;stroke:var(--violet);filter:drop-shadow(0 0 16px #6047ff44)}
-.controls{position:absolute;bottom:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;z-index:2;padding:10px 12px;background:#0b0f19d9;border:1px solid #ffffff12;border-radius:12px;backdrop-filter:blur(8px)}#phase{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:500}#phase::before{content:'';width:7px;height:7px;background:var(--violet);border-radius:50%;box-shadow:0 0 12px #6047ff88}.actions{display:flex;gap:6px;flex-shrink:0}.actions button{padding:9px 12px}.actions .iconbutton{padding:10px;background:#ffffff0b;border:1px solid #ffffff12}.actions .iconbutton:hover{background:#ffffff18}.slash{display:none}.muted .slash{display:block}#error,#viewerror,#memoryError{color:#ff8ba3;font-size:12px;white-space:pre-wrap}#error:empty,#viewerror:empty,#itemMessage:empty,#learning:empty{display:none}#error{position:absolute;bottom:64px;left:16px;background:#171323;border-radius:8px;padding:10px;max-width:calc(100% - 32px)}#viewerror,#itemMessage,#learning{margin:0;padding:10px 16px;color:var(--dim);font-size:12px}
-.commands{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;flex-shrink:0;border-top:1px solid var(--line)}.commands span{font-size:11px;color:#c5cadd;padding:6px 10px;border:1px solid #2a2941;border-radius:6px;background:#191a2b}.commands p{display:none}.itemcontrols{position:absolute;top:16px;right:16px;z-index:2;margin:0;padding:8px 10px;background:#0b0f19de;border:1px solid #ffffff12;border-radius:8px;max-width:calc(100% - 32px)}.itemcontrols summary{font-size:11px}.itemcontrols[open]{max-width:380px}.camerafoot{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 0 0}.camerafoot label{width:100%}.camerafoot button{padding:8px 10px;font-size:12px}
-.conversation{grid-column:2;grid-row:1/span 2;display:flex;flex-direction:column;min-height:0;background:linear-gradient(180deg,#111625,#101421);border-color:#ffffff0d}.transcript{flex:1;min-height:0;overflow-y:scroll;overscroll-behavior:contain;scrollbar-gutter:stable;padding:24px 18px}.transcript::-webkit-scrollbar{width:5px}.transcript::-webkit-scrollbar-thumb{background:#34314e;border-radius:8px}.empty{font-size:13px;line-height:1.6;color:var(--dim)}.exchange{position:relative;margin-bottom:24px}.speaker{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.bubble{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;background:#1d2437;padding:12px 14px;border-radius:12px 12px 3px 12px;margin:0 0 12px 24px;font-size:13px;color:#c9d1e3}.edgy{background:linear-gradient(120deg,#211a32,#191b30);border:1px solid #6047ff29;border-radius:12px 12px 12px 3px;margin:0 12px 0 0;color:#fff}.closed{margin:0;padding:0 18px 12px;text-align:center;font-size:12px;color:var(--dim)}.closed:empty{display:none}.audio{display:flex;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid var(--line);flex-shrink:0;color:var(--dim)}.audio svg{width:17px;height:17px;flex-shrink:0}.audio input{width:100%;accent-color:var(--accent)}.audio output{font-size:11px;width:34px;text-align:right;font-variant-numeric:tabular-nums}
-.memorytrace{padding:14px 18px;border-radius:12px;background:#111525}.edgecaption{font-size:11px;letter-spacing:.05em;color:#a99cff;margin-bottom:10px}.edgecaption::before{content:'';width:5px;height:5px;display:inline-block;border-radius:50%;background:var(--violet);margin-right:7px}.evidence{display:flex;flex-wrap:wrap;align-items:center;gap:14px}.evidence>p{font-size:12px;line-height:1.5;margin:0;flex:1 1 250px}.source{font-size:10px;color:#a99cff;margin-right:8px}.evidenceitem{display:flex;align-items:center;gap:12px}.evidenceitem img{width:80px;height:54px;object-fit:contain;background:#090c16;border-radius:7px}.evidenceitem p{font-size:12px;margin:4px 0;max-width:440px;color:#d3d9e8}.evidenceitem strong{font-size:12px;font-weight:500}.evidenceitem small{display:block;margin-top:4px}.textlink{background:none;color:#fff;padding:0;font-size:13px;text-align:left}.textlink:hover{background:none;color:#afa1ff}.retrievaldetails{margin-left:auto;font-size:11px;color:var(--dim)}.retrievaldetails[open]{flex-basis:100%;margin:0}.retrievaldetails p{font-size:12px;line-height:1.5}footer{display:flex;justify-content:flex-end;margin-top:12px;color:var(--dim);font-size:12px}footer details{max-width:720px;line-height:1.8}footer summary{text-align:right}
-.cardhead{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--line)}.settingscard{max-width:680px;margin:30px auto}.setting{padding:16px 20px;border-bottom:1px solid var(--line)}.setting label{font-size:13px;color:#fff;display:flex;justify-content:space-between;gap:16px}.setting output{font-variant-numeric:tabular-nums;color:#aea0ff}.setting small{display:block;margin:6px 0 10px;line-height:1.5}.setting input{width:100%;accent-color:var(--violet)}.setting:last-child{border-bottom:0}#settingsMessage{padding:0 20px;color:var(--dim);font-size:12px}
-.owner{margin:28px 0}.owner h2{font-size:16px;margin-bottom:14px;color:#bdc3d3}.memorycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}.objectcard{padding:20px}.objectcard h3{margin:0;font-size:17px;font-weight:500;overflow-wrap:anywhere}.objectcard p{font-size:12px;color:var(--dim)}.views{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:18px 0;scrollbar-width:thin;scrollbar-color:#34314e transparent}.savedview{flex:0 0 calc((100% - 24px)/3);min-width:0;display:flex;flex-direction:column;gap:8px;scroll-snap-align:start}.savedview img{width:100%;height:160px;object-fit:contain;background:#080b12;border:1px solid #ffffff08;border-radius:8px}.savedview button{padding:8px;font-size:12px}.objectcard .savedview button{display:none}.objectcard.editing .savedview button{display:block}.carouselbar{display:flex;align-items:center;justify-content:space-between;gap:8px}.carouselbar .arrows{display:flex;gap:8px}.carouselbar button{padding:6px 14px;background:#211e36}.objectcard details{margin-top:16px}.objectcard details>button{margin-top:12px}
-@media(max-width:1000px){body{padding:20px}.grid{grid-template-columns:minmax(0,2fr) minmax(280px,1fr)}header{gap:12px}.brand{gap:12px}.brand h1{padding-left:12px}.badge{display:none}}
-@media(max-width:760px){body{padding:16px}header{flex-wrap:wrap;margin-bottom:16px}.brand svg{width:96px}.brand h1{font-size:16px}.tabs button{padding:7px 12px}.grid{grid-template-columns:1fr;grid-template-rows:auto;height:auto;min-height:0;max-height:none}.cameraCard{min-height:0}.camera{aspect-ratio:4/3;flex:none}.conversation{grid-column:1;grid-row:3;height:420px}.memorytrace{grid-row:2}.commands{gap:6px;padding:10px}.commands span{flex:1 1 45%;font-size:11px;text-align:center}.controls{bottom:10px;left:10px;right:10px}.itemcontrols{top:10px;right:10px}.evidenceitem img{width:64px;height:48px}.settingscard{margin:20px auto}.cardhead{padding:16px}.cardhead button{font-size:12px;padding:8px 12px}}
-@media(max-width:480px){.savedview{flex-basis:100%}.savedview img{height:190px}.brand svg{width:90px}.tabs{gap:0}.tabs button{padding:7px 10px;font-size:12px}.brand{gap:9px}.brand h1{font-size:14px;padding-left:9px}header{gap:10px}.itemcontrols[open]{max-width:calc(100% - 20px)}.camerafoot{gap:6px}.camerafoot select{max-width:180px}.memorytrace{padding:12px}.objectcard{padding:16px}}
-@media(prefers-reduced-motion:reduce){button{transition:none}}
+:root{color-scheme:dark;font:14px 'Mona Sans',system-ui,sans-serif;background:#0b0f19;color:#f2f3fa;--dim:#9fa9be;--line:#252c3d;--accent:#dc244c;--violet:#8876ff}
+*{box-sizing:border-box}body{max-width:1800px;margin:0 auto;padding:22px 28px;background:radial-gradient(ellipse at 20% 0%,#6047ff09,transparent 55%)}[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:18px}.brand svg{width:112px;height:30px;display:block}.brand h1{font-size:18px;font-weight:500;margin:0;padding-left:18px;border-left:1px solid var(--line)}.badge{font-size:11px;color:var(--dim)}.badge::before{content:'';display:inline-block;width:6px;height:6px;background:#a599ff;border-radius:50%;margin-right:8px}.tabs{display:flex;gap:4px;padding:4px;background:#121725;border:1px solid var(--line);border-radius:11px}.tabs button{padding:8px 20px;background:transparent;color:var(--dim);font-weight:500}.tabs button[aria-pressed=true]{background:#29243f;color:#fff}
+button{font:inherit;font-weight:500;border:0;border-radius:7px;padding:10px 16px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s}button:hover{background:#ed315a}button.secondary{background:#242c3d}button.secondary:hover{background:#323d53}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--violet);outline-offset:3px}button svg{width:18px;height:18px;display:block}select,input[type=search]{font:inherit;min-width:0;max-width:100%;background:#151c2c;color:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}small{color:var(--dim);font-size:11px}h2{font-size:14px;font-weight:600;margin:0}label{color:var(--dim);font-size:12px}details summary{cursor:pointer;color:var(--dim);font-size:12px}code{color:#d4cbff}
+.grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(320px,3fr);grid-template-rows:minmax(300px,1fr) minmax(230px,.65fr);gap:16px;height:calc(100dvh - 126px);min-height:570px;max-height:1250px}.card{background:#111725;border:1px solid var(--line);border-radius:14px;overflow:hidden}.cameraCard{display:flex;flex-direction:column;border-color:#37304f}.camera{flex:1;min-height:0;background:#080c14;position:relative;display:grid;place-items:center}.camera img{width:100%;height:100%;object-fit:contain;position:absolute}.placeholder{text-align:center;color:var(--dim);padding:24px;font-size:12px}.placeholder strong{display:block;font-size:24px;font-weight:500;color:#fff;margin:12px 0 6px}.placeholder svg{width:64px;height:64px;stroke:var(--violet)}
+.controls{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:2;padding:9px 10px 9px 14px;background:#0b0f19e6;border:1px solid #ffffff16;border-radius:10px;backdrop-filter:blur(8px)}#phase{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:500}#phase::before{content:'';width:6px;height:6px;background:var(--violet);border-radius:50%}.actions{display:flex;gap:6px;flex-shrink:0}.actions button{padding:8px 12px}.actions .iconbutton{padding:9px;background:#ffffff09;border:1px solid #ffffff14}.actions .iconbutton:hover{background:#ffffff18}.slash{display:none}.muted .slash{display:block}#error,#viewerror,#memoryError{color:#ff9ab1;font-size:12px;white-space:pre-wrap}#error:empty,#viewerror:empty,#itemMessage:empty,#learning:empty,#memoryError:empty{display:none}#error{position:absolute;bottom:62px;left:0;background:#241424;border:1px solid #5c2c40;border-radius:8px;padding:10px;max-width:100%}#viewerror,#itemMessage,#learning{margin:0;padding:10px 16px;color:var(--dim);font-size:12px}
+.itemcontrols{position:absolute;top:14px;right:14px;z-index:2;padding:8px 10px;background:#0b0f19e6;border:1px solid #ffffff16;border-radius:7px;max-width:calc(100% - 28px)}.itemcontrols summary{font-size:11px}.itemcontrols[open]{max-width:380px}.camerafoot{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 0 0}.camerafoot label{width:100%}.camerafoot button{padding:8px 10px;font-size:12px}
+.conversation{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;min-height:0}.eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}.pinnedTip{padding:18px 18px 0;flex-shrink:0}.tipBubble{margin:0 0 0 24px;background:#262039;border:1px solid #8876ff38;color:#d4c9f1}
+.transcript{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:18px}.transcript::-webkit-scrollbar{width:5px}.transcript::-webkit-scrollbar-thumb{background:#39334f;border-radius:8px}.empty{font-size:12px;line-height:1.6;color:var(--dim)}.exchange{position:relative;margin-bottom:18px}.speaker{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.bubble{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;background:#20283a;padding:10px 13px;border-radius:11px 11px 3px 11px;margin:0 0 9px 24px;font-size:13px;color:#d2d9e9}.edgy{background:#201d35;border:1px solid #6047ff2e;border-radius:11px 11px 11px 3px;margin:0 14px 0 0;color:#f6f3ff}.closed{margin:0;padding:0 18px 12px;font-size:11px;color:var(--dim)}.closed:empty{display:none}.audio{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--line);flex-shrink:0;color:var(--dim)}.audio svg{width:16px;height:16px;flex-shrink:0}.audio input{width:100%;accent-color:var(--accent)}.audio output{font-size:11px;width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.memoryworkspace{grid-column:1;grid-row:2;display:grid;grid-template-columns:minmax(0,7fr) minmax(220px,3fr);min-height:0}.memoryworkspace .memorytrace{border-right:1px solid var(--line)}.memorytrace,.searchtrace{display:flex;flex-direction:column;min-height:0}.evidence{overflow:auto;overscroll-behavior:contain;min-height:0;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;align-content:start;flex:1}.evidence>.empty{grid-column:1/-1;padding:12px 0;margin:0}.sourcecard{min-width:0;padding:12px;border:1px solid #303247;border-radius:9px;background:#171c2c}.source{display:block;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#baaaff;margin-bottom:7px}.sourcecard p{font-size:12px;line-height:1.6;margin:0;overflow-wrap:anywhere;white-space:pre-wrap}.evidenceitem{display:flex;align-items:flex-start;gap:12px}.evidenceitem img{width:100px;height:82px;object-fit:contain;background:#090d17;border-radius:6px}.evidenceitem>div{min-width:0}.evidenceitem strong{font-size:13px;font-weight:500}.evidenceitem small{display:block;margin-top:8px}.textlink{background:none;color:#f3eeff;padding:0;font-size:13px;text-align:left}.textlink:hover{background:none;color:#c2b7ff}.retrievaldetails{border-top:1px solid var(--line);padding:10px 18px;font-size:11px;overflow:auto;flex-shrink:0;max-height:45%}.retrievaldetails summary{font-size:11px}.retrievaldetails p{font-size:11px;line-height:1.5;overflow-wrap:anywhere}.searchtrace{background:linear-gradient(145deg,#19182d,#111725)}.map{width:100%;min-height:80px;flex:1;overflow:hidden}.map svg{display:block;width:100%;height:100%;min-height:92px;max-height:180px}.map text{fill:#d0cce0;font:14px 'Mona Sans',system-ui,sans-serif}.map .maplabel{fill:#b5aecb;font-size:12px}.map line{stroke:#9686cf88;stroke-width:1}.map .node{fill:#9380ff;stroke:#c7bbff;stroke-width:1}.map .hub{fill:#302649;stroke:#9f89ef;stroke-width:1}.map .query{fill:#dc244c;stroke:#ff91a8}.mapPulse .node{animation:arrive .9s ease-out both}.mapPulse line{animation:connect .7s ease-out both}.latencies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px 18px 14px;gap:10px;border-top:1px solid #ffffff0d}.metric strong{display:block;font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.metric span{font-size:10px;color:var(--dim);display:block;margin-top:4px}.metric strong small{font-size:10px;font-weight:400;margin-left:3px;letter-spacing:0}footer{display:flex;justify-content:flex-end;margin-top:10px;color:var(--dim);font-size:11px}footer details{max-width:720px;line-height:1.8}footer summary{text-align:right}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--line)}.settingscard{max-width:680px;margin:30px auto}.setting{padding:16px 20px;border-bottom:1px solid var(--line)}.setting label{font-size:13px;color:#fff;display:flex;justify-content:space-between;gap:16px}.setting output{font-variant-numeric:tabular-nums;color:#b6a7ff}.setting small{display:block;margin:6px 0 10px;line-height:1.5}.setting input{width:100%;accent-color:var(--violet)}.setting:last-child{border-bottom:0}#settingsMessage{padding:0 20px;color:var(--dim);font-size:12px}
+.memoryhead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:30px 0 24px}.memoryhead h2{font-size:28px;font-weight:500;letter-spacing:-.04em;margin:8px 0}.memoryhead p{margin:0;color:var(--dim);font-size:12px;line-height:1.6}.memorytools{display:flex;gap:8px;align-items:center}.memorytools input{width:240px}.memorystats{display:flex;gap:24px;margin:0 0 24px;color:var(--dim);font-size:12px}.memorystats strong{color:#e8e2ff;font-weight:500;font-variant-numeric:tabular-nums}.memorynotice{font-size:12px;color:#c5b9ff;line-height:1.6;margin:12px 0}.memorynotice:empty{display:none}.owner{margin:24px 0 32px}.ownerhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}.ownericon{display:grid;place-items:center;background:#29233e;border:1px solid #6047ff35;border-radius:10px;width:34px;height:34px;color:#d0c3ff;font-size:13px}.ownerhead h2{font-size:14px;font-weight:500}.ownerhead small{display:block;margin-top:4px}.memorycards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:16px}.objectcard{padding:18px}.objectcard h3{margin:7px 0 0;font-size:18px;font-weight:500;overflow-wrap:anywhere;letter-spacing:-.02em}.objectcard p{font-size:11px;line-height:1.6;color:var(--dim)}.views{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:18px 0 10px;scrollbar-width:thin;scrollbar-color:#423859 transparent}.savedview{flex:0 0 calc((100% - 24px)/3);min-width:0;display:flex;flex-direction:column;gap:8px;scroll-snap-align:start}.savedview:only-child{flex-basis:100%}.savedview img{width:100%;height:128px;object-fit:contain;background:#090d17;border:1px solid #ffffff0b;border-radius:8px}.savedview button{padding:7px;font-size:11px}.objectcard .savedview button{display:none}.objectcard.editing .savedview button{display:block}.carouselbar{display:flex;align-items:center;justify-content:space-between;gap:8px}.arrows{display:flex;gap:6px}.carouselbar button{padding:5px 12px;background:#27223c}.objectcard details{margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}.objectcard details>button{margin-top:12px;font-size:12px}.objectcard .editstatus{color:#c9bcff;margin-bottom:0}.emptyMemory{padding:50px 24px;text-align:center;border:1px dashed #3a344f;border-radius:14px}.emptyMemory h3{font-size:18px;font-weight:500}.emptyMemory p{color:var(--dim);font-size:13px;line-height:1.8}
+@keyframes arrive{from{opacity:0;stroke-width:6}to{opacity:1;stroke-width:1}}@keyframes connect{from{stroke-dasharray:4 8;stroke-dashoffset:36;opacity:.1}to{stroke-dasharray:4 8;stroke-dashoffset:0;opacity:1}}
+@media(min-width:1500px){.grid{grid-template-columns:minmax(0,7fr) minmax(380px,3fr)}}
+@media(max-width:1000px){body{padding:18px}header{gap:12px}.badge{display:none}.latencies{padding:12px;gap:5px}.metric strong{font-size:17px}.metric span{font-size:10px}}
+@media(max-width:900px){body{padding:14px}header{flex-wrap:wrap;margin-bottom:14px}.brand svg{width:96px}.brand h1{font-size:16px}.tabs button{padding:7px 12px}.grid{display:flex;flex-direction:column;height:auto;min-height:0;max-height:none}.cameraCard{min-height:0}.camera{aspect-ratio:4/3;flex:none}.conversation{height:480px;flex:none}.memoryworkspace{display:flex;flex-direction:column}.memoryworkspace .memorytrace{border-right:0;border-bottom:1px solid var(--line)}.memorytrace{min-height:230px;max-height:420px}.searchtrace{min-height:270px}.map svg{height:140px;max-height:140px}.memoryhead{align-items:stretch;flex-direction:column;gap:16px;margin-top:24px}.memorytools input{width:100%;flex:1}.memorystats{gap:18px}.latencies{padding:14px 18px}.metric strong{font-size:20px}.metric span{font-size:10px}}
+@media(max-width:480px){.savedview{flex-basis:100%}.savedview img{height:190px}.brand svg{width:88px}.tabs button{padding:7px 10px;font-size:12px}.brand{gap:10px}.brand h1{font-size:14px;padding-left:10px}header{gap:12px}.itemcontrols[open]{max-width:calc(100% - 28px)}.evidenceitem img{width:78px;height:70px}.memoryhead h2{font-size:25px}.memorystats{gap:14px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 <header><div class="brand"><svg role="img" aria-label="Qdrant" id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 752 200">
   <defs>
@@ -72,18 +75,20 @@ button{font:inherit;font-weight:500;border:0;border-radius:8px;padding:10px 18px
 <div id="livePanel">
 
 <main class="grid">
-<section class="card cameraCard" aria-label="Live camera"><div class="camera"><div id="placeholder" class="placeholder"><svg viewBox="0 0 80 80" fill="none" stroke-width="1.2" aria-hidden="true"><rect x="12" y="20" width="56" height="40" rx="16"/><path d="M40 10v10M7 33v14M73 33v14"/><circle cx="29" cy="39" r="3"/><circle cx="51" cy="39" r="3"/><path d="M31 50h18"/></svg><strong>Edgy</strong>Start to connect.</div><img id="camera" alt="Live Jetson camera with person, object, and focus boxes" hidden><section class="controls" aria-label="Session controls"><div><div id="phase" role="status" aria-live="polite">Idle</div><p id="activity" class="sr-only">Start attaches to the robot on the Jetson, or starts it.</p><p id="error" role="alert"></p></div><div class="actions"><button id="start" onclick="control('start')">Start</button><button id="mute" class="secondary iconbutton" aria-label="Mute" title="Mute" aria-pressed="false" onclick="robot('mute',{on:!muted})" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/><path class="slash" d="m3 3 18 18"/></svg></button><button id="stop" class="secondary iconbutton" aria-label="Stop" title="Stop" onclick="control('stop')" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button></div></section><details class="itemcontrols"><summary title="Ignore or restore objects">Objects</summary><div class="camerafoot"><label for="item">Visible item</label><select id="item" aria-label="Item to ignore"></select><button id="ignore" class="secondary" disabled>Do not track that</button></div><div class="camerafoot"><label for="restoreItem">Ignored item</label><select id="restoreItem" aria-label="Ignored item to restore"></select><button id="restore" class="secondary" disabled>Restore</button></div></details></div><div class="commands" aria-label="Example voice commands"><p>Say "Hey Edgy", then try:</p><span>What do you see?</span><span>What is this?</span><span>Track this as my wallet</span><span>This is my phone</span><span>Where is my wallet?</span><span>When did you last see my wallet?</span><span>Is this my wallet?</span><span>Forget my wallet</span><span>Ignore that</span><span>What did I show you?</span><span>Is this the same thing I showed you before?</span><span>What did we talk about?</span><span>Remember me, I'm Sam</span><span>Do you remember me?</span><span>What is my name?</span><span>Forget me</span><span>What is Qdrant Edge?</span><span>What can you do?</span></div><p id="learning" role="status"></p><p id="itemMessage" role="status"></p><p id="viewerror" role="status"></p></section>
-<section class="card conversation" aria-label="Conversation"><div id="transcript" class="transcript" tabindex="0" aria-label="Live conversation"><p class="empty">Say “Hey Edgy”.</p></div><p id="closed" class="closed" role="status"></p><div class="audio"><label for="volume" class="sr-only">Robot speaker volume</label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></svg><input id="volume" type="range" min="0" max="100" step="1" value="62" disabled><output id="volumeValue" for="volume"></output></div></section>
-<section class="card memorytrace" aria-label="Qdrant Edge evidence"><div class="edgecaption">Qdrant Edge</div><div id="evidence" class="evidence"><p class="empty">Memories appear here.</p></div></section>
+<section class="card cameraCard" aria-label="Live camera"><div class="camera"><div id="placeholder" class="placeholder"><svg viewBox="0 0 80 80" fill="none" stroke-width="1.2" aria-hidden="true"><rect x="12" y="20" width="56" height="40" rx="16"/><path d="M40 10v10M7 33v14M73 33v14"/><circle cx="29" cy="39" r="3"/><circle cx="51" cy="39" r="3"/><path d="M31 50h18"/></svg><strong>Edgy</strong>Start to connect.</div><img id="camera" alt="Live Jetson camera with person, object, and focus boxes" hidden><section class="controls" aria-label="Session controls"><div><div id="phase" role="status" aria-live="polite">Idle</div><p id="activity" class="sr-only">Start attaches to the robot on the Jetson, or starts it.</p><p id="error" role="alert"></p></div><div class="actions"><button id="start" onclick="control('start')">Start</button><button id="mute" class="secondary iconbutton" aria-label="Mute" title="Mute" aria-pressed="false" onclick="robot('mute',{on:!muted})" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/><path class="slash" d="m3 3 18 18"/></svg></button><button id="stop" class="secondary iconbutton" aria-label="Stop" title="Stop" onclick="control('stop')" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button></div></section><details class="itemcontrols"><summary title="Ignore or restore objects">Objects</summary><div class="camerafoot"><label for="item">Visible item</label><select id="item" aria-label="Item to ignore"></select><button id="ignore" class="secondary" disabled>Do not track that</button></div><div class="camerafoot"><label for="restoreItem">Ignored item</label><select id="restoreItem" aria-label="Ignored item to restore"></select><button id="restore" class="secondary" disabled>Restore</button></div></details></div><p id="learning" role="status"></p><p id="itemMessage" role="status"></p><p id="viewerror" role="status"></p></section>
+<section class="card conversation" aria-label="Conversation"><div class="pinnedTip" id="commandTip" tabindex="0" aria-label="Example voice command. Tips pause while focused."><p id="tipText" class="bubble tipBubble"></p></div><div id="transcript" class="transcript" tabindex="0" aria-label="Live conversation"></div><p id="closed" class="closed" role="status"></p><div class="audio"><label for="volume" class="sr-only">Robot speaker volume</label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></svg><input id="volume" type="range" min="0" max="100" step="1" value="62" disabled><output id="volumeValue" for="volume"></output></div></section>
+<section class="card memoryworkspace" aria-label="Memory and retrieval"><section class="memorytrace" aria-label="Retrieved memories"><div id="evidence" class="evidence"></div><details id="retrievalDetails" class="retrievaldetails" hidden><summary title="Search results and source IDs">Details</summary><div id="retrievalContent"></div></details></section>
+<section class="searchtrace" aria-label="Qdrant Edge retrieval map"><div id="memoryMap" class="map" role="img" aria-label="No retrieval yet"></div><div class="latencies" aria-label="Latest turn latency"><div class="metric" title="Retrieval preparation includes work beyond Edge queries."><strong id="retrievalLatency">&#8212;</strong><span>Retrieval prep</span></div><div class="metric" title="Time from speech end to the first answer text."><strong id="textLatency">&#8212;</strong><span>First text</span></div><div class="metric" title="Time from speech end to the first synthesized phrase. Physical audible latency is measured separately."><strong id="speechLatency">&#8212;</strong><span>Speech ready</span></div></div></section></section>
 
 </main>
 <footer><details><summary>Help</summary>All models and Qdrant Edge run on the Jetson. Ask what Edgy sees, what you explicitly tracked earlier, or what you discussed. Show one object and say “Track this as my wallet” or “This is my phone”. Only named objects keep visual memories. Conversation memory stores text. Ask “Where is my phone?” or say “Forget my phone”; Edgy asks you to say yes or no before it deletes. Say “Ignore that” while you hold an object up, or choose an item in the camera card and press “Do not track that”; “Restore” brings it back. Ask Edgy to remember your face; it asks for consent first. Say “Forget me” to delete it; Edgy asks to confirm first. Follow-up questions stay open for about a minute after each answer finishes. After that, say “Hey Edgy” again. Say “Track this” with no name and Edgy asks what to call it. The robot ignores its microphone while its speaker plays and while muted; Mute and the volume slider act on the robot’s own USB microphone and speaker. Stop stops the robot on the Jetson and clears this view. Closing this page or losing the connection leaves the robot running; Start attaches to it again.</details></footer></div>
-<section id="memoryPanel" aria-label="Saved objects" hidden><p id="memoryError" role="alert"></p><div id="memoryList" aria-live="polite"></div></section>
+<section id="memoryPanel" aria-label="Saved objects" hidden><div class="memoryhead"><div><span class="eyebrow">Stored in Qdrant Edge</span><h2>Object Memories</h2><p>Saved views, grouped by visitor.</p></div><div class="memorytools"><label class="sr-only" for="memorySearch">Search saved objects or visitors</label><input id="memorySearch" type="search" placeholder="Search objects or visitors"><button id="refreshMemory" class="secondary">Refresh</button></div></div><div id="memoryStats" class="memorystats"></div><p id="memoryError" role="alert"></p><p id="memoryNotice" class="memorynotice" role="status"></p><div id="memoryList"></div></section>
 <section id="settingsPanel" hidden><section class="card recognition settingscard"><div class="cardhead"><h2>Recognition settings</h2><button id="resetSettings" class="secondary" disabled>Reset to defaults</button></div><p id="settingsMessage" role="status">Changes apply when you release a slider.</p><div id="recognitionSettings"></div><details class="setting"><summary>Advanced</summary><div id="advancedSettings"></div></details></section></section>
 <script>
 const el=id=>document.getElementById(id);
 let muted=false, cameraActive=false, transcriptText='', evidenceText='', carouselUpdates=[], itemControl={}, ignoredItems=[];
 async function openTab(name){
+  if(!el('memoryPanel').hidden&&name!=='memory')saveMemoryState();
   for(const tab of ['live','memory','settings']){
     el(tab+'Panel').hidden=tab!==name;el(tab+'Tab').setAttribute('aria-pressed',String(tab===name));
   }
@@ -98,59 +103,168 @@ function relativeTime(time){
     if(seconds>=size||size===1){const n=Math.floor(seconds/size);return n+' '+unit+(n===1?'':'s')+' ago';}
   }
 }
-async function memoryEdit(action,data,label,button){
-  if(!confirm(label+'?'))return;
-  button.disabled=true;el('memoryError').textContent='';
+const pendingEdits=new Map(),memoryCardStates=new Map();
+let savedObjects=[],memoryLoading=null,memoryPoll=null,memoryText='',memoryNotice='',memoryGeneration=0,deletedEvidence='';
+function editPresent(objects,edit){
+  const object=objects.find(object=>object.id===edit.data.object);
+  return edit.data.view?!!object?.views.some(view=>view.id===edit.data.view):!!object;
+}
+function memoryStatus(){
+  const queued=[...pendingEdits.values()];
+  el('memoryNotice').textContent=queued.length?(queued.some(edit=>Date.now()-edit.started>7000)?
+    'Still waiting for the robot. Edits apply between conversation turns.':
+    'Applying '+queued.length+' memory edit'+(queued.length===1?'':'s')+'…'):memoryNotice;
+  for(const card of el('memoryList').querySelectorAll('.objectcard')){
+    const edit=pendingEdits.get(card.dataset.object);
+    for(const button of card.querySelectorAll('[data-edit]'))button.disabled=!!edit;
+    card.querySelector('.editstatus').textContent=edit?'Edit pending. You can keep browsing.':'';
+  }
+}
+function scheduleMemory(){
+  clearTimeout(memoryPoll);
+  if(pendingEdits.size)memoryPoll=setTimeout(loadMemory,1500);
+}
+async function memoryEdit(action,data,label){
+  if(pendingEdits.has(data.object)||!confirm(label+'?'))return;
+  const card=document.getElementById('memory-'+data.object);
+  if(card?.contains(document.activeElement))card.querySelector('summary').focus({preventScroll:true});
+  const edit={data,label,started:Date.now(),queued:false};
+  pendingEdits.set(data.object,edit);el('memoryError').textContent='';memoryStatus();
   try{
     const response=await fetch('/'+action,{method:'POST',headers:{'X-Session-Token':'TOKEN','Content-Type':'application/json'},body:JSON.stringify(data)});
-    if(!response.ok)throw Error(response.status===409?'That memory has changed. Open Memory again.':'The robot could not edit this memory.');
-    // The robot applies edits in order with its other memory writes: re-read until done.
-    const gone=data.view||data.object;
-    for(let i=0;i<10&&(await loadMemory()).includes(gone);i++)await new Promise(r=>setTimeout(r,500));
-  }catch(error){el('memoryError').textContent=error.message;}
-  finally{button.disabled=false;}
+    if(!response.ok)throw Error(response.status===409?'That memory has changed. Refresh Memory and try again.':'The robot could not edit this memory.');
+    edit.queued=true;await loadMemory();
+  }catch(error){pendingEdits.delete(data.object);el('memoryError').textContent=error.message;}
+  finally{memoryStatus();scheduleMemory();}
 }
 async function loadMemory(){
-  el('memoryError').textContent='';
-  try{
-    const response=await fetch('/memory');if(!response.ok)throw Error('Memory unavailable. Start a session on Live first.');
-    const objects=await response.json();el('memoryList').replaceChildren();carouselUpdates=[];
-    if(!objects.length){const p=document.createElement('p');p.className='empty';p.textContent='Nothing remembered yet. Hold up an object and say: this is my mouse.';el('memoryList').append(p);return '';}
-    const owners=new Map();
-    for(const object of objects){
-      if(!owners.has(object.owner_label)){
-        const section=document.createElement('section');section.className='owner';const title=document.createElement('h2');title.textContent=object.owner_label;
-        const cards=document.createElement('div');cards.className='memorycards';section.append(title,cards);el('memoryList').append(section);owners.set(object.owner_label,cards);
+  if(memoryLoading)return memoryLoading;
+  const refreshFocused=document.activeElement===el('refreshMemory');
+  el('refreshMemory').disabled=true;
+  const generation=memoryGeneration;
+  memoryLoading=(async()=>{
+    try{
+      const response=await fetch('/memory');if(!response.ok)throw Error('Memory unavailable. Start a session on Live, then refresh.');
+      const objects=await response.json();if(generation!==memoryGeneration)return false;
+      savedObjects=objects;el('memoryError').textContent='';
+      for(const [id,edit] of pendingEdits){
+        if(edit.queued&&!editPresent(savedObjects,edit)){
+          pendingEdits.delete(id);memoryNotice=edit.label+' completed.';
+        }
       }
-      const card=document.createElement('article');card.className='card objectcard';card.id='memory-'+object.id;const title=document.createElement('h3');title.textContent=object.label;
-      const detail=document.createElement('p');detail.textContent='seen '+object.sightings+' times, last seen '+relativeTime(object.last_seen);
-      const views=document.createElement('div');views.className='views';views.setAttribute('aria-label','Saved views of '+object.label);
+      for(const [id,state] of memoryCardStates){
+        const object=savedObjects.find(object=>object.id===id);
+        if(!object)memoryCardStates.delete(id);
+        else if(!object.views.some(view=>view.id===state.view))state.view=null;
+      }
+      if(!el('memoryPanel').hidden)renderMemory();
+      else if(memoryText!==JSON.stringify([savedObjects,el('memorySearch').value.trim().toLocaleLowerCase()])){
+        el('memoryList').replaceChildren();el('memoryStats').replaceChildren();memoryText='';
+      }
+      memoryStatus();return true;
+    }catch(error){el('memoryError').textContent=error.message;return false;}
+    finally{el('refreshMemory').disabled=false;if(refreshFocused&&document.activeElement===document.body)el('refreshMemory').focus({preventScroll:true});scheduleMemory();}
+  })();
+  try{return await memoryLoading;}finally{memoryLoading=null;if(generation!==memoryGeneration&&!el('memoryPanel').hidden)loadMemory();}
+}
+function clearSavedMemory(){
+  memoryGeneration++;savedObjects=[];memoryText='';pendingEdits.clear();memoryCardStates.clear();carouselUpdates=[];clearTimeout(memoryPoll);
+  el('memorySearch').value='';
+  el('memoryList').replaceChildren();el('memoryStats').replaceChildren();el('memoryError').textContent='';
+  memoryNotice='Memory changed. Refresh to load saved objects.';memoryStatus();
+}
+function saveMemoryState(){
+  for(const card of el('memoryList').querySelectorAll('.objectcard')){
+    const object=savedObjects.find(object=>object.id===card.dataset.object);
+    const views=card.querySelector('.views');if(!object||!views.clientWidth)continue;
+    const width=(views.firstElementChild?.offsetWidth||0)+12,index=Math.max(0,Math.round(views.scrollLeft/width));
+    const view=views.children[index]?.dataset.view;
+    memoryCardStates.set(card.dataset.object,{open:card.querySelector('details').open,index,view:object.views.some(item=>item.id===view)?view:null});
+  }
+}
+function renderMemory(){
+  const filter=el('memorySearch').value.trim().toLocaleLowerCase();
+  const text=JSON.stringify([savedObjects,filter]);if(memoryText===text)return;memoryText=text;
+  saveMemoryState();
+  const list=el('memoryList'),states=memoryCardStates,anchors=[];
+  const focus=document.activeElement?.dataset.focusKey,pageY=window.scrollY;
+  for(const card of list.querySelectorAll('.objectcard')){
+    if(card.getBoundingClientRect().bottom>0)anchors.push([card.id,card.getBoundingClientRect().top]);
+  }
+  const ownerKey=object=>object.owner||object.id; // Older releases cannot safely group equal display names.
+  const owners=new Map();
+  for(const object of savedObjects){const id=ownerKey(object);if(!owners.has(id))owners.set(id,{label:object.owner_label,objects:[]});owners.get(id).objects.push(object);}
+  const stats=el('memoryStats');stats.replaceChildren();
+  for(const [number,label] of [[savedObjects.length,'object'],[savedObjects.reduce((n,o)=>n+o.views.length,0),'saved view'],[owners.size,'visitor']]){
+    const stat=document.createElement('span'),count=document.createElement('strong');count.textContent=number;stat.append(count,document.createTextNode(' '+label+(number===1?'':'s')));stats.append(stat);
+  }
+  const names=new Map();for(const group of owners.values())names.set(group.label,(names.get(group.label)||0)+1);
+  list.replaceChildren();carouselUpdates=[];
+  for(const [owner,group] of owners){
+    const objects=group.objects.filter(object=>(object.label+' '+group.label).toLocaleLowerCase().includes(filter));
+    if(!objects.length)continue;
+    const section=document.createElement('section');section.className='owner';section.dataset.owner=owner;
+    const head=document.createElement('div');head.className='ownerhead';
+    const icon=document.createElement('span');icon.className='ownericon';icon.setAttribute('aria-hidden','true');icon.textContent=group.label.slice(0,1).toUpperCase();
+    const heading=document.createElement('div'),title=document.createElement('h2'),subtitle=document.createElement('small');title.textContent=group.label;
+    subtitle.textContent=(names.get(group.label)>1?'Visitor '+owner.slice(-6)+' · ':'')+group.objects.length+' saved object'+(group.objects.length===1?'':'s');
+    if(names.get(group.label)>1)subtitle.title='Visitor '+owner;
+    heading.append(title,subtitle);head.append(icon,heading);
+    const cards=document.createElement('div');cards.className='memorycards';section.append(head,cards);list.append(section);
+    for(const object of objects){
+      const state=states.get(object.id),card=document.createElement('article');card.className='card objectcard';card.id='memory-'+object.id;card.dataset.object=object.id;
+      const kind=document.createElement('span');kind.className='eyebrow';kind.textContent='Visual memory';
+      const title=document.createElement('h3');title.textContent=object.label;
+      const detail=document.createElement('p');detail.textContent='Seen '+object.sightings+' time'+(object.sightings===1?'':'s')+' · Last seen '+relativeTime(object.last_seen);
+      const views=document.createElement('div');views.className='views';views.setAttribute('aria-label','Saved views of '+object.label);views.tabIndex=0;views.dataset.focusKey='views-'+object.id;
       object.views.forEach((view,index)=>{
-        const saved=document.createElement('div');saved.className='savedview';const image=document.createElement('img');image.loading='lazy';image.src='/thumb?view='+encodeURIComponent(view.id);image.alt=object.label+', view '+(index+1)+', '+view.source;
-        const remove=document.createElement('button');remove.className='secondary';remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+image.alt);
-        remove.addEventListener('click',()=>memoryEdit('remove_view',{object:object.id,view:view.id},'Remove '+image.alt,remove));saved.append(image,remove);views.append(saved);
+        const saved=document.createElement('div');saved.className='savedview';saved.dataset.view=view.id;
+        const image=document.createElement('img');image.loading='lazy';image.src='/thumb?view='+encodeURIComponent(view.id);image.alt=object.label+', view '+(index+1)+', '+view.source;
+        const remove=document.createElement('button');remove.className='secondary';remove.textContent='Remove View';remove.dataset.edit='true';remove.dataset.focusKey='remove-'+view.id;remove.setAttribute('aria-label','Remove '+image.alt);
+        remove.addEventListener('click',()=>memoryEdit('remove_view',{object:object.id,view:view.id},'Remove '+image.alt));saved.append(image,remove);views.append(saved);
       });
-      const bar=document.createElement('div');bar.className='carouselbar';
-      const count=document.createElement('small');const arrows=document.createElement('div');arrows.className='arrows';
+      const bar=document.createElement('div');bar.className='carouselbar';const count=document.createElement('small'),arrows=document.createElement('div');arrows.className='arrows';
       const previous=document.createElement('button'),next=document.createElement('button');
       for(const [button,label,direction] of [[previous,'Previous views',-1],[next,'Next views',1]]){
-        button.className='secondary';button.textContent=direction<0?'‹':'›';button.setAttribute('aria-label',label+' of '+object.label);
-        button.addEventListener('click',()=>views.scrollBy({left:direction*views.clientWidth,behavior:'smooth'}));arrows.append(button);
+        button.className='secondary';button.textContent=direction<0?'‹':'›';button.dataset.focusKey=(direction<0?'previous-':'next-')+object.id;button.setAttribute('aria-label',label+' of '+object.label);
+        button.addEventListener('click',()=>views.scrollBy({left:direction*views.clientWidth,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}));arrows.append(button);
       }
-      const update=()=>{const first=views.firstElementChild,width=first?first.offsetWidth+12:1;
-        const start=Math.round(views.scrollLeft/width)+1,shown=Math.max(1,Math.round((views.clientWidth+12)/width));
+      const update=()=>{
+        const width=(views.firstElementChild?.offsetWidth||0)+12;
+        const start=object.views.length?Math.round(views.scrollLeft/width)+1:0,shown=Math.max(1,Math.round((views.clientWidth+12)/width));
         count.textContent=start+'–'+Math.min(object.views.length,start+shown-1)+' of '+object.views.length+' views';
         previous.disabled=views.scrollLeft<1;next.disabled=views.scrollLeft+views.clientWidth>=views.scrollWidth-1;
       };
-      views.addEventListener('scroll',update);carouselUpdates.push(update);requestAnimationFrame(update);bar.append(count,arrows);
-      const edit=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Edit memory';edit.append(summary);
+      views.addEventListener('scroll',update);carouselUpdates.push(update);bar.append(count,arrows);
+      const edit=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Manage Memory';summary.dataset.focusKey='manage-'+object.id;edit.append(summary);edit.open=!!state?.open;card.classList.toggle('editing',edit.open);
       edit.addEventListener('toggle',()=>card.classList.toggle('editing',edit.open));
-      const forget=document.createElement('button');forget.textContent='Forget '+object.label;
-      forget.addEventListener('click',()=>memoryEdit('forget_object',{object:object.id},forget.textContent,forget));edit.append(forget);card.append(title,detail,views,bar,edit);owners.get(object.owner_label).append(card);
+      const forget=document.createElement('button');forget.textContent='Forget '+object.label;forget.dataset.edit='true';forget.dataset.focusKey='forget-'+object.id;
+      forget.addEventListener('click',()=>memoryEdit('forget_object',{object:object.id},forget.textContent));edit.append(forget);
+      const message=document.createElement('p');message.className='editstatus';message.setAttribute('role','status');
+      card.append(kind,title,detail,views,bar,edit,message);cards.append(card);
+      requestAnimationFrame(()=>{
+        if(state){const found=[...views.children].findIndex(view=>view.dataset.view===state.view);const index=found>=0?found:Math.min(state.index,object.views.length-1);views.scrollLeft=Math.max(0,index)*((views.firstElementChild?.offsetWidth||0)+12);}
+        update();
+      });
     }
-    return JSON.stringify(objects);  // the caller checks whether an edited id is still listed
-  }catch(error){el('memoryError').textContent=error.message;return '';}
+  }
+  if(!list.children.length){
+    const empty=document.createElement('div');empty.className='emptyMemory';const title=document.createElement('h3'),hint=document.createElement('p');
+    title.textContent=filter?'No matching memories':'Teach Edgy Something';hint.textContent=filter?'Try another object or visitor name.':'Hold up an object and say "Hey Edgy, this is my mouse". Its saved views will appear here.';empty.append(title,hint);list.append(empty);
+  }
+  requestAnimationFrame(()=>{
+    const anchor=anchors.find(([id])=>document.getElementById(id));
+    if(anchor)window.scrollTo({top:pageY+document.getElementById(anchor[0]).getBoundingClientRect().top-anchor[1],behavior:'instant'});
+    else window.scrollTo({top:pageY,behavior:'instant'});
+    const target=[...list.querySelectorAll('[data-focus-key]')].find(node=>node.dataset.focusKey===focus);
+    if(target)target.focus({preventScroll:true});
+    else if(focus&&list.contains(document.activeElement)===false&&document.activeElement===document.body){
+      const card=anchor&&document.getElementById(anchor[0]);card?.querySelector('summary').focus({preventScroll:true});
+    }
+  });
 }
+el('refreshMemory').addEventListener('click',loadMemory);
+el('memorySearch').addEventListener('input',()=>{renderMemory();memoryStatus();});
 function clearCamera(){
   el('camera').removeAttribute('src');el('camera').hidden=true;el('placeholder').hidden=false;cameraActive=false;
 }
@@ -159,9 +273,9 @@ function clearLive(){
   clearCamera();
   el('mute').disabled=true;el('mute').classList.remove('muted');el('mute').setAttribute('aria-pressed','false');el('mute').setAttribute('aria-label','Mute');el('mute').title='Mute';el('volume').disabled=true;
   el('viewerror').textContent='';
-  el('transcript').replaceChildren();const p=document.createElement('p');p.className='empty';p.textContent='Say “Hey Edgy”.';el('transcript').append(p);setClosed('');transcriptText='';evidenceText='';
+  el('transcript').replaceChildren();setClosed('');transcriptText='';evidenceText='';
   itemControl={};ignoredItems=[];muted=false;items();recognition({},false);
-  el('evidence').replaceChildren();const hint=document.createElement('p');hint.className='empty';hint.textContent='Memories appear here.';el('evidence').append(hint);
+  evidence();
 }
 async function control(action){
   if(action==='stop')clearLive();
@@ -239,41 +353,96 @@ function conversation(turns){
   }
   requestAnimationFrame(scrollConversation);
 }
-function evidence(data,memory){
-  const text=JSON.stringify([data,memory]);if(text===evidenceText)return;evidenceText=text;
-  const expanded=el('retrievalDetails')?.open||false;
+const commandTips=[
+  'What do you see?', 'This is my phone.', 'Where is my phone?',
+  'When did you last see my wallet?', 'Is this the same thing I showed you before?',
+  'What did we talk about?', 'Track this as my wallet.', 'What did I show you?',
+  'Remember me, I\'m Sam.', 'Do you remember me?', 'What is my name?',
+  'Forget my wallet.', 'Forget me.', 'Ignore that.', 'What is this?',
+  'Is this my wallet?', 'What is Qdrant Edge?', 'What can you do?'
+];
+let tipIndex=0;
+function showTip(){
+  const tip=commandTips[tipIndex];el('tipText').textContent='Hey Edgy, '+tip[0].toLowerCase()+tip.slice(1);
+}
+setInterval(()=>{
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.hidden&&!el('livePanel').hidden&&!el('commandTip').matches(':hover')&&!el('commandTip').contains(document.activeElement)){
+    tipIndex=(tipIndex+1)%commandTips.length;showTip();
+  }
+},12000);
+showTip();
+function metric(id,value){
+  const node=el(id);node.replaceChildren();
+  if(value===undefined||value===null||!Number.isFinite(Number(value))||value<0){node.textContent='—';return;}
+  const seconds=value>=1000,unit=document.createElement('small');unit.textContent=seconds?'s':'ms';
+  node.append(document.createTextNode(seconds?(value/1000).toFixed(2):Number(value).toFixed(1)),unit);
+}
+function searchMap(memory){
+  const map=el('memoryMap'),key=JSON.stringify(memory);if(map.dataset.search===key)return;map.dataset.search=key;
+  const ns='http://www.w3.org/2000/svg';
+  const svgNode=(tag,attrs={},text='')=>{const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attrs))node.setAttribute(key,value);if(text)node.textContent=text;return node;};
+  const shards=memory?.shards||[],hits=memory?.hits||[];
+  const height=Math.max(140,shards.length*45+30),middle=height/2;
+  const svg=svgNode('svg',{viewBox:'0 0 360 '+height,'aria-hidden':'true'});
+  if(!memory){
+    map.setAttribute('aria-label','No retrieval yet');
+  }else{
+    svg.classList.add('mapPulse');
+    for(let i=0;i<shards.length;i++){
+      const y=(i+1)*height/(shards.length+1);
+      svg.append(svgNode('line',{x1:40,y1:middle,x2:145,y2:y}),svgNode('line',{x1:145,y1:y,x2:230,y2:middle}));
+      svg.append(svgNode('circle',{cx:145,cy:y,r:6,class:'hub'}),svgNode('text',{x:145,y:y-13,'text-anchor':'middle'},shards[i]));
+    }
+    const shown=hits.slice(0,20);
+    shown.forEach(([text,score],i)=>{
+      const rows=Math.ceil(shown.length/4),x=267+(i%4)*17,y=middle-(rows-1)*8+Math.floor(i/4)*16;
+      svg.append(svgNode('line',{x1:230,y1:middle,x2:x,y2:y}));
+      const dot=svgNode('circle',{cx:x,cy:y,r:3.5,class:'node','data-hit':i});dot.style.animationDelay=(i*25)+'ms';
+      dot.append(svgNode('title',{},String(text)+(score===null?'':' · similarity '+Number(score).toFixed(3))));svg.append(dot);
+    });
+    svg.append(svgNode('circle',{cx:40,cy:middle,r:7,class:'query'}),svgNode('circle',{cx:230,cy:middle,r:3,class:'hub'}));
+    map.setAttribute('aria-label',shards.length+' collections searched, '+hits.length+' retrieval entries displayed. Search connections, not vector positions.');
+  }
+  map.replaceChildren(svg);
+
+}
+function evidence(data={},memory=null){
+  const deletion=data.deleted?(data.turn_id||'deleted'):'';
+  if(deletion&&deletion!==deletedEvidence)clearSavedMemory();deletedEvidence=deletion;
+  metric('retrievalLatency',memory?.ms);metric('textLatency',data.timing?.first_text_ms);metric('speechLatency',data.timing?.speech_ready_ms);
+  const {timing,...sources}=data;
+  const text=JSON.stringify([sources,memory]);if(text===evidenceText)return;evidenceText=text;
+  searchMap(memory);
   el('evidence').replaceChildren();
   for(const [label,items] of [['Knowledge',data.knowledge||[]],['Conversation',data.statements||[]]]){
-    for(const item of items){const p=document.createElement('p');const source=document.createElement('span');source.className='source';source.textContent=label;p.append(source,document.createTextNode(String(item)));el('evidence').append(p);}
+    for(const item of items){const row=document.createElement('article');row.className='sourcecard';const source=document.createElement('span');source.className='source';source.textContent=label;const p=document.createElement('p');p.textContent=String(item);row.append(source,p);el('evidence').append(row);}
   }
   for(const item of data.memories||[]){
-    const row=document.createElement('div');row.className='evidenceitem';
-    if(item.view){const image=document.createElement('img');image.src='/thumb?view='+encodeURIComponent(item.view);image.alt='Saved view of '+item.label;row.append(image);}
-    const body=document.createElement('div');
-    const title=document.createElement(item.object?'button':'strong');title.textContent=item.label;
+    const row=document.createElement('article');row.className='sourcecard';
+    const source=document.createElement('span');source.className='source';source.textContent=item.source||'Stored memory';row.append(source);
+    const content=document.createElement('div');content.className='evidenceitem';
+    if(item.view){const image=document.createElement('img');image.src='/thumb?view='+encodeURIComponent(item.view);image.alt='Saved view of '+item.label;content.append(image);}
+    const body=document.createElement('div'),title=document.createElement(item.object?'button':'strong');title.textContent=item.label;
     if(item.object){title.className='textlink';title.addEventListener('click',async()=>{
-      await openTab('memory');document.getElementById('memory-'+item.object)?.scrollIntoView({block:'center'});
+      el('memorySearch').value='';await openTab('memory');document.getElementById('memory-'+item.object)?.scrollIntoView({block:'center'});
     });}
-    const p=document.createElement('p');p.textContent=item.text;if(item.object)p.hidden=true;
-    const time=document.createElement('small');time.textContent=relativeTime(item.time);time.title=item.source;
-    body.append(title,p,time);row.append(body);el('evidence').append(row);
+    const p=document.createElement('p');p.textContent=item.text;
+    const time=document.createElement('small');time.textContent=relativeTime(item.time);body.append(title,p,time);content.append(body);row.append(content);el('evidence').append(row);
   }
-  if(!el('evidence').childNodes.length){const p=document.createElement('p');p.className='empty';p.textContent='Memories appear here.';el('evidence').append(p);}
-  if(memory||data.memory_ids?.length){
-    const details=document.createElement('details');details.id='retrievalDetails';details.open=expanded;details.className='retrievaldetails';
-    const summary=document.createElement('summary');summary.textContent='Details';details.append(summary);
+  const details=el('retrievalDetails'),content=el('retrievalContent');details.hidden=!(memory||data.memory_ids?.length);content.replaceChildren();
+  if(!details.hidden){
     const lines=[];
     if(memory){
-      // This timer includes retrieval preparation. It is not an isolated Edge query benchmark.
-      lines.push('Retrieval preparation: '+Number(memory.ms).toFixed(1)+' ms');
-      lines.push('Search shards: '+memory.shards.join(', '));
-      lines.push('Search results (may include results unused by the reply):');
+      lines.push('Retrieval preparation: '+Number(memory.ms).toFixed(1)+' ms. This includes work beyond Edge queries.');
+      lines.push('Collections searched: '+memory.shards.join(', '));
+      lines.push('Displayed retrieval entries can include sources that were not supplied to the answer.');
       for(const [hit,score] of memory.hits||[])lines.push(String(hit)+(score===null?'':' · similarity '+Number(score).toFixed(3)));
     }
     if(data.memory_ids?.length)lines.push('Evidence IDs: '+data.memory_ids.join(', '));
-    for(const line of lines){const p=document.createElement('p');p.textContent=line;details.append(p);}el('evidence').append(details);
+    for(const line of lines){const p=document.createElement('p');p.textContent=line;content.append(p);}
   }
 }
+evidence();
 function options(id, values, key){
   // Edit the list in place: rebuilding it on every poll closes an open dropdown and drops the selection.
   const select=el(id), want=new Map(values.map(item=>[String(item[key]),item.title]));

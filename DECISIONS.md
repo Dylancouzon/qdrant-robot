@@ -123,3 +123,6 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D170 2026-10-12: Tracked objects decide whether the view changed.** A held object that moves keeps its track but changes the pixels, so the robot dropped its own answers every turn (D27). The view counts as changed when the set of non-person tracks differs; the pixel difference decides only when neither view has tracks. Settings files keep only values that differ from the defaults.
 
 **D171 2026-10-15: Keep startup context small and the architecture stable.** Dylan: most remaining work is cleanup and refinement. CLAUDE.md keeps guardrails and targets; STATE.md keeps live status; research/lessons.md and research/README.md index detailed workflow, current architecture, and the complete experiment ledger. Load relevant sections on demand.
+
+
+**D172 2026-10-15: Show retrieved evidence beside a Qdrant Edge search map.** Dylan requested a shared 70/30 retrieval panel beneath the camera, full-height conversation, and a cleaner Memory tab. A pinned command bubble rotates examples without headings or extra controls. The map shows displayed retrieval entries; preparation and speech-ready timers keep their measurement limits. Visitor IDs govern card groups, and confirmed forgetting invalidates cached cards. Refines D157 and D158.
