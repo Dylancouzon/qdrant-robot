@@ -17,7 +17,7 @@ Dylan confirmed assembly on 2026-10-16. Existing models, thresholds, fixtures, a
 | Area | Remaining issue | Detail |
 | --- | --- | --- |
 | Conversation | Broad past cues and incomplete history caused regressions in archived stored-reply prototypes. General answer quality remains below target. | [Conversation](conversation.md#broader-stored-exchange-regression-2026-10-15) |
-| Servo qualification | Mounted direction, load, cable clearance, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal need assembly testing. | [Head control](servo.md#next-session-assembled-robot-testing) |
+| Servo qualification | Mounted direction, small loaded motion, cable clearance within ±10°, and short service shutdown passed. Wider travel, prolonged loaded power, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal remain open. | [Head control](servo.md#next-session-assembled-robot-testing) |
 | Identity and privacy | Stranger acceptance and multi-visitor handoffs still need whole-robot qualification. | [Faces](faces.md), [recorded backlog](archive/edge-case-records-2026-10-15.md#earlier-recorded-backlog) |
 | Perception | Lookalike objects, changed viewpoints, small objects, and tracking gaps can limit recognition. | [Objects](objects.md), [camera and encoder records](archive/edge-case-records-2026-10-15.md#camera-and-crop-encoder-d167-d168) |
 | Resources and latency | Paging, sustained detection, and physical audible latency remain unresolved targets. | [STATE.md](../STATE.md), [stack](stack.md) |

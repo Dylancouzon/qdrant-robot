@@ -10,7 +10,6 @@ import numpy as np
 DEVICE = "/dev/video0"
 CAPTURE = (1920, 1080)  # scaled to SIZE, which averages out grain (D167)
 SIZE = (1280, 720)
-ROTATE = cv2.ROTATE_180  # the camera is mounted upside down (STATE.md, Robot facts)
 
 
 class Camera:
@@ -35,7 +34,7 @@ class Camera:
             if not ok:
                 time.sleep(0.05)
                 continue
-            frame = cv2.rotate(cv2.resize(frame, SIZE, interpolation=cv2.INTER_LINEAR), ROTATE)
+            frame = cv2.resize(frame, SIZE, interpolation=cv2.INTER_LINEAR)
             with self._lock:
                 self._frame, self._stamp = frame, time.time()
 

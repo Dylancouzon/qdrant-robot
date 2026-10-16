@@ -7,8 +7,26 @@ import cv2
 import numpy as np
 import pytest
 
-from robot.camera import FileCamera
+from robot.camera import Camera, FileCamera
 from robot.main import Robot
+
+
+def test_mounted_live_capture_keeps_upright_pixels():
+    camera = Camera.__new__(Camera)
+    camera._lock, camera._stop = threading.Lock(), threading.Event()
+    source = np.zeros((720, 1280, 3), np.uint8)
+    source[:360, :640] = (17, 61, 203)
+
+    def read():
+        camera._stop.set()
+        return True, source
+
+    camera.cap = SimpleNamespace(read=read)
+    camera._run()
+    frame, stamp = camera.latest()
+    assert stamp > 0
+    assert tuple(frame[100, 100]) == (17, 61, 203)
+    assert tuple(frame[600, 1100]) == (0, 0, 0)
 
 
 def test_still_stamp_advances(tmp_path):

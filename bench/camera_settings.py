@@ -24,7 +24,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from robot.camera import ROTATE, SIZE
+from robot.camera import SIZE
 from robot.detect import HIGH, Detection, Detector, Tracker, distinct, iou
 from robot.settings import DEFAULTS
 
@@ -59,7 +59,8 @@ class Clip:
             if not ok:
                 return
             t = time.process_time()
-            frame = cv2.rotate(native, ROTATE)
+            # These raw clips were recorded with the pre-assembly camera upside down.
+            frame = cv2.rotate(native, cv2.ROTATE_180)
             if frame.shape[1] != SIZE[0]:
                 frame = cv2.resize(
                     frame,

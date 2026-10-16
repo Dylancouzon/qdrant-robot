@@ -18,7 +18,6 @@ from pathlib import Path
 
 import cv2
 
-from robot.camera import ROTATE
 from robot.config import SHARED
 from robot.detect import Detection, Tracker
 from robot.main import Robot
@@ -38,7 +37,8 @@ def frames(clip: Path):
         k += 1
         if k % step:
             continue
-        frame = cv2.rotate(cap.retrieve()[1], ROTATE)  # mounted upside down, as camera.py does
+        # This raw fixture was captured with the pre-assembly camera upside down.
+        frame = cv2.rotate(cap.retrieve()[1], cv2.ROTATE_180)
         assert frame.shape[1] == WIDTH, frame.shape
         yield k / cap.get(cv2.CAP_PROP_FPS), detect(frame)
     detect.close()

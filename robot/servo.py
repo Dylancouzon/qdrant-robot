@@ -35,6 +35,10 @@ class Servo:
     def write(self, address, value, size=1):
         if address not in (40, 41, 42, 44, 46, 48):
             raise ValueError("Servo control writes RAM registers only")
+        self._write(address, value, size)
+
+    def _write(self, address, value, size=1):
+        """Checked transaction; persistent setup has its own restricted caller."""
         try:
             result, error = getattr(self.packet, f"write{size}ByteTxRx")(
                 self.port, self.id, address, value)
