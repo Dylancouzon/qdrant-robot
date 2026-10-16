@@ -2768,3 +2768,33 @@
 {"key": "f871bdbf9bb1c00f", "pass": false, "why": "It falsely says the visitor mentioned risotto.", "votes": [false, false, false]}
 {"key": "ca160fa7d079b1b7", "pass": true, "why": "It recalls the corrected spicy preference.", "votes": [true, true, true]}
 {"key": "bbe85987d0ffca61", "pass": true, "why": "It names both Microsoft and Qdrant.", "votes": [true, true, true]}
+{"key": "c44e2b68def91b01", "pass": false, "why": "Does not say he looks like he is having fun.", "votes": [false, false, false]}
+{"key": "a72b40d01f587bc7", "pass": true, "why": "Identifies the cat.", "votes": [true, true, true]}
+{"key": "a7189908c4b08a8b", "pass": true, "why": "Recalls the cat.", "votes": [true, true, true]}
+{"key": "12dab57beabce6db", "pass": true, "why": "Recalls the cup.", "votes": [true, true, true]}
+{"key": "bbfc03f850db300e", "pass": true, "why": "Identifies the laptop.", "votes": [true, true, true]}
+{"key": "e53258132412719d", "pass": true, "why": "Recalls the clock first.", "votes": [true, true, true]}
+{"key": "a050c6bdf5e153b3", "pass": true, "why": "Recalls the laptop next.", "votes": [true, true, true]}
+{"key": "60cc206910fb2a18", "pass": true, "why": "Identifies the cat.", "votes": [true, true, true]}
+{"key": "75347419e07f4934", "pass": true, "why": "Identifies the banana without mentioning the cat.", "votes": [true, true, true]}
+{"key": "4e08452d4d7445b9", "pass": true, "why": "Recalls the banana.", "votes": [true, true, true]}
+{"key": "b206c8ff2276997d", "pass": true, "why": "Correctly says the objects differ.", "votes": [true, true, true]}
+{"key": "9f51a54d74bbe86e", "pass": false, "why": "Does not identify the clock.", "votes": [false, false, false]}
+{"key": "c2dfa8517c40cdf4", "pass": false, "why": "Reverses who showed the clock.", "votes": [false, false, false]}
+{"key": "5fa9eb6b3beb60be", "pass": false, "why": "Does not identify the laptop.", "votes": [false, false, false]}
+{"key": "db522afb74e81fd7", "pass": true, "why": "Correctly says it is the same laptop.", "votes": [true, true, true]}
+{"key": "a4b085dc8ed681a3", "pass": true, "why": "Correctly says the objects differ.", "votes": [true, true, true]}
+{"key": "bc12d95405011824", "pass": false, "why": "Offers no way to keep the outing inexpensive.", "votes": [false, false, false]}
+{"key": "d2ae90a2cb2bfcc8", "pass": false, "why": "Accepts staying indoors but suggests no indoor activity.", "votes": [false, false, false]}
+{"key": "eb3309dc67562814", "pass": false, "why": "Offers no one-hour indoor outing.", "votes": [false, false, false]}
+{"key": "7ff1bef1b9a5a3ef", "pass": false, "why": "Offers no houseplant advice or useful question.", "votes": [false, false, false]}
+{"key": "92ad2453403e264d", "pass": false, "why": "Suggests no habit or reminder.", "votes": [false, false, false]}
+{"key": "8a5e0b14ce00b603", "pass": false, "why": "Does not address five-minute weekday practice.", "votes": [false, false, false]}
+{"key": "4de15a082b9d93c0", "pass": true, "why": "Slow chord practice gives the short session a focus.", "votes": [true, true, true]}
+{"key": "7a3c8b28b01fa7b2", "pass": false, "why": "Suggests no genre or useful preference question.", "votes": [false, false, false]}
+{"key": "e06ad747be3a777a", "pass": false, "why": "Explains no difference and asks for no clarification.", "votes": [false, false, false]}
+{"key": "e61f2e0c5bb41f9b", "pass": true, "why": "Greets Dylan and responds to his love of espresso.", "votes": [true, true, true]}
+{"key": "01d0c6a71c9dd0cc", "pass": false, "why": "Does not say it is a laptop.", "votes": [false, false, false]}
+{"key": "4f481c1674f45f25", "pass": true, "why": "Suggests practicing aloud or breathing before the talk.", "votes": [true, true, true]}
+{"key": "1ad22946e7239701", "pass": false, "why": "Offers no beginner step and does not ask which language.", "votes": [false, false, false]}
+{"key": "0bfe600d12621527", "pass": false, "why": "Offers no daily habit or relevant clarification.", "votes": [false, false, false]}

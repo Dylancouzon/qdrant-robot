@@ -79,6 +79,7 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Bake-off shape I adds the evidence instruction twice on newer prompts | Misleading shape comparisons | Add it only when absent | reviews/20261009-011200-49661-review.md |
 | 64 recent sightings of one kind hide older kinds | A missing memory line | Page farther back if a live visit shows it | same |
 | Sightings carry no details (colour, accessories) | "Which teddy had the hat?" fails | Detail from the crop or caption at sighting time | V1-E report |
+| A future plan contains a broad past cue, while scene changes leave user-only history | Archived dialogue retrieval can add unrelated, repeated exchanges and weaken a new topic | Fix general retrieval eligibility and context assembly before adopting stored replies | [Broader dialogue regression](conversation.md#broader-stored-exchange-regression-2026-10-15) |
 | TOLD_MIN 0.5 lets unrelated statements through | Odd memory lines ("talk at four" for minutes) | Calibrate on dev with absent memories | V1-E report |
 | Commands stored before V1-E come back as told lines in old shards | False ownership in old memory | Retention expires them (12 h) | V1-E report |
 | Many conversations without an object | Each keeps a pending guest number in RAM until restart | Drop abandoned entries when a conversation ends | reviews/20261011-024631-51048-review.md |
