@@ -8,7 +8,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Operating rules, reviews, evaluation, deployment, and recovery | [Workflow](workflow.md) |
 | Previous experiments and failure pitfalls | [Lessons index](lessons.md) |
 | Current tasks and known gaps | [Remaining work](edge-cases.md#current-priorities-after-the-project-review-2026-10-15) |
-| General conversation and cross-topic evaluation | [Conversation](conversation.md) |
+| Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md) |
 | Monitor, audio controls, and session lifecycle | [Robot interface](mac-audio-interface.md) |
 | Focus, overlays, and visitor interaction | [Booth behavior](booth-ux.md) |
 | Detector models and preprocessing | [Detector](detector.md) |
@@ -23,3 +23,5 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Binding decisions | [Decisions](../DECISIONS.md); search by ID before opening entries |
 | Saved verdicts and measurements | [Reviews](../reviews/), [results](../bench/results/); use tools/results.py for summaries |
 | Superseded plans and older history | [Archive index](archive/README.md) |
+
+Completed conversation experiments are in the [dated trial report](archive/conversation-trials-2026-10-15.md). The archive index also lists their rejected patches and base commits.

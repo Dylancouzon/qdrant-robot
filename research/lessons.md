@@ -5,7 +5,7 @@ The [experiment ledger](experiment-ledger.md) preserves every tried avenue, outc
 | Question | Ledger section |
 | --- | --- |
 | Models, runtimes, precision, or memory placement | [Brain and runtime](experiment-ledger.md#brain-and-runtime) |
-| Retrieval, conversation, recall, or code answers | [Retrieval and answers](experiment-ledger.md#retrieval-and-answers) |
+| Retrieval, conversation, stored replies, or regressions | [Retrieval and answers](experiment-ledger.md#retrieval-and-answers) |
 | Endpointing, ASR, wake phrases, or deletion confirmation | [Voice](experiment-ledger.md#voice) |
 | Detection, crops, faces, focus, or interface | [Perception, faces, and interface](experiment-ledger.md#perception-faces-and-interface) |
 | RAM, paging, retention, or search timing | [System and memory](experiment-ledger.md#system-and-memory) |

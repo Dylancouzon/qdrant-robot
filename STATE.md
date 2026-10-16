@@ -4,13 +4,13 @@ Updated 2026-10-15. Branch: `spike/conversation-context`. Architecture is settle
 
 ## Active task
 
-Broader memory testing preserved recorded 43/47, visual recall 16/21, and conversation 4/18, but transfer fell from 2/6 to 0/6. A future-plan phrase triggered unrelated dialogue retrieval; duplicate user-only history also remains. Earlier recall improved from 1/6 to 5/6, while the exact Qdrant question still failed. Runtime source is restored; keep accepted f9. The reviewed evidence and records are retained. The enclosure worktree and result.json stay untouched.
+Repository records are organized. [Conversation guidance](research/conversation.md) lists the recall gain, both transfer regressions, and the next checks. Detailed trials and rejected patches are indexed in [the archive](research/archive/README.md#conversation-trials-2026-10-15). Runtime source matches the validated release; the memory prototypes remain archived. The enclosure worktree and existing result.json are preserved.
 
 The [worker-failure notes](research/edge-cases.md#worker-exceptions-2026-10-15) record Dylan's subsequent live test pass. Next work is indexed in [remaining priorities](research/edge-cases.md#current-priorities-after-the-project-review-2026-10-15). Returning-visitor greetings stay parked.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `809470ff`; current accepted release `f9b90b958023`, previous `78d67ad5e10d`. Both regression units finished; results, speech checks, and paging analysis are collected. No live robot or benchmark runs. WSL is idle.
+Jetson `robot`: boot `809470ff`; current accepted release `f9b90b958023`, previous `78d67ad5e10d`. Live unit `qr-robot` is running; logs: `journalctl -u qr-robot`, session: `shared/sessions/20261015-222249`. Benchmark units finished. This cleanup starts no models and leaves the live session running. WSL is idle.
 
 ## Targets
 
@@ -28,4 +28,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read the broader regression in research/conversation.md before further runtime work. Fix general retrieval eligibility and duplicate history before another integrated comparison. Keep accepted f9.
+Read [conversation next steps](research/conversation.md#next-steps). Start with cheap checks of past-question eligibility and duplicate history across varied conversations. Freeze a paired test before another runtime change. Keep accepted f9, and inspect the live unit before scheduling GPU work.

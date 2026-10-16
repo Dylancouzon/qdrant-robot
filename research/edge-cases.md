@@ -8,7 +8,7 @@ The review covered runtime and thread ownership, speech, tracking, recognition, 
 
 | Order | Remaining task | Finish when |
 | --- | --- | --- |
-| One | Improve general conversation, including held-object answers and recent recall. The [cross-topic comparison](conversation.md) found no qualifying change. | Measure useful follow-ups, corrections, and topic changes across varied dialogues. Use held-object clips for visual claims, and compare answers with supplied evidence before changing runtime behavior. |
+| One | Improve general conversation and recent recall. Stored replies gained recall but introduced [two topic-change regressions](conversation.md#broader-stored-exchange-regression-2026-10-15). | Check past-question eligibility and duplicate history with varied recall requests, future plans, corrections, and topic changes. Preserve passing visual, privacy, and transfer cases. |
 | Two | Retest lookalike recognition in good light. DINOv3 confuses differently colored controllers and some laptop pairs (J/E). | Measure both recognition and same-object answers on paired objects. Keep the parked color veto parked until evidence supports it. |
 | Three | Finish Memory-tab polish. Group by visitor ID, retain the edited card's scroll and expansion, and show pending edits after polling ends. | Two visitors with one display name remain distinct. A slow edit has a visible outcome, and repeated view removal keeps its place. |
 | Four | Complete booth acceptance. Per-capability quality, stranger identity, sustained detection, paging, offline startup, restart, deletion, physical latency, and the eight-hour run remain open. | Meet the targets and M4 checks in CLAUDE.md on the Jetson. Keep physical latency parked until that acceptance task resumes (D160). |
@@ -18,6 +18,10 @@ The cleanup fixes explicit result handoff, failed collection handling, full fixt
 Further harness work is bounded: preserve partial replay evidence on interruption, reject empty standalone judge input, propagate bake-off judge failures, and preserve locally enriched historical records during collection. `eval/replay.py` writes its rows only after `run` returns; `eval/judge.py` accepts an empty row list; `bench/brain_bakeoff.py` ignores the judge's exit code. `tools/jetson.py collect` overwrote added metadata in two old local results during this task; their committed versions were restored, and collected originals remain under `build/cleanup-collected-originals/`. The acceptance runner now rejects missing or incomplete results before judging.
 
 The recorded replay's speech check passed 46/47 (J). Its remaining failure is a spelling difference: "Metrocentre via Bens" became "Metro Center via Benz" in independent transcription. Keep the failure visible until the checker handles equivalent spelling without weakening content or truncation checks. The four judged failures concern unprompted image commentary, the beach question, bears reported present after removal, and an incomplete same-object answer. No keyword result changed from the previous recorded run. Evidence: `bench/results/2026-10-15-243f49ff-replay-1792095965{,.judged}.jsonl`.
+
+## Current conversation regressions
+
+The archived dialogue prototype can retrieve unrelated exchanges for future advice containing a broad past cue. Scene changes can leave repeated visitor questions without replies. The [conversation page](conversation.md#broader-stored-exchange-regression-2026-10-15) lists both failed cases and the next checks. Keep held-object visual claims covered when testing the shared retrieval decision.
 
 ## Worker exceptions, 2026-10-15
 
@@ -79,7 +83,6 @@ As of 2026-10-09. D71 (Dylan): v1 logs edge cases and tests the whole robot firs
 | Bake-off shape I adds the evidence instruction twice on newer prompts | Misleading shape comparisons | Add it only when absent | reviews/20261009-011200-49661-review.md |
 | 64 recent sightings of one kind hide older kinds | A missing memory line | Page farther back if a live visit shows it | same |
 | Sightings carry no details (colour, accessories) | "Which teddy had the hat?" fails | Detail from the crop or caption at sighting time | V1-E report |
-| A future plan contains a broad past cue, while scene changes leave user-only history | Archived dialogue retrieval can add unrelated, repeated exchanges and weaken a new topic | Fix general retrieval eligibility and context assembly before adopting stored replies | [Broader dialogue regression](conversation.md#broader-stored-exchange-regression-2026-10-15) |
 | TOLD_MIN 0.5 lets unrelated statements through | Odd memory lines ("talk at four" for minutes) | Calibrate on dev with absent memories | V1-E report |
 | Commands stored before V1-E come back as told lines in old shards | False ownership in old memory | Retention expires them (12 h) | V1-E report |
 | Many conversations without an object | Each keeps a pending guest number in RAM until restart | Drop abandoned entries when a conversation ends | reviews/20261011-024631-51048-review.md |
