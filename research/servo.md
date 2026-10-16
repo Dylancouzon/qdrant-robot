@@ -51,6 +51,8 @@ The early conversational inspection path returned the robot introduction despite
 
 The [final task review](../reviews/20261016-081534-99885-review.md) passed without blocking findings. Deployed release `31866696ff60` matches all 25 checked runtime, model, and dependency files in validated release `6ff84b1df3ce`. The original regression expectations were updated for explicit handover and preserved ownership during target loss. Accepted rollback release `f9b90b958023` remains the previous release. Raw telemetry and voice files stay under ignored `build/` storage or Jetson `shared/` paths.
 
+The mandatory pre-commit checks passed in 232.33 s. They ran lint, dead-code detection, the complete regression suite, browser checks, module assertions, and workflow self-checks. The pinned SDK environment separately passed all 24 servo checks.
+
 ## Remaining qualification
 
 - Implement the calibrated runtime serial adapter. Verify forward position, direction, saved limits, and encoder-zero handling before enabling it.
@@ -58,3 +60,4 @@ The [final task review](../reviews/20261016-081534-99885-review.md) passed witho
 - Measure physical stopping, power behavior, servo noise, and USB-loss behavior. Software cannot promise torque release after disconnect.
 - Inspection latency exceeds the project target. Sustained detection while speaking, paging, strangers, larger groups, and broader held-out acceptance remain unqualified.
 - Body-dependent face-name overlays retain their existing admission rule. Following can work while a weak body detection prevents that overlay.
+- Losing both the active face and body also pauses inspection commands. After Stop at a side pose, the visitor can need to re-enter view. Recovery without visible identity remains pending.
