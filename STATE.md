@@ -4,13 +4,13 @@ Updated 2026-10-16. Branch: `spike/conversation-context`. Architecture is settle
 
 ## Active task
 
-The centered command tip and stored memory map are complete. The map shows real point creation, object links, and once-per-turn recall pulses. It handles deletion, reconnect, and bounded samples. The [interface notes](research/mac-audio-interface.md#stored-memory-map-checks-2026-10-16) retain local, browser, and Jetson checks and their limits. Task reviews passed; the task commit runs all required checks.
-
-The good-light recognition retest is closed on [Dylan's report](research/edge-cases.md#lookalike-recognition-in-good-light-2026-10-15). Conversation trials and returning-visitor greetings stay parked. The enclosure worktree and existing result.json are preserved.
+Dylan accepted the UI and Memory work. The repository handoff indexes current components and preserves historical evidence separately. Conversation trials, returning-visitor greetings, and broader acceptance remain parked. The enclosure worktree stays untouched.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `809470ff`; release `83dd4fb999f5` follows the isolated memory-map checks and is running as `qr-robot`. Previous points to accepted `f9b90b958023` for rollback. Logs: `journalctl -u qr-robot`; session: `shared/sessions/20261016-002006`. The Mac monitor serves port 8765 and is connected. The memory-map benchmark finished. WSL is idle.
+Jetson `robot`: boot `809470ff`; deployed release `83dd4fb999f5`. The `qr-robot` unit is stopped, and no benchmark unit is active. Previous points to accepted `f9b90b958023` for rollback. Last session: `shared/sessions/20261016-002006`; logs: `journalctl -u qr-robot`. The Mac monitor serves port 8765. WSL is idle.
+
+The cleanup changes documentation and benchmark labels only. It does not deploy or start the robot.
 
 The target measurements below precede this interface refresh.
 
@@ -28,6 +28,8 @@ The target measurements below precede this interface refresh.
 
 M4 also needs offline cold start, restart and deletion checks, physical latency, and an eight-hour run. Physical latency stays parked under D160.
 
-## Next command
+## Next step
 
-Use the live interface at http://127.0.0.1:8765 to assess memory creation and recall during real questions. Resume [conversation next steps](research/conversation.md#next-steps) when Dylan chooses the next task; keep the architecture and evidence requirements fixed.
+**Servo motor control and voice commands.** Inspect the connected servo/controller, power supply, electrical interface, travel limits, and desired spoken commands. Review the smallest bounded control path before motion. Keep models, memory, consent, and deletion behavior intact. See the [work queue](research/edge-cases.md#next-steps).
+
+Start with `rg -n 'servo|motor|GPIO|I2C|PWM' robot tools research/architecture.md` to locate existing integration points.

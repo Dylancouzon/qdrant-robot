@@ -30,3 +30,37 @@ git ls-tree -r --name-only archive/2026-10-10/pre-cleanup bench/results reviews
 ```
 
 The Jetson keeps the same results in `shared/results-archive-20261010/`.
+
+## File index
+
+- [edge-sdk-notes-2026-10-07.md](edge-sdk-notes-2026-10-07.md)
+- [answer-evidence.md](answer-evidence.md)
+- [assistant-design.md](assistant-design.md)
+- [capability-plan.md](capability-plan.md)
+- [concepts.md](concepts.md)
+- [conversation-budget.patch](conversation-budget.patch)
+- [conversation-history.patch](conversation-history.patch)
+- [conversation-prompt.patch](conversation-prompt.patch)
+- [conversation-trials-2026-10-15.md](conversation-trials-2026-10-15.md)
+- [decisions-2026-10-10.md](decisions-2026-10-10.md)
+- [dialogue-v1.patch](dialogue-v1.patch)
+- [dialogue-v2.patch](dialogue-v2.patch)
+- [edge-case-records-2026-10-15.md](edge-case-records-2026-10-15.md)
+- [endpointing.md](endpointing.md)
+- [experiment-heads-20261010.json](experiment-heads-20261010.json)
+- [experiments.md](experiments.md)
+- [gemma-fit.md](gemma-fit.md)
+- [grounding.md](grounding.md)
+- [interface-checks-2026-10-16.md](interface-checks-2026-10-16.md)
+- [jetson-trt.md](jetson-trt.md)
+- [lessons-2026-10-10.md](lessons-2026-10-10.md)
+- [lessons-index-2026-10-10.md](lessons-index-2026-10-10.md)
+- [m1-slice-design.md](m1-slice-design.md)
+- [m2-design.md](m2-design.md)
+- [m3-design.md](m3-design.md)
+- [memory-and-booth.md](memory-and-booth.md)
+- [models.md](models.md)
+- [one-voice.patch](one-voice.patch)
+- [recognition-import-plan.md](recognition-import-plan.md)
+- [sight.md](sight.md)
+- [v1-plan.md](v1-plan.md)

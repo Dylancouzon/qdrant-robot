@@ -47,7 +47,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
 | Same-object color veto (mean Lab, middle half) | Same-object windows Delta E p50 11.3, p99 27.1; vetoes 38% of lookalike windows; lightness alone 5.6% (E). Never fired live: the failing question lacked a past cue, and recognition shows the same shape bias | Parked (Dylan); [good-light retest closed](edge-cases.md#lookalike-recognition-in-good-light-2026-10-15) | D169; `bench/color_pairs.py` |
 | Scene change by tracked objects instead of pixels | Dev closet pairs differ 11.4–15.3 against the 8.0 pixel threshold, the same range as a held object moving, so pixels cannot separate them (E) | Current | D170 |
-| Same-object answers from crop MaxSim (D163) | The 2B said yes to every comparison; code now answers from DINOv2 crops (pairs E, replay J). Dev replays compare the closet chair because it holds the focus in every composite; validate live | Current; live check pending | D163; `research/same-object.md` |
+| Same-object answers from crop MaxSim (D163) | The 2B said yes to every comparison; code now answers from DINOv3 crops (D168) (pairs E, replay J). Dev replays compare the closet chair because it holds the focus in every composite; validate live | Current; live check pending | D163; `research/same-object.md` |
 | Intent parsing (rules, BGE scores, linear head) | Never built. The 8 recorded misses (39/47, J) include no wrong past or present choice: `about_past()` fired on every past question. Combined questions still lack earlier evidence | Not the bottleneck for this set; reopen with routing misses | `recall.md` |
 | Recall: earlier frame labeled as past (B) | Right frame delivered; 2B answers in present tense or about the image. 38/47, 10/15 (J) | Rejected | D150 |
 | Recall: B plus a past-tense note (B-note) | 41/47, 11/15 (J); answers still wander ("the first thing I saw was...") | Rejected for B2 | D150 |
@@ -103,7 +103,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 
 | Finding | Value | Ref |
 | --- | --- | --- |
-| Transcription and answer-worker exceptions | Before the fix, an injected exception skipped queue completion (E). After the fix, both failures were reported within 0.17 s and shutdown took about 0.72 s with real models; subsequent cases reopened isolated test memories (J). The original live incident remains unattributed | `bench/results/2026-10-15-worker-failure-1792101431.jsonl`; `research/edge-cases.md#worker-exceptions-2026-10-15` |
+| Transcription and answer-worker exceptions | Before the fix, an injected exception skipped queue completion (E). After the fix, both failures were reported within 0.17 s and shutdown took about 0.72 s with real models; subsequent cases reopened isolated test memories (J). The original live incident remains unattributed | `bench/results/2026-10-15-worker-failure-1792101431.jsonl`; `research/archive/edge-case-records-2026-10-15.md#worker-exceptions-2026-10-15` |
 | Edge query p99, 1,000 points | 0.47–0.49 ms (J), target 10 ms | D36 |
 | Component RAM | bge 409, faces 297, DINOv2 172, YOLO 260, Parakeet 531, Kokoro 1,207 (640 MB CUDA kernels), llama 2B 1,921 MB (J) | D66, D68 |
 | Retention vs named objects | The 12 h window evicted naming turns and sightings of named objects despite D51; fixed by keeping them in `_retain` (live, 2026-10-12) | D164 |
@@ -132,6 +132,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 - The pre-commit checks read the working tree. Stage complete files; partially staged bookkeeping breaks the gate's index cleanup. Never bypass the hook.
 - Do not stop a healthy job on a stale log line (D119). Check real progress counters first.
 - Records grew until 19 of 30 commits were receipts (D149). Keep records lean.
+- `tools/jetson.py collect` can overwrite locally enriched historical results. Preserve collected originals in ignored `build/`, then reconcile task-specific evidence before staging.
 
 ## Machines
 

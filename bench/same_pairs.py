@@ -1,5 +1,5 @@
 """Score "Is this the same thing I showed you before?" on dev image pairs, as the robot answers it:
-different label groups say No; one group gets the MaxSim score of the DINOv2 crops against
+different label groups say No; one group gets MaxSim from the configured crop vectors against
 `same` and `guess_band`. Boxes come from the robot's detector run on each still (CPU, Mac);
 each side is one crop, where the robot holds up to three. Never reads eval/heldout.
 
@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from robot.detect import MODEL as DETECTOR, Detector, region  # noqa: E402
 from robot.memory import maxsim, same_thing  # noqa: E402
 from robot.settings import DEFAULTS  # noqa: E402
-from robot.things import MODEL as DINOV2, Crops, cut  # noqa: E402
+from robot.things import MODEL as ENCODER, Crops, cut  # noqa: E402
 
 DEV = ROOT / "eval/dev"
 MATCH, BAND = DEFAULTS["same"], DEFAULTS["guess_band"]
@@ -119,7 +119,7 @@ def main():
         "source_sha256": {n: hashlib.sha256((ROOT / n).read_bytes()).hexdigest()
                           for n in ("bench/same_pairs.py", "robot/memory.py", "robot/things.py")},
         "model_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
-                         for p in (DETECTOR, DINOV2)},
+                         for p in (DETECTOR, ENCODER)},
         "machine": {"label": "E", "hostname": platform.node(), "platform": platform.platform()},
         "versions": {"python": platform.python_version(), "onnxruntime": ort.__version__,
                      "numpy": np.__version__, "opencv": cv2.__version__},

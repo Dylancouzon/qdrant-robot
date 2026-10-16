@@ -1,47 +1,20 @@
-# Qdrant Edge: what it can do
+# Qdrant Edge in the robot
 
-As of 2026-10-07. Verify against the installed package's `.pyi` stubs before relying on any line.
+The project pins `qdrant-edge-py` 0.8.0. Verify capabilities against that installation's `qdrant_edge/__init__.pyi`, rather than current upstream `master`. Dependencies and model artifacts stay pinned in [pyproject.toml](../pyproject.toml), [uv.lock](../uv.lock), and [models.json](../models.json).
 
-## Summary
+| Shard | Stored evidence | Runtime owner |
+| --- | --- | --- |
+| `knowledge` | Curated facts with question phrasings as a multivector. Recreated from the shipped snapshot on startup. | [knowledge.py](../robot/knowledge.py) |
+| `seen` | Visitor text, selected visual sources, captions, and named-object sightings. | [memory.py](../robot/memory.py) |
+| `things` | Owner-scoped named objects with crop multivectors, saved views, visitor records, and Ignore rules. | [things.py](../robot/things.py) |
+| `people` | Consented face shots with visitor links. | [people.py](../robot/people.py) |
 
-- `qdrant-edge-py` 0.8.0 (2026-08-05) is the latest release. It ships `manylinux_2_28` aarch64 wheels; JetPack 6 has glibc 2.35.
-- One query can fuse prefetches: `QueryRequest(prefetches=[...], query=Fusion.Rrf(k=2))`. **Tested on 0.7.2**: dense plus sparse RRF returned the expected order. Also present in the stubs: `Fusion.Dbsf`, weighted RRF, `Mmr`, `Formula` with `DecayKind` (Lin, Gauss, Exp), `Query.RecommendBestScore`, `RecommendSumScores`, `Discover`, `Context`, `FeedbackNaive`, `OrderBy`, `Sample`, `facet`, `count`, `scroll`.
-- Built-in BM25: `Bm25`, `Bm25Config`, sparse vectors with the IDF modifier. Use `embed_document` for documents and `embed_query` for queries.
-- Multivector with MaxSim: `EdgeVectorParams(multivector_config=MultiVectorConfig(MultiVectorComparator.MaxSim))`. Example: `lib/edge/python/examples/multivector-colbert.py` in qdrant/qdrant.
-- Quantization: scalar, product, binary (1, 1.5, 2 bit), and TurboQuant (4, 2, 1.5, 1 bit). TurboQuant 4-bit is close to int8 recall at twice the compression. Binary 1-bit loses precision below about 1,000 dimensions. Quantization is set at create time.
-- No background optimizer. Call `optimize()` after bulk writes; until then new points are brute-force searched.
-- No built-in sync. The documented pattern: seed from a server shard snapshot (`unpack_snapshot`, `load`), refresh with a partial snapshot (`snapshot_manifest` to `POST /collections/{c}/shards/0/snapshot/partial/create`, then `update_from_snapshot`), push with your own dual-write queue. Edge cannot create snapshots.
-- `query_groups` and `search_matrix` exist only in Rust.
+The Edge shards stay inside the robot process. All inference runs on the Jetson. Embeddings come from the robot's pinned models. Face enrollment needs explicit consent. Forgetting deletes linked points and source files. [Objects](objects.md), [faces](faces.md), and [recall](recall.md) define each flow.
 
-## 0.8.0 compared to 0.7.2 (stub diff)
+## Reading and updates
 
-- New: `EdgeConfig(max_search_threads=, search_pool_core=)`, `MatchPrefix`, `prefix=` on `TextIndexParams`, `DisabledStemmer`, `IdfParams(corpus=Filter)`, `TurboQuantQuantizationConfig`.
-- Changed: `on_disk_payload` defaults to `None` (keep the shard's value). Getters for `on_disk_payload`, `hnsw_config`, `optimizers` return `Optional`.
-- **Not in 0.8.0** (checked in the wheel): `query_batch`, `QueryBatchRequest`, the `Memory` placement enum (Cold, Cached, Pinned). These are on `master`.
+Similarity search uses `QueryRequest` with `Query.Nearest`. Ordered queries use indexed payload times. Metadata reads use `scroll`, `retrieve`, and `count`, with selected payload fields and vectors disabled. MaxSim combines multiple question phrasings, crop views, or face shots within a point. The [memory-map guide](mac-audio-interface.md#what-the-page-shows) describes bounded UI reads.
 
-## Threading
+Version 0.8.0 also exposes `Fusion.Rrf` and `Fusion.Dbsf` for prefetch fusion. The robot's current query paths do not require a new fusion layer. Check installed stubs before introducing a primitive. The [official reading API](https://qdrant.tech/documentation/edge/edge-api/reading-data/) explains request mechanics.
 
-- `max_search_threads` sizes a rayon pool inside the shard (default: CPUs times 4). `search_pool_core` pins it to one core, which keeps search off the cores the models use.
-- The PyO3 bindings appear to hold the GIL during `query` (no `allow_threads` found in `lib/edge/python`). Calls from several Python threads may serialize. Measure in M0.5.
-
-## Known open issues (recheck; recorded 2026-10-07)
-
-- qdrant#10846: `MatchValue(True)` is stored as integer 1.
-- qdrant#9066: an integer index drops range matches when combined with a non-matching match clause.
-- qdrant#9241: no live reload; `close()` and `load()` to swap a shard.
-
-## Numbers
-
-- No published Qdrant or Edge latency on any Jetson. Ours will be the first public numbers we know of.
-- Qdrant's June 2026 blog: 0.51 ms for a hybrid query in the demo's screenshot. A separate iPhone 16 Pro test: about 0.1 ms on device over 10,000 vectors against about 52 ms to Qdrant Cloud over cellular (not an official benchmark).
-
-## Sources
-
-- https://qdrant.tech/documentation/edge/edge-api/reading-data/
-- https://qdrant.tech/documentation/edge/edge-vs-qdrant-cluster/
-- https://qdrant.tech/documentation/edge/edge-synchronization-guide/
-- https://qdrant.tech/documentation/edge/edge-data-synchronization-patterns/
-- https://qdrant.tech/documentation/manage-data/quantization/
-- https://pypi.org/project/qdrant-edge-py/
-- https://github.com/qdrant/qdrant/tree/master/lib/edge/python/examples
-- https://qdrant.tech/blog/qdrant-edge-on-device-vector-search/
+[tools/jetson.py](../tools/jetson.py) owns deployment and collection. Keep closed-shard backups and rollback releases. The [historical SDK survey](archive/edge-sdk-notes-2026-10-07.md) preserves earlier capability comparisons and issue notes; it does not establish current upstream release status.

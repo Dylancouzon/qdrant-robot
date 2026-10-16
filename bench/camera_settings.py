@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Camera capture bake-off on recorded static-scene clips: grain, detector stability, and
-crop-vector stability under the robot's own Detector, Tracker, and DINOv2 crops. Clips are raw
+crop-vector stability with the configured encoder. Clips are raw
 MJPEG files from `v4l2-ctl --stream-to`. Append filters with `:`, joined by `+`: `linear`
 resizes 1080p with INTER_LINEAR instead of INTER_AREA; `median3` (3-frame temporal median) or
 `bilateral` denoises after resizing.

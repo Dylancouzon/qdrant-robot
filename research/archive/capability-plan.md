@@ -22,7 +22,7 @@ Start with useful conversational memory, the evidence contract, a fresh challeng
 | D68/D76: 4B missed the memory floor; live conversation swaps. | Measure active paging in a continuous process. Test capacity enablers only against the complete robot. |
 | D19: TensorRT export lacked an x86 NVIDIA host. | The 3080 now exists. Qualify exact export and runtime compatibility before any extended port. |
 
-D75's 44/74 is development evidence, not a fresh acceptance result. D64's object recognition reached 15/22 phones and 15/35 teddies at zero tested false matches (E). Existing long-context claims cover 2K prompts and 64-token answers, not sustained conversation. See [lessons](lessons.md), [grounding](grounding.md), and [stack](stack.md).
+D75's 44/74 is development evidence, not a fresh acceptance result. D64's object recognition reached 15/22 phones and 15/35 teddies at zero tested false matches (E). Existing long-context claims cover 2K prompts and 64-token answers, not sustained conversation. See [lessons](../lessons.md), [grounding](grounding.md), and [stack](../stack.md).
 
 ## Execution order and machine ownership
 
@@ -147,9 +147,9 @@ Removing execution deadlines preserves every gate and its criteria. The runner r
 
 | Checkpoint | Command | Checks |
 | --- | --- | --- |
-| Before an architectural change | `python3 tools/gate.py design --model gpt-6.1-sol '<brief and evidence>'` | [Design rules](../gates/design.md): two real alternatives, simplest useful solution, over-engineering, duplication, and a Jetson comparison. |
-| After each completed task | `python3 tools/gate.py review --model gpt-6.1-sol '<scope and evidence>'` | [Review rules](../gates/review.md): correctness, performance, unnecessary complexity, overfitting, scope, and optional edge cases. |
-| At a milestone | `python3 tools/gate.py milestone --model gpt-6-astra '<milestone and evidence>'` | [Milestone rules](../gates/milestone.md): acceptance, architectural drift, over-engineering, and remaining capability gaps. |
+| Before an architectural change | `python3 tools/gate.py design --model gpt-6.1-sol '<brief and evidence>'` | [Design rules](../../gates/design.md): two real alternatives, simplest useful solution, over-engineering, duplication, and a Jetson comparison. |
+| After each completed task | `python3 tools/gate.py review --model gpt-6.1-sol '<scope and evidence>'` | [Review rules](../../gates/review.md): correctness, performance, unnecessary complexity, overfitting, scope, and optional edge cases. |
+| At a milestone | `python3 tools/gate.py milestone --model gpt-6-astra '<milestone and evidence>'` | [Milestone rules](../../gates/milestone.md): acceptance, architectural drift, over-engineering, and remaining capability gaps. |
 | After two failed approaches or an architectural doubt | `python3 tools/gate.py design --model gpt-6-astra '<question and prior evidence>'` | Independent counsel on the approach and alternatives. |
 
 The pre-commit hook runs deterministic checks. Command watchdogs remain operational safeguards; a timeout records an incomplete operation and requires diagnosis. It never establishes a failed capability hypothesis. Freeze each task's scope and acceptance before dispatch. Carry optional concerns without growing the task; fixed-outcome failures remain blocking. Log each route's evidence, decision, and reopening condition.
@@ -173,13 +173,13 @@ Record remote jobs with host, directory, PID/unit, command, release, start time,
 
 Read-only check at 2026-10-09 05:42–05:46 UTC: Jetson idle, current release `4387936b8ee9`, about 6,033 MiB available, 107 MiB allocated swap, and 105 GB disk free. Boot ID: `09b4bb27-f975-441c-9d00-7af446ec7de6`. The real clip exists at `shared/clips/live-items-1.avi`. These are idle observations, not a runtime budget.
 
-WSL: RTX 3080 with 10,240 MiB VRAM, 363 MiB used, 0% utilization; about 23 GB RAM available and 798 GB disk free. Ollama has Gemma4:12B and Qwen3.5:9B installed, with neither loaded. Use `/usr/lib/wsl/lib/nvidia-smi`; the command is absent from the SSH PATH. Docker 29.7.2 and daemon access work; GPU-container passthrough still needs qualification. Passwordless sudo is unavailable, so use existing access or user-space setup before escalating a host change. The working environment is `~/qdrant-robot-box/venv`, not `.venv`. Its CUDA 13.2.86 export setup and patched inference binary are documented in [lessons](lessons.md). Mac: 24 GiB RAM and about 240 GiB disk free. Recheck ownership and jobs at execution start.
+WSL: RTX 3080 with 10,240 MiB VRAM, 363 MiB used, 0% utilization; about 23 GB RAM available and 798 GB disk free. Ollama has Gemma4:12B and Qwen3.5:9B installed, with neither loaded. Use `/usr/lib/wsl/lib/nvidia-smi`; the command is absent from the SSH PATH. Docker 29.7.2 and daemon access work; GPU-container passthrough still needs qualification. Passwordless sudo is unavailable, so use existing access or user-space setup before escalating a host change. The working environment is `~/qdrant-robot-box/venv`, not `.venv`. Its CUDA 13.2.86 export setup and patched inference binary are documented in [lessons](../lessons.md). Mac: 24 GiB RAM and about 240 GiB disk free. Recheck ownership and jobs at execution start.
 
 First command: `python3 tools/results.py --cases eval/dev/m2.jsonl --limit 6`. Then run F0 and dispatch the small export preflight and perception preparation. Do not start by repeating the five-model or nine-prompt sweep.
 
 ## Sources and verification limits
 
-- Local evidence: D19, D27, D35, D39, D43, D57, D64, D66, D68, D74–D78; [grounding](grounding.md), [detector](detector.md), [booth UX](booth-ux.md), and [lessons](lessons.md). Installed `.venv/lib/python3.12/site-packages/qdrant_edge/__init__.pyi` governs Edge 0.8.0 APIs.
+- Local evidence: D19, D27, D35, D39, D43, D57, D64, D66, D68, D74–D78; [grounding](grounding.md), [detector](../detector.md), [booth UX](../booth-ux.md), and [lessons](../lessons.md). Installed `.venv/lib/python3.12/site-packages/qdrant_edge/__init__.pyi` governs Edge 0.8.0 APIs.
 - Official [Edge reading API](https://qdrant.tech/documentation/edge/edge-api/reading-data/) and [configuration](https://qdrant.tech/documentation/edge/edge-api/configuration/) describe current features. They do not establish availability in older installed versions.
 - Official [Objectron dataset](https://github.com/google-research-datasets/Objectron), [indices](https://github.com/google-research-datasets/Objectron/blob/master/index/README), and [license](https://github.com/google-research-datasets/Objectron/blob/master/LICENSE) document selective video access. The [EPIC-KITCHENS dataset](https://epic-kitchens.github.io/2026) and [selective downloader](https://github.com/epic-kitchens/epic-kitchens-download-scripts) provide an optional interaction source; automated annotations are not ground truth.
 - Official [YOLOE models, training, and export](https://docs.ultralytics.com/models/yoloe/) and [YOLOE-26 configuration](https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/models/26/yoloe-26-seg.yaml) support the detector candidates. [TensorRT compatibility](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/engine-compatibility.html) requires qualifying the final engine on the target.

@@ -114,11 +114,11 @@ def main() -> None:
     for _ in range(5):
         faces.vectors(frame)
     mark("YuNet + face embedder")
-    from robot.things import Crops
+    from robot.things import MODEL, Crops
     crops = Crops()
     for k in range(1, 9):
         crops([frame[:200, :200]] * k)
-    mark("DINOv2-small crops, batch 1 to 8")
+    mark(f"{MODEL.parent.name} crops, batch 1 to 8")
     from robot.detect import Detector
     detect = Detector()
     for _ in range(50):

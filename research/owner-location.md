@@ -1,14 +1,13 @@
-# Owner and location of objects
+# Object owners and physical location
 
-Dylan's requirement (2026-10-10): each sighting carries a UI-set location, and each named object carries its owner. Not built yet; it needs its own design gate. The earlier parser plan and session drafts are in [archive/answer-evidence.md](archive/answer-evidence.md).
+Object ownership works in the current runtime. UI-set physical locations remain a parked proposal. See [objects](objects.md#owners) for the implemented owner rules.
 
-| Payload | Stored value | Capture rule |
-| --- | --- | --- |
-| `location` | A nullable place label, such as "demo table" | Copy the UI's active robot location into each sighting at capture time |
-| `owner` | A nullable named-person key, such as "Ana" | Bind a verified object introduction to the named speaker in that session |
+## Current ownership
 
-- **Owner.** A name given in the current conversation, or a verified enrolled face, establishes the speaker. Unknown or conflicting identity leaves the owner empty. The field adds no consent shortcut.
-- **Location.** It names where the robot saw the object, never where the object is now. A later location change affects only new sightings.
-- **References.** "My phone" means the current speaker's object; "Ana's phone" means Ana's. The answer says "your phone" to the owner and "Ana's phone" to anyone else. When neither identity nor session evidence resolves the reference, the robot asks whose phone is meant.
-- **Storage.** Owner and label together select an object, so Ana's and Dylan's phones stay apart. The object store keys records by name alone today, so this needs a reviewed storage change. Existing records stay unowned.
-- **Deletion.** "Forget me" removes the person's owner links and linked evidence; "forget my phone" affects only that owner's object. D148 (same-name objects) stays open.
+Each named object carries a visitor ID in `owner`, its spoken `name`, and a normalized `key`. The same visitor can reteach an object; different visitors can use the same name. A told name or consented face enrollment updates the visitor's display identity. The Memory tab groups by visitor ID. "Forget me" removes linked objects and evidence. D154 and D155 implement the owner separation proposed under D148.
+
+## Parked location proposal
+
+Dylan requested physical location labels on 2026-10-10. A future UI location setting would be copied into each sighting at capture time. Later changes would affect only new observations. The location would describe where the robot saw an object, rather than its current whereabouts.
+
+This location field and control need their own scoped design review. Existing owner scoping and consent rules remain intact. Servo motor control and voice commands take priority. The earlier proposal remains in [answer-evidence.md](archive/answer-evidence.md).

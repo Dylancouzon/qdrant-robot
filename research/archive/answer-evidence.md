@@ -1,6 +1,6 @@
 # Intent and evidence testing plan
 
-The parser hypothesis is refuted for the current development set: none of the eight recorded misses is an evidence-selection error ([recall.md](recall.md)). The owner and location requirements and the session designs remain current.
+The parser hypothesis is refuted for the current development set: none of the eight recorded misses is an evidence-selection error ([recall.md](../recall.md)). The owner and location requirements and the session designs remain current.
 
 Keep the accepted Qwen runtime and test independent live, history, and knowledge selection before changing the prompt or model. Compare rules with similarity scores from the existing BGE question embedding. Consider a trained classifier only after those options fail unseen paraphrases. This session produces a plan and source audit only.
 
@@ -207,7 +207,7 @@ Before execution, resolve real phone enrollment, location capture, owner-aware l
 - Local source: `robot/route.py`, `robot/main.py`, `robot/memory.py`, `robot/things.py`, `robot/knowledge.py`, and `robot/brain.py`, at accepted source `011f522`.
 - Complete existing scripts: `eval/dev/m2.jsonl` and `eval/dev/sessions.jsonl`. Their original prompts remain unchanged.
 - D21 raw files: `bench/results/2026-10-08-brain-qwen3vl-2b-text-1791432411.jsonl`, `2026-10-08-brain-qwen35-2b-text-1791432466.jsonl`, `2026-10-08-brain-gemma4-e2b-text-1791432356.jsonl`, and `2026-10-08-brain-qwen3vl-2b-text-1791433913.jsonl`.
-- Historical integration: D87, D103, D108–D110, and D113–D114 in [DECISIONS.md](../DECISIONS.md). D110's detailed contract remains in the coordinator's `research/answer-path.md`.
+- Historical integration: D87, D103, D108–D110, and D113–D114 in [DECISIONS.md](../../DECISIONS.md). D110's detailed contract remains in the coordinator's `research/answer-path.md`.
 - [Named-object reference](https://github.com/Dylancouzon/qdrant-edge-memory-robot), locally inspected at `cfc0dd2c5bb540f08149213c43bd33ba2d0c27f9`.
 - [BGE-small model card](https://huggingface.co/BAAI/bge-small-en-v1.5) and [similarity operations](https://www.sbert.net/docs/package_reference/util/similarity.html).
 - [Independent multi-label classifiers](https://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html).

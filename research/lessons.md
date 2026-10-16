@@ -20,4 +20,4 @@ Open [machine access and environment notes](experiment-ledger.md#machines) befor
 
 The [machine notes](experiment-ledger.md#machines) retain the access details and environment limits.
 
-Current implementation files are indexed in [research/README.md](README.md). Remaining work is in [edge-cases.md](edge-cases.md#current-priorities-after-the-project-review-2026-10-15). Older material is indexed in [archive/README.md](archive/README.md).
+Current implementation files are indexed in [research/README.md](README.md). Remaining work is in [edge-cases.md](edge-cases.md#next-steps). Older material is indexed in [archive/README.md](archive/README.md).

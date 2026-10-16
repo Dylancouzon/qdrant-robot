@@ -1,34 +1,34 @@
 # Experiment index
 
-Main contains the accepted Qwen/UI runtime from `011f522` and the reviewed planning work from `26fed40`. Main also holds the completed Gemma comparison records. Rejected runtime trees are historical Git parents only. Read this index and [STATE](../STATE.md) before opening a detailed record. J means measured on the Jetson, E means measured elsewhere, and U means unverified.
+Main contains the accepted Qwen/UI runtime from `011f522` and the reviewed planning work from `26fed40`. Main also holds the completed Gemma comparison records. Rejected runtime trees are historical Git parents only. Read this index and [STATE](../../STATE.md) before opening a detailed record. J means measured on the Jetson, E means measured elsewhere, and U means unverified.
 
 ## Current and pending work
 
 | Topic | Outcome | Read next |
 | --- | --- | --- |
-| Accepted robot and UI | D147 preview accepted as good enough. Main preserves its source byte-for-byte. | [UI guide](mac-audio-interface.md), [D147 audit](../bench/results/2026-10-10-d147-box-continuity.json). |
+| Accepted robot and UI | D147 preview accepted as good enough. Main preserves its source byte-for-byte. | [UI guide](../mac-audio-interface.md), [D147 audit](../../bench/results/2026-10-10-d147-box-continuity.json). |
 | Intent parsing and tool execution | Next session: keep Qwen fixed and compare rules with existing BGE scores. Location and Owner remain planned prerequisites. Seven development sessions contain 30 spoken turns. Owner comes from the named introducer; location comes from the UI. | [Complete plan](answer-evidence.md). |
-| Same-owner duplicate objects and crop backgrounds | D148 grouping policy and background masking remain undecided. Named-owner requirements are selected for a future build. | [Known gaps](edge-cases.md#next-session-object-recognition-discussion). |
-| Acceptance | Every arm misses measured zero-turn paging and detects below 15 fps during synthesis; the sampled model-stack reserve passes. Physical audio, held-out quality, sustained detection, and M4 remain unqualified. | [Current status](../STATE.md). |
+| Same-owner duplicate objects and crop backgrounds | D148 grouping policy and background masking remain undecided. Named-owner requirements are selected for a future build. | [Known gaps](../objects.md). |
+| Acceptance | Every arm misses measured zero-turn paging and detects below 15 fps during synthesis; the sampled model-stack reserve passes. Physical audio, held-out quality, sustained detection, and M4 remain unqualified. | [Current status](../../STATE.md). |
 
 ## Completed avenues
 
 | Avenue | Measured outcome and disposition | Evidence |
 | --- | --- | --- |
-| Gemma LiteRT and full-stack compute | Three full-stack arms complete 167 questions each (J). Gemma/CPU fits with 1,026 MiB reserve, but scores 31/47 versus Qwen 39/47 and adds speech latency. Keep current Qwen/CUDA. | [Fit comparison](gemma-fit.md), [complete numeric audit](../bench/results/2026-10-10-gemma-full-stack.json). |
+| Gemma LiteRT and full-stack compute | Three full-stack arms complete 167 questions each (J). Gemma/CPU fits with 1,026 MiB reserve, but scores 31/47 versus Qwen 39/47 and adds speech latency. Keep current Qwen/CUDA. | [Fit comparison](gemma-fit.md), [complete numeric audit](../../bench/results/2026-10-10-gemma-full-stack.json). |
 | Model-driven memory tools | Qwen3-VL-2B called memory on 10/13 current-sight questions (J). Preserve code retrieval. | D21; [routing audit](answer-evidence.md#earlier-tests-and-limits). |
 | Sufficient-source diagnostic | Answers improved from 14/24 to 21/24 (J). This controlled upper bound supports evidence work. | D87; archived `overnight-2026-10-09`, `bench/results/2026-10-09-bakeoff-evidence-probe-1791527749{,.judged}.jsonl`. |
 | Calibrated semantic retrieval | Controlled answers improved from 22/32 to 30/32 (J). Integrated qualification remained necessary. | D103; archived overnight source and its paired-event results. |
-| Generative evidence integration | Recorded-audio answers fell from 42/47 to 39/47; joint text/speech fell from 39 to 36 (J). Reject adoption. | D108–D110; [exact aggregate](../bench/results/2026-10-09-f1i-audio-audit.json). |
+| Generative evidence integration | Recorded-audio answers fell from 42/47 to 39/47; joint text/speech fell from 39 to 36 (J). Reject adoption. | D108–D110; [exact aggregate](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-09-f1i-audio-audit.json). |
 | Granite with SmolVLM observer | Integrated oracle answers scored 26/47 judged (J). The prototype remained unadopted. | D112–D113; archived overnight and `p2-observer-dialogue` records. |
-| Plain versus code-owned tool-result evidence | Both arms scored 21/39 judged (J). Two wins and two losses supplied no aggregate gain. Reject adoption. | D114; [summary](../bench/results/2026-10-09-p2-evidence-role-summary.json). |
-| WSL Gemma preparation and prompts | Checkpoint archive verifies. Three BF16 prompts tie at 7/12 (E). Original quantizer exit is unavailable; keep the unchanged prompt. | [Checkpoint receipt](../bench/results/2026-10-10-wsl-checkpoint-validation.json), [prompt receipt](../bench/results/2026-10-10-wsl-gemma-prompt-screen.json). |
-| Native Gemma AWQ on official TensorRT | Build exits 0 in 751.99 s (J). Initialization exits 1 before any answer. Required base weights exceed total board memory. | [Findings](jetson-trt.md), [native exits](../bench/results/2026-10-10-jetson-gemma-awq-native.json), [blocked stages](../bench/results/2026-10-10-jetson-gemma-awq-native.jsonl). |
-| Detector, names, and drawing | D140–D147 repairs became the accepted UI checkpoint. Earlier filter and tracking failures remain archived. | [Short outcome table](lessons.md#detection-repair-outcomes), [historical lessons](archive/lessons-2026-10-10.md). |
+| Plain versus code-owned tool-result evidence | Both arms scored 21/39 judged (J). Two wins and two losses supplied no aggregate gain. Reject adoption. | D114; [summary](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-09-p2-evidence-role-summary.json). |
+| WSL Gemma preparation and prompts | Checkpoint archive verifies. Three BF16 prompts tie at 7/12 (E). Original quantizer exit is unavailable; keep the unchanged prompt. | [Checkpoint receipt](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-wsl-checkpoint-validation.json), [prompt receipt](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-wsl-gemma-prompt-screen.json). |
+| Native Gemma AWQ on official TensorRT | Build exits 0 in 751.99 s (J). Initialization exits 1 before any answer. Required base weights exceed total board memory. | [Findings](jetson-trt.md), [native exits](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-jetson-gemma-awq-native.json), [blocked stages](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-jetson-gemma-awq-native.jsonl). |
+| Detector, names, and drawing | D140–D147 repairs became the accepted UI checkpoint. Earlier filter and tracking failures remain archived. | [Short outcome table](../experiment-ledger.md#perception-faces-and-interface), [historical lessons](lessons-2026-10-10.md). |
 
 ## Retrieve an exact historical record
 
-The [head manifest](archive/experiment-heads-20261010.json) gives every original commit and archive tag. Branches can retire without losing their snapshots. Earlier rejected runtime branches use an ours-strategy history merge. The records-only Gemma branch fast-forwards into main with the accepted runtime unchanged.
+The [head manifest](experiment-heads-20261010.json) gives every original commit and archive tag. Branches can retire without losing their snapshots. Earlier rejected runtime branches use an ours-strategy history merge. The records-only Gemma branch fast-forwards into main with the accepted runtime unchanged.
 
 ```sh
 git show archive/2026-10-10/overnight-2026-10-09:research/answer-path.md

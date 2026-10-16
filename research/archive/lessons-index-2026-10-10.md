@@ -1,35 +1,35 @@
 # Lessons and evidence index (archived)
 
-Archived 2026-10-10 from `research/lessons.md`. Relative links resolve from that former location; pruned paths are in tag `archive/2026-10-10/pre-cleanup`.
+Archived 2026-10-10 from `research/lessons.md`. Navigation links resolve from this archive; pruned paths are preserved in tag `archive/2026-10-10/pre-cleanup`.
 
-Updated 2026-10-10 after accepted-source consolidation and the completed Gemma full-stack comparison. Use the [experiment index](experiments.md) for outcomes and archived evidence. Read [STATE.md](../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](archive/lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
+Updated 2026-10-10 after accepted-source consolidation and the completed Gemma full-stack comparison. Use the [experiment index](experiments.md) for outcomes and archived evidence. Read [STATE.md](../../STATE.md) first. Detailed experiment history is preserved in the [historical lessons archive](lessons-2026-10-10.md); decisions remain in [DECISIONS.md](../../DECISIONS.md). Numbers marked J were measured on our Jetson, E elsewhere, and U remain unverified.
 
 ## Find the current behavior
 
 | Topic | Current guide | Decisions and results |
 | --- | --- | --- |
-| Live camera, audio, labels, and controls | [Mac interface](mac-audio-interface.md) | D124-D147; [final box checkpoint](../bench/results/2026-10-10-d147-box-continuity.json) |
-| Object selection and visual memory | [Booth behavior](booth-ux.md) | D140-D142, D144-D147 |
-| Detector and TensorRT export | [Detector](detector.md) | D139, D146; [default qualification](../bench/results/2026-10-10-d146-detector-default.json) |
+| Live camera, audio, labels, and controls | [Mac interface](../mac-audio-interface.md) | D124-D147; [final box checkpoint](../../bench/results/2026-10-10-d147-box-continuity.json) |
+| Object selection and visual memory | [Booth behavior](../booth-ux.md) | D140-D142, D144-D147 |
+| Detector and TensorRT export | [Detector](../detector.md) | D139, D146; [default qualification](../../bench/results/2026-10-10-d146-detector-default.json) |
 | Source evidence and answers | [Intent and session plan](answer-evidence.md), [Grounding](grounding.md) | D75, D87-D110; archived controlled comparisons |
-| Faces, consent, and deletion | [Faces](faces.md), [identity design](m3-design.md) | D45, D56, D143 |
-| Model choice and complete-stack fit | [Gemma/Qwen comparison](gemma-fit.md) | Retain Qwen/CUDA; [numeric audit](../bench/results/2026-10-10-gemma-full-stack.json) |
-| Speech, wake word, and model memory | [Runtime stack](stack.md), [wake word](wakeword.md) | D24, D65-D76 |
-| Deployment and recovery | [Project instructions](../CLAUDE.md), [STATE.md](../STATE.md) | `tools/jetson.py` and named units |
-| Known unqualified behavior | [Edge cases](edge-cases.md), [STATE.md](../STATE.md) | Keep limits separate from measured passes |
+| Faces, consent, and deletion | [Faces](../faces.md), [identity design](m3-design.md) | D45, D56, D143 |
+| Model choice and complete-stack fit | [Gemma/Qwen comparison](gemma-fit.md) | Retain Qwen/CUDA; [numeric audit](../../bench/results/2026-10-10-gemma-full-stack.json) |
+| Speech, wake word, and model memory | [Runtime stack](../stack.md), [wake word](../wakeword.md) | D24, D65-D76 |
+| Deployment and recovery | [Project instructions](../../CLAUDE.md), [STATE.md](../../STATE.md) | `tools/jetson.py` and named units |
+| Known unqualified behavior | [Edge cases](../edge-cases.md), [STATE.md](../../STATE.md) | Keep limits separate from measured passes |
 
 ## Detection repair outcomes
 
 | Task | Outcome | Audit |
 | --- | --- | --- |
-| D140 | Retain accepted names through weak queries and verify the current crop before item Ignore. | [Names and crop safety](../bench/results/2026-10-10-d140-detection.json) |
-| D141 | Keep at most three diverse views through verified explicit reteaching. | [Object views](../bench/results/2026-10-10-d141-multiview.json) |
-| D142 | Reuse one crop vector for at most one global query after a weak preferred match. | [Name reacquisition](../bench/results/2026-10-10-d142-reacquisition.json) |
-| D143 | Deliver completed face sources through one owner and validate each JPEG before emission. | [Completed-source delivery](../bench/results/2026-10-10-d143-face-delivery.json) |
-| D144 | Suppress a retained name when current descriptor and detector evidence both contradict it. | [False-name suppression](../bench/results/2026-10-10-d144-phone-recovery.json) |
-| D145 | Bound negative-vector continuity by queried misses and run Restore through the existing owner. | [Ignore and Restore](../bench/results/2026-10-10-d145-ignore-continuity.json) |
-| D146 | Adopt the measured YOLOE-26S detector as the development default, with nano fallback. | [Detector default](../bench/results/2026-10-10-d146-detector-default.json) |
-| D147 | Repair drawing geometry and selected `???` styling; Dylan accepts the live checkpoint as good enough. | [Box continuity](../bench/results/2026-10-10-d147-box-continuity.json) |
+| D140 | Retain accepted names through weak queries and verify the current crop before item Ignore. | [Names and crop safety](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-d140-detection.json) |
+| D141 | Keep at most three diverse views through verified explicit reteaching. | [Object views](../../bench/results/2026-10-10-d141-multiview.json) |
+| D142 | Reuse one crop vector for at most one global query after a weak preferred match. | [Name reacquisition](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-d142-reacquisition.json) |
+| D143 | Deliver completed face sources through one owner and validate each JPEG before emission. | [Completed-source delivery](../../bench/results/2026-10-10-d143-face-delivery.json) |
+| D144 | Suppress a retained name when current descriptor and detector evidence both contradict it. | [False-name suppression](../../bench/results/2026-10-10-d144-phone-recovery.json) |
+| D145 | Bound negative-vector continuity by queried misses and run Restore through the existing owner. | [Ignore and Restore](../../bench/results/2026-10-10-d145-ignore-continuity.json) |
+| D146 | Adopt the measured YOLOE-26S detector as the development default, with nano fallback. | [Detector default](../../bench/results/2026-10-10-d146-detector-default.json) |
+| D147 | Repair drawing geometry and selected `???` styling; Dylan accepts the live checkpoint as good enough. | [Box continuity](../../bench/results/2026-10-10-d147-box-continuity.json) |
 
 ## Detection repair: what worked
 
@@ -77,11 +77,11 @@ Media, consenting-face data, recognition vectors, transcripts, private adapters,
 
 ## Separate WSL checkpoint preparation
 
-The other session completed AWQ checkpoint validation and packaging. Preserve [its status receipt](../bench/results/2026-10-09-wsl-d136-status.json). The [validation JSON](/Users/dylanc/Documents/GitHub/qdrant-robot/bench/results/2026-10-10-wsl-checkpoint-validation.json) exists only in the root worktree at that absolute path; do not copy it into this branch. The original quantizer native exit remains unavailable; later validation and packaging preserve native 0. The verified 8,437,452,800-byte archive has SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697` (E). Native Jetson engines later build with exit 0, but initialization exits 1 for CUDA allocation failure before answers. Read [native findings](jetson-trt.md). Successful inference and integrated fit remain unqualified.
+The other session completed AWQ checkpoint validation and packaging. Preserve [its status receipt](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-09-wsl-d136-status.json). The [validation JSON](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-wsl-checkpoint-validation.json) is preserved in the linked historical commit. The original quantizer native exit remains unavailable; later validation and packaging preserve native 0. The verified 8,437,452,800-byte archive has SHA256 `aaf6b5170b427700b048e969d052e0cd8d40a11068e87782e35936c9974c4697` (E). Native Jetson engines later build with exit 0, but initialization exits 1 for CUDA allocation failure before answers. Read [native findings](jetson-trt.md). Successful inference and integrated fit remain unqualified.
 
 The completed-job watcher was removed after its private history was saved. Direct checkpoint input is supported by D117; another ONNX export or repeated quantization is unnecessary. Keep WSL export/engine qualification separate from the accepted detection checkpoint. Full machine and recovery notes remain in the historical archive and STATE.md.
 
-Background inside rectangular recognition crops remains present. The reference uses segmentation masking before embedding. This is a parked recognition proposal under D148; read [known gaps](edge-cases.md#next-session-object-recognition-discussion) before changing preprocessing or stored vectors.
+Background inside rectangular recognition crops remains present. The reference uses segmentation masking before embedding. This is a parked recognition proposal under D148; read [known gaps](../objects.md) before changing preprocessing or stored vectors.
 
 ## Intent and evidence planning, 2026-10-10
 
@@ -118,7 +118,7 @@ The WSL LiteRT GPU request selected Mesa llvmpipe software Vulkan rather than RT
 
 The pinned full multimodal LiteRT 0.18.0 bundle runs on our Jetson NVIDIA Vulkan device. Standalone short-reply median is 29.69 tok/s (J). The frozen Jetson GPU screen scores nine of 12, versus fresh WSL Qwen seven of 12 (E): two net wins miss the frozen three-win rule. WSL CPU Gemma scores six of 12 (E), with different replies. Keep backend results separate; compatible CPU screening cannot predict GPU answers exactly.
 
-The preliminary task stopped at the frozen quality rule. Dylan then explicitly authorized full-stack fit/speed measurements despite the two-net-win result. Preserve the original rule and judgments, record the override, and measure current Qwen/CUDA against Gemma/CPU. Qwen/CPU is the separate placement control. Stranger safeguards and long-duration paging safety remain unqualified. Standalone Jetson jobs each wrote two system swap pages, including during generation; system counters establish activity but not process attribution. See the Gemma LiteRT result decision, [topic report](gemma-fit.md), and [sanitized audit](../bench/results/2026-10-10-gemma-litert-screen.json).
+The preliminary task stopped at the frozen quality rule. Dylan then explicitly authorized full-stack fit/speed measurements despite the two-net-win result. Preserve the original rule and judgments, record the override, and measure current Qwen/CUDA against Gemma/CPU. Qwen/CPU is the separate placement control. Stranger safeguards and long-duration paging safety remain unqualified. Standalone Jetson jobs each wrote two system swap pages, including during generation; system counters establish activity but not process attribution. See the Gemma LiteRT result decision, [topic report](gemma-fit.md), and [sanitized audit](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-gemma-litert-screen.json).
 
 ## Gemma full-stack measurement lessons, 2026-10-10
 
@@ -136,4 +136,4 @@ Report measurement overhead with integrated results. Process-tree smaps collecti
 
 The complete three-arm comparison finishes 167 questions per arm (J). Gemma/CPU fits with 1,026.28 MiB minimum headroom and zero tree VmSwap, but scores 31/47 recorded answers versus Qwen 39/47. First synthesized audio is 4.902/7.557 s p50/p95 versus current Qwen/CUDA 1.587/2.088 s. Qwen/CPU preserves recorded quality and saves headroom, but adds 1.790/2.910 s latency. Keep current Qwen/CUDA; CPU policy includes uninterrupted generation, so its comparison covers both placement and pause removal.
 
-All arms miss the measured zero-turn-paging target, even though both CPU arms have zero process VmSwap. Recorded paging windows are 36/48, nine/48, and 10/48 for current Qwen, Gemma, and CPU Qwen. Stress paging windows are 23/120, five/120, and five/120. Counts bracket turn/playback windows with nominal 250 ms samples; process attribution remains unknown. CPU Qwen reduces paging but costs 1.790 s p50 speech latency and loses four net stress answers and five net joint passes. The cause of its stress variation remains unverified. See the full-stack result decision and [numeric audit](../bench/results/2026-10-10-gemma-full-stack.json).
+All arms miss the measured zero-turn-paging target, even though both CPU arms have zero process VmSwap. Recorded paging windows are 36/48, nine/48, and 10/48 for current Qwen, Gemma, and CPU Qwen. Stress paging windows are 23/120, five/120, and five/120. Counts bracket turn/playback windows with nominal 250 ms samples; process attribution remains unknown. CPU Qwen reduces paging but costs 1.790 s p50 speech latency and loses four net stress answers and five net joint passes. The cause of its stress variation remains unverified. See the full-stack result decision and [numeric audit](../../bench/results/2026-10-10-gemma-full-stack.json).

@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-"""Named-object crop embedding cost on the Jetson (M2.2b): RAM the DINOv2-small session adds
-to a process that already uses CUDA, ms per crop alone, and llama-server decode tok/s with and
-without crops embedded back to back (a bound: the robot embeds on its worker thread, which
-runs turns too, so no crop overlaps a turn's decode; it embeds only new tracks of a named kind
-and naming or "my X" turns).
+"""Measure the configured crop encoder's RAM, isolated cost, and decode contention.
+Repeated crop embedding deliberately stresses concurrency; production bounds model-owner work.
 
     python -m bench.crop_cost [--seconds 30]     on the Jetson, via tools/jetson.py run
 """
@@ -20,9 +17,9 @@ import numpy as np
 import onnxruntime as ort
 
 from robot.brain import URL, Brain
-from robot.config import ROOT, SHARED
+from robot.config import MODELS, ROOT, SHARED
 from robot.text_embed import TextEmbedder
-from robot.things import Crops
+from robot.things import MODEL, Crops
 
 
 def rss_mb() -> float:
@@ -76,7 +73,7 @@ def main() -> None:
     row = {"command": f"python -m bench.crop_cost --seconds {a.seconds}",
            "machine": platform.node(), "release": os.environ.get("ROBOT_RELEASE"),
            "tegrastats": os.environ.get("ROBOT_TEGRASTATS"), "onnxruntime": ort.__version__,
-           "providers": crops.sess.get_providers(), "model": "dinov2-small fp32, 224x224",
+           "providers": crops.sess.get_providers(), "model": str(MODEL.relative_to(MODELS)),
            "rss_added_mb": round(loaded - before, 1),
            "alone_ms_p50": round(float(np.percentile(alone, 50)), 2),
            "alone_ms_p99": round(float(np.percentile(alone, 99)), 2), "alone_n": len(alone),

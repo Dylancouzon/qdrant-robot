@@ -44,6 +44,6 @@ All long jobs used named user units and the existing GPU lock. Every child is te
 
 ## Sources and evidence
 
-The [native receipt](../bench/results/2026-10-10-jetson-gemma-awq-native.json) records commands, units, invocations, exits, telemetry, artifact hashes, and private evidence hashes. The [measurement rows](../bench/results/2026-10-10-jetson-gemma-awq-native.jsonl) preserve the blocked stages. Private evidence lives under `build/p2/logs/native-20261010` and on the Jetson's isolated experiment directory.
+The [native receipt](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-jetson-gemma-awq-native.json) records commands, units, invocations, exits, telemetry, artifact hashes, and private evidence hashes. The [measurement rows](https://github.com/Dylancouzon/qdrant-robot/blob/9751bb69b2f637b5a7cf7ed7d25ee9d8cab9cef7/bench/results/2026-10-10-jetson-gemma-awq-native.jsonl) preserve the blocked stages. Private evidence lives under `build/p2/logs/native-20261010` and on the Jetson's isolated experiment directory.
 
 The coordinator's D117 and selected brief remain the design authority. Installed CLI help, `WeightPolicy`, generated base/draft/visual configs, and allocator source at official revision `95515c2f87fba8982db5a519f9022277667b3cc9` supply the mechanics. Saved source copies identify `externalWeightManager.cpp:54-65,258-287,612-699` and `tensor.cpp:162-173`.

@@ -1,8 +1,10 @@
 # General conversation
 
-The validated release is `f9b90b958023`. It keeps Qwen3-VL-2B, the existing reply policy, and four recent exchanges. Conversation-memory prototypes remain archived. Completed measurements and review receipts are in the [trial report](archive/conversation-trials-2026-10-15.md).
+The retained conversation policy was validated in `f9b90b958023`. [STATE.md](../STATE.md) owns the deployed interface release. It keeps Qwen3-VL-2B, the existing reply policy, and four recent exchanges. Conversation-memory prototypes remain archived. Completed measurements and review receipts are in the [trial report](archive/conversation-trials-2026-10-15.md).
 
 ## Next steps
+
+These conversation follow-ups are parked. Servo motor control and voice commands are the next project task.
 
 1. Check the shared past-question decision against varied recall requests, future plans, corrections, and topic changes. The broad `before` cue currently admits future advice.
 2. Test chronological history assembly that handles questions left without replies after scene changes. Keep source validation, visitor boundaries, and deletion intact.

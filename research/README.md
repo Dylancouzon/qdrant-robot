@@ -7,7 +7,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Architecture and component overview | [Architecture](architecture.md) |
 | Operating rules, reviews, evaluation, deployment, and recovery | [Workflow](workflow.md) |
 | Previous experiments and failure pitfalls | [Lessons index](lessons.md) |
-| Current tasks and known gaps | [Remaining work](edge-cases.md#current-priorities-after-the-project-review-2026-10-15) |
+| Servo work, parked tasks, and known gaps | [Remaining work](edge-cases.md#next-steps) |
 | Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md) |
 | Monitor, audio controls, and session lifecycle | [Robot interface](mac-audio-interface.md) |
 | Focus, overlays, and visitor interaction | [Booth behavior](booth-ux.md) |
@@ -19,9 +19,11 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Edge shards and queries | [Qdrant Edge](qdrant-edge.md) |
 | CUDA, runtimes, memory, and speech costs | [Software stack](stack.md) |
 | Wake phrases | [Wake word](wakeword.md) |
-| Parked owner/location proposal | [Owner and location](owner-location.md) |
+| Implemented ownership and parked location proposal | [Owner and location](owner-location.md) |
 | Binding decisions | [Decisions](../DECISIONS.md); search by ID before opening entries |
 | Saved verdicts and measurements | [Reviews](../reviews/), [results](../bench/results/); use tools/results.py for summaries |
 | Superseded plans and older history | [Archive index](archive/README.md) |
 
 Completed conversation experiments are in the [dated trial report](archive/conversation-trials-2026-10-15.md). The archive index also lists their rejected patches and base commits.
+
+Source and artifact directories have their own indexes in the [repository map](../README.md#repository-map). Dated [interface checks](archive/interface-checks-2026-10-16.md) and [edge-case records](archive/edge-case-records-2026-10-15.md) preserve detail outside current guidance.
