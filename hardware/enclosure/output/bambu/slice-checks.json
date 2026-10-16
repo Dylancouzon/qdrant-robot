@@ -1,0 +1,100 @@
+{
+  "settings": "Bambu Lab P1S, 0.4 mm nozzle, Bambu PLA Basic, 0.2 mm layers, 3 walls, supports off",
+  "plates": [
+    {
+      "project": "output/bambu/Test pieces/Test pieces.3mf",
+      "plate": 1,
+      "name": "Test pieces: fit plate and Jetson slot",
+      "sha256": "dc2f353687471d0a6f1a6e8c55b03403d7fd874a9778d38133d1f6bb6a040d8a",
+      "seconds": 1562.715576171875,
+      "grams": 11.715042114257812,
+      "parts": {
+        "fit-test-plate": [
+          43.0,
+          53.5,
+          11.2
+        ],
+        "slot-test-piece": [
+          40.4,
+          13.0,
+          9.7
+        ]
+      }
+    },
+    {
+      "project": "output/bambu/White.3mf",
+      "plate": 1,
+      "name": "White 1: body shell and port panel",
+      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
+      "seconds": 24266.716796875,
+      "grams": 251.8656768798828,
+      "parts": {
+        "body-shell": [
+          148.6,
+          127.1,
+          152.4
+        ],
+        "port-panel": [
+          91.9,
+          49.3,
+          8.2
+        ]
+      }
+    },
+    {
+      "project": "output/bambu/White.3mf",
+      "plate": 2,
+      "name": "White 2: base plate and head shell",
+      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
+      "seconds": 12861.083984375,
+      "grams": 176.4818572998047,
+      "parts": {
+        "base-plate": [
+          143.2,
+          116.5,
+          48.0
+        ],
+        "head-shell": [
+          116.0,
+          56.0,
+          77.0
+        ]
+      }
+    },
+    {
+      "project": "output/bambu/Black.3mf",
+      "plate": 1,
+      "name": "Black: visor, speaker grille, neck hub, head shaft and horn disc",
+      "sha256": "5491052195d1f14800049dd9982a807eeb2455171d70d62602c8bf733c2feb74",
+      "seconds": 8066.49560546875,
+      "grams": 60.46727752685547,
+      "parts": {
+        "visor": [
+          112.0,
+          52.0,
+          23.5
+        ],
+        "speaker-grille": [
+          101.2,
+          49.2,
+          4.3
+        ],
+        "neck-hub": [
+          50.3,
+          50.7,
+          17.1
+        ],
+        "head-shaft": [
+          50.0,
+          50.0,
+          21.3
+        ],
+        "horn-disc": [
+          31.0,
+          31.0,
+          7.8
+        ]
+      }
+    }
+  ]
+}

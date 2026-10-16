@@ -10,7 +10,7 @@
 | Parked | General conversation and recent recall. | A changed mechanism improves varied topics while preserving passing privacy, visual, correction, and transfer cases. See [conversation](conversation.md#next-steps). |
 | Parked | Booth acceptance. | Meet the targets and M4 checks in [CLAUDE.md](../CLAUDE.md). Physical latency remains parked under D160. |
 
-The enclosure worktree remains outside this task. Existing models, thresholds, fixtures, and rubrics stay fixed until a scoped change needs them.
+Dylan confirmed assembly on 2026-10-16. Existing models, thresholds, fixtures, and rubrics stay fixed until a scoped change needs them.
 
 ## Current limitations
 
@@ -34,6 +34,10 @@ The centered tip, full-height conversation, shared evidence panel, stored memory
 ## Lookalike recognition in good light, 2026-10-15
 
 Dylan reported that the lookalike recognition bug is gone under good light. That retest is closed on his report. The color veto stays parked. Earlier benchmark limits remain unchanged.
+
+## Enclosure qualification
+
+The assembled enclosure still needs mounted travel, cable, power, cooling, fan-noise, and speaker-echo checks. Earlier fit concerns remain in the [enclosure record](archive/enclosure-fit-checks-2026-10-16.md).
 
 ## Historical records
 

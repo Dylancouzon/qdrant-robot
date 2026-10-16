@@ -2,7 +2,7 @@
 
 This autonomous project uses this file in preference to Dylan's global CLAUDE.md where they differ. The lead may implement, test, deploy, commit, and push within project scope. Ask Dylan for physical work, new spending, credentials, or recovery beyond available access.
 
-Keep the architecture stable. Focus on cleanup, observed quirks, interaction, and remaining acceptance work. Reopen architectural choices only for a measured failure or Dylan's request. Leave `codex/robot-enclosure` and its worktree untouched unless Dylan explicitly asks.
+Keep the architecture stable. Focus on cleanup, observed quirks, interaction, and remaining acceptance work. Reopen architectural choices only for a measured failure or Dylan's request.
 
 ## Start with a small context
 

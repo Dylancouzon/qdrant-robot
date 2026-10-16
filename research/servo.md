@@ -25,7 +25,7 @@ The shared microphone follows this turn-taking convention. It provides no speake
 - Each inspection retains its exact frame in the existing RAM history. Turn logs retain capture time, view angle, raw generated caption, caption duration, and actual text instructions. The interface labels the description as generated.
 - Object sightings and teaching accept settled captures. A changed view clears object continuity. Sightings retain their view angle; side and disappearance answers compare compatible views within 1°. General past recall retains other angles and avoids labeling a currently visible category absent.
 
-The runtime enables the motor through `robot.main --servo-calibration PATH`. Without that explicit file, the head stays disabled. [servo.py](../robot/servo.py) supplies one checked transport shared with the [loose-servo helper](../tools/servo.py). The [hardware guide](../hardware/SERVO.md) defines calibration and startup. The enclosure branch and worktree stay unchanged.
+The runtime enables the motor through `robot.main --servo-calibration PATH`. Without that explicit file, the head stays disabled. [servo.py](../robot/servo.py) supplies one checked transport shared with the [loose-servo helper](../tools/servo.py). The [hardware guide](../hardware/SERVO.md) defines calibration and startup.
 
 The serial motor rejects unsafe startup state, malformed calibration, saved-limit conflicts, and encoder-boundary crossings. It preserves the measured startup pose and replaces old goals before enabling torque. RAM settings cap torque at 20%, speed at 10°/s, and acceleration at five. EEPROM remains unchanged. One provisional 1° arrival tolerance applies to both motor progress and Head settlement. Following can hold up to 1° inside the travel limit. Absolute travel limits remain strict. The controller uses acknowledged encoder goals and actual feedback for inspection evidence.
 
@@ -91,7 +91,7 @@ The existing name parser can treat a capitalized "I am ..." statement as an intr
 
 ## Next session: assembled robot testing
 
-Dylan must assemble the head before this qualification. Keep the loose-servo calibration under `shared/experiments/`; its encoder zero is a bench reference. Create a separate mounted calibration after assembly.
+Dylan confirmed robot assembly on 2026-10-16. Mounted qualification remains open. Keep the loose-servo calibration under `shared/experiments/`; its encoder zero is a bench reference. Create a separate mounted calibration after assembly.
 
 1. Switch off power, mount the head facing forward, and check cable slack throughout the permitted travel.
 2. Read the forward encoder, confirm the direction with a 5° command, and start with a 10° software limit.

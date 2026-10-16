@@ -1,10 +1,10 @@
 # State
 
-Updated 2026-10-16. Branch: `spike/conversation-context`. Architecture is settled; use the [topic index](research/README.md) for details.
+Updated 2026-10-16. Branch: `main`. Architecture is settled; use the [topic index](research/README.md) for details.
 
 ## Active task
 
-Physical runtime control and shared visitor selection are complete. Opus reviewed both feature scopes, and its blocking findings are fixed. Loose-servo motion, service shutdown, and mandatory regression checks pass. The next task is assembled-head qualification. The enclosure worktree stays untouched.
+Physical runtime control and shared visitor selection are complete. Opus reviewed both feature scopes, and its blocking findings are fixed. Loose-servo motion, service shutdown, and mandatory regression checks pass. Dylan confirmed assembly on 2026-10-16. Branch reconciliation includes the enclosure and runtime histories; assembled-head qualification is next.
 
 ## Robot and jobs
 
@@ -34,4 +34,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 The provisional Stop settlement target of 0.3 s remains unmet at 0.553 s (J). Qualify loaded power and stationary feedback before unattended use. Inspection latency and broad acceptance remain open.
 
-Next: read `research/servo.md` and perform the assembled-head checklist after mounting.
+Next: read `research/servo.md` and perform the assembled-head checklist with the assembled robot.

@@ -100,6 +100,16 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 | Camera at 15 fps to lower preview grain | Four paired captures: noise 7.34 at 15 fps vs 6.29 at 30 fps, same brightness; our preview encode adds no noise (J) | Rejected; add light instead | `research/objects.md` |
 | Hand detector or depth camera | Not tried; a reach can steal focus for about 3 s | Open | D67 |
 
+## Enclosure
+
+| Avenue | Outcome | Status | Ref |
+| --- | --- | --- | --- |
+| Concept A with body speaker and owned STS3215 | Passed 665 CAD checks and sliced, but Dylan rejected it for printing and assembly (2026-10-12): 38 required parts, 25 of them printed pins, keys, and keepers that break; studs on cantilevers; 34,887 mm² overhang and 20 floating islands (E, `hardware/printcheck.py`). CAD clearance checks do not prove printability; score every part in print orientation | Rejected; tag `archive/concept-a-enclosure` | H2, H4 |
+| Removable speaker and audio keys | Bounded CAD capture and service checks passed (E), but the keys were small flexing printed parts. Loose pockets with walls, gravity, and one rib replace them | Rejected with Concept A | H3, H4 |
+| Simplified enclosure: one shell printed on its roof, base plate, direct servo drive | Nine printed parts, M2 and M3 screws into nut pockets with floors and detents. Final reports record 732.7 mm² overhang, zero islands, and a 1 mm² thin-area exception on the base plate; generated projects estimate 12.6 h and 488 g (E). In the bare-shell study, a 45° chamfer at the bed edge left zero overhang, while split shells left about 16,000 mm². Assembly is complete on Dylan's report; cooling, acoustics, and mounted powered motion remain U | Assembled, Dylan, 2026-10-16; mounted qualification next | H4; `hardware/enclosure/README.md` |
+| Guide verification by step-by-step CAD walkthrough (2026-10-13) | After every CAD check and a Codex review passed, a builder-role agent that followed ASSEMBLY.md and probed the CAD found three steps that could not be done: roof nuts fell through the hole, the sound card could not be plugged in under the speaker, and the grille fell out of its window. Run this walkthrough on every guide change before calling the design ready | Current practice | H4, H6 |
+| Isolated SDK servo control over USB | The loose servo moves and releases torque on the Mac with external power (E). Persistent settings are unchanged. A symmetric return near encoder zero can cross the boundary because of arrival tolerance; calculate from readback instead | Bench verified; mounted-head motion and Jetson power remain U | H7; [servo guide](../hardware/SERVO.md) |
+
 ## System and memory
 
 | Finding | Value | Ref |

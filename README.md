@@ -21,6 +21,7 @@ Live shows the camera, conversation, retrieved text and images, stored memory po
 
 | Area | Index |
 | --- | --- |
+| Enclosure CAD, print projects, and assembly | [Enclosure](hardware/enclosure/README.md) |
 | Servo wiring, calibration, and runtime startup | [Hardware guide](hardware/SERVO.md) |
 | Runtime components and regression tests | [robot](robot/README.md) |
 | Deployment, monitor, models, checks, and result tools | [tools](tools/README.md) |

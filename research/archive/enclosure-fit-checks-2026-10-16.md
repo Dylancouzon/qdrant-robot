@@ -1,0 +1,20 @@
+# Enclosure fit and qualification records
+
+Dylan confirmed assembly on 2026-10-16. These earlier fit concerns preserve the design record. Assembly does not establish powered qualification.
+
+## Simplified enclosure, 2026-10-12
+
+- Bearing seats (24.1 mm), the 14.9 mm journal, nut pockets, detents, and the horn hole pattern (from a public CAD model) are unprinted. Print the fit test plate, the slot test piece, the hub, and the horn disc on the real horn before the full set. See `hardware/enclosure/README.md`.
+- The square drive between disc and shaft has about 4.7° of free play each way, and its section is borderline at full stall. Keep software limits inside ±70° so the servo never stalls on the ±80° stops.
+- The 60.6 mm lintel over the grille window may sag and block the grille. Inspect it on the first shell print and test-fit the grille; 0.6 mm of clearance absorbs small sag.
+- The camera cable crosses the 20 mm neck gap and needs 32.2 mm more length at ±80° than at yaw 0 (E, taut model). Its bend radius at the 4.5 mm cable's two bends is U, because the gap leaves about 15 mm. The USB-A plug size (16 × 9 mm) is U. Test the loop by hand before powered motion.
+- The Jetson hangs by its plastic strip (6 mm thick, 8 mm deep, Dylan) in a 6.6 mm wide slot that grips 6 mm. Test pieces at 7 mm held it loosely and at 6.2 mm did not fit; the full-height 6.6 mm test piece fits (Dylan, 2026-10-15). The heatsink position is E (±4 mm), and the shell lets the Jetson rise 29.7 mm at most, which leaves 8.3 mm of the 38 mm slot engaged. Port positions, the power elbow exit, and the microphone position (holes at Z 15) are unmeasured.
+- The servo adapter board (42 × 32 × 13 mm) stands on a short edge in a 17 mm band, its long edges facing ±X. The servo plug side (-X) and barrel plug side (+X) follow Dylan's sketch and are U, as is the USB data port end. Plug rooms: servo 25 mm, barrel 40 mm, USB 20 mm above the top end, all clear of walls and cables with 13.5, 11.5 and over 30 mm to spare. A USB port on the bottom end needs the board turned end for end, and the jack and servo plugs then sit near the plate. The end ribs are 2.4 mm tall. Servo lead and USB cable routing are untested.
+- The USB sound card has its USB-A plug on one end and the speaker connector and jack on the other (U, which end is unknown). Both end walls have a 16 mm notch open to the plate, and both ends keep 16 mm of plug room (U). The speaker rails start 3 mm in from the speaker end to leave it. An angled USB-A extension that needs more than 16 × 10 mm will not fit.
+- The grille is held only by friction from four 1.5 mm ridges (0.3 mm of grip, U). Test that it stays when the shell lies on its rear face, and that it comes out when pressed inward.
+- The runtime now accepts explicit mounted calibration. Follow [head qualification](../servo.md#next-session-assembled-robot-testing) for forward position, direction, and initial travel.
+- Servo bench preflight checks are read-only. If a previous program left torque enabled, a rejected nudge leaves that state unchanged. Use the helper's `off` command or disconnect servo power. Cleanup applies once the nudge begins writing registers; qualify this scope in any future control interface.
+- The servo lead and the camera cable must reach the servo adapter board and a Jetson port with the shell lying beside the open base plate (U). The shell and plate share one outline at the joint, and only 5 mm squares of flat plate lie under the shell rim at the corners, so no four 60 mm blocks can hold the shell above the plate.
+- Cooling, fan noise, and speaker echo with the shell closed are unmeasured.
+- The speaker rests on 3 mm rail ledges at each end (measured 100 mm speaker). Check that it sits firmly on the first print. The sound card cables pass 0.25 mm behind the speaker, so hold them back while you lower it.
+- The servo adapter board stands on a short end behind 2.4 mm end ribs, with plug rooms on both sides. It can tip sideways before its cables are plugged in, so hold it while you plug. Plugged cables then hold it.

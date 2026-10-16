@@ -8,6 +8,7 @@ The [experiment ledger](experiment-ledger.md) preserves every tried avenue, outc
 | Retrieval, conversation, stored replies, or regressions | [Retrieval and answers](experiment-ledger.md#retrieval-and-answers) |
 | Endpointing, ASR, wake phrases, or deletion confirmation | [Voice](experiment-ledger.md#voice) |
 | Detection, crops, faces, focus, or interface | [Perception, faces, and interface](experiment-ledger.md#perception-faces-and-interface) |
+| Enclosure, printing, or physical assembly | [Enclosure](experiment-ledger.md#enclosure) |
 | RAM, paging, retention, or search timing | [System and memory](experiment-ledger.md#system-and-memory) |
 | Scoring or benchmark interpretation | [Evaluation pitfalls](experiment-ledger.md#evaluation-pitfalls) |
 | Repeated work or process failures | [Process pitfalls](experiment-ledger.md#process-pitfalls) |

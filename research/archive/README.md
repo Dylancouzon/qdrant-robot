@@ -64,3 +64,7 @@ The Jetson keeps the same results in `shared/results-archive-20261010/`.
 - [recognition-import-plan.md](recognition-import-plan.md)
 - [sight.md](sight.md)
 - [v1-plan.md](v1-plan.md)
+
+The [enclosure fit record](enclosure-fit-checks-2026-10-16.md) preserves earlier assembly concerns after Dylan confirmed assembly.
+
+The [branch reconciliation](branch-reconciliation-2026-10-16.md) records the preserved branch tips and local print session.
