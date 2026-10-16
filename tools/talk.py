@@ -243,7 +243,8 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/mona-sans.woff2":
             self.reply(200, (ROOT / "tools/assets/mona-sans-latin.woff2").read_bytes(),
                        "font/woff2")
-        elif self.path.split("?", 1)[0] in ("/camera", "/robot", "/memory", "/thumb"):
+        elif self.path.split("?", 1)[0] in (
+                "/camera", "/robot", "/memory", "/memory_map", "/thumb"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")

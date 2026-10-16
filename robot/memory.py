@@ -521,6 +521,27 @@ class Memory:
         return [{"id": r.id, **r.payload}
                 for r in self.shard.retrieve(list(ids), True, False)] if ids else []
 
+    def map_points(self, included: Collection[int]) -> tuple[int, list[dict]]:
+        """Bounded metadata for the map, including current writes and recalled sources."""
+        fields = ["ts", "first_seen", "last_seen", "named", "label", "said", "caption"]
+        rows = {}
+        for key, limit in (("ts", 128), ("last_seen", 64)):
+            for row in self.shard.query(QueryRequest(
+                    query=OrderBy(key, Direction.Desc), limit=limit,
+                    with_payload=fields, with_vector=False)):
+                rows[row.id] = row.payload
+        ids = list(dict.fromkeys(included))[:32]
+        if ids:
+            for row in self.shard.retrieve(ids, fields, False):
+                rows[row.id] = row.payload
+        return self.shard.count(CountRequest()), [
+            {"id": f"seen:{pid}", "created": pid / 1e6,
+             "kind": "observed" if "last_seen" in payload or payload.get("caption") else "said",
+             "label": str(payload.get("caption") or payload.get("said") or
+                          payload.get("label") or "Observation")[:120],
+             **({"object": f"things:{payload['named']}"} if payload.get("named") else {})}
+            for pid, payload in rows.items()]
+
 def _earlier_selftest() -> None:
     """Views are numbers: a view differs from another by more than 1."""
     differs = lambda a, b: abs(a - b) > 1  # noqa: E731

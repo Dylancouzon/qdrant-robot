@@ -21,7 +21,7 @@ from robot.settings import DEFAULTS, Settings, settings
 from robot.detect import CONFIRM, LOST, Detection, Tracker
 from robot.focus import SMOOTH, Track
 from robot.main import Robot, Turn
-from robot.memory import CountRequest, Memory, ScrollRequest
+from robot.memory import CountRequest, Memory, ScrollRequest, UpdateOperation
 from robot.people import DIM as FACE_DIM, NOT_YOU, People
 from robot.recognition import Recognition
 from robot.text_embed import DIM as TEXT_DIM
@@ -3436,3 +3436,62 @@ def test_carried_preview_rechecks_validity_at_publication(robot, monkeypatch, ch
     else:
         frame_of(r)
     assert not screen.valid(), 'an encoded held overlay cannot outlive its display authority'
+
+
+def test_memory_map_uses_stored_ids_and_bounded_payloads(robot):
+    vectors = np.eye(DIM, dtype=np.float32)[:2]
+    ident = robot.things.name(OWNER, 'clock', ['clock'], vectors, thumbnail_crops(vectors))
+    created = robot.things.shard.retrieve([ident], True, False)[0].payload['created']
+    old = robot.memory.add(None, 'An earlier statement', ts=1, named=ident)
+    for i in range(135):
+        robot.memory.add(None, f'Statement {i}', ts=10+i)
+    for i in range(70):
+        robot.memory.sighting('clock', 'center', 10+i, named=ident)
+    robot.ui_turn = Turn(line=1000, retrieved=1001, ui_recalled=[old])
+    snapshot = robot._memory_map()
+    nodes = {p['id']: p for p in snapshot['nodes']}
+    assert snapshot['total'] == 207 and len(nodes) == 194
+    assert f'seen:{old}' in nodes and nodes[f'seen:{old}']['created'] > 1
+    assert nodes[f'seen:{old}']['object'] == f'things:{ident}'
+    assert snapshot['recall']['ids'] == sorted([f'seen:{old}', f'things:{ident}'])
+    assert all(set(p) <= {'id', 'kind', 'label', 'created', 'object'} for p in nodes.values())
+    delayed = robot.memory.add(None, 'Delayed storage', ts=1)
+    robot.ui_turn = Turn(frame_id=delayed)
+    assert f'seen:{delayed}' in {p['id'] for p in robot._memory_map()['nodes']}
+    assert not robot._memory_map()['recall']['ids'], 'Storing a point does not recall it'
+    robot.ui_turn = Turn(line=1000, retrieved=1001, ui_recalled=[old])
+    view = robot.things.shard.retrieve([ident], True, False)[0].payload['views'][0]['id']
+    assert robot.things.remove_view(ident, view)
+    assert robot._memory_map()['nodes'][-1]['created'] == created
+    # Legacy objects have no reliable creation time. Removing a view cannot invent a birth.
+    robot.things.shard.update(UpdateOperation.delete_payload([ident], ['created']))
+    assert robot._memory_map()['nodes'][-1]['created'] == 0
+    robot.memory.forget([old])
+    assert f'seen:{old}' not in {p['id'] for p in robot._memory_map()['nodes']}
+    assert not robot._memory_map()['recall']['ids']
+    robot.ui_turn.deleted = True
+    assert not robot._memory_map()['recall']['ids']
+
+
+def test_memory_map_survives_reopen_and_forget(tmp_path):
+    r = open_robot(tmp_path)
+    vectors = np.eye(DIM, dtype=np.float32)[:1]
+    try:
+        ident = r.things.name(OWNER, 'clock', ['clock'], vectors, thumbnail_crops(vectors))
+        pid = r.memory.sighting('clock', 'center', time.time(), named=ident)
+        before = r._memory_map()
+    finally:
+        r.memory.shard.close()
+        r.people.shard.close()
+        r.things.shard.close()
+    r = open_robot(tmp_path)
+    try:
+        assert r._memory_map()['nodes'] == before['nodes']
+        r.memory.forget_named(ident)
+        r.things.forget(ident)
+        assert r.memory.points([pid]) == []
+        assert r._memory_map()['nodes'] == []
+    finally:
+        r.memory.shard.close()
+        r.people.shard.close()
+        r.things.shard.close()

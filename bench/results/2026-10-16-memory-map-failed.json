@@ -1,0 +1,11 @@
+{
+  "run": "memory-map",
+  "machine": "qdrant-robot",
+  "release": "76174b0ff766",
+  "complete": false,
+  "checks_passed": false,
+  "input": "oracle text, repeated development clock image, isolated synthetic storage",
+  "tegrastats": "memory-map-20261016-000847.tegrastats",
+  "elapsed_s": 69.169,
+  "error": "Harness assertion len(snapshots) >= 10 failed after turns completed too quickly. Partial timing rows were not saved. The corrected harness saves checkpoints and requires two polls. No runtime failure was observed."
+}

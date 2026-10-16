@@ -174,6 +174,7 @@ class Turn:
     facts: list[str] = field(default_factory=list)
     memories: list[int] = field(default_factory=list)  # evidence: ids of the frames recalled
     ui_evidence: list[dict] = field(default_factory=list)  # readable sources, never logged
+    ui_recalled: list[int] = field(default_factory=list)  # actual prior sources for map pulses
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
@@ -322,7 +323,8 @@ class Robot:
         self.video = View(self._shown, int(os.environ.get("ROBOT_VIEW_PORT", "8090")), token,
                           os.environ.get("ROBOT_VIEW_HOST", "127.0.0.1"), action=self._control,
                           state=lambda: self._shown(False), wake=self._wake_view,
-                          memory=self._memory_list, thumb=self._thumbnail) if token else None
+                          memory=self._memory_list, memory_map=self._memory_map,
+                          thumb=self._thumbnail) if token else None
 
     def hear(self, chunk: np.ndarray) -> None:
         """Every audio input enters here. The robot does not hear itself (silence while its
@@ -1283,6 +1285,10 @@ class Robot:
         held = self._hold(turn)
         recalled_answer = self._code_answer(turn, now, track, look, recalled, memories, held)
         turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
+        turn.ui_recalled = list(dict.fromkeys([
+            *(m["id"] for m in statements if not turn.verbatim),
+            *(pid for pid in turn.memories if pid / 1e6 < turn.speech_start)])) \
+            if turn.keep and not self.hiding else []
         turn.retrieved = time.time()
         self.last_frame, self.last_objects, turn.looked = look.frame, look.objects, look.taken
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
@@ -1340,6 +1346,7 @@ class Robot:
         with (self.out / "turns.jsonl").open("a") as f:
             record = asdict(turn)
             record.pop("ui_evidence")
+            record.pop("ui_recalled")
             f.write(json.dumps(record) + "\n")
         self.turns.put(turn)
 
@@ -1365,7 +1372,8 @@ class Robot:
             return False
         self._hear_name(turn)
         pid = turn.frame_id = self.memory.add(
-            None, turn.question, statement, taken, visitor=turn.visitor)
+            None, turn.question, statement, taken, visitor=turn.visitor,
+            **({"named": turn.named} if turn.named else {}))
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it
         if seen and seen[1]:
@@ -1749,6 +1757,27 @@ class Robot:
                     "sightings": len(sightings)})
             return sorted(objects, key=lambda obj: max(
                 v["time"] for v in obj["views"]), reverse=True)
+        return self.recognition.call(read)
+
+    def _memory_map(self):
+        """Read personal-memory identities through the existing shard owner, without models."""
+        def read(f, c):
+            at, turn = time.time(), self.ui_turn
+            recalled = turn.ui_recalled if turn and turn.retrieved and not (
+                turn.deleted or self.hiding) else []
+            # A delayed write can have an old capture time and fall outside the recent sample.
+            written = ([turn.frame_id, *turn.memories] if turn and turn.keep and not (
+                turn.deleted or self.hiding) else [])
+            total, nodes = self.memory.map_points([pid for pid in written if pid] + recalled)
+            objects, hubs = self.things.map_points(
+                [p["object"][7:] for p in nodes if p.get("object")])
+            ids = {p["id"] for p in nodes}
+            active = {f"seen:{pid}" for pid in recalled} & ids
+            active.update(p["object"] for p in nodes if p["id"] in active and p.get("object"))
+            return {"session": self.session_id, "at": at, "total": total + objects,
+                    "nodes": nodes + hubs,
+                    "recall": {"turn": str(turn.line) if recalled else "",
+                               "ids": sorted(active)}}
         return self.recognition.call(read)
 
     def _thumbnail(self, ident):

@@ -115,6 +115,9 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == "/memory":
             self._reply(json.dumps(view.memory()).encode(), "application/json")
             return
+        if parsed.path == "/memory_map":
+            self._reply(json.dumps(view.memory_map()).encode(), "application/json")
+            return
         if parsed.path == "/thumb":
             ident = parse_qs(parsed.query).get("view", [""])[0]
             data = view.thumb(ident) if valid_id(ident) else None
@@ -228,10 +231,11 @@ class View:
 
     def __init__(self, source: Source, port: int, token: str, host: str = "127.0.0.1",
                  fps: float = 15, width: int = 960, action=None, state=None, wake=lambda: None,
-                 memory=lambda: [], thumb=lambda ident: None):
+                 memory=lambda: [], memory_map=lambda: {}, thumb=lambda ident: None):
         if not token:
             raise ValueError("the view needs a token")
         self.memory, self.thumb = memory, thumb
+        self.memory_map = memory_map
         self.action = action
         self.state = state or source
         self.wake = wake

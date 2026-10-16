@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 from qdrant_edge import (
+    CountRequest,
     Distance,
     EdgeConfig,
     EdgeShard,
@@ -147,6 +148,23 @@ class Things:
             labels[str(row.id)] = f"{displays[owner]}'s {row.payload['name']}"
         return labels
 
+    def map_points(self, linked: Collection[str]) -> tuple[int, list[dict]]:
+        """Read at most 64 object nodes, preferring the sampled evidence's linked objects."""
+        fields = ["name", "created", "type"]
+        query = Filter(must=[FieldCondition(key="type", match=MatchValue("object"))])
+        ids = list(dict.fromkeys(linked))[:64]
+        rows = {str(row.id): row.payload for row in self.shard.retrieve(ids, fields, False)
+                if row.payload.get("type") == "object"} if ids else {}
+        page, _ = self.shard.scroll(ScrollRequest(
+            limit=64, filter=query, with_payload=fields, with_vector=False))
+        for row in page:
+            if len(rows) >= 64:
+                break
+            rows[str(row.id)] = row.payload
+        return self.shard.count(CountRequest(filter=query)), [
+            {"id": f"things:{ident}", "kind": "object", "label": payload["name"][:120],
+             "created": payload.get("created", 0)} for ident, payload in rows.items()]
+
     def new_visitor(self) -> str:
         ident = str(uuid.uuid4())
         self.pending[ident] = self._guest_number()
@@ -190,6 +208,7 @@ class Things:
         existing = self.named(owner, name, [], include_ignored=True)
         ident = existing["id"] if existing else str(uuid.uuid4())
         payload = existing or {"type": "object", "owner": owner, "name": name,
+                               "created": time.time(),
                                "key": " ".join(name.casefold().split()),
                                "labels": [], "turns": [], "views": []}
         payload = {k: v for k, v in payload.items() if k != "id"}

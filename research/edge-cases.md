@@ -19,7 +19,7 @@ The recorded replay's speech check passed 46/47 (J). Its remaining failure is a 
 
 ## Interface refresh, 2026-10-15
 
-The Live tab uses a pinned command bubble, full-height conversation, and a shared 70/30 panel for retrieved evidence, the search map, and measured latency. Memory cards group by visitor ID. Edits preserve gallery position and open controls, and queued operations retain visible feedback. Confirmed voice deletion clears cached cards and rejects stale reads. [Interface notes](mac-audio-interface.md#ui-refresh-checks-2026-10-15) retain the checks and their limits.
+The Live tab uses a centered command tip, full-height conversation, and a shared 70/30 panel for retrieved evidence, stored memory points, and measured latency. Memory cards group by visitor ID. Edits preserve gallery position and open controls, and queued operations retain visible feedback. Confirmed voice deletion clears cached cards and rejects stale reads. [Interface notes](mac-audio-interface.md#ui-refresh-checks-2026-10-15) retain the checks and their limits.
 
 ## Lookalike recognition in good light, 2026-10-15
 

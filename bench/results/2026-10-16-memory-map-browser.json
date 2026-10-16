@@ -1,0 +1,47 @@
+{
+  "run": "memory-map-browser",
+  "input": "CUA Chrome actual browser; live monitor and labeled isolated UI fixture",
+  "live_release": "83dd4fb999f5",
+  "checks": {
+    "desktop_no_overflow": true,
+    "mobile_no_overflow": true,
+    "centered_distinct_say_tip": true,
+    "full_height_conversation": true,
+    "shared_retrieval_panel": true,
+    "memory_map_fills_area": true,
+    "fixture_recall_color_visible": true,
+    "live_stored_map_loaded": true,
+    "saved_thumbnails_loaded": true,
+    "caption_updates_color": true,
+    "sampled_object_position_stable": true
+  },
+  "desktop": {
+    "width": 1274,
+    "height": 713,
+    "conversation_height": 586,
+    "camera_height": 300,
+    "retrieval_panel_height": 268,
+    "map_width": 252,
+    "map_height": 149,
+    "tip_center_x": 1066.0375,
+    "conversation_center_x": 1066.0375
+  },
+  "mobile": {
+    "css_width": 390,
+    "scroll_width": 390,
+    "conversation_height": 478,
+    "map_height": 210
+  },
+  "live": {
+    "map_points": 70,
+    "objects": 4,
+    "saved_views": 14,
+    "loaded_thumbnails": 14
+  },
+  "screenshots": [
+    "build/memory-map/desktop.png",
+    "build/memory-map/mobile.png",
+    "build/memory-map/live.png"
+  ],
+  "complete": true
+}

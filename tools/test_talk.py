@@ -345,7 +345,7 @@ def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
     assert commands[0][-2:] == ["--camera-file", "/existing/private/fixture.avi"]
 
 
-@pytest.mark.parametrize("path", ["/memory", "/thumb?view=saved"])
+@pytest.mark.parametrize("path", ["/memory", "/memory_map", "/thumb?view=saved"])
 def test_memory_proxy_cookie_and_forwarding(path):
     from email.message import Message
     handler = talk.Handler.__new__(talk.Handler)

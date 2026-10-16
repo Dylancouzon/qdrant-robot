@@ -1,0 +1,273 @@
+{
+  "run": "memory-map",
+  "machine": "qdrant-robot",
+  "release": "72dc153bd71d",
+  "input": "oracle text, repeated development clock image, isolated synthetic storage",
+  "tegrastats": "memory-map-20261016-001108.tegrastats",
+  "checks": {
+    "real_recall_ids": true,
+    "no_teaching_recall": true,
+    "bounded_old_recall": true,
+    "polling_during_full_model_turns": true,
+    "storage_time_not_capture_time": true,
+    "delete_purges_node_and_recall": true,
+    "forget_purges_links": true
+  },
+  "snapshots": [
+    {
+      "time": 1792123909.2038047,
+      "http_ms": 19.664270999783184,
+      "bytes": 33113,
+      "shown": 256
+    },
+    {
+      "time": 1792123911.211927,
+      "http_ms": 7.827436000297894,
+      "bytes": 33113,
+      "shown": 256
+    },
+    {
+      "time": 1792123913.2253447,
+      "http_ms": 13.151041001037811,
+      "bytes": 33159,
+      "shown": 256
+    },
+    {
+      "time": 1792123915.2353075,
+      "http_ms": 9.754806000273675,
+      "bytes": 33318,
+      "shown": 256
+    },
+    {
+      "time": 1792123925.256407,
+      "http_ms": 20.31245000034687,
+      "bytes": 33385,
+      "shown": 256
+    },
+    {
+      "time": 1792123927.33108,
+      "http_ms": 69.33638400005293,
+      "bytes": 33385,
+      "shown": 256
+    },
+    {
+      "time": 1792123929.3399882,
+      "http_ms": 8.622590999948443,
+      "bytes": 33525,
+      "shown": 256
+    },
+    {
+      "time": 1792123931.347746,
+      "http_ms": 7.525127000917564,
+      "bytes": 33464,
+      "shown": 256
+    }
+  ],
+  "blocks": [
+    {
+      "polling": false,
+      "start": 1792123903.1833405,
+      "vm_start": {
+        "pswpin": 56697,
+        "pswpout": 481667
+      },
+      "turns": [
+        {
+          "question": "Explain why keeping a robot's memories on this device is useful.",
+          "answer": "I remember you asked about the usefulness of storing memories in this device.",
+          "speech_end": 1792123903.1892712,
+          "first_text_ms": 195.70088386535645,
+          "speech_ready_ms": 1303.2026290893555,
+          "detect_fps": 14.479046189297357,
+          "done": 1792123904.9817955,
+          "audio_s": 4.636625
+        },
+        {
+          "question": "How can you use the object I showed you in a conversation?",
+          "answer": "You showed me a clock, 10 seconds ago.",
+          "speech_end": 1792123905.1239293,
+          "first_text_ms": 767.4238681793213,
+          "speech_ready_ms": 954.2839527130127,
+          "detect_fps": 15.03758541273504,
+          "done": 1792123906.3482435,
+          "audio_s": 2.6926666666666668
+        },
+        {
+          "question": "What is a useful example of combining text and visual memories?",
+          "answer": "I remember you asked about using an object in conversation.",
+          "speech_end": 1792123906.5096953,
+          "first_text_ms": 718.5781002044678,
+          "speech_ready_ms": 1511.7604732513428,
+          "detect_fps": 14.020180822615561,
+          "done": 1792123908.6264412,
+          "audio_s": 3.772
+        }
+      ],
+      "end": 1792123908.8173263,
+      "vm_end": {
+        "pswpin": 56743,
+        "pswpout": 481680
+      }
+    },
+    {
+      "polling": true,
+      "start": 1792123908.818431,
+      "vm_start": {
+        "pswpin": 56743,
+        "pswpout": 481680
+      },
+      "turns": [
+        {
+          "question": "Explain why keeping a robot's memories on this device is useful.",
+          "answer": "Keeping a robot's memories on this device is useful because it allows for quick access to past information, which helps in making informed decisions and improving interactions with users.",
+          "speech_end": 1792123908.818745,
+          "first_text_ms": 876.9984245300293,
+          "speech_ready_ms": 1462.6052379608154,
+          "detect_fps": 14.898978112167036,
+          "done": 1792123912.8920813,
+          "audio_s": 11.315958333333333
+        },
+        {
+          "question": "How can you use the object I showed you in a conversation?",
+          "answer": "You showed me a clock, 4 seconds ago.",
+          "speech_end": 1792123913.0411396,
+          "first_text_ms": 875.4096031188965,
+          "speech_ready_ms": 1142.4591541290283,
+          "detect_fps": 14.106814772627901,
+          "done": 1792123914.4480672,
+          "audio_s": 2.724
+        },
+        {
+          "question": "What is a useful example of combining text and visual memories?",
+          "answer": "I remember you asked about using an object in conversation.",
+          "speech_end": 1792123914.612127,
+          "first_text_ms": 931.0953617095947,
+          "speech_ready_ms": 1685.7240200042725,
+          "detect_fps": 14.855738472003669,
+          "done": 1792123916.6104753,
+          "audio_s": 3.772
+        }
+      ],
+      "end": 1792123916.746699,
+      "vm_end": {
+        "pswpin": 56743,
+        "pswpout": 481795
+      }
+    },
+    {
+      "polling": false,
+      "start": 1792123916.7477107,
+      "vm_start": {
+        "pswpin": 56743,
+        "pswpout": 481795
+      },
+      "turns": [
+        {
+          "question": "Explain why keeping a robot's memories on this device is useful.",
+          "answer": "Keeping a robot's memories on this device is useful because it allows for quick access to past information, which helps in making informed decisions and improving interactions with users.",
+          "speech_end": 1792123916.7480602,
+          "first_text_ms": 919.9750423431396,
+          "speech_ready_ms": 1501.5897750854492,
+          "detect_fps": 14.74744507655478,
+          "done": 1792123920.36858,
+          "audio_s": 11.314666666666668
+        },
+        {
+          "question": "How can you use the object I showed you in a conversation?",
+          "answer": "You showed me a clock, 4 seconds ago.",
+          "speech_end": 1792123920.5487874,
+          "first_text_ms": 846.6002941131592,
+          "speech_ready_ms": 1100.0933647155762,
+          "detect_fps": 13.739495894664948,
+          "done": 1792123921.905643,
+          "audio_s": 2.724
+        },
+        {
+          "question": "What is a useful example of combining text and visual memories?",
+          "answer": "I remember you asked about using an object in conversation.",
+          "speech_end": 1792123922.0535305,
+          "first_text_ms": 896.4211940765381,
+          "speech_ready_ms": 1703.859567642212,
+          "detect_fps": 14.82682656236831,
+          "done": 1792123924.0826375,
+          "audio_s": 3.772
+        }
+      ],
+      "end": 1792123924.2403731,
+      "vm_end": {
+        "pswpin": 56837,
+        "pswpout": 481795
+      }
+    },
+    {
+      "polling": true,
+      "start": 1792123924.241697,
+      "vm_start": {
+        "pswpin": 56837,
+        "pswpout": 481795
+      },
+      "turns": [
+        {
+          "question": "Explain why keeping a robot's memories on this device is useful.",
+          "answer": "Keeping a robot's memories on this device is useful because it allows for quick access to past information, which helps in making informed decisions and improving interactions with users.",
+          "speech_end": 1792123924.242051,
+          "first_text_ms": 898.6437320709229,
+          "speech_ready_ms": 1509.5176696777344,
+          "detect_fps": 14.874345786361083,
+          "done": 1792123927.8714743,
+          "audio_s": 11.314666666666668
+        },
+        {
+          "question": "How can you use the object I showed you in a conversation?",
+          "answer": "You showed me a clock, 4 seconds ago.",
+          "speech_end": 1792123928.0103993,
+          "first_text_ms": 868.7560558319092,
+          "speech_ready_ms": 1127.1069049835205,
+          "detect_fps": 15.66747157970756,
+          "done": 1792123929.3902981,
+          "audio_s": 2.724
+        },
+        {
+          "question": "What is a useful example of combining text and visual memories?",
+          "answer": "I remember you asked about using an object in conversation.",
+          "speech_end": 1792123929.5462923,
+          "first_text_ms": 870.2661991119385,
+          "speech_ready_ms": 1667.299747467041,
+          "detect_fps": 15.169541594626116,
+          "done": 1792123931.538125,
+          "audio_s": 3.772
+        }
+      ],
+      "end": 1792123931.6846592,
+      "vm_end": {
+        "pswpin": 56838,
+        "pswpout": 482533
+      }
+    }
+  ],
+  "complete": true,
+  "seeded_seen": 5000,
+  "sample": {
+    "total": 5205,
+    "shown": 257
+  },
+  "raw_seen_read_ms": [
+    3.294248001111555,
+    2.9663370005437173,
+    5.3292369993869215,
+    3.6181590003252495,
+    3.822292001132155,
+    2.7445409996289527,
+    3.486286001134431,
+    2.92265700045391,
+    2.667483000550419,
+    3.157830000418471,
+    3.646160999778658,
+    2.0516940003290074
+  ],
+  "elapsed_s": 65.24125456809998,
+  "checks_passed": true,
+  "harness_source": "\"\"\"Isolated map lifecycle and paired polling check on real Edge and the full robot.\"\"\"\nimport atexit, json, os, platform, secrets, tempfile, threading, time, urllib.request\nfrom pathlib import Path\nfrom types import SimpleNamespace\nimport cv2\nimport numpy as np\nfrom qdrant_edge import Point, UpdateOperation\nfrom robot import main\nfrom robot.config import SHARED\nfrom robot.settings import Settings\nfrom robot.things import DIM\nstarted=time.time()\nresult={'run':'memory-map','machine':platform.node(),'release':os.environ['ROBOT_RELEASE'],\n        'input':'oracle text, repeated development clock image, isolated synthetic storage',\n        'tegrastats':os.environ['ROBOT_TEGRASTATS'],'checks':{},'snapshots':[],'blocks':[],'complete':False}\npath=SHARED/'results'/f'{time.strftime(\"%Y-%m-%d\")}-memory-map-{int(started)}.json'\ndef save():\n    path.write_text(json.dumps(result,indent=2)+'\\n')\natexit.register(save)\nos.environ['ROBOT_VIEW_TOKEN']=secrets.token_urlsafe(24)\ndef vm():\n    data=dict(line.split()[:2] for line in Path('/proc/vmstat').read_text().splitlines())\n    return {k:int(data[k]) for k in ['pswpin','pswpout']}\nwith tempfile.TemporaryDirectory(dir=SHARED) as temp:\n    root=Path(temp); main.settings=Settings(root/'settings.json')\n    frame=cv2.imread('eval/dev/images/m2-clock.jpg');assert frame is not None\n    camera=SimpleNamespace(latest=lambda:(frame,time.time()))\n    robot=main.Robot(camera,root/'audio',memory=root/'memory',wake_word=False)\n    try:\n        def ask(text):\n            robot.ask(text);turn=robot.next_turn(timeout=100);assert turn.answer\n            return turn\n        url=f'http://127.0.0.1:{robot.video.port}';token=os.environ['ROBOT_VIEW_TOKEN']\n        def get(path):\n            before=time.perf_counter()\n            with urllib.request.urlopen(url+path+'?token='+token,timeout=10) as response:raw=response.read()\n            return json.loads(raw),1000*(time.perf_counter()-before),len(raw)\n        time.sleep(2)\n        taught=ask('Track this as my clock');assert taught.named,taught.answer\n        taught_snapshot,_,_=get('/memory_map')\n        assert not taught_snapshot['recall']['ids'],'Teaching must not claim recall'\n        recalled=ask('Where is my clock?')\n        initial,_,_=get('/memory_map')\n        assert initial['recall']['ids'] and f'things:{taught.named}' in initial['recall']['ids']\n        result['checks']['real_recall_ids']=True\n        result['checks']['no_teaching_recall']=True\n        def seed(f,c):\n            # Real points, isolated fixture payloads, no new model or storage format.\n            owner=robot.things.new_visitor();vectors=np.eye(DIM,dtype=np.float32)[:1]\n            for i in range(200):robot.things.name(owner,f'fixture {i}',['camera'],vectors,[frame])\n            clock=time.time();points=[]\n            for i in range(5000):\n                pid=robot.memory._id()\n                payload=({'said':f'Fixture statement {i}','ts':clock-i/10} if i%3==0 else\n                         {'label':'clock','first_seen':clock-i/10,'last_seen':clock-i/10,'named':taught.named})\n                points.append(Point(pid,{},payload))\n            robot.memory.shard.update(UpdateOperation.upsert_points(points));robot.memory.shard.flush()\n            return len(points)\n        result['seeded_seen']=robot.recognition.call(seed,mutate=True)\n        old_ids=set(initial['recall']['ids']);dense,_,_=get('/memory_map')\n        assert old_ids<=set(dense['recall']['ids'])\n        assert old_ids<=set(p['id'] for p in dense['nodes'])\n        assert len(dense['nodes'])<=288 and dense['total']>=5201\n        result['checks']['bounded_old_recall']=True\n        result['sample']={'total':dense['total'],'shown':len(dense['nodes'])}\n        # Snapshot read time and total owner wait are separate measurements.\n        raw_reads=[];original=robot.memory.map_points\n        def measured(ids):\n            tick=time.perf_counter();value=original(ids);raw_reads.append(1000*(time.perf_counter()-tick));return value\n        robot.memory.map_points=measured\n        enabled=threading.Event();finished=threading.Event();failures=[]\n        def polling():\n            while not finished.wait(2):\n                if enabled.is_set():\n                    try:\n                        snapshot,ms,size=get('/memory_map')\n                        result['snapshots'].append({'time':time.time(),'http_ms':ms,'bytes':size,'shown':len(snapshot['nodes'])})\n                    except Exception as error:failures.append(str(error))\n        thread=threading.Thread(target=polling);thread.start()\n        questions=['Explain why keeping a robot\\'s memories on this device is useful.',\n                   'How can you use the object I showed you in a conversation?',\n                   'What is a useful example of combining text and visual memories?']\n        try:\n            for enabled_polling in [False,True,False,True]:\n                if enabled_polling:enabled.set()\n                else:enabled.clear()\n                block={'polling':enabled_polling,'start':time.time(),'vm_start':vm(),'turns':[]}\n                for question in questions:\n                    turn=ask(question)\n                    block['turns'].append({'question':question,'answer':turn.answer,\n                        'speech_end':turn.speech_end,'first_text_ms':1000*(turn.first_token-turn.speech_end),\n                        'speech_ready_ms':1000*(turn.first_audio-turn.speech_end),\n                        'detect_fps':turn.detect_fps,'done':turn.done,'audio_s':turn.audio_s})\n                block.update(end=time.time(),vm_end=vm());result['blocks'].append(block);save();print('block',enabled_polling,len(result['snapshots']),flush=True)\n        finally:\n            finished.set();thread.join(12)\n        assert not failures,failures\n        assert len(result['snapshots'])>=2, len(result['snapshots'])\n        result['raw_seen_read_ms']=raw_reads\n        result['checks']['polling_during_full_model_turns']=True\n        # A new storage allocation is newer than the prior snapshot despite an old capture time.\n        before,_,_=get('/memory_map')\n        pid=robot.memory.add(None,'Delayed storage fixture',ts=1)\n        # The current turn's new write stays visible even with an old capture timestamp.\n        robot.ui_turn=main.Turn(line=time.time(),frame_id=pid)\n        after,_,_=get('/memory_map')\n        point=next(p for p in after['nodes'] if p['id']==f'seen:{pid}')\n        assert point['created']>before['at']\n        assert not after['recall']['ids'], 'A new write must not claim recall'\n        result['checks']['storage_time_not_capture_time']=True\n        robot.memory.forget([pid]);deleted,_,_=get('/memory_map')\n        assert f'seen:{pid}' not in {p['id'] for p in deleted['nodes']}\n        assert not deleted['recall']['ids']\n        result['checks']['delete_purges_node_and_recall']=True\n        def forget(f,c):\n            robot.memory.forget_named(taught.named);robot.things.forget(taught.named)\n        robot.recognition.call(forget,mutate=True)\n        deleted,_,_=get('/memory_map')\n        assert f'things:{taught.named}' not in {p['id'] for p in deleted['nodes']}\n        assert not any(p.get('object')==f'things:{taught.named}' for p in deleted['nodes'])\n        result['checks']['forget_purges_links']=True\n    finally:robot.close()\nresult['complete']=True;result['elapsed_s']=time.time()-started\nresult['checks_passed']=all(result['checks'].values())\npath=SHARED/'results'/f'{time.strftime(\"%Y-%m-%d\")}-memory-map-{int(started)}.json'\npath.write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result),flush=True)\n",
+  "command": "tools.jetson.run(\"memory-map\", [\"-c\", result[\"harness_source\"]], wait=True)",
+  "limits": "Four alternating blocks, three oracle turns per block, no audio playback. Short development smoke check. Paging counters cover complete blocks and cannot attribute paging to polling; response lengths and conversation history differ. No held-out quality, physical audible latency, long-session performance, or M4 acceptance claim."
+}

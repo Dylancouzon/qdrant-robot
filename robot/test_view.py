@@ -428,6 +428,7 @@ def test_memory_and_thumbnail_routes():
                 "last_seen": None, "sightings": 0}]
     looked_up = []
     view = SimpleNamespace(token=TOKEN.encode(), memory=lambda: objects,
+        memory_map=lambda: {"nodes": objects},
         thumb=lambda value: looked_up.append(value) or (
             b"\xff\xd8saved" if value == ident else None))
     handler = _Handler.__new__(_Handler)
@@ -443,6 +444,9 @@ def test_memory_and_thumbnail_routes():
         return codes[-1], handler.wfile.getvalue()
     code, data = get(f"/memory?token={TOKEN}")
     assert code == 200 and json.loads(data) == objects
+    code, data = get(f"/memory_map?token={TOKEN}")
+    assert code == 200 and json.loads(data) == {"nodes": objects}
+    assert get("/memory_map")[0] == 403
     assert get(f"/thumb?token={TOKEN}&view={ident}") == (200, b"\xff\xd8saved")
     assert headers["Content-Type"] == "image/jpeg"
     assert get(f"/thumb?token={TOKEN}&view={uuid.uuid4()}")[0] == 404
