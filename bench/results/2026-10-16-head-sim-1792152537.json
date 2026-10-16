@@ -1,0 +1,2061 @@
+{
+  "machine": "qdrant-robot",
+  "python": "3.12.3",
+  "release": "6ff84b1df3ce",
+  "input": "oracle text; rotating development photo panorama",
+  "motor": "simulated, 20 degrees/s, +/-70 degrees",
+  "hardware_motion": false,
+  "tegrastats": "head-sim-caption-20261016-080856.tegrastats",
+  "status": "passed",
+  "baseline_release": "83dd4fb999f5",
+  "baseline": {
+    "selected_known": true,
+    "selected_name": "Dylan"
+  },
+  "person_admission": {
+    "raw": {
+      "person_scores": [
+        0.2486572265625,
+        0.2176513671875
+      ],
+      "admitted_people": 0
+    },
+    "jpeg": {
+      "person_scores": [
+        0.48828125,
+        0.4111328125
+      ],
+      "admitted_people": 2
+    }
+  },
+  "following_diagnostics": {
+    "counts": {
+      "preview": 748,
+      "expired at preview": 0,
+      "unrecognized visitor": 201,
+      "conversation": 223,
+      "microphone suppressed": 10,
+      "goal": 20,
+      "settling": 27,
+      "stale source": 32,
+      "centered": 131,
+      "inspection": 49,
+      "stopped": 31
+    },
+    "samples": [
+      {
+        "age_ms": 72.6,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 69.8,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 61.3,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 58.9,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 63.7,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 67.8,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 77.3,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 73.7,
+        "name": "Sam",
+        "reason": "microphone suppressed",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 99.7,
+        "name": "Sam",
+        "reason": "microphone suppressed",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 143.7,
+        "name": "Sam",
+        "reason": "microphone suppressed",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 178.0,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 142.6,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 178.0,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 138.2,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 165.7,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 197.6,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 155.2,
+        "name": "Sam",
+        "reason": "centered",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 178.9,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": true,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 106.3,
+        "name": "Sam",
+        "reason": "conversation",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 6,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 115.7,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 106.1,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 87.1,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 76.5,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 73.7,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 79.6,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 98.6,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 91.4,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 75.1,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 61.6,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 63.4,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 78.1,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": false,
+          "paused": true,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 7,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      },
+      {
+        "age_ms": 103.4,
+        "name": "Dylan",
+        "reason": "stopped",
+        "head": {
+          "angle": 12.721874999999999,
+          "goal": 12.721874999999999,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 8,
+          "settled": 1792152604.2009864
+        },
+        "tracks": [
+          [
+            166,
+            [
+              117,
+              255,
+              324,
+              539
+            ],
+            "person",
+            0.43115234375
+          ],
+          [
+            250,
+            [
+              629,
+              260,
+              792,
+              504
+            ],
+            "person",
+            0.36572265625
+          ],
+          [
+            279,
+            [
+              1201,
+              0,
+              1280,
+              184
+            ],
+            "person",
+            0.262451171875
+          ]
+        ]
+      }
+    ]
+  },
+  "following": {
+    "seconds": 5.167073965072632,
+    "angle": 12.54375,
+    "detection_fps": 15.09557442768054
+  },
+  "description_comparison": {
+    "right": {
+      "source_time": 1792152585.0540476,
+      "view_angle": 45.0,
+      "caption": "Main object: stop sign. Around it: clothes on racks to the right and behind, a microphone in front of the person, various items including a bottle and other objects scattered around the room.",
+      "caption_s": 2.961439847946167,
+      "isolated_stream": "A cluttered closet with a stop sign overlay, showing a man recording on the left and various clothes hanging on racks.",
+      "first_stream_token_s": 0.9229905605316162,
+      "stream_s": 2.4390907287597656
+    },
+    "left": {
+      "source_time": 1792152598.7207072,
+      "view_angle": -45.0,
+      "caption": "Main object: cat. Around it: chairs on the left and right, a rack of clothes in the center, and a pink surface where the cat is lying.",
+      "caption_s": 1.8509352207183838,
+      "isolated_stream": "A cat is sleeping on a pink blanket inside an office with two black mesh chairs, and the image has been edited to include a microphone in front of it.",
+      "first_stream_token_s": 0.11720943450927734,
+      "stream_s": 2.126491069793701
+    }
+  },
+  "turns": [
+    {
+      "question": "Remember me, my name is Dylan.",
+      "answer": "May I remember your face, Dylan? Please say yes or no.",
+      "visitor": "d8194b50-326a-47e2-9353-9eb1651734c7",
+      "view_angle": 0.0,
+      "looked": 1792152553.3633335,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.299657843612259,
+      "identity": {
+        "face_px": 129,
+        "claimed": null,
+        "face_ms": 35.5,
+        "scores": [],
+        "box": [
+          572,
+          184,
+          702,
+          361
+        ]
+      },
+      "first_text_s": 1.4709498882293701,
+      "speech_ready_s": 1.9111127853393555
+    },
+    {
+      "question": "Yes.",
+      "answer": "Thank you, Dylan. I will remember your face.",
+      "visitor": "d8194b50-326a-47e2-9353-9eb1651734c7",
+      "view_angle": 0.0,
+      "looked": 1792152555.9491088,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.1228271074876,
+      "identity": {
+        "face_px": 129,
+        "claimed": null,
+        "face_ms": 44.3,
+        "scores": [],
+        "box": [
+          572,
+          184,
+          702,
+          361
+        ]
+      },
+      "first_text_s": 0.9775004386901855,
+      "speech_ready_s": 1.2683193683624268
+    },
+    {
+      "question": "My name is Sam.",
+      "answer": "Nice to meet you, Sam! Want me to remember your face so I recognize you next time?",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 0.0,
+      "looked": 1792152559.8695097,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.049633805538113,
+      "identity": {
+        "face_px": 62,
+        "claimed": null,
+        "face_ms": 62.4,
+        "scores": [
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          1054,
+          282,
+          1117,
+          370
+        ]
+      },
+      "first_text_s": 3.219327449798584,
+      "speech_ready_s": 3.6868624687194824
+    },
+    {
+      "question": "Yes.",
+      "answer": "Thank you, Sam. I will remember your face.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 0.0,
+      "looked": 1792152564.646836,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.070164243542647,
+      "identity": {
+        "face_px": 62,
+        "claimed": null,
+        "face_ms": 61.8,
+        "scores": [
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          1054,
+          282,
+          1117,
+          370
+        ]
+      },
+      "first_text_s": 1.1353068351745605,
+      "speech_ready_s": 1.542724847793579
+    },
+    {
+      "question": "Talk to Sam.",
+      "answer": "I am talking to Sam now.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 0.0,
+      "looked": 1792152579.715858,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 14.725710355349229,
+      "identity": {
+        "face_px": 61,
+        "claimed": null,
+        "face_ms": 69.6,
+        "scores": [
+          [
+            "Sam",
+            0.984,
+            0.984
+          ],
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          680,
+          285,
+          742,
+          369
+        ]
+      },
+      "first_text_s": 2.05767822265625,
+      "speech_ready_s": 2.525388479232788
+    },
+    {
+      "question": "What is on your right?",
+      "answer": "I see stop sign.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 45.0,
+      "looked": 1792152585.0540476,
+      "caption": "Main object: stop sign. Around it: clothes on racks to the right and behind, a microphone in front of the person, various items including a bottle and other objects scattered around the room.",
+      "caption_s": 2.961439847946167,
+      "detection_fps": 14.938875080948659,
+      "identity": {
+        "face_px": 61,
+        "claimed": null,
+        "face_ms": 76.2,
+        "scores": [
+          [
+            "Sam",
+            0.984,
+            0.984
+          ],
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          680,
+          285,
+          742,
+          369
+        ]
+      },
+      "first_text_s": 5.800139904022217,
+      "speech_ready_s": 6.165295362472534
+    },
+    {
+      "question": "What is on your left?",
+      "answer": "I see cat.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": -45.0,
+      "looked": 1792152598.7207072,
+      "caption": "Main object: cat. Around it: chairs on the left and right, a rack of clothes in the center, and a pink surface where the cat is lying.",
+      "caption_s": 1.8509352207183838,
+      "detection_fps": 14.53369863724175,
+      "identity": {
+        "face_px": 61,
+        "claimed": null,
+        "face_ms": 103.8,
+        "scores": [
+          [
+            "Sam",
+            0.984,
+            0.984
+          ],
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          680,
+          285,
+          742,
+          369
+        ]
+      },
+      "first_text_s": 6.331538677215576,
+      "speech_ready_s": 6.605053186416626
+    },
+    {
+      "question": "Forget me.",
+      "answer": "Should I forget everything about you, Sam? Say yes or no.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 0.0,
+      "looked": 1792152606.3323195,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.05420618634934,
+      "identity": {
+        "face_px": 61,
+        "claimed": "Sam",
+        "face_ms": 108.3,
+        "scores": [
+          [
+            "Sam",
+            0.984,
+            0.984
+          ],
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          680,
+          285,
+          742,
+          369
+        ]
+      },
+      "first_text_s": 1.4257798194885254,
+      "speech_ready_s": 1.9362492561340332
+    },
+    {
+      "question": "Yes.",
+      "answer": "Done, Sam. I have forgotten your face.",
+      "visitor": "2d4d2873-9554-4a1c-b8fb-633ff2e03b57",
+      "view_angle": 0.0,
+      "looked": 1792152609.0196698,
+      "caption": "",
+      "caption_s": 0.0,
+      "detection_fps": 15.133478138507833,
+      "identity": {
+        "face_px": 61,
+        "claimed": null,
+        "face_ms": 105.3,
+        "scores": [
+          [
+            "Sam",
+            0.984,
+            0.984
+          ],
+          [
+            "Dylan",
+            -0.034,
+            -0.034
+          ]
+        ],
+        "box": [
+          680,
+          285,
+          742,
+          369
+        ]
+      },
+      "first_text_s": 1.3558578491210938,
+      "speech_ready_s": 1.7684004306793213
+    }
+  ],
+  "goals": [
+    0.0,
+    -3.0,
+    -4.809374999999999,
+    -1.8093749999999993,
+    1.1906250000000007,
+    4.190625000000001,
+    7.190625000000001,
+    10.190625,
+    12.54375,
+    9.54375,
+    6.543749999999999,
+    3.5437499999999993,
+    0.5437499999999993,
+    -2.4562500000000007,
+    -4.5,
+    -1.5,
+    1.5,
+    4.5,
+    7.5,
+    10.5,
+    12.721874999999999,
+    45.0,
+    12.721874999999999,
+    -45.0,
+    12.721874999999999
+  ],
+  "final_head": {
+    "angle": 12.721874999999999,
+    "goal": 12.721874999999999,
+    "moving": false,
+    "halt": false,
+    "paused": false,
+    "inspecting": false,
+    "following": false,
+    "error": "",
+    "generation": 7,
+    "settled": 1792152604.2009864
+  }
+}

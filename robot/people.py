@@ -146,6 +146,17 @@ def located_face(faces: Faces, frame: np.ndarray
     return faces.embed([align(frame, f[4:14].reshape(5, 2))])[0], int(f[2]), box
 
 
+def located_faces(faces: Faces, frame: np.ndarray) -> list[tuple]:
+    """All usable source faces, each with its own vector, width, and pixel bounds."""
+    found = [f for f in faces.detect(frame) if f[2] >= MIN_FACE]
+    if not found:
+        return []
+    # The pinned model declares batch size one. Keep each inference within that contract.
+    vectors = [faces.embed([align(frame, f[4:14].reshape(5, 2))])[0] for f in found]
+    return [(vector, int(f[2]), tuple(int(v) for v in (f[0], f[1], f[0] + f[2], f[1] + f[3])))
+            for vector, f in zip(vectors, found, strict=True)]
+
+
 def face(faces: Faces, frame: np.ndarray) -> tuple[np.ndarray, int] | None:
     found = located_face(faces, frame)
     return found[:2] if found else None

@@ -1,0 +1,31 @@
+{
+  "machine": "qdrant-robot",
+  "python": "3.12.3",
+  "release": "0867c9d8982c",
+  "input": "oracle text; rotating development photo panorama",
+  "motor": "simulated, 20 degrees/s, +/-70 degrees",
+  "hardware_motion": false,
+  "tegrastats": "head-sim-20261016-073700.tegrastats",
+  "status": "failed",
+  "baseline_release": "83dd4fb999f5",
+  "baseline": {
+    "selected_known": true,
+    "selected_name": "Dylan"
+  },
+  "error": "RuntimeError: Timed out: following moves toward selected Sam",
+  "final_head": {
+    "angle": 0.0,
+    "goal": 0.0,
+    "moving": false,
+    "halt": false,
+    "paused": false,
+    "inspecting": false,
+    "following": true,
+    "error": "",
+    "generation": 2,
+    "settled": 1792150638.5725684
+  },
+  "goals": [
+    0.0
+  ]
+}

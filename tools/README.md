@@ -10,6 +10,7 @@
 | [gate.py](gate.py) | Run deterministic checks and read-only Codex gates. |
 | [results.py](results.py) | Summarize replay and brain bake-off JSONL offline. |
 | [record.py](record.py) | Record real fixture speech on the Mac. |
+| [servo.py](servo.py) | Read or gently nudge the loose STS3215. Follow [the hardware guide](../hardware/SERVO.md). |
 | [githooks/pre-commit](githooks/pre-commit) | Run required checks before commits. |
 | [test_gate.py](test_gate.py), [test_results.py](test_results.py), [test_talk.py](test_talk.py) | Exercise gates, evidence reporting, lifecycle, and proxies. |
 

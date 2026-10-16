@@ -23,6 +23,8 @@ from pathlib import Path
 import numpy as np
 
 from robot import audio, brain
+from robot.attention import Candidate, choose, handover
+from robot.head import Head, INSPECT, Interrupted, command as head_command
 from robot.asr import Ears, Scribe, woken
 from robot.config import SHARED
 from robot.settings import settings
@@ -58,9 +60,8 @@ from robot.people import (
     People,
     consent,
     done,
-    face,
     forget_question,
-    located_face,
+    located_faces,
     name_in,
     reply,
     request,
@@ -122,6 +123,13 @@ def scene_change(a: np.ndarray, b: np.ndarray) -> float:
 
 def differs(a: "Look", b: "Look") -> bool:
     return scene_change(a.frame, b.frame) > SCENE_CHANGE
+
+
+def prompt_text(messages):
+    """Log actual text instructions without image bytes or the shared system prompt."""
+    return [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
+            if isinstance(m["content"], list) else m
+            for m in messages if m["role"] != "system"]
 
 
 @dataclass
@@ -186,6 +194,7 @@ class Turn:
     caption: str = ""             # that look's caption: ready, demand (made in this turn), or
     #                               failed (none, interrupted, or no main object); "" no look
     caption_s: float = 0.0        # seconds the on-demand caption took
+    visual_caption: str = ""     # generated from this turn's exact captured inspection view
     delivered: bool = False       # the caption supplied the code answer, or was in the request
     #                               the brain answered
     speech_start: float = 0.0     # the VAD heard speech start
@@ -203,6 +212,9 @@ class Turn:
     detect_fps: float = 0.0       # detection and tracking rate while this turn ran
     identity: dict = field(default_factory=dict)  # face width, two-shot scores, name claimed
     visitor: str = ""             # resolved once before object actions
+    selection_error: str = ""     # ambiguous or missing active visitor: no personal writes
+    motion: int = 0               # accepted head request, before entering the answer queue
+    view_angle: float = 0.0       # measured angle of the sight source
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
     deleted: bool = False         # a voice deletion ran: its content leaves the live UI too
@@ -214,7 +226,7 @@ class Turn:
 class Robot:
     def __init__(self, camera, out: Path, memory: Path = SHARED / "memory",
                  play: Callable[[np.ndarray], None] | None = None, model: str = brain.MODEL,
-                 wake_word: bool = True):
+                 wake_word: bool = True, head: Head | None = None):
         """`wake_word` False: every line is answered (scripted sessions never say it)."""
         self.camera, self.out, self.wake_word = camera, out, wake_word
         self.camera_source = "Live camera"
@@ -230,6 +242,10 @@ class Robot:
         self.route = Router(self.embed)
         self.voice = Speaker()
         self.speaker = audio.Mouth(play)
+        self.head = head or Head()
+        self.head.blocked = lambda: self.speaking or self.speaker.playing(audio.SELF_VOICE_TAIL_S)
+        self.head_view = 0
+        self.turn_seen = None
         self.muted, self.volume = False, audio.saved_volume()  # the page's controls
         self.volume_lock = threading.Lock()  # mixer, saved level, and page value change together
         self.brain = brain.Brain(model)
@@ -316,6 +332,7 @@ class Robot:
         self.threads = [threading.Thread(target=t, name=t.__name__, daemon=True)
                         for t in (self._watch, self._detect, self._transcribe, self._work)]
         self.recognition = Recognition(self._preview)
+        self.head.start()
         for t in self.threads:
             t.start()
         self.ears = Ears(self._heard_start, self._heard_line)
@@ -341,9 +358,10 @@ class Robot:
         t = time.time()
         self.speaking = False
         self.asked += 1
-        self.jobs.put(("turn", Turn(question=text, line=t, transcribed=t, speech_end=t,
-                                    speech_start=self.speech_start, target=self.start_target),
-                          self.start_frame))
+        turn = Turn(question=text, line=t, transcribed=t, speech_end=t,
+                    speech_start=self.speech_start, target=self.start_target)
+        self._motion_request(turn)
+        self.jobs.put(("turn", turn, self.start_frame))
 
     def check_health(self) -> None:
         """Raise the saved failure instead of accepting input after a worker stopped."""
@@ -372,6 +390,7 @@ class Robot:
         pauses so no sighting of the old session reaches the new memory, and the tracker starts
         over so objects still in view are sighted again."""
         self.check_health()
+        self.head.request("stop")
         self.recognition.pause()  # stop background publications before draining their consumer
         self.jobs.join()  # turns may still make priority model requests
         self.check_health()
@@ -392,6 +411,7 @@ class Robot:
             self.last_objects = frozenset()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.face = None, 0.0, None
+            self.face_track, self.turn_seen = None, None
             self.teaching, self.start_target = None, None
             self.current_visitor = ""
             self._clear_confirmation()
@@ -437,7 +457,18 @@ class Robot:
             turn = Turn(question=text, line=t_line, transcribed=time.time(),
                         speech_end=speech_end, speech_start=speech_start, target=target)
             self.ui_turn, self.ui_thinking = turn, True
+            self._motion_request(turn)
             self.jobs.put(("turn", turn, shot))
+
+    def _motion_request(self, turn):
+        text = woken(turn.question)
+        if self.wake_word and text is None and \
+                turn.speech_start - self.last_line > CONVERSATION_S:
+            return
+        text = text or turn.question
+        kind = head_command(text)
+        if kind or handover(text) or name_in(text):
+            turn.motion = self.head.request(kind or "handover")
 
     def _consume(self, pending: queue.Queue, perform: Callable[[tuple], None]) -> None:
         """Account for every queued item, including failures and the stop signal."""
@@ -504,6 +535,7 @@ class Robot:
     def _track(self, frame: np.ndarray, dets: list, taken: float | None = None) -> list[Sighting]:
         """Track one detected frame; keep its boxes with the frame they are in, for crops."""
         with self.detecting:
+            self._head_view()
             found = self.tracker.update(dets, frame.shape[1], time.time())
             self.view, self.view_at = (frame, self.tracker.view()), time.time()
             self.view_taken = self.view_at if taken is None else taken
@@ -528,6 +560,20 @@ class Robot:
                 self.focus.geometry(tracks)))
             self.delivery.notify_all()
         return found
+
+    def _head_view(self):
+        """Discard object continuity and queued source authority when the viewpoint changes."""
+        if self.head_view == self.head.view:
+            return
+        self.head_view = self.head.view
+        self.tracker.tracks = [t for t in self.tracker.tracks if t.label == "person"]
+        self.points = {t.id: self.points[t.id] for t in self.tracker.tracks if t.id in self.points}
+        self.focus, self.verified, self.ready, self.window = None, None, None, None
+        self.views.clear()
+        self.offers.clear()
+        self.crop_due.clear()
+        self.item_checked.clear()
+        self.session_id = secrets.token_hex(16)
 
     def _refocus(self, frame: np.ndarray) -> None:
         """Feed the focus the tracks in view on the frame just tracked, and keep the view's
@@ -675,7 +721,11 @@ class Robot:
                 "targets": targets,
                 "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source,
-                "muted": self.muted, "volume": self.volume},
+                "muted": self.muted, "volume": self.volume,
+                "active_visitor": self._active_name(),
+                "head": {"enabled": self.head.motor is not None,
+                         "angle": round(self.head.angle, 1), "following": self.head.following,
+                         "error": self.head.error}},
                 ignored_items=self.things.preferences(), settings=settings.snapshot(),
                 window=self._window_status(objects))
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
@@ -717,14 +767,17 @@ class Robot:
             else:
                 self.away.discard(s.track)
 
+    def _active_name(self):
+        person = self.people.by_visitor(self.current_visitor) if self.current_visitor else None
+        return person["name"] if person else self.told[0] if self.told else ""
+
     def _preview(self, frame, taken, tracks, epochs, session, geometry, gallery):
         """Model-owner background work; fresh results alone authorize selected writes."""
         if time.time() - taken > PREVIEW_TTL or gallery != self.recognition.epoch:
             return
-        found_face = located_face(self.recognition.faces, frame)
-        scores = self.people.scores(found_face[0]) if found_face else []
-        person = scores[0][0] if scores and scores[0][2] >= THRESHOLD and (
-            len(scores) == 1 or scores[1][2] < THRESHOLD) else None
+        selected, _ = self._select_face(self.recognition.faces, frame)
+        found_face = (selected.vector, selected.width, selected.box) if selected else None
+        person = selected.name if selected else None
         with self.detecting:
             focus = self.focus
             preferences = {i: focus.name(i) for i in epochs}
@@ -733,6 +786,9 @@ class Robot:
                          focus.epoch(i) == epochs[i]}
                 self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry,
                                      gallery)
+                self._follow_face(selected, frame.shape[1], taken)
+        if not self.head.valid(taken):
+            return
         recognized, excluded = self._query_objects(frame, tracks, preferences, (taken, epochs))
         if time.time() - taken > PREVIEW_TTL:
             return
@@ -816,7 +872,7 @@ class Robot:
         taken, epochs = source
         with self.detecting:
             self._window_status()
-            if self.window is not window or track.label in BODY or \
+            if not self.head.valid(taken) or self.window is not window or track.label in BODY or \
                     epochs.get(track.id) != window["epoch"] or \
                     not self.focus.accepts(track.id, taken) or \
                     time.time() - taken > PREVIEW_TTL:
@@ -993,7 +1049,7 @@ class Robot:
     def _remember_matches(self, frame: np.ndarray, taken: float, tracks: list[Track],
                           recognized: dict, person: str | None) -> None:
         """Only this snapshot's sure matches may create or advance visual sightings."""
-        if self.hiding or time.time() - taken > PREVIEW_TTL:
+        if self.hiding or time.time() - taken > PREVIEW_TTL or not self.head.valid(taken):
             return
         for t in tracks:
             name, score = recognized.get(t.id, (None, 0.0))
@@ -1009,10 +1065,10 @@ class Robot:
                     pid = None
                 if pid:
                     self.memory.set(pid, label=t.label, region=region(t.box, frame.shape[1]),
-                                    last_seen=taken)
+                                    last_seen=taken, view_angle=self.head.angle)
                 else:
                     pid = self.points[t.id] = self.memory.sighting(
-                        t.label, region(t.box, frame.shape[1]), taken, name)
+                        t.label, region(t.box, frame.shape[1]), taken, name, self.head.angle)
                 if person:
                     self.recognition.call(lambda f, c, pid=pid: self.people.link(person, [pid]))
         if recognized:
@@ -1030,17 +1086,32 @@ class Robot:
         matches by the two-shot rule, or None without a usable face. An identity turn logs
         the face width, the step time, and the two best people's scores, never the face."""
         started = time.time()
-        def identify(faces, crops):
-            found = face(faces, frame)
-            scores = self.people.scores(found[0])[:2] if found else []
-            return found, scores
-        found, scores = self.recognition.call(identify)
-        name = scores[0][0] if scores and scores[0][2] >= THRESHOLD else None
+        selected, error = self.recognition.call(
+            lambda faces, crops: self._select_face(faces, frame, turn.question if turn else ""))
+        scores = selected.scores if selected else []
         if turn is not None:
-            turn.identity = {"face_px": found[1] if found else 0, "claimed": None,
+            turn.selection_error = error
+            turn.identity = {"face_px": selected.width if selected else 0, "claimed": None,
                              "face_ms": round(1000 * (time.time() - started), 1),
-                             "scores": [[n, round(b, 3), round(s, 3)] for n, b, s in scores]}
-        return (found[0], name) if found else None
+                             "scores": [[n, round(b, 3), round(s, 3)] for n, b, s in scores],
+                             "box": selected.box if selected else None}
+        return (selected.vector, selected.name) if selected else None
+
+    def _select_face(self, faces, frame, text=""):
+        candidates = [Candidate(vector, width, box, self.people.scores(vector)[:2])
+                      for vector, width, box in located_faces(faces, frame)]
+        return choose(candidates, self.face, text)
+
+    @staticmethod
+    def _face_person(box, tracks):
+        candidates = [t for t in tracks if t.label == "person" and inside(box, t.box) >= .8]
+        return candidates[0] if len(candidates) == 1 else None
+
+    def _follow_face(self, selected, width, taken):
+        if selected and selected.name:
+            return self.head.follow(selected.box, width, taken)
+        self.head.hold()
+        return "unrecognized visitor"
 
     def _retain(self, now: float) -> None:
         """Bound memory to the retention window and caps (Memory.retain) after each write,
@@ -1223,6 +1294,15 @@ class Robot:
         shown objects and sightings."""
         if not turn.visitor:
             self._resolve_visitor(turn, now)
+        if head_command(turn.question) == "stop":
+            self._cancel_personal()
+            turn.keep = False
+            return "Stopped."
+        if turn.selection_error:
+            return turn.selection_error
+        if name := handover(turn.question):
+            turn.keep = False
+            return f"I am talking to {name} now."
         if answer := self._deletion_answer(turn) or self._confirmation_answer(turn):
             return answer
         teaching, self.teaching = self.teaching, None  # asked once; any other line drops it
@@ -1247,7 +1327,116 @@ class Robot:
             self.ui_turn = None
             self._log(turn)
             return
-        turn.question = heard or turn.question  # "Hey Edgy." alone: the brain greets back
+        if not turn.motion:
+            self._motion_request(turn)
+        turn.question = heard or turn.question
+        identity_shot, previous = shot, None
+        self.head.paused = True
+        self.head.hold()
+        try:
+            if head_command(turn.question) in ("left", "right"):
+                shot, previous = self._inspect(turn, shot)
+                if not turn.selection_error:
+                    self._inspection_turn(turn, shot, identity_shot)
+                    return
+            self._answer_turn(turn, shot, identity_shot)
+        except Interrupted as error:
+            turn.keep, turn.answer, turn.done = False, str(error), time.time()
+            self._log(turn)
+        finally:
+            try:
+                if previous is not None:
+                    self._return_head(turn, previous)
+            finally:
+                self.head.finish(turn.motion)
+
+    def _inspection_turn(self, turn, shot, identity_shot):
+        """Describe the exact stopped image through the existing image-only caption operation."""
+        self._cancel_personal()
+        started, detections, track = time.time(), self.detections, self._visitor()
+        self.ui_turn, self.ui_thinking, self.panel = turn, True, None
+        self.ui_turns.append(turn)
+        look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, True, [])
+        turn.kind, turn.looked, turn.retrieved = "sight", shot[1], started
+        turn.prompt = prompt_text(brain.caption_messages(look.image))
+        began = time.time()
+        def cancel():
+            return (self.speaking or self.head.generation != turn.motion or self.head.closed or
+                    self.closing.is_set())
+        look.caption = self.brain.caption(look.image, cancel)
+        self.ready = None  # Captioning replaces the server's conversation prefix.
+        turn.caption, turn.caption_s = "demand", time.time() - began
+        turn.visual_caption = look.caption or ""
+        if cancel():
+            raise Interrupted("The view description was interrupted.")
+        thing = main_object(turn.visual_caption)
+        answer = f"I see {thing}." if thing else "I could not describe that view. Please ask again."
+        turn.delivered = bool(thing)
+        if turn.visual_caption and not self.hiding:
+            turn.ui_evidence = [{"label": "Current camera view", "text": turn.visual_caption,
+                                 "source": "Generated description from the captured frame",
+                                 "time": look.taken}]
+        self.last_frame, self.last_objects = look.frame, look.objects
+        self._finish_turn(turn, self._said(answer, turn), look, identity_shot, None, None,
+                          started, detections, track)
+
+    def _inspect(self, turn, shot):
+        if shot[0] is None:
+            turn.selection_error, turn.keep = "I need a camera image before turning.", False
+            return shot, None
+        if shot[0] is not None and self._resolve_visitor(turn, shot[0]):
+            self._clear_dialogue()
+        if turn.selection_error:
+            return shot, None
+        previous = self.head.angle
+        try:
+            goal = INSPECT if head_command(turn.question) == "right" else -INSPECT
+            self.head.move(goal, turn.motion)
+            settled = self.head.wait(turn.motion)
+            shot = self._inspection_frame(settled, turn.motion)
+            turn.view_angle = self.head.angle
+        except Interrupted:
+            raise
+        except RuntimeError as error:
+            turn.selection_error, turn.keep = str(error), False
+            self.head.request("stop")
+            return shot, None
+        return shot, previous
+
+    def _inspection_frame(self, settled, generation):
+        deadline = time.monotonic() + 2
+        with self.delivery:
+            while True:
+                self.head._current(generation)
+                if self.view[0] is not None and self.view_taken > settled and \
+                        self.head.valid(self.view_taken) and \
+                        0 <= time.time() - self.view_taken < .3:
+                    return self.view[0], self.view_taken
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("I could not get a fresh view after turning.")
+                self.delivery.wait(.05)
+
+    def _return_head(self, turn, previous):
+        try:
+            with self.head.condition:
+                while self.speaker.playing(audio.SELF_VOICE_TAIL_S):
+                    self.head._current(turn.motion)
+                    self.head.condition.wait(.05)
+            self.head.move(previous, turn.motion)
+            self.head.wait(turn.motion)
+            self.head.resume(turn.motion)
+        except Interrupted:
+            pass  # A newer command owns the head, including its return policy.
+        except RuntimeError as error:
+            self.head.request("stop")
+            self.control_message = str(error)
+
+    def _clear_dialogue(self):
+        self.history, self.looked, self.teaching, self.asking = [], [], None, None
+        self.held.clear()
+        self.ui_turns.clear()
+
+    def _answer_turn(self, turn, shot, identity_shot):
         self.ui_turn, self.ui_thinking = turn, True
         self.panel = None
         self.ui_turns.append(turn)
@@ -1264,7 +1453,7 @@ class Robot:
         past = about_past(turn.question)
         recalled, memories = self._recall(turn, look.frame) if past else ([], [])
         # The frame at speech start: the cached look may show an earlier visitor.
-        now, taken = (look.frame, look.taken) if shot[0] is None else shot
+        now, taken = (look.frame, look.taken) if identity_shot[0] is None else identity_shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
         # earlier exchanges or first-person statements reach this prompt.
         if self._resolve_visitor(turn, now):
@@ -1299,9 +1488,9 @@ class Robot:
         msgs = brain.messages(look.history, image, memories, turn.facts,
                               turn.question, look.changed, past, told)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
-        turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
-                       if isinstance(m["content"], list) else m
-                       for m in msgs if m["role"] != "system"]
+        turn.prompt = prompt_text(msgs)
+        if turn.selection_error:
+            turn.prompt = []
         if recalled_answer:
             turn.verbatim = True
             tokens = self._said(recalled_answer, turn)
@@ -1310,6 +1499,12 @@ class Robot:
             tokens = self._said(turn.facts[0], turn)
         else:
             tokens = self._tokens(msgs, turn)
+        statement = None if is_question(turn.question) or command(
+            turn.question, self.vocab) else question
+        self._finish_turn(turn, tokens, look, (now, taken), statement, held,
+                          started, detections, track)
+
+    def _finish_turn(self, turn, tokens, look, shot, statement, held, started, detections, track):
         audio_parts = self._speak(tokens, turn)
         turn.done = time.time()
         turn.detect_fps = (self.detections - detections) / (turn.done - started)
@@ -1317,16 +1512,11 @@ class Robot:
         spoken = np.concatenate(audio_parts or [np.zeros(1)])
         turn.audio_s = len(spoken) / RATE
         audio.write_wav(self.out / turn.wav, spoken, RATE)
-        self.history = (self.history + [{"role": "user", "content": turn.question},
-                                        {"role": "assistant", "content": turn.answer}]
-                        )[-2 * HISTORY_TURNS:]
-        self.exchanges += 1
+        self._remember_dialogue(turn)
         # Findable later; a command ("this is my phone") is an action, never evidence of
         # ownership (things.py holds what was named).
-        statement = None if is_question(turn.question) or command(
-            turn.question, self.vocab) else question
-        if self._store(turn, (now, taken), statement, track):  # one privacy decision for both
-            if self.looked and not differs(self.looked[-1], look):
+        if self._store(turn, shot, statement, track):  # one privacy decision for both
+            if look.caption is None and self.looked and not differs(self.looked[-1], look):
                 look.caption = self.looked[-1].caption  # one caption per view run
             self.looked = (self.looked + [look])[-HISTORY_TURNS:]
             if held:
@@ -1335,6 +1525,13 @@ class Robot:
         # The answer ends when its audio does (the speech end in tests without audio).
         self.last_line = max(turn.speech_end, turn.first_audio + turn.audio_s)
         self._log(turn)
+
+    def _remember_dialogue(self, turn):
+        if not turn.selection_error:
+            self.history = (self.history + [{"role": "user", "content": turn.question},
+                                           {"role": "assistant", "content": turn.answer}]
+                            )[-2 * HISTORY_TURNS:]
+            self.exchanges += 1
 
     def _log(self, turn: Turn) -> None:
         self.ui_thinking = False
@@ -1353,6 +1550,8 @@ class Robot:
     def _told(self, question: np.ndarray, turn: Turn) -> list[dict]:
         """The visitor's earlier statements nearest `question`, except those about an ignored
         kind, and first-person ones (D70) told before this conversation."""
+        if turn.selection_error:
+            return []
         return [m for m in self.memory.told(question, before=turn.speech_start, n=4)
                 if not mentions(m["said"], self.ignored) and (
                     not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
@@ -1367,7 +1566,7 @@ class Robot:
         if not turn.keep:
             return False
         frame, taken = shot
-        seen = self._whois(frame)
+        seen = self.turn_seen
         if self._hidden(seen, track):
             return False
         self._hear_name(turn)
@@ -1398,12 +1597,9 @@ class Robot:
         return self.hiding is not None or v.forgotten
 
     def _visitor(self) -> int | None:
-        """The person track in view with the largest box (at a booth, the one speaking)."""
+        """The selected visitor's live track, or the sole person before selection."""
         with self.detecting:
-            boxes = {t: box for t, (label, box) in self.tracker.view().items()
-                     if label == "person"}
-        return max(boxes, key=lambda t: (boxes[t][2] - boxes[t][0]) * (boxes[t][3] - boxes[t][1]),
-                   default=None)
+            return self._visitor_unlocked([Track(*t) for t in self.tracker.scored()])
 
     def _identity(self, turn: Turn, frame: np.ndarray, track: int | None) -> str | None:
         """Identity requests answered in code (robot/people.py) from the face in the current
@@ -1512,7 +1708,19 @@ class Robot:
         if turn.visitor:
             return False
         seen = self._whois(frame, turn)
-        new = self._converse(turn, seen, self._visitor())
+        if turn.selection_error:
+            return self._reject_selection(turn, turn.selection_error)
+        with self.detecting:
+            tracks = [Track(*t) for t in self.tracker.scored()]
+            box = turn.identity.get("box")
+            selected = self._face_person(box, tracks) if box else None
+            track = selected.id if selected else self._visitor_unlocked(tracks)
+        if self._missing_visitor(turn, seen, track):
+            return self._reject_selection(turn, NOT_YOU)
+        explicit = bool(handover(turn.question))
+        new = self._converse(turn, seen, track)
+        if explicit:
+            self._cancel_personal()
         person = self.people.person(seen[1]) if seen and seen[1] else None
         self.turn_seen = seen
         # A missed face in a conversation that goes on stays with the previous turn's visitor.
@@ -1520,9 +1728,36 @@ class Robot:
         turn.visitor = person["visitor"] if person else (
             self.current_visitor if missed else self.conversation_visitor)
         if turn.visitor != self.current_visitor:
-            self._clear_confirmation()
+            self._cancel_personal()
+            self.session_id = secrets.token_hex(16)
         self.current_visitor = turn.visitor
-        return new
+        if seen and turn.motion and turn.motion == self.head.generation and \
+                (explicit or name_in(turn.question)):
+            self.head.activate(turn.motion)
+        return new or explicit
+
+    def _missing_visitor(self, turn, seen, track):
+        same_track = track is not None and track == self.face_track
+        timely = turn.speech_start - self.last_line <= CONVERSATION_S
+        return seen is None and self.face is not None and not (same_track and timely)
+
+    def _reject_selection(self, turn, error):
+        turn.selection_error = error
+        turn.visitor, turn.keep = self.current_visitor or self.conversation_visitor, False
+        self.turn_seen = None
+        self._cancel_personal()
+        self.head.hold()
+        return False
+
+    def _cancel_personal(self):
+        self._clear_confirmation()
+        self.asking, self.teaching, self.window = None, None, None
+
+    def _visitor_unlocked(self, tracks):
+        people = [t.id for t in tracks if t.label == "person"]
+        if self.face_track in people:
+            return self.face_track
+        return people[0] if len(people) == 1 else None
 
     def _hear_name(self, turn: Turn) -> None:
         """Hold the told name and update the current visitor record, if it exists."""
@@ -1549,7 +1784,7 @@ class Robot:
     def _enroll(self, name: str, shots: list[np.ndarray], frame: np.ndarray, turn: Turn) -> bool:
         """Enroll `name` after consent from the face that asked and the face that said yes
         (two frames, one person): face vectors in the people shard, no image."""
-        if (seen := self._whois(frame, turn)) is None or any(
+        if (seen := self.turn_seen) is None or any(
                 float(seen[0] @ s) < THRESHOLD for s in shots):
             return False  # no face now, or not the face that asked
         return self.recognition.call(lambda f, c: self.people.enroll(
@@ -1596,6 +1831,7 @@ class Robot:
         self.ui_turns.clear()
         self.turn_seen = None
         self.teaching = None
+        self.head.request("stop")
         with self.delivery:
             self.verified = None
             self.delivery.notify_all()
@@ -1696,10 +1932,15 @@ class Robot:
             self.volume = data["percent"]
         return True
 
+    def _stop_head(self, action, data):
+        self.head.request("stop")
+        return True
+
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
         direct = {"mute": self._setting, "volume": self._setting, "settings": self._setting,
-                  "forget_object": self._memory_control, "remove_view": self._memory_control}
+                  "forget_object": self._memory_control, "remove_view": self._memory_control,
+                  "stop_head": self._stop_head}
         if action in direct and isinstance(data, dict):
             return direct[action](action, data)
         if action not in ("ignore", "restore") or not isinstance(data, dict):
@@ -1957,7 +2198,7 @@ class Robot:
             views, objects = self._views(track)
             epoch = self.focus.epoch(track)
             gallery, session = self.recognition.epoch, self.session_id
-        if not views or pinned not in (None, epoch):
+        if not self._binding_source(views, pinned, epoch):
             return "Sorry, I lost sight of it. Hold it up and say it again."
         taken, frame, view = views[0]
         label, box = view[track]
@@ -1969,8 +2210,8 @@ class Robot:
         if {label, *labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
         seen = self._whois(frame)
-        if self._hidden(seen, self._visitor()):
-            return "I cannot remember this while the forgotten visitor is in view."
+        if error := self._binding_error(seen):
+            return error
         shots = [cut(f, v[track][1]) for _, f, v in views[:SHOTS]]
         vectors = self.recognition.call(lambda f, c: c(shots))
         if any(self.things.excluded(v) for v in vectors):
@@ -1981,7 +2222,7 @@ class Robot:
                         not self.focus.accepts(track, taken) or \
                         self.focus.epoch(track) != epoch or \
                         self.recognition.epoch != gallery + 1 or self.session_id != session or \
-                        time.time() - taken > PREVIEW_TTL:
+                        time.time() - taken > PREVIEW_TTL or not self.head.valid(taken):
                     return None
                 return self.things.name(
                     turn.visitor,
@@ -2001,7 +2242,7 @@ class Robot:
                               box=list(box), source_size=[frame.shape[1], frame.shape[0]])
         self.things.link(ident, pid)
         sighting = self.points[track] = self.memory.sighting(
-            label, region(box, frame.shape[1]), taken, ident)
+            label, region(box, frame.shape[1]), taken, ident, self.head.angle)
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid, sighting]))
         turn.memories, turn.named = [pid], ident
@@ -2013,6 +2254,16 @@ class Robot:
         return f"Got it, that is your {name}. " + (
             "Turn it slowly so I can see all sides." if settings.window_s > 0 else
             "I will remember it.")
+
+    def _binding_source(self, views, pinned, epoch):
+        return bool(views) and pinned in (None, epoch) and self.head.valid(views[0][0])
+
+    def _binding_error(self, seen):
+        if self.face is not None and seen is None:
+            return "Please look at me so I can check whose object this is."
+        if self._hidden(seen, self._visitor()):
+            return "I cannot remember this while the forgotten visitor is in view."
+        return ""
 
     def _forget_thing(self, turn: Turn, owner: str, name: str, labels: list[str]) -> str:
         """Ask before deleting the object the visitor named, resolved now."""
@@ -2129,7 +2380,8 @@ class Robot:
         newest: dict[str, dict] = {}  # kind -> its newest sighting: one line per object
         for s in self.memory.sightings(turn.speech_start, SIGHTINGS, in_view, self.ignored,
                                        named=selected):
-            newest.setdefault(kind_of(s["label"]), s)
+            if self._same_view(s):
+                newest.setdefault(kind_of(s["label"]), s)
         sights = list(newest.values())[:LINES]
         turn.memories = [m["id"] for m in recalled + sights]
         ago = lambda ts: brain.age(turn.speech_start - ts)  # noqa: E731
@@ -2199,6 +2451,7 @@ class Robot:
         # window, not a group-by; Edge 0.8 has none. Facet on label if one kind floods it).
         past = self.memory.sightings(turn.speech_start, SIGHTINGS, here, self.ignored,
                                      named=self.things.visual_links(self.ignored), **query[1])
+        past = [s for s in past if self._same_view(s)]
         with self.detecting:
             now = [{"id": -t, "label": label, "region": region(box, self.view[0].shape[1]),
                     "last_seen": self.view_taken} for t, (label, box) in self.view[1].items()
@@ -2210,6 +2463,10 @@ class Robot:
             turn.memories = [i for i in ids if i > 0]
             return answer
         return None
+
+    def _same_view(self, sighting):
+        return self.head.valid(self.view_taken) and \
+            abs(sighting.get("view_angle", 0.) - self.head.angle) <= 1.
 
     def _said(self, fact: str, turn: Turn) -> Iterator[str]:
         turn.first_token, turn.answer = time.time(), fact
@@ -2256,6 +2513,7 @@ class Robot:
     def close(self) -> None:
         """Finish the queued work, stop the threads, and release the shards and llama-server,
         so a new Robot can open the same memory folder (a restart)."""
+        self.head.close()
         watch, detect, transcribe, work = self.threads
         if self.video:
             self.video.close()

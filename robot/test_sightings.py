@@ -176,7 +176,7 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
     from robot.memory import UNAVAILABLE
     from robot.text_embed import DIM as TEXT_DIM
 
-    monkeypatch.setattr(main, "face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     robot = open_robot(tmp_path)
     robot.asking, robot.stream, robot.wake_word, robot.turns = None, None, False, queue.Queue()
     robot.ready, robot.last_frame, robot.exchanges, robot.detections = None, None, 0, 0

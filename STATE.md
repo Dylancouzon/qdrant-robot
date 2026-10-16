@@ -4,15 +4,15 @@ Updated 2026-10-16. Branch: `spike/conversation-context`. Architecture is settle
 
 ## Active task
 
-Dylan accepted the UI and Memory work. The repository handoff indexes current components and preserves historical evidence separately. Conversation trials, returning-visitor greetings, and broader acceptance remain parked. The enclosure worktree stays untouched.
+Shared visitor selection and bounded simulated head control are implemented and reviewed. The nine-turn Jetson scenario and all nine saved speech outputs pass. An introduction selects the sole unknown beside a known visitor. Conversation, ownership, and following share that selection. Physical runtime integration remains next; the enclosure worktree stays untouched.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `809470ff`; deployed release `83dd4fb999f5`. The `qr-robot` unit is stopped, and no benchmark unit is active. Previous points to accepted `f9b90b958023` for rollback. Last session: `shared/sessions/20261016-002006`; logs: `journalctl -u qr-robot`. The Mac monitor serves port 8765. WSL is idle.
+Jetson `robot`: boot `809470ff`; current release `31866696ff60`. The `qr-robot` unit is stopped, and no benchmark unit is active. Previous points to accepted `f9b90b958023`; baseline `83dd4fb999f5` remains available. Validated simulation: `shared/experiments/head-sim-1792152537/session`. The Mac monitor serves port 8765 for the current release.
 
-The cleanup changes documentation and benchmark labels only. It does not deploy or start the robot.
+Motor output stays disabled. The connected Jetson adapter passes read-only status after adding the robot user to `dialout`.
 
-The target measurements below precede this interface refresh.
+The broad acceptance measurements below precede servo work. Current simulation measurements and gaps are in [head control](research/servo.md).
 
 ## Targets
 
@@ -30,6 +30,6 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next step
 
-**Servo motor control and voice commands.** Inspect the connected servo/controller, power supply, electrical interface, travel limits, and desired spoken commands. Review the smallest bounded control path before motion. Keep models, memory, consent, and deletion behavior intact. See the [work queue](research/edge-cases.md#next-steps).
+**Calibrated servo adapter and mounted qualification.** Establish forward position, direction, encoder limits, and cable clearance with Dylan. Implement the runtime serial adapter before enabling motion. Inspection latency, sustained performance, and broader acceptance remain open. See [head control](research/servo.md#remaining-qualification).
 
-Start with `rg -n 'servo|motor|GPIO|I2C|PWM' robot tools research/architecture.md` to locate existing integration points.
+Next: read `hardware/SERVO.md`, then plan the calibrated runtime adapter against the connected controller's readback.

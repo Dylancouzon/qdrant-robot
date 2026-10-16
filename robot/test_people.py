@@ -162,7 +162,7 @@ def test_robot_identity(monkeypatch) -> None:
     from robot import main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection
     from robot.main import FIRST_PERSON, Robot, Turn
-    from robot.people import DECLINED, KEPT, _id
+    from robot.people import DECLINED, KEPT, NOT_YOU, _id
     from robot.text_embed import DIM as TEXT_DIM
     from robot.test_things import open_robot
 
@@ -171,9 +171,10 @@ def test_robot_identity(monkeypatch) -> None:
     def fake_face(faces, frame):
         steps.append(1)
         k = int(frame[0, 0, 0])
-        return None if k == 99 else (np.eye(DIM, dtype=np.float32)[k], 120)
+        return [] if k == 99 else [(np.eye(DIM, dtype=np.float32)[k], 120,
+                                   (500, 100, 620, 220))]
 
-    monkeypatch.setattr(main, "face", fake_face)
+    monkeypatch.setattr(main, "located_faces", fake_face)
     here, near = (400, 100, 800, 700), (450, 100, 850, 700)
     clock = iter(range(int(time.time()), int(time.time()) + 10_000))  # wall clock, as turns
 
@@ -235,14 +236,15 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("I'm Ana.", frames(99, 1)) is None, "told with no face: no offer"
         assert ask("What's my name?", frames(99, 1)) == "You told me you're Ana.", "a follow-up"
         assert ask("What's my name?", frames(99, MAX_MISSED + CONFIRM, (0, 100, 300, 700))) \
-            == NOT_MET, "no face, another person track: a new conversation"
+            == NOT_YOU, "loss holds the active selection and requires face verification"
         for _ in range(main.CONVERSATION_S + 1):
             next(clock)  # a pause: whoever speaks now may be someone else
-        assert ask("What's my name?", frames(99, 1)) == NOT_MET, "no face after a gap: dropped"
-        assert ask("I'm Ana.", frames(99, 1)) is None
-        assert ask("Yes.", frames(4, 1)) is None and robot.people.identify(np.eye(DIM)[4]) is None \
+        assert ask("What's my name?", frames(99, 1)) == NOT_YOU, "loss preserves the visitor ID"
+        assert ask("I'm Ana.", frames(99, 1)) == NOT_YOU
+        assert ask("Yes.", frames(4, 1)).startswith("Please introduce yourself") and \
+            robot.people.identify(np.eye(DIM)[4]) is None \
             and robot.people.identify(np.eye(DIM)[1]) is None, "another visitor's yes: nobody"
-        assert ask("I'm Ana.", ana) == offer("Ana"), "her face: a new linked visitor, one offer"
+        assert ask("Remember me, I'm Ana.", ana).startswith("May I"), "fresh face, explicit consent"
         assert ask("No thanks.", ana) == DECLINED, "no"
         assert robot.people.identify(np.eye(DIM)[1]) is None, "a no enrolls nothing"
         assert ask("What's my name?", ana) == "You told me you're Ana.", "the name stays"
@@ -262,12 +264,14 @@ def test_robot_identity(monkeypatch) -> None:
         ben = frames(2, 3)  # Ben steps into Ana's place: the track goes on
         assert robot._visitor() == track and not robot._stale(ben), \
             "and the prefilled look of Ana stays valid for his turn"
-        assert ask("Do you remember me?", ben).startswith("I don't think we've met")
+        assert ask("Do you remember me?", ben).startswith("Please introduce yourself")
         assert linked("Ana") == ana_links, "his turn is not linked to her"
-        assert ask("Who am I?", ben) == NOT_MET and linked("Ana") == ana_links, \
+        assert ask("Who am I?", ben).startswith("Please introduce yourself") and \
+            linked("Ana") == ana_links, \
             "Ben inherits neither Ana's told name nor her evidence"
         assert ask("Remember me, I'm Ben.", ben).startswith("May I")
-        assert ask("Yes.", frames(1, 1)) == done("enroll", "Ben", False), "not the face that asked"
+        assert ask("Yes.", frames(1, 1)).startswith("Please introduce yourself")
+        assert robot.people.person("Ben") is None and robot.asking is None
         assert ask("Remember me, I'm Ben.", ben).startswith("May I")
         assert ask("Yes.", ben) == done("enroll", "Ben", True)
         assert ask("Great, thanks, robot.", ben) is None
@@ -280,6 +284,7 @@ def test_robot_identity(monkeypatch) -> None:
         frames(None, MAX_MISSED + 2)  # Ben leaves; Ana steps in nearby before his track ends
         ana = frames(1, CONFIRM + 1, near)
         assert robot._visitor() == track, "her new track continued his lost one"
+        assert ask("Talk to Ana.", ana) == "I am talking to Ana now."
         assert ask("What's my name?", ana) == "You're Ana. I remember your face."
         assert ask("Thanks!", ana) is None
         assert ask("Missed face line.", frames(99, 1, near)) is None
@@ -304,7 +309,8 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("Yes.", ana) is None and robot.people.identify(np.eye(DIM)[1]), \
             "a yes with no question pending deletes nothing"
         assert ask("Please forget me.", ana).startswith("Should I forget")
-        assert ask("Yes.", frames(2, 1)) is None and robot.people.identify(np.eye(DIM)[1]), \
+        assert ask("Yes.", frames(2, 1)).startswith("Please introduce yourself") and \
+            robot.people.identify(np.eye(DIM)[1]), \
             "another visitor's yes deletes nothing"
         assert ask("Please forget me.", ana).startswith("Should I forget")
         assert robot.deleting and turns[-1].keep is False, "the question is no evidence"
@@ -319,11 +325,11 @@ def test_robot_identity(monkeypatch) -> None:
             "her linked turns go, Ben's stay"
         frames(None, LOST + 2)  # the detector loses her: no person track at all
         assert ask("Hello again, I'm still here.", ana) is None
-        assert ask("Can you hear me?", frames(99, 1)) is None
+        assert ask("Can you hear me?", frames(99, 1)) == NOT_YOU
         assert not any(t in said() for t in ("Please forget me.", "Hello again, I'm still here.",
                                              "Can you hear me?")), "nothing of her is stored"
-        assert ask("Hi, I'm next in line.", frames(2, 1)) is None
-        assert "Hi, I'm next in line." in said(), "another face ends the hiding"
+        assert ask("Hi, I'm Ben.", frames(2, 1)) is None
+        assert "Hi, I'm Ben." in said(), "an introduction transfers the selected visitor"
         monkeypatch.setattr(memory, "MAX_POINTS", 1)
         robot._retain(float(next(clock)))
         assert robot.memory.shard.count(memory.CountRequest()) <= 1 and linked("Ben"), \
@@ -336,7 +342,7 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("Still me.", ben) is None and "Still me." not in said()
         cy = frames(3, 3)  # Cy steps into Ben's place: the same track id
         assert robot._visitor() == track
-        assert ask("Hello, I'm new here.", cy) is None and "Hello, I'm new here." in said(), \
+        assert ask("Hello, I'm Cy.", cy) == offer("Cy") and "Hello, I'm Cy." in said(), \
             "a new face on a forgotten track is stored"
         robot.memory.shard.close()
         robot.people.shard.close()
@@ -356,11 +362,14 @@ def test_robot_identity(monkeypatch) -> None:
         assert ask("I'm from Lisbon.", cy) is None
         assert ask("Where am I from?", cy) is None and turns[-1].told == ["I'm from Lisbon."]
         assert "Lisbon" in str(turns[-1].prompt), "Cy's own exchanges stay in the prompt"
-        assert ask("So which town do I live in?", frames(5, 1)) is None, "a paraphrase"
+        assert ask("So which town do I live in?", frames(5, 1)).startswith(
+            "Please introduce yourself"), "a replacement cannot take the active conversation"
         assert not any(FIRST_PERSON.search(x) for x in turns[-1].told) and "Lisbon" not in str(
             turns[-1].prompt), "a visitor replacing Cy within the window gets none of Cy's " \
             "statements or exchanges (D70)"
+        assert ask("Hi, I'm Eve.", frames(5, 1)) == offer("Eve")
         assert ask("Where am I from?", frames(5, 1)) is None and turns[-1].told == []
+        assert ask("Talk to Cy.", cy) == "I am talking to Cy now."
         assert ask("Where am I from?", cy) is None and turns[-1].told == [], \
             "nor does Cy after that new conversation"
 

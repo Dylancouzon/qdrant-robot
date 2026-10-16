@@ -38,7 +38,7 @@ def held(label: str, value: int, track: int = 1, point: int = 7) -> Held:
 
 @pytest.fixture
 def robot(tmp_path, monkeypatch):
-    monkeypatch.setattr(main, "face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     monkeypatch.setattr(main, "SETTLE_S", 0)
     r = open_robot(tmp_path)
     r.recognition.crops = embed

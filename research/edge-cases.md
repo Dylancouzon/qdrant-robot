@@ -2,11 +2,11 @@
 
 ## Next steps
 
-**Servo motor control and voice commands.** Dylan selected this as the next task on 2026-10-16. The current runtime has no motor controller. Begin with the connected hardware, electrical interface, power supply, travel limits, and intended spoken commands. Review the smallest implementation before physical motion. Keep models, memory, consent, and deletion behavior intact.
+**Physical servo qualification.** Shared visitor selection, ownership, following, and left/right inspection pass the [finite-speed simulation](servo.md). The normal runtime keeps motor output disabled. Implement the calibrated serial adapter, then verify mounted direction, travel, cable clearance, power, and stopping. Keep models, memory, consent, and deletion behavior intact.
 
 | Priority | Task | Finish when |
 | --- | --- | --- |
-| Next | Servo motor control and voice commands. | Agreed commands produce bounded, repeatable movement with a stop command and clear failure handling. |
+| Next | Calibrated servo adapter and mounted qualification. | Verify bounded physical movement, stopping, cable clearance, and power behavior. |
 | Parked | General conversation and recent recall. | A changed mechanism improves varied topics while preserving passing privacy, visual, correction, and transfer cases. See [conversation](conversation.md#next-steps). |
 | Parked | Booth acceptance. | Meet the targets and M4 checks in [CLAUDE.md](../CLAUDE.md). Physical latency remains parked under D160. |
 

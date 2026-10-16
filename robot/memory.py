@@ -392,11 +392,13 @@ class Memory:
         self.shard.flush()
         return pid
 
-    def sighting(self, label: str, region: str, seen: float, named: str | None = None) -> int:
+    def sighting(self, label: str, region: str, seen: float, named: str | None = None,
+                 view_angle: float = 0.) -> int:
         """Store a track label, region, time, and matched object point ID (robot/things.py)."""
         pid = self._id()
         self.shard.update(UpdateOperation.upsert_points([Point(pid, {}, {
             "label": label, "region": region, "first_seen": seen, "last_seen": seen,
+            "view_angle": view_angle,
             **({"named": named} if named else {})})]))
         self.shard.flush()
         return pid

@@ -21,6 +21,7 @@ from robot.settings import DEFAULTS, Settings, settings
 from robot.detect import CONFIRM, LOST, Detection, Tracker
 from robot.focus import SMOOTH, Track
 from robot.main import Robot, Turn
+from robot.head import Head
 from robot.memory import CountRequest, Memory, ScrollRequest, UpdateOperation
 from robot.people import DIM as FACE_DIM, NOT_YOU, People
 from robot.recognition import Recognition
@@ -53,6 +54,8 @@ def open_robot(root: Path) -> Robot:
     robot.things = Things(root, robot.people)
     robot.conversation_visitor = OWNER
     robot.conversation_started = True
+    robot.head, robot.head_view = Head(), 0
+    robot.turn_seen, robot.face_track = None, None
     robot.current_visitor = OWNER
     robot._clear_confirmation()
     if robot.things.visitor(OWNER) is None:
@@ -79,6 +82,7 @@ def open_robot(root: Path) -> Robot:
     robot.item_checked = {}
     robot.detecting, robot.detect_failed, robot.history = threading.Lock(), None, []
     robot.worker_failed = None
+    robot.closing = threading.Event()
     robot.looked, robot.held = [], deque(maxlen=main.HISTORY_TURNS)
     robot.delivery = threading.Condition(robot.detecting)
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
@@ -148,8 +152,7 @@ def delete_thing(robot: Robot, owner: str, name: str) -> None:
 
 def test_things(monkeypatch) -> None:
     monkeypatch.setattr(main, "SETTLE_S", 0)  # the test's speech starts after its frames
-    monkeypatch.setattr(main, "face", lambda faces, frame: None)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     with tempfile.TemporaryDirectory() as tmp:
         robot = open_robot(Path(tmp))
         show(robot, [(GOLD, CENTER)])
@@ -252,7 +255,7 @@ def test_things(monkeypatch) -> None:
 
 def test_ignore(monkeypatch) -> None:
     monkeypatch.setattr(main, "SETTLE_S", 0)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     with tempfile.TemporaryDirectory() as tmp:
         robot = open_robot(Path(tmp))
         robot.things.ignore(["chair"], True)  # a stored rule: the UI writes only item rules
@@ -295,8 +298,7 @@ def close_robot(r):
 @pytest.fixture
 def robot(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
-    monkeypatch.setattr(main, "face", lambda faces, frame: None)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     r = open_robot(tmp_path)
     yield r
     close_robot(r)
@@ -329,7 +331,7 @@ def test_text_only_retrieval_and_person_deletion(robot, monkeypatch):
     v = np.eye(TEXT_DIM, dtype=np.float32)[0]
     face = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [face, face], time.time())
-    monkeypatch.setattr(r, "_whois", lambda frame: (face, "Ana"))
+    r.turn_seen = face, "Ana"  # The selected speech-start identity supplies storage links.
     turn = Turn(question="The booth closes at five.")
     r._store(turn, (frame_of(r), time.time()), v, None)
     rows = r.memory.told(v, time.time() + 1)
@@ -457,8 +459,7 @@ def test_legacy_named_recall_filters_before_limit(robot):
 
 def test_ignore_rule_survives_restart_and_object_forget(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
-    monkeypatch.setattr(main, "face", lambda faces, frame: None)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: None)
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [])
     r = open_robot(tmp_path)
     frame_of(r)
     r.focus.focus = next(iter(r.view[1]))
@@ -491,15 +492,16 @@ def test_verified_face_frame_and_anonymous_replacement(robot, monkeypatch):
     v = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [v, v], time.time())
     source = frame_of(r, people=True)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces",
+                        lambda faces, frame: [(v, 100, (500, 100, 600, 200))])
     preview(r)
     newer = frame_of(r, BLACK, people=True)
     frame, screen = r._shown()
     assert frame is source and (500, 100, 600, 200, "Ana", "known") in screen.boxes
     assert not any(b[5] == "person" for b in r.screen[1].boxes)
     assert any(t[2] == "person" for t in r.tracker.scored()), "person tracking stays internal"
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (np.eye(FACE_DIM)[1], 100,
-                                                                  (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda faces, frame: [(np.eye(FACE_DIM)[1], 100,
+                                                                  (500, 100, 600, 200))])
     preview(r)
     assert r.verified[1] is newer and r._shown()[0] is newer
     assert r.verified[3][1][4:] == ("", "other"), "unidentified face stays anonymous"
@@ -527,12 +529,12 @@ def test_completed_face_wakes_delivery_before_crops_and_after_timeout(robot, mon
     def located(*args):
         entered.set()
         assert release.wait(2)
-        return vector, 100, (500, 100, 600, 200)
+        return [(vector, 100, (500, 100, 600, 200))]
     def crop(*args):
         crop_entered.set()
         assert crop_release.wait(2)
         return {}, {}
-    monkeypatch.setattr(main, "located_face", located)
+    monkeypatch.setattr(main, "located_faces", located)
     monkeypatch.setattr(r, "_query_objects", crop)
     worker = threading.Thread(target=lambda: r._preview(*job))
     worker.start()
@@ -584,7 +586,7 @@ def test_nonwaiting_completed_source_phase_and_encoding_margin(robot, monkeypatc
     origin = time.time()
     clock = [origin+.035]
     monkeypatch.setattr(main.time, "time", lambda: clock[0])
-    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vector, 100, (500, 100, 600, 200))])
     first = frame_of(r, people=True)
     clock[0] = origin+.075
     preview(r)
@@ -618,13 +620,13 @@ def test_final_jpeg_validation_rejects_changed_face_authority(robot, monkeypatch
     vector = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [vector, vector], time.time())
     source = frame_of(r, people=True)
-    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vector, 100, (500, 100, 600, 200))])
     preview(r)
     frame, screen = r._shown()
     assert frame is source and any(b[4] == "Ana" for b in screen.boxes)
     if invalid == "negative":
         frame_of(r, BLACK, people=True)
-        monkeypatch.setattr(main, "located_face", lambda *a: None)
+        monkeypatch.setattr(main, "located_faces", lambda *a: [])
         preview(r)
     elif invalid == "gallery":
         r.recognition.epoch += 1
@@ -644,8 +646,8 @@ def test_unidentified_weak_person_gap_cannot_publish_face(robot, monkeypatch, de
     tracks = [Track(*t) for t in r.tracker.scored()]
     weak = [Track(t.id, t.box, t.label, .21 if t.label == "person" else t.score) for t in tracks]
     job = delivery_job(r, source, r.view_taken)
-    monkeypatch.setattr(main, "located_face", lambda *a: (np.eye(FACE_DIM)[0], 100,
-                       (500, 100, 600, 200)) if detected else None)
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(np.eye(FACE_DIM)[0], 100,
+                       (500, 100, 600, 200))] if detected else [])
     frame_of(r, people=False)
     r._preview(source, job[1], weak, *job[3:])
     assert r.verified is None
@@ -656,7 +658,7 @@ def test_fresh_two_person_ambiguity_replaces_known_completion(robot, monkeypatch
     vector = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [vector, vector], time.time())
     source = frame_of(r, people=True)
-    monkeypatch.setattr(main, "located_face", lambda *a: (vector, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vector, 100, (500, 100, 600, 200))])
     preview(r)
     assert r.verified[3][1][4] == "Ana"
     dets = [Detection("person", .9, (200, 50, 610, 700)),
@@ -704,11 +706,11 @@ def test_same_source_known_identity_cannot_change_after_publication(robot, monke
     for index, name in enumerate(("Ana", "Bob")):
         r.people.enroll(name, [vectors[index], vectors[index]], time.time())
     source = frame_of(r, people=True)
-    monkeypatch.setattr(main, "located_face", lambda *a: (vectors[0], 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vectors[0], 100, (500, 100, 600, 200))])
     preview(r)
     _, screen = r._shown()
     assert screen.valid() and r.shown_known
-    monkeypatch.setattr(main, "located_face", lambda *a: (vectors[1], 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vectors[1], 100, (500, 100, 600, 200))])
     preview(r)
     frame, screen = r._shown()
     assert frame is source and any(b[4] == "Bob" for b in screen.boxes)
@@ -736,7 +738,8 @@ def test_verified_and_current_frames_publish_the_same_unknown_focus(robot, monke
     dets.append(Detection("person", .9, (300, 0, 1000, 720)))
     for _ in range(CONFIRM):
         r._track(frame, dets, taken)
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces",
+                        lambda faces, frame: [(v, 100, (500, 100, 600, 200))])
     for _ in range(2):
         r.crop_due.clear()
         preview(r)
@@ -1546,7 +1549,8 @@ def test_face_gap_during_generation_rejects_old_preview(robot, monkeypatch):
     source_time, epoch = r.view_taken, r.recognition.epoch
     tracks = [Track(*t) for t in r.tracker.scored()]
     epochs = {i: r.focus.epoch(i) for i in r.focus.visible}
-    monkeypatch.setattr(main, "located_face", lambda faces, frame: (v, 100, (500, 100, 600, 200)))
+    monkeypatch.setattr(main, "located_faces",
+                        lambda faces, frame: [(v, 100, (500, 100, 600, 200))])
     preview(r)
     r.ui_thinking = True
     frame_of(r, people=False)
@@ -1573,8 +1577,8 @@ def drain_matches(r):
 
 def test_item_ignore_learning_aliases_other_instance_restart_restore(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
-    monkeypatch.setattr(main, "face", lambda f, image: None)
-    monkeypatch.setattr(main, "located_face", lambda f, image: None)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [])
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [])
     r = open_robot(tmp_path)
     try:
         frame_of(r)
@@ -2364,8 +2368,8 @@ def test_face_drawing_filters_exact_source_without_identity_carry(robot, monkeyp
     descriptor = [vector if known else np.eye(FACE_DIM, dtype=np.float32)[1]]
     def locate(faces, frame):
         received.append(frame)
-        return descriptor[0], 100, raw[0]
-    monkeypatch.setattr(main, 'located_face', locate)
+        return [(descriptor[0], 100, raw[0])]
+    monkeypatch.setattr(main, "located_faces", locate)
     first = frame_of(r, people=True)
     preview(r)
     before = r.verified[3][1]
@@ -2393,12 +2397,12 @@ def test_face_drawing_filters_exact_source_without_identity_carry(robot, monkeyp
     assert r.verified[3][1][4:] == (('', 'other') if known else ('Ana', 'known'))
     # A fresh negative completion clears the filter, including anonymous history.
     clock[0] += .067
-    monkeypatch.setattr(main, 'located_face', lambda *a: None)
+    monkeypatch.setattr(main, "located_faces", lambda *a: [])
     frame_of(r, people=True)
     preview(r)
     assert r.verified[3][1:] == (None, None)
     clock[0] += .067
-    monkeypatch.setattr(main, 'located_face', locate)
+    monkeypatch.setattr(main, "located_faces", locate)
     raw[0] = (490, 90, 620, 220)
     frame_of(r, people=True)
     preview(r)
@@ -2446,7 +2450,7 @@ def test_face_drawing_history_resets_on_changed_source_authority(robot, monkeypa
     clock = [time.time()]
     monkeypatch.setattr(main.time, 'time', lambda: clock[0])
     raw = [(500, 100, 600, 200)]
-    monkeypatch.setattr(main, 'located_face', lambda *a: (vector, 100, raw[0]))
+    monkeypatch.setattr(main, "located_faces", lambda *a: [(vector, 100, raw[0])])
     frame_of(r, people=True)
     preview(r)
     assert r.verified[3][1][4:] == ('Ana', 'known')

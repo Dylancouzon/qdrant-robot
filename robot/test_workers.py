@@ -9,6 +9,7 @@ import pytest
 
 from robot import main
 from robot.main import Robot
+from robot.head import Head
 
 
 def bare_robot():
@@ -17,6 +18,7 @@ def bare_robot():
     robot.closing, robot.detecting = threading.Event(), threading.Lock()
     robot.worker_failed, robot.detect_failed = None, None
     robot.asked = 0
+    robot.head, robot.wake_word, robot.last_line = Head(), False, 0.
     return robot
 
 

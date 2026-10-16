@@ -1,0 +1,22 @@
+{
+  "machine": "qdrant-robot",
+  "release": "31866696ff60",
+  "operation": "Read-only status through tools/servo.py",
+  "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+  "servo_register_writes": false,
+  "hardware_motion_requested": false,
+  "dependencies": {"feetech-servo-sdk": "1.0.0", "pyserial": "3.5"},
+  "access": "Added qdrant to the existing dialout group; systemd job confirmed access",
+  "status": {
+    "id": 1,
+    "position": 853,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 27,
+    "fault": 0,
+    "moving": 0
+  },
+  "passed": true,
+  "limits": "Readback does not establish forward position, mounted limits, or loaded performance"
+}

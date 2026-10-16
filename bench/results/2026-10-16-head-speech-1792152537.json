@@ -1,0 +1,81 @@
+{
+  "machine": "dylans-macbook-pro.tail04131.ts.net",
+  "source_release": "6ff84b1df3ce",
+  "mode": "Independent Mac Parakeet transcription of saved Jetson Kokoro WAVs",
+  "max_wer": 0.35,
+  "rows": [
+    {
+      "question": "Remember me, my name is Dylan.",
+      "answer": "May I remember your face, Dylan? Please say yes or no.",
+      "heard": "May I remember your face, Dylan? Please say yes or no.",
+      "wer": 0.0,
+      "duration_s": 3.802,
+      "passed": true
+    },
+    {
+      "question": "Yes.",
+      "answer": "Thank you, Dylan. I will remember your face.",
+      "heard": "Thank you, Dylan. I will remember your face.",
+      "wer": 0.0,
+      "duration_s": 3.35,
+      "passed": true
+    },
+    {
+      "question": "My name is Sam.",
+      "answer": "Nice to meet you, Sam! Want me to remember your face so I recognize you next time?",
+      "heard": "Nice to meet you, Sam, want me to remember your face so I recognize you next time.",
+      "wer": 0.0,
+      "duration_s": 5.568666666666667,
+      "passed": true
+    },
+    {
+      "question": "Yes.",
+      "answer": "Thank you, Sam. I will remember your face.",
+      "heard": "Thank you, Sam. I will remember your face.",
+      "wer": 0.0,
+      "duration_s": 3.3386666666666667,
+      "passed": true
+    },
+    {
+      "question": "Talk to Sam.",
+      "answer": "I am talking to Sam now.",
+      "heard": "I am talking to Sam now.",
+      "wer": 0.0,
+      "duration_s": 1.6672916666666666,
+      "passed": true
+    },
+    {
+      "question": "What is on your right?",
+      "answer": "I see stop sign.",
+      "heard": "I see stop sign.",
+      "wer": 0.0,
+      "duration_s": 1.4112916666666666,
+      "passed": true
+    },
+    {
+      "question": "What is on your left?",
+      "answer": "I see cat.",
+      "heard": "I see cat.",
+      "wer": 0.0,
+      "duration_s": 1.1066666666666667,
+      "passed": true
+    },
+    {
+      "question": "Forget me.",
+      "answer": "Should I forget everything about you, Sam? Say yes or no.",
+      "heard": "Should I forget everything about you, Sam, say yes or no?",
+      "wer": 0.0,
+      "duration_s": 3.941333333333333,
+      "passed": true
+    },
+    {
+      "question": "Yes.",
+      "answer": "Done, Sam. I have forgotten your face.",
+      "heard": "Done Sam. I have forgotten your face.",
+      "wer": 0.0,
+      "duration_s": 2.667333333333333,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

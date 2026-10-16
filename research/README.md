@@ -8,6 +8,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Operating rules, reviews, evaluation, deployment, and recovery | [Workflow](workflow.md) |
 | Previous experiments and failure pitfalls | [Lessons index](lessons.md) |
 | Servo work, parked tasks, and known gaps | [Remaining work](edge-cases.md#next-steps) |
+| Shared active visitor and bounded head movement | [Head control](servo.md) |
 | Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md) |
 | Monitor, audio controls, and session lifecycle | [Robot interface](mac-audio-interface.md) |
 | Focus, overlays, and visitor interaction | [Booth behavior](booth-ux.md) |

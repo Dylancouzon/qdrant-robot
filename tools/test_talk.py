@@ -289,7 +289,7 @@ def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
     assert all("test-only-secret" not in arg for arg in args)
 
 
-@pytest.mark.parametrize("path", ["/ignore", "/mute", "/volume", "/settings",
+@pytest.mark.parametrize("path", ["/ignore", "/mute", "/volume", "/settings", "/stop_head",
                                   "/forget_object", "/remove_view"])
 def test_item_proxy_requires_cookie_and_forwards_bounded_body(path):
     from email.message import Message

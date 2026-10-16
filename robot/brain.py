@@ -92,6 +92,11 @@ def jpeg(frame: np.ndarray) -> dict:
     return {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + data.decode()}}
 
 
+def caption_messages(image: dict) -> list[dict]:
+    """The source image alone supplies a visual description, without conversation or persona."""
+    return [{"role": "user", "content": [image, {"type": "text", "text": CAPTION}]}]
+
+
 def sentences(text: str) -> int:
     """Finished statements of at least MIN_WORDS words; shorter ones ("Of course!") and
     questions (a joke's setup) do not count, so an answer can follow them."""
@@ -217,7 +222,7 @@ class Brain:
     def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
         """Describe one frame from the frame alone (no persona, no conversation), so a memory
         is evidence of what was seen; None if `stop` interrupts it."""
-        msgs = [{"role": "user", "content": [image, {"type": "text", "text": CAPTION}]}]
+        msgs = caption_messages(image)
         text = ""
         for delta in self.answer(msgs, max_tokens=48):
             if stop():

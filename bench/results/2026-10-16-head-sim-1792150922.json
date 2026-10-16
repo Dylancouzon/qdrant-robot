@@ -1,0 +1,614 @@
+{
+  "machine": "qdrant-robot",
+  "python": "3.12.3",
+  "release": "a2fc6edadf08",
+  "input": "oracle text; rotating development photo panorama",
+  "motor": "simulated, 20 degrees/s, +/-70 degrees",
+  "hardware_motion": false,
+  "tegrastats": "head-sim-trace-20261016-074202.tegrastats",
+  "status": "failed",
+  "following_diagnostics": {
+    "counts": {
+      "preview": 432,
+      "expired at preview": 0,
+      "unrecognized visitor": 88,
+      "conversation": 14,
+      "microphone suppressed": 1,
+      "face/person association": 324
+    },
+    "samples": [
+      {
+        "age_ms": 83.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 79.9,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 77.0,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 75.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 69.3,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.8,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.4,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.9,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 71.3,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 73.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.4,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 69.5,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 76.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 74.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 73.3,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 71.0,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.7,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.8,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.4,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.0,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 71.0,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.8,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 71.2,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 69.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 70.0,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.9,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.6,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": true,
+          "error": "",
+          "generation": 2,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      },
+      {
+        "age_ms": 72.1,
+        "name": "Sam",
+        "reason": "face/person association",
+        "head": {
+          "angle": 0.0,
+          "goal": 0.0,
+          "moving": false,
+          "halt": true,
+          "paused": false,
+          "inspecting": false,
+          "following": false,
+          "error": "",
+          "generation": 3,
+          "settled": 1792150939.1169772
+        },
+        "tracks": []
+      }
+    ]
+  },
+  "error": "RuntimeError: Timed out: following moves toward selected Sam",
+  "final_head": {
+    "angle": 0.0,
+    "goal": 0.0,
+    "moving": false,
+    "halt": false,
+    "paused": false,
+    "inspecting": false,
+    "following": true,
+    "error": "",
+    "generation": 2,
+    "settled": 1792150939.1169772
+  },
+  "goals": [
+    0.0
+  ]
+}
