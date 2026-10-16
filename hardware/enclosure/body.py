@@ -1102,12 +1102,19 @@ def check_panel_removal(parts):
     return {"panel_pull_out_steps_mm": "0 to 40, 2 mm", "max_overlap_mm3": worst}
 
 
+# The skirt's ends follow the slanted window edge, so their outer corners are acute wedges that
+# sample at 1.87 mm about 1 mm in from the corner. Squaring them would open a gap in the outer wall.
+THIN_OK = {"Required/White/base-plate": (2.0, 1.8)}  # part: (thin mm2, min thickness mm) allowed
+
+
 def run_printcheck(meshes):
     with ProcessPoolExecutor() as pool:
         futures = {n: pool.submit(printcheck.analyze, m) for n, m in meshes.items()}
         rows = {n: f.result() for n, f in futures.items()}
     for n, r in rows.items():
-        assert r["floating_islands"] == 0 and r["thin_mm2"] == 0, (n, r)
+        thin_ok, min_ok = THIN_OK.get(n, (0.0, 2.0))
+        assert r["floating_islands"] == 0 and r["thin_mm2"] <= thin_ok, (n, r)
+        assert r["min_thickness_mm"] >= min_ok, (n, r)
     return rows
 
 

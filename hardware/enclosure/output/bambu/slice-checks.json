@@ -5,19 +5,19 @@
       "project": "output/bambu/Test pieces/Test pieces.3mf",
       "plate": 1,
       "name": "Test pieces: fit plate and Jetson slot",
-      "sha256": "010bf27f3eba48a28c3b2d6fc150fbf8a5c7e026cfa5d9ee6864835c07fba2ce",
-      "seconds": 1605.7408447265625,
-      "grams": 11.782649993896484,
+      "sha256": "dc2f353687471d0a6f1a6e8c55b03403d7fd874a9778d38133d1f6bb6a040d8a",
+      "seconds": 1562.715576171875,
+      "grams": 11.715042114257812,
       "parts": {
         "fit-test-plate": [
-          42.8,
-          53.4,
+          43.0,
+          53.5,
           11.2
         ],
         "slot-test-piece": [
           40.4,
           13.0,
-          9.9
+          9.7
         ]
       }
     },
@@ -25,9 +25,9 @@
       "project": "output/bambu/White.3mf",
       "plate": 1,
       "name": "White 1: body shell and port panel",
-      "sha256": "fedd886543733d7a44b037c3e9f71d59b91e1b4b0a741d70af72bc287686eb12",
-      "seconds": 24275.318359375,
-      "grams": 251.86660766601562,
+      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
+      "seconds": 24266.716796875,
+      "grams": 251.8656768798828,
       "parts": {
         "body-shell": [
           148.6,
@@ -45,9 +45,9 @@
       "project": "output/bambu/White.3mf",
       "plate": 2,
       "name": "White 2: base plate and head shell",
-      "sha256": "fedd886543733d7a44b037c3e9f71d59b91e1b4b0a741d70af72bc287686eb12",
-      "seconds": 12813.435546875,
-      "grams": 176.71267700195312,
+      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
+      "seconds": 12861.083984375,
+      "grams": 176.4818572998047,
       "parts": {
         "base-plate": [
           143.2,
@@ -65,9 +65,9 @@
       "project": "output/bambu/Black.3mf",
       "plate": 1,
       "name": "Black: visor, speaker grille, neck hub, head shaft and horn disc",
-      "sha256": "abae580b951566e877f0ed7408ba6d8d3aae338f77d4026bc905f0d1d190ae6d",
-      "seconds": 8093.07275390625,
-      "grams": 60.51371765136719,
+      "sha256": "5491052195d1f14800049dd9982a807eeb2455171d70d62602c8bf733c2feb74",
+      "seconds": 8066.49560546875,
+      "grams": 60.46727752685547,
       "parts": {
         "visor": [
           112.0,

@@ -28,7 +28,7 @@
   "head visor retention": "two M3 x 8 screws up through the floor lip into nut slots in two visor tabs; the spigot ring locates the visor; no flexing part",
   "head second eye": "22 mm circle groove at X 22, 1.2 wide, 0.6 deep: 28 mm from camera",
   "head camera view": "100 deg cone from the lens front clears visor, shell, and shaft; lens tip 0.5 mm behind the visor face, opening 19.0 mm",
-  "head camera mount": "4 M2 x 8 screws into 7 mm posts with 1.9 mm pilots, 33.76 mm square; board center Y -15.7, 11.7 mm in front of the geometry.py position (X and Z unchanged)",
+  "head camera mount": "4 M2 x 8 screws into 7 mm posts with 2.1 mm pilots, 34.00 mm square; board center Y -15.7, 11.7 mm in front of the geometry.py position (X and Z unchanged)",
   "head cable hole": "17 x 10 mm through the floor at (22.6, 22.6), 1 mm of floor all round the 1 mm flare on the underside; it replaces the old rear slot",
   "head envelope": "116 x 80 x 56 mm; 444 mm3 of the shell lies outside the approved head (the rear chamfer)",
   "head sections": {
@@ -66,13 +66,13 @@
    "island_max_z_mm": null,
    "thin_mm2": 0.0,
    "min_thickness_mm": 2.4,
-   "volume_mm3": 22532,
+   "volume_mm3": 22510,
    "bbox_mm": [
     112.0,
     52.0,
     23.5
    ],
-   "face_count": 9092,
+   "face_count": 9096,
    "file": "enclosure/output/print/Required/Black/visor.stl"
   },
   "hub": {

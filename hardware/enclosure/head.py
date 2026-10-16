@@ -39,9 +39,10 @@ REAR_CHAMFER = (2.93, 2.83)  # 46 degrees: tangent to the approved 5 mm rear fil
 FLOOR_CB_DEPTH = 3.0
 CAMERA_XZ = (-24.0, HEAD_CZ)  # camera position in geometry.py
 BOARD, BOARD_T, LENS_D, LENS_L = 38.0, 1.6, 15.0, 23.0
-# Camera holes sit 3 mm from each board corner along the diagonal (Dylan, test piece 2026-10-15).
-STANDOFF_PITCH = BOARD - 2 * 3.0 / sqrt(2)  # 33.76 mm square
-PILOT_D = 1.9  # M2 pilot; 1.7 printed too small on the test piece
+# Camera holes: Arducam lists a 34 x 34 mm pattern for the B0200, and it fit the test piece after
+# 32.3 and 33.76 missed (Dylan, 2026-10-15).
+STANDOFF_PITCH = 34.0
+PILOT_D = 2.1  # M2 pilot that fit the test piece; 1.7 and 1.9 printed too tight
 VISOR_T, LENS_RECESS, LENS_HOLE_D = 3.0, 0.5, 19.0
 LENS_TIP_Y = FRONT_Y + LENS_RECESS
 BOARD_FRONT_Y = LENS_TIP_Y + LENS_L

@@ -43,13 +43,13 @@ Nine printed parts. Fasteners are M3 screws into hex-nut pockets, and M2 screws 
 
 The shell drops over the populated base plate. Four M3 screws pass up through the base plate into nut pockets in the shell's corner bosses. The shell's cut edge gets a flat seat, at least 3 mm wide, where the base plate sits. This seat replaces the knife edge that causes A1's thin area in the study.
 
-Everything on the base plate must pass straight up through the 131.7 × 110.3 mm opening and fit inside the tapering cavity. The builder checks this as a vertical sweep of every component and pocket. The Jetson stands on edge in a pocket, and its ports face the port panel. Plugs go in through the port panel after the shell is closed. The servo lead runs to the bus board with enough slack to lift the shell 60 mm before you unplug it.
+Everything on the base plate must pass straight up through the 131.7 × 110.3 mm opening and fit inside the tapering cavity. The builder checks this as a vertical sweep of every component and pocket. The Jetson stands on edge in a pocket, and its ports face the port panel. Internal cables connect before the shell closes; only the power cable leaves through the port window. The servo lead runs to the bus board with enough slack to lift the shell 60 mm before you unplug it.
 
 ### Neck joint
 
 - **Hub:** it sits on the roof between Z 160 and Z 178. Three M3 screws pass down through the hub into nut pockets under the roof. The bore has a central inner shoulder that touches only the outer races. The upper bearing presses down onto the shoulder, and the lower bearing presses up onto it.
 - **Shaft:** a 14.9 mm journal passes through both bearings. Its top flange rests on the upper bearing's inner race through a narrow ring that touches only the inner race, so the bearings carry the head's weight. A square boss on the horn disc fits a socket in the shaft's lower end. The shaft length leaves 0.5 mm of axial play, so no screw can clamp the bearings.
-- **Horn disc:** it is 31 mm across, so it fits through the 32.4 mm roof opening. Four M3 screws fix it to the servo horn (14 mm square pattern, U). One M3 screw runs from the top of the flange down the shaft's center into a nut under the disc. This screw pulls the disc against the shaft's end face, not against a bearing.
+- **Horn disc:** it is 31 mm across, so it fits through the 32.4 mm roof opening. Four M3 screws fix it to the servo horn (9.9 mm square, on a 14 mm circle, U). One M3 screw runs from the top of the flange down the shaft's center into a nut under the disc. This screw pulls the disc against the shaft's end face, not against a bearing.
 - **Servo:** it hangs from the horn disc inside a pocket under the roof. The pocket's two long walls stop it from turning, and 1 mm of vertical clearance keeps the head load off the servo. It needs no strap: the shaft holds it.
 - **Stops:** a slot under the flange meets a post on top of the hub at ±80°.
 - **Head:** two M3 screws pass down through the head floor into nut pockets in the flange. You reach them through the front opening with the visor removed.
@@ -68,7 +68,7 @@ Service is the same steps in reverse.
 
 ### Head and camera
 
-The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (33.76 mm square). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a 17 × 10 mm hole in the head floor, crosses the neck gap behind the hub, and enters the body through a matching roof hole. A 30 × 30 × 30 mm slack loop inside the body absorbs the ±80° turn, and the Jetson plug space below it leads to a USB port. The horn disc holds its nut with two 0.4 mm lips at the pocket mouth.
+The head is one white shell, open at the front. The visor closes the front and carries the camera on four M2 screws (34 mm square). Clearance checks use the measured camera: a 38 × 38 mm board, a lens holder 15 mm across and 23 mm tall, a 6 mm heatsink, and a 4 mm connector. The camera cable leaves through a 17 × 10 mm hole in the head floor, crosses the neck gap behind the hub, and enters the body through a matching roof hole. A 30 × 30 × 30 mm slack loop inside the body absorbs the ±80° turn, and the Jetson plug space below it leads to a USB port. The horn disc holds its nut with two 0.4 mm lips at the pocket mouth.
 
 ## Measured alternatives
 
@@ -81,7 +81,7 @@ The head is one white shell, open at the front. The visor closes the front and c
 | B: upright shell plus roof lid | 2 | 9 | 0 | 2.0 mm |
 | C: front and rear halves, as in Concept A | 2 | 15,992 | 0 | 0 mm |
 
-The design gate preferred B because the study shell A1 shows 617 mm² of thin surface. That thin area is the knife edge left where the cut crosses the 46° roll. The 3 mm flat seat removes it, while B would add a lid seam and its fasteners. Choose A1. Its open bottom is cut at Z 8.9, where the inner base roll reaches 46°. The opening is 131.7 × 110.3 mm, and the base plate covers the 140.0 × 118.6 mm outer edge.
+The design gate preferred B because the study shell A1 shows 617 mm² of thin surface. That thin area is the knife edge left where the cut crosses the 46° roll. The 3 mm flat seat removes it, while B would add a lid seam and its fasteners. Choose A1. Its open bottom is cut at Z 7.6 (`CUT_Z` in `body.py`). The opening is 131.7 × 110.3 mm, and the base plate covers the 140.0 × 118.6 mm outer edge.
 
 | Servo drive | Minimum clearance | Closest |
 | --- | --- | --- |
@@ -94,7 +94,7 @@ Choose A. It removes both gears and the gear mount. In print orientation, the se
 ## Acceptance
 
 - Required printed parts: nine, down from 38.
-- `printcheck.py`: zero floating islands and zero thin area under 2 mm on every required part. The checker skips a 1 mm band along sharp edges, except on parts that are mostly edges. Total overhang under 10% of the Concept A baseline (3,489 mm²) in `hardware/printcheck-baseline.json`. Each remaining exception is named.
+- `printcheck.py`: zero floating islands and zero thin area under 2 mm on every required part. The checker skips a 1 mm band along sharp edges, except on parts that are mostly edges. Total overhang under 10% of the Concept A baseline (3,489 mm²) in `hardware/printcheck-baseline.json`. Each remaining exception is named: `base-plate` keeps 1 mm² at 1.87 mm on the acute end of the port skirt (`THIN_OK` in `body.py`).
 - Every Concept A clearance check that applies still passes: hardware and reservations, plug access, fan and outlet paths, camera focus travel, microphone holes, and the head through ±80°. The vertical sweep of the populated base plate through the opening also passes.
 - All parts slice in Bambu Studio on the P1S with 0.4 mm nozzle, PLA, 0.2 mm layers.
 - Test pieces print first: one M3 nut pocket and screw boss, one catch, the hub with its bearing seats, and the horn disc on the horn.

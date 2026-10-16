@@ -259,8 +259,8 @@
  "pockets": {
   "wall_to_part_mm": {
    "jetson slot back wall / Jetson tray strip": 0.5,
-   "jetson slot wall - / Jetson tray strip": 0.1,
-   "jetson slot wall + / Jetson tray strip": 0.1,
+   "jetson slot wall - / Jetson tray strip": 0.3,
+   "jetson slot wall + / Jetson tray strip": 0.3,
    "jetson back wall / Jetson tray and board": 1.0,
    "jetson back wall / Bus board": 2.0,
    "jetson rim / Jetson tray and board": 1.0,
@@ -280,7 +280,7 @@
   "max_overlap_mm3": 0.0
  },
  "jetson_slot": {
-  "slot_width_mm": 6.2,
+  "slot_width_mm": 6.6,
   "slot_grip_mm": 6.0,
   "strip_mm_thick_deep": [
    6.0,
@@ -360,9 +360,9 @@
    "floating_islands": 0,
    "island_max_mm2": 0.0,
    "island_max_z_mm": null,
-   "thin_mm2": 0.0,
-   "min_thickness_mm": 2.4,
-   "volume_mm3": 147456,
+   "thin_mm2": 1.0,
+   "min_thickness_mm": 1.87,
+   "volume_mm3": 147246,
    "bbox_mm": [
     143.2,
     116.5,
@@ -404,5 +404,5 @@
   }
  },
  "printcheck_total_overhang_mm2": 519.0,
- "runtime_s": 161.0
+ "runtime_s": 177.4
 }
