@@ -1,0 +1,369 @@
+diff --git a/eval/replay.py b/eval/replay.py
+index f14c152..187f234 100644
+--- a/eval/replay.py
++++ b/eval/replay.py
+@@ -91,15 +91,15 @@ def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> di
+     want = [frames.get(k, Shown(set(), None, 0.0)) for k in step.get("evidence", [])]
+     row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
+            "heard": " | ".join(t.question for t in turns), "split": len(turns),
+-           "evidence_ok": all(said in turn.told if said else
+-                               bool(ids & set(turn.memories)) or
+-                               (looked and turn.selected == looked and turn.delivered)
++           "evidence_ok": all(bool(ids & set(turn.exchanges)) or
++                               (said in turn.told if said else bool(ids & set(turn.memories)) or
++                                (looked and turn.selected == looked and turn.delivered))
+                                for ids, said, looked in want)
+                            if want else None,
+            "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
+            "selected": turn.selected, "caption": turn.caption, "caption_s": turn.caption_s,
+            "delivered": turn.delivered, "kind": turn.kind, "verbatim": turn.verbatim,
+-           "told": turn.told,
++           "told": turn.told, "exchanges": turn.exchanges,
+            "prompt": turn.prompt,
+            "line_s": turn.line - turn.speech_end,
+            "asr_s": turn.transcribed - turn.speech_end,
+diff --git a/robot/brain.py b/robot/brain.py
+index 29bfe89..9679323 100644
+--- a/robot/brain.py
++++ b/robot/brain.py
+@@ -42,6 +42,7 @@ MODEL = "qwen3vl-2b"
+ _SENTENCE = re.compile(r"[^.!?]+[.!?](?=\s|$)")
+ IMAGE_WIDTH = 672   # frames are downscaled before encoding; the server caps tokens anyway
+ MAX_TOKENS = 64
++CONTEXT = 2048
+ MAX_SENTENCES = 1   # one sentence: second sentences were where hedges and stale details crept in
+ MIN_WORDS = 6       # shorter sentences ("Of course!", "I see it now.") do not count
+ SYSTEM = (
+@@ -79,7 +80,8 @@ def server_args(model: str) -> list[str]:
+     # Memory (bench/memory_budget.py): prompts stay under about 1,000 tokens, so 2,048 of
+     # context; no host-RAM prompt cache (8 GiB by default, it pushed the robot into swap).
+     return [str(SERVER), "-m", str(GGUF / weights), "-mm", str(GGUF / mmproj), "-ngl", "99",
+-            "-fa", "on", "-c", "2048", "-ub", "256", "--cache-ram", "0", "-np", "1", "--jinja",
++            "-fa", "on", "-c", str(CONTEXT), "-ub", "256", "--cache-ram", "0", "-np", "1",
++            "--jinja",
+             "--image-max-tokens", "256", "--reasoning", "off", "--host", "127.0.0.1",
+             "--port", URL.rsplit(":", 1)[1], *extra]
+ 
+diff --git a/robot/main.py b/robot/main.py
+index c6e5cfe..10e98ee 100644
+--- a/robot/main.py
++++ b/robot/main.py
+@@ -177,6 +177,7 @@ class Turn:
+     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
+     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
+     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
++    exchanges: list[int] = field(default_factory=list)  # quoted dialogue, never visual evidence
+     prompt: list = field(default_factory=list)  # the brain's messages without images or system
+     frame_id: int = 0             # this turn's text memory point
+     looked: float = 0.0           # capture time of the frame this turn looked at
+@@ -1275,8 +1276,6 @@ class Robot:
+         track = self._visitor()
+         held = self._hold(turn)
+         recalled_answer = self._code_answer(turn, now, track, look, recalled, memories, held)
+-        turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
+-        turn.retrieved = time.time()
+         self.last_frame, self.last_objects, turn.looked = look.frame, look.objects, look.taken
+         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
+         # points at the present; never for small talk or knowledge (it pulled answers to the room).
+@@ -1285,6 +1284,10 @@ class Robot:
+         image = look.image if sees else None
+         msgs = brain.messages(look.history, image, memories, turn.facts,
+                               turn.question, look.changed, past, told)
++        self._dialogue(turn, look.history, msgs,
++                       past and image is None and not recalled_answer and not turn.verbatim)
++        turn.ui_evidence = self._evidence(turn) if turn.keep and not self.hiding else []
++        turn.retrieved = time.time()
+         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
+         turn.prompt = [{**m, "content": [c for c in m["content"] if c.get("type") == "text"]}
+                        if isinstance(m["content"], list) else m
+@@ -1343,6 +1346,47 @@ class Robot:
+                 if not mentions(m["said"], self.ignored) and (
+                     not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
+ 
++    def _dialogue(self, turn: Turn, history: list[dict], msgs: list[dict], eligible: bool) -> None:
++        """Add bounded, source-checked quotations for a generated past answer without an image."""
++        if not eligible:
++            return
++        rows = self.memory.exchanges(turn.visitor, self.since, turn.speech_start)
++        points = {p["id"] for p in self.memory.points([
++            pid for row in rows for pid in row.get("evidence", {}).get("points", [])])}
++        visible = self.things.visual_links(self.ignored)
++        chosen, lines = [], []
++        header = brain.EVIDENCE + "Conversation memories (quoted dialogue, not observations):\n"
++        for row in rows:
++            evidence = row.get("evidence", {})
++            if not set(evidence.get("points", [])) <= points or not set(
++                    evidence.get("objects", [])) <= visible.keys():
++                continue
++            if mentions(row["said"] + " " + row["answer"], self.ignored):
++                continue
++            pair = [{"role": "user", "content": row["said"]},
++                    {"role": "assistant", "content": row["answer"]}]
++            if any(history[i:i + 2] == pair for i in range(len(history) - 1)):
++                continue
++            line = (f"Exchange {row['id']}, {brain.age(turn.speech_start - row['ts'])}: "
++                    f"visitor said {json.dumps(row['said'])}; "
++                    f"robot replied {json.dumps(row['answer'])}.")
++            text = header + "\n".join([line, *lines]) + "\n\n"
++            if self.brain.tokens(text) > 384:
++                continue
++            content = [{"type": "text", "text": text + msgs[-1]["content"][-1]["text"]}]
++            candidate = [*msgs[:-1], {**msgs[-1], "content": content}]
++            # JSON deliberately overcounts role/field labels; reserve chat markers and output.
++            if self.brain.tokens(json.dumps(candidate)) + brain.MAX_TOKENS + 128 > brain.CONTEXT:
++                continue
++            chosen.append(row["id"])
++            lines.insert(0, line)
++            if len(chosen) == 6:
++                break
++        if chosen:
++            msgs[-1]["content"][-1]["text"] = (
++                header + "\n".join(lines) + "\n\n" + msgs[-1]["content"][-1]["text"])
++            turn.exchanges = chosen[::-1]
++
+     def _store(self, turn: Turn, shot: tuple[np.ndarray, float],
+                statement: np.ndarray | None, track: int | None) -> bool:
+         """Remember conversation text, linked to the enrolled person in the speech-start frame.
+@@ -1357,8 +1401,16 @@ class Robot:
+         if self._hidden(seen, track):
+             return False
+         self._hear_name(turn)
++        sources = self.memory.points([*turn.memories, *turn.exchanges])
++        ids = {p["id"] for p in sources}
++        objects = {p["named"] for p in sources if p.get("named")}
++        objects.update(ident for p in sources for ident in p.get("evidence", {}).get("objects", []))
++        objects.update(str(row.id) for row in self.things.objects()
++                       if ids.intersection(row.payload["turns"]))
+         pid = turn.frame_id = self.memory.add(
+-            None, turn.question, statement, taken, visitor=turn.visitor)
++            None, turn.question, statement, taken, visitor=turn.visitor, answer=turn.answer,
++            evidence={"points": sorted(ids), "objects": sorted(objects),
++                      "facts": turn.facts, "statements": turn.told})
+         if turn.named:
+             self.things.link(turn.named, pid)  # "forget my phone" deletes it
+         if seen and seen[1]:
+@@ -1555,6 +1607,7 @@ class Robot:
+                 self.memory.forget(person.get("linked", []))
+             for row in rows:
+                 self.memory.forget_named(str(row.id))
++                self.memory.forget_dialogue(str(row.id))
+             self.things.remove_thumbnails([
+                 view["thumbnail"] for row in rows for view in row.payload["views"]])
+             self.recognition.call(lambda f, c: self.things.forget_visitor(visitor), mutate=True)
+@@ -1995,6 +2048,7 @@ class Robot:
+             self.candidate = self.confirming = None
+         self.memory.forget(named["turns"])
+         self.memory.forget_named(named["id"])
++        self.memory.forget_dialogue(named["id"])
+         self.things.forget(named["id"])
+         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}
+         with self.detecting:
+@@ -2012,7 +2066,9 @@ class Robot:
+         self.held.clear()
+         for turn in [*self.ui_turns, self.ui_turn]:
+             if turn is not None:
+-                turn.ui_evidence = [m for m in turn.ui_evidence if m.get("object") != ident]
++                turn.ui_evidence = [m for m in turn.ui_evidence
++                                    if m.get("object") != ident
++                                    and ident not in m.get("objects", [])]
+         self.panel = None
+ 
+     def named_evidence(self, turn: Turn, named: dict, this: bool = False
+@@ -2143,7 +2199,12 @@ class Robot:
+                 summaries["session"] = {"label": "Session caption", "text": look.caption,
+                                         "source": "Generated caption in this conversation",
+                                         "time": look.taken}
+-        return list(summaries.values())
++        return [*summaries.values(), *[
++            {"id": row["id"], "label": "Generated dialogue",
++             "text": f"Visitor: {row['said']} Robot: {row['answer']}",
++             "source": "Generated dialogue", "time": row["ts"],
++             "objects": row.get("evidence", {}).get("objects", [])}
++            for row in self.memory.points(turn.exchanges)]]
+ 
+     def _sighted(self, turn: Turn) -> str | None:
+         """The answer to a sighting question from the sightings and the tracks in view now, or
+diff --git a/robot/memory.py b/robot/memory.py
+index 3145ddc..4231c46 100644
+--- a/robot/memory.py
++++ b/robot/memory.py
+@@ -466,6 +466,23 @@ class Memory:
+             filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before))])))
+         return [{**self._row(h), "score": h.score} for h in hits]
+ 
++    def exchanges(self, visitor: str, since: int, before: float, n: int = 10) -> list[dict]:
++        """Recent complete dialogue for this visitor, after the conversation's point-ID boundary."""
++        if not visitor:
++            return []
++        hits = self.shard.query(QueryRequest(
++            limit=n, query=OrderBy("ts", Direction.Desc), with_payload=True,
++            filter=Filter(must=[FieldCondition(key="visitor", match=MatchValue(visitor)),
++                                FieldCondition(key="ts", range=RangeFloat(lt=before)),
++                                FieldCondition(key="answer", is_empty=False)])))
++        return [self._row(h) for h in hits if h.id > since and h.payload.get("answer")]
++
++    def forget_dialogue(self, ident: str) -> None:
++        """Delete dialogue derived from an object, without adding it to visual evidence links."""
++        while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
++                must=[FieldCondition(key="evidence.objects", match=MatchValue(ident))])))[0]:
++            self.forget([row.id for row in rows])
++
+     def recent(self, before: float, n: int = 3,
+                selected: dict[str, list[int]] | None = None, skip: Collection[str] = ()
+                ) -> list[dict]:
+diff --git a/robot/test_sightings.py b/robot/test_sightings.py
+index b85b61b..a331ff7 100644
+--- a/robot/test_sightings.py
++++ b/robot/test_sightings.py
+@@ -200,7 +200,8 @@ def test_earlier_frame(monkeypatch, tmp_path) -> None:
+         captioned.append(things[url(image)])
+         return None if broken else f"Main object: {things[url(image)]}. Around it: a wall."
+ 
+-    robot.brain = Stub(prefill=lambda m: None, answer=answer, caption=caption)
++    robot.brain = Stub(prefill=lambda m: None, answer=answer, caption=caption,
++                       tokens=lambda text: len(text.split()))
+     robot.voice = Stub(say=lambda text: np.zeros(160, np.float32))
+     robot.speaker = Stub(play=lambda pcm: None)
+     clock = iter(range(int(time.time()), int(time.time()) + 10_000))
+diff --git a/robot/test_dialogue.py b/robot/test_dialogue.py
+new file mode 100644
+index 0000000..031bebb
+--- /dev/null
++++ b/robot/test_dialogue.py
+@@ -0,0 +1,136 @@
++"""Quoted exchanges use existing Edge points, visitor boundaries, and deletion paths."""
++import json
++import time
++from types import SimpleNamespace as Stub
++
++import numpy as np
++import pytest
++
++from robot import brain
++from robot.main import Turn
++from robot.memory import CountRequest, Memory
++from robot.test_things import OWNER, close_robot, open_robot, thumbnail_crops
++from robot.things import DIM
++
++
++@pytest.fixture
++def robot(tmp_path, monkeypatch):
++    r = open_robot(tmp_path)
++    r.brain = Stub(tokens=lambda text: len(text.split()))
++    monkeypatch.setattr(r, "_whois", lambda *args: None)
++    yield r
++    close_robot(r)
++
++
++def recall(r, history=(), **fields):
++    turn = Turn(question="What did we discuss?", visitor=OWNER,
++                speech_start=time.time() + 1, **fields)
++    msgs = brain.messages(list(history), None, question=turn.question, past=True)
++    r._dialogue(turn, list(history), msgs, True)
++    return turn, msgs
++
++
++def test_exchange_scope_old_points_and_restart(tmp_path):
++    m = Memory(tmp_path)
++    old = m.add(None, "Old session", ts=10, visitor=OWNER, answer="Old reply")
++    current = m.add(None, "Which city?", ts=11, visitor=OWNER, answer="Tokyo")
++    m.add(None, "Other visitor", ts=12, visitor="other", answer="Private")
++    m.add(None, "Legacy statement", ts=13, visitor=OWNER)
++    m.add(None, "Future turn", ts=30, visitor=OWNER, answer="Future")
++    assert [p["id"] for p in m.exchanges(OWNER, old, 20)] == [current]
++    m.shard.close()
++    m = Memory(tmp_path)
++    assert [p["id"] for p in m.exchanges(OWNER, old, 20)] == [current]
++    assert m.exchanges(OWNER, time.time_ns() // 1000, 20) == []
++    assert m.exchanges("", 0, 20) == []
++    m.shard.close()
++
++
++def test_store_keeps_reply_on_one_existing_point_and_forget_me_removes_it(robot):
++    r = robot
++    turn = Turn(question="Which city is Japan's capital?", answer="Tokyo.",
++                visitor=OWNER, facts=["A supplied fact"])
++    assert r._store(turn, (np.zeros((9, 9, 3), np.uint8), time.time()), None, None)
++    assert r.memory.shard.count(CountRequest()) == 1
++    [row] = r.memory.exchanges(OWNER, 0, time.time() + 1)
++    assert row["answer"] == "Tokyo." and row["evidence"]["facts"] == turn.facts
++    assert "frame" not in row and not list(r.memory.frames.iterdir())
++    assert r._forget(None, None, None, OWNER)
++    assert r.memory.points([turn.frame_id]) == []
++
++
++@pytest.mark.parametrize("hidden", [False, True])
++def test_hidden_or_deleted_turn_stores_no_reply(robot, hidden):
++    robot.hiding = (None, time.time()) if hidden else None
++    turn = Turn(question="Private", answer="Private reply", visitor=OWNER, keep=hidden)
++    assert not robot._store(turn, (np.zeros((9, 9, 3), np.uint8), time.time()), None, None)
++    assert robot.memory.exchanges(OWNER, 0, time.time() + 1) == []
++
++
++def test_bounded_chronological_quotes_deduplicate_whole_pairs(robot):
++    r = robot
++    ids = [r.memory.add(None, f"Question {k}", ts=k + 1, visitor=OWNER,
++                        answer=f"Reply {k}") for k in range(12)]
++    history = [{"role": "user", "content": "Question 11"},
++               {"role": "assistant", "content": "Reply 11"}]
++    turn, msgs = recall(r, history)
++    assert turn.exchanges == ids[-7:-1]
++    text = msgs[-1]["content"][0]["text"]
++    assert "not observations" in text and "Question 11" not in text
++    assert text.index("Question 5") < text.index("Question 10")
++    assert r.brain.tokens(text.split("Visitor: What did we discuss?")[0]) <= 384
++    assert r.brain.tokens(json.dumps(msgs)) + brain.MAX_TOKENS + 128 <= brain.CONTEXT
++    evidence = r._evidence(turn)
++    assert len(evidence) == 6 and {p["source"] for p in evidence} == {"Generated dialogue"}
++    assert turn.memories == [], "quoted replies never become visual evidence IDs"
++
++
++def test_long_pairs_and_full_prompts_drop_whole_exchanges(robot):
++    r = robot
++    short = r.memory.add(None, "A short question", ts=1, visitor=OWNER, answer="A short reply")
++    r.memory.add(None, "Too long", ts=2, visitor=OWNER, answer="word " * 500)
++    assert recall(r)[0].exchanges == [short]
++    history = [{"role": "user", "content": "word " * brain.CONTEXT}]
++    turn, msgs = recall(r, history)
++    assert turn.exchanges == [] and len(msgs[-1]["content"]) == 1
++
++
++def test_ineligible_answer_never_reads_dialogue(robot, monkeypatch):
++    monkeypatch.setattr(robot.memory, "exchanges", lambda *args: pytest.fail("Unexpected recall"))
++    msgs = brain.messages([], None, question="What is here?")
++    robot._dialogue(Turn(), [], msgs, False)
++    assert len(msgs[-1]["content"]) == 1
++
++
++def test_ignored_text_objects_and_missing_sources_are_not_quoted(robot):
++    r = robot
++    r.ignored = {"phone"}
++    r.memory.add(None, "What did I show?", ts=1, visitor=OWNER, answer="A phone")
++    r.memory.add(None, "Was it yours?", ts=2, visitor=OWNER, answer="Yes, that one.",
++                 evidence={"objects": ["deleted-or-hidden-object"]})
++    r.memory.add(None, "What did you say?", ts=3, visitor=OWNER, answer="A private reply",
++                 evidence={"points": [123]})
++    assert recall(r)[0].exchanges == []
++
++
++def test_object_deletion_removes_derived_quotes_without_visual_or_retention_links(robot):
++    r = robot
++    ident = r.things.name(OWNER, "camera", ["camera"], np.eye(DIM, dtype=np.float32)[:1],
++                          thumbnail_crops([1]), "Ana")
++    source = r.memory.sighting("camera", "center", time.time(), ident)
++    original = r.things.named(OWNER, "camera", [])
++    first = Turn(question="Did you see it?", answer="Yes, that one.", visitor=OWNER,
++                 memories=[source])
++    r._store(first, (np.zeros((9, 9, 3), np.uint8), time.time()), None, None)
++    second = Turn(question="What did you reply?", answer=first.answer, visitor=OWNER,
++                  exchanges=[first.frame_id])
++    r._store(second, (np.zeros((9, 9, 3), np.uint8), time.time()), None, None)
++    assert r.things.named(OWNER, "camera", [])["turns"] == original["turns"]
++    for row in r.memory.points([first.frame_id, second.frame_id]):
++        assert row["evidence"]["objects"] == [ident]
++    r.ui_turn = Turn(exchanges=[second.frame_id])
++    r.ui_turn.ui_evidence = r._evidence(r.ui_turn)
++    assert r.ui_turn.ui_evidence
++    r._forget_object(original)
++    assert r.memory.points([source, first.frame_id, second.frame_id]) == []
++    assert r.ui_turn.ui_evidence == []

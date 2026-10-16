@@ -4,13 +4,13 @@ Updated 2026-10-15. Branch: `spike/conversation-context`. Architecture is settle
 
 ## Active task
 
-The general-conversation comparison found no qualifying change. Three policy changes and one installed 2B model failed the frozen criteria. All prototypes are archived; runtime source and the production default are restored. General conversation remains unresolved. The reusable evaluation and evidence passed checks and review. The enclosure worktree and result.json stay untouched.
+Conversation-memory testing found no qualifying change. Bounded storage and retrieval supplied all opening replies; best judged recall improved from 1/6 to 5/6, but the exact Qdrant question failed. Native-role controls also failed. Both prototypes are archived and runtime source is restored. The reviewed fixtures and evidence are retained. The enclosure worktree and result.json stay untouched.
 
-The [worker-failure notes](research/edge-cases.md#worker-exceptions-2026-10-15) record Dylan's subsequent live test pass. Next work is indexed in [remaining priorities](research/edge-cases.md#current-priorities-after-the-project-review-2026-10-15). Conversation spill and returning-visitor greetings stay parked.
+The [worker-failure notes](research/edge-cases.md#worker-exceptions-2026-10-15) record Dylan's subsequent live test pass. Next work is indexed in [remaining priorities](research/edge-cases.md#current-priorities-after-the-project-review-2026-10-15). Returning-visitor greetings stay parked.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `9c5cc14a`; current accepted release `f9b90b958023`, previous `78d67ad5e10d`. The conversation jobs finished. No live robot or benchmark runs. WSL is idle.
+Jetson `robot`: boot `809470ff`; current accepted release `f9b90b958023`, previous `78d67ad5e10d`. All exchange tests and controls finished. No live robot or benchmark runs. WSL is idle.
 
 ## Targets
 
@@ -28,4 +28,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next command
 
-Read research/conversation.md before the next context-handling design. Keep the production default unchanged; do not repeat rejected trials without new evidence.
+Read the stored-exchange evidence in research/conversation.md before a different generation diagnostic. Retain accepted f9; do not repeat the rejected integrations unchanged.

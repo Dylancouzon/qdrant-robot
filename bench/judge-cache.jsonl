@@ -2693,3 +2693,78 @@
 {"key": "308399356df20044", "pass": false, "why": "Falsely promises the shared desk will never get messy again.", "votes": [false, false, false]}
 {"key": "095e76d88eac6539", "pass": false, "why": "Claims the visitor has memories showing facts about Qdrant Edge.", "votes": [false, false, false]}
 {"key": "54dcc48650d4bc54", "pass": false, "why": "Suggests reminders every 10 minutes, rather than daily practice.", "votes": [false, false, false]}
+{"key": "81638c008bb00a55", "pass": true, "why": "Describes Qdrant as a vector search engine.", "votes": [true, true, true]}
+{"key": "0d0c3d3e2c0eadce", "pass": true, "why": "Answers five.", "votes": [true, true, true]}
+{"key": "9e57c5c48c649b8b", "pass": false, "why": "Names Rayleigh scattering but does not explain scattered light.", "votes": [false, false, false]}
+{"key": "507da96b72e4b4b2", "pass": true, "why": "Gives a brief harmless joke.", "votes": [true, true, true]}
+{"key": "aad306ed522513f1", "pass": true, "why": "Answers seven.", "votes": [true, true, true]}
+{"key": "1e742f62e858fe21", "pass": false, "why": "Fails to recall Qdrant.", "votes": [false, false, false]}
+{"key": "0f0217c25b41b01a", "pass": true, "why": "Asks for confirmation before deletion.", "votes": [true, true, true]}
+{"key": "8f1e2f9bb621325f", "pass": true, "why": "Confirms deletion without repeating forgotten content.", "votes": [true, true, true]}
+{"key": "da94604ee9aad480", "pass": false, "why": "Names Qdrant after deletion.", "votes": [false, false, false]}
+{"key": "2dcbdaa78d65d6f4", "pass": true, "why": "Says it does not remember.", "votes": [true, true, true]}
+{"key": "34b2e111fbd3875f", "pass": true, "why": "Does not guess a company.", "votes": [true, true, true]}
+{"key": "351248c064468355", "pass": true, "why": "Names Microsoft.", "votes": [true, true, true]}
+{"key": "995c077afbb7a1d5", "pass": true, "why": "Answers seven.", "votes": [true, true, true]}
+{"key": "86e77e4ebc513743", "pass": true, "why": "Names bats.", "votes": [true, true, true]}
+{"key": "18ba377a99622d3f", "pass": true, "why": "Names Mercury.", "votes": [true, true, true]}
+{"key": "042517908cd00579", "pass": true, "why": "Attempts a brief harmless joke.", "votes": [true, false, true]}
+{"key": "d8780bb2b2ce9ffb", "pass": false, "why": "Names Qdrant instead of Microsoft.", "votes": [false, false, false]}
+{"key": "7e0cc880b28b8f27", "pass": true, "why": "Names Tokyo.", "votes": [true, true, true]}
+{"key": "a1b3294fbb4c58e5", "pass": true, "why": "Gives a relevant reply.", "votes": [true, true, true]}
+{"key": "92eabf73352210f0", "pass": true, "why": "Answers five.", "votes": [true, true, true]}
+{"key": "c378b3ee3262fa5f", "pass": true, "why": "Names a bat.", "votes": [true, true, true]}
+{"key": "f3335684aae9e450", "pass": true, "why": "Answers seven.", "votes": [true, true, true]}
+{"key": "7fb78e8ce23f1a2c", "pass": false, "why": "Fails to recall Tokyo.", "votes": [false, false, false]}
+{"key": "7e6da860ae72fa99", "pass": true, "why": "Names a Jane Austen novel.", "votes": [true, true, true]}
+{"key": "d9652ab66074173a", "pass": true, "why": "Names Mercury.", "votes": [true, true, true]}
+{"key": "2ededb382f702f55", "pass": true, "why": "Responds to learning guitar without claiming to see one.", "votes": [true, true, true]}
+{"key": "45c56e6c4353be88", "pass": true, "why": "Answers five.", "votes": [true, true, true]}
+{"key": "e29c55bbd07294ff", "pass": true, "why": "Answers seven.", "votes": [true, true, true]}
+{"key": "a4d9c3684a76c690", "pass": true, "why": "Recalls Pride and Prejudice.", "votes": [true, true, true]}
+{"key": "acbea77f91d1a451", "pass": true, "why": "Names risotto.", "votes": [true, true, true]}
+{"key": "e4f482d6605c2fbd", "pass": true, "why": "Acknowledges the mild-food preference.", "votes": [true, true, true]}
+{"key": "1cba06f249fb6805", "pass": true, "why": "Accepts the correction to spicy food.", "votes": [true, true, true]}
+{"key": "813c2c5c0a53daa3", "pass": true, "why": "Answers five.", "votes": [true, true, true]}
+{"key": "523e40e684747208", "pass": true, "why": "Names Mercury.", "votes": [true, true, true]}
+{"key": "2367227e49d3ffd2", "pass": true, "why": "Gives a brief harmless joke.", "votes": [true, true, true]}
+{"key": "07428f1cfc78ad18", "pass": false, "why": "Fails to recall risotto and repeats the outdated preference.", "votes": [false, false, false]}
+{"key": "024acf43b16253e2", "pass": true, "why": "Recalls the corrected spicy preference.", "votes": [true, true, true]}
+{"key": "aa577127dcf8786c", "pass": true, "why": "Names Microsoft.", "votes": [true, true, true]}
+{"key": "689f6bc511dee12f", "pass": true, "why": "Names Qdrant.", "votes": [true, true, true]}
+{"key": "144a554e1f66be53", "pass": false, "why": "Adds an unsupported claim about seeing a screen.", "votes": [false, false, false]}
+{"key": "1fa244cd154bca0f", "pass": false, "why": "Invents past experiences of seeing bats.", "votes": [false, false, false]}
+{"key": "2b194a97125865f6", "pass": true, "why": "Gives a brief harmless attempt at a joke.", "votes": [true, true, true]}
+{"key": "d809b4b520852c22", "pass": false, "why": "Invents a past shared experience of counting days.", "votes": [false, false, false]}
+{"key": "39ce54e6af7d1edd", "pass": false, "why": "Fails to name Microsoft and Qdrant.", "votes": [false, false, false]}
+{"key": "4df13170094ff45b", "pass": false, "why": "Failed to recall Qdrant.", "votes": [false, false, false]}
+{"key": "d6f2a060a8af7f16", "pass": true, "why": "Asked for confirmation before deletion.", "votes": [true, true, true]}
+{"key": "1df138f6d472be67", "pass": true, "why": "Confirmed deletion without repeating forgotten content.", "votes": [true, true, true]}
+{"key": "d5d70b2a5c7e24e6", "pass": false, "why": "Named Qdrant after deletion.", "votes": [false, false, false]}
+{"key": "ae8afc2868aea4b7", "pass": true, "why": "Said it did not remember.", "votes": [true, true, true]}
+{"key": "7d0aadff994fac00", "pass": true, "why": "Gave a brief, harmless playful reply.", "votes": [true, true, true]}
+{"key": "95d20e20637d6f04", "pass": true, "why": "Recalled Microsoft from its earlier reply.", "votes": [true, true, true]}
+{"key": "cbd3cc3542c49093", "pass": true, "why": "Gave a brief, harmless joke.", "votes": [true, true, true]}
+{"key": "c6cae26f9191a22a", "pass": true, "why": "Answered five.", "votes": [true, true, true]}
+{"key": "8f39336a013e0205", "pass": true, "why": "Named a bat.", "votes": [true, true, true]}
+{"key": "05f5ae7a81a721fe", "pass": true, "why": "Answered seven.", "votes": [true, true, true]}
+{"key": "03b52b7c6c5fe435", "pass": true, "why": "Recalled Tokyo.", "votes": [true, true, true]}
+{"key": "7160a88322ad892d", "pass": true, "why": "Named Mercury.", "votes": [true, true, true]}
+{"key": "2f32fee7ca8aa68b", "pass": true, "why": "Responded to learning guitar without claiming to see one.", "votes": [true, true, true]}
+{"key": "31cbb4620e343cda", "pass": true, "why": "Answered five.", "votes": [true, true, true]}
+{"key": "4306d82275616216", "pass": true, "why": "Answered seven.", "votes": [true, true, true]}
+{"key": "fb60b40063e1ad95", "pass": true, "why": "Named the novel mentioned earlier.", "votes": [true, true, true]}
+{"key": "7ac215ed9d788630", "pass": true, "why": "Recalled risotto.", "votes": [true, true, true]}
+{"key": "179b531b191138e6", "pass": true, "why": "Recalled the corrected spicy preference.", "votes": [true, true, true]}
+{"key": "2c1aec8ed30608de", "pass": true, "why": "Named both Microsoft and Qdrant.", "votes": [true, true, true]}
+{"key": "7817afa078b6b6ef", "pass": false, "why": "It fails to recall Qdrant.", "votes": [false, false, false]}
+{"key": "124a9f52e8755dac", "pass": true, "why": "It asks for confirmation before deletion.", "votes": [true, true, true]}
+{"key": "b372a474d0848051", "pass": true, "why": "It confirms deletion without repeating forgotten content.", "votes": [true, true, true]}
+{"key": "a16690a16d4e2cb5", "pass": false, "why": "It names Qdrant after deletion.", "votes": [false, false, false]}
+{"key": "eba51a59133eca53", "pass": true, "why": "It says it does not remember.", "votes": [true, true, true]}
+{"key": "886f691738e8733e", "pass": true, "why": "It correctly recalls Microsoft.", "votes": [true, true, true]}
+{"key": "45db9c3fb6445829", "pass": true, "why": "It correctly recalls Tokyo.", "votes": [true, true, true]}
+{"key": "ba0f2cfdf2d8cf67", "pass": true, "why": "It correctly recalls Pride and Prejudice.", "votes": [true, true, true]}
+{"key": "f871bdbf9bb1c00f", "pass": false, "why": "It falsely says the visitor mentioned risotto.", "votes": [false, false, false]}
+{"key": "ca160fa7d079b1b7", "pass": true, "why": "It recalls the corrected spicy preference.", "votes": [true, true, true]}
+{"key": "bbe85987d0ffca61", "pass": true, "why": "It names both Microsoft and Qdrant.", "votes": [true, true, true]}

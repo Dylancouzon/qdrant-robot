@@ -49,3 +49,35 @@ Qwen3.5-2B scored 6/18 development and 2/6 transfer, judged (J). It lost several
 The minimum sampled `MemAvailable` was 683,581,440 bytes across 345 samples (J). Paging occurred in 33/172 development and 19/75 transfer one-second intervals overlapping a response (J). These intervals include synthesized speech duration and have boundary uncertainty. Whole-replay swap-out counters increased by 165,535,744 and 145,408,000 bytes, including model loading (J). This candidate also fails the no-paging target. `bench/results/2026-10-15-conversation-model-resources.jsonl` retains the analysis, raw-source hashes, and measurement limits. The protocol file retains the command and installed model hashes.
 
 All four candidates are rejected. Runtime source matches the accepted release. General conversation remains unresolved; the evidence supports examining how instructions, retrieved statements, and dialogue context interact. It does not support more per-topic rules, a larger-model retry, or another wording sweep.
+
+## Stored exchange prototype, 2026-10-15
+
+Dylan validated accepted live release `f9b90b958023` and requested recall of both sides of a conversation after topic changes. Opus 5.5 recommended adding replies to existing text points and using bounded recent retrieval before semantic decay. The prototype stores `answer` and source `evidence` on the existing point. No point, vector, index, or shard is added.
+
+The frozen development fixture has 44 typed turns across six sessions. It contains six topic-recall probes, a corrected food preference, and three no-memory/deletion/restart probes. Four intervening exchanges and a scene change remove the opening reply from the ordinary prompt window. Keyword checks and source delivery are reported separately from judged correctness.
+
+| Arm | Judged overall | Judged topic recall | Raw source checks |
+| --- | --- | --- | --- |
+| Accepted `f9b90b958023` | 34/44 | 1/6 | 2/7 |
+| Quoted exchanges, `e345d845afa2` | 38/44 | 5/6 | 7/7 |
+| Existing retrieval instruction, `347285a7bee6` | 37/44 | 4/6 | 7/7 |
+
+All measurements are J. The first prototype recalled Microsoft, Tokyo, a novel, risotto, and both discussed companies. Both prototypes failed the exact single-Qdrant question despite source delivery. The second also reversed speaker roles when recalling the dish. All three arms passed the corrected preference. All three passed two of three no-memory checks; the post-deletion answer still mentioned Qdrant. Its identity prompt names Qdrant, while deleted exchange records were absent. This is a model-generated false memory, not successful retrieval. Neither prototype qualifies.
+
+The prototype retrieves at most ten same-visitor rows, filters point IDs after the active conversation boundary, removes already-present pairs and unsafe sources, and supplies at most six complete pairs within 384 tokens. The full prompt reserves output and chat-template space. Actual server chat-template checks confirm the delivered prompts fit; the first Qdrant prompt had 532 tokens (J).
+
+Dialogue source IDs remain separate from visual IDs. Object references propagate through `evidence.objects` on dialogue points. Existing object and visitor deletion callers delete those records through a payload filter. These references never enter `things.turns`, so they do not protect dialogue from retention or feed visual answers. Deletion also clears derived evidence cards. Records with unavailable sources or ignored objects are excluded, including pronoun-only replies.
+
+The initial complete local pytest run found a test double missing the tokenizer method; that double was corrected. One subsequent gate run exceeded its 300 s test limit. A diagnostic run completed with 403 tests passing in 194.67 s. Baseline and first-prototype speech checks matched 40/44 texts each (J); short numeric answers produced digit or plural transcription mismatches. The checker remains unchanged.
+
+The second integration reuses the existing retrieval instruction and one text block. Its extra food failure shows that clearer source delivery alone does not guarantee correct speaker attribution. A controlled Jetson diagnostic then replayed the same captured prompts as quotes and as native user/assistant roles, with and without image prefill. Native roles still failed the exact Qdrant question. Source-removal and neutral-topic controls also produced Qdrant guesses. These controls do not establish that the company/category distinction is the sole cause, or that the model has an inherent ceiling.
+
+The counsel verdict permitted one representation diagnostic and required stopping if it failed the exact question. No native-role production path was built. Both prototypes are archived as `archive/dialogue-{v1,v2}.patch` against `314645d`; runtime source is restored. Recorded-voice, visual-recall, and conversation regressions were not run because neither candidate qualified. Existing ordinary answer failures remain separate from the recall score.
+
+All seven opening reply sources were confirmed in each candidate's actual prompt, independently of `evidence_ok`. The maximum rendered prompts were 788 and 787 tokens, with output space available (J). Each of the three 44-turn speech checks matched 40/44 texts; the unchanged checker recorded four short-number mismatches per run.
+
+System paging occurred in 52/209 and 20/210 one-second intervals overlapping responses (J). These intervals have boundary uncertainty, and kernel counters do not identify the paging process. Minimum sampled available memory was 986,583,040 and 1,007,783,936 bytes (J). Samples do not establish peak headroom or paging safety. `bench/results/2026-10-15-exchanges-analysis.jsonl` retains the derivation, raw-resource locations, and hashes. The protocol records the frozen criteria and commands. The first fixture's source paths were normalized only after SHA-256 equality checks; original bytes remain in `build/`.
+
+The initial regression plan cited the obsolete 15-turn recall fixture. The current fixture has 21 turns. No candidate reached regression, and a future trial must establish its current baseline before setting that floor. General conversation memory remains open. The missing stored reply is a real code gap, but answer generation from supplied dialogue also needs a measured correction.
+
+The [exchange task review](../reviews/20261015-211223-67375-review.md) approves the retained tests and records. Its suggested exact source-text checks are included in the analysis, with all seven opening replies confirmed. Before any future representation trial, merge overlapping user messages after scene changes; complete-pair deduplication can leave repeated questions and confuse corrections.
