@@ -302,31 +302,40 @@ STEPS = (
          moves=((("neck-hub", "bearing lower", "bearing upper"), away(UP, 30)),
                 (("hub screw",), away(UP, 55)))),
     Step("Neck", "Fit the servo horn.",
-         "Set the servo horn on the servo output shaft so the head will point forward. Fix it with "
-         "the screw from the servo kit. Calibration at first power-on sets the exact middle.",
+         "Push the servo horn onto the servo's output shaft. Fix it with the horn screw from the "
+         "servo kit.",
          ("servo case", "servo horn"), (30, 20, 200, (-10, 0, 140)),
-         "The servo horn has 14.4° spline steps, so the head can sit up to 7.2° off forward until "
-         "calibration.",
+         "Any spline position works. Before the servo goes in, you turn the horn disc by hand to "
+         "line up with the head shaft, and calibration at first power-on records forward.",
          ((("servo horn",), away(UP, 20)),), reset=()),
     Step("Neck", "Set the horn disc on the servo horn.",
-         "Press {center_nut} into the pocket on the underside of the horn disc. Set the horn disc "
-         "on the servo horn with the nut pocket down. Turn it until its four holes line up with "
-         "the holes in the servo horn.",
+         "Press {center_nut} into the hex pocket in the flat underside of the horn disc. Set the "
+         "horn disc on the servo horn, flat side down and square boss up. Turn the disc until "
+         "its four holes line up with the four holes in the servo horn.",
          ("horn-disc", "disc nut"), (30, 20, 200, (0, 0, 150)),
-         "Press the nut in until it snaps past the two lips. It must stay when you turn the horn "
-         "disc over.",
+         "The nut stays trapped between the disc and the servo horn. It takes the center screw "
+         "that holds the head shaft later; the four screws in the next step hold the disc to the "
+         "servo horn. Press the nut in until it snaps past the two lips. It must stay when you "
+         "turn the horn disc over.",
          ((("horn-disc", "disc nut"), away(UP, 30)),), reset=("servo case", "servo horn")),
     Step("Neck", "Screw the horn disc to the servo horn.",
-         "Drive {horn} through the horn disc into the servo horn. Use the 2.5 mm hex key.",
+         "Drive {horn} down through the four holes in the horn disc into the servo horn. Use the "
+         "2.5 mm hex key.",
          ("horn screw",), (30, 20, 200, (0, 0, 150)),
+         "The screw heads sit in the four round recesses at the corners of the square boss.",
          moves=((("horn screw",), away(UP, 22)),)),
     Step("Neck", "Slide the servo into the shell.",
-         "Lay the shell on its rear face on the cloth. Slide the servo into its pocket through the "
-         "open bottom, with the horn disc entering the roof hole. The servo rests on the long "
-         "pocket wall under it.",
+         "Plug the servo lead into either connector on the servo, and turn the horn disc by hand "
+         "until the sides of its square boss run parallel to the sides of the servo case. Lay the "
+         "shell on its rear face on the cloth, and push the servo, horn disc first, through the "
+         "open bottom up to the roof. Point the case away from the port window, so it drops into "
+         "its pocket and the horn disc enters the roof hole from below.",
          SERVO, (-25, 25, 460, (0, 60, -5)),
-         "The two long pocket walls stop the servo from turning. The rear face of the shell is "
-         "flat, so the shell lies steady.",
+         "Without power, the servo shaft turns slowly by hand. With the boss lined up, the head "
+         "shaft's socket fits over it when the flange faces the front. The servo rests on the "
+         "long pocket wall under it, and the two long walls stop it from turning. Let the free "
+         "end of the lead hang out of the open bottom; you plug it into the servo adapter board "
+         "before you close the shell.",
          ((SERVO, away(DOWN, 45)),), reset=NECK, tilt=LYING),
     Step("Neck", "Insert the head shaft and drive the center screw.",
          "Turn the shaft until the two nut channels in its flange face the front. Push the shaft "
