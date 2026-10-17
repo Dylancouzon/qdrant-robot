@@ -4,11 +4,11 @@ Updated 2026-10-16. Architecture is settled; use the [topic index](research/READ
 
 ## Active task
 
-Full-frame video, larger text, and explicit calibrated head startup are complete. The camera keeps its source aspect ratio. The launcher now passes the existing mounted calibration when explicitly configured. Keep the quiet fan profile.
+Named wake greetings are implemented and deployed for Dylan to test. A wake-only phrase uses the freshly verified selected face; unknown visitors receive a generic greeting. UI framing, readable text, and calibrated startup are complete. Dylan requested lighter commit rules: the hook now runs static checks, task tests precede review, and full checks remain required for releases and milestones.
 
 ## Robot and jobs
 
-Jetson boot is 89124a54; robot release is 10b77aad5356 (previous 599d42f96b75). Unit qr-robot runs with --servo-calibration /home/qdrant/qdrant-robot/shared/servo-mounted.json after Dylan confirmed power cycling and clearance. Head control is enabled and following, with no error or warning. The Mac monitor is http://127.0.0.1:8766 and retains the same calibration argument for Start. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. No benchmark job remains running.
+Jetson boot is 89124a54; robot release is d05a6afe18d5 (previous 10b77aad5356). Unit qr-robot runs with --servo-calibration /home/qdrant/qdrant-robot/shared/servo-mounted.json after Dylan confirmed power cycling and clearance. Head control is enabled and following, with no error or warning. The Mac monitor is http://127.0.0.1:8766 and retains the same calibration argument for Start. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. No benchmark job remains running.
 
 Mounted file: /home/qdrant/qdrant-robot/shared/servo-mounted.json, zero 2080, direction one, limit 60. Runtime speed is 40°/s, acceleration/deceleration 40, torque cap 20%, and arrival tolerance 1.5°. Reported 65°C verifies release and pauses the head for at least 180 seconds, with 10 continuous seconds at or below 55°C before eligibility. Reported 70°C latches only the head off until restart after cooling. Speech and vision remain available. Fresh movement input is required after recovery. Other faults remain fatal. Helpers retain 60°C. Do not repeat EEPROM setup.
 
@@ -34,6 +34,6 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 Real heating versus temperature-feedback error remains unresolved. Qualify prolonged enclosure cooling and microphone recognition before selecting a louder fan profile. Then check two-person handoff, inspection, Stop during speech, and departure. The +70° range remains unqualified. Stop travel reached 3.604° and settled in 0.513 s (J); the provisional 0.3 s target remains unmet. Unattended motion remains unqualified.
 
-Next command: inspect current qr-robot feedback before any new motion trial. Keep the current live session running. A failed torque-release acknowledgement requires power disconnection.
+Next command: say "Hey Edgy" with a green name label visible to test the named greeting. Keep the current live session running. A failed torque-release acknowledgement requires power disconnection.
 
-Validation: 33 launcher checks and the DOM harness pass (E). Live full-frame camera and desktop/mobile/tablet layout checks pass (E). Read-only servo feedback before restart was stationary, torque off, 38°C, 5.4 V, and fault-free (J). The restarted controller reported following at 40°C with no warning (J). These are operational checks, not prolonged cooling or M4 acceptance.
+Validation: all 26 attention/identity checks pass on Mac with real Edge stores and stub faces, brain, and voice (E). Seven greeting regressions pass on the Jetson with synthetic faces (J). The hook enforces lint and dead-code checks. All 11 gate tests pass in 3.28 seconds (E). Named-greeting live testing remains pending. Broader acceptance targets remain unchanged.

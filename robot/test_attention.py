@@ -374,3 +374,92 @@ def test_thermal_inspection_warning_uses_speech_without_stopping_conversation(
         assert motor.goals == [0.]
     finally:
         close_robot(robot)
+
+
+@pytest.mark.parametrize("wake,name", [
+    ("Hey Edgy.", "Mira"), ("Hi Edgie!", "Sam"), ("Okay Edgy...", "Ana"),
+])
+def test_named_wake_greeting_uses_verified_face(tmp_path, monkeypatch, wake, name):
+    robot = speaking_robot(tmp_path)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vector, 120, (100, 100, 220, 220))])
+    try:
+        robot.people.enroll(name, [vector, vector], time.time())
+        turn = answer(robot, wake, frame)
+        assert turn.answer == f"Hi, {name}." and turn.verbatim and not turn.keep
+        assert turn.identity["claimed"] == name
+    finally:
+        close_robot(robot)
+
+
+def test_unknown_wake_greeting_and_wake_with_question(tmp_path, monkeypatch):
+    robot = speaking_robot(tmp_path)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vector, 120, (100, 100, 220, 220))])
+    try:
+        assert answer(robot, "Hey Edgy", frame).answer == "Hi."
+        turn = answer(robot, "Hey Edgy, what can you do?", frame)
+        assert turn.question == "what can you do?" and not turn.verbatim
+        assert turn.answer.startswith("Okay.")
+    finally:
+        close_robot(robot)
+
+
+def test_wake_greeting_requires_face_despite_body_continuity_and_deletion(tmp_path, monkeypatch):
+    robot = speaking_robot(tmp_path)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    visible = [True]
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vector, 120, (100, 100, 220, 220))] if visible[0] else [])
+    try:
+        robot.people.enroll("Mira", [vector, vector], time.time())
+        for _ in range(CONFIRM):
+            robot._track(frame, [Detection("person", .9, (0, 0, 400, 700))], time.time())
+        assert answer(robot, "Hey Edgy", frame).answer == "Hi, Mira."
+        visible[0] = False
+        missed = answer(robot, "Hey Edgy", frame)
+        assert missed.answer == "Hi." and missed.identity.get("claimed") is None
+        assert not missed.selection_error, "body continuity cannot substitute a named face"
+        visible[0] = True
+        robot.people.forget("Mira")
+        deleted = answer(robot, "Hey Edgy", frame)
+        assert deleted.answer == "Hi." and deleted.identity.get("claimed") is None
+    finally:
+        close_robot(robot)
+
+
+def test_ambiguous_wake_greeting_does_not_choose_a_name(tmp_path, monkeypatch):
+    robot = speaking_robot(tmp_path)
+    vectors = np.eye(DIM, dtype=np.float32)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vectors[0], 120, (100, 100, 220, 220)), (vectors[1], 120, (800, 100, 920, 220))])
+    try:
+        for i, name in enumerate(["Mira", "Sam"]):
+            robot.people.enroll(name, [vectors[i], vectors[i]], time.time())
+        turn = answer(robot, "Hey Edgy", frame)
+        assert turn.selection_error and turn.identity.get("claimed") is None
+        assert "Mira" not in turn.answer and "Sam" not in turn.answer
+    finally:
+        close_robot(robot)
+
+
+def test_wake_greeting_preserves_pending_face_consent(tmp_path, monkeypatch):
+    robot = speaking_robot(tmp_path)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vector, 120, (100, 100, 220, 220))])
+    try:
+        answer(robot, "Remember me, I am Noor.", frame)
+        assert robot.asking and robot.people.person("Noor") is None
+        turn = answer(robot, "Hey Edgy", frame)
+        assert "may I remember" in turn.answer and robot.asking
+        assert robot.people.person("Noor") is None
+    finally:
+        close_robot(robot)

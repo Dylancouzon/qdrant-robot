@@ -1,0 +1,18 @@
+{
+  "machine": "Mac",
+  "label": "E",
+  "command": "python3 tools/gate.py precommit",
+  "result": "passed",
+  "static_checks_seconds": 0.44,
+  "checks": [
+    "repository Ruff",
+    "repository Vulture"
+  ],
+  "focused_tests": {
+    "command": "uv run --no-project --with pytest pytest -q tools/test_gate.py",
+    "result": "11 passed in 3.28s"
+  },
+  "previous_full_run": "Interrupted at Dylan's request to change the rules. No completed test result is claimed.",
+  "release_validation": "The default checks command retains the full pytest suite, npm install and UI harness, module assertions, and tool self-tests. Regression tests verify both command plans and hook selection.",
+  "limits": "Static hook duration excludes task tests and review. This does not measure full release validation."
+}

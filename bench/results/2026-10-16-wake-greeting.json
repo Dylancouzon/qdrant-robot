@@ -1,0 +1,44 @@
+{
+  "machine": "Mac",
+  "label": "E",
+  "mode": "Real Edge stores, synthetic face vectors, stub brain and voice, oracle wake text through the complete turn path",
+  "checks": "26 attention/identity/ownership/consent tests passed in 33.13 seconds after extracting the greeting helper to meet the complexity limit",
+  "coverage": [
+    "named greetings for existing wake aliases and different enrolled names",
+    "generic greeting for an unknown face",
+    "wake-plus-question still follows the ordinary question route",
+    "missing face with continued body track does not reuse a name",
+    "deleting enrollment removes the name from subsequent greeting",
+    "ambiguous recognized faces produce no name claim",
+    "wake-only input preserves pending enrollment consent"
+  ],
+  "source_sha256": "b3135931b8b561ca23ab5a6769125f4ea5776032393c0470d1ae1febc49b3852",
+  "test_sha256": "bc9b3462ca724e5251658bd87a15af79bfd711c69820a1cbebbf1bc7ce0fdb08",
+  "limits": "Does not establish camera recognition accuracy, physical latency, or held-out stranger acceptance.",
+  "jetson": {
+    "label": "J",
+    "release": "d05a6afe18d5",
+    "command": "python3 tools/jetson.py run wake-greeting-check --wait -- -m pytest -q robot/test_attention.py -k wake_greeting",
+    "result": "7 passed, 19 deselected in 5.34 seconds",
+    "mode": "Real Edge stores and synthetic face vectors; no models, motor, or live audio used by the test unit",
+    "backup": "shared/backups/wake-greeting-20261016-215732",
+    "servo_after_stop": {
+      "position": 2679,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 43,
+      "fault": 0,
+      "moving": 0
+    },
+    "live_startup": {
+      "status": "Say 'Hey Edgy'",
+      "head_enabled": true,
+      "head_following": true,
+      "head_error": "",
+      "head_warning": "",
+      "head_temperature_c": 43,
+      "named_greeting_observed": false
+    },
+    "source_note": "The live release and Jetson checks use the equivalent inline greeting before the local helper extraction. Keep the live session available for Dylan."
+  }
+}

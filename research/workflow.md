@@ -33,7 +33,8 @@ Subagents do not spawn subagents. The lead reads every builder diff before revie
 
 `tools/gate.py <design|review|milestone> [--model <name>] "<what to judge, with paths and evidence>"` runs Codex read-only, saves the verdict to `reviews/`, and exits 0 only on `GO`, `PASS`, or `MILESTONE MET`. Exit 3 means act on the findings; exit 124 means timeout. The criteria are in [gates/design.md](../gates/design.md), [gates/review.md](../gates/review.md), and [gates/milestone.md](../gates/milestone.md).
 
-- `tools/githooks/pre-commit` (enable once: `git config core.hooksPath tools/githooks`) runs ruff, vulture, tests, and module assertions. It blocks only on failure and reminds about a missing review (D17). Checks read the working tree: stage complete files, never partially staged bookkeeping, and never bypass the hook.
+- `tools/githooks/pre-commit` (enable once: `git config core.hooksPath tools/githooks`) runs ruff and vulture. It blocks on failure and reminds about a missing review (D17, D196). Checks read the working tree: stage complete files, never partially staged bookkeeping, and never bypass the hook.
+- Run relevant task tests once before review. Repeat them only after material code changes or a failure. Run `python3 tools/gate.py checks` for the full test suite, UI harness, module assertions, and tool self-tests before a release deployment or milestone acceptance. Reuse a passing full run for unchanged source; do not rerun it at every commit.
 - Resolve every blocking finding, or reject it with evidence in the next gate brief (the verdict file keeps it). `DECISIONS.md` gets only the binding outcome. Rerun a gate only after a material change.
 - Do not gate records-only changes (status, lessons, decisions text).
 

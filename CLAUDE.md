@@ -50,4 +50,4 @@ Use only tools/jetson.py for the Mac-to-Jetson workflow. Inspect running jobs an
 
 Pin qdrant-edge-py 0.8.0 and the model, runtime, and preprocessing revisions. Verify Edge capabilities against installed stubs. Edge fuses prefetches with Fusion.Rrf and Fusion.Dbsf.
 
-Keep one implementation per operation and preserve necessary regression coverage. Never bypass the pre-commit hook. Resolve blocking review findings before completion. The robot sudo password stays in gitignored .env and never enters tracked files or logs.
+Keep one implementation per operation and preserve necessary regression coverage. Never bypass the pre-commit hook, which runs lint and dead-code checks. Run relevant task tests before review, and full checks before a release or milestone. Reuse unchanged passing results. Resolve blocking review findings before completion. The robot sudo password stays in gitignored .env and never enters tracked files or logs.

@@ -1643,7 +1643,7 @@ class Robot:
 
     def _identity(self, turn: Turn, frame: np.ndarray, track: int | None) -> str | None:
         """Identity requests answered in code (robot/people.py) from the face in the current
-        frame, never from a track: consent, enrollment, "forget me", "do you remember me",
+        frame, never from a track: wake greetings, consent, enrollment, "forget me",
         "what's my name", and the offer to remember a face after "I'm Ana". None for any
         other turn."""
         if not turn.visitor:
@@ -1654,7 +1654,7 @@ class Robot:
                 answer := self._consent(turn, asked, frame)) is not None:
             return answer
         if req is None and not name_in(turn.question):
-            return None
+            return self._wake_greeting(turn)
         seen = self.turn_seen
         vec, name = seen or (None, None)
         turn.identity["claimed"] = name
@@ -1683,6 +1683,15 @@ class Robot:
         if action:
             self.asking = action[1], 1, [vec]
         return answer
+
+    def _wake_greeting(self, turn: Turn) -> str | None:
+        """Greet a wake-only turn with the freshly verified selected face, if available."""
+        if woken(turn.question) != "":
+            return None
+        turn.keep = False
+        name = self.turn_seen[1] if self.turn_seen else None
+        turn.identity["claimed"] = name
+        return f"Hi, {name}." if name else "Hi."
 
     def _ask_deletion(self, turn: Turn, question: str, delete: Callable[[], str]) -> str:
         """Ask once before a voice deletion; the next line from this visitor answers it."""

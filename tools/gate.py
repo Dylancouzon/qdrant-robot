@@ -63,8 +63,8 @@ def reviewed(tree: str) -> bool:
                for text in texts)
 
 
-def checks() -> int:
-    """Deterministic checks every commit to main must pass. Prints the size delta."""
+def checks(*, static_only: bool = False) -> int:
+    """Run fast static commit checks, or full release validation. Print the size delta."""
     # git lists untracked files first; keep test order stable when files become tracked.
     py = sorted(f for f in git("ls-files", "--cached", "--others", "--exclude-standard",
                               "*.py").splitlines() if not f.startswith("refs/"))
@@ -72,15 +72,17 @@ def checks() -> int:
     if py:
         steps += [["uvx", "ruff", "check", *py],  # rules in ruff.toml
                   ["uvx", "vulture", "--min-confidence", "80", *py]]
-    tests = [f for f in py if Path(f).name.startswith("test_")]
-    if tests:
-        steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
-    steps += [["npm", "--prefix", "tools/ui", "ci", "--ignore-scripts", "--no-audit", "--no-fund"],
-              ["npm", "--prefix", "tools/ui", "test"]]
-    # One interpreter shares expensive dependency imports across all existing assertions.
-    steps += [[str(ROOT / ".venv/bin/python"), str(ROOT / "tools/gate.py"), "modules"]]
-    steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",
-                                                                    "tools/gate.py")]
+    if not static_only:
+        tests = [f for f in py if Path(f).name.startswith("test_")]
+        if tests:
+            steps.append(["uv", "run", "--no-project", "--with", "pytest", "pytest", "-q", *tests])
+        steps += [["npm", "--prefix", "tools/ui", "ci", "--ignore-scripts",
+                   "--no-audit", "--no-fund"],
+                  ["npm", "--prefix", "tools/ui", "test"]]
+        # One interpreter shares expensive dependency imports across all existing assertions.
+        steps += [[str(ROOT / ".venv/bin/python"), str(ROOT / "tools/gate.py"), "modules"]]
+        steps += [[sys.executable, str(ROOT / t), "selftest"] for t in ("tools/jetson.py",
+                                                                        "tools/gate.py")]
     started = time.monotonic()
     for cmd in steps:
         code = check_step(cmd)
@@ -133,7 +135,8 @@ def module_checks() -> None:
 def precommit() -> int:
     """git pre-commit hook: block failing checks; remind (never block) about review.
 
-    Checks read the working tree (light by design, D17): stage everything you commit.
+    Static checks read the working tree: stage everything you commit. Run task tests before
+    review; full release checks remain available through `tools/gate.py checks`.
     """
     staged = code_tree("index")
     if staged == code_tree("HEAD"):
@@ -141,7 +144,7 @@ def precommit() -> int:
     if not reviewed(staged):
         print("Reminder: no PASS review matches this code. Run `tools/gate.py review` "
               "before calling the task done (CLAUDE.md, Gates).", file=sys.stderr)
-    return checks()
+    return checks(static_only=True)
 
 
 def verdict(response: str) -> str:

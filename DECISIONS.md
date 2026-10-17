@@ -184,3 +184,7 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D193 2026-10-16: Preserve the complete camera frame and readable text.** Supersedes D192's fill crop after Dylan reported cut-off boxes and small text. Size the pane to the source aspect ratio, remove fill mode, use 16 px chat and 14 px source/control text, and put detection/map controls beneath the image.
 
 **D194 2026-10-16: Forward explicit saved calibration through the monitor.** The launcher accepts `--servo-calibration PATH` and passes it when starting a new robot unit. Keep the default unset and preserve an attached unit's existing configuration. Reuse the assembled calibration after readiness and health checks; do not repeat persistent setup.
+
+**D195 2026-10-16: Greet a recognized visitor on a wake-only phrase.** At Dylan's request, use the freshly verified selected speech-start face for the name. Retained conversation or body identity supplies no name; unknown and ambiguous cases keep their existing identity gates. Preserve consent and confirmation priority, ordinary wake-plus-question routing, and transient greeting storage.
+
+**D196 2026-10-16: Keep commit checks proportionate.** At Dylan's request, run lint and dead-code checks in the mandatory hook. Run relevant task tests once before review, and full repository checks before a release deployment or milestone. Repeat validation after material changes or failures, rather than duplicating unchanged passing tests at commit.

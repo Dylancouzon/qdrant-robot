@@ -42,7 +42,7 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 | Calibrated floors 0.53 / 0.55 | Controlled 22/32 to 30/32; integrated recorded audio 42 to 39/47 (J) | Rejected for runtime | D100–D108 |
 | Bounded evidence assembly (A/B contract) | Frozen, never built; the session moved to Granite | Open idea | D109, D110 |
 | Persist both sides on existing turn points instead of spilling evicted history | First prototype improved recall from 1/6 to 5/6. Broader paired runs preserved recorded 43/47, visual 16/21, and conversation 4/18, but lost both transfer passes, 2/6 to 0/6 (J). A future-plan phrase triggered unrelated dialogue retrieval. The exact Qdrant question still failed | Archived after broader regression; retrieval eligibility and duplicate history need a general fix | [Exchange results](conversation.md#stored-exchange-prototype-2026-10-15), [broader regression](conversation.md#broader-stored-exchange-regression-2026-10-15); D96, D127 |
-| Greet a returning visitor by name when the face match comes back into view | Not tried. Face match and consent already exist; the greeting does not (Reachy demo idea). Must keep zero false identity claims on strangers | Open idea (Dylan, 2026-10-13); not now | `faces.md` |
+| Named greeting on an explicit wake phrase | The existing verified face match supplies a direct greeting. All 26 attention/identity tests pass with real Edge stores and synthetic faces, including missing-face body continuity, strangers, ambiguity, deletion, consent, and attached questions (E). Seven targeted greeting regressions also pass on the Jetson with synthetic faces (J). Wake-only input creates no stored personal fact. | Deployed at Dylan's request; live test pending | D195; [Booth flow](booth-ux.md#named-wake-greetings) |
 | bge-small scoring bare labels vs questions | Does not work | Known limit | D73 |
 | Continuous 1,800 s baseline | 10/48; older-memory, topic, and correction questions 0/24 (J) | Baseline for long conversation | D96 |
 | Same-object color veto (mean Lab, middle half) | Same-object windows Delta E p50 11.3, p99 27.1; vetoes 38% of lookalike windows; lightness alone 5.6% (E). Never fired live: the failing question lacked a past cue, and recognition shows the same shape bias | Parked (Dylan); [good-light retest closed](edge-cases.md#lookalike-recognition-in-good-light-2026-10-15) | D169; `bench/color_pairs.py` |
@@ -138,6 +138,8 @@ Use the [short lessons index](lessons.md) to select the relevant section before 
 - ONNX Runtime telemetry aborts pytest after the tests pass. `tools/gate.py` sets `ORT_DISABLE_TELEMETRY=1` (D89).
 
 ## Process pitfalls
+
+- D196 removes duplicate full tests at commit after Dylan reported the delay. The hook runs lint and dead-code checks in 0.44 seconds (E). Relevant task tests precede review; full checks remain required before releases and milestones. Eleven gate regressions pass in 3.28 seconds (E). See `bench/results/2026-10-16-commit-checks.json`.
 
 - Six hours of evaluation preparation produced no deployed gain (D102). Build the runnable thing first, then measure.
 - The D139–D147 box-display loop ran many prototypes; Dylan accepted the live result and stopped it. Ask what "good enough" means before a fifth prototype.

@@ -30,7 +30,6 @@ def repo(tmp_path, monkeypatch):
     sh(tmp_path, "git", "add", "-A")
     sh(tmp_path, "git", "commit", "-q", "-m", "init")
     monkeypatch.setattr(gate, "ROOT", tmp_path)
-    monkeypatch.setattr(gate, "checks", lambda: 0)  # checks are tested in CI itself
     return tmp_path
 
 
@@ -50,6 +49,7 @@ def test_untracked_code_changes_the_tree(repo):
 
 
 def test_precommit_reminds_but_blocks_only_failing_checks(repo, monkeypatch, capsys):
+    monkeypatch.setattr(gate, "checks", lambda **kwargs: 0)
     (repo / "app.py").write_text("x = 2\n")
     sh(repo, "git", "add", "-A")
     assert gate.precommit() == 0
@@ -57,7 +57,7 @@ def test_precommit_reminds_but_blocks_only_failing_checks(repo, monkeypatch, cap
     stamp(repo, gate.code_tree("worktree"))
     assert gate.precommit() == 0
     assert "Reminder" not in capsys.readouterr().err
-    monkeypatch.setattr(gate, "checks", lambda: 1)
+    monkeypatch.setattr(gate, "checks", lambda **kwargs: 1)
     assert gate.precommit() == 1
 
 
@@ -120,3 +120,26 @@ def test_gate_timeout_has_no_tree_stamp(repo, monkeypatch):
     monkeypatch.setattr(gate, "TIMEOUT_S", 0.2)
     assert gate.run("review", "test", "test-model") == 124
     assert not gate.reviewed(gate.code_tree("worktree"))
+
+
+def test_commit_runs_static_checks_and_release_keeps_full_validation(repo, monkeypatch):
+    monkeypatch.setattr(gate, "git", lambda *args: "robot/asr.py\nrobot/test_asr.py")
+    calls = []
+    monkeypatch.setattr(gate, "check_step", lambda cmd: calls.append(cmd) or 0)
+    assert gate.checks(static_only=True) == 0
+    assert [cmd[1] for cmd in calls] == ["ruff", "vulture"]
+    calls.clear()
+    assert gate.checks() == 0
+    assert any("pytest" in cmd for cmd in calls)
+    assert any(cmd[0] == "npm" for cmd in calls)
+    assert any("modules" in cmd for cmd in calls)
+    assert any("selftest" in cmd for cmd in calls)
+
+
+def test_precommit_selects_static_checks(repo, monkeypatch):
+    (repo / "app.py").write_text("x = 2\n")
+    sh(repo, "git", "add", "-A")
+    calls = []
+    monkeypatch.setattr(gate, "checks", lambda **kwargs: calls.append(kwargs) or 0)
+    assert gate.precommit() == 0
+    assert calls == [{"static_only": True}]

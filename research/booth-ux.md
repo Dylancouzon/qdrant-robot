@@ -4,7 +4,7 @@ Current behavior follows D140–D147 and D159. The selected "???" and named-obje
 
 ## Visitor flow
 
-1. Select **Start**, wait for **Listening**, and say "Hey Edgy". Follow-up questions work for about a minute after an answer finishes.
+1. Select **Start**, wait for **Listening**, and say "Hey Edgy". A wake-only phrase greets the freshly recognized selected visitor by name. Unknown visitors receive "Hi."; ambiguous selection keeps its existing clarification. A question after the wake phrase receives its normal answer. Follow-up questions work for about a minute after an answer finishes.
 2. Hold up one object and say "Track this as my wallet" or "This is my phone". "Track this" alone makes the robot ask for the name.
 3. Ask what the robot sees, what you showed it, or where it last saw a named object.
 4. Select an eligible item and press **Do not track that** to save negative example vectors. **Restore** removes that preference.
@@ -49,3 +49,9 @@ The interface can still blink after detection losses longer than 200 ms or size 
 The paired Mac check keeps stationary jitter at 3.08 px RMS (E). At 20 px per detected frame, final movement lag falls from 37 to 18 px; at 40 px, it falls from 74 to zero (E). On the first 675 frames of an existing development clip, selected focus without an outline falls from 111 to 102 frames (E). This comparison uses confirmed tracks; production also suppresses carry around unconfirmed replacements. Its nine-frame gain can therefore overstate the production gain. It measures drawing, not detector quality.
 
 The full-model live Jetson check receives 208 JPEGs during one oracle-text turn, with 139 ms median source age and 172 ms p95 (J). Its isolated memory has no enrolled faces, so named-face transitions remain covered by runtime tests rather than live acceptance. See `bench/results/2026-10-11-overlay-1791732278.json` and `bench/results/2026-10-11-overlay-1791732322.json`. Recreate the baseline with `git show c47f593:robot/focus.py > build/overlay/focus_baseline.py`, then run `python -m bench.overlay --baseline build/overlay/focus_baseline.py`.
+
+## Named wake greetings
+
+The identity answer path forms a wake-only greeting from the existing speech-start face match. The stored conversation name and continued body track supply no name for this answer. Pending confirmation and face consent keep their existing priority. Wake-only greetings remain in the transient conversation and do not become stored personal statements. Local real-Edge checks with synthetic face vectors cover names, aliases, absent or ambiguous identity, deletion, consent, and attached questions. See `bench/results/2026-10-16-wake-greeting.json`.
+
+The [task review](../reviews/20261016-220041-93749-review.md) passed. Seven targeted regressions also pass on the Jetson with synthetic faces (J). The deployed release and live-test status are recorded in STATE.md.
