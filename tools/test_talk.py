@@ -290,7 +290,7 @@ def test_workflow_view_token_uses_stdin_and_inherited_environment(monkeypatch):
 
 
 @pytest.mark.parametrize("path", ["/ignore", "/mute", "/volume", "/settings", "/stop_head",
-                                  "/forget_object", "/remove_view"])
+                                  "/resume_head", "/forget_object", "/remove_view"])
 def test_item_proxy_requires_cookie_and_forwards_bounded_body(path):
     from email.message import Message
     handler = talk.Handler.__new__(talk.Handler)

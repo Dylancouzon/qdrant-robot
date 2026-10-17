@@ -2,6 +2,8 @@
 
 ## Next steps
 
+**Head button during delayed polling.** An older status response can briefly restore the previous button state (U). The controller still enforces cooling, fault, and fresh-input guards. Reject older responses if this becomes observable.
+
 **Passive head displacement after motor shutdown.** Confirmed torque release does not establish a measured camera angle or physical settlement. Fault handling rejects transition captures and stores unknown pose. Physical stability after release remains unmeasured.
 
 **Loaded power and temperature feedback.** Mounted direction, watched ±60° travel at 40°/s, and cable clearance passed. Dylan reported good live motion. The [head guide](servo.md) records brief temperature trips, the requested cooling pause and 70°C head protection, and remaining qualification. Keep models, memory, consent, and deletion behavior intact.

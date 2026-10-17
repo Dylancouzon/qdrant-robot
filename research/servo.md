@@ -12,7 +12,8 @@ One active visitor supplies conversation identity, object ownership, and followi
 | "Talk to NAME" | Select a verified visible person and clear pending personal questions. |
 | "This is my phone" | Use the selected visitor's owner ID, including when another person is visible. |
 | "What is on your left/right?" | Inspect -45°/+45°, describe the settled capture, return, and restore following. |
-| "Stop" or Stop head | Cancel movement, following, and obsolete inspection returns. Verified selection can enable following again. |
+| "Stop" or Stop head | Cancel movement, following, and obsolete inspection returns. The button becomes Resume head. Verified selection can also enable following again. |
+| Resume head | Enable following from fresh camera input. Cooling, faults, and disabled motor output still block resuming. |
 
 Selection persists through arrivals and departures until an introduction, verified handover, forgetting, or reset. Ambiguous matches hold position. Missing face and body evidence preserves ownership and blocks personal actions. Enrollment and deletion require fresh face evidence. A handover clears pending consent, naming, deletion, teaching, and conversation context. The microphone uses this turn-taking convention without speaker separation.
 

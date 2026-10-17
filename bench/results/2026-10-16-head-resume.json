@@ -1,0 +1,16 @@
+{
+  "what": "Stop head becomes Resume head and restores following from fresh camera input",
+  "machine": "Mac (E)",
+  "baseline_revision": "6813a36",
+  "focused_checks": "17 passed, 71 deselected in 0.32 s",
+  "ui_checks": "DOM harness passed",
+  "safety": "Resume rejects missing or closed controllers, motor faults, and cooling. Previous inspection goals remain cancelled.",
+  "review": "reviews/20261016-234351-86442-review.md",
+  "deployment": "Pending. Dylan confirmed that the Jetson is powered off.",
+  "enclosure": "Previously staged correction committed separately as 6813a36; unchanged validation reused.",
+  "full_checks": {
+    "status": "pass",
+    "machine": "Mac (E)",
+    "seconds": 265.5
+  }
+}

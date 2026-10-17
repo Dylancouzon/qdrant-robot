@@ -287,7 +287,7 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(403, b"Forbidden")
             return
         if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head",
-                         "/forget_object", "/remove_view"):
+                         "/resume_head", "/forget_object", "/remove_view"):
             cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
             if cookie is None or not secrets.compare_digest(cookie.value, self.token):
                 self.reply(403, b"Forbidden")

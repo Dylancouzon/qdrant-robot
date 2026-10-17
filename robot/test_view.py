@@ -458,8 +458,8 @@ def test_memory_and_thumbnail_routes():
     assert get(f"/thumb?view={ident}")[0] == 403
 
 
-@pytest.mark.parametrize("action", ["forget_object", "remove_view"])
-def test_memory_post_routes(action):
+@pytest.mark.parametrize("action", ["forget_object", "remove_view", "stop_head", "resume_head"])
+def test_control_post_routes(action):
     import io
     from types import SimpleNamespace
     from robot.view import _Handler

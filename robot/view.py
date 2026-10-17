@@ -18,7 +18,7 @@ import numpy as np
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, or other
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
-ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head",
+ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head", "/resume_head",
            "/forget_object", "/remove_view")
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."

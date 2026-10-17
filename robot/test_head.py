@@ -305,3 +305,40 @@ def test_exception_without_message_latches_before_cleanup_closes_motor():
     assert head.error == 'AssertionError' and not head.following
     head.tick(101.)
     assert motor.reads == 1
+
+
+def test_head_button_resume_cancels_old_goals_and_requires_fresh_input(monkeypatch):
+    from robot.main import Robot
+    robot = Robot.__new__(Robot)
+    robot.head = Head(SimMotor())
+    clock = [100.]
+    monkeypatch.setattr(time, "time", lambda: clock[0])
+    drive(robot.head)
+    previous = robot.head.request("right")
+    robot.head.move(45, previous)
+    assert robot._control("stop_head", {}) and not robot.head.following
+    with pytest.raises(Interrupted):
+        robot.head.move(0, previous)
+    clock[0] = 101.
+    assert robot._control("resume_head", {}) and robot.head.following
+    assert not robot.head.inspecting
+    robot.head.tick(101.)
+    assert robot.head.goal == robot.head.angle == 0.
+    box = (1000, 50, 1200, 650)
+    assert robot.head.follow(box, 1280, 100.9, 101.1) == "stale source"
+    assert robot.head.follow(box, 1280, 101.1, 101.1) == "goal"
+
+
+@pytest.mark.parametrize("blocked", ["disabled", "closed", "fault", "cooling"])
+def test_head_button_resume_preserves_motor_safety_blocks(blocked):
+    from robot.main import Robot
+    robot = Robot.__new__(Robot)
+    robot.head = Head(None if blocked == "disabled" else SimMotor())
+    assert robot._control("stop_head", {})
+    if blocked == "fault":
+        robot.head.error = "Motor communication fault"
+    elif blocked != "disabled":
+        setattr(robot.head, blocked, True)
+    generation = robot.head.generation
+    assert not robot._control("resume_head", {})
+    assert not robot.head.following and robot.head.generation == generation

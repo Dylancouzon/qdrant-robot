@@ -13,7 +13,9 @@ const dom=new JSDOM(page,{url:'http://127.0.0.1:8765',runScripts:'dangerously',p
     if(url==='/memory')return {ok:available,json:async()=>delayedRead?await delayedRead:structuredClone(list)};
     if(url==='/memory_map')return {ok:true,json:async()=>delayedMap?await delayedMap:structuredClone(mapData)};
     if(url==='/robot')return {ok:true,json:async()=>live};
-    posts.push([url,JSON.parse(options.body)]);return {ok:accepted,status:accepted?202:409};
+    posts.push([url,JSON.parse(options.body)]);
+    if(accepted&&['/stop_head','/resume_head'].includes(url))live.control.head.following=url==='/resume_head';
+    return {ok:accepted,status:accepted?202:409};
   };
   Object.defineProperty(w.HTMLElement.prototype,'offsetWidth',{get(){return this.className==='savedview'?100:400;}});
   Object.defineProperty(w.HTMLElement.prototype,'clientWidth',{get(){return 324;}});
@@ -97,12 +99,26 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  assert.equal(run('carouselUpdates.length'),0);await run("openTab('memory')");assert.equal(d.querySelectorAll('.objectcard').length,2);
  live.evidence={deleted:true,turn_id:'deletion-2'};await run('status()');assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('carouselUpdates.length'),0);
  // Cooling is a head warning; camera, microphone, and the normal session remain usable.
- live.control={head:{enabled:true,warning:'Head motor cooling. 180 seconds minimum. I can still see and talk.'}};
+ live.control={head:{enabled:true,following:true,warning:'Head motor cooling. 180 seconds minimum. I can still see and talk.'}};
  await run('status()');assert.match(d.querySelector('#headWarning').textContent,/180 seconds minimum/);
  assert.equal(d.querySelector('#phase').textContent,'Listening');assert.equal(d.querySelector('#camera').hidden,false);assert.equal(d.querySelector('#mute').disabled,false);assert.equal(d.querySelector('#headStop').disabled,false);
  live.control.head.warning='Head motor cooling. Waiting for safe temperature. I can still see and talk.';
  await run('status()');assert.match(d.querySelector('#headWarning').textContent,/Waiting for safe temperature/);
  live.control.head.warning='';await run('status()');assert.equal(d.querySelector('#headWarning').textContent,'');
+ assert.equal(d.querySelector('#headStop').textContent,'Stop head');
+ accepted=true;
+ await run('toggleHead()');assert.equal(posts.at(-1)[0],'/stop_head');
+ assert.equal(d.querySelector('#headStop').textContent,'Resume head');
+ assert.equal(d.querySelector('#headStop').getAttribute('aria-label'),'Resume head movement');
+ await run('toggleHead()');assert.equal(posts.at(-1)[0],'/resume_head');
+ assert.equal(d.querySelector('#headStop').textContent,'Stop head');
+ live.control.head.following=false;await run('status()');
+ assert.equal(d.querySelector('#headStop').textContent,'Resume head');
+ live.control.head.cooling=true;await run('status()');assert.equal(d.querySelector('#headStop').disabled,true);
+ live.control.head.cooling=false;live.control.head.error='Motor off after fault';await run('status()');assert.equal(d.querySelector('#headStop').disabled,true);
+ live.control.head.error='';accepted=false;await run('toggleHead()');
+ assert.equal(d.querySelector('#headStop').textContent,'Resume head');assert.equal(d.querySelector('#headStop').disabled,false);
+ accepted=true;live.control.head.following=true;
  live.control.head.warning='Head motor cooling.';await run('status()');
  run('clearLive()');assert.equal(d.querySelector('#headWarning').textContent,'');assert.equal(d.querySelector('#speechLatency').textContent,'—');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(errors.length,0,errors.join('\n'));
  global.console.log('PASS: two visitor IDs with the same name, queued edits, failed refresh, repeated removal, view retention, conflicts, evidence safety, per-turn source order and retention, historical sources, compact detections, camera framing, timing, stable stored memory IDs, births, sample turnover, recall pulses, map deletion races, search, tips, confirmed voice deletion, stale-read rejection, and clearing.');dom.window.close();

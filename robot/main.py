@@ -2000,15 +2000,21 @@ class Robot:
             self.volume = data["percent"]
         return True
 
-    def _stop_head(self, action, data):
-        self.head.request("stop")
-        return True
+    def _head_control(self, action, data):
+        with self.head.condition:
+            if action == "resume_head" and (self.head.motor is None or self.head.closed or
+                    self.head.error or self.head.cooling):
+                return False
+            generation = self.head.request("stop")
+            if action == "resume_head":
+                self.head.activate(generation)
+            return True
 
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
         direct = {"mute": self._setting, "volume": self._setting, "settings": self._setting,
                   "forget_object": self._memory_control, "remove_view": self._memory_control,
-                  "stop_head": self._stop_head}
+                  "stop_head": self._head_control, "resume_head": self._head_control}
         if action in direct and isinstance(data, dict):
             return direct[action](action, data)
         if action not in ("ignore", "restore") or not isinstance(data, dict):
