@@ -12,6 +12,7 @@ Completed 2026-10-17 and rejected for the runtime (D209). Ranked exchange recall
 | `eval/dev/demo.jsonl` paired (J) | 51/79 | 48/79 |
 | Sealed `eval/validation/recall.jsonl` judged (J) | 25/55 | 23/55 |
 | Fused exchange query on the Jetson, 3,000 queries (J) | | 2.17 ms p50, 3.67 ms p99 |
+| Recorded voice judged; people checks judged (J) | 42/47; 22/34 | 42/47; 22/34 |
 
 Dense alone matched the fused arms on this benchmark: the BM25 leg showed no measured gain. The bge query instruction prefix did not change the outcome. Time decay did not move corrected statements first (14 to at most 15 of 20 on the selection half, E), and statement traps scored 0.69 to 0.71, inside the gold range of 0.53 to 0.90, so no threshold separates them. With the gold exchange delivered, the robot still answered "I don't remember" or picked the wrong line in several turns. RAM headroom stayed at or above 886 MB, with up to 378 MB of swap held (J).
 

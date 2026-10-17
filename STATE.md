@@ -8,7 +8,7 @@ The [memory demo session](research/overnight-conversation.md) is complete (D207,
 
 ## Robot and jobs
 
-No qr-* unit runs. Boot 748cf835. Deployed release c85580324e35 (main at ee63bf2); its knowledge selftest passes on the Jetson (0.88 ms, J). `previous` points to experiment release 1a8445ee3604, so `tools/jetson.py rollback` lands there; the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker was 0% during testing and is back at 100% (mixer and `shared/speaker-volume`).
+No qr-* unit runs. Boot 748cf835. Deployed release d1d27ee0fbad (main at d6ba494, same runtime as c85580324e35); its knowledge selftest passes on the Jetson (0.91 ms, J). `previous` points to experiment release b098e6e416d1, so `tools/jetson.py rollback` lands there; the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker was 0% during testing and is back at 100% (mixer and `shared/speaker-volume`).
 
 Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; telemetry uses `shared/results/*.tegrastats`. Preserve memories, results, backups, and previous releases.
 
