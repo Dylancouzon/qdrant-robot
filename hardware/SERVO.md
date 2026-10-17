@@ -127,7 +127,7 @@ The runtime rejects encoder-boundary crossings, saved-limit conflicts, and initi
 
 The runtime readback window is 4.5–6.0 V. A known-good bench supply reported 5.6 V, above the original 5.5 V software ceiling. The 6 V ceiling remains within the confirmed 7.4 V variant's [manufacturer operating range](https://www.feetechrc.com/74v-19-kgcm-plastic-case-metal-tooth-magnetic-code-double-axis-ttl-series-steering-gear.html). The manufacturer specifies 6–7.4 V; our 5 V unloaded trial does not qualify mounted operation. Keep temperature, mode, fault, and unsafe-voltage checks immediate.
 
-Startup preserves the measured position and primes its goal before enabling torque. It caps RAM torque at 20%, speed at 10°/s, and acceleration at five. The provisional arrival tolerance is 1°. Normal SIGTERM, faults, and shutdown attempt torque release. USB loss can prevent confirmation.
+Startup preserves the measured position and primes its goal before enabling torque. It caps RAM torque at 20%, speed at 40°/s, and acceleration at 60. The loose-servo nudge keeps acceleration five. On this firmware, priming the current-position goal enables torque, so all RAM caps precede that write. The provisional arrival tolerance is 1.5°. Travel limits remain strict. Normal SIGTERM, faults, and shutdown attempt torque release. USB loss can prevent confirmation.
 
 Keep temporary loose-servo calibration in `shared/experiments/`. After assembly, create `/home/qdrant/qdrant-robot/shared/servo-mounted.json` from measured forward position and direction. Follow [assembled testing](../research/servo.md#next-session-assembled-robot-testing) before enabling normal movement.
 

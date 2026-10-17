@@ -1,0 +1,6586 @@
+{
+  "machine": "Jetson",
+  "release": "56bc36aec999",
+  "tegrastats": "mounted-return-candidate-20261016-194627.tegrastats",
+  "mode": "return forward after unpassed70-degree stage",
+  "physical_zero": "Fresh user-confirmed forward 2080; prior mounted zero2019 retained in backup",
+  "source": "\"\"\"Watch staged mounted travel at unchanged speed and torque, retaining feedback before cleanup.\"\"\"\nimport hashlib\nimport json\nimport os\nimport signal\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot.config import SHARED\nfrom robot.head import Head, interrupt\nfrom robot.servo import SerialMotor, calibration, connect, safe\n\nport = '/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00'\nfolder = SHARED / 'experiments/servo-mounted-calibration'\nbackup = folder / 'preflight-1792191450.json'\nassert hashlib.sha256(backup.read_bytes()).hexdigest() == (\n    '46f3b14bb835f8c130b95694fa1c3ef684f07c382c1cf39aad52cb57b4e80a33')\noriginal = json.loads(backup.read_text())['saved_registers_0_39']\nexpected = original.copy()\nexpected[31:33] = [226, 7]\nrecord = {'machine': 'Jetson', 'release': os.environ['ROBOT_RELEASE'],\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'mode': 'return forward after unpassed70-degree stage',\n          'physical_zero': 'Fresh user-confirmed forward 2080; prior mounted zero2019 retained in backup',\n          'source': Path(__file__).read_text(), 'moves': [], 'trace': [], 'status': 'incomplete'}\noutput = SHARED / 'results' / f'{time.strftime(\"%Y-%m-%d\")}-mounted-direction-{time.time_ns()}.json'\nhead = None\nsignal.signal(signal.SIGTERM, interrupt)\nsignal.signal(signal.SIGINT, interrupt)\ntry:\n    with connect(port) as device:\n        samples = []\n        for _ in range(20):\n            started = time.monotonic()\n            state = device.status()\n            assert time.monotonic() - started <= .3, 'Expired forward status'\n            safe(state)\n            assert state['torque'] == 0 and state['moving'] == 0\n            samples.append(state)\n            time.sleep(.05)\n        positions = sorted(s['position'] for s in samples)\n        assert positions[-1] - positions[0] <= 2, 'Forward pose is moving'\n        assert [device.read(a) for a in range(40)] == expected, 'Saved settings changed'\n        assert device.read(55) == 1, 'Saved settings are unlocked'\n    config = json.loads((SHARED / 'servo-mounted.json').read_text())\n    assert config['zero'] == 2019 and config['direction'] == 1\n    config['zero'] = 2080\n    assert positions[-1] - positions[0] <= 2 and 2080 <= positions[10] <= 2876\n    config['limit'] = 70\n    calibration(config['zero'], config['direction'], config['limit'])\n    path = folder / f'direction-{time.time_ns()}.json'\n    with path.open('x') as file:\n        file.write(json.dumps(config, indent=2) + '\\n')\n    record.update(calibration=config, calibration_path=str(path), forward_samples=samples)\n    print(json.dumps({'forward_zero': config['zero'], 'limit': 70, 'test': 'return forward only'}),\n          flush=True)\n    head = Head(SerialMotor.open(path))\n    head.start()\n    head.wait(0, timeout=5)\n    token = head.request('right')\n    for goal in (0,):\n        started = time.monotonic()\n        head.move(goal, token)\n        deadline = time.monotonic() + 20\n        while True:\n            with head.condition:\n                record['trace'].append({'time': time.time(), 'angle': head.angle,\n                    'goal': head.goal, 'moving': head.moving, 'feedback': head.motor.status.copy(),\n                    'progress_age_s': time.monotonic() - head.motor.progress,\n                    'encoder_goal': head.motor.target, 'head_error': head.error})\n                if head.error:\n                    raise RuntimeError(head.error)\n                if not head.halt and head.sent == head.goal and not head.moving:\n                    break\n            assert time.monotonic() < deadline, 'Travel wait expired'\n            time.sleep(.02)\n        head.wait(token, timeout=1)\n        record['moves'].append({'requested_degrees': goal, 'measured_degrees': head.angle,\n                                'settlement_s': time.monotonic() - started,\n                                'feedback': head.motor.status.copy()})\n        assert abs(head.angle - goal) <= head.tolerance\n        print(json.dumps(record['moves'][-1]), flush=True)\n        time.sleep(2 if goal else 1)\n    record['status'] = 'passed'\nexcept BaseException as error:\n    record.update(status='failed', error=repr(error))\n    raise\nfinally:\n    if head:\n        record['fault_feedback_before_cleanup'] = head.motor.status.copy()\n        head.close()\n        record['head_error'] = head.error\n    try:\n        with connect(port) as device:\n            record['after'] = device.status()\n            record['saved_registers_unchanged'] = [device.read(a) for a in range(40)] == expected\n        assert record['after']['torque'] == 0, 'Torque release is unconfirmed'\n        assert record['after']['moving'] == 0, 'Servo still reports movement'\n        assert record['saved_registers_unchanged'], 'Saved settings changed during movement'\n        assert not record.get('head_error'), record.get('head_error')\n    except BaseException as error:\n        record.update(status='failed', cleanup_error=repr(error))\n        raise\n    finally:\n        output.write_text(json.dumps(record, indent=2) + '\\n')\n        print(json.dumps({'result': str(output), 'status': record['status']}), flush=True)\n",
+  "moves": [
+    {
+      "requested_degrees": 0,
+      "measured_degrees": 0.263671875,
+      "settlement_s": 6.824038747000486,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      }
+    }
+  ],
+  "trace": [
+    {
+      "time": 1792194389.274573,
+      "angle": 66.26953125,
+      "goal": 0,
+      "moving": false,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.16507301000001462,
+      "encoder_goal": 2834,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.2946775,
+      "angle": 66.26953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.014408089999960794,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.3147752,
+      "angle": 66.26953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.03450287699979526,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.3349688,
+      "angle": 66.26953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05469622599957802,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.355091,
+      "angle": 66.26953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07481885299966962,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.37518,
+      "angle": 66.26953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2834,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09490695199929178,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.3952677,
+      "angle": 66.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2833,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.11499489200014068,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.4159522,
+      "angle": 66.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2833,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.1356808219998129,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.4360774,
+      "angle": 66.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2833,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.15580527400015853,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.4561858,
+      "angle": 65.302734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2823,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01156590899972798,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.476286,
+      "angle": 65.302734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2823,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03166504899945721,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.4993107,
+      "angle": 64.86328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2818,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.054690049999408075,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.5194068,
+      "angle": 64.86328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2818,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0747857970000041,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.539494,
+      "angle": 64.86328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2818,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09487303199966846,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.5595837,
+      "angle": 64.16015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2810,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005579752000812732,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.5799367,
+      "angle": 64.16015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2810,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025934351000614697,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.600036,
+      "angle": 64.16015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2810,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04603141000006872,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.620172,
+      "angle": 63.80859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2806,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06616875800045818,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.640272,
+      "angle": 63.80859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2806,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08626805700077966,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.663811,
+      "angle": 63.193359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2799,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.611299977521412e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.6839097,
+      "angle": 63.193359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2799,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02016397199986386,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.7040114,
+      "angle": 63.193359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2799,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04026637500010111,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.7240837,
+      "angle": 62.578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2792,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005622696000500582,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.744184,
+      "angle": 62.578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2792,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025723659000504995,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.764281,
+      "angle": 62.578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2792,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04581975900055113,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.7843802,
+      "angle": 62.138671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2787,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06591899400063994,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.8044739,
+      "angle": 62.138671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2787,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08603368500007491,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.82791,
+      "angle": 61.5234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2780,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.208000013430137e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.8480139,
+      "angle": 61.5234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2780,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02016579599967372,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.8680937,
+      "angle": 61.5234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2780,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0402460550003525,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.8881936,
+      "angle": 60.908203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2773,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005197635000513401,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.9082892,
+      "angle": 60.908203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2773,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02529335000053834,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.9284334,
+      "angle": 60.908203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2773,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04543809000006149,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.9485333,
+      "angle": 60.46875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2768,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06553722900025605,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.9686341,
+      "angle": 60.46875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2768,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08563937700000679,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194389.9924445,
+      "angle": 59.765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2760,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.201700034580426e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.0125406,
+      "angle": 59.765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2760,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02017878800052131,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.032662,
+      "angle": 59.765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2760,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0402797520000604,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.0527637,
+      "angle": 59.326171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2755,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.060380939000424405,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.0728807,
+      "angle": 59.326171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2755,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08049806200051535,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.0929804,
+      "angle": 59.326171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2755,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10059816200009664,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.113081,
+      "angle": 58.798828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2749,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011593750000429281,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.1331751,
+      "angle": 58.798828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2749,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03168767300030595,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.1560638,
+      "angle": 58.18359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2742,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 7.648100017831894e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.1761615,
+      "angle": 58.18359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2742,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020174244999907387,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.196261,
+      "angle": 58.18359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2742,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.040273511999657785,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.216378,
+      "angle": 57.65625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2736,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005609928000012587,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.2364755,
+      "angle": 57.65625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2736,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025707660000080068,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.2565742,
+      "angle": 57.65625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2736,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045806606999576616,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.2766724,
+      "angle": 57.3046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2732,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.065904369999771,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.2967684,
+      "angle": 57.3046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2732,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08600059699983831,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.3201303,
+      "angle": 56.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2723,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 5.948899979557609e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.3402286,
+      "angle": 56.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2723,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020157603999905405,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.3603272,
+      "angle": 56.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2723,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04025613500016334,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.3804228,
+      "angle": 55.986328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2717,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00579047500013985,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.400522,
+      "angle": 55.986328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2717,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025890093999805686,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.420648,
+      "angle": 55.986328125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2717,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.046016240999961155,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.4407425,
+      "angle": 55.37109375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2710,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010563369000010425,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.4609563,
+      "angle": 55.37109375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2710,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030779693000113184,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.4851587,
+      "angle": 54.84375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2704,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.963299983908655e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.5052586,
+      "angle": 54.84375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2704,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020167780000519997,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.5253544,
+      "angle": 54.84375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2704,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0402640070005873,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.5454528,
+      "angle": 54.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2699,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06036237800071831,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.5655503,
+      "angle": 54.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2699,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08046046200070123,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.585677,
+      "angle": 54.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2699,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10058929700062436,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.605793,
+      "angle": 53.701171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2691,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010790346999783651,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.6259012,
+      "angle": 53.701171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2691,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030898414000148477,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.651072,
+      "angle": 53.26171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2686,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.056068787000185694,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.671174,
+      "angle": 53.26171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2686,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07617166999989422,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.6912608,
+      "angle": 53.26171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2686,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09625567300008697,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.71134,
+      "angle": 52.646484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2679,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00548096600050485,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.7314126,
+      "angle": 52.646484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2679,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025552488999892375,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.7514782,
+      "angle": 52.646484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2679,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04561786799968104,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.7715702,
+      "angle": 52.119140625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2673,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01075249099994835,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.7916782,
+      "angle": 52.119140625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2673,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03086097499999596,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.8159816,
+      "angle": 51.591796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2667,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 7.62250001571374e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.836091,
+      "angle": 51.591796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2667,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020185379999929864,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.8562016,
+      "angle": 51.591796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2667,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04029613600050652,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.8763094,
+      "angle": 50.888671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2659,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005278308000015386,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.8964138,
+      "angle": 50.888671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2659,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025382791999618348,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.9165223,
+      "angle": 50.888671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2659,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04549213900008908,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.9366338,
+      "angle": 50.44921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2654,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06560388599973521,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.956764,
+      "angle": 50.44921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2654,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08573163399978512,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194390.981309,
+      "angle": 50.009765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2649,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 7.635299971298082e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.0014064,
+      "angle": 50.009765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2649,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0201731879997169,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.0215154,
+      "angle": 50.009765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2649,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04028090300016629,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.0416124,
+      "angle": 49.306640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2641,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 37,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0055892890004543005,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.0617182,
+      "angle": 49.306640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2641,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 37,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025696268000501732,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.0818288,
+      "angle": 49.306640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2641,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 37,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04580775900012668,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.1019285,
+      "angle": 48.779296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2635,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010148162999939814,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.1220188,
+      "angle": 48.779296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2635,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030238150000513997,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.1466827,
+      "angle": 48.251953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2629,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.790499992348487e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.1667876,
+      "angle": 48.251953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2629,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020173091999822645,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.1868951,
+      "angle": 48.251953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2629,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04028058399944712,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.2069974,
+      "angle": 47.63671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2622,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00539251800000784,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.227112,
+      "angle": 47.63671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2622,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025506249000500247,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.247193,
+      "angle": 47.63671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2622,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045586412000375276,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.267307,
+      "angle": 47.109375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2616,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.008513390000189247,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.2874115,
+      "angle": 47.109375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2616,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.028618961000574927,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.307534,
+      "angle": 47.109375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2616,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.048742165000476234,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.3276675,
+      "angle": 46.494140625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2609,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.013796946000184107,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.3477702,
+      "angle": 46.494140625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2609,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03390043700073875,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.3687215,
+      "angle": 45.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2603,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 8.854499992594356e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.388819,
+      "angle": 45.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2603,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02018640400001459,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.408915,
+      "angle": 45.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2603,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04030163999959768,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.4290318,
+      "angle": 45.52734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2598,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.060399115000109305,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.4491365,
+      "angle": 45.52734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2598,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08050414199988154,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.4692483,
+      "angle": 45.52734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2598,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10061668999969697,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.4893541,
+      "angle": 44.82421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2590,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010854187999939313,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.5094428,
+      "angle": 44.82421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2590,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030941102999349823,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.5342402,
+      "angle": 44.296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2584,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 9.299299927079119e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.5543442,
+      "angle": 44.296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2584,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020196772999952373,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.5744479,
+      "angle": 44.296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2584,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.040300071999809006,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.5945494,
+      "angle": 43.76953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2578,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005645033000291733,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.6146486,
+      "angle": 43.76953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2578,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025766317000488925,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.6347697,
+      "angle": 43.76953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2578,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04586696000023949,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.654863,
+      "angle": 43.154296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2571,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011076271000092675,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.6749399,
+      "angle": 43.154296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2571,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0311521140001787,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.6986892,
+      "angle": 42.626953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2565,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 9.148899971478386e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.718789,
+      "angle": 42.626953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2565,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020191941000121005,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.738901,
+      "angle": 42.626953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2565,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04030528800012689,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.758998,
+      "angle": 42.099609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2559,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00570628100012982,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.7790818,
+      "angle": 42.099609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2559,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02579121300004772,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.799166,
+      "angle": 42.099609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2559,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045874671999627026,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.8192868,
+      "angle": 41.484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2552,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011004878000676399,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.8393903,
+      "angle": 41.484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2552,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.031108017000406107,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.8629675,
+      "angle": 41.044921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2547,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05468515400025353,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.8830683,
+      "angle": 41.044921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2547,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07478688500032149,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.9031699,
+      "angle": 41.044921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2547,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09488816800057975,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.9232721,
+      "angle": 40.517578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2541,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0056156880000344245,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.9433782,
+      "angle": 40.517578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2541,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025722955999299302,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.9634867,
+      "angle": 40.517578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2541,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04583169499983342,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194391.9835923,
+      "angle": 39.814453125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2533,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010481512000296789,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.0036948,
+      "angle": 39.814453125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2533,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03058490700004768,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.0281794,
+      "angle": 39.462890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2529,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05506855099974928,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.0482626,
+      "angle": 39.462890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2529,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07515021800008981,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.0683358,
+      "angle": 39.462890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2529,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09522282899979473,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.0884151,
+      "angle": 38.759765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2521,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005628681000416691,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.1084945,
+      "angle": 38.759765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2521,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02570820399978402,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.1285682,
+      "angle": 38.759765625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2521,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04578033500001766,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.148646,
+      "angle": 38.232421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2515,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011245073000281991,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.1687193,
+      "angle": 38.232421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2515,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0313174920001984,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.1919737,
+      "angle": 37.79296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2510,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05457388800004992,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.2120745,
+      "angle": 37.79296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2510,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07469465899976058,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.2321956,
+      "angle": 37.79296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2510,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.094795814000463,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.2522955,
+      "angle": 37.08984375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2502,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005818122999698971,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.2723894,
+      "angle": 37.08984375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2502,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025910605999342806,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.2924705,
+      "angle": 37.08984375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2502,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0459919209997679,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.312564,
+      "angle": 36.5625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2496,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011022669999874779,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.3326669,
+      "angle": 36.5625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2496,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0311251369994352,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.3566282,
+      "angle": 36.03515625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2490,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 8.10250003269175e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.376736,
+      "angle": 36.03515625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2490,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020189636000395694,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.396838,
+      "angle": 36.03515625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2490,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04029085500042129,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.416947,
+      "angle": 35.419921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2483,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005791466999653494,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.4370387,
+      "angle": 35.419921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2483,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025882861999889428,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.4571357,
+      "angle": 35.419921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2483,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045980113000041456,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.477231,
+      "angle": 34.98046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2478,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0660758279991569,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.4973333,
+      "angle": 34.98046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2478,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08617899999990186,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.5214813,
+      "angle": 34.365234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2471,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 7.062500026222551e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.5415895,
+      "angle": 34.365234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2471,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020178468000267458,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.5616937,
+      "angle": 34.365234375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2471,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0402823439999338,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.581795,
+      "angle": 33.837890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2465,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005519110999557597,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.6018968,
+      "angle": 33.837890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2465,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025621161999879405,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.6220279,
+      "angle": 33.837890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2465,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04575422199923196,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.6421442,
+      "angle": 33.310546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2459,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01072001100055786,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.6622472,
+      "angle": 33.310546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2459,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0308239500000127,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.687357,
+      "angle": 32.783203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2453,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.80009998177411e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.707463,
+      "angle": 32.783203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2453,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020173668000097678,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.727565,
+      "angle": 32.783203125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2453,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.040275911000208,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.7476656,
+      "angle": 32.255859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2447,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0057210020004276885,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.7677658,
+      "angle": 32.255859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2447,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025820492999628186,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.7878623,
+      "angle": 32.255859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2447,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04591710400018201,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.8079586,
+      "angle": 31.552734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2439,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00994492799964064,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.8280852,
+      "angle": 31.552734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2439,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03007305999926757,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.8533306,
+      "angle": 31.201171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2435,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.055318761999842536,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.8734345,
+      "angle": 31.201171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2435,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0754217730000164,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.893541,
+      "angle": 31.201171875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2435,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09552942399932363,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.9136415,
+      "angle": 30.498046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2427,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005342692999874998,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.9337382,
+      "angle": 30.498046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2427,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025439144000301894,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.9538372,
+      "angle": 30.498046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2427,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045538923000094655,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.973936,
+      "angle": 29.8828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2420,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.010654568999598268,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194392.9940336,
+      "angle": 29.8828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2420,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030752460999792675,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.018389,
+      "angle": 29.35546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2414,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 8.771299962972989e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.0384874,
+      "angle": 29.35546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2414,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020184420000077807,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.058579,
+      "angle": 29.35546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2414,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04027664699970046,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.0789576,
+      "angle": 28.916015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2409,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06065566199958994,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.0990543,
+      "angle": 28.916015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2409,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08075185699999565,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.1191373,
+      "angle": 28.916015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2409,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10083339599987085,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.1392276,
+      "angle": 28.212890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2401,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01158597399989958,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.1593282,
+      "angle": 28.212890625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2401,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03168693699990399,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.1824265,
+      "angle": 27.7734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2396,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05478470700018079,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.202527,
+      "angle": 27.7734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2396,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07488499800001591,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.222625,
+      "angle": 27.7734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2396,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09500481000031868,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.242748,
+      "angle": 27.24609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2390,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00544893400001456,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.2628453,
+      "angle": 27.24609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2390,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025546793000103207,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.2829447,
+      "angle": 27.24609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2390,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045646413000213215,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.303035,
+      "angle": 26.54296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2382,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01083697200010647,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.3231134,
+      "angle": 26.54296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2382,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.030914543000108097,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.3475945,
+      "angle": 26.279296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2379,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05539901799966174,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.3677013,
+      "angle": 26.279296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2379,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07550439799979358,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.3878036,
+      "angle": 26.279296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2379,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09560689699992508,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.4079056,
+      "angle": 25.3125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2368,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005358757000067271,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.428032,
+      "angle": 25.3125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2368,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02548608899996907,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.448152,
+      "angle": 25.3125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2368,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04560545300046215,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.4682467,
+      "angle": 24.9609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2364,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06569960000069841,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.4883254,
+      "angle": 24.9609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2364,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08577726700059429,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.512256,
+      "angle": 24.873046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2363,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10971069600054761,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.5323632,
+      "angle": 24.873046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2363,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.129818219000299,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.5524716,
+      "angle": 24.873046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2363,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.14992651000011392,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.5725603,
+      "angle": 23.642578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2349,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005129729999680421,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.5926356,
+      "angle": 23.642578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2349,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02520454899968172,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.612704,
+      "angle": 23.642578125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2349,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045272360000126355,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.632802,
+      "angle": 23.5546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2348,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06537095499970746,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.6528842,
+      "angle": 23.5546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2348,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08545444700030203,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.6770244,
+      "angle": 22.939453125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2341,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 8.208100007323083e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.697127,
+      "angle": 22.939453125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2341,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020185635999951046,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.717268,
+      "angle": 22.939453125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2341,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04032768799970654,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.7373734,
+      "angle": 21.97265625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2330,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005361061000257905,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.7574701,
+      "angle": 21.97265625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2330,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02545776900024066,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.7775705,
+      "angle": 21.97265625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2330,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04556615599994984,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.7976809,
+      "angle": 21.708984375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2327,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06566942300014489,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.8177829,
+      "angle": 21.708984375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2327,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08578443500027788,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.8411884,
+      "angle": 21.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2321,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.995300009293715e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.8612726,
+      "angle": 21.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2321,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020152483999481774,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.8813515,
+      "angle": 21.181640625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2321,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04023123899969505,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.9014323,
+      "angle": 20.91796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2318,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06031229800009896,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.9215271,
+      "angle": 20.91796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2318,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08040900499963755,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.9416397,
+      "angle": 20.91796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2318,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10052353599985508,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.9617324,
+      "angle": 19.599609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2303,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011310801000036008,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194393.981809,
+      "angle": 19.599609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2303,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03138686800048163,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.0052702,
+      "angle": 19.599609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2303,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.054850499000167474,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.025383,
+      "angle": 19.599609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2303,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07497443900047074,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.0455048,
+      "angle": 19.599609375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2303,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09508516200003214,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.0656242,
+      "angle": 19.248046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2299,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.11520548600037728,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.085715,
+      "angle": 19.248046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2299,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.13529307300086657,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.1058228,
+      "angle": 19.248046875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2299,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.15540306000002602,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.1259267,
+      "angle": 18.28125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2288,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011131631000353082,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.1460466,
+      "angle": 18.28125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2288,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03125489899957756,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.1693974,
+      "angle": 18.10546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2286,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05460166400007438,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.1894772,
+      "angle": 18.10546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2286,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07468137900013971,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.2095733,
+      "angle": 18.10546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2286,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09477760600020702,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.2296638,
+      "angle": 16.875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2272,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005725578000237874,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.2497382,
+      "angle": 16.875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2272,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025799405000725528,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.2698343,
+      "angle": 16.875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2272,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04589899200072978,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.2899575,
+      "angle": 16.69921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2270,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06602238699997542,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.3100557,
+      "angle": 16.69921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2270,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08611762300006376,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.3358479,
+      "angle": 16.435546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2267,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.11191008300011163,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.3559618,
+      "angle": 16.435546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2267,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.132027303000541,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.3761718,
+      "angle": 16.435546875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2267,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.15223706800043146,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.396267,
+      "angle": 15.380859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2255,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005810891000692209,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.4163783,
+      "angle": 15.380859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2255,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02592263800033834,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.436483,
+      "angle": 15.380859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2255,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04604219400061993,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.4566038,
+      "angle": 15.205078125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2253,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06614622899996903,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.476721,
+      "angle": 15.205078125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2253,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08626447300048312,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.5031006,
+      "angle": 15.029296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2251,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.11264321300041047,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.523302,
+      "angle": 15.029296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2251,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.13284708900027908,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.5434153,
+      "angle": 15.029296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2251,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.1529603409999254,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.5635092,
+      "angle": 13.359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2232,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00582986700010224,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.5835888,
+      "angle": 13.359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2232,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025907854000251973,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.6036623,
+      "angle": 13.359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2232,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045981584999935876,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.623756,
+      "angle": 13.271484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2231,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06607720400006656,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.643883,
+      "angle": 13.271484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2231,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08620485600022221,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.666899,
+      "angle": 13.271484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2231,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10922083300010854,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.6869977,
+      "angle": 13.271484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2231,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.12931859600030293,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.707076,
+      "angle": 13.271484375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2231,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.14939421500002936,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.7271705,
+      "angle": 11.953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2216,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005465446000016527,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.7472699,
+      "angle": 11.953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2216,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025565289000041957,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.7673728,
+      "angle": 11.953125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2216,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045668076999390905,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.7874684,
+      "angle": 11.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2211,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06576347200007149,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.8075888,
+      "angle": 11.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2211,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08588555599999381,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.8309822,
+      "angle": 11.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2211,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10927715299931151,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.8510666,
+      "angle": 11.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2211,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.12936093200005416,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.8711953,
+      "angle": 11.513671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2211,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.1494940239999778,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.891298,
+      "angle": 11.07421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2206,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.00577565800085722,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.9113996,
+      "angle": 11.07421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2206,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025878990000819613,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.9315302,
+      "angle": 11.07421875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2206,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.046011761000045226,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.9516416,
+      "angle": 9.4921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2188,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0113124979998247,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.9717305,
+      "angle": 9.4921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2188,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.031399797000631224,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194394.9950879,
+      "angle": 9.4921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2188,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.054756737999923644,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.01516,
+      "angle": 9.4921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2188,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07482835700011492,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.0352426,
+      "angle": 9.4921875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2188,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09491066400005366,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.05532,
+      "angle": 9.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2187,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.11498877899975923,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.0753908,
+      "angle": 9.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2187,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.13505899000028876,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.0954573,
+      "angle": 9.404296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2187,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.15512532899992948,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.1155365,
+      "angle": 8.0859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2172,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011327825999615015,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.1356115,
+      "angle": 8.0859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2172,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03140226100003929,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.159115,
+      "angle": 7.91015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2170,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.1,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0549066280000261,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.1791842,
+      "angle": 7.91015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2170,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.1,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07497450299979391,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.1992493,
+      "angle": 7.91015625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2170,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.1,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09503946600034396,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.2193155,
+      "angle": 7.55859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2166,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005741769999985991,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.2393942,
+      "angle": 7.55859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2166,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025819661000241467,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.2594602,
+      "angle": 7.55859375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2166,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.045885583000199404,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.2795255,
+      "angle": 6.6796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2156,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011433747000410222,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.2995906,
+      "angle": 6.6796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2156,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03149803799988149,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.3231275,
+      "angle": 6.50390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2154,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.05503751000014745,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.3432105,
+      "angle": 6.50390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2154,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.07511818500006484,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.3632803,
+      "angle": 6.50390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2154,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.09518785199998092,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.3833482,
+      "angle": 5.625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2144,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005777610999757599,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.4034162,
+      "angle": 5.625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2144,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.025844652999694517,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.4234834,
+      "angle": 5.625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2144,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04592411199973867,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.4435635,
+      "angle": 5.2734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2140,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.0659927870001411,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.4636295,
+      "angle": 5.2734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2140,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08605813400026818,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.4866414,
+      "angle": 4.5703125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2132,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.236899935174733e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.5067108,
+      "angle": 4.5703125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2132,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020130403999246482,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.526779,
+      "angle": 4.5703125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2132,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04019840699947963,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.546846,
+      "angle": 4.04296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2126,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.005809483000120963,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.5669203,
+      "angle": 4.04296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2126,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.02588430099967809,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.5870013,
+      "angle": 4.04296875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2126,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04596500899970124,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.6070957,
+      "angle": 3.603515625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2121,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.06605979599953571,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.6271799,
+      "angle": 3.603515625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2121,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08615186299994093,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.6501389,
+      "angle": 2.900390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2113,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 6.115299947850872e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.6702123,
+      "angle": 2.900390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2113,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020133923999310355,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.6902797,
+      "angle": 2.900390625,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2113,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04020099899935303,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.7103462,
+      "angle": 2.548828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2109,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.060268233999522636,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.7304122,
+      "angle": 2.548828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2109,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08033361199977662,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.750477,
+      "angle": 2.548828125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2109,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10039822299950174,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.7705421,
+      "angle": 1.845703125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2101,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.01096954900003766,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.790608,
+      "angle": 1.845703125,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2101,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03103470399946673,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.814377,
+      "angle": 1.318359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2095,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 4.054500004713191e-05,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.8344526,
+      "angle": 1.318359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2095,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.020115235000048415,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.8545177,
+      "angle": 1.318359375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2095,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.04018039000038698,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.874583,
+      "angle": 0.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2091,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.060246345000450674,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.8946512,
+      "angle": 0.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2091,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.08031406000009156,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.9147172,
+      "angle": 0.966796875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2091,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.10037995099992258,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.934783,
+      "angle": 0.52734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2086,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.011453555999651144,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.9548485,
+      "angle": 0.52734375,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2086,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 1
+      },
+      "progress_age_s": 0.03151839099973586,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.9781427,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.054813058999570785,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194395.9982152,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.07488512599957176,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194396.0182803,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.09495021699967765,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194396.0383575,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.11502772399944661,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194396.0584228,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.1350925909991929,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194396.0784864,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": true,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.1551564329993198,
+      "encoder_goal": 2080,
+      "head_error": ""
+    },
+    {
+      "time": 1792194396.0985518,
+      "angle": 0.263671875,
+      "goal": 0.0,
+      "moving": false,
+      "feedback": {
+        "id": 1,
+        "position": 2083,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "progress_age_s": 0.17522241999995458,
+      "encoder_goal": 2080,
+      "head_error": ""
+    }
+  ],
+  "status": "passed",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 2080,
+    "direction": 1,
+    "limit": 70
+  },
+  "calibration_path": "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/direction-1792194389084668618.json",
+  "forward_samples": [
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2834,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    }
+  ],
+  "fault_feedback_before_cleanup": {
+    "id": 1,
+    "position": 2083,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "head_error": "",
+  "after": {
+    "id": 1,
+    "position": 2083,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true
+}

@@ -193,3 +193,90 @@ def test_stop_discards_even_a_small_unsent_goal():
     head.request("stop")
     head.tick(101.)
     assert head.goal == head.angle == 0 and motor.goals == [0]
+
+
+@pytest.mark.parametrize("delay", [0., .15, .3])
+def test_follow_updates_during_motion_and_expires_without_callbacks(delay):
+    motor = SimMotor(speed=10)
+    head = Head(motor)
+    drive(head)
+    edge = (1000, 0, 1280, 700)
+    assert head.follow(edge, 1280, 101 - delay, 101) == "goal"
+    head.tick(101.)
+    head.tick(101.05)
+    previous = head.goal
+    assert head.moving
+    assert head.follow(edge, 1280, 101.05 - delay, 101.05) == "goal"
+    assert head.goal > previous
+    head.tick(101.1)
+    head.tick(101.4)
+    held = head.goal
+    drive(head, 101.45, .5)
+    assert head.angle == held and not head.error
+    assert not head.valid(101.)
+
+
+def test_centered_and_lost_faces_cancel_pending_corrections():
+    for lost in (False, True):
+        head = Head(SimMotor(speed=10))
+        drive(head)
+        head.follow((1000, 0, 1280, 700), 1280, 101, 101)
+        head.tick(101.)
+        head.tick(101.05)
+        if lost:
+            head.hold(taken=101.06)
+        else:
+            assert head.follow((600, 0, 680, 700), 1280, 101.06, 101.06) == "centered"
+        head.tick(101.1)
+        assert head.goal == head.angle < 3
+        held = head.goal
+        assert head.follow((1000, 0, 1280, 700), 1280, 101.04, 101.11) == "stale source"
+        drive(head, 101.15, .5)
+        assert head.angle == held
+
+
+def test_pre_handover_and_out_of_order_sources_cannot_restore_following(monkeypatch):
+    monkeypatch.setattr(time, "time", lambda: 101.)
+    head = Head(SimMotor())
+    drive(head)
+    old = head.generation
+    new = head.request("handover")
+    head.activate(new)
+    head.finish(new)
+    head.tick(101.)
+    edge = (1000, 0, 1280, 700)
+    assert head.follow(edge, 1280, 101.01, 101.02, old) == "cancelled source"
+    assert head.follow(edge, 1280, 100.99, 101.02, new) == "stale source"
+    assert head.follow(edge, 1280, 101.01, 101.02, new) == "goal"
+    assert head.follow(edge, 1280, 101.005, 101.02, new) == "stale source"
+    head.request("stop")
+    assert head.follow(edge, 1280, 101.03, 101.03, new) == "cancelled source"
+    assert not head.following
+
+
+def test_small_reverse_face_error_cancels_previous_forward_correction():
+    motor = SimMotor(speed=10)
+    motor.tolerance = 1.5
+    head = Head(motor)
+    drive(head)
+    head.follow((1000, 0, 1280, 700), 1280, 101, 101)
+    head.tick(101.)
+    head.tick(101.05)
+    assert 0 < head.angle < head.goal
+    assert head.follow((510, 0, 610, 100), 1280, 101.06, 101.06) == 'goal'
+    head.tick(101.1)
+    assert head.goal < head.angle < 6
+
+
+def test_exception_without_message_latches_before_cleanup_closes_motor():
+    class FailingMotor(SimMotor):
+        reads = 0
+        def read(self, now):
+            self.reads += 1
+            raise AssertionError()
+    motor = FailingMotor()
+    head = Head(motor)
+    head.tick(100.)
+    assert head.error == 'AssertionError' and not head.following
+    head.tick(101.)
+    assert motor.reads == 1

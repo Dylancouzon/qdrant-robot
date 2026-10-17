@@ -17,7 +17,7 @@ Dylan confirmed assembly on 2026-10-16. Existing models, thresholds, fixtures, a
 | Area | Remaining issue | Detail |
 | --- | --- | --- |
 | Conversation | Broad past cues and incomplete history caused regressions in archived stored-reply prototypes. General answer quality remains below target. | [Conversation](conversation.md#broader-stored-exchange-regression-2026-10-15) |
-| Servo qualification | Mounted direction, small loaded motion, cable clearance within ±10°, and short service shutdown passed. Wider travel, prolonged loaded power, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal remain open. | [Head control](servo.md#next-session-assembled-robot-testing) |
+| Servo qualification | Mounted direction, loaded motion, cable clearance through ±60°, Stop, and short service shutdown passed. The +70° attempt stopped 1.67° short; that range remains unqualified. Live following uses 40°/s with continuous corrections. Prolonged loaded power, the isolated 65°C report, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal remain open. | [Head control](servo.md#next-session-assembled-robot-testing) |
 | Identity and privacy | Stranger acceptance and multi-visitor handoffs still need whole-robot qualification. | [Faces](faces.md), [recorded backlog](archive/edge-case-records-2026-10-15.md#earlier-recorded-backlog) |
 | Perception | Lookalike objects, changed viewpoints, small objects, and tracking gaps can limit recognition. | [Objects](objects.md), [camera and encoder records](archive/edge-case-records-2026-10-15.md#camera-and-crop-encoder-d167-d168) |
 | Resources and latency | Paging, sustained detection, and physical audible latency remain unresolved targets. | [STATE.md](../STATE.md), [stack](stack.md) |
@@ -37,7 +37,7 @@ Dylan reported that the lookalike recognition bug is gone under good light. That
 
 ## Enclosure qualification
 
-The assembled enclosure still needs mounted travel, cable, power, cooling, fan-noise, and speaker-echo checks. Earlier fit concerns remain in the [enclosure record](archive/enclosure-fit-checks-2026-10-16.md).
+The assembled enclosure passed watched travel and cable checks through ±60°. It still needs prolonged power, cooling, fan-noise, and speaker-echo checks. Earlier fit concerns remain in the [enclosure record](archive/enclosure-fit-checks-2026-10-16.md).
 
 ## Historical records
 

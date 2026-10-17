@@ -1,0 +1,80 @@
+{
+  "machine": "dylans-macbook-pro.tail04131.ts.net",
+  "hardware_motion": false,
+  "speed_deg_s": 10,
+  "arrival_tolerance_deg": 1.5,
+  "baseline_revision": "de2ff19:robot/head.py",
+  "capture_period_s": 0.07,
+  "scenario": "ramp, plateau, reversal, face loss10..11s, speech12..13s, Stop20s",
+  "baseline_sha256": "dffb39cebb863bd650a64e2772864ae041a6ac5022abd144af439cec13a5d4c4",
+  "candidate_sha256": "71d6ba405db9282f847b034c7dc870b618231bb8d5e236e8071b29278a6fae6c",
+  "runs": [
+    {
+      "capture_delay_s": 0.0,
+      "baseline": {
+        "mean_error_deg": 4.92335302135389,
+        "offcenter_stationary_fraction": 0.2523364485981308,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 71
+      },
+      "candidate": {
+        "mean_error_deg": 4.883280327123763,
+        "offcenter_stationary_fraction": 0.0547945205479452,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 106
+      },
+      "performance_passed": true,
+      "expiry_hold_passed": false,
+      "passed": true
+    },
+    {
+      "capture_delay_s": 0.15,
+      "baseline": {
+        "mean_error_deg": 4.3181735574738145,
+        "offcenter_stationary_fraction": 0.3333333333333333,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 81
+      },
+      "candidate": {
+        "mean_error_deg": 4.271422080872228,
+        "offcenter_stationary_fraction": 0.31346578366445915,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 84
+      },
+      "performance_passed": true,
+      "expiry_hold_passed": false,
+      "passed": true
+    },
+    {
+      "capture_delay_s": 0.3,
+      "baseline": {
+        "mean_error_deg": 14.543389368468878,
+        "offcenter_stationary_fraction": 1.0,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 1
+      },
+      "candidate": {
+        "mean_error_deg": 14.543389368468878,
+        "offcenter_stationary_fraction": 1.0,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 1
+      },
+      "performance_passed": false,
+      "expiry_hold_passed": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

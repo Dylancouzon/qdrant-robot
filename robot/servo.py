@@ -6,9 +6,11 @@ import time
 from pathlib import Path
 
 SCALE = 4096 / 360
-TOLERANCE = 1.0  # Provisional loose-servo precision; travel limits remain strict.
+TOLERANCE = 1.5  # Provisional mounted arrival precision; travel limits remain strict.
 FEEDBACK_S = 0.3
-SPEED = 10
+SPEED = 40
+ACCELERATION = 60
+PROGRESS_STEPS = 5  # Exceed stationary encoder noise before renewing a travel watch.
 
 
 class Servo:
@@ -99,11 +101,11 @@ class Servo:
         finally:
             self.off()
 
-    def prepare(self, position, speed):
-        """Cap RAM power and speed, then replace old goals before torque enable."""
+    def prepare(self, position, speed, acceleration=5):
+        """Set the RAM profile, then prime the current position before torque can engage."""
         self.off()
         self.write(48, min(self.read(48, 2), 200), 2)
-        self.write(41, 5)
+        self.write(41, acceleration)
         self.write(44, 0, 2)
         self.write(46, speed, 2)
         self.write(42, position, 2)
@@ -169,6 +171,8 @@ class SerialMotor:
         self.target = self.position = None
         self.feedback = self.deadline = self.progress = 0.
         self.distance = math.inf
+        self.progress_position = self.arrival = None
+        self.deadline_target = None
         self.read(time.time())
         if self.status["torque"] or self.status["moving"]:
             raise RuntimeError("Require a stationary servo with torque off before startup")
@@ -214,21 +218,36 @@ class SerialMotor:
     def _progress(self, now):
         if self.target is None:
             return
-        distance = abs(self.target - self.position)
-        if distance <= self.tolerance * SCALE:
-            self.progress = now
-            if not self.status["moving"]:
-                self.deadline = None
-        elif self.deadline is None:
-            # Holding has no expired travel deadline. Watch a new displacement normally.
-            self.progress, self.distance = now, distance
-            self.deadline = now + distance / (SPEED * SCALE) + 2.
-        elif distance < self.distance - 1:
-            self.progress, self.distance = now, distance
-        elif now - self.progress > 1.:
-            raise RuntimeError("Servo movement stalled")
         if self.deadline is not None and now > self.deadline:
             raise RuntimeError("Servo movement timed out")
+        distance = abs(self.target - self.position)
+        arrived = distance <= self.tolerance * SCALE and not self.status["moving"]
+        if arrived:
+            self.arrival = now if self.arrival is None else self.arrival
+            if now - self.arrival >= .1:
+                self.deadline = None
+                return
+        else:
+            self.arrival = None
+        if self.deadline is None and arrived:
+            return
+        if self.deadline is None:
+            # Holding has no expired travel deadline. Watch a new displacement normally.
+            self.progress, self.distance = now, distance
+            self.progress_position = self.position
+            self.deadline = now + distance / (SPEED * SCALE) + 2.
+            self.deadline_target = self.target
+        elif ((self.target - self.progress_position) *
+              (self.position - self.progress_position) > 0 and
+              abs(self.position - self.progress_position) > PROGRESS_STEPS):
+            self.progress, self.distance = now, distance
+            self.progress_position = self.position
+            if (distance > self.tolerance * SCALE and
+                    self.target != self.deadline_target):
+                self.deadline = now + distance / (SPEED * SCALE) + 2.
+                self.deadline_target = self.target
+        elif distance > self.tolerance * SCALE and now - self.progress > 1.:
+            raise RuntimeError("Servo movement stalled")
 
     def move(self, angle):
         if self.closed:
@@ -245,14 +264,20 @@ class SerialMotor:
         self.servo.write(42, target, 2)
         self.ack_at = time.monotonic()
         self.write_s = self.ack_at - self.sent_at
-        self.target, self.progress = target, time.monotonic()
+        if target != self.target:
+            self.arrival = None
+        self.target = target
         self.distance = abs(target - self.position)
-        self.deadline = self.progress + self.distance / (SPEED * SCALE) + 2.
+        if self.deadline is None or self.progress_position is None:
+            self.progress = time.monotonic()
+            self.progress_position = self.position
+            self.deadline = self.progress + self.distance / (SPEED * SCALE) + 2.
+            self.deadline_target = target
         return self.direction * (target - self.zero) / SCALE
 
     def _enable(self):
         started = time.monotonic()
-        self.servo.prepare(self.position, round(SPEED * SCALE))
+        self.servo.prepare(self.position, round(SPEED * SCALE), ACCELERATION)
         if time.monotonic() - started > 1.:
             raise RuntimeError("Servo startup transaction budget exceeded")
         self.servo.write(40, 1)

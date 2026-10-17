@@ -74,6 +74,7 @@ Records exist so the next session works well. Write each fact once, in the one p
 - **Sight:** use fixture images and recorded clips. Use the live camera only for capture, orientation, and fps checks; check frame brightness first because the room may be dark.
 - **Live:** the robot hears and speaks through its own USB audio on the Jetson; `tools/talk.py` is only the monitor and controls, and the robot keeps running without it.
 - **Human test days:** put a short checklist in `STATE.md` of what only a human can judge, and record each result as a fixture.
+- **Physical tuning:** reuse one staged script with fixed limits and pass criteria. Ask Dylan for physical readiness and observations. Resolve conditional review findings with focused regressions. Repeat a design gate only when the design changes; run one task review when the change is complete. Keep checks, evidence, and torque-release verification in the script.
 
 ## Mac-to-Jetson workflow
 

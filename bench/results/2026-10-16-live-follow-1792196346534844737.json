@@ -1,0 +1,35 @@
+{
+  "release": "7bc4a41a9f5e",
+  "machine": "Jetson",
+  "tegrastats": "robot-20261016-201905.tegrastats",
+  "source": "\"\"\"Run the unchanged live entry point while retaining bounded numeric following diagnostics.\"\"\"\nimport json\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import main\nfrom robot.config import SHARED\nfrom bench.head_sim import trace_following\n\nreport = {'release': os.environ['ROBOT_RELEASE'], 'machine': 'Jetson',\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'status': 'running',\n          'source': Path(__file__).read_text()}\noutput = SHARED / 'experiments/servo-mounted-calibration' / f'live-follow-{time.time_ns()}.json'\nOriginal = main.Robot\n\n\nclass ObservedRobot(Original):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        trace_following(self, report)\n        follow = self._follow_face\n        self.last_report = 0.\n        def observe(*args, **kwargs):\n            result = follow(*args, **kwargs)\n            if time.monotonic() - self.last_report > 1:\n                self.last_report = time.monotonic()\n                self.save_report()\n            return result\n        self._follow_face = observe\n        print(f'following diagnostics: {output}', flush=True)\n\n    def save_report(self):\n        diagnostic = report['following_diagnostics']\n        safe = {**report, 'following_diagnostics': {**diagnostic, 'samples': [\n            {k: v for k, v in row.items() if k != 'name'} for row in diagnostic['samples']]}}\n        temp = output.with_suffix('.tmp')\n        temp.write_text(json.dumps(safe, indent=2) + '\\n')\n        temp.replace(output)\n\n    def close(self):\n        try:\n            super().close()\n        finally:\n            report['status'] = 'closed'\n            self.save_report()\n\n\nmain.Robot = ObservedRobot\nmain.main()\n",
+  "status": "listening; no selected visitor in this startup snapshot",
+  "trace_source": "experiments/servo-mounted-calibration/live-follow-1792196346534844737.json",
+  "trace_snapshot_sha256": "ce7cf3309538d00d347cd2ce9fdeb812b40c4c68c2c3b68131e5aa30fc25d04b",
+  "calibration": {
+    "zero": 2080,
+    "direction": 1,
+    "limit": 60
+  },
+  "configured_speed_deg_s": 40,
+  "acceleration": 60,
+  "samples": 1610,
+  "reasons": {
+    "preview": 1610,
+    "expired at preview": 0,
+    "unrecognized visitor": 1610
+  },
+  "selected_face_samples": 0,
+  "controller_faults": [],
+  "last_feedback": {
+    "id": 1,
+    "position": 2076,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "human_clearance": "Dylan confirmed the watched \u00b160\u00b0 turns and returns had clear cables."
+}

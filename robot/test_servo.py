@@ -48,14 +48,16 @@ def test_prime_old_goal_and_respect_direction():
     actual = servo.SerialMotor(device, 2048, -1, 10)
     actual.move(5)
     assert packet.positions == [2048, 2048 - round(5 * servo.SCALE)]
-    assert packet.memory[46] == 114  # Approximately 10 degrees/s.
+    assert packet.memory[46] == 455  # Approximately 40 degrees/s.
+    assert packet.memory[41] == 60
     assert packet.memory[48] == 200
     assert all(address >= 40 for address, _ in packet.writes)
     actual.close()
     assert packet.memory[40] == 0
 
 
-def test_head_uses_actual_motor_limits_and_arrival_error():
+def test_head_uses_actual_motor_limits_and_arrival_error(monkeypatch):
+    monkeypatch.setattr(servo.time, "time", lambda: 100.)
     actual, packet = motor()
     head = Head(actual)
     head.tick(100.)
@@ -276,7 +278,7 @@ def test_stop_waits_for_bounded_startup_without_old_goal_jump():
         head.close()
 
 
-@pytest.mark.parametrize("steps,accepted", [(11, True), (12, False)])
+@pytest.mark.parametrize("steps,accepted", [(17, True), (18, False)])
 def test_arrival_tolerance_boundary_keeps_stationary_stall_check(monkeypatch, steps, accepted):
     actual, packet = motor()
     clock = [actual.feedback]
@@ -304,6 +306,8 @@ def test_settled_hold_starts_new_watch_after_external_displacement(monkeypatch):
     monkeypatch.setattr(servo.time, "monotonic", lambda: clock[0])
     actual.move(5)
     actual.read(0)
+    clock[0] += .11
+    actual.read(0)
     assert actual.deadline is None
     clock[0] += 10
     actual.read(0)
@@ -312,6 +316,8 @@ def test_settled_hold_starts_new_watch_after_external_displacement(monkeypatch):
     assert actual.deadline > clock[0]
     clock[0] += .5
     packet.memory[56] = packet.memory[42]
+    actual.read(0)
+    clock[0] += .11
     actual.read(0)
     assert actual.deadline is None
     actual.close()
@@ -349,8 +355,9 @@ def test_measured_supply_readback_window(voltage, accepted):
         assert not packet.writes
 
 
-@pytest.mark.parametrize("steps", [7, 11])
-def test_following_holds_quantized_limit_without_repeated_view_resets(steps):
+@pytest.mark.parametrize("steps", [7, 17])
+def test_following_holds_quantized_limit_without_repeated_view_resets(monkeypatch, steps):
+    monkeypatch.setattr(servo.time, "time", lambda: 100.)
     actual, packet = motor()
     head = Head(actual)
     head.tick(100.)
@@ -368,3 +375,96 @@ def test_following_holds_quantized_limit_without_repeated_view_resets(steps):
         head.tick(now)
     assert head.view == view and len(packet.writes) == writes and not head.moving
     head.close()
+
+
+@pytest.mark.parametrize("moving", [0, 1])
+@pytest.mark.parametrize("targets", [(5, -5), (5, .1), (.1, -.1)])
+def test_retargeting_a_frozen_encoder_cannot_refresh_watchdog(monkeypatch, targets, moving):
+    actual, packet = motor()
+    clock = [actual.feedback]
+    monkeypatch.setattr(servo.time, "monotonic", lambda: clock[0])
+    actual.move(5)
+    packet.memory.update({56: 2048, 66: moving})
+    started = actual.progress
+    with pytest.raises(RuntimeError, match="stalled|timed out"):
+        for step in range(1, 80):
+            clock[0] += .05
+            actual.read(0)
+            actual.move(targets[step % 2])
+            packet.memory.update({56: 2048, 66: moving})
+            assert actual.progress == started
+    assert clock[0] - started <= 2.6
+    actual.close()
+    assert packet.memory[40] == 0
+
+
+def test_fresh_encoder_progress_allows_continuous_goals_and_reversals(monkeypatch):
+    actual, packet = motor()
+    clock = [actual.feedback]
+    monkeypatch.setattr(servo.time, "monotonic", lambda: clock[0])
+    actual.move(5)
+    for direction in (1, -1):
+        for _ in range(45):
+            clock[0] += .05
+            packet.memory.update({56: actual.position + direction * 2, 66: 1})
+            actual.read(0)
+            angle = (actual.position - 2048) / servo.SCALE + direction * 3
+            actual.move(max(-10, min(10, angle)))
+    assert actual.progress > clock[0] - .16
+    actual.close()
+
+
+def test_moving_flag_inside_arrival_tolerance_keeps_bounded_deadline(monkeypatch):
+    actual, packet = motor()
+    clock = [actual.feedback]
+    monkeypatch.setattr(servo.time, "monotonic", lambda: clock[0])
+    actual.move(5)
+    target = packet.memory[42]
+    with pytest.raises(RuntimeError, match="timed out"):
+        for step in range(1, 80):
+            clock[0] += .05
+            packet.memory.update({56: target + (2 if step % 2 else -2), 66: 1})
+            actual.read(0)
+    actual.close()
+
+
+
+@pytest.mark.parametrize('moving', [0, 1])
+def test_encoder_noise_with_alternating_nearby_goals_cannot_renew_deadline(monkeypatch, moving):
+    actual, packet = motor()
+    clock = [actual.feedback]
+    monkeypatch.setattr(servo.time, 'monotonic', lambda: clock[0])
+    actual.move(1.6)
+    deadline = actual.deadline
+    with pytest.raises(RuntimeError, match='stalled|timed out'):
+        for step in range(80):
+            clock[0] += .05
+            packet.memory.update({56: 2048 + (2 if step % 2 == 0 else -2), 66: moving})
+            actual.read(0)
+            actual.move(-1.6 if step % 2 == 0 else 1.6)
+            assert actual.deadline == deadline
+    assert clock[0] <= deadline + .051
+    actual.close()
+
+
+@pytest.mark.parametrize('watched', [False, True])
+def test_watched_stop_reports_clearance_diagnostic_without_loosening_other_checks(watched):
+    import time
+    from bench.servo_runtime import stop_check
+    head = SimpleNamespace(angle=0., halt=False, moving=False, sent=0., goal=0., error='',
+                           motor=SimpleNamespace(), wait=lambda *args, **kwargs: None)
+    def request(_kind):
+        head.angle = 3.1640625
+        head.motor.sent_at = head.motor.ack_at = time.monotonic()
+        return 1
+    head.request = request
+    trace = []
+    def note(kind):
+        trace.append({'kind': kind})
+    if watched:
+        result = stop_check(head, trace, note, watched=True)
+        assert not result['stop_excursion_target_met'] and result['watched']
+    else:
+        with pytest.raises(AssertionError, match='excursion'):
+            stop_check(head, trace, note)
+    assert trace[-1]['stop_maximum_sampled_degrees'] == 3.1640625

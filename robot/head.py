@@ -37,8 +37,8 @@ class SimMotor:
     """Advance measured angle at a finite speed; tests render their camera from this readback."""
 
     def __init__(self, angle=0.0, speed=20.0):
-        if not math.isfinite(angle) or abs(angle) > LIMIT or not 0 < speed <= 30:
-            raise ValueError("Require a bounded initial angle and speed up to 30 degrees/s")
+        if not math.isfinite(angle) or abs(angle) > LIMIT or not 0 < speed <= 40:
+            raise ValueError("Require a bounded initial angle and speed up to 40 degrees/s")
         self.angle, self.speed, self.target, self.last = angle, speed, angle, None
         self.goals = []
 
@@ -72,6 +72,8 @@ class Head:
         self.paused = False
         self.moving, self.error, self.closed = False, "", False
         self.sent, self.stationary = None, None
+        self.source = self.follow_after = 0.
+        self.expires = None
         self.thread = None
 
     def start(self):
@@ -92,6 +94,8 @@ class Head:
         """Invalidate old motion before a queued answer can resume or return."""
         with self.condition:
             self.generation += 1
+            self.follow_after = time.time()
+            self.expires = None
             self.halt = self.motor is not None
             self.inspecting = kind != "stop"
             if kind == "stop":
@@ -111,7 +115,8 @@ class Head:
             try:
                 self._tick(now)
             except Exception as error:
-                self.error, self.following, self.inspecting = str(error), False, False
+                self.error = str(error) or type(error).__name__
+                self.following, self.inspecting = False, False
                 self._close_motor()
             self.condition.notify_all()
 
@@ -122,6 +127,8 @@ class Head:
         if self.sent is None:
             self.goal = angle
         self.angle = angle
+        if self.expires is not None and now > self.expires:
+            self.halt, self.expires = True, None
         blocked = self.blocked()
         target = self._target(angle, moving, blocked)
         if target != self.sent:
@@ -152,34 +159,50 @@ class Head:
         target = angle if braking else self.goal
         return target
 
-    def follow(self, box, width, taken, now=None):
-        """Use only a uniquely verified source after the previous correction settled."""
+    def follow(self, box, width, taken, now=None, generation=None):
+        """Refresh a bounded correction from a fresh, uniquely verified face."""
         now = time.time() if now is None else now
         with self.condition:
+            if generation is not None and generation != self.generation:
+                return "cancelled source"
             if reason := self._follow_hold(taken, now):
                 return reason
+            self.source, self.expires = taken, taken + FRESH_S
             error = (box[0] + box[2]) / (2 * width) - .5
             if abs(error) > .06:
-                delta = max(-3., min(3., 24 * error))
+                delta = max(-6., min(6., 48 * error))
                 goal = max(-self.limit, min(self.limit, self.angle + delta))
-                if (abs(goal - self.angle) <= self.tolerance or
-                        abs(goal - self.goal) < getattr(self.motor, "resolution", 0.)):
+                if abs(goal - self.angle) <= self.tolerance:
+                    if delta * (self.goal - self.angle) < 0:
+                        self.halt = True
+                        self.condition.notify_all()
+                        return "reversal"
+                    return "limit"
+                if abs(goal - self.goal) < getattr(self.motor, "resolution", 0.):
                     return "limit"
                 self.goal = goal
                 self.condition.notify_all()
                 return "goal"
+            self.halt = True
+            self.condition.notify_all()
             return "centered"
 
     def _follow_hold(self, taken, now):
         states = ((not self.following, "stopped"), (self.paused, "conversation"),
-                  (self.inspecting, "inspection"), (self.moving or self.halt, "settling"),
+                  (self.inspecting, "inspection"), (self.halt, "settling"),
                   (bool(self.error), "fault"), (self.blocked(), "microphone suppressed"),
-                  (not self.settled <= taken <= now or now - taken > FRESH_S, "stale source"))
+                  (not max(self.source, self.follow_after) < taken <= now or
+                   now - taken > FRESH_S, "stale source"))
         return next((reason for held, reason in states if held), "")
 
-    def hold(self):
+    def hold(self, generation=None, taken=None):
         with self.condition:
-            if not self.inspecting:
+            if taken is not None and taken <= self.source:
+                return
+            if (generation is None or generation == self.generation) and not self.inspecting:
+                if taken is not None:
+                    self.source = taken
+                self.expires = None
                 self.halt = True
 
     def move(self, angle, generation):

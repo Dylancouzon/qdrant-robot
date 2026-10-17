@@ -1,0 +1,142 @@
+{
+  "machine": "Jetson",
+  "release": "daaae842e12d",
+  "tegrastats": "mounted-travel60-20261016-201658.tegrastats",
+  "source": "\"\"\"Check the requested 120-degree total travel at the measured40degree/s profile.\"\"\"\nimport json,os,signal,sys,time\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()))\nfrom robot import servo\nfrom robot.head import Head,interrupt\nfrom robot.config import SHARED\nfrom bench import servo_runtime\n\nconfig=json.loads((SHARED/'servo-mounted.json').read_text())\nassert config['zero']==2080 and config['direction']==1 and config['limit']==45\nconfig['limit']=60\npath=SHARED/'experiments/servo-mounted-calibration'/f'travel60-{time.time_ns()}.json'\npath.write_text(json.dumps(config,indent=2)+'\\n')\nr={'machine':'Jetson','release':os.environ['ROBOT_RELEASE'],'tegrastats':os.environ['ROBOT_TEGRASTATS'],\n 'source':Path(__file__).read_text(),'calibration':config,'calibration_path':str(path),\n 'speed':40,'acceleration':60,'trace':[],'status':'incomplete'}\noutput=SHARED/'results'/f'2026-10-16-mounted-travel60-{time.time_ns()}.json'\noriginal_status=servo.Servo.status\ndef confirmed_status(device):\n state=original_status(device)\n state['temperature_primary_c']=state['temperature_c']\n state['temperature_repeat_c']=device.read(63)\n state['temperature_c']=max(state['temperature_c'],state['temperature_repeat_c'])\n return state\nservo.Servo.status=confirmed_status\nservo.SPEED=servo_runtime.SPEED=40\nservo.ACCELERATION=60\nhead=None\nsignal.signal(signal.SIGTERM,interrupt)\nsignal.signal(signal.SIGINT,interrupt)\ntry:\n with servo.connect(config['port']) as s:\n  r['before']=s.status();before=[s.read(i) for i in range(40)]\n  assert not r['before']['torque'] and not r['before']['moving']\n head=Head(servo.SerialMotor.open(path));head.start();head.wait(0,5)\n servo_runtime.travel(head,r['trace'])\n r['status']='passed'\nexcept BaseException as error:\n r.update(status='failed',error=repr(error));raise\nfinally:\n if head:\n  r['fault_feedback_before_cleanup']=head.motor.status.copy();head.close();r['head_error']=head.error\n with servo.connect(config['port']) as s:\n  r['after']=s.status();r['saved_registers_unchanged']=before==[s.read(i) for i in range(40)]\n  r['lock']=s.read(55)\n if r['after']['torque'] or r['after']['moving'] or not r['saved_registers_unchanged'] or r.get('head_error'):\n  r['status']='failed'\n output.write_text(json.dumps(r,indent=2)+'\\n')\n print(json.dumps({'result':str(output),'status':r['status']}),flush=True)\n",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 2080,
+    "direction": 1,
+    "limit": 60
+  },
+  "calibration_path": "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/travel60-1792196218214529635.json",
+  "speed": 40,
+  "acceleration": 60,
+  "trace": [
+    {
+      "requested_degrees": 0,
+      "measured_degrees": -0.263671875,
+      "settlement_s": 0.17355887800022174,
+      "feedback": {
+        "id": 1,
+        "position": 2077,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 39,
+        "temperature_repeat_c": 39
+      }
+    },
+    {
+      "requested_degrees": 60,
+      "measured_degrees": 58.623046875,
+      "settlement_s": 1.7762060420000125,
+      "feedback": {
+        "id": 1,
+        "position": 2747,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 39,
+        "temperature_repeat_c": 39
+      }
+    },
+    {
+      "requested_degrees": 0,
+      "measured_degrees": 0.17578125,
+      "settlement_s": 1.7163711590001185,
+      "feedback": {
+        "id": 1,
+        "position": 2082,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 39,
+        "temperature_repeat_c": 39
+      }
+    },
+    {
+      "requested_degrees": -60,
+      "measured_degrees": -59.501953125,
+      "settlement_s": 1.7731560510001145,
+      "feedback": {
+        "id": 1,
+        "position": 1403,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 39,
+        "temperature_repeat_c": 39
+      }
+    },
+    {
+      "requested_degrees": 0,
+      "measured_degrees": -0.3515625,
+      "settlement_s": 1.7263703600001463,
+      "feedback": {
+        "id": 1,
+        "position": 2076,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 39,
+        "temperature_repeat_c": 39
+      }
+    }
+  ],
+  "status": "passed",
+  "before": {
+    "id": 1,
+    "position": 2077,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 39,
+    "temperature_repeat_c": 39
+  },
+  "fault_feedback_before_cleanup": {
+    "id": 1,
+    "position": 2076,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 39,
+    "temperature_repeat_c": 39
+  },
+  "head_error": "",
+  "after": {
+    "id": 1,
+    "position": 2076,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 39,
+    "temperature_repeat_c": 39
+  },
+  "saved_registers_unchanged": true,
+  "lock": 1
+}

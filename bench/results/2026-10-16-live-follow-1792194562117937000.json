@@ -1,0 +1,36 @@
+{
+  "machine": "Jetson",
+  "release": "a089d3d9e4dc",
+  "tegrastats": "robot-20261016-194707.tegrastats",
+  "status": "observed, human quality report pending",
+  "trace_source": "experiments/servo-mounted-calibration/live-follow-1792194428623014633.json",
+  "trace_snapshot_sha256": "009cb524ab2b5bfb784112101db1034ce7b0d6ee5c23d07c9ceb987a1095b33e",
+  "samples": 1638,
+  "selected_face_samples": 401,
+  "reasons": {
+    "preview": 1640,
+    "expired at preview": 0,
+    "unrecognized visitor": 1243,
+    "goal": 273,
+    "limit": 73,
+    "centered": 34,
+    "stale source": 15
+  },
+  "selected_capture_age_ms": {
+    "p50": 106.3,
+    "p95": 216.1
+  },
+  "goals_while_moving": 267,
+  "measured_angle_range_deg": [
+    -44.384765625,
+    44.033203125
+  ],
+  "controller_faults": [],
+  "calibration": {
+    "zero": 2080,
+    "direction": 1,
+    "limit": 45
+  },
+  "normal_speed_deg_s": 10,
+  "source": "\"\"\"Run the unchanged live entry point while retaining bounded numeric following diagnostics.\"\"\"\nimport json\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import main\nfrom robot.config import SHARED\nfrom bench.head_sim import trace_following\n\nreport = {'release': os.environ['ROBOT_RELEASE'], 'machine': 'Jetson',\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'status': 'running',\n          'source': Path(__file__).read_text()}\noutput = SHARED / 'experiments/servo-mounted-calibration' / f'live-follow-{time.time_ns()}.json'\nOriginal = main.Robot\n\n\nclass ObservedRobot(Original):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        trace_following(self, report)\n        follow = self._follow_face\n        self.last_report = 0.\n        def observe(*args, **kwargs):\n            result = follow(*args, **kwargs)\n            if time.monotonic() - self.last_report > 1:\n                self.last_report = time.monotonic()\n                self.save_report()\n            return result\n        self._follow_face = observe\n        print(f'following diagnostics: {output}', flush=True)\n\n    def save_report(self):\n        diagnostic = report['following_diagnostics']\n        safe = {**report, 'following_diagnostics': {**diagnostic, 'samples': [\n            {k: v for k, v in row.items() if k != 'name'} for row in diagnostic['samples']]}}\n        temp = output.with_suffix('.tmp')\n        temp.write_text(json.dumps(safe, indent=2) + '\\n')\n        temp.replace(output)\n\n    def close(self):\n        try:\n            super().close()\n        finally:\n            report['status'] = 'closed'\n            self.save_report()\n\n\nmain.Robot = ObservedRobot\nmain.main()\n"
+}

@@ -1,0 +1,71 @@
+{
+  "machine": "dylans-macbook-pro.tail04131.ts.net",
+  "hardware_motion": false,
+  "speed_deg_s": 10,
+  "arrival_tolerance_deg": 1.5,
+  "baseline_sha256": "ac4f227fde304e409a37563bd52f88224b9d1251e6509cd33d797b1d7b57f721",
+  "candidate_sha256": "a870500a5d9a4e4ae2c6ec6dda06f8f0da20b3231f9c73e7154528c368772e1c",
+  "runs": [
+    {
+      "capture_delay_s": 0.0,
+      "baseline": {
+        "mean_error_deg": 4.978429143374315,
+        "offcenter_stationary_fraction": 0.40901771336553944,
+        "maximum_overshoot_deg": 1.0046020678856884,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 27
+      },
+      "candidate": {
+        "mean_error_deg": 4.667060427078486,
+        "offcenter_stationary_fraction": 0.3072100313479624,
+        "maximum_overshoot_deg": 0.9295057678553462,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 69
+      },
+      "passed": true
+    },
+    {
+      "capture_delay_s": 0.15,
+      "baseline": {
+        "mean_error_deg": 5.92395339933215,
+        "offcenter_stationary_fraction": 0.5422045680238332,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 21
+      },
+      "candidate": {
+        "mean_error_deg": 4.031940027260284,
+        "offcenter_stationary_fraction": 0.43248945147679324,
+        "maximum_overshoot_deg": 0.8898234190706802,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 79
+      },
+      "passed": false
+    },
+    {
+      "capture_delay_s": 0.3,
+      "baseline": {
+        "mean_error_deg": 7.728667503157739,
+        "offcenter_stationary_fraction": 0.6569678407350689,
+        "maximum_overshoot_deg": 0.2925651190324139,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 21
+      },
+      "candidate": {
+        "mean_error_deg": 14.543389368468878,
+        "offcenter_stationary_fraction": 1.0,
+        "maximum_overshoot_deg": 0.0,
+        "wrong_way_corrections": 0,
+        "stop_excursion_deg": 0.0,
+        "goal_count": 1
+      },
+      "passed": false
+    }
+  ],
+  "passed": false
+}

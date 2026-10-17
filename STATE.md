@@ -1,16 +1,16 @@
 # State
 
-Updated 2026-10-16. Branch: `main`. Architecture is settled; use the [topic index](research/README.md) for details.
+Updated 2026-10-16. Architecture is settled; use the [topic index](research/README.md) for details.
 
 ## Active task
 
-Improve live following after initial assembled bring-up. Dylan reports slow, uneven tracking and limited travel; small scripted movements and cable clearance passed within ±10°. The controller currently stops between corrections of at most 3°, with motor speed capped at 10°/s. Mounted Stop, return, short service shutdown, upright camera capture, and audible robot replies passed (J). Await readiness for watched ±20° clearance checks while measuring the live tracking pauses.
+The requested 40°/s profile and 120° total travel (±60°) are running. Dylan confirmed cable clearance after both turns and returns. Continuous six-degree corrections reduce pauses. The final task review passed. Remaining work concerns qualification rather than further speed tuning.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `c5f739e0`; live release `d4bfe27ff762`; previous `454112d0d65a`. Unit `qr-robot` is listening; logs are in `journalctl -u qr-robot` and `shared/sessions/`. Benchmarks are stopped. The Mac monitor runs at `http://127.0.0.1:8766`. The final recorded-fixture import correction is host-only; live runtime files match. Accepted `f9b90b958023` remains available.
+Jetson `robot`: boot `c5f739e0`; deployed release `7bc4a41a9f5e`. Unit `qr-robot` is listening. Its bounded following diagnostics stay under `shared/experiments/servo-mounted-calibration/`; its service log is `journalctl -u qr-robot`. The Mac monitor is at `http://127.0.0.1:8766`. Accepted `f9b90b958023` remains available.
 
-Motor output is opt-in through `/home/qdrant/qdrant-robot/shared/servo-mounted.json`. It uses measured zero 2019, verified direction one, and a 10° limit. Loose-servo calibration must not be reused.
+Motor output is opt-in through `/home/qdrant/qdrant-robot/shared/servo-mounted.json`. It uses confirmed forward zero 2080, verified direction one, and the watched ±60° limit. The previous mounted file is backed up. Loose-servo calibration must not be reused.
 
 The broad acceptance measurements below precede servo work. Current evidence and gaps are in [head control](research/servo.md).
 
@@ -30,8 +30,6 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next step
 
-**Test the assembled head.** Follow [mounted calibration and checks](research/servo.md#next-session-assembled-robot-testing): forward encoder, direction, small initial travel, cable clearance, gradual limits, two-person ownership, inspection, Stop, shutdown, and loaded power.
+The requested following profile and watched travel checks are complete. The provisional Stop settlement target of 0.3 s remains unmet at up to 0.452 s, with up to 3.164° additional sampled travel (J). One isolated 65°C report triggered immediate shutdown; its cause remains unresolved. Qualify loaded power and feedback before unattended use.
 
-The provisional Stop settlement target of 0.3 s remains unmet at 0.509 s, with 1.143° additional sampled travel (J). Qualify loaded power and stationary feedback before unattended use. Inspection latency and broad acceptance remain open.
-
-Next: sample live following, distinguish commanded settling from feedback faults, and compare a smoother bounded correction with the current controller. Expand travel only through watched clearance checks. Full 45° inspection travel, prolonged loaded power, two-person ownership, and M4 acceptance remain open. Do not repeat the EEPROM write.
+Next: qualify prolonged loaded power and feedback, then two-person ownership and inspection. Keep 70° travel, inspection latency, and M4 acceptance open. Do not repeat the EEPROM write.

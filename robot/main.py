@@ -782,6 +782,7 @@ class Robot:
         """Model-owner background work; fresh results alone authorize selected writes."""
         if time.time() - taken > PREVIEW_TTL or gallery != self.recognition.epoch:
             return
+        generation = self.head.generation
         selected, _ = self._select_face(self.recognition.faces, frame)
         found_face = (selected.vector, selected.width, selected.box) if selected else None
         person = selected.name if selected else None
@@ -793,7 +794,7 @@ class Robot:
                          focus.epoch(i) == epochs[i]}
                 self._verified_frame(frame, taken, tracks, valid, found_face, person, geometry,
                                      gallery)
-                self._follow_face(selected, frame.shape[1], taken)
+                self._follow_face(selected, frame.shape[1], taken, generation)
         if not self.head.valid(taken):
             return
         recognized, excluded = self._query_objects(frame, tracks, preferences, (taken, epochs))
@@ -1114,10 +1115,10 @@ class Robot:
         candidates = [t for t in tracks if t.label == "person" and inside(box, t.box) >= .8]
         return candidates[0] if len(candidates) == 1 else None
 
-    def _follow_face(self, selected, width, taken):
+    def _follow_face(self, selected, width, taken, generation=None):
         if selected and selected.name:
-            return self.head.follow(selected.box, width, taken)
-        self.head.hold()
+            return self.head.follow(selected.box, width, taken, generation=generation)
+        self.head.hold(generation, taken)
         return "unrecognized visitor"
 
     def _retain(self, now: float) -> None:

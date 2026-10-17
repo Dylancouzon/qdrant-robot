@@ -1,4 +1,4 @@
-"""Qualify the real loose servo through Head, using measured yaw for projected following."""
+"""Qualify calibrated head movement, watched travel, Stop, and service shutdown."""
 import argparse
 import json
 import os
@@ -11,11 +11,28 @@ from robot.head import Head, Interrupted, interrupt
 from robot.servo import SPEED, SerialMotor, connect
 
 
-def wait_stopped(head, token):
-    settled = head.wait(token, timeout=5)
+def wait_stopped(head, token, timeout=5):
+    settled = head.wait(token, timeout=timeout)
     if head.error:
         raise RuntimeError(head.error)
     return settled
+
+
+def travel(head, trace):
+    """Run only the explicitly configured, human-watched stage, returning after each side."""
+    token = head.request("right")
+    for goal in (0, head.limit, 0, -head.limit, 0):
+        started = time.monotonic()
+        head.move(goal, token)
+        wait_stopped(head, token, timeout=head.limit / SPEED + 3)
+        with head.condition:
+            row = {"requested_degrees": goal, "measured_degrees": head.angle,
+                   "settlement_s": time.monotonic() - started,
+                   "feedback": head.motor.status.copy()}
+        trace.append(row)
+        print(json.dumps(row), flush=True)
+        assert abs(row["measured_degrees"] - goal) <= head.tolerance
+        time.sleep(2 if goal else 1)
 
 
 def exercise(head, trace):
@@ -86,7 +103,7 @@ def exercise(head, trace):
     return stop_result
 
 
-def stop_check(head, trace, note):
+def stop_check(head, trace, note, *, watched=False):
     """Measure an intercepted move; the caller requires active motion."""
     before, started = head.angle, time.monotonic()
     stop = head.request("stop")
@@ -108,22 +125,31 @@ def stop_check(head, trace, note):
     result = {"stop_request_monotonic": started, "stop_settled_s": elapsed,
               "stop_dispatch_s": dispatch, "stop_ack_s": acknowledgement,
               "stop_maximum_sampled_degrees": maximum,
+              "watched": watched,
+              "stop_excursion_target_degrees": 3,
+              "stop_excursion_target_met": maximum <= 3,
               "stop_time_target_s": .3, "stop_time_target_met": elapsed <= .3}
     trace.append({"kind": "stop", **result})
     assert 0 <= dispatch <= .1, "Hold goal missed the first controller cycle"
-    assert maximum <= 3, "Stop excursion exceeded three degrees"
+    if not watched:
+        assert maximum <= 3, "Stop excursion exceeded three degrees"
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("calibration", type=Path)
-    parser.add_argument("--hold", action="store_true", help="Wait for service SIGTERM")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--hold", action="store_true", help="Wait for service SIGTERM")
+    mode.add_argument("--travel", action="store_true",
+                      help="Human-watched travel stage at the explicit calibrated limit")
     args = parser.parse_args()
     config = json.loads(args.calibration.read_text())
-    assert config["limit"] <= 10, "Loose-servo qualification requires at most 10 degrees"
+    assert config["limit"] <= (70 if args.travel else 10), (
+        "Functional checks require at most 10 degrees")
     result = {"release": os.environ.get("ROBOT_RELEASE"), "machine": "Jetson",
-              "mode": "service-shutdown" if args.hold else "loose-servo",
+              "mode": ("service-shutdown" if args.hold else
+                       "watched-travel" if args.travel else "calibrated-functional"),
               "calibration": config, "external_supply": "5 V / 4 A",
               "configured_speed_deg_s": SPEED,
               "tegrastats": os.environ.get("ROBOT_TEGRASTATS"), "trace": []}
@@ -145,6 +171,8 @@ def main():
                 if head.error:
                     raise RuntimeError(head.error)
                 time.sleep(.1)
+        elif args.travel:
+            travel(head, result["trace"])
         else:
             result.update(exercise(head, result["trace"]))
         result["status"] = "passed"

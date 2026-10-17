@@ -1,0 +1,56 @@
+{
+  "machine": "Jetson",
+  "release": "478d6bb12491",
+  "tegrastats": "mounted-response15-5-20261016-195525.tegrastats",
+  "speed": 15,
+  "acceleration": 5,
+  "source": "\"\"\"Compare one temporary acceleration setting with fixed moves, retargets, and peak-speed Stops.\"\"\"\nimport argparse\nimport json\nimport os\nimport signal\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import servo\nfrom robot.head import Head, interrupt\nfrom robot.config import SHARED\nfrom bench import servo_runtime\n\np=argparse.ArgumentParser()\np.add_argument('--speed',type=int,choices=(15,20,30),required=True)\np.add_argument('--acceleration',type=int,choices=(5,10,20),required=True)\na=p.parse_args()\nrecord={'machine':'Jetson','release':os.environ['ROBOT_RELEASE'],\n 'tegrastats':os.environ['ROBOT_TEGRASTATS'],'speed':a.speed,'acceleration':a.acceleration,\n 'source':Path(__file__).read_text(),'trace':[],'moves':[],'stops':[],'status':'incomplete',\n 'source_type':'projected fresh face; no camera inference; capture age zero',\n 'criteria':{'excursion_deg':3,'dispatch_s':.1,'settlement_s':2,'minimum_peak_speed_fraction':.8}}\noutput=SHARED/'results'/f'2026-10-16-mounted-response-{time.time_ns()}.json'\nconfig=SHARED/'experiments/servo-mounted-calibration/functional-2080-10.json'\nhead=None\nsignal.signal(signal.SIGTERM,interrupt)\nsignal.signal(signal.SIGINT,interrupt)\n\ndef note(kind):\n with head.condition:\n  m=head.motor\n  row={'kind':kind,'time':time.time(),'angle':head.angle,'goal':head.goal,\n   'feedback_monotonic':m.feedback,'encoder_position':m.position,'encoder_goal':m.target,\n   'feedback':m.status.copy(),'sent':getattr(m,'sent_at',None),'ack':getattr(m,'ack_at',None)}\n  record['trace'].append(row)\n  return row\n\ndef move(goal):\n start=time.monotonic();token=head.request('right');head.move(goal,token)\n while head.halt or head.moving or head.sent!=head.goal:\n  note('fixed')\n  assert not head.error and time.monotonic()-start<6\n  time.sleep(.01)\n head.wait(token,1)\n record['moves'].append({'goal':goal,'angle':head.angle,'seconds':time.monotonic()-start})\n head.finish(token)\n\ntry:\n with servo.connect(json.loads(config.read_text())['port']) as device:\n  record['before']=device.status();before=[device.read(i) for i in range(40)]\n  record['initial_acceleration']=device.read(41)\n  record['raw_register85']=device.read(85)\n # Center at the currently qualified profile and cleared45degree travel.\n head=Head(servo.SerialMotor.open(SHARED/'servo-mounted.json'))\n head.start();head.wait(0,5)\n token=head.request('right');head.move(0,token);head.wait(token,10)\n head.close();head=None\n servo.SPEED=servo_runtime.SPEED=a.speed\n original=servo.Servo.prepare\n def prepare(device,position,speed):\n  original(device,position,speed)\n  assert device.read(40)==0\n  device.write(41,a.acceleration)\n  assert device.read(41)==a.acceleration\n servo.Servo.prepare=prepare\n head=Head(servo.SerialMotor.open(config));head.start();head.wait(0,5)\n with head.condition:\n  record['actual_acceleration']=head.motor.servo.read(41)\n  record['actual_speed_steps_s']=head.motor.servo.read(46,2)\n for goal in (8,0,-8,0):move(goal)\n start=time.monotonic()\n while time.monotonic()-start<3:\n  head.follow((1000,0,1280,700),1280,time.time())\n  note('retarget')\n  assert not head.error\n  time.sleep(.07)\n record['retarget_end_angle']=head.angle\n move(0)\n for direction in (1,-1,1,-1,1,-1):\n  move(-8*direction)\n  token=head.request('right');head.move(8*direction,token)\n  deadline=time.monotonic()+4;previous=note('accelerating');peak=0.\n  while True:\n   row=note('accelerating')\n   dt=row['feedback_monotonic']-previous['feedback_monotonic']\n   if dt>0:\n    velocity=(row['encoder_position']-previous['encoder_position'])/servo.SCALE/dt\n    peak=max(peak,abs(velocity));previous=row\n   assert not head.error and time.monotonic()<deadline\n   if direction*head.angle>=0 and peak>=.8*a.speed:break\n   time.sleep(.005)\n  assert head.moving\n  result=servo_runtime.stop_check(head,record['trace'],note)\n  record['stops'].append({'direction':direction,'measured_peak_deg_s':peak,**result})\n  print(json.dumps(record['stops'][-1]),flush=True)\n move(0)\n record['status']='passed'\nexcept BaseException as error:\n record.update(status='failed',error=repr(error));raise\nfinally:\n if head:\n  record['fault_feedback_before_cleanup']=head.motor.status.copy();head.close()\n  record['head_error']=head.error\n with servo.connect(json.loads(config.read_text())['port']) as device:\n  record['after']=device.status()\n  record['saved_registers_unchanged']=before==[device.read(i) for i in range(40)]\n  record['final_acceleration']=device.read(41)\n  record['lock']=device.read(55)\n if record['after']['torque'] or record['after']['moving'] or not record['saved_registers_unchanged']:\n  record['status']='failed'\n output.write_text(json.dumps(record,indent=2)+'\\n')\n print(json.dumps({'result':str(output),'status':record['status']}),flush=True)\n",
+  "trace": [],
+  "moves": [],
+  "stops": [],
+  "status": "failed",
+  "source_type": "projected fresh face; no camera inference; capture age zero",
+  "criteria": {
+    "excursion_deg": 3,
+    "dispatch_s": 0.1,
+    "settlement_s": 2,
+    "minimum_peak_speed_fraction": 0.8
+  },
+  "before": {
+    "id": 1,
+    "position": 2071,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "initial_acceleration": 5,
+  "raw_register85": 250,
+  "error": "RuntimeError('Attempting to use a port that is not open')",
+  "fault_feedback_before_cleanup": {
+    "id": 1,
+    "position": 2071,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "head_error": "Attempting to use a port that is not open",
+  "after": {
+    "id": 1,
+    "position": 2071,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true,
+  "final_acceleration": 5,
+  "lock": 1
+}

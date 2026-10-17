@@ -131,12 +131,21 @@ def compare_streaming_description(robot, turn):
 def trace_following(robot, report):
     """Keep a bounded trace at the existing following boundary, without changing its decisions."""
     follow, preview = robot._follow_face, robot.recognition.preview
-    counts, samples = Counter(), deque(maxlen=32)
+    counts, samples = Counter(), deque(maxlen=2048)
     report["following_diagnostics"] = {"counts": counts, "samples": samples}
-    def observe(selected, width, taken):
-        reason = follow(selected, width, taken)
+    def observe(selected, width, taken, generation=None):
+        reason = follow(selected, width, taken, generation)
         counts[reason] += 1
+        motor = robot.head.motor
         samples.append({"age_ms": round(1000 * (time.time() - taken), 1),
+                        "source_time": taken,
+                        "face_error": ((selected.box[0] + selected.box[2]) / (2 * width) - .5)
+                        if selected else None,
+                        "encoder_position": getattr(motor, "position", None),
+                        "encoder_goal": getattr(motor, "target", None),
+                        "feedback": getattr(motor, "status", None),
+                        "progress_age_s": time.monotonic() - motor.progress
+                        if hasattr(motor, "progress") else None,
                         "name": selected.name if selected else None, "reason": reason,
                         "head": head_state(robot.head), "tracks": [
                             row for row in robot.tracker.scored() if row[2] == "person"]})

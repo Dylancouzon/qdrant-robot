@@ -1,0 +1,249 @@
+{
+  "machine": "Jetson",
+  "release": "d4bfe27ff762",
+  "tegrastats": "mounted-travel20-20261016-193152.tegrastats",
+  "mode": "watched mounted 20-degree travel check",
+  "physical_zero": "Reuse confirmed mounted zero 2019 and direction +1",
+  "source": "\"\"\"Measure the human-aligned mounted zero, then use Head for one 5-degree turn and return.\"\"\"\nimport hashlib\nimport json\nimport os\nimport signal\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot.config import SHARED\nfrom robot.head import Head, interrupt\nfrom robot.servo import SerialMotor, calibration, connect, safe\n\nport = '/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00'\nfolder = SHARED / 'experiments/servo-mounted-calibration'\nbackup = folder / 'preflight-1792191450.json'\nassert hashlib.sha256(backup.read_bytes()).hexdigest() == (\n    '46f3b14bb835f8c130b95694fa1c3ef684f07c382c1cf39aad52cb57b4e80a33')\noriginal = json.loads(backup.read_text())['saved_registers_0_39']\nexpected = original.copy()\nexpected[31:33] = [226, 7]\nrecord = {'machine': 'Jetson', 'release': os.environ['ROBOT_RELEASE'],\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'mode': 'watched mounted 20-degree travel check',\n          'physical_zero': 'Reuse confirmed mounted zero 2019 and direction +1',\n          'source': Path(__file__).read_text(), 'moves': [], 'status': 'incomplete'}\noutput = SHARED / 'results' / f'{time.strftime(\"%Y-%m-%d\")}-mounted-direction-{time.time_ns()}.json'\nhead = None\nsignal.signal(signal.SIGTERM, interrupt)\nsignal.signal(signal.SIGINT, interrupt)\ntry:\n    with connect(port) as device:\n        samples = []\n        for _ in range(20):\n            started = time.monotonic()\n            state = device.status()\n            assert time.monotonic() - started <= .3, 'Expired forward status'\n            safe(state)\n            assert state['torque'] == 0 and state['moving'] == 0\n            samples.append(state)\n            time.sleep(.05)\n        positions = sorted(s['position'] for s in samples)\n        assert positions[-1] - positions[0] <= 2, 'Forward pose is moving'\n        assert [device.read(a) for a in range(40)] == expected, 'Saved settings changed'\n        assert device.read(55) == 1, 'Saved settings are unlocked'\n    config = json.loads((SHARED / 'servo-mounted.json').read_text())\n    assert config['zero'] == 2019 and config['direction'] == 1\n    config['limit'] = 20\n    calibration(config['zero'], config['direction'], config['limit'])\n    path = folder / f'direction-{time.time_ns()}.json'\n    with path.open('x') as file:\n        file.write(json.dumps(config, indent=2) + '\\n')\n    record.update(calibration=config, calibration_path=str(path), forward_samples=samples)\n    print(json.dumps({'forward_zero': config['zero'], 'limit': 20, 'test': 'forward, right20, forward, left20, forward'}),\n          flush=True)\n    head = Head(SerialMotor.open(path))\n    head.start()\n    head.wait(0, timeout=5)\n    token = head.request('right')\n    for goal in (0, 20, 0, -20, 0):\n        started = time.monotonic()\n        head.move(goal, token)\n        head.wait(token, timeout=5)\n        record['moves'].append({'requested_degrees': goal, 'measured_degrees': head.angle,\n                                'settlement_s': time.monotonic() - started,\n                                'feedback': head.motor.status.copy()})\n        assert abs(head.angle - goal) <= head.tolerance\n        print(json.dumps(record['moves'][-1]), flush=True)\n        time.sleep(2 if goal else 1)\n    record['status'] = 'passed'\nexcept BaseException as error:\n    record.update(status='failed', error=repr(error))\n    raise\nfinally:\n    if head:\n        head.close()\n        record['head_error'] = head.error\n    try:\n        with connect(port) as device:\n            record['after'] = device.status()\n            record['saved_registers_unchanged'] = [device.read(a) for a in range(40)] == expected\n        assert record['after']['torque'] == 0, 'Torque release is unconfirmed'\n        assert record['after']['moving'] == 0, 'Servo still reports movement'\n        assert record['saved_registers_unchanged'], 'Saved settings changed during movement'\n        assert not record.get('head_error'), record.get('head_error')\n    except BaseException as error:\n        record.update(status='failed', cleanup_error=repr(error))\n        raise\n    finally:\n        output.write_text(json.dumps(record, indent=2) + '\\n')\n        print(json.dumps({'result': str(output), 'status': record['status']}), flush=True)\n",
+  "moves": [
+    {
+      "requested_degrees": 0,
+      "measured_degrees": 0.087890625,
+      "settlement_s": 1.2138788480001494,
+      "feedback": {
+        "id": 1,
+        "position": 2020,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      }
+    }
+  ],
+  "status": "failed",
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 2019,
+    "direction": 1,
+    "limit": 20
+  },
+  "calibration_path": "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/direction-1792193513898004363.json",
+  "forward_samples": [
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.3,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    },
+    {
+      "id": 1,
+      "position": 2122,
+      "mode": 0,
+      "torque": 0,
+      "voltage_v": 5.4,
+      "temperature_c": 39,
+      "fault": 0,
+      "moving": 0
+    }
+  ],
+  "error": "RuntimeError('Servo movement stalled')",
+  "head_error": "Servo movement stalled",
+  "after": {
+    "id": 1,
+    "position": 2233,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "saved_registers_unchanged": true,
+  "cleanup_error": "AssertionError('Servo movement stalled')"
+}
