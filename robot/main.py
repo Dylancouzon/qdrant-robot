@@ -1491,6 +1491,7 @@ class Robot:
 
     def _clear_dialogue(self):
         self.history, self.looked, self.teaching, self.asking = [], [], None, None
+        self.topic = None
         self.held.clear()
         self.ui_turns.clear()
 
@@ -1522,7 +1523,7 @@ class Robot:
         if self._resolve_visitor(turn, now):
             self.ui_turns.clear()
             self.ui_turns.append(turn)
-            self.history, self.looked, self.teaching = [], [], None
+            self.history, self.looked, self.teaching, self.topic = [], [], None, None
             self.held.clear()
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
@@ -1676,6 +1677,7 @@ class Robot:
         elif statement is not None and (topic := self.topic) and topic[0] == turn.visitor and \
                 turn.speech_start - topic[2] <= CONVERSATION_S and _PRONOUN.search(turn.question):
             self.things.link(topic[1], pid)  # "I bought it in Paris" goes with the object
+            self.topic = topic[0], topic[1], turn.speech_start  # the follow-ups go on
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid]))
         self._retain(time.time())

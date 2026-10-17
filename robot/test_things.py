@@ -3609,18 +3609,28 @@ def test_pronoun_statement_after_naming_is_forgotten_with_the_object(robot):
     r = robot
     frame_of(r)
     r.focus.focus = next(iter(r.view[1]))
+    start = time.time()
     answer, named = ask(r, "This is my phone")
     assert answer.startswith("Got it")
-    shot = (r.view[0], time.time())
+    named.speech_start = start
+    shot = (r.view[0], start)
     assert r._store(named, shot, None, None)
     vec = np.eye(TEXT_DIM, dtype=np.float32)[0]
-    said = Turn(question="I bought it in Paris.", answer="Nice.", speech_start=time.time() + 1,
-                visitor=named.visitor)
-    assert r._store(said, shot, vec, None)
-    other = Turn(question="I live in Lyon.", answer="Lovely.", speech_start=time.time() + 1,
+    # A chain of follow-ups, each under CONVERSATION_S after the one before, but the last more
+    # than CONVERSATION_S after the naming; then an unrelated statement, then an object question.
+    for text, dt in [("I bought it in Paris.", 50), ("They gave me a discount.", 100),
+                     ("I purchased it in Berlin.", 150), ("I live in Lyon.", 160)]:
+        said = Turn(question=text, answer="Nice.", speech_start=start + dt, visitor=named.visitor)
+        assert r._store(said, shot, vec, None)
+    asked = Turn(question="Where is my phone?", speech_start=start + 300, visitor=named.visitor)
+    assert r._things(asked, None)
+    after = Turn(question="That was a gift.", answer="Lovely.", speech_start=start + 310,
                  visitor=named.visitor)
-    assert r._store(other, shot, vec, None)
+    assert r._store(after, shot, vec, None)
     assert forget(r, "Forget my phone")[0].startswith("Done")
-    left = [m["said"] for m in r.memory.told(vec, time.time() + 5, visitor=said.visitor, n=9)]
-    assert left == ["I live in Lyon."], "the pronoun statement went with the phone"
-    assert r.memory.exchanges(said.visitor, time.time() + 5, n=9) == []
+    root = r.memory.frames.parent
+    r.memory.shard.close()
+    r.memory = Memory(root)
+    left = [m["said"] for m in r.memory.told(vec, start + 999, visitor=named.visitor, n=9)]
+    assert left == ["I live in Lyon."], left
+    assert r.memory.exchanges(named.visitor, start + 999, n=9) == []
