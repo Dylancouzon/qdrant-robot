@@ -14,6 +14,10 @@ D206 supersedes D70's statement-scoping clause. Claude Opus 5.5 checked the [min
 
 The pre-change memory backup is `shared/backups/pre-person-memory-1792214398165463000/memory/` on the Jetson. It was copied with closed shards under the shared job lock. The [task review](../reviews/20261017-011944-59900-review.md) passes. Full release checks pass in 277.78 seconds (E). The [isolated Jetson check](../bench/results/2026-10-17-person-memory.json) passes all seven query, admission, persistence, and deletion checks with qdrant-edge-py 0.8.0 (J). It uses a temporary store and no models; live answer quality remains unmeasured.
 
+## Next execution
+
+The [overnight handoff](overnight-conversation.md) scopes the next experiment. It audits the current tests, separates retrieval from answer quality, and defines fresh validation. Mac analysis and judging may run in parallel; Jetson trials wait for the other session to release access. The overnight session has not started.
+
 ## Deferred next steps
 
 1. Retrieve complete exchanges for explicit conversation-history questions. Fix retrieval eligibility and duplicate history before revisiting the archived prototype.

@@ -10,7 +10,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Servo work, parked tasks, and known gaps | [Remaining work](edge-cases.md#next-steps) |
 | Enclosure, printing, and assembly | [Enclosure](../hardware/enclosure/README.md), [trial history](experiment-ledger.md#enclosure) |
 | Shared active visitor and bounded head movement | [Head control](servo.md) |
-| Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md) |
+| Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md), [overnight execution plan](overnight-conversation.md) |
 | Monitor, audio controls, and session lifecycle | [Robot interface](mac-audio-interface.md) |
 | Focus, overlays, and visitor interaction | [Booth behavior](booth-ux.md) |
 | Detector models and preprocessing | [Detector](detector.md) |

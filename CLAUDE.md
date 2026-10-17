@@ -6,7 +6,7 @@ Keep the architecture stable. Focus on cleanup, observed quirks, interaction, an
 
 ## Start with a small context
 
-1. Read this file, STATE.md, and the short [lessons index](research/lessons.md), including after compaction.
+1. Read this file, [STATE.md](STATE.md), and the short [lessons index](research/lessons.md), including after compaction.
 2. Reconcile STATE.md with `git status`. Finish the active task before starting another.
 3. Use the [topic index](research/README.md) to open only files relevant to that task. Search relevant decision IDs before reading their entries.
 4. Use `python3 tools/results.py` for evidence summaries. Open individual result rows and logs only for the question at hand.
