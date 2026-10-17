@@ -1,5 +1,23 @@
 # Hybrid Edge memory session plan
 
+Completed 2026-10-17 and rejected for the runtime (D209). Ranked exchange recall retrieved far better but did not answer better; the 2B model's use of quoted evidence and the speech-verb cue limit dialogue recall, not Qdrant retrieval. The rejected commit is tag `archive/hybrid-exchanges-2026-10-17`.
+
+## Results
+
+| Measurement | Time-ordered (main) | Fused dense and BM25 (DBSF) |
+| --- | --- | --- |
+| Gold exchanges beyond the live window, benchmark check half (E) | 6/13, top one never gold | 13/13, top one gold 12/13 |
+| Gold exchange delivered, cued dialogue turns of `recall-long` (J) | 6/9 | 8/9 |
+| `eval/dev/recall-long.jsonl` judged (J) | 62/87, 60/87 | 58/87, 61/87 |
+| `eval/dev/demo.jsonl` paired (J) | 51/79 | 48/79 |
+| Sealed `eval/validation/recall.jsonl` judged (J) | 25/55 | 23/55 |
+| Fused exchange query on the Jetson, 3,000 queries (J) | | 2.17 ms p50, 3.67 ms p99 |
+
+Dense alone matched the fused arms on this benchmark: the BM25 leg showed no measured gain. The bge query instruction prefix did not change the outcome. Time decay did not move corrected statements first (14 to at most 15 of 20 on the selection half, E), and statement traps scored 0.69 to 0.71, inside the gold range of 0.53 to 0.90, so no threshold separates them. With the gold exchange delivered, the robot still answered "I don't remember" or picked the wrong line in several turns. RAM headroom stayed at or above 886 MB, with up to 378 MB of swap held (J).
+
+The design gate (RETHINK) showed that `UpdateOperation.create_dense_vector` and `create_sparse_vector` add named vectors in place; `update_vectors` backfills, and a `must_not HasVectorCondition` filter finds turns written without them. No migration is needed for a later schema change.
+
+
 Dylan asked on 2026-10-17 for a best-in-class Qdrant Edge memory, run like the [memory demo session](overnight-conversation.md). The goal is better recall of what visitors said and what the robot answered, with no regression in the demo, privacy, deletion, or latency.
 
 ## Verified Edge 0.8.0 capabilities
