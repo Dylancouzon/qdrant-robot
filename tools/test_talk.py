@@ -333,8 +333,16 @@ def test_robot_launch_uses_its_own_audio_and_forwards_only_the_view(session):
     assert talk.robot_args("clip.avi") == ["-m", "robot.main", "--camera-file", "clip.avi"]
 
 
-def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
-    instance = talk.Session("release", "/existing/private/fixture.avi")
+@pytest.mark.parametrize("camera,calibration,expected", [
+    ("/existing/private/fixture.avi", None,
+     ["--camera-file", "/existing/private/fixture.avi"]),
+    (None, "/existing/servo-mounted.json", ["--servo-calibration", "/existing/servo-mounted.json"]),
+    ("fixture.avi", "servo.json",
+     ["--camera-file", "fixture.avi", "--servo-calibration", "servo.json"]),
+])
+def test_explicit_camera_and_calibration_forwarded_through_workflow(
+        monkeypatch, camera, calibration, expected):
+    instance = talk.Session("release", camera, calibration)
     commands = []
     monkeypatch.setattr(talk, "remote", lambda script: f"{talk.BASE}/releases/release")
     monkeypatch.setattr(talk, "command", lambda args, env=None: commands.append(args))
@@ -342,7 +350,7 @@ def test_recorded_camera_forwarded_through_existing_workflow(monkeypatch):
         (_ for _ in ()).throw(RuntimeError("fake tunnel end"))))
     monkeypatch.setattr(instance, "cleanup_remote", lambda: "")
     instance.run()
-    assert commands[0][-2:] == ["--camera-file", "/existing/private/fixture.avi"]
+    assert commands[0][-len(expected):] == expected
 
 
 @pytest.mark.parametrize("path", ["/memory", "/memory_map", "/thumb?view=saved"])

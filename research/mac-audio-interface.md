@@ -10,7 +10,7 @@ Run `.venv/bin/python tools/talk.py --release RELEASE_ID`, using the current rel
 
 Say "Hey Edgy" to start a turn. Follow-up questions work for about a minute after an answer finishes. **Stop** stops the `qr-robot` unit and closes the tunnel. Closing the page, Ctrl-C, or losing the tunnel leaves the robot running and listening; Start attaches again. The unit does not start at boot. The local page remains open for another Start.
 
-**Talking to** shows the selected visitor. **Stop head** cancels head movement and following while the robot keeps running. Servo startup requires the explicit calibration procedure in the [hardware guide](../hardware/SERVO.md). After that unit starts, the monitor attaches through its existing Start flow.
+**Talking to** shows the selected visitor. **Stop head** cancels head movement and following while the robot keeps running. For a calibrated head, launch the monitor with `--servo-calibration /home/qdrant/qdrant-robot/shared/servo-mounted.json`. Start passes that existing Jetson file to `robot.main`; Stop and Start retain the option while the monitor stays open. The default leaves motor output disabled. Attaching to an existing unit preserves its startup options. The [hardware guide](../hardware/SERVO.md) covers first calibration; the assembled head already has its saved calibration.
 
 A transcription or answer-worker exception stops the session and preserves its traceback in the Jetson journal. Pending work is discarded before resources close. Start launches another session after the failed unit stops.
 
@@ -28,15 +28,15 @@ Use one camera viewer. A second MJPEG subscriber replaces the first. Each sessio
 
 The camera shows known object names, one orange "???" teaching focus, and admitted grey object outlines. Person detection supplies internal cues; the page draws verified face outlines instead of body boxes. Face identity uses only the current verified result on its exact source pixels. The status and transcript show Listening, Hearing you, Thinking, and Speaking.
 
-The camera fills the main pane beside a narrow conversation column. The default framing crops the source to fill the pane without bars. **View controls**, then **Show full frame**, reveals the complete source when its edges matter. Narrow screens use a 16:9 camera followed by conversation. Session errors stay expandable so a traceback cannot cover the camera.
+The camera fills the main pane beside a narrow conversation column. The pane follows the source aspect ratio and shows the complete frame. Chat uses 16 px text; source cards and action buttons use 14 px. Narrow screens put conversation after the camera. The detection strip and map control sit beneath the video, leaving its edges visible. Session errors stay expandable so a traceback cannot cover the camera.
 
-The bottom-left strip shows up to three admitted current detector categories and their detector confidence, with a count for additional detections. These scores describe categories independently of stored-object similarity. Stale sources, suppressed objects, faces, and carried outlines contribute no detections. Camera and state failures clear the strip.
+The strip beneath the video shows up to three admitted current detector categories and their detector confidence, with a count for additional detections. These scores describe categories independently of stored-object similarity. Stale sources, suppressed objects, faces, and carried outlines contribute no detections. Camera and state failures clear the strip.
 
 Each of the eight published transcript turns carries its supplied evidence. The page renders these sources immediately before the answer and keeps them through streaming and reload. Sources retain their original labels, including generated captions. Empty source sections stay hidden. Selecting a named object opens its Memory card. Search results and timings remain under **Turn details**.
 
 The command tip says `Say "Hey Edgy, ..."`. It occupies the middle of an empty conversation and stays at the top during conversation. Examples rotate every 12 seconds without extra controls. Hover, keyboard focus, hidden tabs, and reduced motion pause rotation.
 
-The memory map opens from a compact bottom-right disclosure. Objects and evidence occupy separate columns. The map reads stored IDs from `seen` and named object points from `things`. Statements use violet, observations use teal, and recalled sources use pink. Lines connect evidence with its stored named-object ID. Stored IDs determine object positions; evidence positions derive from their IDs and object links. The positions are schematic. The map does not combine embedding spaces. Knowledge facts remain in the retrieved cards.
+The memory map opens from a compact disclosure beside the detection strip. Objects and evidence occupy separate columns. The map reads stored IDs from `seen` and named object points from `things`. Statements use violet, observations use teal, and recalled sources use pink. Lines connect evidence with its stored named-object ID. Stored IDs determine object positions; evidence positions derive from their IDs and object links. The positions are schematic. The map does not combine embedding spaces. Knowledge facts remain in the retrieved cards.
 
 The authenticated `/memory_map` endpoint reads at most 128 recent turns, 64 recent sightings, 32 current or recalled IDs, and 64 named objects. It selects metadata without vectors or image bytes. Current-turn writes stay visible when their capture time is old. The browser polls once per two seconds while Live is visible, with one request in flight. A sampled count and total remain visible. Point IDs encode storage allocation time; new named objects carry immutable `created` metadata. Legacy objects with no creation time do not get a birth pulse.
 
@@ -95,3 +95,11 @@ Isolated Jetson publication checks use real Edge stores and a stub crop encoder.
 The Chrome comparison uses isolated state and a development image. At 1770×971 CSS pixels, the candidate camera occupies 77.6% of the workspace (E). Fill framing shows 84.2% of the 16:9 source; full-frame mode shows the entire source. Narrow 16:9 framing preserves the source. Browser checks found no horizontal overflow at 433, 800, 1422, and 1770 CSS pixels (E). See `bench/results/2026-10-16-ui-camera-browser.json`.
 
 The [design review](../reviews/20261016-211758-49436-design.md) and [final task review](../reviews/20261016-213249-68016-review.md) cover this change. Full required checks passed in 263.97 seconds (E). The deployed release is recorded in STATE.md; the monitor was updated without starting a robot session.
+
+## Full-frame and calibrated startup checks, 2026-10-16
+
+Dylan reported small text and cut-off boxes. The full-frame pane shows the complete 960×540 source at 1296.9×729.5 CSS pixels on the measured desktop (E). Mobile and tablet checks at 390 and 800 CSS pixels retain the complete source without horizontal overflow. The DOM harness covers both 4:3 and 16:9 image-load updates. The launcher harness passes 33 checks, including explicit camera and calibration arguments (E). See `bench/results/2026-10-16-ui-framing.json`.
+
+The previous Start command omitted calibration. After Dylan confirmed power cycling and clearance, the existing saved calibration started the same Jetson release. Head control reported enabled, following, 40°C, and no error or warning (J). No persistent calibration write or motor-policy change occurred.
+
+The follow-up passed its [task review](../reviews/20261016-214850-81977-review.md). The optional attachment-test extension is deferred because attachment behavior is unchanged and already covered by the existing lifecycle harness. The mandatory commit hook checks the complete suite before publication.

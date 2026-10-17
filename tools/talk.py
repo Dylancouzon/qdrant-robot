@@ -24,9 +24,10 @@ SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
 
 
-def robot_args(camera_file: str | None) -> list[str]:
+def robot_args(camera_file: str | None, servo_calibration: str | None = None) -> list[str]:
     """The `robot.main` arguments; the robot uses its own USB audio."""
-    return ["-m", "robot.main", *(["--camera-file", camera_file] if camera_file else [])]
+    return ["-m", "robot.main", *(["--camera-file", camera_file] if camera_file else []),
+            *(["--servo-calibration", servo_calibration] if servo_calibration else [])]
 
 
 def command(args: list[str], env=None) -> str:
@@ -57,9 +58,11 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Attach this page to the robot unit through one tunnel; the unit outlives the session."""
 
-    def __init__(self, release: str, camera_file: str | None = None):
+    def __init__(self, release: str, camera_file: str | None = None,
+                 servo_calibration: str | None = None):
         self.release = release
         self.camera_file = camera_file
+        self.servo_calibration = servo_calibration
         self.view_port = self.view_token = None
         self.lock = threading.Lock()
         self.stopped = threading.Event()   # this session ends
@@ -193,7 +196,7 @@ class Session:
             else:
                 self.view_token = secrets.token_hex(32)
                 command([sys.executable, str(ROOT / "tools/jetson.py"), "run", NAME,
-                         "--", *robot_args(self.camera_file)],
+                         "--", *robot_args(self.camera_file, self.servo_calibration)],
                         env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
             with socket.socket() as reserve:
                 reserve.bind(("127.0.0.1", 0))
@@ -314,8 +317,9 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int, release: str, camera_file: str | None = None) -> None:
-    session = Session(release, camera_file)
+def serve(port: int, release: str, camera_file: str | None = None,
+          servo_calibration: str | None = None) -> None:
+    session = Session(release, camera_file, servo_calibration)
     token = secrets.token_urlsafe(32)
     Handler.session = session
     Handler.token = token
@@ -338,7 +342,9 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
     parser.add_argument("--release", help="exact Jetson release printed by tools/jetson.py deploy")
     parser.add_argument("--camera-file", help="existing Jetson recorded camera fixture path")
+    parser.add_argument("--servo-calibration",
+                        help="existing Jetson mounted servo calibration path")
     args = parser.parse_args()
     if not args.release:
         parser.error("--release is required for the deployed interface release")
-    serve(args.port, args.release, args.camera_file)
+    serve(args.port, args.release, args.camera_file, args.servo_calibration)

@@ -180,3 +180,7 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D191 2026-10-16: Restore the quiet fan profile for the enclosed microphone.** Supersedes D190 after Dylan identified the microphone inside the case. Verify the original configuration and active quiet profile. Compare recognition and temperatures before selecting a louder profile; automatic fan control remains active.
 
 **D192 2026-10-16: Give the camera the main monitor pane.** At Dylan's request, supersedes D172 and D173's lower 70/30 panel. Fill framing removes bars; View controls offers the full source, and narrow layouts preserve 16:9. Compact detector confidence, per-answer supplied sources, and a collapsible object/evidence map preserve existing recognition, provenance, and deletion rules.
+
+**D193 2026-10-16: Preserve the complete camera frame and readable text.** Supersedes D192's fill crop after Dylan reported cut-off boxes and small text. Size the pane to the source aspect ratio, remove fill mode, use 16 px chat and 14 px source/control text, and put detection/map controls beneath the image.
+
+**D194 2026-10-16: Forward explicit saved calibration through the monitor.** The launcher accepts `--servo-calibration PATH` and passes it when starting a new robot unit. Keep the default unset and preserve an attached unit's existing configuration. Reuse the assembled calibration after readiness and health checks; do not repeat persistent setup.

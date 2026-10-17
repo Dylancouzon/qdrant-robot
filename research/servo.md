@@ -34,7 +34,7 @@ The provisional arrival tolerance is 1.5°, accepting 17 encoder steps and rejec
 {"port":"/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00","zero":2080,"direction":1,"limit":60}
 ```
 
-Motor output requires `robot.main --servo-calibration PATH`. The runtime rejects encoder crossings, saved-limit conflicts, unsafe startup state, stale feedback, stalls, and movement deadlines. The [hardware guide](../hardware/SERVO.md) gives wiring and startup details. Loose-servo calibration must not replace the mounted file.
+Motor output requires `robot.main --servo-calibration PATH`. The Mac monitor forwards that argument when launched with `tools/talk.py --servo-calibration PATH`; the path names an existing Jetson file. Start without that explicit option leaves the head disabled. Reuse the mounted calibration for the assembled robot. The runtime rejects encoder crossings, saved-limit conflicts, unsafe startup state, stale feedback, stalls, and movement deadlines. The [hardware guide](../hardware/SERVO.md) gives wiring and startup details. Loose-servo calibration must not replace the mounted file.
 
 The saved homing offset is 2018. Its original backup and the earlier ±45° mounted file remain preserved. The [trial archive](archive/mounted-servo-trials-2026-10-16.md) records their exact paths, checksums, the uncertain write acknowledgement, and successful read-only reconciliation after power cycling. Runtime saved-register writes remain prohibited.
 

@@ -1,0 +1,104 @@
+{
+  "machine_labels": {
+    "browser": "E",
+    "head": "J"
+  },
+  "mode": "Live monitor layout plus isolated DOM and lifecycle regressions; existing Jetson runtime and saved calibration",
+  "robot_release": "10b77aad5356",
+  "source_dimensions": [
+    960,
+    540
+  ],
+  "before": {
+    "viewport": [
+      1770,
+      999
+    ],
+    "camera": [
+      1356.901123046875,
+      906.2239990234376
+    ],
+    "fit": "cover",
+    "chat_px": 13,
+    "sources_px": 11,
+    "actions_px": 11
+  },
+  "after": {
+    "viewport": [
+      1770,
+      971
+    ],
+    "camera": [
+      1296.901123046875,
+      729.5052490234375
+    ],
+    "fit": "contain",
+    "source_coverage_percent": 100,
+    "chat_px": 16,
+    "sources_px": 14,
+    "actions_px": 14,
+    "horizontal_overflow": false,
+    "detections_inside_video": false
+  },
+  "responsive": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "camera": [
+        372.8993225097656,
+        209.7482757568359
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": [
+        800,
+        800
+      ],
+      "camera": [
+        782.8993530273438,
+        440.373291015625
+      ],
+      "horizontal_overflow": false
+    }
+  ],
+  "regressions": {
+    "lifecycle": "33 passed in 7.89 seconds",
+    "dom": "PASS, including 640x480 and 960x540 image-load aspect updates"
+  },
+  "head": {
+    "reason_disabled": "Previous Start command omitted --servo-calibration.",
+    "user_confirmed": "Power-cycled and clear for movement.",
+    "before": {
+      "position": 2071,
+      "torque": 0,
+      "temperature_c": 38,
+      "voltage_v": 5.4,
+      "fault": 0,
+      "moving": 0
+    },
+    "calibration": "shared/servo-mounted.json",
+    "after": {
+      "enabled": true,
+      "angle": -13.7,
+      "following": true,
+      "error": "",
+      "warning": "",
+      "cooling": false,
+      "temperature_c": 40
+    }
+  },
+  "limitations": [
+    "No EEPROM writes, new calibration, runtime motor change, or new thermal qualification.",
+    "The Jetson runtime release stays unchanged; the updated Mac launcher serves the new UI and passes its existing calibration option.",
+    "The stopped unconfigured unit logged RuntimeError: _work stopped during shutdown, then deactivated successfully. The replacement unit started normally; this pre-existing shutdown diagnostic is carried separately."
+  ],
+  "sources_sha256": {
+    "tools/talk.html": "75e07a29db9244b89c45a18dbeffceb529c31ea005dd4b4c78bf7ee4cd96dc7d",
+    "tools/talk.py": "6c4fbea3a2eabf369dcd5a3011714e9675f3af7acfbc68629f1c47879cf398da",
+    "tools/ui/test_talk.cjs": "3b899c702f4da0f6fd233dccb24c8f9fc72e1d67191df9c99ea7338d64c5471e",
+    "tools/test_talk.py": "ed965deeae1d9984cc6b3d942086b019b51e58ebb89a9ae3e094d2a3d7c3b231"
+  }
+}

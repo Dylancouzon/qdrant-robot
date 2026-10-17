@@ -82,7 +82,10 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  run(`detections([{label:'cup <script>',score:.874},{label:'book',score:.61},{label:'phone',score:.9},{label:'chair',score:.4}])`);
  assert.equal(d.querySelector('#detections').hidden,false);assert.equal(d.querySelectorAll('.detection').length,3);assert.match(d.querySelector('#detectionList').textContent,/87%.*61%.*90%.*\+1 more/);assert.equal(d.querySelector('#detectionList script'),null);
  d.querySelector('#camera').dispatchEvent(new w.Event('error'));assert.equal(d.querySelector('#detections').hidden,true);
- d.querySelector('#frameMode').click();assert.equal(d.querySelector('#camera').classList.contains('fullframe'),true);assert.equal(d.querySelector('#frameMode').getAttribute('aria-pressed'),'true');d.querySelector('#frameMode').click();assert.equal(d.querySelector('#camera').classList.contains('fullframe'),false);
+ Object.defineProperty(d.querySelector('#camera'),'naturalWidth',{value:640,configurable:true});Object.defineProperty(d.querySelector('#camera'),'naturalHeight',{value:480,configurable:true});
+ d.querySelector('#camera').dispatchEvent(new w.Event('load'));assert.equal(d.querySelector('#livePanel').style.getPropertyValue('--camera-ratio'),'640/480');
+ Object.defineProperty(d.querySelector('#camera'),'naturalWidth',{value:960});Object.defineProperty(d.querySelector('#camera'),'naturalHeight',{value:540});
+ d.querySelector('#camera').dispatchEvent(new w.Event('load'));assert.equal(d.querySelector('#livePanel').style.getPropertyValue('--camera-ratio'),'960/540');
  await run("openTab('live')");intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);
  d.querySelector('#commandTip').focus();intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);d.activeElement.blur();
  reducedMotion=true;intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);reducedMotion=false;
