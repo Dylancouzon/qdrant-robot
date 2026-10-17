@@ -56,8 +56,8 @@ def test_projected_person_converges_and_holds_at_travel_limit():
         center = 640 + focal * math.tan(math.radians(bearing - head.angle))
         head.follow((center - 100, 40, center + 100, 680), 1280, now, now)
         errors.append(abs(center / 1280 - .5))
-    assert max(errors[:100]) > .06
-    assert max(errors[-50:]) <= .06
+    assert max(errors[:100]) > .12
+    assert max(errors[-50:]) <= .12
     assert motor.goals and all(abs(goal) <= 70 for goal in motor.goals)
     for tick in range(500):
         now = 131 + tick / 15
@@ -263,9 +263,25 @@ def test_small_reverse_face_error_cancels_previous_forward_correction():
     head.tick(101.)
     head.tick(101.05)
     assert 0 < head.angle < head.goal
-    assert head.follow((510, 0, 610, 100), 1280, 101.06, 101.06) == 'goal'
+    assert head.follow((400, 0, 500, 100), 1280, 101.06, 101.06) == 'goal'
     head.tick(101.1)
     assert head.goal < head.angle < 6
+
+
+def test_centered_face_jitter_keeps_camera_view_stable():
+    motor = SimMotor()
+    head = Head(motor)
+    drive(head)
+    view, goals = head.view, len(motor.goals)
+    for step in range(90):
+        now = 101 + step / 15
+        offset = 1280 * .11 * math.sin(step / 4)
+        center = 640 + offset
+        assert head.follow((center - 80, 50, center + 80, 400), 1280, now, now) == 'centered'
+        head.tick(now)
+    assert head.view == view and len(motor.goals) == goals
+    assert head.angle == 0 and not head.moving
+    assert head.follow((1000, 50, 1160, 400), 1280, 108, 108) == 'goal'
 
 
 def test_exception_without_message_latches_before_cleanup_closes_motor():

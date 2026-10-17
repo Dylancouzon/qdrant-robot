@@ -1,0 +1,284 @@
+{
+  "what": "Stationary camera object-admission diagnosis and paired threshold replay",
+  "source_release": "d05a6afe18d5",
+  "source_revision": "0393d41",
+  "comparison_machine": "Mac (E), replaying Jetson (J) detections",
+  "limitation": "This does not reproduce or measure the reported 30-second full-session wait.",
+  "proposed_change": "Object admission 0.25 to 0.15. Body admission stays 0.25; LOW stays 0.10.",
+  "target_box": [
+    580,
+    300,
+    955,
+    550
+  ],
+  "capture_source": "import hashlib\nimport json\nimport os\nimport time\nfrom collections import Counter\nfrom pathlib import Path\n\nimport cv2\nimport numpy as np\n\nfrom robot.camera import Camera\nfrom robot import detect\nfrom robot.focus import Focus, Track\nfrom robot.config import SHARED\n\nassert os.system('systemctl is-active --quiet qr-robot') != 0, 'Robot must be stopped'\ndetect.LOW = .05\nout = SHARED / 'experiments' / f'detect-delay-{int(time.time())}'\nout.mkdir(parents=True)\ndetector, camera = detect.Detector(), Camera()\ntracker, focus = detect.Tracker(), Focus(1280, 720)\nrows, times, sources = [], [], []\ntry:\n    time.sleep(2)\n    start, last, due = time.time(), 0, time.monotonic()\n    while time.time() - start < 12:\n        time.sleep(max(0, due - time.monotonic()))\n        due = max(due + 1 / 15, time.monotonic())\n        frame, taken = camera.latest()\n        if frame is None or taken == last:\n            continue\n        last = taken\n        before = time.perf_counter()\n        raw = detector(frame)\n        times.append((time.perf_counter() - before) * 1000)\n        sources.append(taken)\n        tracker.update([d for d in raw if d.conf >= .1], 1280, taken)\n        tracks = [Track(*t) for t in tracker.scored()]\n        focus.update(taken, tracks, [t.box for t in tracks if t.label == 'person'])\n        row = dict(t=round(time.time()-start, 3), source_age_ms=round((time.time()-taken)*1000, 2),\n                   brightness=round(float(frame.mean()), 1), focus=focus.focus,\n                   detections=[dict(label=d.label, score=round(d.conf, 4), box=d.box,\n                                    min_side=min(d.box[2]-d.box[0], d.box[3]-d.box[1])) for d in raw],\n                   tracks=[dict(id=t.id, label=t.label, score=t.score, box=t.box,\n                                sized=focus.sized(t), eligible=focus.eligible(t)) for t in tracks])\n        rows.append(row)\n        if len(rows) % 15 == 1:\n            cv2.imwrite(str(out / f'frame-{len(rows):04d}.jpg'), frame)\nfinally:\n    camera.close()\n    detector.close()\nsummary = dict(machine='Jetson', release=os.environ.get('ROBOT_RELEASE'),\n               tegrastats=os.environ.get('ROBOT_TEGRASTATS'), frames=len(rows),\n               elapsed_s=round(rows[-1]['t'], 3), detection_ms_p50_p95=np.percentile(times, [50,95]).tolist(),\n               source_fps=round((len(sources)-1)/(sources[-1]-sources[0]), 2),\n               brightness_p50=float(np.median([r['brightness'] for r in rows])),\n               focus_frames=dict(Counter(str(r['focus']) for r in rows)),\n               labels=dict(Counter(d['label'] for r in rows for d in r['detections'])),\n               private_path=str(out), engine_sha256=hashlib.sha256(\n                   detect.MODEL.with_suffix('.fp16.engine').read_bytes()).hexdigest())\n(out / 'raw.json').write_text(json.dumps(rows))\n(out / 'summary.json').write_text(json.dumps(summary, indent=2))\nprint(json.dumps(summary, indent=2))\n",
+  "replay_source": "\"\"\"Replay private detector caches through unchanged tracking and focus rules.\"\"\"\nimport hashlib\nimport json\nfrom collections import Counter\nfrom pathlib import Path\n\nimport numpy as np\n\nfrom robot import detect as D, focus as F\n\nROOT = Path('build/detect-delay')\n\n\ndef replay(rows, threshold, target=None, width=1280):\n    D.OBJECT_CONFIDENCE = F.OBJECT_CONFIDENCE = threshold\n    tracker, focus = D.Tracker(), F.Focus(width, round(width * 9 / 16))\n    samples, labels = [], Counter()\n    for row in rows:\n        detections = [D.Detection(d['label'], d['score'], tuple(d['box']))\n                      for d in row['detections'] if d['score'] >= D.LOW]\n        tracker.update(detections, width, row['t'])\n        tracks = [F.Track(*t) for t in tracker.scored()]\n        focus.update(row['t'], tracks, [t.box for t in tracks if t.label == 'person'])\n        boxes = focus.boxes(tracks, [])\n        target_boxes = [b for b in boxes if target and\n                        D.iou(np.array([target]), np.array([b[:4]]))[0, 0] >= .5]\n        samples.append((row['t'], target_boxes, len(boxes)))\n        geometry = focus.geometry(tracks)\n        for box in boxes:\n            track = next(t for t in tracks if geometry.get(t.id) == box[:4])\n            labels[track.label] += 1\n    return dict(frames=len(samples), first_target_box_s=next((t for t, b, _ in samples if b), None),\n                target_box_frames=sum(bool(b) for _, b, _ in samples),\n                first_target_focus_s=next((t for t, bs, _ in samples\n                                          if any(b[5] == 'focus' for b in bs)), None),\n                target_focus_frames=sum(any(b[5] == 'focus' for b in bs) for _, bs, _ in samples),\n                mean_object_boxes=float(np.mean([n for _, _, n in samples])),\n                boxed_label_frames=dict(labels))\n\n\nresult = dict(what='Stationary camera object-admission diagnosis and paired threshold replay',\n              source_release='d05a6afe18d5', source_revision='0393d41',\n              comparison_machine='Mac (E), replaying Jetson (J) detections',\n              limitation='This does not reproduce or measure the reported 30-second full-session wait.',\n              proposed_change='Object admission 0.25 to 0.15. Body admission stays 0.25; LOW stays 0.10.',\n              target_box=[580, 300, 955, 550],\n              capture_source=(ROOT / 'probe.py').read_text(),\n              replay_source=Path(__file__).read_text(), captures={})\nfor name in ('capture', 'control'):\n    path = ROOT / name / 'raw.json'\n    rows = json.loads(path.read_text())\n    result['captures'][name] = dict(\n        measurement=json.loads((path.parent / 'summary.json').read_text()),\n        raw_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),\n        baseline=replay(rows, .25, result['target_box'] if name == 'capture' else None),\n        candidate=replay(rows, .15, result['target_box'] if name == 'capture' else None))\nresult['development_controls'] = {}\nfrom bench.detect_stability import load\nfor name in ('b720', 'b1080', 'live'):\n    path = Path(f'build/detect-quality/detector/cache/{name}-s384.jsonl')\n    meta, frames = load(path)\n    rows = [dict(t=t, detections=[dict(label=d.label, score=d.conf, box=d.box) for d in ds])\n            for t, ds in frames]\n    result['development_controls'][name] = dict(\n        note='Object coverage only; detector labels do not establish false-positive correctness.',\n        raw_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),\n        baseline=replay(rows, .25, width=meta['width']),\n        candidate=replay(rows, .15, width=meta['width']))\nout = Path('bench/results/2026-10-16-object-admission.json')\nout.write_text(json.dumps(result, indent=2) + '\\n')\nprint(out)\nfor name, data in result['captures'].items():\n    print(name, json.dumps({arm: data[arm] for arm in ('baseline', 'candidate')}))\n",
+  "captures": {
+    "capture": {
+      "measurement": {
+        "machine": "Jetson",
+        "release": "d05a6afe18d5",
+        "tegrastats": "detect-delay-20261016-221416.tegrastats",
+        "frames": 180,
+        "elapsed_s": 12.022,
+        "detection_ms_p50_p95": [
+          11.718838999968284,
+          12.259815949983022
+        ],
+        "source_fps": 14.92,
+        "brightness_p50": 90.6,
+        "focus_frames": {
+          "None": 17,
+          "2": 163
+        },
+        "labels": {
+          "person": 812,
+          "chair": 391,
+          "watch": 113,
+          "potted plant": 406,
+          "face": 325,
+          "plush toy": 221,
+          "t-shirt": 177,
+          "toy": 267,
+          "monitor": 179,
+          "teddy bear": 271,
+          "clock": 180,
+          "poster": 197,
+          "keyboard": 161,
+          "laptop": 199,
+          "photo": 215,
+          "ball": 151,
+          "book": 168,
+          "backpack": 194,
+          "bag": 38,
+          "bottle": 50,
+          "apple": 69,
+          "lamp": 9,
+          "dog": 98,
+          "cat": 24,
+          "wallet": 1,
+          "badge": 14,
+          "sticker": 2,
+          "camera": 2
+        },
+        "private_path": "/home/qdrant/qdrant-robot/shared/experiments/detect-delay-1792203257",
+        "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086"
+      },
+      "raw_sha256": "2965f13b0ce4ebaca0f29b6db8edefdf54b3384f79ae384832822b8a34531fd4",
+      "baseline": {
+        "frames": 180,
+        "first_target_box_s": 1.757,
+        "target_box_frames": 154,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 2.2,
+        "boxed_label_frames": {
+          "chair": 177,
+          "plush toy": 154,
+          "teddy bear": 51,
+          "monitor": 14
+        }
+      },
+      "candidate": {
+        "frames": 180,
+        "first_target_box_s": 0.175,
+        "target_box_frames": 177,
+        "first_target_focus_s": 1.223,
+        "target_focus_frames": 162,
+        "mean_object_boxes": 2.4944444444444445,
+        "boxed_label_frames": {
+          "chair": 177,
+          "plush toy": 177,
+          "backpack": 10,
+          "teddy bear": 64,
+          "monitor": 21
+        }
+      }
+    },
+    "control": {
+      "measurement": {
+        "machine": "Jetson",
+        "release": "d05a6afe18d5",
+        "tegrastats": "detect-delay-control-20261016-221656.tegrastats",
+        "frames": 180,
+        "elapsed_s": 12.017,
+        "detection_ms_p50_p95": [
+          11.636936999821046,
+          12.417929399907734
+        ],
+        "source_fps": 14.92,
+        "brightness_p50": 92.8,
+        "focus_frames": {
+          "None": 17,
+          "2": 163
+        },
+        "labels": {
+          "keyboard": 335,
+          "chair": 432,
+          "bottle": 489,
+          "clock": 349,
+          "person": 837,
+          "laptop": 470,
+          "monitor": 371,
+          "potted plant": 390,
+          "book": 174,
+          "computer mouse": 356,
+          "poster": 178,
+          "photo": 133,
+          "backpack": 56,
+          "headphones": 58,
+          "lamp": 19,
+          "sticker": 10,
+          "scissors": 9,
+          "glasses": 7,
+          "cup": 185,
+          "bag": 3,
+          "mug": 2,
+          "hat": 1
+        },
+        "private_path": "/home/qdrant/qdrant-robot/shared/experiments/detect-delay-1792203416",
+        "engine_sha256": "52d40436be6b16df5ab26d83a9b1611b08ce20222734f5aafb10169d5ecde086"
+      },
+      "raw_sha256": "2dab6a566ef49eb7c0329e3b629f1771bd40016d08344491facb4170edfe81d1",
+      "baseline": {
+        "frames": 180,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 0.9888888888888889,
+        "boxed_label_frames": {
+          "chair": 178
+        }
+      },
+      "candidate": {
+        "frames": 180,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 1.1888888888888889,
+        "boxed_label_frames": {
+          "chair": 178,
+          "laptop": 36
+        }
+      }
+    }
+  },
+  "development_controls": {
+    "b720": {
+      "note": "Object coverage only; detector labels do not establish false-positive correctness.",
+      "raw_sha256": "021e902b86386d157fda47a9b2fd04cef23b6a8cba1121abd6ad3e3853866f8b",
+      "baseline": {
+        "frames": 450,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 2.0044444444444443,
+        "boxed_label_frames": {
+          "microphone": 367,
+          "chair": 6,
+          "backpack": 517,
+          "bag": 6,
+          "clock": 6
+        }
+      },
+      "candidate": {
+        "frames": 450,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 2.14,
+        "boxed_label_frames": {
+          "microphone": 376,
+          "chair": 6,
+          "backpack": 564,
+          "bicycle": 1,
+          "cat": 3,
+          "bag": 11,
+          "clock": 2
+        }
+      }
+    },
+    "b1080": {
+      "note": "Object coverage only; detector labels do not establish false-positive correctness.",
+      "raw_sha256": "f6f31355e3d343cc0b687485d7ae9ee207aadb19534022dd80bc4f07088601b2",
+      "baseline": {
+        "frames": 225,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 1.44,
+        "boxed_label_frames": {
+          "microphone": 89,
+          "chair": 220,
+          "backpack": 15
+        }
+      },
+      "candidate": {
+        "frames": 225,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 2.2133333333333334,
+        "boxed_label_frames": {
+          "microphone": 168,
+          "chair": 221,
+          "backpack": 109
+        }
+      }
+    },
+    "live": {
+      "note": "Object coverage only; detector labels do not establish false-positive correctness.",
+      "raw_sha256": "6232ef77de8aee83e029f57943e9228d8d95cc339dd748234e12af3a765e9f85",
+      "baseline": {
+        "frames": 1331,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 0.8369646882043577,
+        "boxed_label_frames": {
+          "camera": 37,
+          "chair": 797,
+          "phone": 276,
+          "microphone": 3,
+          "bag": 1
+        }
+      },
+      "candidate": {
+        "frames": 1331,
+        "first_target_box_s": null,
+        "target_box_frames": 0,
+        "first_target_focus_s": null,
+        "target_focus_frames": 0,
+        "mean_object_boxes": 1.0097670924117206,
+        "boxed_label_frames": {
+          "camera": 41,
+          "chair": 949,
+          "phone": 275,
+          "microphone": 21,
+          "bag": 58
+        }
+      }
+    }
+  },
+  "comparison_rules": "Both threshold arms use the candidate BODY-transition guard. Baseline means the 0.25 threshold under those rules, rather than exact HEAD. The private target/control baseline outcomes also match HEAD; historical development-cache counts can differ.",
+  "validation": {
+    "focused_head_and_admission_tests": 104,
+    "focused_tests_machine": "Mac (E)",
+    "ui_harness": "pass (E)",
+    "full_checks": "pass (E), 260.94 seconds, 600-second per-step limit",
+    "review": "reviews/20261016-222710-18849-review.md",
+    "deployed_release": "539e6f2d48a5",
+    "jetson_detector_selfcheck": "pass (J), TensorRT, python -m robot.detect",
+    "following_center_band": ".12 frame width on either side",
+    "chat_font": "10pt; previous16px=12pt",
+    "chat_retrieved_thumbnail_px": 62.4,
+    "live_plush_and_following_check": "pending"
+  }
+}

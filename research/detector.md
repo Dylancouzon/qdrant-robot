@@ -4,6 +4,8 @@ Development default updated 2026-10-10 (D146). Historical tables below were meas
 
 ## Summary
 
+Object proposals and unknown focus use 0.15 confidence (D197); body proposals and person association retain 0.25. Named objects retain the 0.25 fallback when current crop evidence is weak. Weak body detections cannot convert object tracks into people. The cat plushie gains an outline at 0.175 s and orange focus at 1.223 s; baseline focus never selects it during 12 s (E, paired Jetson detections). The no-plush control adds intermittent monitor outlines, with no toy outlines. This does not reproduce the reported 30-second full-session delay. [Evidence](../bench/results/2026-10-16-object-admission.json).
+
 - Default: YOLOE-26s with the same fixed 50-word booth vocabulary, end-to-end export at 384x640, and TensorRT FP16 backend (`robot/detect.py`). It supplies the proposal needed to teach the held phone, which nano misses. D145 reaches 91.51% named phone movement and 92.46% Restore coverage. (J) Keep YOLOE-26n as the fallback.
 - Scope: [D146's phone replay](../bench/results/2026-10-10-d146-detector-default.json) passes all 12 checks, with 91.43% named movement coverage and 91.47% Restore coverage. Conversation face naming is 88.10%, with a 453.8 ms held-source interval; smoothness and paging remain open. The external cup reaches 73.78% across changed viewpoints, with zero wrong cup overlays. These development results establish no general detection or distinct-instance false-positive acceptance. (J)
 - Backend: raw TensorRT (A) over onnxruntime with the TensorRT provider (B). Same speed, 340 MB less RAM, and no six-minute engine build inside the robot process. (J)

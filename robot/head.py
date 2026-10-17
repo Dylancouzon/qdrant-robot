@@ -214,7 +214,7 @@ class Head:
                 return reason
             self.source, self.expires = taken, taken + FRESH_S
             error = (box[0] + box[2]) / (2 * width) - .5
-            if abs(error) > .06:
+            if abs(error) > .12:
                 delta = max(-6., min(6., 48 * error))
                 goal = max(-self.limit, min(self.limit, self.angle + delta))
                 if abs(goal - self.angle) <= self.tolerance:

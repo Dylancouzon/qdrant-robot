@@ -103,3 +103,7 @@ Dylan reported small text and cut-off boxes. The full-frame pane shows the compl
 The previous Start command omitted calibration. After Dylan confirmed power cycling and clearance, the existing saved calibration started the same Jetson release. Head control reported enabled, following, 40°C, and no error or warning (J). No persistent calibration write or motor-policy change occurred.
 
 The follow-up passed its [task review](../reviews/20261016-214850-81977-review.md). The optional attachment-test extension is deferred because attachment behavior is unchanged and already covered by the existing lifecycle harness. The mandatory commit hook checks the complete suite before publication.
+
+## Chat sizing
+
+The conversation uses 10 pt text, two points smaller than the previous 16 px (12 pt) text. Retrieved thumbnails in chat measure 62.4 px square, 30% larger than 48 px. They retain their width in narrow cards.

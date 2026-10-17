@@ -18,7 +18,7 @@ Selection persists through arrivals and departures until an introduction, verifi
 
 ## Controller and evidence
 
-[attention.py](../robot/attention.py) selects the verified face. [head.py](../robot/head.py) applies a ±6% center band and proportional corrections of at most 6°. Fresh captures update goals during movement. Centered, lost, or expired evidence cancels them. Source timestamps must increase; captures older than 300 ms cannot authorize motion. Generations reject results from an earlier selection or command. Speech and playback pause movement.
+[attention.py](../robot/attention.py) selects the verified face. [head.py](../robot/head.py) applies a ±12% center band and proportional corrections of at most 6°. Fresh captures update goals during movement. Centered, lost, or expired evidence cancels them. Source timestamps must increase; captures older than 300 ms cannot authorize motion. Generations reject results from an earlier selection or command. Speech and playback pause movement.
 
 [main.py](../robot/main.py) separates speech-start identity from the settled inspection capture. Inspection uses image-only captioning, retains the exact frame and generated-source metadata, and cancels for speech, Stop, or shutdown. Object sightings and teaching require settled captures. A changed view clears object continuity. Side and disappearance answers compare views within 1°; general recall retains evidence from other views.
 
