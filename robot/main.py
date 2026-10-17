@@ -1532,11 +1532,7 @@ class Robot:
         replying = bool(self.asking or self.deleting or self.confirming)
         statements = self._told(question, turn) if is_question(turn.question) else []
         turn.told = [m["said"] for m in statements]
-        # The prompt skips statements the live window already holds: a duplicate made the brain
-        # echo its earlier reply (the panel and evidence still show the hit).
-        live = {m["content"] for m in self.history if m["role"] == "user"}
-        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements
-                if m["said"] not in live]
+        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
         self.panel = {"shards": ["knowledge", "seen"], "ms": 1000 * (time.time() - started),
                       "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
