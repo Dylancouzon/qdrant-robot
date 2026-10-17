@@ -1,0 +1,49 @@
+{
+  "machine": "Jetson",
+  "release": "599d42f96b75",
+  "status": "live startup verified; session remains running",
+  "tegrastats": "robot-20261016-210939.tegrastats",
+  "observed_at": 1792199492.114667,
+  "samples": 1354,
+  "temperature_min_c": 36,
+  "temperature_max_c": 40,
+  "latest_feedback": {
+    "id": 1,
+    "position": 2071,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 37,
+    "fault": 0,
+    "moving": 0
+  },
+  "latest_head": {
+    "angle": -0.791015625,
+    "goal": -0.791015625,
+    "moving": false,
+    "halt": true,
+    "paused": false,
+    "inspecting": false,
+    "following": true,
+    "error": "",
+    "generation": 0,
+    "settled": 1792199396.092742,
+    "cooling": false,
+    "warning": ""
+  },
+  "feedback_completion_timestamps": true,
+  "ui": "Live camera visible; robot microphone listening; monitor attached at port 8766",
+  "calibration": {
+    "zero": 2080,
+    "direction": 1,
+    "limit": 60
+  },
+  "speed_deg_s": 40,
+  "acceleration_deceleration": 40,
+  "fan_profile": "quiet",
+  "raw_snapshot": {
+    "local_path": "build/assembled-preflight/final-live/live-follow-1792199380684339560.json",
+    "sha256": "6fc8fabc3f70e88e08065afe3c1f0039066dd5c10d94a01a2a6bc6d4f33456b1",
+    "jetson_path": "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/live-follow-1792199380684339560.json"
+  }
+}

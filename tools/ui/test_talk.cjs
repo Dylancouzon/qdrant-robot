@@ -80,6 +80,14 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('savedObjects.length'),0);assert.equal(d.querySelectorAll('#evidence img').length,0);assert.equal(d.querySelector('#retrievalContent').textContent,'');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(d.querySelector('#transcript').textContent.includes('clock'),false);
  assert.equal(run('carouselUpdates.length'),0);await run("openTab('memory')");assert.equal(d.querySelectorAll('.objectcard').length,2);
  live.evidence={deleted:true,turn_id:'deletion-2'};await run('status()');assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('carouselUpdates.length'),0);
- run('clearLive()');assert.equal(d.querySelector('#speechLatency').textContent,'—');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(errors.length,0,errors.join('\n'));
+ // Cooling is a head warning; camera, microphone, and the normal session remain usable.
+ live.control={head:{enabled:true,warning:'Head motor cooling. 180 seconds minimum. I can still see and talk.'}};
+ await run('status()');assert.match(d.querySelector('#headWarning').textContent,/180 seconds minimum/);
+ assert.equal(d.querySelector('#phase').textContent,'Listening');assert.equal(d.querySelector('#camera').hidden,false);assert.equal(d.querySelector('#mute').disabled,false);assert.equal(d.querySelector('#headStop').disabled,false);
+ live.control.head.warning='Head motor cooling. Waiting for safe temperature. I can still see and talk.';
+ await run('status()');assert.match(d.querySelector('#headWarning').textContent,/Waiting for safe temperature/);
+ live.control.head.warning='';await run('status()');assert.equal(d.querySelector('#headWarning').textContent,'');
+ live.control.head.warning='Head motor cooling.';await run('status()');
+ run('clearLive()');assert.equal(d.querySelector('#headWarning').textContent,'');assert.equal(d.querySelector('#speechLatency').textContent,'—');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(errors.length,0,errors.join('\n'));
  global.console.log('PASS: two visitor IDs with the same name, queued edits, failed refresh, repeated removal, view retention, conflicts, evidence safety, timing, stable stored memory IDs, births, sample turnover, recall pulses, map deletion races, search, tips, confirmed voice deletion, stale-read rejection, and clearing.');dom.window.close();
 })().catch(e=>{global.console.error(e);dom.window.close();process.exitCode=1;});

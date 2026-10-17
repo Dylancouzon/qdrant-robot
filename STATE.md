@@ -4,17 +4,17 @@ Updated 2026-10-16. Architecture is settled; use the [topic index](research/READ
 
 ## Active task
 
-Following tuning is complete at 40°/s and ±60° travel. Dylan confirmed cable clearance and good live testing. The reviewed runtime temperature cutoff is now 65°C; brief temperature reports remain unexplained. Current instructions and compact result summaries replace superseded trial detail. Cleanup and validation are complete. The archive tag preserves complete trial evidence.
+Thermal cooldown, gentler braking, review, and cleanup are complete. Live testing is ready. Keep the quiet fan profile because the microphone is inside the case. Next work qualifies real temperature feedback, prolonged cooling, and microphone recognition under load.
 
 ## Robot and jobs
 
-Jetson `robot`: boot `c5f739e0`; live release `74df9ed96eb2`; previous `7bc4a41a9f5e`. Unit `qr-robot` is listening. Logs: `journalctl -u qr-robot`; bounded numeric trace: `shared/experiments/servo-mounted-calibration/live-follow-1792197005362604383.json`. No benchmark job is running. Runtime and pinned dependency bytes match the validated local files. The Mac monitor at `http://127.0.0.1:8766` uses the live release; reuse it. Accepted `f9b90b958023` remains available.
+Jetson boot is 89124a54; deployed live release is 599d42f96b75. Unit qr-robot runs the mounted controller. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. Numeric feedback diagnostics use shared/experiments/servo-mounted-calibration/live-follow-1792199380684339560.json. No benchmark job remains running. The attached Mac monitor is http://127.0.0.1:8766, with robot camera and microphone ready.
 
-Mounted file: `/home/qdrant/qdrant-robot/shared/servo-mounted.json`, zero 2080, direction one, limit 60. Runtime speed is 40°/s, acceleration 60, torque cap 20%, arrival tolerance 1.5°, and temperature cutoff 65°C. Helper and offset setup retain 60°C. No automatic fault restart. Do not repeat EEPROM setup or use loose-servo calibration.
+Mounted file: /home/qdrant/qdrant-robot/shared/servo-mounted.json, zero 2080, direction one, limit 60. Runtime speed is 40°/s, acceleration/deceleration 40, torque cap 20%, and arrival tolerance 1.5°. Reported 65°C verifies release and pauses the head for at least 180 seconds, with 10 continuous seconds at or below 55°C before eligibility. Reported 70°C latches only the head off until restart after cooling. Speech and vision remain available. Fresh movement input is required after recovery. Other faults remain fatal. Helpers retain 60°C. Do not repeat EEPROM setup.
 
-[Current head control](research/servo.md) gives operation, evidence, backups, and remaining checks. [Trial history](research/archive/mounted-servo-trials-2026-10-16.md) and [the evidence manifest](research/archive/mounted-servo-evidence-2026-10-16.json) locate complete originals in tag `archive/2026-10-16/mounted-follow-trials`.
+[Current head control](research/servo.md) gives operation, validation, backups, and remaining checks. [Trial history](research/archive/mounted-servo-trials-2026-10-16.md) and [the evidence manifest](research/archive/mounted-servo-evidence-2026-10-16.json) locate complete originals in tag archive/2026-10-16/mounted-follow-trials. Private media and raw logs remain under ignored build/ and Jetson shared/. Concurrent enclosure edits were left untouched.
 
-The broad acceptance measurements below precede servo work. Current evidence and gaps are in [head control](research/servo.md).
+The broad acceptance measurements below precede servo work.
 
 ## Targets
 
@@ -32,10 +32,8 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next step
 
-Investigate transient servo temperature feedback and qualify prolonged loaded power and enclosure cooling. The 60°C trip released torque; 100 read-only samples afterward returned 37–40°C (J). The cutoff adjustment does not establish harmless feedback or adequate cooling. The earlier Jetson GPU reached 70.875°C under load (J).
+Real heating versus temperature-feedback error remains unresolved. Qualify prolonged enclosure cooling and microphone recognition before selecting a louder fan profile. Then check two-person handoff, inspection, Stop during speech, and departure. The +70° range remains unqualified. Stop travel reached 3.604° and settled in 0.513 s (J); the provisional 0.3 s target remains unmet. Unattended motion remains unqualified.
 
-Stop added up to 3.164° sampled travel and settled in 0.452 s (J), missing the provisional 0.3 s goal. Keep 70° travel, two-person ownership, inspection latency, and M4 acceptance open. Physical latency stays parked. No further speed tuning is planned.
+Next command: inspect qr-robot status and recent feedback through tools/jetson.py before any restart. Reuse the existing monitor. A failed torque-release acknowledgement requires power disconnection.
 
-Next command: inspect `qr-robot` status and recent logs through `tools/jetson.py` before any restart. Reuse the existing monitor and read [workflow recovery](research/workflow.md#recovery). A fault requires diagnosis; an unconfirmed torque release requires power disconnection.
-
-Validation: the temperature change passed 112 focused checks, final reviews, and the full required hook in 243.00 s (E). The prior smooth-following hook passed in 240.06 s.
+Validation: full required checks passed in 230.28 seconds (E). Final Jetson integration passed the real 180-second timer with a fake servo, real models, USB microphone capture, speaker playback, and passive-displacement recovery. This does not qualify live recognition or real cooling.

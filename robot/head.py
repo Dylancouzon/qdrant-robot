@@ -73,8 +73,24 @@ class Head:
         self.moving, self.error, self.closed = False, "", False
         self.sent, self.stationary = None, None
         self.source = self.follow_after = 0.
+        self.valid_after = 0.
         self.expires = None
+        self.cooling = False
+        self.awaiting_motion = False
         self.thread = None
+
+    @property
+    def warning(self):
+        with self.condition:
+            if not self.cooling:
+                return ""
+            if self.motor.thermal_latched:
+                return ("Head motor reported at least 70°C. Motor off; restart after cooling. "
+                        "I can still see and talk.")
+            remaining = math.ceil(max(0, self.motor.cooldown_until - time.monotonic()))
+            wait = (f"{remaining} seconds minimum." if remaining else
+                    "Waiting for safe temperature.")
+            return f"Head motor cooling. {wait} I can still see and talk."
 
     def start(self):
         if self.motor is not None:
@@ -127,6 +143,13 @@ class Head:
         if self.sent is None:
             self.goal = angle
         self.angle = angle
+        if self._thermal(angle, moving, now):
+            return
+        if self.awaiting_motion:
+            self.goal = self.sent = angle
+            self.halt = False
+            self._settle(angle, moving, now)
+            return
         if self.expires is not None and now > self.expires:
             self.halt, self.expires = True, None
         blocked = self.blocked()
@@ -139,6 +162,9 @@ class Head:
             if self.goal == target:
                 self.goal = self.sent
             moving = True
+        self._settle(angle, moving, now)
+
+    def _settle(self, angle, moving, now):
         if moving or abs(self.goal - angle) > self.tolerance:
             if not self.moving:
                 self.view += 1
@@ -148,6 +174,25 @@ class Head:
             self.stationary = now if self.stationary is None else self.stationary
             if self.moving and now - self.stationary >= SETTLE_S:
                 self.moving, self.settled = False, now
+
+    def _thermal(self, angle, moving, now):
+        cooling = getattr(self.motor, "cooling", False)
+        if cooling != self.cooling:
+            self.cooling = cooling
+            self.awaiting_motion = True
+            self.generation += 1
+            self.follow_after = self.valid_after = time.time()
+            self.expires = None
+            self.inspecting, self.halt = False, False
+            self.goal = self.sent = angle
+            self.view += 1
+            self.changed, self.stationary, self.moving = now, None, True
+            print(self.warning if cooling else
+                  "Head motor cooled; waiting for fresh movement input.", flush=True)
+        if cooling:
+            self.goal = self.sent = angle
+            self.halt, self.moving, self.stationary = False, moving, None
+        return cooling
 
     def _target(self, angle, moving, blocked):
         pending = self.goal != self.sent
@@ -181,6 +226,7 @@ class Head:
                 if abs(goal - self.goal) < getattr(self.motor, "resolution", 0.):
                     return "limit"
                 self.goal = goal
+                self.awaiting_motion = False
                 self.condition.notify_all()
                 return "goal"
             self.halt = True
@@ -189,6 +235,7 @@ class Head:
 
     def _follow_hold(self, taken, now):
         states = ((not self.following, "stopped"), (self.paused, "conversation"),
+                  (self.cooling, "cooling"),
                   (self.inspecting, "inspection"), (self.halt, "settling"),
                   (bool(self.error), "fault"), (self.blocked(), "microphone suppressed"),
                   (not max(self.source, self.follow_after) < taken <= now or
@@ -208,11 +255,14 @@ class Head:
     def move(self, angle, generation):
         with self.condition:
             self._current(generation)
+            if self.cooling:
+                raise RuntimeError(self.warning)
             if not math.isfinite(angle):
                 raise ValueError("Head goal must be finite")
             if self.motor is None:
                 raise RuntimeError("Head movement is disabled until calibration.")
             self.goal, self.halt = max(-self.limit, min(self.limit, angle)), False
+            self.awaiting_motion = False
             self.inspecting = True
             self.condition.notify_all()
 
@@ -221,6 +271,8 @@ class Head:
         with self.condition:
             while True:
                 self._current(generation)
+                if self.cooling:
+                    raise RuntimeError(self.warning)
                 if not self.halt and self.sent == self.goal and not self.moving:
                     return self.settled
                 remaining = deadline - time.monotonic()
@@ -251,7 +303,8 @@ class Head:
         with self.condition:
             if self.motor is None:
                 return True
-            return (not self.error and not self.moving and not self.halt and taken >= self.settled
+            return (not self.error and not self.cooling and not self.moving and
+                    not self.halt and taken >= max(self.settled, self.valid_after)
                     and (view is None or view == self.view))
 
     def close(self):

@@ -105,7 +105,7 @@ def converse(robot, text):
 def head_state(head):
     return {name: getattr(head, name) for name in (
         "angle", "goal", "moving", "halt", "paused", "inspecting", "following", "error",
-        "generation", "settled")}
+        "generation", "settled", "cooling", "warning")}
 
 
 def compare_streaming_description(robot, turn):
@@ -144,6 +144,9 @@ def trace_following(robot, report):
                         "encoder_position": getattr(motor, "position", None),
                         "encoder_goal": getattr(motor, "target", None),
                         "feedback": getattr(motor, "status", None),
+                        "feedback_time": getattr(motor, "feedback_at", None),
+                        "feedback_read_s": getattr(motor, "read_s", None),
+                        "feedback_monotonic": getattr(motor, "feedback", None),
                         "progress_age_s": time.monotonic() - motor.progress
                         if hasattr(motor, "progress") else None,
                         "name": selected.name if selected else None, "reason": reason,

@@ -732,7 +732,10 @@ class Robot:
                 "active_visitor": self._active_name(),
                 "head": {"enabled": self.head.motor is not None,
                          "angle": round(self.head.angle, 1), "following": self.head.following,
-                         "error": self.head.error}},
+                         "error": self.head.error, "warning": self.head.warning,
+                         "cooling": self.head.cooling,
+                         "temperature_c": getattr(self.head.motor, "status", {}).get(
+                             "temperature_c")}},
                 ignored_items=self.things.preferences(), settings=settings.snapshot(),
                 window=self._window_status(objects))
             status = ("Hearing you" if self.speaking or self.lines.unfinished_tasks else
@@ -798,7 +801,7 @@ class Robot:
         if not self.head.valid(taken):
             return
         recognized, excluded = self._query_objects(frame, tracks, preferences, (taken, epochs))
-        if time.time() - taken > PREVIEW_TTL:
+        if time.time() - taken > PREVIEW_TTL or not self.head.valid(taken):
             return
         with self.detecting:
             if session != self.session_id or gallery != self.recognition.epoch:
@@ -1348,8 +1351,15 @@ class Robot:
                     return
             self._answer_turn(turn, shot, identity_shot)
         except Interrupted as error:
-            turn.keep, turn.answer, turn.done = False, str(error), time.time()
-            self._log(turn)
+            if self.head.cooling and self.head.generation == turn.motion + 1:
+                turn.selection_error, turn.keep = self.head.warning, False
+                turn.caption, turn.visual_caption, turn.caption_s = "", "", 0.
+                turn.delivered, turn.looked, turn.view_angle = False, 0., 0.
+                turn.ui_evidence = []
+                self._answer_turn(turn, identity_shot, identity_shot)
+            else:
+                turn.keep, turn.answer, turn.done = False, str(error), time.time()
+                self._log(turn)
         finally:
             try:
                 if previous is not None:
@@ -1388,6 +1398,9 @@ class Robot:
                           started, detections, track)
 
     def _inspect(self, turn, shot):
+        if self.head.cooling:
+            turn.selection_error, turn.keep = self.head.warning, False
+            return shot, None
         if shot[0] is None:
             turn.selection_error, turn.keep = "I need a camera image before turning.", False
             return shot, None

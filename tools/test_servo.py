@@ -26,6 +26,8 @@ class Packet:
     def write1ByteTxRx(self, _port, _id, address, value):
         self.writes.append((address, value))
         self.memory[address] = value
+        if address == 42:
+            self.memory[40] = 1  # Firmware engages torque when a goal is primed.
         if self.memory[40] and address in (40, 42):
             self.memory[56] = self.memory[42]
             self.positions.append(self.memory[56])
@@ -94,7 +96,7 @@ def test_old_goal_cannot_cause_startup_jump(device):
     motor, packet = device
     packet.memory.update({44: 1000, 48: 100})
     result = motor.nudge(5)
-    assert packet.positions == [2048, result["target"]]
+    assert packet.positions == [2048, 2048, result["target"]]
     assert packet.memory[44] == 0
     assert packet.memory[48] == 100  # Never increase a pre-existing lower limit.
     assert packet.memory[40] == 0

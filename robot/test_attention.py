@@ -206,12 +206,17 @@ def test_foreground_inspection_cancels_when_stop_arrives(tmp_path):
         close_robot(robot)
 
 
-@pytest.mark.parametrize("side, angle, color", [("right", 45., 210), ("left", -45., 30)])
+@pytest.mark.parametrize("start, side, angle, color", [
+    (0., "right", 45., 210), (0., "left", -45., 30),
+    (-60., "left", -45., 30), (-45., "left", -45., 30), (60., "left", -45., 30),
+])
 def test_inspection_uses_settled_view_and_returns_before_following(
-        tmp_path, monkeypatch, side, angle, color):
+        tmp_path, monkeypatch, start, side, angle, color):
     from bench.head_sim import TurningCamera
     robot = speaking_robot(tmp_path)
-    head = Head(SimMotor(speed=30))
+    motor = SimMotor(angle=start, speed=40)
+    motor.limit = 60
+    head = Head(motor)
     robot.head = head
     robot.knowledge.search = lambda q: [(1., "An unrelated knowledge answer.")]
     requests = []
@@ -257,7 +262,8 @@ def test_inspection_uses_settled_view_and_returns_before_following(
         assert turn.prompt == main.prompt_text(requests[0])
         assert any(stamp == turn.looked and yaw == angle for stamp, yaw in camera.frames)
         assert robot.looked[-1].frame[360, 640, 0] == color
-        assert head.angle == 0 and not head.inspecting and head.following
+        assert head.angle == start and not head.inspecting and head.following
+        assert all(abs(goal) <= 60 for goal in motor.goals)
         assert not failures
     finally:
         stopped.set()
@@ -318,5 +324,53 @@ def test_recall_keeps_other_angles_but_does_not_claim_visible_labels_missing(tmp
         _, lines = robot._recall(Turn(question="What did you see?", speech_start=stamp), frame)
         assert not any("not in view" in line for line in lines)
         robot.head.close()
+    finally:
+        close_robot(robot)
+
+
+@pytest.mark.parametrize('interrupted,stop_after', [(False, False), (True, False), (True, True)])
+def test_thermal_inspection_warning_uses_speech_without_stopping_conversation(
+        tmp_path, monkeypatch, interrupted, stop_after):
+    from robot.head import Interrupted
+    robot = speaking_robot(tmp_path)
+    motor = SimMotor()
+    robot.head = Head(motor)
+    robot.head.tick(time.time())
+    spoken = []
+    robot.voice.say = lambda text: (spoken.append(text) or np.zeros(160, np.float32))
+    robot.brain.answer = lambda m, **k: (t for t in ([] if k.get('prior') else ['Okay.']))
+    monkeypatch.setattr(main, 'located_faces', lambda *args: [])
+    def overheat():
+        motor.cooling, motor.thermal_latched = True, False
+        motor.cooldown_until = time.monotonic() + 180
+        motor.target = motor.angle
+        robot.head.tick(time.time())
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    if interrupted:
+        def inspect(turn, shot):
+            turn.caption, turn.visual_caption, turn.caption_s = 'demand', 'A cancelled view.', .2
+            turn.delivered, turn.looked, turn.view_angle = True, time.time(), -45.
+            overheat()
+            if stop_after:
+                robot.head.request('stop')
+            raise Interrupted('Head movement was cancelled.')
+        robot._inspect = inspect
+    else:
+        overheat()
+    try:
+        turn = answer(robot, 'What is on your left?', frame)
+        assert robot.head.cooling and not robot.head.error
+        robot.check_health()
+        if stop_after:
+            assert not spoken and not robot.head.following
+        else:
+            assert 'Head motor cooling' in turn.answer and spoken
+            assert not turn.keep and not turn.frame_id and not turn.visual_caption
+            assert not turn.caption and not turn.caption_s and not turn.delivered
+        spoken.clear()
+        ordinary = answer(robot, 'How are you?', frame)
+        assert ordinary.answer == 'Okay.' and spoken
+        robot.check_health()
+        assert motor.goals == [0.]
     finally:
         close_robot(robot)

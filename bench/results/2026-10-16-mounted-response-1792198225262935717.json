@@ -1,0 +1,285 @@
+{
+  "machine": "Jetson",
+  "release": "74df9ed96eb2",
+  "tegrastats": "mounted-brake40-20261016-205025.tegrastats",
+  "speed": 40,
+  "acceleration": 40,
+  "source": "\"\"\"Compare one temporary acceleration setting with fixed moves, retargets, and peak-speed Stops.\"\"\"\nimport argparse\nimport json\nimport os\nimport signal\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import servo\nfrom robot.head import Head, interrupt\nfrom robot.config import SHARED\nfrom bench import servo_runtime\n\np=argparse.ArgumentParser()\np.add_argument('--speed',type=int,choices=(15,20,30,40),required=True)\np.add_argument('--acceleration',type=int,choices=(5,10,20,30,40,60),required=True)\np.add_argument('--calibration', type=Path, default=SHARED/'servo-mounted.json')\na=p.parse_args()\nrecord={'machine':'Jetson','release':os.environ['ROBOT_RELEASE'],\n 'tegrastats':os.environ['ROBOT_TEGRASTATS'],'speed':a.speed,'acceleration':a.acceleration,\n 'source':Path(__file__).read_text(),'trace':[],'moves':[],'stops':[],'status':'incomplete',\n 'source_type':'projected fresh face; no camera inference; capture age zero',\n 'criteria':{'excursion_deg':3,'dispatch_s':.1,'settlement_s':2,'minimum_peak_speed_fraction':.9}}\noutput=SHARED/'results'/f'2026-10-16-mounted-response-{time.time_ns()}.json'\nconfig=a.calibration\nrecord[\"calibration\"]=json.loads(config.read_text())\nrecord[\"command\"]=sys.argv\nhead=None\nsignal.signal(signal.SIGTERM,interrupt)\nsignal.signal(signal.SIGINT,interrupt)\n\noriginal_status = servo.Servo.status\ndef confirmed_status(device):\n state = original_status(device)\n state['temperature_primary_c'] = state['temperature_c']\n state['temperature_repeat_c'] = device.read(63)\n state['temperature_c'] = max(state['temperature_c'], state['temperature_repeat_c'])\n return state\nservo.Servo.status = confirmed_status\nrecord['feedback_confirmation'] = 'Two temperature reads; either unsafe reading retains immediate fault'\n\ndef note(kind):\n with head.condition:\n  m=head.motor\n  row={'kind':kind,'time':time.time(),'angle':head.angle,'goal':head.goal,\n   'feedback_monotonic':m.feedback,'encoder_position':m.position,'encoder_goal':m.target,\n   'feedback':m.status.copy(),'sent':getattr(m,'sent_at',None),'ack':getattr(m,'ack_at',None)}\n  record['trace'].append(row)\n  return row\n\ndef move(goal):\n start=time.monotonic();token=head.request('right');head.move(goal,token)\n while head.halt or head.moving or head.sent!=head.goal:\n  note('fixed')\n  assert not head.error and time.monotonic()-start<12\n  time.sleep(.01)\n head.wait(token,1)\n record['moves'].append({'goal':goal,'angle':head.angle,'seconds':time.monotonic()-start})\n head.finish(token)\n\ntry:\n with servo.connect(json.loads(config.read_text())['port']) as device:\n  record['before']=device.status();before=[device.read(i) for i in range(40)]\n  record['initial_acceleration']=device.read(41)\n  record['raw_register85']=device.read(85)\n servo.SPEED=servo_runtime.SPEED=a.speed\n original=servo.Servo.prepare\n def prepare(device,position,speed,acceleration=5):\n  original(device,position,speed)\n  device.off()  # This servo enables torque when its current-position goal is primed.\n  assert device.read(40)==0, 'Torque off before acceleration override'\n  device.write(41,a.acceleration)\n  assert device.read(41)==a.acceleration\n servo.Servo.prepare=prepare\n head=Head(servo.SerialMotor.open(config));head.start();head.wait(0,5)\n with head.condition:\n  record['actual_acceleration']=head.motor.servo.read(41)\n  record['actual_speed_steps_s']=head.motor.servo.read(46,2)\n for goal in (0,45,0,-45,0):move(goal)\n start=time.monotonic()\n while time.monotonic()-start<3:\n  head.follow((1000,0,1280,700),1280,time.time())\n  note('retarget')\n  assert not head.error\n  time.sleep(.07)\n record['retarget_end_angle']=head.angle\n move(0)\n for direction in (1,-1,1,-1,1,-1):\n  move(-8*direction)\n  token=head.request('right');head.move(40*direction,token)\n  deadline=time.monotonic()+5;previous=note('accelerating');peak=0.;plateau=0\n  while True:\n   row=note('accelerating')\n   dt=row['feedback_monotonic']-previous['feedback_monotonic']\n   if dt>0:\n    velocity=(row['encoder_position']-previous['encoder_position'])/servo.SCALE/dt\n    peak=max(peak,abs(velocity));previous=row\n    plateau=plateau+1 if abs(velocity)>=.9*a.speed else 0\n   assert not head.error and time.monotonic()<deadline\n   if direction*head.angle>=0 and plateau>=2:break\n   time.sleep(.005)\n  assert head.moving\n  result=servo_runtime.stop_check(head,record['trace'],note,watched=True)\n  record['stops'].append({'direction':direction,'measured_peak_deg_s':peak,**result})\n  print(json.dumps(record['stops'][-1]),flush=True)\n move(0)\n record['status']='passed'\nexcept BaseException as error:\n record.update(status='failed',error=repr(error));raise\nfinally:\n if head:\n  record['fault_feedback_before_cleanup']=head.motor.status.copy();head.close()\n  record['head_error']=head.error\n with servo.connect(json.loads(config.read_text())['port']) as device:\n  record['after']=device.status()\n  record['saved_registers_unchanged']=before==[device.read(i) for i in range(40)]\n  record['final_acceleration']=device.read(41)\n  record['lock']=device.read(55)\n if record['after']['torque'] or record['after']['moving'] or not record['saved_registers_unchanged']:\n  record['status']='failed'\n output.write_text(json.dumps(record,indent=2)+'\\n')\n print(json.dumps({'result':str(output),'status':record['status']}),flush=True)\n",
+  "moves": [
+    {
+      "goal": 0,
+      "angle": 0.087890625,
+      "seconds": 0.4582890409999436
+    },
+    {
+      "goal": 45,
+      "angle": 43.681640625,
+      "seconds": 1.3937789089999342
+    },
+    {
+      "goal": 0,
+      "angle": 0.087890625,
+      "seconds": 1.393681344000015
+    },
+    {
+      "goal": -45,
+      "angle": -44.6484375,
+      "seconds": 1.450886849000085
+    },
+    {
+      "goal": 0,
+      "angle": -0.263671875,
+      "seconds": 1.3959270750000314
+    },
+    {
+      "goal": 0,
+      "angle": 0.087890625,
+      "seconds": 1.4021811310000203
+    },
+    {
+      "goal": -8,
+      "angle": -7.91015625,
+      "seconds": 0.4576164049999534
+    },
+    {
+      "goal": 8,
+      "angle": 7.822265625,
+      "seconds": 0.5131805470000472
+    },
+    {
+      "goal": -8,
+      "angle": -7.734375,
+      "seconds": 0.5140935189999709
+    },
+    {
+      "goal": 8,
+      "angle": 7.55859375,
+      "seconds": 0.45824604799997815
+    },
+    {
+      "goal": -8,
+      "angle": -7.734375,
+      "seconds": 0.45791633199996795
+    },
+    {
+      "goal": 8,
+      "angle": 7.822265625,
+      "seconds": 0.4573899499999925
+    },
+    {
+      "goal": 0,
+      "angle": -0.703125,
+      "seconds": 0.1820609249999734
+    }
+  ],
+  "stops": [
+    {
+      "direction": 1,
+      "measured_peak_deg_s": 53.42111824439633,
+      "stop_request_monotonic": 695.02807514,
+      "stop_settled_s": 0.5132690029998912,
+      "stop_dispatch_s": 0.005053029999999126,
+      "stop_ack_s": 0.006314232999898195,
+      "stop_maximum_sampled_degrees": 3.603515625,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    },
+    {
+      "direction": -1,
+      "measured_peak_deg_s": 44.29452978183198,
+      "stop_request_monotonic": 696.339381166,
+      "stop_settled_s": 0.45235769300006723,
+      "stop_dispatch_s": 0.0051760530000137805,
+      "stop_ack_s": 0.00643876700007695,
+      "stop_maximum_sampled_degrees": 3.427734375,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    },
+    {
+      "direction": 1,
+      "measured_peak_deg_s": 52.29026993450464,
+      "stop_request_monotonic": 697.589394802,
+      "stop_settled_s": 0.45038938999994116,
+      "stop_dispatch_s": 0.005048419999980069,
+      "stop_ack_s": 0.006291753000027711,
+      "stop_maximum_sampled_degrees": 3.427734375,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    },
+    {
+      "direction": -1,
+      "measured_peak_deg_s": 49.494104543300544,
+      "stop_request_monotonic": 698.780177302,
+      "stop_settled_s": 0.5093532330000698,
+      "stop_dispatch_s": 0.005139503999998851,
+      "stop_ack_s": 0.006382959000006849,
+      "stop_maximum_sampled_degrees": 3.515625,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    },
+    {
+      "direction": 1,
+      "measured_peak_deg_s": 50.93091665278264,
+      "stop_request_monotonic": 700.03039477,
+      "stop_settled_s": 0.44811605799998233,
+      "stop_dispatch_s": 0.005020726999987346,
+      "stop_ack_s": 0.006269800999916697,
+      "stop_maximum_sampled_degrees": 3.427734375,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    },
+    {
+      "direction": -1,
+      "measured_peak_deg_s": 44.670353822128035,
+      "stop_request_monotonic": 701.218074222,
+      "stop_settled_s": 0.4531820349999407,
+      "stop_dispatch_s": 0.005038172000013219,
+      "stop_ack_s": 0.0063242349999654834,
+      "stop_maximum_sampled_degrees": 3.603515625,
+      "watched": true,
+      "stop_excursion_target_degrees": 3,
+      "stop_excursion_target_met": false,
+      "stop_time_target_s": 0.3,
+      "stop_time_target_met": false
+    }
+  ],
+  "status": "passed",
+  "source_type": "projected fresh face; no camera inference; capture age zero",
+  "criteria": {
+    "excursion_deg": 3,
+    "dispatch_s": 0.1,
+    "settlement_s": 2,
+    "minimum_peak_speed_fraction": 0.9
+  },
+  "calibration": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A46085287-if00",
+    "zero": 2080,
+    "direction": 1,
+    "limit": 45
+  },
+  "command": [
+    "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/brake-compare-51c382a8a16a.py",
+    "--speed",
+    "40",
+    "--acceleration",
+    "40",
+    "--calibration",
+    "/home/qdrant/qdrant-robot/shared/experiments/servo-mounted-calibration/prior-mounted45-1792196345221376502.json"
+  ],
+  "feedback_confirmation": "Two temperature reads; either unsafe reading retains immediate fault",
+  "before": {
+    "id": 1,
+    "position": 2150,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 38,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 38,
+    "temperature_repeat_c": 37
+  },
+  "initial_acceleration": 60,
+  "raw_register85": 250,
+  "actual_acceleration": 40,
+  "actual_speed_steps_s": 455,
+  "retarget_end_angle": 44.033203125,
+  "fault_feedback_before_cleanup": {
+    "id": 1,
+    "position": 2072,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 37,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 37,
+    "temperature_repeat_c": 37
+  },
+  "head_error": "",
+  "after": {
+    "id": 1,
+    "position": 2072,
+    "mode": 0,
+    "torque": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 37,
+    "fault": 0,
+    "moving": 0,
+    "temperature_primary_c": 37,
+    "temperature_repeat_c": 37
+  },
+  "saved_registers_unchanged": true,
+  "final_acceleration": 40,
+  "lock": 1,
+  "trace_summary": {
+    "samples": 1472,
+    "first": {
+      "kind": "fixed",
+      "time": 1792198225.4999588,
+      "angle": 6.15234375,
+      "goal": 0,
+      "feedback_monotonic": 683.753365294,
+      "encoder_position": 2150,
+      "encoder_goal": 2150,
+      "feedback": {
+        "id": 1,
+        "position": 2150,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 38,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 37,
+        "temperature_repeat_c": 38
+      },
+      "sent": 683.586338187,
+      "ack": 683.587564295
+    },
+    "last": {
+      "kind": "fixed",
+      "time": 1792198243.5883367,
+      "angle": -0.703125,
+      "goal": 0.0,
+      "feedback_monotonic": 701.843338465,
+      "encoder_position": 2072,
+      "encoder_goal": 2080,
+      "feedback": {
+        "id": 1,
+        "position": 2072,
+        "mode": 0,
+        "torque": 1,
+        "voltage_v": 5.4,
+        "temperature_c": 37,
+        "fault": 0,
+        "moving": 0,
+        "temperature_primary_c": 37,
+        "temperature_repeat_c": 37
+      },
+      "sent": 701.676601899,
+      "ack": 701.677857997
+    }
+  },
+  "raw_trace_archive": {
+    "jetson_path": "/home/qdrant/qdrant-robot/shared/results/2026-10-16-mounted-response-1792198225262935717.json",
+    "local_path": "build/assembled-preflight/brake40-results/2026-10-16-mounted-response-1792198225262935717.json",
+    "sha256": "cc8190ffc9256d4b5a273c0c49ce4d6faf6c19f68127fe399a5c744cbd726b7e"
+  },
+  "human_quality": "Dylan reported it was smoother than before."
+}

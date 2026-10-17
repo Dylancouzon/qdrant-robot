@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from robot import servo
-from robot.head import Head
+from robot.head import Head, Interrupted
 from tools.test_servo import Packet
 
 
@@ -32,7 +32,7 @@ def test_invalid_calibration_never_writes(zero, direction, limit):
 
 
 @pytest.mark.parametrize("address,value", [
-    (33, 1), (65, 1), (40, 1), (66, 1), (62, 120), (63, 65), (56, 100), (11, 2050),
+    (33, 1), (65, 1), (40, 1), (66, 1), (62, 120), (56, 100), (11, 2050),
 ])
 def test_unsafe_startup_never_writes(address, value):
     device, packet = bus()
@@ -47,9 +47,9 @@ def test_prime_old_goal_and_respect_direction():
     packet.memory[42] = 4000
     actual = servo.SerialMotor(device, 2048, -1, 10)
     actual.move(5)
-    assert packet.positions == [2048, 2048 - round(5 * servo.SCALE)]
+    assert packet.positions == [2048, 2048, 2048 - round(5 * servo.SCALE)]
     assert packet.memory[46] == 455  # Approximately 40 degrees/s.
-    assert packet.memory[41] == 60
+    assert packet.memory[41] == 40
     assert packet.memory[48] == 200
     assert all(address >= 40 for address, _ in packet.writes)
     actual.close()
@@ -180,6 +180,8 @@ class DelayedPacket(Packet):
         self.advance()
         self.writes.append((address, value))
         self.memory[address] = value
+        if address == 42:
+            self.memory[40] = 1
         return (-6, 0) if (address, value) == self.fail_at else (0, 0)
 
     write2ByteTxRx = write1ByteTxRx
@@ -365,28 +367,152 @@ def test_runtime_temperature_boundary_preserves_cool_setup_requirement(temperatu
     else:
         with pytest.raises(RuntimeError, match="below 60 C"):
             servo.safe(status)
-    if temperature < 65:
-        actual = servo.SerialMotor(device, 2048, 1, 10)
-        actual.close()
-    else:
-        with pytest.raises(RuntimeError, match="below 65 C"):
-            servo.SerialMotor(device, 2048, 1, 10)
-        assert not packet.writes
+    actual = servo.SerialMotor(device, 2048, 1, 10)
+    assert actual.cooling == (temperature >= 65)
+    assert actual.thermal_latched == (temperature >= 70)
+    assert all(address == 40 and value == 0 for address, value in packet.writes)
+    actual.close()
 
 
-def test_runtime_temperature_trip_latches_and_releases_without_recovery():
+def thermal_head(monkeypatch):
+    clock = [100.]
+    monkeypatch.setattr(servo.time, 'monotonic', lambda: clock[0])
+    monkeypatch.setattr(servo.time, 'time', lambda: 1000 + clock[0])
     actual, packet = motor()
     head = Head(actual)
-    head.tick(100.)
-    assert packet.memory[40] == 1
+    head.tick(1100.)
+    return head, actual, packet, clock
+
+
+def test_cooling_releases_torque_and_resumes_only_with_fresh_authority(monkeypatch):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    old = head.request('right')
+    head.move(5, old)
+    clock[0] += .05
+    head.tick(1000 + clock[0])
     packet.memory[63] = 65
-    head.tick(100.05)
-    assert "temperature 65 C" in head.error and actual.closed
-    assert packet.memory[40] == 0
+    clock[0] += .05
+    head.tick(1000 + clock[0])
+    assert head.cooling and not head.error and not actual.closed
+    assert packet.memory[40] == 0 and actual.target is None
+    assert head.generation != old and not head.valid(1000 + clock[0])
+    with pytest.raises(Interrupted):
+        head.move(0, old)
+    with pytest.raises(RuntimeError, match='cooling'):
+        actual.move(0)
+    with pytest.raises(RuntimeError, match='cooling'):
+        head.move(0, head.generation)
+    writes = len(packet.writes)
+    packet.memory.update({63: 55, 56: 2048 + 30})
+    clock[0] = actual.cooldown_until - .01
+    head.tick(1000 + clock[0])
+    assert head.cooling
+    clock[0] += .02
+    head.tick(1000 + clock[0])
+    assert head.cooling and 'Waiting for safe temperature' in head.warning
+    for _ in range(101):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    recovered = 1000 + clock[0]
+    assert not head.cooling and packet.memory[40] == 0 and not head.error
+    assert len(packet.writes) == writes and head.goal == head.angle
+    assert head.follow((1000, 0, 1280, 700), 1280, recovered - .1, recovered) == 'stale source'
+    assert not head.valid(recovered - .1)
+    clock[0] += .2
+    head.tick(1000 + clock[0])
+    assert head.follow((1000, 0, 1280, 700), 1280,
+                       1000 + clock[0], 1000 + clock[0]) == 'goal'
+    head.tick(1000 + clock[0])
+    assert packet.memory[40] == 1 and not head.error
+    head.close()
+
+
+@pytest.mark.parametrize('temperature,latched', [(64, False), (65, False), (70, True)])
+def test_timer_never_restarts_a_hot_motor_and_hard_limit_latches(monkeypatch, temperature, latched):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    head.tick(1100.)
+    packet.memory[63] = temperature
+    clock[0] += 190
+    head.tick(1000 + clock[0])
+    assert head.cooling and not head.error and packet.memory[40] == 0
+    assert actual.thermal_latched == latched
+    packet.memory[63] = 55
+    clock[0] += .1
+    head.tick(1000 + clock[0])
+    for _ in range(99):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    assert head.cooling
+    packet.memory[63] = 56  # One warm reading resets the continuous cool interval.
+    clock[0] += .1
+    head.tick(1000 + clock[0])
+    packet.memory[63] = 55
+    clock[0] += .1
+    head.tick(1000 + clock[0])
+    for _ in range(102):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    assert head.cooling == latched and packet.memory[40] == 0
+    if latched:
+        assert 'restart after cooling' in head.warning
+    head.close()
+
+
+def test_stop_and_handover_during_cooling_cannot_replay_old_goals(monkeypatch):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    head.tick(1100.)
+    handed = head.request('handover')
+    head.activate(handed)
+    head.finish(handed)
+    head.request('stop')
     packet.memory[63] = 39
-    head.tick(100.1)
-    assert head.error and actual.closed and not head.following
+    clock[0] += 1
+    head.tick(1000 + clock[0])
+    clock[0] = actual.cooldown_until + 1
+    head.tick(1000 + clock[0])
+    for _ in range(102):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    assert not head.cooling and not head.following
+    assert head.follow((1000, 0, 1280, 700), 1280,
+                       1000 + clock[0], 1000 + clock[0]) == 'stopped'
     assert packet.memory[40] == 0
+    head.close()
+
+
+@pytest.mark.parametrize('fault', ['release', 'voltage', 'mode', 'status', 'bounds', 'torque'])
+def test_cooling_never_masks_nonthermal_faults(monkeypatch, fault):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    if fault == 'release':
+        packet.fail_at = (40, 0)
+    elif fault == 'voltage':
+        packet.memory[62] = 61
+    elif fault == 'mode':
+        packet.memory[33] = 1
+    elif fault == 'status':
+        packet.memory[65] = 4
+    elif fault == 'bounds':
+        packet.memory[56] = 4000
+    elif fault == 'torque':
+        packet.memory[40] = 0
+    head.tick(1100.)
+    assert head.error and actual.closed
+    packet.fail_at = None
+    packet.memory.update({63: 39, 62: 54, 33: 0, 65: 0})
+    clock[0] += 500
+    head.tick(1600.)
+    assert head.error and actual.closed
+
+
+def test_hot_startup_validates_saved_calibration_before_cooldown(monkeypatch):
+    device, packet = bus()
+    packet.memory.update({63: 70, 11: 2050})
+    with pytest.raises(ValueError, match='saved travel'):
+        servo.SerialMotor(device, 2048, 1, 10)
+    assert not packet.writes
 
 
 @pytest.mark.parametrize("steps", [7, 17])
@@ -502,3 +628,79 @@ def test_watched_stop_reports_clearance_diagnostic_without_loosening_other_check
         with pytest.raises(AssertionError, match='excursion'):
             stop_check(head, trace, note)
     assert trace[-1]['stop_maximum_sampled_degrees'] == 3.1640625
+
+
+def test_gap_in_feedback_restarts_continuous_cool_confirmation(monkeypatch):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    head.tick(1100.)
+    packet.memory[63] = 39
+    clock[0] = actual.cooldown_until + 1
+    head.tick(1000 + clock[0])
+    for _ in range(90):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    clock[0] += .31
+    head.tick(1000 + clock[0])
+    assert head.cooling and actual.cool_since == clock[0]
+    for _ in range(102):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    assert not head.cooling and packet.memory[40] == 0
+    head.close()
+
+
+def test_hot_startup_never_primes_a_goal_while_cooling():
+    device, packet = bus()
+    packet.memory[63] = 65
+    actual = servo.SerialMotor(device, 2048, 1, 10)
+    head = Head(actual)
+    head.tick(100.)
+    assert head.cooling and not head.error and not actual.enabled
+    assert packet.memory[40] == 0
+    assert all(address == 40 and value == 0 for address, value in packet.writes)
+    head.close()
+
+
+def test_wall_clock_changes_cannot_finish_monotonic_cooldown(monkeypatch):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    head.tick(1100.)
+    packet.memory[63] = 39
+    wall = [1100.]
+    monkeypatch.setattr(servo.time, 'time', lambda: wall[0])
+    for _ in range(102):
+        clock[0] += .1
+        wall[0] += 100000
+        head.tick(wall[0])
+    assert head.cooling and actual.cool_since is not None
+    assert packet.memory[40] == 0 and actual.cooldown_until > clock[0]
+    head.close()
+
+@pytest.mark.parametrize('blocked', [False, True])
+def test_recovered_stopped_motor_stays_off_after_passive_displacement(monkeypatch, blocked):
+    head, actual, packet, clock = thermal_head(monkeypatch)
+    packet.memory[63] = 65
+    head.tick(1100.)
+    head.request('stop')
+    packet.memory[63] = 50
+    for _ in range(1810):
+        clock[0] += .1
+        head.tick(1000 + clock[0])
+    assert not head.cooling and head.awaiting_motion and not head.following
+    writes = len(packet.writes)
+    packet.memory[56] += 30
+    head.blocked = lambda: blocked
+    head.hold()
+    for _ in range(5):
+        clock[0] += .05
+        head.tick(1000 + clock[0])
+    assert not head.error and packet.memory[40] == 0 and len(packet.writes) == writes
+    assert head.goal == head.sent == head.angle
+    head.blocked = lambda: False
+    token = head.request('right')
+    head.move(5, token)
+    clock[0] += .05
+    head.tick(1000 + clock[0])
+    assert not head.awaiting_motion and packet.memory[40] == 1
+    head.close()

@@ -9,8 +9,12 @@ SCALE = 4096 / 360
 TOLERANCE = 1.5  # Provisional mounted arrival precision; travel limits remain strict.
 FEEDBACK_S = 0.3
 SPEED = 40
-ACCELERATION = 60
-TEMPERATURE_LIMIT = 65  # Internal feedback; below the documented 70 C overheat protection.
+ACCELERATION = 40
+TEMPERATURE_LIMIT = 65
+HARD_TEMPERATURE_LIMIT = 70
+COOL_TEMPERATURE = 55
+COOLDOWN_S = 180
+COOL_STABLE_S = 10
 PROGRESS_STEPS = 5  # Exceed stationary encoder noise before renewing a travel watch.
 
 
@@ -153,10 +157,12 @@ def safe(status, temperature_limit=60):
     # The 5 V supply has reported 5.6 V; 6 V remains within the 7.4 V model rating.
     if status["mode"] != 0 or status["fault"]:
         raise RuntimeError("Require position mode and no servo fault")
-    if not 4.5 <= status["voltage_v"] <= 6.0 or status["temperature_c"] >= temperature_limit:
+    hot = temperature_limit is not None and status["temperature_c"] >= temperature_limit
+    if not 4.5 <= status["voltage_v"] <= 6.0 or hot:
+        thermal = f" and below {temperature_limit} C" if temperature_limit is not None else ""
         raise RuntimeError(f"Servo supply {status['voltage_v']} V, "
                            f"temperature {status['temperature_c']} C; "
-                           f"require 4.5..6.0 V and below {temperature_limit} C")
+                           f"require 4.5..6.0 V{thermal}")
 
 
 class SerialMotor:
@@ -171,14 +177,16 @@ class SerialMotor:
         self.closed = self.enabled = False
         self.target = self.position = None
         self.feedback = self.deadline = self.progress = 0.
-        self.distance = math.inf
         self.progress_position = self.arrival = None
         self.deadline_target = None
-        self.read(time.time())
+        self.cooldown_until, self.cool_since = 0., None
+        self.thermal_latched = False
+        self._feedback()
         if self.status["torque"] or self.status["moving"]:
             raise RuntimeError("Require a stationary servo with torque off before startup")
         if not servo.read(9, 2) <= self.low < self.high <= servo.read(11, 2):
             raise ValueError("Calibration exceeds the servo saved travel limits")
+        self._temperature(self.feedback)
 
     @classmethod
     def open(cls, path):
@@ -198,23 +206,58 @@ class SerialMotor:
         motor.connection = connection
         return motor
 
-    def read(self, _now):
+    @property
+    def cooling(self):
+        return self.cooldown_until > 0
+
+    def _feedback(self):
         started = time.monotonic()
         status = self.servo.status()
         finished = time.monotonic()
         if finished - started > FEEDBACK_S:
             raise RuntimeError("Servo feedback expired during read")
         self.status = status
-        safe(status, TEMPERATURE_LIMIT)
+        safe(status, None)  # Thermal handling releases the motor without losing the session.
         if not self.low <= status["position"] <= self.high:
             raise RuntimeError("Servo feedback exceeds calibrated travel")
-        if self.enabled and status["torque"] != 1:
-            raise RuntimeError("Servo torque changed unexpectedly")
+        if status["torque"] != int(self.enabled):
+            raise RuntimeError("Servo torque changed unexpectedly; "
+                               "require torque off when inactive")
+        if self.cooling and finished - self.feedback > FEEDBACK_S:
+            self.cool_since = None
         self.position, self.feedback, self.status = status["position"], finished, status
+        self.feedback_at = time.time()
         self.read_s = finished - started
-        self._progress(finished)
+
+    def _temperature(self, now):
+        temperature = self.status["temperature_c"]
+        if temperature >= TEMPERATURE_LIMIT and not self.cooling:
+            self.servo.off()
+            self.enabled = False
+            self.status["torque"] = 0  # off() verified the register after its acknowledgement.
+            self.target = self.deadline = self.progress_position = self.arrival = None
+            self.deadline_target = None
+            self.cooldown_until = time.monotonic() + COOLDOWN_S
+        if temperature >= HARD_TEMPERATURE_LIMIT and not self.thermal_latched:
+            self.thermal_latched = True
+            print(f"Head motor thermal protection latched at reported {temperature} C", flush=True)
+        if not self.cooling:
+            return
+        if temperature <= COOL_TEMPERATURE and not self.status["moving"]:
+            self.cool_since = now if self.cool_since is None else self.cool_since
+        else:
+            self.cool_since = None
+        if (not self.thermal_latched and self.cool_since is not None and
+                now >= self.cooldown_until and now - self.cool_since >= COOL_STABLE_S):
+            self.cooldown_until, self.cool_since = 0., None
+
+    def read(self, _now):
+        self._feedback()
+        self._temperature(self.feedback)
+        if not self.cooling:
+            self._progress(self.feedback)
         angle = self.direction * (self.position - self.zero) / SCALE
-        return angle, bool(status["moving"])
+        return angle, bool(self.status["moving"])
 
     def _progress(self, now):
         if self.target is None:
@@ -234,14 +277,14 @@ class SerialMotor:
             return
         if self.deadline is None:
             # Holding has no expired travel deadline. Watch a new displacement normally.
-            self.progress, self.distance = now, distance
+            self.progress = now
             self.progress_position = self.position
             self.deadline = now + distance / (SPEED * SCALE) + 2.
             self.deadline_target = self.target
         elif ((self.target - self.progress_position) *
               (self.position - self.progress_position) > 0 and
               abs(self.position - self.progress_position) > PROGRESS_STEPS):
-            self.progress, self.distance = now, distance
+            self.progress = now
             self.progress_position = self.position
             if (distance > self.tolerance * SCALE and
                     self.target != self.deadline_target):
@@ -253,6 +296,8 @@ class SerialMotor:
     def move(self, angle):
         if self.closed:
             raise RuntimeError("Servo is closed")
+        if self.cooling:
+            raise RuntimeError("Head motor is cooling")
         if not math.isfinite(angle) or abs(angle) > self.limit:
             raise ValueError("Servo goal exceeds calibrated travel")
         if time.monotonic() - self.feedback > FEEDBACK_S:
@@ -268,11 +313,11 @@ class SerialMotor:
         if target != self.target:
             self.arrival = None
         self.target = target
-        self.distance = abs(target - self.position)
+        distance = abs(target - self.position)
         if self.deadline is None or self.progress_position is None:
             self.progress = time.monotonic()
             self.progress_position = self.position
-            self.deadline = self.progress + self.distance / (SPEED * SCALE) + 2.
+            self.deadline = self.progress + distance / (SPEED * SCALE) + 2.
             self.deadline_target = target
         return self.direction * (target - self.zero) / SCALE
 

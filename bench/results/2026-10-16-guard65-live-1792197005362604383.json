@@ -3,7 +3,7 @@
   "machine": "Jetson",
   "tegrastats": "robot-20261016-203004.tegrastats",
   "source": "\"\"\"Run the unchanged live entry point while retaining bounded numeric following diagnostics.\"\"\"\nimport json\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import main\nfrom robot.config import SHARED\nfrom bench.head_sim import trace_following\n\nreport = {'release': os.environ['ROBOT_RELEASE'], 'machine': 'Jetson',\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'status': 'running',\n          'source': Path(__file__).read_text()}\noutput = SHARED / 'experiments/servo-mounted-calibration' / f'live-follow-{time.time_ns()}.json'\nOriginal = main.Robot\n\n\nclass ObservedRobot(Original):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        trace_following(self, report)\n        follow = self._follow_face\n        self.last_report = 0.\n        def observe(*args, **kwargs):\n            result = follow(*args, **kwargs)\n            if time.monotonic() - self.last_report > 1:\n                self.last_report = time.monotonic()\n                self.save_report()\n            return result\n        self._follow_face = observe\n        print(f'following diagnostics: {output}', flush=True)\n\n    def save_report(self):\n        diagnostic = report['following_diagnostics']\n        safe = {**report, 'following_diagnostics': {**diagnostic, 'samples': [\n            {k: v for k, v in row.items() if k != 'name'} for row in diagnostic['samples']]}}\n        temp = output.with_suffix('.tmp')\n        temp.write_text(json.dumps(safe, indent=2) + '\\n')\n        temp.replace(output)\n\n    def close(self):\n        try:\n            super().close()\n        finally:\n            report['status'] = 'closed'\n            self.save_report()\n\n\nmain.Robot = ObservedRobot\nmain.main()\n",
-  "status": "listening; short startup observation only",
+  "status": "Startup observation passed; later stopped by 65 C guard",
   "trace_source": "build/assembled-preflight/guard65-live-snapshot/experiments/servo-mounted-calibration/live-follow-1792197005362604383.json",
   "trace_snapshot_sha256": "4dbc16e96674621626ffa23b43939c94fbacdfd5bd5208f044ee1dce2ac2a780",
   "snapshot_samples": 1740,
@@ -58,5 +58,37 @@
     "pyproject.toml": "39d9f92bd16b255b79fa2cd8c911dd8bc9d119d78cbd0fffe76c767d1e010314",
     "uv.lock": "368f01263401ebf63ed78112b886e79f7a6172a1bd8be76afb18c8b634024a21"
   },
-  "qualification": "No prolonged loaded thermal qualification; earlier good human motion report applies to identical motion constants under the previous60C guard."
+  "qualification": "No prolonged loaded thermal qualification; earlier good human motion report applies to identical motion constants under the previous60C guard.",
+  "subsequent_fault": {
+    "time_local": "2026-10-16 20:37:46 America/New_York",
+    "error": "Servo supply 5.4 V, temperature 65 C; require 4.5..6.0 V and below 65 C",
+    "final_cached_feedback": {
+      "id": 1,
+      "position": 2143,
+      "mode": 0,
+      "torque": 1,
+      "voltage_v": 5.4,
+      "temperature_c": 65,
+      "fault": 0,
+      "moving": 1
+    },
+    "counts": {
+      "preview": 6035,
+      "expired at preview": 0,
+      "unrecognized visitor": 4858,
+      "goal": 312,
+      "limit": 16,
+      "centered": 685,
+      "stale source": 63,
+      "microphone suppressed": 62,
+      "conversation": 21,
+      "settling": 1,
+      "stopped": 3,
+      "cancelled source": 1
+    },
+    "raw_trace_local": "build/assembled-preflight/reboot-recovery-89124a54/experiments/servo-mounted-calibration/live-follow-1792197005362604383.json",
+    "raw_trace_sha256": "379fcb83b980c82e21358ddade40554d2e7715db9b4100068c0cc5c093ea6f1e",
+    "physical_context": "Dylan reported repeated left/right testing, then switched off the Jetson.",
+    "cleanup": "No release failure appeared in the journal; post-reboot read-only samples confirmed torque off."
+  }
 }

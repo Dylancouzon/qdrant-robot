@@ -4,7 +4,7 @@ Edgy sees, listens, talks, and remembers on one Jetson Orin Nano Super 8 GB. Qdr
 
 Read [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [lessons index](research/lessons.md) before work. [Research topics](research/README.md) explain current behavior. [Decisions](DECISIONS.md) preserve binding choices.
 
-**Next step: Qualify loaded power and temperature feedback.** The assembled head has cleared ±60° travel at 40°/s, and Dylan reported good live motion. The mounted software temperature cutoff is 65°C. The [handoff](STATE.md#next-step) records current jobs and remaining qualification. Conversation experiments and broader acceptance remain parked.
+**Next step: Qualify loaded power and temperature feedback.** The assembled head has cleared ±60° travel at 40°/s, and Dylan reported good live motion. The head now cools with torque off at 65°C while speech and vision continue; 70°C latches head movement off. The [handoff](STATE.md#next-step) records current jobs and remaining qualification. Conversation experiments and broader acceptance remain parked.
 
 ## Run the interface
 

@@ -1,0 +1,248 @@
+{
+  "machine": "Jetson",
+  "release": "726308b08b19",
+  "tegrastats": "thermal-sim-20261016-210528.tegrastats",
+  "source": "\"\"\"Verify the full cooldown with Jetson models and audio, without opening a servo port.\"\"\"\nimport ast\nimport hashlib\nimport json\nimport os\nimport sys\nimport threading\nimport time\nfrom pathlib import Path\nfrom types import SimpleNamespace\n\nsys.path.insert(0, str(Path.cwd()))\nimport numpy as np\nfrom robot import audio, servo\nfrom robot.config import ROOT, SHARED\nfrom robot.head import Head\nfrom robot.main import Robot\nfrom bench.head_sim import TurningCamera, converse, head_state, load, until\n\n\ndef forbidden(*args, **kwargs):\n    raise AssertionError('No real serial connection is permitted in this simulation')\n\n\nservo.connect = forbidden\n# Compile the one existing packet fake without importing pytest into the robot environment.\nsource = ROOT / 'tools/test_servo.py'\nnode = next(n for n in ast.parse(source.read_text()).body\n            if isinstance(n, ast.ClassDef) and n.name == 'Packet')\nnamespace = {}\nexec(compile(ast.Module(body=[node], type_ignores=[]), str(source), 'exec'), namespace)\npacket = namespace['Packet']()\ntransport = servo.Servo(SimpleNamespace(is_using=False), packet, 1)\nmotor = servo.SerialMotor(transport, 2048, 1, 60)\nhead = Head(motor)\nfolder = SHARED / 'experiments' / f'thermal-sim-{time.time_ns()}'\nresult = {'machine': 'Jetson', 'release': os.environ['ROBOT_RELEASE'],\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'source': Path(__file__).read_text(),\n          'packet_source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),\n          'hardware_motion': False, 'input': 'Oracle text and development photos; real microphone capture fed as silence; USB speaker playback',\n          'status': 'failed', 'turns': [], 'samples': [], 'microphone_chunks': 0}\noutput = SHARED / 'results' / f'2026-10-16-thermal-sim-{time.time_ns()}.json'\nstop = threading.Event()\nrobot = microphone = None\nfailures = []\n\n\ndef speak(text):\n    turn = converse(robot, text)\n    result['turns'].append({'question': text, 'answer': turn.answer,\n                            'audio_s': turn.audio_s, 'wav': str(robot.out / turn.wav),\n                            'cooling': head.cooling, 'head_error': head.error})\n    assert turn.answer and turn.audio_s > 0\n    return turn\n\n\ndef capture():\n    try:\n        for chunk in audio.mic():\n            if stop.is_set():\n                break\n            robot.hear(np.zeros_like(chunk))\n            result['microphone_chunks'] += 1\n    except BaseException as error:\n        failures.append(repr(error))\n\n\ntry:\n    center = load(ROOT / 'eval/faces/scenes/dev-p05-enroll-a.jpg')\n    camera = TurningCamera(head, center, load(ROOT / 'eval/dev/live/closet-cat-center.jpg'),\n                           load(ROOT / 'eval/dev/live/closet-stopsign-center.jpg'))\n    robot = Robot(camera, folder / 'session', folder / 'memory', wake_word=False, head=head)\n    microphone = threading.Thread(target=capture, daemon=True)\n    microphone.start()\n    time.sleep(2)\n    speak('Remember me, my name is Dylan.')\n    speak('Yes.')\n    packet.memory[63] = 65\n    until(lambda: head.cooling, 3, 'thermal cooldown')\n    released = motor.cooldown_until - servo.COOLDOWN_S\n    result['release_monotonic'] = released\n    assert packet.memory[40] == 0 and not head.error and not motor.closed\n    warning = speak('What is on your left?')\n    assert 'cooling' in warning.answer.lower() and not warning.frame_id\n    robot._control('stop_head', {})\n    packet.memory[63] = 50\n    writes = len(packet.writes)\n    chunks = result['microphone_chunks']\n    speak('How are you?')\n    spoke_again = False\n    deadline = motor.cooldown_until\n    while time.monotonic() < deadline:\n        robot.check_health()\n        assert (head.cooling or time.monotonic() >= deadline) and packet.memory[40] == 0\n        assert len(packet.writes) == writes\n        assert not failures, failures\n        elapsed = time.monotonic() - released\n        result['samples'].append({'elapsed_s': elapsed, 'head': head_state(head),\n                                  'torque': packet.memory[40], 'temperature_c': packet.memory[63],\n                                  'microphone_chunks': result['microphone_chunks'],\n                                  'detections': robot.detections})\n        if elapsed > 60 and not spoke_again:\n            speak('What do you see?')\n            spoke_again = True\n        time.sleep(.5)\n    until(lambda: not head.cooling, 15, 'cooldown recovery')\n    result['recovery_s'] = time.monotonic() - released\n    assert result['recovery_s'] >= 180\n    assert not motor.enabled and packet.memory[40] == 0 and not head.following\n    assert len(packet.writes) == writes and result['microphone_chunks'] > chunks + 100\n    packet.memory[56] += 30\n    speak('How are you?')\n    assert head.awaiting_motion and packet.memory[40] == 0 and len(packet.writes) == writes\n    result['passive_displacement_stayed_off'] = True\n    speak('Talk to Dylan.')\n    packet.memory[63] = 70\n    until(lambda: motor.thermal_latched and head.cooling, 3, 'latched head protection')\n    speak('What is on your right?')\n    robot.check_health()\n    assert not head.error and packet.memory[40] == 0\n    result['final_head'] = head_state(head)\n    result['status'] = 'passed'\nexcept BaseException as error:\n    result['error'] = repr(error)\n    raise\nfinally:\n    stop.set()\n    if microphone:\n        microphone.join(5)\n    result['microphone_failures'] = failures\n    result['microphone_stopped'] = microphone is None or not microphone.is_alive()\n    if robot:\n        robot.close()\n    result['final_torque'] = packet.memory[40]\n    result['packet_writes'] = packet.writes\n    result['session'] = str(folder)\n    output.write_text(json.dumps(result, indent=2) + '\\n')\n    print(json.dumps({'result': str(output), 'status': result['status'],\n                      'recovery_s': result.get('recovery_s'),\n                      'microphone_chunks': result['microphone_chunks']}), flush=True)\n",
+  "packet_source_sha256": "f6c0d2ca2f85d0365ec284e21f9698ba65920efe70c5272b8c1268497cb286c5",
+  "hardware_motion": false,
+  "input": "Oracle text and development photos; real microphone capture fed as silence; USB speaker playback",
+  "status": "passed",
+  "turns": [
+    {
+      "question": "Remember me, my name is Dylan.",
+      "answer": "May I remember your face, Dylan? Please say yes or no.",
+      "audio_s": 3.802,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199145912.wav",
+      "cooling": false,
+      "head_error": ""
+    },
+    {
+      "question": "Yes.",
+      "answer": "Thank you, Dylan. I will remember your face.",
+      "audio_s": 3.35,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199147179.wav",
+      "cooling": false,
+      "head_error": ""
+    },
+    {
+      "question": "What is on your left?",
+      "answer": "Head motor cooling. 180 seconds minimum. I can still see and talk.",
+      "audio_s": 5.021958333333333,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199149228.wav",
+      "cooling": true,
+      "head_error": ""
+    },
+    {
+      "question": "How are you?",
+      "answer": "I'm doing fine, Dylan. The world moves fast\u2014your presence is always in motion, but I\u2019m here with you, right where we\u2019re at.",
+      "audio_s": 7.5953333333333335,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199151148.wav",
+      "cooling": true,
+      "head_error": ""
+    },
+    {
+      "question": "What do you see?",
+      "answer": "I see a woman standing in what looks like a cluttered room with clothes hanging on racks and an office chair.",
+      "audio_s": 5.974,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199209619.wav",
+      "cooling": true,
+      "head_error": ""
+    },
+    {
+      "question": "How are you?",
+      "answer": "I'm doing fine, Dylan. The world moves fast\u2014your presence is always in motion, but I\u2019m here with you, right where we\u2019re at.",
+      "audio_s": 7.5953333333333335,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199329195.wav",
+      "cooling": false,
+      "head_error": ""
+    },
+    {
+      "question": "Talk to Dylan.",
+      "answer": "I am talking to Dylan now.",
+      "audio_s": 1.73,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199332595.wav",
+      "cooling": false,
+      "head_error": ""
+    },
+    {
+      "question": "What is on your right?",
+      "answer": "Head motor reported at least 70\u00b0C. Motor off; restart after cooling. I can still see and talk.",
+      "audio_s": 6.570583333333333,
+      "wav": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685/session/1792199334833.wav",
+      "cooling": true,
+      "head_error": ""
+    }
+  ],
+  "microphone_chunks": 2412,
+  "release_monotonic": 1607.424316474,
+  "recovery_s": 180.02123336599993,
+  "passive_displacement_stayed_off": true,
+  "final_head": {
+    "angle": 2.63671875,
+    "goal": 2.63671875,
+    "moving": false,
+    "halt": false,
+    "paused": false,
+    "inspecting": false,
+    "following": true,
+    "error": "",
+    "generation": 8,
+    "settled": 1792199329.2713804,
+    "cooling": true,
+    "warning": "Head motor reported at least 70\u00b0C. Motor off; restart after cooling. I can still see and talk."
+  },
+  "microphone_failures": [],
+  "microphone_stopped": true,
+  "final_torque": 0,
+  "packet_writes": [
+    [
+      40,
+      0
+    ],
+    [
+      48,
+      200
+    ],
+    [
+      41,
+      40
+    ],
+    [
+      44,
+      0
+    ],
+    [
+      46,
+      455
+    ],
+    [
+      42,
+      2048
+    ],
+    [
+      40,
+      1
+    ],
+    [
+      42,
+      2048
+    ],
+    [
+      40,
+      0
+    ],
+    [
+      40,
+      0
+    ],
+    [
+      40,
+      0
+    ]
+  ],
+  "session": "/home/qdrant/qdrant-robot/shared/experiments/thermal-sim-1792199129416123685",
+  "independent_audio_validation": {
+    "machine": "Mac",
+    "transcriber": "Parakeet int8 CPU",
+    "detail": "Case, punctuation, and degree symbol normalized. Saved output only; no microphone recognition claim.",
+    "matched": 7,
+    "count": 8,
+    "rows": [
+      {
+        "answer": "May I remember your face, Dylan? Please say yes or no.",
+        "transcript": "May I remember your face. Dylan, please say yes or no.",
+        "words_match": true
+      },
+      {
+        "answer": "Thank you, Dylan. I will remember your face.",
+        "transcript": "Thank you, Dylan. I will remember your face.",
+        "words_match": true
+      },
+      {
+        "answer": "Head motor cooling. 180 seconds minimum. I can still see and talk.",
+        "transcript": "Head motor cooling, 180 seconds. I can still see and talk.",
+        "words_match": false
+      },
+      {
+        "answer": "I'm doing fine, Dylan. The world moves fast\u2014your presence is always in motion, but I\u2019m here with you, right where we\u2019re at.",
+        "transcript": "I'm doing fine. Dylan, the world moves fast, your presence is always in motion, but I'm here with you, right where we're at.",
+        "words_match": true
+      },
+      {
+        "answer": "I see a woman standing in what looks like a cluttered room with clothes hanging on racks and an office chair.",
+        "transcript": "I see a woman standing in what looks like a cluttered room with clothes hanging on racks and an office chair.",
+        "words_match": true
+      },
+      {
+        "answer": "I'm doing fine, Dylan. The world moves fast\u2014your presence is always in motion, but I\u2019m here with you, right where we\u2019re at.",
+        "transcript": "I'm doing fine. Dylan, the world moves fast, your presence is always in motion, but I'm here with you, right where we're at.",
+        "words_match": true
+      },
+      {
+        "answer": "I am talking to Dylan now.",
+        "transcript": "I am talking to Dylan now.",
+        "words_match": true
+      },
+      {
+        "answer": "Head motor reported at least 70\u00b0C. Motor off; restart after cooling. I can still see and talk.",
+        "transcript": "Head motor reported at least 70C. Motor off. Restart after cooling. I can still see and talk.",
+        "words_match": true
+      }
+    ],
+    "phrase_check": {
+      "method": "First 3.8 seconds of unchanged WAV; Parakeet CPU",
+      "transcript": "Head motor cooling, 180 seconds minimum. I can see"
+    },
+    "assessment": "Seven full-WAV transcripts matched all normalized words. The full transcript omitted minimum in the cooling warning. Transcribing its unchanged first 3.8 seconds recovered minimum and the correct 180-second limit. Both thermal warnings and all eight answers retain their content."
+  },
+  "samples_summary": {
+    "count": 339,
+    "first": {
+      "elapsed_s": 6.408280143999946,
+      "head": {
+        "angle": 0.0,
+        "goal": 0.0,
+        "moving": false,
+        "halt": false,
+        "paused": false,
+        "inspecting": false,
+        "following": false,
+        "error": "",
+        "generation": 4,
+        "settled": 1792199144.0055156,
+        "cooling": true,
+        "warning": "Head motor cooling. 174 seconds minimum. I can still see and talk."
+      },
+      "torque": 0,
+      "temperature_c": 50,
+      "microphone_chunks": 144,
+      "detections": 172
+    },
+    "last": {
+      "elapsed_s": 179.52056412599995,
+      "head": {
+        "angle": 0.0,
+        "goal": 0.0,
+        "moving": false,
+        "halt": false,
+        "paused": false,
+        "inspecting": false,
+        "following": false,
+        "error": "",
+        "generation": 4,
+        "settled": 1792199144.0055156,
+        "cooling": true,
+        "warning": "Head motor cooling. 1 seconds minimum. I can still see and talk."
+      },
+      "torque": 0,
+      "temperature_c": 50,
+      "microphone_chunks": 2307,
+      "detections": 2766
+    }
+  },
+  "raw_trace_archive": {
+    "local_path": "build/assembled-preflight/thermal-final/2026-10-16-thermal-sim-1792199129416417914.json",
+    "jetson_path": "/home/qdrant/qdrant-robot/shared/results/2026-10-16-thermal-sim-1792199129416417914.json",
+    "sha256": "d4fb786c60f1fd4454cc0f62310ad2213a7371f8ae0cae6370fecfb7507ba732"
+  }
+}
