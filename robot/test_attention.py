@@ -42,6 +42,94 @@ def answer(robot, text, frame):
     return turn
 
 
+def test_confirmed_motor_fault_keeps_teaching_and_spoken_inspection_warning(tmp_path, monkeypatch):
+    from robot.test_things import CENTER, frame_of, hold
+
+    monkeypatch.setattr(main, "SETTLE_S", 0)
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    monkeypatch.setattr(main, "located_faces", lambda *args: [
+        (vector, 120, (500, 50, 620, 170))])
+    robot = speaking_robot(tmp_path)
+    robot.head = Head(SimMotor())
+    try:
+        monkeypatch.setattr(robot.head.motor, "read", lambda now: (_ for _ in ()).throw(
+            RuntimeError("There is no status packet!")))
+        robot.head.tick(time.time())
+        assert robot.head.release_confirmed and not robot.head.fatal_error
+        time.sleep(.11)  # Fresh camera evidence follows the shutdown quarantine.
+        frame = frame_of(robot, people=True)
+        hold(robot, CENTER)
+        introduced = answer(robot, "I am Sam.", frame)
+        assert not introduced.selection_error and not robot.head.following
+        named = answer(robot, "This is my wallet.", frame)
+        assert named.answer.startswith("Got it, that is your wallet") and named.named
+        robot.check_health()
+        warning = answer(robot, "Look left.", frame)
+        assert warning.answer == robot.head.warning and warning.audio_s > 0
+        assert not warning.keep and not robot.worker_failed and not robot.head.following
+        screen = robot._shown(False)[1]
+        assert not screen.control["head"]["enabled"]
+        assert screen.control["head"]["warning"] == robot.head.warning
+        assert screen.control["head"]["angle"] is None
+        assert not robot._same_view({"view_angle": 0.})
+        assert not robot._same_view({"view_angle": None})
+    finally:
+        robot.head.close()
+        close_robot(robot)
+
+
+@pytest.mark.parametrize("fault_during_prefill", [False, True])
+def test_motor_fault_discards_queued_camera_sources(tmp_path, monkeypatch, fault_during_prefill):
+    robot = speaking_robot(tmp_path)
+    robot.head = Head(SimMotor())
+    frame = np.full((720, 1280, 3), 40, np.uint8)
+    taken = time.time()
+    calls = []
+    def fault():
+        monkeypatch.setattr(robot.head.motor, "read", lambda now: (_ for _ in ()).throw(
+            RuntimeError("There is no status packet!")))
+        robot.head.tick(time.time())
+    def prefill(messages):
+        calls.append(messages)
+        if fault_during_prefill:
+            fault()
+    robot.brain.prefill = prefill
+    try:
+        if not fault_during_prefill:
+            fault()
+        robot._look((frame, taken))
+        assert len(calls) == int(fault_during_prefill) and robot.ready is None
+        turn = Turn(question="What do you see?", speech_start=taken)
+        robot._answer_turn(turn, (frame, taken), (frame, taken))
+        assert not turn.keep and not turn.answer and not robot.ui_thinking
+        assert len(calls) == int(fault_during_prefill)
+    finally:
+        robot.head.close()
+        close_robot(robot)
+
+
+def test_motor_fault_during_visitor_prefill_discards_empty_look(tmp_path, monkeypatch):
+    robot = speaking_robot(tmp_path)
+    robot.head = Head(SimMotor())
+    frame, taken = np.zeros((720, 1280, 3), np.uint8), time.time()
+    robot.ready = main.Look(frame, taken, b"", 0, False, [])
+    monkeypatch.setattr(robot, "_stale", lambda frame: False)
+    monkeypatch.setattr(robot, "_resolve_visitor", lambda *args: True)
+    def prefill(messages):
+        monkeypatch.setattr(robot.head.motor, "read", lambda now: (_ for _ in ()).throw(
+            RuntimeError("There is no status packet!")))
+        robot.head.tick(time.time())
+    robot.brain.prefill = prefill
+    try:
+        turn = Turn(question="What do you see?", speech_start=taken)
+        robot._answer_turn(turn, (frame, taken), (frame, taken))
+        assert robot.ready is None and not robot.ui_thinking and not turn.answer
+        robot.check_health()
+    finally:
+        robot.head.close()
+        close_robot(robot)
+
+
 def test_unknown_introduction_beside_known_visitor_and_owner_handover(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "SETTLE_S", 0)
     vectors = np.eye(DIM, dtype=np.float32)

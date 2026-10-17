@@ -1,0 +1,42 @@
+{
+  "what": "Keep speech and vision after a servo fault only when motor shutdown is confirmed",
+  "baseline_release": "43a78a5a93a3",
+  "baseline_revision": "898ae07",
+  "live_crash_utc": "2026-10-16 23:09:54",
+  "error": "head stopped: [TxRxResult] There is no status packet!",
+  "teaching": "The object turn completed before the servo fault.",
+  "missed_reply_cause": "unresolved",
+  "subsequent_readonly_status": {
+    "torque": 0,
+    "moving": 0,
+    "voltage_v": 5.4,
+    "temperature_c": 38,
+    "fault": 0
+  },
+  "design": "reviews/20261016-231248-60713-design.md",
+  "source_sha256": {
+    "robot/head.py": "3635109b2fd073d5129aa2acb1ae646a29cfde2ed335520e918aab3f7a18ed8b",
+    "robot/main.py": "8850756bb9c4518b52720aee07ec6d269e706d5c73ec5712c4e70f2a41a55c96",
+    "robot/test_servo.py": "e30fb634d1dfe2d8ff8b421489ce1d52206df8ca2850361d9b8bc68369d5503b",
+    "robot/test_workers.py": "b0a275b363a545fb725a8ccc5f47d085129bdcdb3beef8e39abbaff30ac42e8d",
+    "robot/test_attention.py": "bfb95aea6d2884600a8c77825673432e237ec3b4fcace2a7401556d3f0e3847e",
+    "bench/worker_failure.py": "c05b514009005efaf117fc72c663215247dfafb19094618d9a369d41434e5ba3"
+  },
+  "baseline_regressions": "Three expected failures (E).",
+  "targeted_log": "........................................................................ [ 48%]\n........................................................................ [ 96%]\n......                                                                   [100%]\n150 passed in 52.64s",
+  "original_journal_sha256": "b2a8ce1a2f45c0117d217e91332a94da03582b2b05e319fe375cb7a4b2acce57",
+  "limits": "No physical motor operation; the cause of the intermittent serial failure remains unresolved.",
+  "full_checks": {
+    "status": "pass",
+    "machine": "Mac (E)",
+    "seconds": 263.69,
+    "note": "Reuse unchanged checks; the final empty-look guard has a separate focused regression."
+  },
+  "final_prefill_check": ".                                                                        [100%]\n1 passed, 31 deselected in 1.63s",
+  "final_static_check": "ruff passes on the final changed source files (E).",
+  "smoke_scope": "One simulated motor fault, continued camera activity, and one spoken head warning. No audio quality or physical motor testing.",
+  "deployed_release": "1e95640260aa",
+  "jetson_smoke": "bench/results/2026-10-16-worker-failure-1792207341.jsonl",
+  "jetson_smoke_status": "Pass (J): confirmed shutdown, continued detection, one spoken warning, no later motor goals, clean shutdown.",
+  "task_review": "reviews/20261016-232313-70449-review.md"
+}

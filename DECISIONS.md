@@ -198,3 +198,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D200 2026-10-16: Preserve stationary camera validity during following holds.** A centered or unknown visitor requests a halt only when motion is active or pending. Supersedes D197: restore the original 0.25 detector settings after Dylan reported a live regression; keep D198's center band and D199's chat sizes.
 
 **D201 2026-10-16: Align spoken naming with the orange focus.** Naming captures the eligible orange focus before another held object at speech start. Comparisons retain D169's held-object priority; explicit pins and source checks remain. This refines D169 for naming after Dylan reported the phone receiving the plushie's cat label.
+
+**D202 2026-10-16: Keep speech and vision after confirmed motor shutdown.** Dylan approved isolating servo faults after a missing reply ended a teaching session. Supersede D188's whole-session handling of nonthermal faults: attempt release once, retain failed or interrupted release as fatal, and latch the head off until restart after confirmed release. Reject transition captures and retain unknown pose; preserve thermal recovery.

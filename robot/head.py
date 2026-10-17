@@ -78,10 +78,24 @@ class Head:
         self.cooling = False
         self.awaiting_motion = False
         self.thread = None
+        self.release_confirmed = None  # None before close, False after failure, True after success
+
+    @property
+    def fatal_error(self):
+        with self.condition:
+            return self.error if self.release_confirmed is not True else ""
+
+    @property
+    def view_angle(self):
+        with self.condition:
+            return None if self.error else self.angle
 
     @property
     def warning(self):
         with self.condition:
+            if self.error and self.release_confirmed is True:
+                return ("Head motor stopped after a fault. Motor off; restart to enable movement. "
+                        "I can still see and talk.")
             if not self.cooling:
                 return ""
             if self.motor.thermal_latched:
@@ -112,8 +126,8 @@ class Head:
             self.generation += 1
             self.follow_after = time.time()
             self.expires = None
-            self.halt = self.motor is not None
-            self.inspecting = kind != "stop"
+            self.halt = self.motor is not None and not self.error
+            self.inspecting = kind != "stop" and not self.error
             if kind == "stop":
                 self.following = False
             self.condition.notify_all()
@@ -121,6 +135,9 @@ class Head:
 
     def activate(self, generation):
         with self.condition:
+            if self.error and self.release_confirmed is True and \
+                    generation == self.generation and not self.closed:
+                return
             self._current(generation)
             self.following = True
 
@@ -133,7 +150,16 @@ class Head:
             except Exception as error:
                 self.error = str(error) or type(error).__name__
                 self.following, self.inspecting = False, False
+                self.generation += 1
+                self.expires = None
                 self._close_motor()
+                if self.release_confirmed is True:
+                    self.cooling, self.moving, self.halt = False, False, False
+                    self.goal = self.sent = self.angle
+                    self.view += 1
+                    self.changed = time.time()
+                    self.settled = self.valid_after = self.changed + SETTLE_S
+                    print(f"{self.warning} Fault: {self.error}", flush=True)
             self.condition.notify_all()
 
     def _tick(self, now):
@@ -285,7 +311,7 @@ class Head:
         if generation != self.generation or self.closed:
             raise Interrupted("Head movement was cancelled.")
         if self.error:
-            raise RuntimeError(self.error)
+            raise RuntimeError(self.warning or self.error)
 
     def resume(self, generation):
         with self.condition:
@@ -301,6 +327,9 @@ class Head:
 
     def valid(self, taken, view=None):
         with self.condition:
+            if self.error:
+                return (self.release_confirmed is True and taken >= self.valid_after and
+                        (view is None or view == self.view))
             if self.motor is None:
                 return True
             return (not self.error and not self.cooling and not self.moving and
@@ -318,8 +347,12 @@ class Head:
             self._close_motor()
 
     def _close_motor(self):
+        if self.release_confirmed is not None:
+            return
+        self.release_confirmed = False
         try:
             self.motor.close()
+            self.release_confirmed = True
         except Exception as error:
             self.error = f"{self.error}; {error}".strip("; ")
             print(self.error, file=sys.stderr, flush=True)

@@ -128,6 +128,42 @@ def test_failed_torque_off_closes_port_and_keeps_fault():
     assert "UNCONFIRMED" in head.error
 
 
+@pytest.mark.parametrize("release_fails", [False, True])
+def test_motor_fault_isolated_only_after_confirmed_release(monkeypatch, release_fails):
+    actual, packet = motor()
+    head = Head(actual)
+    head.tick(100.)
+    generation, view = head.request("right"), head.view
+    if release_fails:
+        packet.fail_at = (40, 0)
+    monkeypatch.setattr(actual, "read", lambda now: (_ for _ in ()).throw(
+        RuntimeError("There is no status packet!")))
+    head.tick(101.)
+    assert head.error and actual.closed and not head.following
+    assert head.release_confirmed is not release_fails
+    assert bool(head.fatal_error) is release_fails
+    if not release_fails:
+        assert packet.memory[40] == 0 and head.warning
+        assert not head.valid(100.) and not head.valid(head.valid_after - .01)
+        assert head.valid(head.valid_after + .01, head.view)
+        assert not head.valid(head.valid_after + .01, view)
+        assert head.generation != generation
+        token = head.request("handover")
+        head.activate(token)
+        assert not head.following
+        with pytest.raises(RuntimeError, match="Motor off"):
+            head.move(5, token)
+    else:
+        assert not head.valid(1e12)
+    writes = list(packet.writes)
+    head.tick(102.)
+    head.close()
+    head.close()
+    assert packet.writes == writes
+    assert head.release_confirmed is not release_fails
+    assert bool(head.fatal_error) is release_fails
+
+
 def test_stall_and_movement_deadline(monkeypatch):
     actual, packet = motor()
     clock = [actual.feedback]

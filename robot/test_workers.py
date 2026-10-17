@@ -204,6 +204,62 @@ def test_head_fault_rejects_input_instead_of_silently_disabling_vision():
         robot.next_turn(timeout=1)
 
 
+def test_confirmed_head_shutdown_keeps_microphone_and_answer_delivery(monkeypatch):
+    from robot.head import SimMotor
+    robot = bare_robot()
+    robot.head = Head(SimMotor())
+    monkeypatch.setattr(robot.head.motor, "read", lambda now: (_ for _ in ()).throw(
+        RuntimeError("There is no status packet!")))
+    robot.head.tick(time.time())
+    heard = []
+    robot.muted, robot.speaker = False, Stub(playing=lambda *args: False)
+    robot.ears = Stub(feed=heard.append)
+    chunk = np.zeros(160, np.float32)
+    robot.hear(chunk)
+    turn = main.Turn(answer="Still here.")
+    robot.turns.put(turn)
+    assert heard == [chunk] and robot.next_turn(timeout=1) is turn
+
+
+@pytest.mark.parametrize("release_fails", [False, True])
+def test_health_waits_for_motor_shutdown_result(monkeypatch, release_fails):
+    from robot.head import SimMotor
+    robot = bare_robot()
+    motor = SimMotor()
+    entered, finish, checked = threading.Event(), threading.Event(), threading.Event()
+    errors = []
+    def close():
+        entered.set()
+        assert finish.wait(2)
+        if release_fails:
+            raise RuntimeError("Torque off is UNCONFIRMED")
+    monkeypatch.setattr(motor, "close", close)
+    monkeypatch.setattr(motor, "read", lambda now: (_ for _ in ()).throw(RuntimeError("timeout")))
+    robot.head = Head(motor)
+    fault = threading.Thread(target=lambda: robot.head.tick(time.time()))
+    def health():
+        try:
+            robot.check_health()
+        except RuntimeError as error:
+            errors.append(error)
+        finally:
+            checked.set()
+    check = threading.Thread(target=health)
+    try:
+        fault.start()
+        assert entered.wait(1)
+        check.start()
+        assert not checked.wait(.02)
+        finish.set()
+        assert checked.wait(1)
+        assert bool(errors) is release_fails
+    finally:
+        finish.set()
+        fault.join(2)
+        if check.ident is not None:
+            check.join(2)
+
+
 def test_accepted_wake_opens_followup_window_before_answer_finishes():
     robot = bare_robot()
     robot.wake_word, robot.last_line = True, 0.

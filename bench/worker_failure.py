@@ -8,6 +8,7 @@ import gc
 import json
 import os
 import platform
+import subprocess
 import tempfile
 import time
 from pathlib import Path
@@ -18,11 +19,65 @@ from robot.brain import MODEL
 from robot.camera import FileCamera
 from robot.config import SHARED
 from robot.main import Robot
+from robot.head import Head, SimMotor
+from robot import audio
+from robot.tts import RATE
+
+
+class FaultMotor(SimMotor):
+    fault = False
+
+    def read(self, now):
+        if self.fault:
+            raise RuntimeError("There is no status packet!")
+        return super().read(now)
+
+
+def wait_for(check, label):
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        if check():
+            return
+        time.sleep(.05)
+    raise AssertionError(label)
+
+
+def head_trial(robot):
+    wait_for(lambda: robot.detections > 3, "initial detection")
+    robot.head.motor.fault = True
+    wait_for(lambda: bool(robot.head.error), "injected motor fault")
+    assert not robot.head.fatal_error and robot.head.release_confirmed
+    goals, detected = list(robot.head.motor.goals), robot.detections
+    wait_for(lambda: robot.detections > detected + 3 and
+             robot.view_taken >= robot.head.valid_after, "post-fault detection")
+    robot.ask("Look left.")
+    warning = robot.next_turn(timeout=60)
+    assert warning.answer == robot.head.warning, warning.answer
+    assert warning.audio_s > 0
+    assert robot.head.motor.goals == goals and robot.head.view_angle is None
+    robot.check_health()
+    return {"turns": [{"question": warning.question, "answer": warning.answer,
+                       "audio_s": warning.audio_s, "wav": warning.wav}],
+            "release_confirmed": True, "post_fault_detection": True,
+            "motor_goals_after_fault": 0, "view_angle": None, "input": "oracle text"}
+
+
+def play_checked(pcm, completed, errors):
+    try:
+        audio.aplay(audio.SPEAKER, RATE)(pcm)
+        completed.append(len(pcm))
+    except (OSError, subprocess.SubprocessError) as error:
+        errors.append(str(error))
+        raise
 
 
 def trial(arm: str, memory: Path, out: Path) -> dict:
     camera = FileCamera()
-    robot = Robot(camera, out / arm, memory=memory, wake_word=False)
+    head = Head(FaultMotor()) if arm == "head" else None
+    playback, playback_errors = [], []
+    robot = Robot(camera, out / arm, memory=memory, wake_word=False, head=head,
+                  play=(lambda pcm: play_checked(pcm, playback, playback_errors))
+                  if arm == "head" else None)
     row = {"arm": arm}
     injected = RuntimeError(f"injected {arm} failure")
 
@@ -30,8 +85,14 @@ def trial(arm: str, memory: Path, out: Path) -> dict:
         raise injected
 
     try:
-        camera.show(Path("eval/dev/live/closet-night.jpg"))
-        if arm == "healthy":
+        camera.show(Path("eval/dev/live/closet-cat-center.jpg" if arm == "head" else
+                         "eval/dev/live/closet-night.jpg"))
+        if arm == "head":
+            row.update(head_trial(robot))
+            robot.speaker.q.join()
+            assert playback and not playback_errors, playback_errors
+            row.update(speaker_phrases=len(playback), playback_errors=playback_errors)
+        elif arm == "healthy":
             robot.ask("What is Qdrant Edge?")
             turn = robot.next_turn()
             assert turn.answer and turn.audio_s > 0, "healthy robot produced no speech"
@@ -81,6 +142,7 @@ def trial(arm: str, memory: Path, out: Path) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", required=True)
+    parser.add_argument("--arm", choices=("healthy", "transcribe", "work", "head"))
     args = parser.parse_args()
     stamp = f"{time.strftime('%Y-%m-%d')}-worker-failure-{int(time.time())}"
     out = SHARED / "sessions" / stamp
@@ -89,17 +151,19 @@ def main() -> None:
             "machine": platform.node(), "release": os.environ.get("ROBOT_RELEASE"),
             "tegrastats": os.environ.get("ROBOT_TEGRASTATS"), "model": MODEL,
             "python": platform.python_version(), "command": "python -m bench.worker_failure "
-            f"--revision {args.revision}", "complete": False}
+            f"--revision {args.revision}" + (f" --arm {args.arm}" if args.arm else ""),
+            "complete": False}
     result.write_text(json.dumps(head) + "\n")
+    arms = [args.arm] if args.arm else ("healthy", "transcribe", "work", "head")
     with tempfile.TemporaryDirectory() as memory:
-        for arm in ("healthy", "transcribe", "work"):
+        for arm in arms:
             row = trial(arm, Path(memory), out)
             with result.open("a") as file:
                 file.write(json.dumps(row) + "\n")
             print(json.dumps(row), flush=True)
             gc.collect()  # release model sessions before reopening the same test shards
     with result.open("a") as file:
-        file.write(json.dumps({**head, "complete": True, "n": 3}) + "\n")
+        file.write(json.dumps({**head, "complete": True, "n": len(arms)}) + "\n")
     print(f"results: {result}", flush=True)
 
 

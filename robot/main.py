@@ -216,7 +216,7 @@ class Turn:
     visitor: str = ""             # resolved once before object actions
     selection_error: str = ""     # ambiguous or missing active visitor: no personal writes
     motion: int = 0               # 0: unchecked; -1: wake rejected; positive: head generation
-    view_angle: float = 0.0       # measured angle of the sight source
+    view_angle: float | None = 0.0  # measured angle, or unknown after a motor fault
     named: str = ""               # the visitor's object this turn named: linked to its frame
     keep: bool = True             # False: not stored ("forget my phone")
     deleted: bool = False         # a voice deletion ran: its content leaves the live UI too
@@ -391,8 +391,8 @@ class Robot:
             raise RuntimeError(f"{name} stopped") from error
         if self.detect_failed is not None:
             raise RuntimeError("detection stopped") from self.detect_failed
-        if self.head.error:
-            raise RuntimeError(f"head stopped: {self.head.error}")
+        if error := self.head.fatal_error:
+            raise RuntimeError(f"head stopped: {error}")
 
     def next_turn(self, timeout: float = 60) -> Turn:
         """Wait for an answer while checking for failed workers."""
@@ -758,6 +758,7 @@ class Robot:
                                "score": round(float(t.det.conf), 3)} for t in self.tracker.tracks
                               if t.id in admitted_tracks and not t.missed and
                               t.det.label not in BODY and t.det.label not in self.focus.ignored]
+            angle = self.head.view_angle
             screen = replace(screen, control={"session": self.session_id,
                 "targets": targets,
                 "detections": detections,
@@ -765,8 +766,9 @@ class Robot:
                 "message": self.control_message, "camera_source": self.camera_source,
                 "muted": self.muted, "volume": self.volume,
                 "active_visitor": self._active_name(),
-                "head": {"enabled": self.head.motor is not None,
-                         "angle": round(self.head.angle, 1), "following": self.head.following,
+                "head": {"enabled": self.head.motor is not None and not self.head.error,
+                         "angle": None if angle is None else round(angle, 1),
+                         "following": self.head.following,
                          "error": self.head.error, "warning": self.head.warning,
                          "cooling": self.head.cooling,
                          "temperature_c": getattr(self.head.motor, "status", {}).get(
@@ -1102,10 +1104,10 @@ class Robot:
                     pid = None
                 if pid:
                     self.memory.set(pid, label=t.label, region=region(t.box, frame.shape[1]),
-                                    last_seen=taken, view_angle=self.head.angle)
+                                    last_seen=taken, view_angle=self.head.view_angle)
                 else:
                     pid = self.points[t.id] = self.memory.sighting(
-                        t.label, region(t.box, frame.shape[1]), taken, name, self.head.angle)
+                        t.label, region(t.box, frame.shape[1]), taken, name, self.head.view_angle)
                 if person:
                     self.recognition.call(lambda f, c, pid=pid: self.people.link(person, [pid]))
         if recognized:
@@ -1208,6 +1210,9 @@ class Robot:
             self.memory.set(job[1], caption=caption)
 
     def _look(self, shot: tuple[np.ndarray, float]) -> None:
+        if self.head.error and not self.head.valid(shot[1]):
+            self.ready = None
+            return
         with self.detecting:
             objects = frozenset(t for t, (label, _) in self.view[1].items() if label not in BODY)
         # The tracks decide when either view has any: an object moving in the hand keeps its
@@ -1221,7 +1226,7 @@ class Robot:
         look = Look(shot[0], shot[1], brain.jpeg(shot[0]), self.exchanges, changed, history,
                     objects)
         self.brain.prefill(brain.messages(history, look.image))
-        self.ready = look
+        self.ready = None if self.head.error and not self.head.valid(shot[1]) else look
 
     def _undescribed(self) -> Look | None:
         """The oldest retained look without a caption that ends its view run: one caption per
@@ -1377,7 +1382,7 @@ class Robot:
                     return
             self._answer_turn(turn, shot, identity_shot)
         except Interrupted as error:
-            if self.head.cooling and self.head.generation == turn.motion + 1:
+            if self.head.warning and self.head.generation == turn.motion + 1:
                 turn.selection_error, turn.keep = self.head.warning, False
                 turn.caption, turn.visual_caption, turn.caption_s = "", "", 0.
                 turn.delivered, turn.looked, turn.view_angle = False, 0., 0.
@@ -1424,7 +1429,7 @@ class Robot:
                           started, detections, track)
 
     def _inspect(self, turn, shot):
-        if self.head.cooling:
+        if self.head.warning:
             turn.selection_error, turn.keep = self.head.warning, False
             return shot, None
         if shot[0] is None:
@@ -1483,12 +1488,17 @@ class Robot:
         self.ui_turns.clear()
 
     def _answer_turn(self, turn, shot, identity_shot):
+        if self.head.error and (not self.head.valid(shot[1]) or
+                (identity_shot[0] is not None and not self.head.valid(identity_shot[1]))):
+            turn.keep, self.ui_thinking, self.ready = False, False, None
+            self.control_message = self.head.warning
+            return
         self.ui_turn, self.ui_thinking = turn, True
         self.panel = None
         self.ui_turns.append(turn)
         if self._stale(shot[0]):  # the scene changed after the last look
             self._look(shot)
-        if (look := self.ready) is None:
+        if (look := self.ready) is None or (self.head.error and not self.head.valid(look.taken)):
             self.ui_thinking = False
             return  # no camera frame yet: nothing to answer about
         started, detections = time.time(), self.detections
@@ -1509,6 +1519,9 @@ class Robot:
             self.held.clear()
             self._look((now, taken))  # re-prefilled without the earlier exchanges
             look = self.ready
+            if look is None:
+                self.ui_thinking = False
+                return
         statements = self._told(question, turn)
         turn.told = [m["said"] for m in statements]
         told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
@@ -2300,7 +2313,7 @@ class Robot:
                               box=list(box), source_size=[frame.shape[1], frame.shape[0]])
         self.things.link(ident, pid)
         sighting = self.points[track] = self.memory.sighting(
-            label, region(box, frame.shape[1]), taken, ident, self.head.angle)
+            label, region(box, frame.shape[1]), taken, ident, self.head.view_angle)
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid, sighting]))
         turn.memories, turn.named = [pid], ident
@@ -2525,8 +2538,9 @@ class Robot:
         return None
 
     def _same_view(self, sighting):
-        return self.head.valid(self.view_taken) and \
-            abs(sighting.get("view_angle", 0.) - self.head.angle) <= 1.
+        angle, previous = self.head.view_angle, sighting.get("view_angle", 0.)
+        return angle is not None and previous is not None and self.head.valid(self.view_taken) \
+            and abs(previous - angle) <= 1.
 
     def _said(self, fact: str, turn: Turn) -> Iterator[str]:
         turn.first_token, turn.answer = time.time(), fact
