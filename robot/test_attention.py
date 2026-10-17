@@ -595,6 +595,9 @@ def test_guest_statement_remains_linked_after_enrollment_and_return(tmp_path, mo
     monkeypatch.setattr(main, "located_faces", lambda f, image: [
         (vectors[active[0]], 120, (100, 100, 220, 220))] if active[0] is not None else [])
     robot = speaking_robot(tmp_path)
+    # Drink lines share their own direction, so recall ranks by meaning, not by tie order.
+    robot.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[
+        [int("tea" in t or "drink" in t) for t in texts]]
     frame = np.zeros((720, 1280, 3), np.uint8)
     try:
         for _ in range(CONFIRM):
@@ -604,6 +607,8 @@ def test_guest_statement_remains_linked_after_enrollment_and_return(tmp_path, mo
         preference = answer(robot, "I like tea.", frame)
         assert preference.frame_id and not robot.people.person("Mira")
         guest = preference.visitor
+        stored = robot.memory.told(np.eye(TEXT_DIM)[0], time.time() + 1, visitor=guest, n=9)
+        assert "No thanks." not in [m["said"] for m in stored], "a consent reply is no fact"
         assert "remember your face" in answer(robot, "Remember me, I'm Mira.", frame).answer
         answer(robot, "Yes.", frame)
         assert robot.people.person("Mira")["visitor"] == guest

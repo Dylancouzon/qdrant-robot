@@ -41,6 +41,7 @@ from robot.memory import (
     compares,
     earlier_view,
     article,
+    is_question,
     is_statement,
     kind_of,
     main_object,
@@ -1523,9 +1524,16 @@ class Robot:
             if look is None:
                 self.ui_thinking = False
                 return
-        statements = self._told(question, turn)
+        # A yes or no to the robot's own consent, deletion, or object question is a reply, not
+        # a fact about the visitor (stored as one, "Yes, go for it." came back as a memory).
+        replying = bool(self.asking or self.deleting or self.confirming)
+        statements = self._told(question, turn) if is_question(turn.question) else []
         turn.told = [m["said"] for m in statements]
-        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements]
+        # The prompt skips statements the live window already holds: a duplicate made the brain
+        # echo its earlier reply (the panel and evidence still show the hit).
+        live = {m["content"] for m in self.history if m["role"] == "user"}
+        told = [f"{brain.age(turn.speech_start - m['ts'])}: {m['said']}" for m in statements
+                if m["said"] not in live]
         self.panel = {"shards": ["knowledge", "seen"], "ms": 1000 * (time.time() - started),
                       "hits": [(f"knowledge: {fact}", score) for score, fact in found] + [
                           (f"said: {m['said']}", m["score"]) for m in statements] + [
@@ -1560,8 +1568,9 @@ class Robot:
             tokens = self._said(turn.facts[0], turn)
         else:
             tokens = self._tokens(msgs, turn)
-        statement = question if (is_statement(turn.question) and not head_command(
-            turn.question) and not command(turn.question, self.vocab)) else None
+        statement = question if (is_statement(turn.question) and not replying and not
+                                 head_command(turn.question) and
+                                 not command(turn.question, self.vocab)) else None
         self._finish_turn(turn, tokens, look, (now, taken), statement, held,
                           started, detections, track)
 
