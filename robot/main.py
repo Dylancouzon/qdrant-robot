@@ -1506,8 +1506,13 @@ class Robot:
         started, detections = time.time(), self.detections
         question = self.embed([turn.question])[0]
         found = self.knowledge.search(question)
-        turn.facts = [fact for _, fact in found]
         turn.verbatim = bool(found) and found[0][0] >= VERBATIM
+        prior = next((m["content"] for m in reversed(self.history) if m["role"] == "user"), "")
+        if not found and prior:
+            # A follow-up ("would that work offline?") names its topic in the line before; the
+            # joined text grounds the brain, never a word-for-word fact.
+            found = self.knowledge.search(self.embed([f"{prior} {turn.question}"])[0])
+        turn.facts = [fact for _, fact in found]
         past = about_past(turn.question)
         recalled, memories = self._recall(turn, look.frame) if past else ([], [])
         # The frame at speech start: the cached look may show an earlier visitor.
@@ -1551,7 +1556,9 @@ class Robot:
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
-        sees = compares(turn.question) or (turn.kind == "sight" and not past)
+        # A matched fact makes the question one about the robot: the image would pull the
+        # answer to the room ("Where do you keep that?" described the visitor).
+        sees = compares(turn.question) or (turn.kind == "sight" and not past and not turn.facts)
         image = look.image if sees else None
         said = self._exchanges(turn, look.history) if about_dialogue(turn.question) else []
         msgs = brain.messages(look.history, image, memories, turn.facts,
