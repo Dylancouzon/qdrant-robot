@@ -6,7 +6,7 @@ const objects=[{id:'one',owner:'visitor-001',owner_label:'Sam',label:"Sam's mous
 let list=structuredClone(objects),available=true,accepted=true,posts=[],live=null,delayedRead=null,delayedMap=null,mapData={session:'a',at:100,total:0,nodes:[],recall:{turn:'',ids:[]}},reducedMotion=false,intervals=[];
 const console=new VirtualConsole();const errors=[];console.on('jsdomError',e=>errors.push(String(e)));console.forwardTo(global.console);
 const dom=new JSDOM(page,{url:'http://127.0.0.1:8765',runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:console,beforeParse(w){
-  w.HTMLElement.prototype.scrollIntoView=()=>{};w.matchMedia=()=>({matches:reducedMotion,addEventListener(){}});w.confirm=()=>true;w.scrollTo=()=>{};
+  w.HTMLElement.prototype.scrollIntoView=()=>{};w.matchMedia=()=>({matches:reducedMotion,addEventListener:(_,listener)=>{w.mediaChange=listener;}});w.confirm=()=>true;w.scrollTo=()=>{};
   w.setInterval=fn=>{intervals.push(fn);return 0;};w.setTimeout=()=>0;
   w.fetch=async(url,options)=>{
     if(url==='/status')return {ok:true,json:async()=>({phase:live?'Listening':'Idle',active:!!live,error:'',view_ready:!!live})};
@@ -23,7 +23,7 @@ const dom=new JSDOM(page,{url:'http://127.0.0.1:8765',runScripts:'dangerously',p
 }});
 const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTimeout(r,30));
 (async()=>{
- await run("openTab('chat')");assert.equal(d.querySelector('#livePanel').hidden,false);assert.equal(d.querySelector('#livePanel').dataset.pane,'chat');assert.equal(d.querySelector('#chatTab').getAttribute('aria-pressed'),'true');assert.equal(d.querySelector('#liveTab').getAttribute('aria-pressed'),'false');
+ await run("openTab('chat')");assert.equal(d.querySelector('#livePanel').hidden,false);assert.equal(d.querySelector('#livePanel').dataset.pane,'chat');assert.equal(d.querySelector('#chatTab').getAttribute('aria-pressed'),'true');assert.equal(d.querySelector('#liveTab').getAttribute('aria-pressed'),'false');w.mediaChange({matches:false});await tick();assert.equal(d.querySelector('#liveTab').getAttribute('aria-pressed'),'true');assert.equal(d.querySelector('#livePanel').dataset.pane,'live');
  await run("openTab('memory')");await tick();
  assert.equal(d.querySelectorAll('.owner').length,2);assert.equal(d.querySelectorAll('.objectcard').length,2);
  assert.match(d.querySelector('#memoryStats').textContent,/2 objects8 saved views2 visitors/);
