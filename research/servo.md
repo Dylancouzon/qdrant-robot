@@ -21,6 +21,8 @@ Selection persists through arrivals and departures until an introduction, verifi
 
 [attention.py](../robot/attention.py) selects the verified face. [head.py](../robot/head.py) applies a ±12% center band and proportional corrections of at most 6°. Fresh captures update goals during movement. Centered, lost, or expired evidence cancels them. Source timestamps must increase; captures older than 300 ms cannot authorize motion. Generations reject results from an earlier selection or command. Speech and playback pause movement. Stationary centered or unknown faces preserve camera validity, so object preference checks can run. A halt requires active or pending movement.
 
+Following reversals first brake, then require 250 ms of stationary feedback and continued fresh opposite-direction requests. Centered, lost, or expired evidence clears reversal confirmation. Stop and inspection commands remain immediate. The delay filters rapid reversals; its effect on heating remains unmeasured.
+
 [main.py](../robot/main.py) separates speech-start identity from the settled inspection capture. Inspection uses image-only captioning, retains the exact frame and generated-source metadata, and cancels for speech, Stop, or shutdown. Object sightings and teaching require settled captures. A changed view clears object continuity. Side and disappearance answers compare views within 1°; general recall retains evidence from other views.
 
 [servo.py](../robot/servo.py) provides the checked transport shared with [the loose-servo helper](../tools/servo.py). The serial port opens exclusively. Startup requires torque off, stationary position mode, valid feedback, and no reported fault. It primes the measured pose after all RAM caps. On this firmware, the current-position goal itself enables torque. Runtime writes remain RAM-only.
@@ -80,6 +82,12 @@ The [final Jetson cooldown integration](../bench/results/2026-10-16-thermal-sim-
 
 The thermal cooldown and gentler braking task passed its [final review](../reviews/20261016-210546-35698-review.md), 20 focused thermal checks, and the full mandatory hook in 230.28 seconds (E). The review found and verified the repair of a passive-displacement recovery bug. The smooth-following and earlier guard tasks passed full hooks in 240.06 and 243.00 seconds (E). The [cleanup review](../reviews/20261016-203148-5856-review.md) verified all 13 archived trace originals and compact summaries.
 
+
+## Following reversal pause, 2026-10-17
+
+Dylan reported temperature trips during repeated direction changes and requested a small reversal delay. D204 adds the 250 ms stationary pause to following. The [paired simulation](../bench/results/2026-10-17-head-reversal-delay.json) changed rapid-alternation motion reversals from 47 to zero over eight seconds (E). A sustained reversal retained one reversal and the same endpoint. These scripted face requests use a simulated motor; they establish neither physical cooling nor camera tracking quality.
+
+All 118 focused head and servo checks pass (E). Full checks pass in 266.08 s (E). The [task review](../reviews/20261017-002043-15095-review.md) passes and reproduces the comparison. The [deployed Jetson comparison](../bench/results/2026-10-17-head-reversal-delay-jetson.json) gives the same simulated results (J), with no physical motor access. It carries possible direction bias under alternating requests in [remaining work](edge-cases.md).
 
 ## Next session: assembled robot testing
 

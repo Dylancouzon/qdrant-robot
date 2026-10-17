@@ -8,6 +8,8 @@
 
 **Loaded power and temperature feedback.** Mounted direction, watched ±60° travel at 40°/s, and cable clearance passed. Dylan reported good live motion. The [head guide](servo.md) records brief temperature trips, the requested cooling pause and 70°C head protection, and remaining qualification. Keep models, memory, consent, and deletion behavior intact.
 
+**Alternating following requests after reversal delay.** Rapid alternating detections can resume the original direction while reversals wait for confirmation. The simulated candidate reaches its travel limit under sustained 150 ms alternation (E). Check live camera feedback; if observed, require confirmation before resuming either direction after an interrupted reversal pause.
+
 | Priority | Task | Finish when |
 | --- | --- | --- |
 | Next | Loaded power, cooling, and transient temperature feedback. | Explain guard trips and qualify prolonged watched operation before unattended use. |

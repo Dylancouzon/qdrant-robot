@@ -263,9 +263,113 @@ def test_small_reverse_face_error_cancels_previous_forward_correction():
     head.tick(101.)
     head.tick(101.05)
     assert 0 < head.angle < head.goal
-    assert head.follow((400, 0, 500, 100), 1280, 101.06, 101.06) == 'goal'
+    assert head.follow((400, 0, 500, 100), 1280, 101.06, 101.06) == 'reversal pause'
     head.tick(101.1)
-    assert head.goal < head.angle < 6
+    assert head.goal == head.angle < 6
+
+
+@pytest.mark.parametrize("direction", [-1, 1])
+def test_follow_reversal_waits_for_stationary_dwell_and_fresh_confirmation(direction):
+    motor = SimMotor(speed=10)
+    head = Head(motor)
+    drive(head)
+    def follow(sign, now):
+        center = 640 + sign * 400
+        return head.follow((center - 50, 0, center + 50, 100), 1280, now, now)
+    assert follow(direction, 101.) == "goal"
+    head.tick(101.)
+    head.tick(101.05)
+    assert follow(-direction, 101.06) == "reversal pause"
+    head.tick(101.1)
+    stopped = head.angle
+    assert motor.target == stopped
+    head.tick(101.2)
+    assert follow(-direction, 101.2) == "reversal pause"
+    head.tick(101.31)
+    assert not head.moving
+    assert follow(-direction, 101.31) == "reversal pause"
+    head.tick(101.4)
+    assert follow(-direction, 101.4) == "reversal pause"
+    assert motor.target == stopped
+    head.tick(101.46)
+    assert follow(-direction, 101.46) == "goal"
+    head.tick(101.47)
+    assert direction * (motor.target - stopped) < 0
+
+
+def test_follow_reversal_does_not_queue_a_goal_to_replay_without_frames():
+    motor = SimMotor(speed=10)
+    head = Head(motor)
+    drive(head)
+    head.follow((1000, 0, 1200, 100), 1280, 101., 101.)
+    head.tick(101.)
+    head.tick(101.05)
+    head.follow((100, 0, 300, 100), 1280, 101.06, 101.06)
+    head.tick(101.1)
+    stopped = head.angle
+    drive(head, 101.15, 1.)
+    assert head.angle == motor.target == stopped
+    assert head.reverse_since is None
+
+
+@pytest.mark.parametrize("interruption", ["centered", "lost", "original", "stop", "speech"])
+def test_follow_reversal_confirmation_restarts_after_interruption(interruption, monkeypatch):
+    head = Head(SimMotor(speed=10))
+    drive(head)
+    right, left = (1000, 0, 1200, 100), (100, 0, 300, 100)
+    head.follow(right, 1280, 101., 101.)
+    head.tick(101.)
+    head.tick(101.05)
+    assert head.follow(left, 1280, 101.06, 101.06) == "reversal pause"
+    drive(head, 101.1, .25)
+    if interruption == "centered":
+        head.follow((600, 0, 680, 100), 1280, 101.32, 101.32)
+    elif interruption == "lost":
+        head.hold(taken=101.32)
+    elif interruption == "original":
+        assert head.follow(right, 1280, 101.32, 101.32) == "goal"
+    elif interruption == "stop":
+        monkeypatch.setattr(time, "time", lambda: 101.32)
+        head.request("stop")
+    else:
+        head.paused = True
+        head.hold()
+    assert head.reverse_since is None
+    if interruption == "stop":
+        assert head.follow(left, 1280, 101.33, 101.33) == "stopped"
+    elif interruption == "speech":
+        assert head.follow(left, 1280, 101.33, 101.33) == "conversation"
+    else:
+        assert head.follow(left, 1280, 101.33, 101.33) == "reversal pause"
+        assert head.reverse_since == 101.33
+
+
+def test_follow_reversal_waits_for_motion_feedback_before_starting_dwell():
+    class CoastingMotor(SimMotor):
+        coasting = False
+        def read(self, now):
+            angle, moving = super().read(now)
+            return angle, moving or self.coasting
+    motor = CoastingMotor(speed=10)
+    head = Head(motor)
+    drive(head)
+    head.follow((1000, 0, 1200, 100), 1280, 101., 101.)
+    head.tick(101.)
+    head.tick(101.05)
+    motor.coasting = True
+    left = (100, 0, 300, 100)
+    for step in range(10):
+        now = 101.06 + step * .05
+        head.tick(now)
+        assert head.follow(left, 1280, now, now) == "reversal pause"
+        assert motor.target >= head.angle
+    motor.coasting = False
+    for step in range(5):
+        now = 101.6 + step * .05
+        head.tick(now)
+        assert head.follow(left, 1280, now, now) == "reversal pause"
+    head.tick(101.86)
+    assert head.follow(left, 1280, 101.86, 101.86) == "goal"
 
 
 def test_centered_face_jitter_keeps_camera_view_stable():

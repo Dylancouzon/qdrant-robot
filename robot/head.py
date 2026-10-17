@@ -11,6 +11,7 @@ INSPECT = 45.0
 FRESH_S = 0.3
 SETTLE_S = 0.1
 PERIOD_S = 0.05
+REVERSE_S = 0.25
 
 
 def interrupt(signum, _frame):
@@ -73,6 +74,7 @@ class Head:
         self.moving, self.error, self.closed = False, "", False
         self.sent, self.stationary = None, None
         self.source = self.follow_after = 0.
+        self.follow_direction, self.reverse_since = 0, None
         self.valid_after = 0.
         self.expires = None
         self.cooling = False
@@ -126,6 +128,7 @@ class Head:
             self.generation += 1
             self.follow_after = time.time()
             self.expires = None
+            self.follow_direction, self.reverse_since = 0, None
             self.halt = self.motor is not None and not self.error
             self.inspecting = kind != "stop" and not self.error
             if kind == "stop":
@@ -178,7 +181,10 @@ class Head:
             return
         if self.expires is not None and now > self.expires:
             self.halt, self.expires = True, None
+            self.reverse_since = None
         blocked = self.blocked()
+        if blocked or self.paused:
+            self.reverse_since = None
         target = self._target(angle, moving, blocked)
         if target != self.sent:
             if not math.isfinite(target) or abs(target) > self.limit:
@@ -209,6 +215,7 @@ class Head:
             self.generation += 1
             self.follow_after = self.valid_after = time.time()
             self.expires = None
+            self.follow_direction, self.reverse_since = 0, None
             self.inspecting, self.halt = False, False
             self.goal = self.sent = angle
             self.view += 1
@@ -238,10 +245,16 @@ class Head:
                 return "cancelled source"
             if reason := self._follow_hold(taken, now):
                 return reason
+            if taken - self.source > FRESH_S:
+                self.reverse_since = None
             self.source, self.expires = taken, taken + FRESH_S
             error = (box[0] + box[2]) / (2 * width) - .5
             if abs(error) > .12:
                 delta = max(-6., min(6., 48 * error))
+                direction = 1 if delta > 0 else -1
+                if self._reversal_wait(direction, now):
+                    self.condition.notify_all()
+                    return "reversal pause"
                 goal = max(-self.limit, min(self.limit, self.angle + delta))
                 if abs(goal - self.angle) <= self.tolerance:
                     if delta * (self.goal - self.angle) < 0:
@@ -252,11 +265,23 @@ class Head:
                 if abs(goal - self.goal) < getattr(self.motor, "resolution", 0.):
                     return "limit"
                 self.goal = goal
+                self.follow_direction, self.reverse_since = direction, None
                 self.awaiting_motion = False
                 self.condition.notify_all()
                 return "goal"
             self.hold(generation)
             return "centered"
+
+    def _reversal_wait(self, direction, now):
+        """Brake once, then require stationary time and repeated opposite face evidence."""
+        if direction != -self.follow_direction:
+            self.reverse_since = None
+            return False
+        if self.reverse_since is None:
+            self.reverse_since = now
+            self.halt = self.moving or self.goal != self.sent
+        return (self.moving or self.stationary is None or
+                now - max(self.reverse_since, self.stationary) < REVERSE_S)
 
     def _follow_hold(self, taken, now):
         states = ((not self.following, "stopped"), (self.paused, "conversation"),
@@ -272,6 +297,7 @@ class Head:
             if taken is not None and taken <= self.source:
                 return
             if (generation is None or generation == self.generation) and not self.inspecting:
+                self.reverse_since = None
                 if taken is not None:
                     self.source = taken
                 self.expires = None
