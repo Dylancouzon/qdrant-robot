@@ -1,0 +1,10 @@
+{"arm": "recent", "split": "check", "exchange": {"n": 13.0, "hit": 0.462, "first": 0.0, "rr": 0.122, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "dense", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.949, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "dense-instruct", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.962, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "rrf", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.949, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "dbsf", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.949, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "rrf-instruct", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.949, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "dbsf-instruct", "split": "check", "exchange": {"n": 13.0, "hit": 1.0, "first": 0.923, "rr": 0.962, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "robot", "split": "check", "exchange": {"n": 13.0, "hit": 0.462, "first": 0.0, "rr": 0.122, "cue": 0.846}, "history": {"n": 7.0}}
+{"arm": "runtime-statements", "split": "check", "statement": {"n": 17.0, "hit": 0.941, "first": 0.706, "rr": 0.824, "cue": 0.0}, "trap": {"n": 3.0, "delivered": 1.0}, "history": {"n": 2.0}}
+{"summary": "recall_bench", "split": "check", "machine": "macOS-26.6.2", "revision": "3bbfb24", "data_sha256": "a1502854ab5f81c2"}

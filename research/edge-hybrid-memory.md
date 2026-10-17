@@ -22,11 +22,11 @@ Dylan asked on 2026-10-17 for a best-in-class Qdrant Edge memory, run like the [
 
 ## Verified Edge 0.8.0 capabilities
 
-Checked against the installed stubs and a Mac probe (E): built-in `Bm25` with the IDF `Modifier`; `Prefetch` legs fused with `Fusion.Rrf` and `Fusion.Dbsf`; a `Formula` that rescores fused results with `Decay` over a payload field; a `Text` payload index for `MatchText`; and `HasVectorCondition`. An existing shard rejects new named vectors, so new vectors need a migration to a new shard that keeps point IDs.
+Checked against the installed stubs and a Mac probe (E): built-in `Bm25` with the IDF `Modifier`; `Prefetch` legs fused with `Fusion.Rrf` and `Fusion.Dbsf`; a `Formula` that rescores fused results with `Decay` over a payload field; a `Text` payload index for `MatchText`; and `HasVectorCondition`. Loading an existing shard with a config that adds named vectors fails; the design gate found `create_dense_vector` and `create_sparse_vector`, which add them in place.
 
 ## Candidate design
 
-1. Migrate `seen` once, preserving IDs, payloads, and existing vectors. Add a dense `dialog` vector (bge-small of question and answer) and a sparse BM25 `words` vector with IDF. Back up the closed live store first. Older releases can still open the shard.
+1. (Superseded by the in-place APIs above; no migration ran.) Migrate `seen` once, preserving IDs, payloads, and existing vectors. Add a dense `dialog` vector (bge-small of question and answer) and a sparse BM25 `words` vector with IDF. Back up the closed live store first. Older releases can still open the shard.
 2. Exchange recall: dense and BM25 prefetches under the visitor filter, fused with RRF, rescored by a formula with exponential time decay. This replaces time ordering.
 3. Statement recall: the same hybrid query restricted to points with a statement vector; the decay favors corrections.
 4. Object deletion: `MatchText` filters on text indexes replace the client-side regex scan.

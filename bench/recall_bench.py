@@ -10,7 +10,10 @@ are scored once on the runtime path (dense said vector, TOLD_MIN, two delivered)
 scores the robot's own Memory.exchanges, which must match the arm it implements (recent).
 D209 kept the time-ordered runtime: ranked arms retrieved better but did not answer better.
 """
+import hashlib
 import json
+import platform
+import subprocess
 import sys
 import tempfile
 import time
@@ -185,13 +188,21 @@ def main(split: str, robot: bool) -> None:
     for name, find in finds.items():
         rows.append({"arm": name, "split": split,
                      **summary(score(convs, store, split, find, {"exchange", "history"}))})
+    if robot:  # the runtime implements the time-ordered arm (D209)
+        assert rows[-1]["exchange"] == rows[0]["exchange"], (rows[0], rows[-1])
     statements = score(convs, store, split, lambda c, q, skip: store.told(
         q["text"], c["visitor"], BASE + q["t"]), {"statement", "trap"})
     rows.append({"arm": "runtime-statements", "split": split, **summary(statements)})
+    rows.append({"summary": "recall_bench", "split": split,
+                 "machine": platform.platform(terse=True),
+                 "revision": subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                                            capture_output=True, text=True).stdout.strip(),
+                 "data_sha256": hashlib.sha256(DATA.read_bytes()).hexdigest()[:16]})
     for row in rows:
         print(json.dumps(row))
     stamp = time.strftime("%Y-%m-%d")
-    out = Path(__file__).parent / "results" / f"{stamp}-recall-bench-{split}.jsonl"
+    name = f"{stamp}-recall-bench-{split}-{int(time.time())}.jsonl"
+    out = Path(__file__).parent / "results" / name
     out.write_text("".join(json.dumps(r) + "\n" for r in rows))
 
 
