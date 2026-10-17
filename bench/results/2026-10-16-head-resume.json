@@ -6,7 +6,7 @@
   "ui_checks": "DOM harness passed",
   "safety": "Resume rejects missing or closed controllers, motor faults, and cooling. Previous inspection goals remain cancelled.",
   "review": "reviews/20261016-234351-86442-review.md",
-  "deployment": "Pending. Dylan confirmed that the Jetson is powered off.",
+  "deployment": "Deployed d35fce65af87 on Jetson boot 62240398-5ac5-400f-b467-9ec11c328838. Previous release 1e95640260aa is preserved. No qr-* unit is loaded. Matching Mac monitor health check passed in Idle. Live Stop/Resume confirmation remains pending.",
   "enclosure": "Previously staged correction committed separately as 6813a36; unchanged validation reused.",
   "full_checks": {
     "status": "pass",
