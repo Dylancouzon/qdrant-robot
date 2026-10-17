@@ -34,7 +34,7 @@ The strip beneath the video shows up to three admitted current detector categori
 
 Each of the eight published transcript turns carries its supplied evidence. The page renders these sources immediately before the answer and keeps them through streaming and reload. Sources retain their original labels, including generated captions. Empty source sections stay hidden. Selecting a named object opens its Memory card. Search results and timings remain under **Turn details**.
 
-The command tip says `Say "Hey Edgy, ..."`. It occupies the middle of an empty conversation and stays at the top during conversation. Examples rotate every 12 seconds without extra controls. Hover, keyboard focus, hidden tabs, and reduced motion pause rotation.
+An empty conversation shows a large bubble that says `Say "Hey Edgy" to wake up.` Once conversation starts, the bubble becomes a compact command tip pinned beneath the chat header. The transcript scrolls independently, so the tip stays visible. Examples rotate every 12 seconds without extra controls. Hover, keyboard focus, hidden tabs, and reduced motion pause rotation.
 
 The memory map opens from a compact disclosure beside the detection strip. Objects and evidence occupy separate columns. The map reads stored IDs from `seen` and named object points from `things`. Statements use violet, observations use teal, and recalled sources use pink. Lines connect evidence with its stored named-object ID. Stored IDs determine object positions; evidence positions derive from their IDs and object links. The positions are schematic. The map does not combine embedding spaces. Knowledge facts remain in the retrieved cards.
 

@@ -204,3 +204,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D203 2026-10-16: Pair Stop head with Resume head.** Dylan requested a resume action after stopping. The button follows server state. Resume cancels obsolete inspection work and requires fresh camera input; cooling, motor faults, closed controllers, and disabled motor output remain blocked.
 
 **D204 2026-10-17: Pause following before reversing direction.** At Dylan's request, brake on an opposite following correction, then require 250 ms of stationary feedback and continued fresh opposite-direction face evidence. Centering, loss, expiry, speech, Stop, handover, and cooling clear pending confirmation. Stop and inspection remain immediate; thermal limits remain unchanged.
+
+**D205 2026-10-17: Make chat wake guidance prominent and keep tips pinned.** At Dylan's request, an empty chat shows a large wake-up bubble. During conversation, the same bubble shows compact rotating tips outside the transcript scroller.

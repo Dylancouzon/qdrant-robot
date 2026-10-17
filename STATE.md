@@ -2,13 +2,13 @@
 
 Updated 2026-10-17. Architecture is settled; use the [topic index](research/README.md) for details.
 
-## Session handoff
+## Active task
 
-Session complete. The 250 ms following reversal pause is deployed and pushed. Focused checks, full checks, task review, and the Jetson simulated-controller comparison pass. Physical heating improvement, alternating-input tracking bias, and live Stop/Resume confirmation remain pending. See [head control](research/servo.md#following-reversal-pause-2026-10-17) for evidence and remaining checks.
+Dylan confirmed the speaker works. The local monitor now shows a large wake-up bubble in an empty chat and a pinned tips bubble during conversation. Dylan will check the UI; broader tests and browser checks are skipped at his request. The active robot remains on release ff1206efa987. Physical heating improvement, alternating-input tracking bias, and live Stop/Resume confirmation remain pending.
 
 ## Robot and jobs
 
-Last verified Jetson boot is 62240398, current release ff1206efa987, and previous release d35fce65af87. No qr-* unit was loaded at the last successful check. The session-end SSH status probe did not return; recheck remote state before starting. The idle Mac monitor at http://127.0.0.1:8766 is closed for session cleanup. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. Deployment started no model or motor job. Memories, results, and the previous release remain intact.
+Jetson boot is 748cf835, current release ff1206efa987, and previous release d35fce65af87. The qr-robot unit is active. The Mac monitor at http://127.0.0.1:8766 is Listening and uses the mounted calibration. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. Memories, results, and the previous release remain intact.
 
 Mounted file: /home/qdrant/qdrant-robot/shared/servo-mounted.json, zero 2080, direction one, limit 60. Runtime speed is 40°/s, acceleration/deceleration 40, torque cap 20%, and arrival tolerance 1.5°. Reported 65°C verifies release and pauses the head for at least 180 seconds, with 10 continuous seconds at or below 55°C before eligibility. Reported 70°C latches only the head off until restart after cooling. Speech and vision remain available.
 
@@ -36,4 +36,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 Real heating versus temperature-feedback error remains unresolved. Qualify prolonged enclosure cooling and microphone recognition before selecting a louder fan profile. Then check two-person handoff, inspection, Stop during speech, and departure. The +70° range remains unqualified. Stop travel reached 3.604° and settled in 0.513 s (J); the provisional 0.3 s target remains unmet. Unattended motion remains unqualified.
 
-Next command: `.venv/bin/python tools/talk.py --port 8766 --release ff1206efa987 --servo-calibration /home/qdrant/qdrant-robot/shared/servo-mounted.json`. Open the monitor and select Start during watched use. Compare repeated direction changes, then check Stop head followed by Resume head.
+Next step: reload the monitor and check the empty-chat wake prompt and pinned tips during conversation. Select Stop in the monitor to end the robot session.
