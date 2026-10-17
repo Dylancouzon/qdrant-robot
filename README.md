@@ -8,6 +8,10 @@ Read [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [lessons index](resea
 
 ## Run the interface
 
+The robot serves the page itself from boot. Open `http://qdrant-robot.local:8765/?key=MONITOR_KEY` from any device on its network, or `http://10.42.0.1:8765/?key=MONITOR_KEY` on its `l6-robot` hotspot. The robot raises the hotspot 90 to 120 s after Wi-Fi drops. `MONITOR_KEY` and `HOTSPOT_PASSWORD` are in the gitignored `.env`.
+
+The Mac launcher still works through an SSH tunnel:
+
 ```sh
 .venv/bin/python tools/talk.py --port 8766 --release RELEASE_ID
 open http://127.0.0.1:8766
@@ -15,7 +19,7 @@ open http://127.0.0.1:8766
 
 Use the deployed release in STATE.md. Select **Start**, wait for readiness, and say "Hey Edgy". The robot uses its own USB microphone and speaker. **Stop** stops the robot. Closing the page or launcher leaves it running. Use one camera viewer.
 
-Live shows the camera, conversation, retrieved text and images, stored memory points, and measured turn timings. Memory manages saved object views. Settings controls recognition. Read the [interface guide](research/mac-audio-interface.md) for teaching, consent, forgetting, audio, authentication, and recorded-camera checks.
+Live shows the camera, conversation, retrieved text and images, stored memory points, and measured turn timings. On a phone, Live shows the robot view and Chat shows the conversation. Memory manages saved object views. Settings controls recognition. Read the [interface guide](research/mac-audio-interface.md) for teaching, consent, forgetting, audio, authentication, and recorded-camera checks.
 
 ## Repository map
 

@@ -8,7 +8,7 @@ The [memory demo session](research/overnight-conversation.md) is complete (D207,
 
 ## Robot and jobs
 
-No qr-* unit runs; `robot-monitor` runs (D211). Boot 748cf835. Deployed release f65fb1941942 (on-robot monitor and phone tabs, D211); `previous` is a7a7f5385d29; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
+No qr-* unit runs; `robot-monitor` runs (D211). Boot 8cbcfb5c; a reboot started `robot-monitor` and rejoined Wi-Fi (E). Deployed release f65fb1941942 (on-robot monitor and phone tabs, D211); `previous` is a7a7f5385d29; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
 
 Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; telemetry uses `shared/results/*.tegrastats`. Preserve memories, results, backups, and previous releases.
 

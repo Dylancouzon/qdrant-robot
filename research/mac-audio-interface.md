@@ -34,7 +34,7 @@ The Mac launcher still works over Wi-Fi and its SSH tunnel.
 
 The camera shows known object names, one orange "???" teaching focus, and admitted grey object outlines. Person detection supplies internal cues; the page draws verified face outlines instead of body boxes. Face identity uses only the current verified result on its exact source pixels. The status and transcript show Listening, Hearing you, Thinking, and Speaking.
 
-The camera fills the main pane beside a narrow conversation column. The pane follows the source aspect ratio and shows the complete frame. Chat uses 16 px text; source cards and action buttons use 14 px. Narrow screens put conversation after the camera. The detection strip and map control sit beneath the video, leaving its edges visible. Session errors stay expandable so a traceback cannot cover the camera.
+The camera fills the main pane beside a narrow conversation column. At 600 px or less, a Chat tab appears: Live shows only the camera card, and Chat shows only the conversation card. Widening the page from Chat returns to Live. The pane follows the source aspect ratio and shows the complete frame. Chat uses 16 px text; source cards and action buttons use 14 px. Narrow screens put conversation after the camera. The detection strip and map control sit beneath the video, leaving its edges visible. Session errors stay expandable so a traceback cannot cover the camera.
 
 The strip beneath the video shows up to three admitted current detector categories and their detector confidence, with a count for additional detections. These scores describe categories independently of stored-object similarity. Stale sources, suppressed objects, faces, and carried outlines contribute no detections. Camera and state failures clear the strip.
 

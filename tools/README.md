@@ -19,7 +19,7 @@
 
 ## UI development
 
-The page is code-native HTML, CSS, and JavaScript in `talk.html`. The running Mac monitor reads it on page loads. Python proxy changes require a launcher restart. [Interface guidance](../research/mac-audio-interface.md) defines behavior.
+The page is code-native HTML, CSS, and JavaScript in `talk.html`. The running monitor reads it on page loads. Python proxy changes require a launcher restart; on the robot, `tools/jetson.py deploy` restarts `robot-monitor`. [Interface guidance](../research/mac-audio-interface.md) defines behavior.
 
 ```sh
 npm --prefix tools/ui ci --ignore-scripts
