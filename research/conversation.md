@@ -14,9 +14,22 @@ D206 supersedes D70's statement-scoping clause. Claude Opus 5.5 checked the [min
 
 The pre-change memory backup is `shared/backups/pre-person-memory-1792214398165463000/memory/` on the Jetson. It was copied with closed shards under the shared job lock. The [task review](../reviews/20261017-011944-59900-review.md) passes. Full release checks pass in 277.78 seconds (E). The [isolated Jetson check](../bench/results/2026-10-17-person-memory.json) passes all seven query, admission, persistence, and deletion checks with qdrant-edge-py 0.8.0 (J). It uses a temporary store and no models; live answer quality remains unmeasured.
 
-## Next execution
+## Memory demo session, 2026-10-17
 
-The [overnight handoff](overnight-conversation.md) scopes the next experiment. It audits the current tests, separates retrieval from answer quality, and defines fresh validation. Mac analysis and judging may run in parallel; Jetson trials wait for the other session to release access. The overnight session has not started.
+The [session plan](overnight-conversation.md) targets a developer demo of on-device memory. D207 keeps five changes. Each stored turn point also keeps the robot's answer. A question with a past speech verb ("what did you tell me", "what were we talking about") gets this visitor's six newest exchanges outside the live window, quoted as words, never as sight. Stored statements are recalled only for questions, and a yes or no to the robot's own consent, deletion, or object question stores no statement vector. A follow-up about the robot is grounded with the previous question when that question matched a fact; a direct fact match drops the image. Forgetting an object also deletes the visitor's turns that name it or its label.
+
+| Run (oracle, `eval/dev/demo.jsonl`, 79 turns) | Judged, raw | Judged, paired |
+| --- | --- | --- |
+| Baseline, twice | 39/79, 39/79 | 39/79, 39/79 |
+| Memory facts | 36/79 | 41/79 |
+| Plus exchange quotes, twice | 47/79, 42/79 | 46/79, 46/79 |
+| Plus recall gating, twice | 40/79, 42/79 | 44/79, 46/79 |
+| Plus follow-up facts, twice | 50/79, 48/79 | 49/79, 50/79 |
+| Final, live-window statements kept | 48/79 | 49/79 |
+
+All measurements are J. In the paired column, `bench/paired.py` gives a turn whose answer matches the first baseline word for word the baseline verdict: the contextual judge flipped identical safe stranger replies between runs. Forgetting an object now also drops the visitor's stored answers and the live conversation, after the task review found a pronoun-only answer surviving. Dialogue recall rose from 0/6 to 4/6, memory explanations from 2/12 to 6/12, and personal recall from 12/14 to 14/14. Sealed validation rose from 12/34 to 15/34 with no capability losing a turn. Recorded voice stayed 42/47 with no flipped turn, first audio 1.75 s p50 against 1.74 s, and people checks stayed 22/34. No run leaked a name or fact to a stranger or claimed a false identity. RAM headroom stayed between 857 and 1,220 MB, with 75 to 458 MB of swap held; paging during a turn remains unmeasured.
+
+Two-sentence replies were rejected again (D208). Omitting live-window statements from the prompt lost a direct "Where am I from?" recall and was reverted. Object answers still pass only 1/7 in development because the false face on the teddy bear locks out faceless turns. Sight answers stay at 3 to 5 of 10. Remaining gaps are in [edge cases](edge-cases.md).
 
 ## Deferred next steps
 

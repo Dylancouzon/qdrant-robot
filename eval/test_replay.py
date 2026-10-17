@@ -137,3 +137,21 @@ def test_sighted() -> None:
     kept = {**row, "id": 6, "first_seen": 1.0, "last_seen": 1.0}
     assert replay.sighted([kept], shown, step, set()) == set()
     assert replay.sighted([kept], shown, step, {6}) == {6}
+
+
+def test_exchange_evidence_counts_for_dialogue_only() -> None:
+    """A quoted exchange proves what was said (a statement, or a dialogue-recall step), never
+    what was seen."""
+    frames: dict[str, replay.Shown] = {}
+    said = Turn(question="I fly home on Sunday.", answer="Safe travels!", frame_id=1)
+    replay.score({"id": "a", "expect_any": [""]}, [said], frames, oracle=True)
+    asked = Turn(question="Is Edge local?", answer="Yes.", frame_id=2)
+    replay.score({"id": "b", "expect_any": [""]}, [asked], frames, oracle=True)
+    quoted = Turn(question="What did you say?", answer="That Edge is local.", frame_id=3,
+                  exchanges=[1, 2])
+    statement = {"id": "c", "expect_any": [""], "evidence": ["a"]}
+    assert replay.score(statement, [quoted], frames, oracle=True)["evidence_ok"] is True
+    dialogue = {"id": "d", "expect_any": [""], "evidence": ["b"], "capability": "dialogue-recall"}
+    assert replay.score(dialogue, [quoted], frames, oracle=True)["evidence_ok"] is True
+    visual = {"id": "e", "expect_any": [""], "evidence": ["b"], "capability": "object-recall"}
+    assert replay.score(visual, [quoted], frames, oracle=True)["evidence_ok"] is False

@@ -317,7 +317,7 @@ def about_past(question: str) -> bool:
 
 
 def about_dialogue(question: str) -> bool:
-    """Whether the visitor asks what was said earlier ("What did you tell me about it?")."""
+    """Whether the visitor asks what was said earlier ("What did you say about the price?")."""
     return bool(_DIALOGUE.search(question.replace("\u2019", "'")))
 
 
@@ -567,6 +567,14 @@ class Memory:
                 break
         self.forget(found)
 
+    def forget_answers(self, visitor: str) -> None:
+        """Drop the stored answers of this visitor's turns, so no exchange quote returns: an
+        answer can repeat a forgotten object's details without naming it ("You bought it in
+        Paris")."""
+        self.shard.update(UpdateOperation.delete_payload_by_filter(Filter(must=[
+            FieldCondition(key="visitor", match=MatchValue(visitor))]), ["answer"]))
+        self.shard.flush()
+
     def forget_named(self, ident: str) -> None:
         """Delete selected crops and sightings, including records outside current track links."""
         while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
@@ -771,7 +779,7 @@ if __name__ == "__main__":
     assert about_past("What did I just show you?") and about_past("Do you remember me?")
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
-    for text in ("What did you tell me about it?", "What were we talking about?", "Remind me "
+    for text in ("What did you say about the price?", "What were we discussing?", "Remind me "
                  "what you said.", "Did I mention my job?", "What have we discussed so far?",
                  "What did you just explain to me?", "Recap our conversation."):
         assert about_dialogue(text), text

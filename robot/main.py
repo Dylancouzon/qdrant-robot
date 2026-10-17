@@ -43,7 +43,6 @@ from robot.memory import (
     article,
     is_question,
     is_statement,
-    names_any,
     kind_of,
     main_object,
     maxsim,
@@ -87,6 +86,7 @@ from robot.tts import RATE, Speaker, phrases
 from robot.view import valid_id, Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
+_PRONOUN = re.compile(r"\b(?:it|its|it's|that|that's|this|they|them|these|those)\b", re.I)
 # ponytail: newest first, no similarity ranking; a long conversation's oldest topics drop out.
 EXCHANGES = 6      # stored exchanges quoted for a question about the conversation
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
@@ -246,6 +246,10 @@ class Turn:
 
 
 class Robot:
+    # (visitor, object id, time) of the last turn that named or asked about an object: a
+    # statement right after it that says "it" or "that" is about it, and is forgotten with it.
+    topic: tuple[str, str, float] | None = None
+
     def __init__(self, camera, out: Path, memory: Path = SHARED / "memory",
                  play: Callable[[np.ndarray], None] | None = None, model: str = brain.MODEL,
                  wake_word: bool = True, head: Head | None = None):
@@ -437,7 +441,7 @@ class Robot:
             self.last_objects = frozenset()
             self.away, self.visitors, self.asking, self.hiding = set(), {}, None, None
             self.told, self.last_line, self.last_input, self.face = None, 0.0, 0.0, None
-            self.face_track, self.turn_seen = None, None
+            self.face_track, self.turn_seen, self.topic = None, None, None
             self.teaching, self.start_target = None, None
             self.start_teaching_target = None
             self.current_visitor = ""
@@ -1528,7 +1532,7 @@ class Robot:
         found = found or self._follow_up_facts(question, turn.question)
         turn.facts = [fact for _, fact in found]
         # A yes or no to the robot's own consent, deletion, or object question is a reply, not
-        # a fact about the visitor (stored as one, "Yes, go for it." came back as a memory).
+        # a fact about the visitor (stored as one, a bare consent came back as a memory).
         replying = bool(self.asking or self.deleting or self.confirming)
         statements = self._told(question, turn) if is_question(turn.question) else []
         turn.told = [m["said"] for m in statements]
@@ -1668,6 +1672,10 @@ class Robot:
             **({"named": turn.named} if turn.named else {}))
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it
+            self.topic = turn.visitor, turn.named, turn.speech_start
+        elif statement is not None and (topic := self.topic) and topic[0] == turn.visitor and \
+                turn.speech_start - topic[2] <= CONVERSATION_S and _PRONOUN.search(turn.question):
+            self.things.link(topic[1], pid)  # "I bought it in Paris" goes with the object
         if seen and seen[1]:
             self.recognition.call(lambda f, c: self.people.link(seen[1], [pid]))
         self._retain(time.time())
@@ -1998,6 +2006,7 @@ class Robot:
             )
         if set(named["labels"]) & self.ignored:
             return f"I am ignoring {plural(name)}, so I do not remember any."
+        self.topic = turn.visitor, named["id"], turn.speech_start
         return self._mine(turn, mode, named, "your" if owner == turn.visitor else possessive)
 
     def _valid_item(self, data):
@@ -2393,10 +2402,11 @@ class Robot:
         if any(p and p["object"] == named["id"] for p in (self.candidate, self.confirming)):
             self.candidate = self.confirming = None
         self.memory.forget(named["turns"])
-        words = {named["name"], *named["labels"]}
-        self.memory.forget_mentions(named["owner"], words)
-        self.history = [m for pair in zip(self.history[::2], self.history[1::2], strict=True)
-                        if not any(names_any(x["content"], words) for x in pair) for m in pair]
+        # What was said about it may not name it ("I bought it in Paris"): the visitor's turns
+        # that name it go, and so do all their stored answers and the live conversation.
+        self.memory.forget_mentions(named["owner"], {named["name"], *named["labels"]})
+        self.memory.forget_answers(named["owner"])
+        self.history = []
         self.memory.forget_named(named["id"])
         self.things.forget(named["id"])
         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}

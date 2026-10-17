@@ -3603,3 +3603,24 @@ def test_memory_map_survives_reopen_and_forget(tmp_path):
         r.memory.shard.close()
         r.people.shard.close()
         r.things.shard.close()
+
+
+def test_pronoun_statement_after_naming_is_forgotten_with_the_object(robot):
+    r = robot
+    frame_of(r)
+    r.focus.focus = next(iter(r.view[1]))
+    answer, named = ask(r, "This is my phone")
+    assert answer.startswith("Got it")
+    shot = (r.view[0], time.time())
+    assert r._store(named, shot, None, None)
+    vec = np.eye(TEXT_DIM, dtype=np.float32)[0]
+    said = Turn(question="I bought it in Paris.", answer="Nice.", speech_start=time.time() + 1,
+                visitor=named.visitor)
+    assert r._store(said, shot, vec, None)
+    other = Turn(question="I live in Lyon.", answer="Lovely.", speech_start=time.time() + 1,
+                 visitor=named.visitor)
+    assert r._store(other, shot, vec, None)
+    assert forget(r, "Forget my phone")[0].startswith("Done")
+    left = [m["said"] for m in r.memory.told(vec, time.time() + 5, visitor=said.visitor, n=9)]
+    assert left == ["I live in Lyon."], "the pronoun statement went with the phone"
+    assert r.memory.exchanges(said.visitor, time.time() + 5, n=9) == []

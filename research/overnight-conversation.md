@@ -1,52 +1,35 @@
-# Overnight conversation handoff
+# Memory demo session plan
 
-Opus owns execution. Improve natural booth conversation, grounded Qdrant explanations, and relevant personal recall with the existing model. Compare mechanisms rather than memorizing scripts. This plan authorizes bounded experiments, not a claim of "best in class" retrieval or M4 acceptance.
+Completed 2026-10-17. Results and kept changes are in the [conversation record](conversation.md#memory-demo-session-2026-10-17) and D207. Two-sentence replies were rejected (D208). The validation set's first use is spent.
 
-## Audit and starting point
+Dylan set this scope on 2026-10-17; it replaces the earlier overnight conversation handoff. The demo shows on-device long-term memory with Qdrant Edge to developers. The robot must hold a quick, natural, multi-turn conversation, recall facts from earlier turns and from an earlier session, explain how its memory works, and start the right fixed-rule action from natural phrasing. Advice and general trivia are out of scope; the advice suite stays only as a regression guard.
 
-The shipped runtime keeps four complete exchanges and retrieves at most two visitor-scoped statements. `robot/memory.py:TOLD_MIN` already sets a cosine threshold of 0.5. Historical relevant and irrelevant scores overlap near that boundary. Knowledge retrieval has separate thresholds in `robot/knowledge.py`; calibrate each source separately.
+## Fixtures
 
-The reviewed dialogue suites contain 18 conversation turns, six transfer turns, and 44 stored-exchange turns. Their limitations determine their role:
+- Development: `eval/dev/demo.jsonl`, eight sessions, oracle text. Face scenes p05 to p07 and their strangers; images from `eval/dev/live/` and `m2-*`.
+- Validation: `eval/validation/demo.jsonl`, four sessions, written by a separate Sonnet 5.5 author. Face scenes p08, p09, and `dev-stranger-p06-2`; `coco-*` images. The lead records only its hash and capability counts, never reads its questions or rubrics before the keep-or-reject decision, and counts its first use in `DECISIONS.md`. A later change inspired by its transcripts needs a new validation set.
+- Regression guards: recorded voice (`sessions.jsonl`, 43/47 J), visual recall (`recall.jsonl`, 16/21 J), M3 people checks, and deletion.
 
-- Keep conversation and transfer as known regressions. Unrelated camera switches confound conversation with scene-history pruning. Transfer has already influenced decisions.
-- Keep deletion, restart, correction, and absent-memory checks. Treat assistant-reply recall beyond the live window as a deferred capability probe.
-- Add primary Qdrant conversations and visitor-fact recall. Existing dialogue fixtures underrepresent both. Existing recorded sessions contain additional knowledge checks.
-- Grade actual preceding replies. Anchor most follow-ups to visitor-supplied referents. Report opening and dependent follow-up failures separately, while retaining every turn in the total.
-- Empty `expect_any` lists can pass empty answers. Keyword results are diagnostic only. The earlier baseline varied from 7/18 to 4/18 judged passes (J).
+## Metrics
 
-The [conversation record](conversation.md) preserves prior trials. The [Sonnet 5.5 audit](../reviews/20261017-sonnet55-dialogue-audit.md) and [Opus 5.5 plan review](../reviews/20261017-opus55-overnight-plan.md) preserve the findings. This plan incorporates Opus's corrections; its original verdict was needs-attention.
+Each spoken turn carries a capability: sight, object recall, personal recall, dialogue recall, session recall, memory explanation, action, privacy, or small talk. The main metric is embarrassing answers per session: wrong facts, false memories, prompt recitation, or empty praise. Report judged correctness per capability. False identity claims, wrong deletions, and privacy failures must stay at zero. First-audio latency must not rise beyond baseline variation.
 
-## Scope and machines
+## Changes, compared one at a time
 
-Keep Qwen3-VL-2B, four exchanges, reply length policy, embeddings, runtime pins, and Edge 0.8.0. Preserve evidence provenance, visitor filtering, consent, and deletion. Defer stored assistant exchanges, decay, extraction, cloud consolidation, new models, and broad routing changes. A threshold cannot repair broken history assembly.
+1. Memory facts in the knowledge snapshot, verified against the code and Qdrant documentation. A collision check keeps personal and sight questions below the knowledge threshold.
+2. Recall of earlier exchanges beyond the four-exchange window, fixing the two traced prototype faults: the broad past cue and unanswered history after a scene change.
+3. At most two short spoken sentences within the existing 64-token budget (rejected, D208).
+4. Wider general phrasing for a fixed-rule action only when a development miss shows it.
+5. Personal-recall threshold only when baseline traces show irrelevant memories in answers.
 
-Use the Mac for fixture work, analysis, and existing network judging. Dylan approved serialized Jetson trials after the other session releases it. Obtain that release before remote work. Then inspect jobs, boot, deployed release, and logs through `tools/jetson.py`. Respect `shared/gpu.lock`; run one model stack at a time. Use isolated replay stores, fixture camera/audio, and no servo calibration or physical motion. Preserve live stores, backups, and prior releases.
+## Guardrails against overfitting and drift
 
-Opus integrates and owns records. At most two Sonnet 5.5 agents may audit disjoint artifacts in parallel. One may author only the frozen validation fixture and its hash. Give each a concrete question and stop condition. They must not edit runtime code, launch Jetson jobs, write the shared judge cache, or spawn agents. Use one judge coordinator with its existing vote workers. Check authentication, capacity, disk, and Mac sleep prevention. Record an unavailable model rather than silently substituting one.
+- Every runtime change is a general mechanism. The lead reviews each diff with one question: would it still work with different wording? Runtime code contains no fixture phrases; a grep over changed runtime files checks this.
+- Each fix must also pass reworded variants written after the fix, outside the fixtures.
+- Freeze the judge model, prompt, and contextual rubric before comparisons. Run the baseline twice and count only gains larger than its disagreement. Pair the final run with a fresh baseline.
+- Workers edit only their assigned paths, never runtime code they were not given, and never the judge cache. The lead integrates and verifies every result.
+- Stop and keep the stable release when evidence conflicts. Never rerun an unchanged quality failure.
 
-## Execute in order
+## Jetson
 
-1. **Freeze realistic development cases.** Create eight sessions, totaling 48 turns: three five-turn Qdrant explanations, two five-turn advice conversations, two eight-turn personal-memory conversations, and one seven-turn shown-object conversation. Include constraints, correction, topic changes, and pronoun follow-ups. Keep the camera stable except for one intentional, relevant change. In memory sessions, state facts early, then insert four useful intervening exchanges before recall. Keep guest identity continuous and gaps below 60 seconds. Use ordinary conversation rather than trivia padding. Ground knowledge rubrics in the shipped corpus and official documentation. Read Qdrant advisor guidance before changing retrieval mechanics.
-2. **Freeze fresh validation before tuning.** Let a separate Sonnet author write four eight-turn sessions in one new validation file. Cover Qdrant follow-ups, fact correction, irrelevant-memory rejection, and object discussion. Place tested memories beyond the live window. Use different intents, entities, and frames from development. The author returns only the file path, hash, and capability counts. Opus must not read its questions or rubrics during tuning. Never open existing `eval/heldout`. Count the new validation's first use in `DECISIONS.md`.
-3. **Check the harness cheaply.** Reuse `eval/replay.py` and `bench/conversation.py`. Require complete rows and footer before judging. The generic `eval/run.py` judge lacks dialogue context. Check restart boundaries in contextual judging. Preserve partial logs on interruption. Make only demonstrated, blocking harness fixes, with focused checks. Freeze the judge model, prompt, rubrics, and cache rules before comparisons.
-4. **Measure retrieval independently.** Build 24 balanced development queries against isolated planted statements: 12 relevant and 12 irrelevant. Include same-owner distractors, lexical overlap, short useful facts, corrections, and no-memory questions. Split them equally into selection and check sets before measuring. Record candidate scores, expected source IDs, selected IDs, and delivered prompt evidence. Check cross-owner isolation, missing identity, enrolled carryover, guest reset, consent decline, confirmed deletion, and restart deterministically with existing lower-level helpers. Keep these checks separate from judged dialogue quality. Add no visitor simulation framework.
-5. **Establish the current baseline.** Run development twice on the reconciled current source, using identical fixtures, model settings, and modes. Replay creates fresh stores; do not add store seeding. Save full prompts and sources. Reuse cached judgments for identical inputs. Measure disagreement overall and per capability. If disagreement masks the prospective improvement, use one diagnostic repeat. Trace differing prompts, retrieval, and answers. Stop ranking when unexplained variation still exceeds the targeted gain. Measure minutes per replay from the first run and report remaining capacity.
-6. **Test history assembly first.** Compare stable-view and deliberate-change prompts. Repair the traced loss of assistant context after a scene change, keeping current visual evidence authoritative. Reject stale visual claims. Name the difference from the archived rejected patch. Allow one revision. Substitute live-window duplicate exclusion only if baseline prompts demonstrate that duplicates displace useful evidence. This substitution consumes the same mechanism budget.
-7. **Calibrate personal retrieval second.** Pre-register cutoffs 0.5, 0.53, and 0.56 from the existing score ranges. Screen exported candidate scores on the Mac, using the selection half from step four. Preserve relevant recall while reducing irrelevant delivery. Freeze one cutoff before evaluating the check half; reject it rather than retuning on that half. Collect embeddings and Edge scores on the Jetson once access is released. Send at most one cutoff to a full model replay. Keep knowledge thresholds unchanged this session. Combine history and threshold changes only if their separate comparisons support both.
-8. **Confirm one finalist.** Repeat the paired baseline and finalist development runs once. Then run frozen validation once per arm with the same contextual judge. Read only per-capability counts and deterministic failures until recording keep-or-reject in `DECISIONS.md`. Inspect transcripts afterward for the morning report. Freeze the candidate thereafter; validation-inspired changes require a future validation set. Run one focused recorded-voice check, plus retained deletion, grounding, and absent-memory regressions. Use existing audio transcription checks. Oracle text measures reasoning; recorded replay checks ASR integration. Neither establishes physical audible latency.
-
-## Selection and stop rules
-
-Record answer usefulness, knowledge correctness, personal recall, retrieval precision and recall, and irrelevant evidence delivery separately. A useful reply gives a specific next step or a necessary clarification. Agreement alone does not satisfy an advice request. Judge against actual dialogue and supplied sources. Missing judgments, empty answers, and incomplete runs fail.
-
-Require zero failures in deterministic privacy, consent, identity-filtering, and deletion checks. Compare each mechanism on its affected turns and sources. Require a targeted answer gain repeated in both paired comparisons, exceeding the observed baseline disagreement. Require fewer irrelevant sources without losing relevant sources on the independent retrieval check half. Permit no additional unsupported visual claims. Other capability losses must stay within measured baseline variation. Validation must improve overall, with at most one net lost turn per capability. Report all counts and uncertainty. If evidence conflicts, retain the stable runtime. These checks guide development; the project's 90% per-capability acceptance target remains unmet until proper acceptance.
-
-Allocate at most 12 full 48-turn development replays: two baseline, one drift diagnostic, two history attempts, one threshold candidate, one combination, two final paired runs, and three reserved repeats or diagnosed infrastructure retries. Skip unused allocations. Run only two 32-turn validation replays. Threshold screening uses saved scores, not full LLM runs. Deterministic checks and one focused audio regression are separate. After two failed approaches, use workflow counsel before further work. Stop on resource pressure, authentication limits, or unresolved drift. Retry an infrastructure failure once after diagnosis. Never rerun an unchanged quality failure hoping for a pass.
-
-If the Jetson remains occupied, finish fixture preparation, static harness checks, frozen validation, and the runnable command list. Record that baseline and candidates remain unmeasured. Leave deployment unchanged. Do not expand work to fill the night.
-
-## Morning handoff
-
-Store run metadata and summaries in `bench/results/`; retain private transcripts, audio, prompts, and raw traces in ignored `build/`. Record revision, release, fixture hashes, commands, seeds, modes, judge settings, counts, disagreements, timing, RAM, paging, and `tegrastats` for every Jetson comparison. Label Jetson measurements J and Mac measurements E.
-
-Report baseline versus finalist by capability, relevance tradeoffs, three representative dialogue examples, remaining failures, and the keep-or-reject decision. Run focused checks and task review for changed code. Run full checks before any release deployment. Preserve rollback and restore the stable deployment when rejecting a trial. Update the conversation record and STATE.md, keeping STATE.md below 50 lines. Commit and push the reviewed task. Leave physical demo qualification, long-term memory consolidation, and M4 acceptance as separate next steps.
+Dylan granted the Jetson and the Mac for eight hours from 2026-10-17 02:30. The speaker stays at 0% during tests (mixer and `shared/speaker-volume`); restore 100% afterwards. Use isolated replay stores and no physical motion. Preserve live stores, backups, and release `6e8fd759c5d2` for rollback.

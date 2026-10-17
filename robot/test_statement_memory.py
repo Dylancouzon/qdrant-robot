@@ -89,3 +89,18 @@ def test_forgetting_an_object_forgets_what_was_said_about_it(tmp_path):
         assert [p["id"] for p in memory.points([other, theirs])] == [other, theirs]
     finally:
         memory.shard.close()
+
+
+def test_forgetting_answers_survives_reopen_and_keeps_other_visitors(tmp_path):
+    memory = Memory(tmp_path)
+    memory.add(None, "I bought it in Paris.", vector(), ts=100, visitor="Mira",
+               answer="You bought it in Paris.")
+    memory.add(None, "Hi!", ts=101, visitor="Jo", answer="Hello!")
+    memory.forget_answers("Mira")
+    memory.shard.close()
+    memory = Memory(tmp_path)
+    try:
+        assert memory.exchanges("Mira", 200, n=5) == [], "no quote of the pronoun-only answer"
+        assert [row["answer"] for row in memory.exchanges("Jo", 200, n=5)] == ["Hello!"]
+    finally:
+        memory.shard.close()
