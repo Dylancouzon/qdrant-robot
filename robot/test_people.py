@@ -161,7 +161,7 @@ def test_robot_identity(monkeypatch) -> None:
 
     from robot import main, memory
     from robot.detect import CONFIRM, LOST, MAX_MISSED, Detection
-    from robot.main import FIRST_PERSON, Robot, Turn
+    from robot.main import Robot, Turn
     from robot.people import DECLINED, KEPT, NOT_YOU, _id
     from robot.text_embed import DIM as TEXT_DIM
     from robot.test_things import open_robot
@@ -364,14 +364,14 @@ def test_robot_identity(monkeypatch) -> None:
         assert "Lisbon" in str(turns[-1].prompt), "Cy's own exchanges stay in the prompt"
         assert ask("So which town do I live in?", frames(5, 1)).startswith(
             "Please introduce yourself"), "a replacement cannot take the active conversation"
-        assert not any(FIRST_PERSON.search(x) for x in turns[-1].told) and "Lisbon" not in str(
+        assert turns[-1].told == [] and "Lisbon" not in str(
             turns[-1].prompt), "a visitor replacing Cy within the window gets none of Cy's " \
             "statements or exchanges (D70)"
         assert ask("Hi, I'm Eve.", frames(5, 1)) == offer("Eve")
         assert ask("Where am I from?", frames(5, 1)) is None and turns[-1].told == []
         assert ask("Talk to Cy.", cy) == "I am talking to Cy now."
-        assert ask("Where am I from?", cy) is None and turns[-1].told == [], \
-            "nor does Cy after that new conversation"
+        assert ask("Where am I from?", cy) is None and turns[-1].told == ["I'm from Lisbon."], \
+            "D206 restores the enrolled visitor's own statements after handover"
 
 
 def test_face_position_matches_selected_detection(monkeypatch):

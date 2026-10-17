@@ -1,16 +1,28 @@
 # General conversation
 
-The retained conversation policy was validated in `f9b90b958023`. [STATE.md](../STATE.md) owns the deployed interface release. It keeps Qwen3-VL-2B, the existing reply policy, and four recent exchanges. Conversation-memory prototypes remain archived. Completed measurements and review receipts are in the [trial report](archive/conversation-trials-2026-10-15.md).
+The robot keeps Qwen3-VL-2B, the existing reply policy, and four recent exchanges. [STATE.md](../STATE.md) owns the deployed release. Earlier full-exchange prototypes remain archived. Completed measurements and review receipts are in the [trial report](archive/conversation-trials-2026-10-15.md).
 
-## Next steps
+## Personal statement recall
 
-These conversation follow-ups are parked. Servo motor control and voice commands are the next project task.
+Statement queries require the resolved visitor ID and apply its payload filter before similarity ranking. Every statement belongs to its visitor, including general statements. Enrolled visitors can recall their own statements from earlier conversations within the existing 12-hour ordinary retention. Guests retain temporary conversation IDs; a reset or restart gives them a new identity. Consent-based enrollment reuses the guest's visitor ID, preserving earlier statements from that conversation. Curated knowledge remains shared.
 
-1. Check the shared past-question decision against varied recall requests, future plans, corrections, and topic changes. The broad `before` cue currently admits future advice.
-2. Test chronological history assembly that handles questions left without replies after scene changes. Keep source validation, visitor boundaries, and deletion intact.
-3. Freeze a paired comparison before changing runtime behavior. Require gains across topics and preserve previously passing correction, privacy, visual, and transfer cases.
+The runtime still delivers at most two matching statements with their source IDs. Missing or ambiguous visitor identity blocks personal retrieval. Ignored-object suppression and "forget me" deletion remain in place. Old unowned points do not qualify for personal recall. A false enrolled-face match now risks disclosing earlier-conversation statements; stranger qualification remains open.
 
-Keep the existing model and evidence requirements. A new trial needs a changed mechanism and fresh paired baselines. The exact Qdrant recall failure, false memory after deletion, general answer quality, and response-interval paging remain open.
+New bare acknowledgements such as "okay", "thank you", "yes", "no", "um", and "hmm" receive no statement vector. Raw diagnostic turn records and short-term dialogue remain available. Questions and device actions keep their existing evidence rules. Existing filler vectors are not rewritten; ordinary retention removes them over time. This change adds neither stored assistant replies nor conversation summaries.
+
+D206 supersedes D70's statement-scoping clause. Claude Opus 5.5 checked the [minimal plan](person-memory-plan.md) before implementation. Its [review](../reviews/20261017-opus55-person-memory-plan.md) required explicit recording of the changed sharing rule and separate enrolled/guest acceptance checks. Both corrections were applied before code changes.
+
+The pre-change memory backup is `shared/backups/pre-person-memory-1792214398165463000/memory/` on the Jetson. It was copied with closed shards under the shared job lock. The [task review](../reviews/20261017-011944-59900-review.md) passes. Full release checks pass in 277.78 seconds (E). The [isolated Jetson check](../bench/results/2026-10-17-person-memory.json) passes all seven query, admission, persistence, and deletion checks with qdrant-edge-py 0.8.0 (J). It uses a temporary store and no models; live answer quality remains unmeasured.
+
+## Deferred next steps
+
+1. Retrieve complete exchanges for explicit conversation-history questions. Fix retrieval eligibility and duplicate history before revisiting the archived prototype.
+2. Choose retention beyond 12 hours only when returning-visitor use requires it. Named-object evidence already follows its own protection rules.
+3. Improve transcript admission only for observed recognition errors; preserve useful short statements and ordinary dialogue.
+4. Add recency weighting only after demonstrating stale results displacing relevant evidence.
+5. Consider offline consolidation only after measuring a need. Retain source IDs, corrections, and visitor deletion links in any summaries.
+
+The broad `before` cue still admits future advice. History assembly can retain questions without replies after scene changes. The exact Qdrant recall failure, false memory after deletion, general answer quality, and response-interval paging remain open. Keep the existing model and evidence requirements, and use a fresh paired comparison before expanding dialogue retrieval.
 
 ## Stored exchange prototype, 2026-10-15
 

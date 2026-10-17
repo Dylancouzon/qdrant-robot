@@ -315,6 +315,14 @@ def is_question(text: str) -> bool:
     return text.rstrip().endswith("?") or bool(_ASKS.match(text.strip()))
 
 
+_FILLER = re.compile(r"(?:ok(?:ay)?|thanks?|thank you|yes|no|u[mh]+|hm+)[.!?,\s]*", re.I)
+
+
+def is_statement(text: str) -> bool:
+    """Keep meaningful statements searchable; omit questions and bare acknowledgements."""
+    return bool(text.strip()) and not is_question(text) and not _FILLER.fullmatch(text.strip())
+
+
 # A deletion is authorized only by an imperative: the line starts with the verb, after optional
 # filler, a polite frame ("can you please"), or "I want you to". Everything else is no command.
 _DELETE = re.compile(r"^\W*(?:(?:ok|okay|so|um|uh|well|now|and|then|please)\W+)*"
@@ -460,12 +468,15 @@ class Memory:
             row["thumb"] = grey.astype(np.float32)
         return row
 
-    def told(self, query: np.ndarray, before: float, n: int = 2) -> list[dict]:
-        """Payloads of the visitor's earlier statements closest to `query` (unit bge vector)."""
+    def told(self, query: np.ndarray, before: float, visitor: str, n: int = 2) -> list[dict]:
+        """Earlier statements from one resolved visitor, filtered before similarity ranking."""
+        if not visitor:
+            return []
         hits = self.shard.query(QueryRequest(
             limit=n, query=Query.Nearest(query.tolist(), using="said"), with_payload=True,
             score_threshold=TOLD_MIN,
-            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before))])))
+            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
+                                FieldCondition(key="visitor", match=MatchValue(visitor))])))
         return [{**self._row(h), "score": h.score} for h in hits]
 
     def recent(self, before: float, n: int = 3,
@@ -626,7 +637,8 @@ def _retain_selftest(seen: Memory, frames: Path, img: np.ndarray) -> None:
     cups = [seen.sighting("cup", "left", day - hour + k) for k in range(4)]
     assert seen.retain(day, ()) and len(seen.sightings(1e9, 99, label=["cup"])) == 4, \
         "an hour-old cup outlives three newer cup tracks"
-    assert seen.recent(before=1e9, n=99) == [] and seen.told(np.eye(TEXT_DIM)[0], 1e9) == [], \
+    assert seen.recent(before=1e9, n=99) == [] and seen.told(
+        np.eye(TEXT_DIM)[0], 1e9, visitor="selftest-visitor") == [], \
         "turns, captions, and statements past the window are evicted"
     assert old_turns and not any((frames / f).exists() for f in old_turns), "and their frames"
     assert seen.sightings(1e9, 99, label=["bag"]) == [], "a sighting past the window too"
@@ -665,9 +677,11 @@ if __name__ == "__main__":
         b, c = seen.add(img, "first turn", ts=300.0), seen.add(img, "second turn", ts=300.0)
         v = np.zeros(TEXT_DIM, np.float32)
         v[0] = 1.0
-        seen.add(img, "I love espresso.", v, ts=310.0)
-        assert [m["said"] for m in seen.told(v, before=400.0)] == ["I love espresso."]
-        assert seen.told(v, before=305.0) == [], "only statements made before the question"
+        seen.add(img, "I love espresso.", v, ts=310.0, visitor="selftest-visitor")
+        assert [m["said"] for m in seen.told(
+            v, before=400.0, visitor="selftest-visitor")] == ["I love espresso."]
+        assert seen.told(v, before=305.0, visitor="selftest-visitor") == [], \
+            "only statements made before the question"
         seen.set(b, caption="a desk")
         seen.set(c, caption="a desk")
         assert b != c and [m["said"] for m in seen.recent(before=400.0, n=2)] in (
@@ -685,7 +699,8 @@ if __name__ == "__main__":
         seen.forget([mine])
         assert [s["label"] for s in seen.sightings(before=400.0, n=1, hide={
             seen.sightings(before=400.0)[0]["id"]})] == ["cup"], "hidden points leave room"
-        assert len(seen.recent(before=400.0, n=9)) == 3 and seen.told(v, before=400.0)[0][
+        assert len(seen.recent(before=400.0, n=9)) == 3 and seen.told(
+            v, before=400.0, visitor="selftest-visitor")[0][
             "said"] == "I love espresso.", "sightings are neither captioned frames nor statements"
         seen.shard.close()
         frames = Path(tmp) / "frames"

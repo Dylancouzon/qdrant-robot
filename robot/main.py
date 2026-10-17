@@ -40,7 +40,7 @@ from robot.memory import (
     compares,
     earlier_view,
     article,
-    is_question,
+    is_statement,
     kind_of,
     main_object,
     maxsim,
@@ -91,8 +91,6 @@ DETECT_FPS = 15
 DETECT_RESTARTS = 3  # detector failures it recovers from by reloading; the next one stops it
 SIGHTINGS = 64  # the newest out-of-view sightings a sighting answer groups
 LINES = 4  # sighting lines for the brain at most: the newest of each kind
-# A statement about the speaker (D70): recalled only in the conversation it was told in.
-FIRST_PERSON = re.compile(r"\b(?:i|i'm|i've|i'd|i'll|me|my|mine|myself)\b", re.I)
 # Identity is the face in the current frame, never a track (design
 # reviews/20261008-161702-78890-design.md): a visitor replacing another keeps the track id.
 # Conversation identity uses the fresh speech-start frame.
@@ -298,11 +296,10 @@ class Robot:
         # identification: RAM only, never written, dropped when another face or no face for
         # CLEAR_S follows (or at a restart). Until then no turn showing that face is stored.
         self.hiding: tuple[np.ndarray, float] | None = None
-        # The conversation (D60, D70): the face last seen (RAM only, never written; None:
-        # no face), and the first point id stored in it (ids are microseconds, Memory._id).
+        # The conversation identity: the last selected face, kept only in RAM.
+        # D206 scopes stored statements by the resolved visitor ID.
         self.face: np.ndarray | None = None
         self.face_track: int | None = None  # the largest person track when `face` was last seen
-        self.since = time.time_ns() // 1000  # nothing from before a start is the speaker's
         # (name, offered) the visitor told in this conversation; offered: the robot offered
         # to remember their face (D69), once per conversation.
         self.told: tuple[str, bool] | None = None
@@ -439,7 +436,7 @@ class Robot:
             self.start_teaching_target = None
             self.current_visitor = ""
             self._clear_confirmation()
-            self.since, self.panel = time.time_ns() // 1000, None
+            self.panel = None
             self.view, self.offers = (None, {}), {}
             self.focus, self.screen = None, (None, Screen())
             self.views.clear()
@@ -1511,7 +1508,7 @@ class Robot:
         # The frame at speech start: the cached look may show an earlier visitor.
         now, taken = (look.frame, look.taken) if identity_shot[0] is None else identity_shot
         # The visitor speaking now (D60, D70): a new face ends the conversation, so none of the
-        # earlier exchanges or first-person statements reach this prompt.
+        # earlier exchanges reach this prompt. Stored statements use the resolved visitor ID.
         if self._resolve_visitor(turn, now):
             self.ui_turns.clear()
             self.ui_turns.append(turn)
@@ -1558,8 +1555,8 @@ class Robot:
             tokens = self._said(turn.facts[0], turn)
         else:
             tokens = self._tokens(msgs, turn)
-        statement = None if is_question(turn.question) or command(
-            turn.question, self.vocab) else question
+        statement = question if (is_statement(turn.question) and not head_command(
+            turn.question) and not command(turn.question, self.vocab)) else None
         self._finish_turn(turn, tokens, look, (now, taken), statement, held,
                           started, detections, track)
 
@@ -1607,13 +1604,12 @@ class Robot:
         self.turns.put(turn)
 
     def _told(self, question: np.ndarray, turn: Turn) -> list[dict]:
-        """The visitor's earlier statements nearest `question`, except those about an ignored
-        kind, and first-person ones (D70) told before this conversation."""
-        if turn.selection_error:
+        """Recall only this visitor's statements, excluding ignored object kinds."""
+        if turn.selection_error or not turn.visitor:
             return []
-        return [m for m in self.memory.told(question, before=turn.speech_start, n=4)
-                if not mentions(m["said"], self.ignored) and (
-                    not FIRST_PERSON.search(m["said"]) or m["id"] > self.since)][:2]
+        return [m for m in self.memory.told(
+            question, before=turn.speech_start, visitor=turn.visitor, n=4)
+                if not mentions(m["said"], self.ignored)][:2]
 
     def _store(self, turn: Turn, shot: tuple[np.ndarray, float],
                statement: np.ndarray | None, track: int | None) -> bool:
@@ -1750,7 +1746,7 @@ class Robot:
         on only while the largest person track `track` is the one that was largest when the
         held face was last seen, and the line started at most CONVERSATION_S after the last
         answer ended. Without a held face, the same time limit applies (a face seen then joins
-        it). A new one drops the told name and the earlier first-person statements."""
+        it). A new one drops the told name and temporary guest identity."""
         held = self.face
         in_time = turn.speech_start - self.last_line <= CONVERSATION_S
         if held is None:
@@ -1765,7 +1761,7 @@ class Robot:
         if not linked:
             self._clear_confirmation()
             self.window = None
-            self.told, self.since = None, time.time_ns() // 1000
+            self.told = None
             self.conversation_visitor = self.things.new_visitor()
         if seen is not None or not linked:  # a missed face in a conversation that goes on keeps it
             self.face, self.face_track = (seen[0] if seen else None), track

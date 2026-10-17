@@ -194,7 +194,8 @@ def test_ambiguous_introduction_and_spoken_name_never_authorize_identity(tmp_pat
         selected = answer(robot, "Talk to Sam.", frame)
         assert selected.selection_error and robot.people.person("Sam") is None
         assert not robot.head.following, "An unverified name cannot re-enable following"
-        assert not robot.memory.told(np.eye(TEXT_DIM)[0], time.time() + 1)
+        assert not robot.memory.told(np.eye(TEXT_DIM)[0], time.time() + 1,
+                                     visitor=robot.current_visitor)
     finally:
         close_robot(robot)
 
@@ -583,5 +584,66 @@ def test_wake_greeting_preserves_pending_face_consent(tmp_path, monkeypatch):
         turn = answer(robot, "Hey Edgy", frame)
         assert "may I remember" in turn.answer and robot.asking
         assert robot.people.person("Noor") is None
+    finally:
+        close_robot(robot)
+
+
+def test_guest_statement_remains_linked_after_enrollment_and_return(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "SETTLE_S", 0)
+    vectors = np.eye(DIM, dtype=np.float32)
+    active = [0]
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [
+        (vectors[active[0]], 120, (100, 100, 220, 220))] if active[0] is not None else [])
+    robot = speaking_robot(tmp_path)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    try:
+        for _ in range(CONFIRM):
+            robot._track(frame, [Detection("person", .9, (0, 0, 400, 700))], time.time())
+        assert "remember your face" in answer(robot, "Hi, I'm Mira.", frame).answer
+        answer(robot, "No thanks.", frame)
+        preference = answer(robot, "I like tea.", frame)
+        assert preference.frame_id and not robot.people.person("Mira")
+        guest = preference.visitor
+        assert "remember your face" in answer(robot, "Remember me, I'm Mira.", frame).answer
+        answer(robot, "Yes.", frame)
+        assert robot.people.person("Mira")["visitor"] == guest
+        active[0] = 1
+        answer(robot, "Hi, I'm Jo.", frame)
+        other = answer(robot, "What drink do I like?", frame)
+        assert other.visitor != guest and "I like tea." not in other.told
+        active[0] = 0
+        answer(robot, "Talk to Mira.", frame)
+        returned = answer(robot, "What drink do I like?", frame)
+        assert returned.visitor == guest and "I like tea." in returned.told
+        assert preference.frame_id in returned.ui_recalled
+        active[0] = None
+        missed = answer(robot, "Which drink did I mention?", frame)
+        assert not missed.selection_error and missed.visitor == guest
+        assert "I like tea." in missed.told, "a missed face on the same body keeps its visitor ID"
+        active[0] = 0
+        answer(robot, "Forget me.", frame)
+        answer(robot, "Yes.", frame)
+        assert not robot.memory.points([preference.frame_id])
+        assert not robot.memory.told(np.eye(TEXT_DIM)[0], time.time() + 1, visitor=guest)
+    finally:
+        close_robot(robot)
+
+
+def test_filler_keeps_raw_turns_without_statement_vectors(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "SETTLE_S", 0)
+    monkeypatch.setattr(main, "located_faces", lambda f, image: [])
+    robot = speaking_robot(tmp_path)
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    try:
+        filler = answer(robot, "Okay.", frame)
+        useful = answer(robot, "I like tea.", frame)
+        answer(robot, "Stop.", frame)
+        assert robot.memory.points([filler.frame_id])[0]["said"] == "Okay."
+        assert [row["id"] for row in robot.memory.told(
+            np.eye(TEXT_DIM)[0], time.time() + 1, visitor=useful.visitor)] == [useful.frame_id]
+        assert any(item["role"] == "user" and item["content"] == "Okay."
+                   for item in robot.history)
+        assert robot._told(np.eye(TEXT_DIM)[0], Turn(visitor=useful.visitor,
+                           selection_error="ambiguous", speech_start=time.time() + 1)) == []
     finally:
         close_robot(robot)

@@ -87,7 +87,7 @@ def open_robot(root: Path) -> Robot:
     robot.delivery = threading.Condition(robot.detecting)
     robot.vocab = {"phone", "wallet", "cup", "mug", "chair", "person", "bag"}
     robot.hiding, robot.jobs, robot.lines = None, queue.Queue(), queue.Queue()
-    robot.told, robot.focus, robot.last_line, robot.face, robot.since = None, None, 0, None, 0
+    robot.told, robot.focus, robot.last_line, robot.face = None, None, 0, None
     robot.teaching, robot.start_target, robot.window, robot.asking = None, None, None, None
     robot.out = root
     robot.wake_word = False
@@ -269,20 +269,25 @@ def test_ignore(monkeypatch) -> None:
             "an ignored kind is not stored"
         assert robot.ignored == {"chair"}
         v = np.eye(TEXT_DIM, dtype=np.float32)[0]
-        robot.memory.add(frame, "My chair at home is red.", v, ts=time.time())
+        robot.memory.add(frame, "My chair at home is red.", v, ts=time.time(),
+                         visitor=robot.current_visitor)
         robot.last_line = time.time()  # the same conversation
-        turn = Turn(speech_start=time.time() + 1)
+        turn = Turn(speech_start=time.time() + 1, visitor=robot.current_visitor)
         assert robot._told(v, turn) == [], "a statement about chairs is not recalled"
-        turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1)
+        turn = Turn(question="Did you notice any chairs?", speech_start=time.time() + 1,
+                    visitor=robot.current_visitor)
         assert robot._sighted(turn) == "I am ignoring chairs, so I do not remember any."
         robot.things.ignore(["chair"], False)
         robot.ignored = robot.things.ignored()
         assert [m["said"] for m in robot._told(v, turn)] == ["My chair at home is red."]
-        robot.since = time.time_ns() // 1000
-        assert robot._told(v, turn) == [], "a first-person statement of an earlier visitor (D70)"
-        robot.memory.add(frame, "The booth closes at five.", v, ts=time.time())
-        assert [m["said"] for m in robot._told(v, turn)] == ["The booth closes at five."], \
-            "a general statement is shared"
+        turn.visitor = "another-visitor"
+        assert robot._told(v, turn) == [], "another visitor's personal statement stays private"
+        robot.memory.add(frame, "The booth closes at five.", v, ts=time.time(),
+                         visitor=robot.current_visitor)
+        assert robot._told(v, turn) == [], "D206 also scopes general statements to their visitor"
+        turn.visitor = robot.current_visitor
+        assert {m["said"] for m in robot._told(v, turn)} == {
+            "My chair at home is red.", "The booth closes at five."}
         robot.tracker = Tracker()  # a chair that arrives now
         robot._sight([s for _ in range(CONFIRM) for s in robot._track(frame, chair)])
         assert robot.memory.sightings(time.time() + 1, 9) == [], "unknown tracks stay in RAM"
@@ -332,14 +337,15 @@ def test_text_only_retrieval_and_person_deletion(robot, monkeypatch):
     face = np.eye(FACE_DIM, dtype=np.float32)[0]
     r.people.enroll("Ana", [face, face], time.time())
     r.turn_seen = face, "Ana"  # The selected speech-start identity supplies storage links.
-    turn = Turn(question="The booth closes at five.")
+    turn = Turn(question="The booth closes at five.", visitor=r.people.person("Ana")["visitor"])
     r._store(turn, (frame_of(r), time.time()), v, None)
-    rows = r.memory.told(v, time.time() + 1)
+    rows = r.memory.told(v, time.time() + 1, visitor=turn.visitor)
     assert rows[0]["id"] == turn.frame_id and rows[0]["said"] == turn.question
     assert not {"frame", "thumb", "caption"} & rows[0].keys()
     assert not list(r.memory.frames.iterdir()) and r.jobs.empty()
     assert r._forget(None, "Ana", face, r.people.person("Ana")["visitor"])
-    assert not r.memory.points([turn.frame_id]) and not r.memory.told(v, time.time() + 1)
+    assert not r.memory.points([turn.frame_id]) and not r.memory.told(
+        v, time.time() + 1, visitor=turn.visitor)
 
 
 def test_unknown_current_answers_use_ram(robot):

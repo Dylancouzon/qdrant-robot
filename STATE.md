@@ -4,11 +4,11 @@ Updated 2026-10-17. Architecture is settled; use the [topic index](research/READ
 
 ## Active task
 
-Dylan confirmed the speaker works. The local monitor now shows a large wake-up bubble in an empty chat and a pinned tips bubble during conversation. Dylan will check the UI; broader tests and browser checks are skipped at his request. The active robot remains on release ff1206efa987. Physical heating improvement, alternating-input tracking bias, and live Stop/Resume confirmation remain pending.
+Minimal visitor-scoped statement recall is implemented after Claude Opus 5.5 checked the plan. Recognized visitors can recall their own earlier statements within ordinary retention. New bare acknowledgements have no statement vector. Focused regressions, task review, full release checks, and the isolated Jetson check pass. Full exchange recall, retention changes, recency weighting, and consolidation remain deferred in [conversation handoff](research/conversation.md#deferred-next-steps).
 
 ## Robot and jobs
 
-Jetson boot is 748cf835, current release ff1206efa987, and previous release d35fce65af87. The qr-robot unit is active. The Mac monitor at http://127.0.0.1:8766 is Listening and uses the mounted calibration. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. Memories, results, and the previous release remain intact.
+Jetson boot is 748cf835, current release 6e8fd759c5d2, and previous release ff1206efa987. No qr-* unit is loaded. The Mac monitor at http://127.0.0.1:8766 is Idle and uses the mounted calibration for Start. Logs use journalctl -u qr-robot; telemetry uses shared/results/robot-*.tegrastats. Memories, results, and the previous release remain intact.
 
 Mounted file: /home/qdrant/qdrant-robot/shared/servo-mounted.json, zero 2080, direction one, limit 60. Runtime speed is 40°/s, acceleration/deceleration 40, torque cap 20%, and arrival tolerance 1.5°. Reported 65°C verifies release and pauses the head for at least 180 seconds, with 10 continuous seconds at or below 55°C before eligibility. Reported 70°C latches only the head off until restart after cooling. Speech and vision remain available.
 
@@ -36,4 +36,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 Real heating versus temperature-feedback error remains unresolved. Qualify prolonged enclosure cooling and microphone recognition before selecting a louder fan profile. Then check two-person handoff, inspection, Stop during speech, and departure. The +70° range remains unqualified. Stop travel reached 3.604° and settled in 0.513 s (J); the provisional 0.3 s target remains unmet. Unattended motion remains unqualified.
 
-Next step: reload the monitor and check the empty-chat wake prompt and pinned tips during conversation. Select Stop in the monitor to end the robot session.
+Next step: reload the monitor, select Start, and check personal statement recall with two visitors and a returning enrolled person. The monitor remains Idle. Deferred memory work is in the conversation handoff. Physical heating, alternating-input following bias, live Stop/Resume, and broader acceptance remain open.

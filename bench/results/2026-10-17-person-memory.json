@@ -1,0 +1,18 @@
+{
+  "machine": "qdrant-robot",
+  "release": "6e8fd759c5d2",
+  "tegrastats": "person-memory-check-20261017-012507.tegrastats",
+  "mode": "isolated real Edge; no models",
+  "qdrant_edge_py": "0.8.0",
+  "checks": {
+    "filter_before_limit": true,
+    "missing_and_guest_isolation": true,
+    "reopen": true,
+    "deletion_after_reopen": true,
+    "other_visitor_preserved": true,
+    "filler_admission": true,
+    "short_statement_preserved": true
+  },
+  "passed": true,
+  "source": "\"\"\"Check the deployed visitor filter in a temporary Edge store without models or robot data.\"\"\"\nimport importlib.metadata\nimport json\nimport os\nfrom pathlib import Path\nimport platform\nimport tempfile\n\nimport numpy as np\nfrom robot.config import SHARED\nfrom robot.memory import Memory, is_statement\nfrom robot.text_embed import DIM\n\nassert importlib.metadata.version('qdrant-edge-py') == '0.8.0'\nquery = np.zeros(DIM, np.float32)\nquery[0] = 1\nown_vector = query.copy()\nown_vector[:2] = .8, .6\nchecks = {}\nwith tempfile.TemporaryDirectory(prefix='visitor-recall-', dir=SHARED / 'experiments') as tmp:\n    memory = Memory(Path(tmp))\n    own = memory.add(None, 'I prefer tea.', own_vector, ts=100, visitor='one')\n    foreign = [memory.add(None, 'I prefer coffee.', query, ts=100, visitor='two')\n               for _ in range(8)]\n    memory.add(None, 'Unowned legacy text.', query, ts=100)\n    checks['filter_before_limit'] = [r['id'] for r in memory.told(\n        query, 200, visitor='one', n=1)] == [own]\n    checks['missing_and_guest_isolation'] = all(not memory.told(query, 200, visitor=v)\n                                               for v in ('', 'new-guest'))\n    memory.shard.close()\n    memory = Memory(Path(tmp))\n    checks['reopen'] = [r['id'] for r in memory.told(query, 200, visitor='one')] == [own]\n    memory.forget_visitor('one')\n    memory.shard.close()\n    memory = Memory(Path(tmp))\n    checks['deletion_after_reopen'] = not memory.told(query, 200, visitor='one')\n    checks['other_visitor_preserved'] = bool(memory.points(foreign))\n    memory.shard.close()\nchecks['filler_admission'] = all(not is_statement(t) for t in ('Okay.', 'Thank you!', 'um'))\nchecks['short_statement_preserved'] = is_statement('I like tea.')\nassert all(checks.values()), checks\nreport = {'machine': platform.node(), 'release': os.environ['ROBOT_RELEASE'],\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'mode': 'isolated real Edge; no models',\n          'qdrant_edge_py': importlib.metadata.version('qdrant-edge-py'),\n          'checks': checks, 'passed': True}\npath = SHARED / 'results/2026-10-17-person-memory.json'\npath.write_text(json.dumps(report, indent=2) + '\\n')\nprint(json.dumps(report))\n"
+}
