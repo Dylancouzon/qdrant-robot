@@ -59,3 +59,18 @@ def test_questions_and_bare_acknowledgements_are_not_statements(text):
                                  "No sugar.", "Yes, I enjoy hiking.", "Thank you for the book."])
 def test_short_meaningful_statements_remain_searchable(text):
     assert is_statement(text)
+
+
+def test_exchanges_survive_reopen_and_forget_me_deletes_them(tmp_path):
+    memory = Memory(tmp_path)
+    memory.add(None, "Where is it stored?", ts=100, visitor="Mira", answer="In Qdrant Edge.")
+    memory.add(None, "Hi!", ts=110, visitor="Jo", answer="Hello!")
+    memory.shard.close()
+    memory = Memory(tmp_path)
+    try:
+        assert [row["answer"] for row in memory.exchanges("Mira", 200, n=5)] == ["In Qdrant Edge."]
+        memory.forget_visitor("Mira")
+        assert memory.exchanges("Mira", 200, n=5) == []
+        assert [row["answer"] for row in memory.exchanges("Jo", 200, n=5)] == ["Hello!"]
+    finally:
+        memory.shard.close()

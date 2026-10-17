@@ -36,6 +36,7 @@ from robot.knowledge import VERBATIM, Knowledge
 from robot.memory import (
     UNAVAILABLE,
     Memory,
+    about_dialogue,
     about_past,
     compares,
     earlier_view,
@@ -84,6 +85,8 @@ from robot.tts import RATE, Speaker, phrases
 from robot.view import valid_id, Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
+# ponytail: newest first, no similarity ranking; a long conversation's oldest topics drop out.
+EXCHANGES = 6      # stored exchanges quoted for a question about the conversation
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
 SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
 # Camera rate: unthrottled detection halved LLM decode (research/detector.md).
@@ -185,6 +188,7 @@ class Turn:
     kind: str = ""                # sight, recall, social, or knowledge (robot/route.py)
     verbatim: bool = False        # answered from Edge in code (a fact, a shown object), no LLM
     told: list[str] = field(default_factory=list)  # earlier visitor statements recalled
+    exchanges: list[int] = field(default_factory=list)  # earlier exchanges quoted (words only)
     prompt: list = field(default_factory=list)  # the brain's messages without images or system
     frame_id: int = 0             # this turn's text memory point
     looked: float = 0.0           # capture time of the frame this turn looked at
@@ -1541,8 +1545,9 @@ class Robot:
         turn.kind = self.route(question)
         sees = compares(turn.question) or (turn.kind == "sight" and not past)
         image = look.image if sees else None
+        said = self._exchanges(turn, look.history) if about_dialogue(turn.question) else []
         msgs = brain.messages(look.history, image, memories, turn.facts,
-                              turn.question, look.changed, past, told)
+                              turn.question, look.changed, past, told, said)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
         turn.prompt = prompt_text(msgs)
         if turn.selection_error:
@@ -1611,6 +1616,19 @@ class Robot:
             question, before=turn.speech_start, visitor=turn.visitor, n=4)
                 if not mentions(m["said"], self.ignored)][:2]
 
+    def _exchanges(self, turn: Turn, history: list[dict]) -> list[str]:
+        """This visitor's newest stored exchanges that the live window no longer holds in full,
+        oldest first, excluding ignored kinds. Sets turn.exchanges to their point ids."""
+        if turn.selection_error:
+            return []
+        live = {(m["role"], m["content"]) for m in history}
+        rows = [r for r in self.memory.exchanges(turn.visitor, turn.speech_start, n=12)
+                if not {("user", r["said"]), ("assistant", r["answer"])} <= live
+                and not mentions(r["said"] + " " + r["answer"], self.ignored)][:EXCHANGES][::-1]
+        turn.exchanges = [r["id"] for r in rows]
+        return [f"{brain.age(turn.speech_start - r['ts'])}: the visitor said "
+                f"{json.dumps(r['said'])}; you replied {json.dumps(r['answer'])}" for r in rows]
+
     def _store(self, turn: Turn, shot: tuple[np.ndarray, float],
                statement: np.ndarray | None, track: int | None) -> bool:
         """Remember conversation text, linked to the enrolled person in the speech-start frame.
@@ -1626,7 +1644,7 @@ class Robot:
             return False
         self._hear_name(turn)
         pid = turn.frame_id = self.memory.add(
-            None, turn.question, statement, taken, visitor=turn.visitor,
+            None, turn.question, statement, taken, visitor=turn.visitor, answer=turn.answer,
             **({"named": turn.named} if turn.named else {}))
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it

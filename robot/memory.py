@@ -58,6 +58,15 @@ def thumb(frame: np.ndarray) -> np.ndarray:
 
 # Past questions that also point at the present ("Is this what I showed you?") need the image.
 _NOW = re.compile(r"\b(this|these|that one|now|here|right now)\b", re.I)
+# Questions about the conversation itself need a past speech verb: a bare past cue ("before a
+# trip") once pulled unrelated earlier dialogue into an advice answer (research/conversation.md).
+_DIALOGUE = re.compile(
+    r"\b(?:you|we|i)\s+(?:just\s+|already\s+|ever\s+)?(?:said|told|mentioned|talked|discussed|"
+    r"asked|chatted|recommended|suggested|explained)\b|"
+    r"\b(?:did|have|had)\s+(?:you|we|i)\s+(?:\w+\s+)?(?:say|tell|mention|talk|discuss|ask|"
+    r"chat|recommend|suggest|explain)\b|"
+    r"\bwere\s+we\s+(?:just\s+)?(?:talking|discussing|chatting)\b|\b(?:our|the)\s+conversation\b|"
+    r"^\W*remind me\b", re.I)
 # ASR ends some questions with a period ("is Qdrant written in Rust."): the opening word decides.
 _ASKS = re.compile(r"^(what|where|who|whom|whose|when|why|how|which|is|are|was|were|do|does|did|"
                    r"can|could|will|would|should|have|has|tell me)\b", re.I)
@@ -307,6 +316,11 @@ def about_past(question: str) -> bool:
     return bool(_PAST.search(question))
 
 
+def about_dialogue(question: str) -> bool:
+    """Whether the visitor asks what was said earlier ("What did you tell me about it?")."""
+    return bool(_DIALOGUE.search(question.replace("\u2019", "'")))
+
+
 def about_now(question: str) -> bool:
     return bool(_NOW.search(question))
 
@@ -478,6 +492,17 @@ class Memory:
             filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
                                 FieldCondition(key="visitor", match=MatchValue(visitor))])))
         return [{**self._row(h), "score": h.score} for h in hits]
+
+    def exchanges(self, visitor: str, before: float, n: int) -> list[dict]:
+        """One resolved visitor's newest stored exchanges (question and answer), newest first."""
+        if not visitor:
+            return []
+        hits = self.shard.query(QueryRequest(
+            limit=n, query=OrderBy("ts", Direction.Desc), with_payload=True,
+            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
+                                FieldCondition(key="visitor", match=MatchValue(visitor)),
+                                FieldCondition(key="answer", is_empty=False)])))
+        return [self._row(h) for h in hits]
 
     def recent(self, before: float, n: int = 3,
                selected: dict[str, list[int]] | None = None, skip: Collection[str] = ()
@@ -682,6 +707,13 @@ if __name__ == "__main__":
             v, before=400.0, visitor="selftest-visitor")] == ["I love espresso."]
         assert seen.told(v, before=305.0, visitor="selftest-visitor") == [], \
             "only statements made before the question"
+        seen.add(None, "Is it fast?", ts=311.0, visitor="selftest-visitor",
+                 answer="Yes, under 1 ms.")
+        seen.add(None, "Hi!", ts=312.0, visitor="someone-else", answer="Hello!")
+        assert [m["answer"] for m in seen.exchanges("selftest-visitor", 400.0, n=5)] == [
+            "Yes, under 1 ms."], "only this visitor's exchanges with an answer"
+        assert seen.exchanges("selftest-visitor", 311.0, n=5) == [] and \
+            seen.exchanges("", 400.0, n=5) == []
         seen.set(b, caption="a desk")
         seen.set(c, caption="a desk")
         assert b != c and [m["said"] for m in seen.recent(before=400.0, n=2)] in (
@@ -720,6 +752,14 @@ if __name__ == "__main__":
     assert about_past("What did I just show you?") and about_past("Do you remember me?")
     assert not about_past("What is on your left?") and not about_past("What color is it?")
     assert about_now("Is this what I showed you before?") and not about_now("What did I show you?")
+    for text in ("What did you tell me about it?", "What were we talking about?", "Remind me "
+                 "what you said.", "Did I mention my job?", "What have we discussed so far?",
+                 "What did you just explain to me?", "Recap our conversation."):
+        assert about_dialogue(text), text
+    for text in ("I want to learn words before a trip. Any ideas?", "Can you tell me what you "
+                 "see?", "Could you explain Qdrant Edge?", "Did you see my mug?",
+                 "What did I show you?", "Tell me a joke."):
+        assert not about_dialogue(text), text
     assert is_question("is Qdrant written in Rust.") and is_question("Where am I from?")
     for text in ("Is this the same thing I showed you before?", "Is this the same as what I just "
                  "showed you?", "Is this the same laptop as before?", "Have you seen this before?",

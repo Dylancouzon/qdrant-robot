@@ -91,15 +91,15 @@ def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> di
     want = [frames.get(k, Shown(set(), None, 0.0)) for k in step.get("evidence", [])]
     row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
            "heard": " | ".join(t.question for t in turns), "split": len(turns),
-           "evidence_ok": all(said in turn.told if said else
-                               bool(ids & set(turn.memories)) or
+           "evidence_ok": all(said in turn.told or bool(ids & set(turn.exchanges)) if said else
+                               bool(ids & {*turn.memories, *turn.exchanges}) or
                                (looked and turn.selected == looked and turn.delivered)
                                for ids, said, looked in want)
                            if want else None,
            "answer": turn.answer, "memories": turn.memories, "facts": turn.facts,
            "selected": turn.selected, "caption": turn.caption, "caption_s": turn.caption_s,
            "delivered": turn.delivered, "kind": turn.kind, "verbatim": turn.verbatim,
-           "told": turn.told,
+           "told": turn.told, "exchanges": turn.exchanges,
            "prompt": turn.prompt,
            "line_s": turn.line - turn.speech_end,
            "asr_s": turn.transcribed - turn.speech_end,

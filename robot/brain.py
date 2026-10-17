@@ -147,19 +147,21 @@ def age(seconds: float) -> str:
 
 def messages(history: list[dict], now: dict | None, memories: list[str] = (), facts: list[str] = (),
              question: str | None = None, changed: bool = False,
-             past: bool = False, told: list[str] = ()) -> list[dict]:
+             past: bool = False, told: list[str] = (), said: list[str] = ()) -> list[dict]:
     """The chat prompt. Without a question it is the prefix that prefill caches: the frame
     comes before everything that depends on the question. `changed`: the view differs from
     the previous turn's, so earlier answers no longer describe it. `past`: the question is
     about the past, so the answer comes from memories, not from the image. `now` None: no
-    image, for questions about the past (a 2B brain describes the image whatever it is told)."""
+    image, for questions about the past (a 2B brain describes the image whatever it is told).
+    `said`: earlier exchanges outside the live window, a record of words, never of sight."""
     content = [now] if now else []
     if question is not None:
-        blocks = (("Memories", memories), ("The visitor told you", told), ("Facts", facts))
+        blocks = (("Memories", memories), ("Earlier conversation", said),
+                  ("The visitor told you", told), ("Facts", facts))
         text = "".join(f"{title}:\n- " + "\n- ".join(lines) + "\n\n"
                        for title, lines in blocks if lines)
         note = (CHANGED if changed and history else "") + (PAST if past else "")
-        lead = EVIDENCE if memories or told else ""
+        lead = EVIDENCE if memories or told or said else ""
         content.append({"type": "text", "text": f"{lead}{text}{note}Visitor: {question}"})
     return [{"role": "system", "content": SYSTEM}, *history, {"role": "user", "content": content}]
 
