@@ -11,6 +11,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 from qdrant_edge import (
+    Bm25,
+    Bm25Config,
     CountRequest,
     Direction,
     Distance,
@@ -19,12 +21,17 @@ from qdrant_edge import (
     EdgeVectorParams,
     FieldCondition,
     Filter,
+    Fusion,
     HasIdCondition,
+    HasVectorCondition,
     MatchAny,
     MatchValue,
+    Modifier,
     OrderBy,
     PayloadSchemaType,
     Point,
+    PointVectors,
+    Prefetch,
     Query,
     QueryRequest,
     RangeFloat,
@@ -367,6 +374,11 @@ class Memory:
             self.shard = EdgeShard.create(str(path), EdgeConfig(vectors={
                 "image": EdgeVectorParams(size=IMAGE_DIM, distance=Distance.Cosine),
                 "said": EdgeVectorParams(size=TEXT_DIM, distance=Distance.Cosine)}))
+        # Exchange vectors: meaning (bge-small) and words (Edge BM25 with IDF) of the visitor's
+        # line and the answer. Created in place, a no-op when they exist.
+        self.shard.update(UpdateOperation.create_dense_vector("dialog", TEXT_DIM, Distance.Cosine))
+        self.shard.update(UpdateOperation.create_sparse_vector("words", Modifier.Idf))
+        self.words = Bm25(Bm25Config())
         for field in ("ts", "last_seen"):  # a no-op when the index exists
             self.shard.update(UpdateOperation.create_field_index(field, PayloadSchemaType.Float))
         self.shard.update(UpdateOperation.create_field_index("frame", PayloadSchemaType.Keyword))
@@ -407,13 +419,16 @@ class Memory:
         return jpg
 
     def add(self, frame: np.ndarray | None, said: str, said_vec: np.ndarray | None = None,
-            ts: float | None = None, **fields) -> int:
-        """Store text and an optional source crop, with a statement vector when supplied."""
+            ts: float | None = None, dialog_vec: np.ndarray | None = None, **fields) -> int:
+        """Store text and an optional source crop, with a statement vector when supplied and
+        exchange vectors when the answer's meaning vector (`dialog_vec`) is."""
         ts = ts or time.time()
         visual = {} if frame is None else {"frame": self.save(frame),
                                           "thumb": thumb(frame).tobytes().hex()}
         pid = self._id()
         vectors = {} if said_vec is None else {"said": said_vec.tolist()}
+        if dialog_vec is not None:
+            vectors |= self._exchange_vectors(f"{said} {fields['answer']}", dialog_vec)
         self.shard.update(UpdateOperation.upsert_points([Point(pid, vectors, {
             "ts": ts, "said": said, **visual, **fields})]))
         self.shard.flush()
@@ -498,15 +513,47 @@ class Memory:
                                 FieldCondition(key="visitor", match=MatchValue(visitor))])))
         return [{**self._row(h), "score": h.score} for h in hits]
 
-    def exchanges(self, visitor: str, before: float, n: int) -> list[dict]:
-        """One resolved visitor's newest stored exchanges (question and answer), newest first."""
+    def _exchange_vectors(self, text: str, dialog_vec: np.ndarray) -> dict:
+        return {"dialog": dialog_vec.tolist(), "words": self.words.embed_document(text)}
+
+    def backfill(self, embed: Callable[[list[str]], np.ndarray]) -> int:
+        """Give answered turns without exchange vectors their vectors: turns stored before the
+        vectors existed, or by an older release after a rollback. Returns how many."""
+        missing, offset = [], None
+        while True:  # collect first: updating while paging a filter on the vector would skip
+            page, offset = self.shard.scroll(ScrollRequest(
+                offset=offset, limit=256, with_payload=["said", "answer"], filter=Filter(
+                    must=[FieldCondition(key="answer", is_empty=False)],
+                    must_not=[HasVectorCondition("dialog")])))
+            missing += page
+            if offset is None:
+                break
+        for i in range(0, len(missing), 64):
+            page = missing[i:i + 64]
+            texts = [f"{r.payload['said']} {r.payload['answer']}" for r in page]
+            self.shard.update(UpdateOperation.update_vectors([
+                PointVectors(r.id, self._exchange_vectors(t, v))
+                for r, t, v in zip(page, texts, embed(texts), strict=True)]))
+        self.shard.flush()
+        return len(missing)
+
+    def exchanges(self, visitor: str, before: float, n: int, query: np.ndarray, text: str
+                  ) -> list[dict]:
+        """One resolved visitor's stored exchanges most relevant to the question, best first:
+        meaning (`query`, its bge vector, on dialog) and words (`text`, Edge BM25 on words),
+        fused by distribution-based score fusion. bench/recall_bench.py: by time, 6 of 13
+        gold exchanges beyond the live window; fused, 13 of 13 (E)."""
         if not visitor:
             return []
-        hits = self.shard.query(QueryRequest(
-            limit=n, query=OrderBy("ts", Direction.Desc), with_payload=True,
-            filter=Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
-                                FieldCondition(key="visitor", match=MatchValue(visitor)),
-                                FieldCondition(key="answer", is_empty=False)])))
+        mine = Filter(must=[FieldCondition(key="ts", range=RangeFloat(lt=before)),
+                            FieldCondition(key="visitor", match=MatchValue(visitor)),
+                            FieldCondition(key="answer", is_empty=False)])
+        legs = [Prefetch(limit=4 * n, query=Query.Nearest(query.tolist(), using="dialog"),
+                         filter=mine),
+                Prefetch(limit=4 * n, query=Query.Nearest(self.words.embed_query(text),
+                                                          using="words"), filter=mine)]
+        hits = self.shard.query(QueryRequest(limit=n, prefetches=legs, query=Fusion.Dbsf(),
+                                             with_payload=True))
         return [self._row(h) for h in hits]
 
     def recent(self, before: float, n: int = 3,
@@ -571,8 +618,9 @@ class Memory:
         """Drop the stored answers of this visitor's turns, so no exchange quote returns: an
         answer can repeat a forgotten object's details without naming it ("You bought it in
         Paris")."""
-        self.shard.update(UpdateOperation.delete_payload_by_filter(Filter(must=[
-            FieldCondition(key="visitor", match=MatchValue(visitor))]), ["answer"]))
+        mine = Filter(must=[FieldCondition(key="visitor", match=MatchValue(visitor))])
+        self.shard.update(UpdateOperation.delete_vectors_by_filter(mine, ["dialog", "words"]))
+        self.shard.update(UpdateOperation.delete_payload_by_filter(mine, ["answer"]))
         self.shard.flush()
 
     def forget_named(self, ident: str) -> None:
@@ -734,13 +782,13 @@ if __name__ == "__main__":
             v, before=400.0, visitor="selftest-visitor")] == ["I love espresso."]
         assert seen.told(v, before=305.0, visitor="selftest-visitor") == [], \
             "only statements made before the question"
-        seen.add(None, "Is it fast?", ts=311.0, visitor="selftest-visitor",
+        seen.add(None, "Is it fast?", ts=311.0, dialog_vec=v, visitor="selftest-visitor",
                  answer="Yes, under 1 ms.")
-        seen.add(None, "Hi!", ts=312.0, visitor="someone-else", answer="Hello!")
-        assert [m["answer"] for m in seen.exchanges("selftest-visitor", 400.0, n=5)] == [
-            "Yes, under 1 ms."], "only this visitor's exchanges with an answer"
-        assert seen.exchanges("selftest-visitor", 311.0, n=5) == [] and \
-            seen.exchanges("", 400.0, n=5) == []
+        seen.add(None, "Hi!", ts=312.0, dialog_vec=v, visitor="someone-else", answer="Hello!")
+        ask = lambda visitor, before: seen.exchanges(visitor, before, 5, v, "fast")  # noqa: E731
+        assert [m["answer"] for m in ask("selftest-visitor", 400.0)] == [
+            "Yes, under 1 ms."], "only this visitor's exchanges with vectors and an answer"
+        assert ask("selftest-visitor", 311.0) == [] and ask("", 400.0) == []
         seen.set(b, caption="a desk")
         seen.set(c, caption="a desk")
         assert b != c and [m["said"] for m in seen.recent(before=400.0, n=2)] in (

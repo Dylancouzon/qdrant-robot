@@ -87,7 +87,6 @@ from robot.view import valid_id, Screen, View
 
 HISTORY_TURNS = 4  # the conversation window, in exchanges
 _PRONOUN = re.compile(r"\b(?:it|its|it's|that|that's|this|they|them|these|those)\b", re.I)
-# ponytail: newest first, no similarity ranking; a long conversation's oldest topics drop out.
 EXCHANGES = 6      # stored exchanges quoted for a question about the conversation
 WATCH_S = 0.3      # how often idle time checks whether the prefilled frame is stale
 SCENE_CHANGE = 8.0  # mean absolute difference (0-255) of 64x36 grey thumbnails
@@ -260,6 +259,7 @@ class Robot:
         self.knowledge, self.embed = Knowledge(), TextEmbedder()
         self.people = People(memory)
         self.memory = Memory(memory)
+        self.memory.backfill(self.embed)
         self.things = Things(memory, self.people)
         self.conversation_visitor = self.things.new_visitor()
         self.conversation_started = False
@@ -431,6 +431,7 @@ class Robot:
             self.things.shard.close()
             self.people = People(memory)
             self.memory = Memory(memory)
+            self.memory.backfill(self.embed)
             self.things = Things(memory, self.people)
             self.conversation_visitor = self.things.new_visitor()
             self.conversation_started = False
@@ -1559,7 +1560,8 @@ class Robot:
         # answer to the room ("Where do you keep that?" described the visitor).
         sees = compares(turn.question) or (turn.kind == "sight" and not past and not direct)
         image = look.image if sees else None
-        said = self._exchanges(turn, look.history) if about_dialogue(turn.question) else []
+        said = (self._exchanges(turn, look.history, question) if about_dialogue(turn.question)
+                else [])
         msgs = brain.messages(look.history, image, memories, turn.facts,
                               turn.question, look.changed, past, told, said)
         # Logged without the image and the system prompt (brain.SYSTEM, fixed per release).
@@ -1641,15 +1643,18 @@ class Robot:
             question, before=turn.speech_start, visitor=turn.visitor, n=4)
                 if not mentions(m["said"], self.ignored)][:2]
 
-    def _exchanges(self, turn: Turn, history: list[dict]) -> list[str]:
-        """This visitor's newest stored exchanges that the live window no longer holds in full,
-        oldest first, excluding ignored kinds. Sets turn.exchanges to their point ids."""
+    def _exchanges(self, turn: Turn, history: list[dict], question: np.ndarray) -> list[str]:
+        """This visitor's stored exchanges most relevant to the question that the live window
+        no longer holds in full, oldest first, excluding ignored kinds. Sets turn.exchanges to
+        their point ids."""
         if turn.selection_error:
             return []
         live = {(m["role"], m["content"]) for m in history}
-        rows = [r for r in self.memory.exchanges(turn.visitor, turn.speech_start, n=12)
+        rows = [r for r in self.memory.exchanges(turn.visitor, turn.speech_start, 2 * EXCHANGES,
+                                                 question, turn.question)
                 if not {("user", r["said"]), ("assistant", r["answer"])} <= live
-                and not mentions(r["said"] + " " + r["answer"], self.ignored)][:EXCHANGES][::-1]
+                and not mentions(r["said"] + " " + r["answer"], self.ignored)][:EXCHANGES]
+        rows.sort(key=lambda r: r["ts"])
         turn.exchanges = [r["id"] for r in rows]
         return [f"{brain.age(turn.speech_start - r['ts'])}: the visitor said "
                 f"{json.dumps(r['said'])}; you replied {json.dumps(r['answer'])}" for r in rows]
@@ -1668,8 +1673,10 @@ class Robot:
         if self._hidden(seen, track):
             return False
         self._hear_name(turn)
+        dialog = self.embed([f"{turn.question} {turn.answer}"])[0] if turn.answer else None
         pid = turn.frame_id = self.memory.add(
-            None, turn.question, statement, taken, visitor=turn.visitor, answer=turn.answer,
+            None, turn.question, statement, taken, dialog, visitor=turn.visitor,
+            answer=turn.answer,
             **({"named": turn.named} if turn.named else {}))
         if turn.named:
             self.things.link(turn.named, pid)  # "forget my phone" deletes it

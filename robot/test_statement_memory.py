@@ -12,6 +12,11 @@ def vector(first=1.):
     return result
 
 
+def quotes(memory, visitor):
+    """The answers of this visitor's quoted exchanges before t=200."""
+    return [row["answer"] for row in memory.exchanges(visitor, 200, 5, vector(), "answer")]
+
+
 def test_visitor_filter_precedes_similarity_limit_and_rejects_unowned_points(tmp_path):
     memory = Memory(tmp_path)
     try:
@@ -63,15 +68,16 @@ def test_short_meaningful_statements_remain_searchable(text):
 
 def test_exchanges_survive_reopen_and_forget_me_deletes_them(tmp_path):
     memory = Memory(tmp_path)
-    memory.add(None, "Where is it stored?", ts=100, visitor="Mira", answer="In Qdrant Edge.")
-    memory.add(None, "Hi!", ts=110, visitor="Jo", answer="Hello!")
+    memory.add(None, "Where is it stored?", ts=100, dialog_vec=vector(), visitor="Mira",
+               answer="In Qdrant Edge.")
+    memory.add(None, "Hi!", ts=110, dialog_vec=vector(), visitor="Jo", answer="Hello!")
     memory.shard.close()
     memory = Memory(tmp_path)
     try:
-        assert [row["answer"] for row in memory.exchanges("Mira", 200, n=5)] == ["In Qdrant Edge."]
+        assert quotes(memory, "Mira") == ["In Qdrant Edge."]
         memory.forget_visitor("Mira")
-        assert memory.exchanges("Mira", 200, n=5) == []
-        assert [row["answer"] for row in memory.exchanges("Jo", 200, n=5)] == ["Hello!"]
+        assert quotes(memory, "Mira") == []
+        assert quotes(memory, "Jo") == ["Hello!"]
     finally:
         memory.shard.close()
 
@@ -93,14 +99,35 @@ def test_forgetting_an_object_forgets_what_was_said_about_it(tmp_path):
 
 def test_forgetting_answers_survives_reopen_and_keeps_other_visitors(tmp_path):
     memory = Memory(tmp_path)
-    memory.add(None, "I bought it in Paris.", vector(), ts=100, visitor="Mira",
-               answer="You bought it in Paris.")
-    memory.add(None, "Hi!", ts=101, visitor="Jo", answer="Hello!")
+    memory.add(None, "I bought it in Paris.", vector(), ts=100, dialog_vec=vector(),
+               visitor="Mira", answer="You bought it in Paris.")
+    memory.add(None, "Hi!", ts=101, dialog_vec=vector(), visitor="Jo", answer="Hello!")
     memory.forget_answers("Mira")
     memory.shard.close()
     memory = Memory(tmp_path)
     try:
-        assert memory.exchanges("Mira", 200, n=5) == [], "no quote of the pronoun-only answer"
-        assert [row["answer"] for row in memory.exchanges("Jo", 200, n=5)] == ["Hello!"]
+        assert quotes(memory, "Mira") == [], "no quote of the pronoun-only answer"
+        assert quotes(memory, "Jo") == ["Hello!"]
+    finally:
+        memory.shard.close()
+
+
+def test_backfill_gives_old_answers_vectors_and_forget_answers_removes_them(tmp_path):
+    from robot.memory import Filter, HasVectorCondition, ScrollRequest
+    embed = lambda texts: np.stack([vector() for _ in texts])  # noqa: E731
+    with_dialog = lambda m: [r.id for r in m.shard.scroll(ScrollRequest(  # noqa: E731
+        limit=10, filter=Filter(must=[HasVectorCondition("dialog")])))[0]]
+    memory = Memory(tmp_path)
+    old = memory.add(None, "Is it fast?", ts=100, visitor="Mira", answer="Under 1 ms.")
+    new = memory.add(None, "Where?", ts=101, dialog_vec=vector(), visitor="Mira", answer="Here.")
+    memory.add(None, "No answer stored.", ts=102, visitor="Mira")
+    memory.shard.close()
+    memory = Memory(tmp_path)  # as after a rollback write: vectors created, one turn missing
+    try:
+        assert sorted(with_dialog(memory)) == [new]
+        assert memory.backfill(embed) == 1 and memory.backfill(embed) == 0
+        assert sorted(with_dialog(memory)) == [old, new]
+        memory.forget_answers("Mira")
+        assert with_dialog(memory) == [] and quotes(memory, "Mira") == []
     finally:
         memory.shard.close()

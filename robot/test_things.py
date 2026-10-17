@@ -3607,6 +3607,7 @@ def test_memory_map_survives_reopen_and_forget(tmp_path):
 
 def test_pronoun_statement_after_naming_is_forgotten_with_the_object(robot):
     r = robot
+    r.embed = lambda texts: np.eye(TEXT_DIM, dtype=np.float32)[[0] * len(texts)]
     frame_of(r)
     r.focus.focus = next(iter(r.view[1]))
     start = time.time()
@@ -3633,4 +3634,4 @@ def test_pronoun_statement_after_naming_is_forgotten_with_the_object(robot):
     r.memory = Memory(root)
     left = [m["said"] for m in r.memory.told(vec, start + 999, visitor=named.visitor, n=9)]
     assert left == ["I live in Lyon."], left
-    assert r.memory.exchanges(named.visitor, start + 999, n=9) == []
+    assert r.memory.exchanges(named.visitor, start + 999, 9, vec, "phone Paris gift") == []
