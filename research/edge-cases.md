@@ -2,11 +2,11 @@
 
 ## Next steps
 
-**Physical servo qualification.** Shared visitor selection, ownership, following, and left/right inspection pass the [finite-speed simulation](servo.md). The serial runtime requires an explicit calibration file. After assembly, verify mounted direction, travel, cable clearance, power, and stopping. Keep models, memory, consent, and deletion behavior intact.
+**Loaded power and temperature feedback.** Mounted direction, watched ±60° travel at 40°/s, and cable clearance passed. Dylan reported good live motion. The [head guide](servo.md) records brief temperature trips, the requested 65°C runtime cutoff, and remaining qualification. Keep models, memory, consent, and deletion behavior intact.
 
 | Priority | Task | Finish when |
 | --- | --- | --- |
-| Next | Assembled-head calibration and qualification. | Verify bounded physical movement, stopping, cable clearance, and power behavior. |
+| Next | Loaded power, cooling, and transient temperature feedback. | Explain guard trips and qualify prolonged watched operation before unattended use. |
 | Parked | General conversation and recent recall. | A changed mechanism improves varied topics while preserving passing privacy, visual, correction, and transfer cases. See [conversation](conversation.md#next-steps). |
 | Parked | Booth acceptance. | Meet the targets and M4 checks in [CLAUDE.md](../CLAUDE.md). Physical latency remains parked under D160. |
 
@@ -17,7 +17,7 @@ Dylan confirmed assembly on 2026-10-16. Existing models, thresholds, fixtures, a
 | Area | Remaining issue | Detail |
 | --- | --- | --- |
 | Conversation | Broad past cues and incomplete history caused regressions in archived stored-reply prototypes. General answer quality remains below target. | [Conversation](conversation.md#broader-stored-exchange-regression-2026-10-15) |
-| Servo qualification | Mounted direction, loaded motion, cable clearance through ±60°, Stop, and short service shutdown passed. The +70° attempt stopped 1.67° short; that range remains unqualified. Live following uses 40°/s with continuous corrections. Prolonged loaded power, the isolated 65°C report, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal remain open. | [Head control](servo.md#next-session-assembled-robot-testing) |
+| Servo qualification | Mounted direction, loaded motion, cable clearance through ±60°, Stop, and short service shutdown passed. The +70° attempt stopped 1.67° short; that range remains unqualified. Live following uses 40°/s with continuous corrections. Prolonged loaded power, the brief 65°C and 60°C reports, intermittent supply-guard trips, and the unmet 0.3 s provisional Stop goal remain open. | [Head control](servo.md#next-session-assembled-robot-testing) |
 | Identity and privacy | Stranger acceptance and multi-visitor handoffs still need whole-robot qualification. | [Faces](faces.md), [recorded backlog](archive/edge-case-records-2026-10-15.md#earlier-recorded-backlog) |
 | Perception | Lookalike objects, changed viewpoints, small objects, and tracking gaps can limit recognition. | [Objects](objects.md), [camera and encoder records](archive/edge-case-records-2026-10-15.md#camera-and-crop-encoder-d167-d168) |
 | Resources and latency | Paging, sustained detection, and physical audible latency remain unresolved targets. | [STATE.md](../STATE.md), [stack](stack.md) |

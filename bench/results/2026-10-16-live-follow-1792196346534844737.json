@@ -3,33 +3,80 @@
   "machine": "Jetson",
   "tegrastats": "robot-20261016-201905.tegrastats",
   "source": "\"\"\"Run the unchanged live entry point while retaining bounded numeric following diagnostics.\"\"\"\nimport json\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import main\nfrom robot.config import SHARED\nfrom bench.head_sim import trace_following\n\nreport = {'release': os.environ['ROBOT_RELEASE'], 'machine': 'Jetson',\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'status': 'running',\n          'source': Path(__file__).read_text()}\noutput = SHARED / 'experiments/servo-mounted-calibration' / f'live-follow-{time.time_ns()}.json'\nOriginal = main.Robot\n\n\nclass ObservedRobot(Original):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        trace_following(self, report)\n        follow = self._follow_face\n        self.last_report = 0.\n        def observe(*args, **kwargs):\n            result = follow(*args, **kwargs)\n            if time.monotonic() - self.last_report > 1:\n                self.last_report = time.monotonic()\n                self.save_report()\n            return result\n        self._follow_face = observe\n        print(f'following diagnostics: {output}', flush=True)\n\n    def save_report(self):\n        diagnostic = report['following_diagnostics']\n        safe = {**report, 'following_diagnostics': {**diagnostic, 'samples': [\n            {k: v for k, v in row.items() if k != 'name'} for row in diagnostic['samples']]}}\n        temp = output.with_suffix('.tmp')\n        temp.write_text(json.dumps(safe, indent=2) + '\\n')\n        temp.replace(output)\n\n    def close(self):\n        try:\n            super().close()\n        finally:\n            report['status'] = 'closed'\n            self.save_report()\n\n\nmain.Robot = ObservedRobot\nmain.main()\n",
-  "status": "listening; no selected visitor in this startup snapshot",
+  "status": "stopped by servo temperature guard",
+  "human_quality": "Dylan reported that his testing was good.",
+  "human_clearance": "Dylan confirmed clear cables during the \u00b160\u00b0 turns and returns.",
   "trace_source": "experiments/servo-mounted-calibration/live-follow-1792196346534844737.json",
-  "trace_snapshot_sha256": "ce7cf3309538d00d347cd2ce9fdeb812b40c4c68c2c3b68131e5aa30fc25d04b",
+  "trace_snapshot_sha256": "27293fb23872045ab6ce4004bebe2baca97e80d9a02dc182dc9d3dcf8dd77bf3",
+  "samples": 2048,
+  "selected_face_samples": 1374,
+  "reasons": {
+    "preview": 3185,
+    "expired at preview": 0,
+    "unrecognized visitor": 1836,
+    "goal": 526,
+    "centered": 428,
+    "limit": 51,
+    "stale source": 76,
+    "settling": 1,
+    "microphone suppressed": 93,
+    "conversation": 154,
+    "cancelled source": 2,
+    "inspection": 4,
+    "stopped": 5
+  },
+  "selected_capture_age_ms": {
+    "p50": 112.2,
+    "p95": 254.4
+  },
+  "goals_while_moving": 495,
+  "measured_angle_range_deg": [
+    -56.513671875,
+    59.0625
+  ],
+  "controller_faults": [
+    "Servo supply 5.4 V, temperature 60 C; require 4.5..6.0 V and below 60 C"
+  ],
   "calibration": {
     "zero": 2080,
     "direction": 1,
     "limit": 60
   },
-  "configured_speed_deg_s": 40,
+  "normal_speed_deg_s": 40,
   "acceleration": 60,
-  "samples": 1610,
-  "reasons": {
-    "preview": 1610,
-    "expired at preview": 0,
-    "unrecognized visitor": 1610
+  "guard_temperature_c": 60,
+  "cleanup_confirmation": "A subsequent 100-sample read-only check confirmed torque zero, stationary feedback, and temperatures 37\u201340 C.",
+  "qualification": "Good human motion report; thermal/feedback qualification remains open.",
+  "jetson_temperature_ranges_c": {
+    "cpu": [
+      52.406,
+      67.343
+    ],
+    "gpu": [
+      54.468,
+      70.875
+    ],
+    "soc0": [
+      52.375,
+      65.437
+    ],
+    "soc1": [
+      52.343,
+      64.937
+    ],
+    "soc2": [
+      51.093,
+      65.187
+    ],
+    "tj": [
+      54.468,
+      70.875
+    ]
   },
-  "selected_face_samples": 0,
-  "controller_faults": [],
-  "last_feedback": {
-    "id": 1,
-    "position": 2076,
-    "mode": 0,
-    "torque": 1,
-    "voltage_v": 5.4,
-    "temperature_c": 39,
-    "fault": 0,
-    "moving": 0
+  "complete_tegrastats": {
+    "local_path": "build/assembled-preflight/completed-thermal-session/robot-20261016-201905.tegrastats",
+    "sha256": "e6ad4fc2c4be907c837c0a1b760483a6f9206c3d34a7953da82d482060d7e2f3",
+    "samples": 253
   },
-  "human_clearance": "Dylan confirmed the watched \u00b160\u00b0 turns and returns had clear cables."
+  "thermal_interpretation": "Jetson sensor values are separate from servo register63. Enclosure heating remains possible but unmeasured."
 }

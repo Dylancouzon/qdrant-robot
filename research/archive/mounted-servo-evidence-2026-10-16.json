@@ -1,0 +1,110 @@
+{
+  "archive_tag": "archive/2026-10-16/mounted-follow-trials",
+  "policy": "Complete original bytes remain in this git tag and the ignored Mac archive. Current files keep run outcomes, source, conditions, and summary evidence. Never use historical settings as operating instructions.",
+  "files": [
+    {
+      "path": "bench/results/2026-10-16-mounted-direction-1792194165231623850.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-direction-1792194165231623850.json",
+      "sha256": "3d3735071ce39925305d0e3c4c32e699ea9a8add3d97227f5ab0afa9a3ef7762",
+      "bytes": 200114,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-direction-1792194165231623850.json",
+      "summary_sha256": "7fd6f3a3c1e8876bfeb11f84e8e6df4ecd3f0a9aab7d5e252906094bb5f88d8b"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-direction-1792194202789448223.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-direction-1792194202789448223.json",
+      "sha256": "742710c4ad60de1cb39f3ca7374a92f2f93222b2d0478a9374a3cb74afdc534f",
+      "bytes": 407693,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-direction-1792194202789448223.json",
+      "summary_sha256": "79753e01d89b99ef562da54f18bc764f34c5a5887078838e8825da1180cafe45"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-direction-1792194296610923755.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-direction-1792194296610923755.json",
+      "sha256": "abebe740e3da09239b779d7077e520182f613a6a0d606191e4766b2e1c21cdf2",
+      "bytes": 183674,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-direction-1792194296610923755.json",
+      "summary_sha256": "c1a712dccf4b73b2145c0bfb304905b83a40fc3b0ab387954cba0cf2404922c5"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-direction-1792194387951124684.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-direction-1792194387951124684.json",
+      "sha256": "1f1844922db4f9a8e3b90a4d026a4ad133210cbbc38b6f7db85c6aac090fe4e0",
+      "bytes": 149749,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-direction-1792194387951124684.json",
+      "summary_sha256": "e6e7438588d7f792e9ddace5635da22156cc22de30a39b07c5fecf3ac9bae392"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195145396606014.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195145396606014.json",
+      "sha256": "b351426d0137f82cae61f2289787edf09ebb665fe50a5d4f8ed51eeb9db166fb",
+      "bytes": 1010007,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195145396606014.json",
+      "summary_sha256": "65e9d46a0ab48850db80cedf39db8e0a17cbe0ac7231bb9dbd599f5dcfbebc71"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195195719174608.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195195719174608.json",
+      "sha256": "0b07f0862bae6e09f4d39bf34787b4d957b22fe2e64668f04b756c251a83e52e",
+      "bytes": 1459601,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195195719174608.json",
+      "summary_sha256": "6797fe44f70e20e69eb89586ebdf1d9de52446a8fd69631e21587959df232b1f"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195254592815335.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195254592815335.json",
+      "sha256": "b71f14f79580bae6f676eec32a0d9ae2ca3559a489732b71b8233a9844748678",
+      "bytes": 1213059,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195254592815335.json",
+      "summary_sha256": "69f9355dcb8cb20685e6ab13a6f8f39a5da7ef2d9276d246484ed60a6721e57f"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195416115341193.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195416115341193.json",
+      "sha256": "e65c4b50b0787db9dc066791838a6ed0b039043308a7b6120358f1795ab85a2d",
+      "bytes": 560514,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195416115341193.json",
+      "summary_sha256": "ba9f6cc3affb7f1271fe2b25d12f6c10cec9426ed2e4f29e45e26a0e834f9c73"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195460098136855.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195460098136855.json",
+      "sha256": "5ab07d7be63fa8d9f2909e94adb992d5c150b46ba247e20a92fc1ea931edc2cb",
+      "bytes": 885230,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195460098136855.json",
+      "summary_sha256": "c23fc66a4e828f6131c3e5c3357237777271cc317e2923bb2e4562eac3dbb2f9"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195748140479295.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195748140479295.json",
+      "sha256": "afd15877a4971e837ddc4ea5cb1f326bdec1f715249eb949bca7a07aedd4a06e",
+      "bytes": 884268,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195748140479295.json",
+      "summary_sha256": "acdda121b168477244a7482a12ec9b57243ea34b6b795162663ee0570534e0e8"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792195965602504119.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792195965602504119.json",
+      "sha256": "ca2853f581be6dffeb2a6b8c3fe85eab44e9484fb004901bda3ccb3f4e685e6d",
+      "bytes": 653275,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792195965602504119.json",
+      "summary_sha256": "3386ef18c1dc61a51ef0b5dcc8472ce8be5ec94ebf1dcea37960ae3aeb849340"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-response-1792196157047349769.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-response-1792196157047349769.json",
+      "sha256": "ff84be02d7da74a541d3b82f9a6b4508d317f3158a4e35bae39b4eb40feee36a",
+      "bytes": 815864,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-response-1792196157047349769.json",
+      "summary_sha256": "554992a66833ff36fa1d0b8acc8e0e5c781162fce1cbe6ab73bc948799458321"
+    },
+    {
+      "path": "bench/results/2026-10-16-mounted-speed15-1792194673985382586.json",
+      "git_object": "archive/2026-10-16/mounted-follow-trials:bench/results/2026-10-16-mounted-speed15-1792194673985382586.json",
+      "sha256": "78dcbee1276082314e6a644ebd3028a6da3993feebf31924008aeabe943e306d",
+      "bytes": 92524,
+      "local_copy": "build/servo-trial-archive-2026-10-16/bench/results/2026-10-16-mounted-speed15-1792194673985382586.json",
+      "summary_sha256": "da5601cab17bf8f158d459fbd77e7a4f283a35d0f78f57325059029d10af04ad"
+    }
+  ]
+}

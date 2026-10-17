@@ -32,7 +32,7 @@ def test_invalid_calibration_never_writes(zero, direction, limit):
 
 
 @pytest.mark.parametrize("address,value", [
-    (33, 1), (65, 1), (40, 1), (66, 1), (62, 120), (63, 60), (56, 100), (11, 2050),
+    (33, 1), (65, 1), (40, 1), (66, 1), (62, 120), (63, 65), (56, 100), (11, 2050),
 ])
 def test_unsafe_startup_never_writes(address, value):
     device, packet = bus()
@@ -353,6 +353,40 @@ def test_measured_supply_readback_window(voltage, accepted):
         with pytest.raises(RuntimeError, match="Servo supply"):
             servo.SerialMotor(device, 2048, 1, 10)
         assert not packet.writes
+
+
+@pytest.mark.parametrize("temperature", [59, 60, 64, 65, 70, 80])
+def test_runtime_temperature_boundary_preserves_cool_setup_requirement(temperature):
+    device, packet = bus()
+    packet.memory[63] = temperature
+    status = device.status()
+    if temperature < 60:
+        servo.safe(status)
+    else:
+        with pytest.raises(RuntimeError, match="below 60 C"):
+            servo.safe(status)
+    if temperature < 65:
+        actual = servo.SerialMotor(device, 2048, 1, 10)
+        actual.close()
+    else:
+        with pytest.raises(RuntimeError, match="below 65 C"):
+            servo.SerialMotor(device, 2048, 1, 10)
+        assert not packet.writes
+
+
+def test_runtime_temperature_trip_latches_and_releases_without_recovery():
+    actual, packet = motor()
+    head = Head(actual)
+    head.tick(100.)
+    assert packet.memory[40] == 1
+    packet.memory[63] = 65
+    head.tick(100.05)
+    assert "temperature 65 C" in head.error and actual.closed
+    assert packet.memory[40] == 0
+    packet.memory[63] = 39
+    head.tick(100.1)
+    assert head.error and actual.closed and not head.following
+    assert packet.memory[40] == 0
 
 
 @pytest.mark.parametrize("steps", [7, 17])

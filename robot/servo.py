@@ -10,6 +10,7 @@ TOLERANCE = 1.5  # Provisional mounted arrival precision; travel limits remain s
 FEEDBACK_S = 0.3
 SPEED = 40
 ACCELERATION = 60
+TEMPERATURE_LIMIT = 65  # Internal feedback; below the documented 70 C overheat protection.
 PROGRESS_STEPS = 5  # Exceed stationary encoder noise before renewing a travel watch.
 
 
@@ -148,14 +149,14 @@ def calibration(zero, direction, limit):
     return low, high
 
 
-def safe(status):
+def safe(status, temperature_limit=60):
     # The 5 V supply has reported 5.6 V; 6 V remains within the 7.4 V model rating.
     if status["mode"] != 0 or status["fault"]:
         raise RuntimeError("Require position mode and no servo fault")
-    if not 4.5 <= status["voltage_v"] <= 6.0 or status["temperature_c"] >= 60:
+    if not 4.5 <= status["voltage_v"] <= 6.0 or status["temperature_c"] >= temperature_limit:
         raise RuntimeError(f"Servo supply {status['voltage_v']} V, "
                            f"temperature {status['temperature_c']} C; "
-                           "require 4.5..6.0 V and below 60 C")
+                           f"require 4.5..6.0 V and below {temperature_limit} C")
 
 
 class SerialMotor:
@@ -204,7 +205,7 @@ class SerialMotor:
         if finished - started > FEEDBACK_S:
             raise RuntimeError("Servo feedback expired during read")
         self.status = status
-        safe(status)
+        safe(status, TEMPERATURE_LIMIT)
         if not self.low <= status["position"] <= self.high:
             raise RuntimeError("Servo feedback exceeds calibrated travel")
         if self.enabled and status["torque"] != 1:

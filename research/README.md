@@ -29,3 +29,5 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 Completed conversation experiments are in the [dated trial report](archive/conversation-trials-2026-10-15.md). The archive index also lists their rejected patches and base commits.
 
 Source and artifact directories have their own indexes in the [repository map](../README.md#repository-map). Dated [interface checks](archive/interface-checks-2026-10-16.md) and [edge-case records](archive/edge-case-records-2026-10-15.md) preserve detail outside current guidance.
+
+Mounted calibration and speed trials are in [the dated report](archive/mounted-servo-trials-2026-10-16.md). [The evidence manifest](archive/mounted-servo-evidence-2026-10-16.json) locates complete raw traces; current result files retain outcomes and summaries.

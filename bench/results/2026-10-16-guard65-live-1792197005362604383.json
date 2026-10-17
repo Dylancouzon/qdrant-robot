@@ -1,0 +1,62 @@
+{
+  "release": "74df9ed96eb2",
+  "machine": "Jetson",
+  "tegrastats": "robot-20261016-203004.tegrastats",
+  "source": "\"\"\"Run the unchanged live entry point while retaining bounded numeric following diagnostics.\"\"\"\nimport json\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\nsys.path.insert(0, str(Path.cwd()))\nfrom robot import main\nfrom robot.config import SHARED\nfrom bench.head_sim import trace_following\n\nreport = {'release': os.environ['ROBOT_RELEASE'], 'machine': 'Jetson',\n          'tegrastats': os.environ['ROBOT_TEGRASTATS'], 'status': 'running',\n          'source': Path(__file__).read_text()}\noutput = SHARED / 'experiments/servo-mounted-calibration' / f'live-follow-{time.time_ns()}.json'\nOriginal = main.Robot\n\n\nclass ObservedRobot(Original):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        trace_following(self, report)\n        follow = self._follow_face\n        self.last_report = 0.\n        def observe(*args, **kwargs):\n            result = follow(*args, **kwargs)\n            if time.monotonic() - self.last_report > 1:\n                self.last_report = time.monotonic()\n                self.save_report()\n            return result\n        self._follow_face = observe\n        print(f'following diagnostics: {output}', flush=True)\n\n    def save_report(self):\n        diagnostic = report['following_diagnostics']\n        safe = {**report, 'following_diagnostics': {**diagnostic, 'samples': [\n            {k: v for k, v in row.items() if k != 'name'} for row in diagnostic['samples']]}}\n        temp = output.with_suffix('.tmp')\n        temp.write_text(json.dumps(safe, indent=2) + '\\n')\n        temp.replace(output)\n\n    def close(self):\n        try:\n            super().close()\n        finally:\n            report['status'] = 'closed'\n            self.save_report()\n\n\nmain.Robot = ObservedRobot\nmain.main()\n",
+  "status": "listening; short startup observation only",
+  "trace_source": "build/assembled-preflight/guard65-live-snapshot/experiments/servo-mounted-calibration/live-follow-1792197005362604383.json",
+  "trace_snapshot_sha256": "4dbc16e96674621626ffa23b43939c94fbacdfd5bd5208f044ee1dce2ac2a780",
+  "snapshot_samples": 1740,
+  "temperature_range_c": [
+    37,
+    41
+  ],
+  "controller_faults": [],
+  "last_feedback": {
+    "id": 1,
+    "position": 1747,
+    "mode": 0,
+    "torque": 1,
+    "voltage_v": 5.4,
+    "temperature_c": 39,
+    "fault": 0,
+    "moving": 0
+  },
+  "configured_speed_deg_s": 40,
+  "acceleration": 60,
+  "calibration": {
+    "zero": 2080,
+    "direction": 1,
+    "limit": 60
+  },
+  "runtime_temperature_limit_c": 65,
+  "runtime_source_sha256": {
+    "robot/recognition.py": "c272471b25fc11f8416e06366982e4501d7b10793ddf97f888d84547e7c4d90d",
+    "robot/things.py": "d57ed1af580c53260174f255f3c721463c72dffbd9e7eeb6a12e8ae208aa5a24",
+    "robot/attention.py": "a2355366eefc5d13b96e15f7eceadc8e56daa0b2825211131f93d8acc00b0adf",
+    "robot/config.py": "3050149511ff8de937a8a0a216ecdca3835b69b05813e8da1daa4eb0e228bb72",
+    "robot/servo.py": "06e7980c2d7e6acf71e3ecd5a3e19be9d05b00e68444c42b8070fa298629d4fc",
+    "robot/faces.py": "98a7faa9d72214741c7eca718d4a6d12bed03feb46c6bca6f00f752b1126539c",
+    "robot/memory.py": "95a67553709dfca7252eb1acf0412dfe5679ecebe393f861d8712fae722afb9b",
+    "robot/route.py": "5cbbd9722f53e9d8b26f599414a2b7adc994724b637db94165eae356a3e60dc6",
+    "robot/tts.py": "6779582c65ca58a2a71b3046187ce780c042d573b3aeb8e77d8180abe25eca69",
+    "robot/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "robot/asr.py": "a0a3d4eec080a45693b0db2dd51336b196608889d1c3cba7da7c357ffce981dc",
+    "robot/text_embed.py": "abd4cd15665ef0f1e7ebee3886204a88216f479c8322e1ffbfc6acf743df8525",
+    "robot/brain.py": "8bcc1186eea5c143dbc6561cb4f754b2e0aa2cba9db8858fec6225e58bc8cadf",
+    "robot/camera.py": "78c6f5c6ec82f5a5453e89cfbfc4ba9b91a24df9eb33bf930ea78ffbb4f99d89",
+    "robot/people.py": "b263c310804ae73d03baec3481f1a89c2d03d1b962aac3a28e1fecadc76251c8",
+    "robot/view.py": "032e6b51da08a416719a2deddc49f349da2fe889593db001d98d36461792611b",
+    "robot/head.py": "8be34735792c0d1d53322530817c1f68006cdb16fe3c8c7c9f16fcd85ca12ae0",
+    "robot/settings.py": "ee826c86a53a033426b2e735d1dad4d0d878b7da248e9c4544fbf1fb1e080f47",
+    "robot/audio.py": "62274bd4d5a7e42a43dccd6d82a58694cf54da7f50408e3d74c2f42d1dfc8633",
+    "robot/main.py": "97b90e7e7826a5d0e540fb9f9fdd63990794be7d7101cc5ad81c1140fce0fa29",
+    "robot/knowledge.py": "27c5d9931fc90ef53fd1cd5c18fd566e4e667ab4ec60e052af2dbff927ce06c5",
+    "robot/detect.py": "ecb6d60c1fe9f998fe2df2d7d0002d4c0eba85c9d632572d8879f8bc4c0518af",
+    "robot/focus.py": "95e38e964a41fc381d55d722d9e16c4645991f4c6dd3bfd546fee74e31479cf2",
+    "bench/head_sim.py": "99e3f919c30ccace7c6a5236b28bdf3ff2770d75e29b492937d0910785b80884",
+    "pyproject.toml": "39d9f92bd16b255b79fa2cd8c911dd8bc9d119d78cbd0fffe76c767d1e010314",
+    "uv.lock": "368f01263401ebf63ed78112b886e79f7a6172a1bd8be76afb18c8b634024a21"
+  },
+  "qualification": "No prolonged loaded thermal qualification; earlier good human motion report applies to identical motion constants under the previous60C guard."
+}

@@ -2,7 +2,7 @@
 
 This is the simplified enclosure for the Qdrant Edge robot. It keeps the approved tapered white body, black visor head, speaker grille, and ±80° head turn. Nine printed parts replace Concept A's 38. Fasteners are M3 and M2 screws with M3 nuts, and no printed pin, key, keeper, strap, or gear remains. Concept A is tagged `archive/concept-a-enclosure`.
 
-Open [the viewer](output/robot-viewer.html) to see the assembled robot, turn the head, and read the parts, fasteners, and steps. Read [ASSEMBLY.md](ASSEMBLY.md) to build it. Read [BRIEF.md](BRIEF.md) for the design reasons and [MEASUREMENTS.md](MEASUREMENTS.md) for the part sizes. Dylan confirmed robot assembly on 2026-10-16. Cooling, acoustics, cable clearance, and mounted powered motion still need qualification.
+Open [the viewer](output/robot-viewer.html) to see the assembled robot, turn the head, and read the parts, fasteners, and steps. Read [ASSEMBLY.md](ASSEMBLY.md) to build it. Read [BRIEF.md](BRIEF.md) for the design reasons and [MEASUREMENTS.md](MEASUREMENTS.md) for the part sizes. Dylan confirmed robot assembly on 2026-10-16. Watched mounted motion and cable clearance passed through ±60° at 40°/s. Cooling, acoustics, transient servo temperature feedback, and prolonged loaded power remain unqualified. The ±80° value describes modeled mechanical travel; runtime travel is ±60°.
 
 The saved [assembly print session](assembly-white.3mf) preserves the local Bambu Studio edits from the enclosure worktree. It has three plates, support settings enabled, and no sliced G-code. The generated projects and estimates below remain the reproducible design outputs. Re-slice the saved session before printing; `bambu.py` does not regenerate it.
 

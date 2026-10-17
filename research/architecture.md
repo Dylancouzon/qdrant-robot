@@ -20,7 +20,7 @@ Raise the capability ceiling for perception, sustained conversation, useful retr
 | "Do you remember me?" | Face match against people (one point per person, face shots as a multivector, MaxSim) |
 | "What is Qdrant Edge?" | A knowledge shard that ships as a snapshot (facts with question phrasings as a multivector) |
 
-Priority when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. [Head control](servo.md) shares one active visitor with conversation and ownership. Finite-speed simulation passes the functional scenario. The serial runtime requires an explicit calibration file; mounted qualification remains next. A Wikipedia shard is an add-on after M4.
+Priority when goals conflict: good answers, then fast answers, then camera fps, then search latency. Give the generative model as much memory as the rest allows. [Head control](servo.md) shares one active visitor with conversation and ownership. Finite-speed simulation passes the functional scenario. The serial runtime uses explicit mounted calibration. Watched ±60° travel at 40°/s passed; transient temperature feedback and prolonged loaded power remain open. A Wikipedia shard is an add-on after M4.
 
 ## Hardware and machines
 

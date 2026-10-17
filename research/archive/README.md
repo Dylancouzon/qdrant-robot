@@ -68,3 +68,7 @@ The Jetson keeps the same results in `shared/results-archive-20261010/`.
 The [enclosure fit record](enclosure-fit-checks-2026-10-16.md) preserves earlier assembly concerns after Dylan confirmed assembly.
 
 The [branch reconciliation](branch-reconciliation-2026-10-16.md) records the preserved branch tips and local print session.
+
+The [mounted servo trial report](mounted-servo-trials-2026-10-16.md) preserves calibration recovery, staged travel, speed comparisons, rejected measurements, and historical procedures. Use [current head control](../servo.md) for operation.
+
+The [mounted servo evidence manifest](mounted-servo-evidence-2026-10-16.json) maps 13 complete raw traces to tag `archive/2026-10-16/mounted-follow-trials`. Current result files retain compact summaries. Read a complete original with `git show archive/2026-10-16/mounted-follow-trials:bench/results/FILENAME`.

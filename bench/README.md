@@ -12,7 +12,7 @@ These scripts preserve reproducible experiments. They do not replace [acceptance
 | Same-object and color comparisons | [same_pairs.py](same_pairs.py), [color_pairs.py](color_pairs.py) |
 | Camera quality, detections, and recorded sightings | [camera_settings.py](camera_settings.py), [detect_stability.py](detect_stability.py), [clip_sightings.py](clip_sightings.py) |
 | Focus, overlays, and live delivery | [focus_clip.py](focus_clip.py), [overlay.py](overlay.py), [view_bench.py](view_bench.py), [view_lag.py](view_lag.py) |
-| Active visitor and bounded head movement | [head_sim.py](head_sim.py) uses real models and simulated yaw; [servo_runtime.py](servo_runtime.py) checks the USB motor within ±10°. [servo_center.py](servo_center.py) preserves the approved one-time mounted offset setup and guarded verification. |
+| Active visitor and bounded head movement | [head_sim.py](head_sim.py) uses real models and simulated yaw; [servo_runtime.py](servo_runtime.py) runs functional checks within ±10° and watched travel from an explicit calibration. [head_follow.py](head_follow.py) compares delayed following paths without hardware. [servo_center.py](servo_center.py) preserves the approved one-time mounted offset setup and guarded verification. |
 | Face models and consented identity | [faces_bakeoff.py](faces_bakeoff.py), [people_bench.py](people_bench.py) |
 | Component RAM, idle soak, and worker failures | [memory_budget.py](memory_budget.py), [soak.py](soak.py), [worker_failure.py](worker_failure.py) |
 

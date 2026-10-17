@@ -4,13 +4,13 @@ Edgy sees, listens, talks, and remembers on one Jetson Orin Nano Super 8 GB. Qdr
 
 Read [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [lessons index](research/lessons.md) before work. [Research topics](research/README.md) explain current behavior. [Decisions](DECISIONS.md) preserve binding choices.
 
-**Next step: Test the assembled head.** Shared visitor selection and servo runtime control are implemented. The [handoff](STATE.md#next-step) links the mounted calibration and test sequence. Conversation experiments and broader acceptance remain parked.
+**Next step: Qualify loaded power and temperature feedback.** The assembled head has cleared ±60° travel at 40°/s, and Dylan reported good live motion. The mounted software temperature cutoff is 65°C. The [handoff](STATE.md#next-step) records current jobs and remaining qualification. Conversation experiments and broader acceptance remain parked.
 
 ## Run the interface
 
 ```sh
-.venv/bin/python tools/talk.py --release RELEASE_ID
-open http://127.0.0.1:8765
+.venv/bin/python tools/talk.py --port 8766 --release RELEASE_ID
+open http://127.0.0.1:8766
 ```
 
 Use the deployed release in STATE.md. Select **Start**, wait for readiness, and say "Hey Edgy". The robot uses its own USB microphone and speaker. **Stop** stops the robot. Closing the page or launcher leaves it running. Use one camera viewer.

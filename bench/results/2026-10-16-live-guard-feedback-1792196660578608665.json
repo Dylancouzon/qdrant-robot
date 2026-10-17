@@ -1,0 +1,1411 @@
+{
+  "machine": "Jetson",
+  "release": "7bc4a41a9f5e",
+  "operation": "read-only feedback after live thermal guard",
+  "samples": [
+    {
+      "time": 1792196655.053844,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.1091874,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.1646032,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.2196915,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.275349,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.3307054,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.386852,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.442175,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.4976006,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 40
+    },
+    {
+      "time": 1792196655.5527415,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.607833,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.6632655,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.7183378,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.773601,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.828735,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.88434,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.939482,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196655.9946008,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.0498886,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.1049852,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.1601076,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.2158177,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.270814,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.3258183,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.3808594,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.4359887,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.49099,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.5460653,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.6015022,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 37
+    },
+    {
+      "time": 1792196656.656615,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.7121358,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.7672403,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.8222659,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.8773534,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.932494,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196656.9874911,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.042488,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.098,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.1531281,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.2088711,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.2639997,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.3191047,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.3742194,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.4292352,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.484747,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.5398214,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.594995,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.650112,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.705714,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.761008,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.8163297,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.8713815,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.9271154,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196657.9822223,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.0378478,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.094076,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.1492617,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.2056804,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.2612288,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.3170145,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.3721347,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.4273438,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.4823494,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.537338,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.5923364,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.6477506,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.7028496,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.7581112,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.813129,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 40,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.8685179,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.9238768,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196658.9791343,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.0343783,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.0893514,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.145533,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.2007582,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.2568412,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.3118358,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.3668447,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.421869,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.4768271,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.5318582,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.5868611,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.6420243,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.6971562,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.7525597,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.8076508,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.8630326,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.9180334,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196659.9730349,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.0281622,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.0832527,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.1382625,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.1933658,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.2485216,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.3037217,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.3587549,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.4139445,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.3,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.4689395,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    },
+    {
+      "time": 1792196660.5242636,
+      "status": {
+        "id": 1,
+        "position": 1751,
+        "mode": 0,
+        "torque": 0,
+        "voltage_v": 5.4,
+        "temperature_c": 39,
+        "fault": 0,
+        "moving": 0
+      },
+      "temperature_repeat": 39
+    }
+  ],
+  "lock": 1,
+  "source": "read-only Servo.status plus repeated register-63 reads, 100 samples at 50 ms intervals; no register writes",
+  "status": "stationary; torque off; cause unresolved",
+  "saved_temperature_limit_register13_read_later": 80
+}

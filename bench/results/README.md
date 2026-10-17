@@ -20,3 +20,5 @@ rg --files bench/results | sort
 ```
 
 The second command lists every retained artifact without loading it. Older evidence that left the working tree remains in [archive tags](../../research/archive/README.md#evidence-from-earlier-archive-tags). Private raw journals and audio stay in ignored `build/` or on the Jetson. Collection can restore raw copies over locally enriched files; reconcile those copies before staging.
+
+Detailed mounted-servo traces from 2026-10-16 are archived in tag `archive/2026-10-16/mounted-follow-trials`. [The manifest](../../research/archive/mounted-servo-evidence-2026-10-16.json) gives exact git objects, checksums, and ignored local copies. Current files retain source scripts, verdicts, conditions, measurements, and trace endpoints. The [trial report](../../research/archive/mounted-servo-trials-2026-10-16.md) explains failures and superseded settings.
