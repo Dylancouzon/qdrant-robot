@@ -1,0 +1,90 @@
+{
+  "machine": "Mac",
+  "label": "E",
+  "mode": "Chrome with isolated synthetic state and a 960x540 development image; no live camera or robot controls",
+  "baseline": {
+    "workspace": [
+      1697.3438720703125,
+      845.1041870117188
+    ],
+    "camera": [
+      1175.82470703125,
+      442.3611450195313
+    ],
+    "fit": "contain"
+  },
+  "candidate": {
+    "viewport": [
+      1770,
+      971
+    ],
+    "workspace": [
+      1746.007080078125,
+      907.1094360351562
+    ],
+    "camera": [
+      1356.901123046875,
+      905.998291015625
+    ],
+    "chat_width": 380,
+    "fit": "cover",
+    "camera_workspace_area_percent": 77.61933101120414,
+    "source_frame_visible_percent": 84.24484784162841
+  },
+  "responsive": [
+    {
+      "viewport": [
+        433,
+        938
+      ],
+      "camera": [
+        416,
+        234
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": [
+        1422,
+        889
+      ],
+      "camera": [
+        1048,
+        824
+      ],
+      "chat_width": 340,
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": [
+        1770,
+        971
+      ],
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": [
+        800,
+        800
+      ],
+      "camera": [
+        783,
+        440
+      ],
+      "layout": "stacked",
+      "horizontal_overflow": false
+    }
+  ],
+  "checks": [
+    "source cards immediately precede their answer",
+    "compact live detector strip",
+    "collapsed and expanded map",
+    "full-frame option changes object-fit to contain",
+    "DOM tests: streaming, historical reconstruction, no-source turn, deletion, source escaping, score escaping, camera error clearing, map identity, and stale cache rejection"
+  ],
+  "limits": [
+    "Synthetic state does not qualify live inference, camera rate, physical speech latency, or memory pressure.",
+    "Default desktop fill crops camera edges; View controls exposes full frame.",
+    "Mobile 16:9 framing preserves the full 16:9 source."
+  ]
+}

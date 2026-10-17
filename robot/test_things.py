@@ -1127,6 +1127,56 @@ def test_live_latency_uses_current_turn_milestones(robot):
     assert all(value is None for value in robot._shown(False)[1].evidence["timing"].values())
 
 
+def test_transcript_keeps_supplied_sources_and_applies_deletion(robot):
+    frame_of(robot)
+    earlier = Turn(line=1, answer="A reply", facts=["A fact"], told=["A statement"],
+                   memories=[42], ui_evidence=[{"label": "Generated caption", "text": "A cup"}])
+    robot.ui_turns.append(earlier)
+    robot.ui_turn = Turn(line=2, answer="Code reply", verbatim=True,
+                         facts=["Other fact"], told=["Unused statement"])
+    state = robot._shown(False)[1]
+    assert state.transcript[0]["evidence"]["memories"] == earlier.ui_evidence
+    assert state.transcript[0]["evidence"]["statements"] == earlier.told
+    assert state.transcript[1]["evidence"] == state.evidence
+    assert state.evidence["knowledge"] == state.evidence["statements"] == []
+    earlier.deleted = True
+    sources = robot._shown(False)[1].transcript[0]["evidence"]
+    assert all(sources[name] == []
+               for name in ("knowledge", "statements", "memory_ids", "memories"))
+    robot.hiding = (None, time.time())
+    state = robot._shown(False)[1]
+    assert len(state.transcript) == 1 and state.evidence["deleted"]
+
+
+def test_detection_metadata_uses_fresh_admitted_categories(robot):
+    frame_of(robot, people=True)
+    state = robot._shown(False)[1].control
+    assert len(state["detections"]) == 1
+    detection = state["detections"][0]
+    assert detection["label"] == "phone" and detection["score"] == .9
+    track = detection["track"]
+    source = next(t for t in robot.tracker.tracks if t.id == track)
+    source.det = Detection("cup", .73, source.det.box)
+    detection = robot._shown(False)[1].control["detections"][0]
+    assert detection["label"] == "cup" and detection["score"] == .73
+    assert source.label == "phone", "the detector score must not use the majority category"
+    source.det = Detection("phone", .9, source.det.box)
+    robot.focus.checking.add(track)
+    assert not robot._shown(False)[1].control["detections"]
+    robot.focus.checking.clear()
+    robot.focus.excluded[track] = "ignored"
+    assert not robot._shown(False)[1].control["detections"]
+    robot.focus.excluded.clear()
+    robot.focus.ignored.add("phone")
+    assert not robot._shown(False)[1].control["detections"]
+    robot.focus.ignored.clear()
+    robot.view_taken -= 1
+    assert not robot._shown(False)[1].control["detections"]
+    frame_of(robot)
+    robot._track(robot.view[0], [], time.time())
+    assert not robot._shown(False)[1].control["detections"], "carried boxes have no fresh detection"
+
+
 def test_conversation_window_runs_from_the_end_of_the_last_answer(robot):
     robot.last_line = 1000.0
     for gap, goes_on in ((main.CONVERSATION_S, True), (main.CONVERSATION_S + 1, False)):

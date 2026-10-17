@@ -178,3 +178,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D190 2026-10-16: Use NVIDIA's existing cool fan profile.** At Dylan's request to reduce heating, replace the quiet default with cool while preserving automatic closed-loop control and the supplied fan curves. Back up the configuration and prior daemon state. Verify the active profile; enclosure and servo cooling still require measurement.
 
 **D191 2026-10-16: Restore the quiet fan profile for the enclosed microphone.** Supersedes D190 after Dylan identified the microphone inside the case. Verify the original configuration and active quiet profile. Compare recognition and temperatures before selecting a louder profile; automatic fan control remains active.
+
+**D192 2026-10-16: Give the camera the main monitor pane.** At Dylan's request, supersedes D172 and D173's lower 70/30 panel. Fill framing removes bars; View controls offers the full source, and narrow layouts preserve 16:9. Compact detector confidence, per-answer supplied sources, and a collapsible object/evidence map preserve existing recognition, provenance, and deletion rules.

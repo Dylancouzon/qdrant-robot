@@ -223,6 +223,22 @@ class Turn:
     compared: dict = field(default_factory=dict)  # a same-object answer: capture times, labels,
     #                                               and the MaxSim score (None: different kinds)
 
+    def evidence(self, hidden: bool = False) -> dict:
+        """Sources supplied to this answer, with deletion applied before publication."""
+        deleted = bool(self.deleted or hidden)
+        return {"knowledge": [] if deleted else self.facts if not self.verbatim else
+                [self.answer] if self.answer in self.facts else [],
+                "statements": self.told if not (deleted or self.verbatim) else [],
+                "memory_ids": [] if deleted else self.memories,
+                "memories": [] if deleted else self.ui_evidence,
+                "deleted": deleted, "turn_id": str(self.line),
+                "timing": {name: round(1000 * (end - self.speech_end), 1)
+                           if self.speech_end and end >= self.speech_end else None
+                           for name, end in (("first_text_ms", self.first_token),
+                                             ("speech_ready_ms", self.first_audio))},
+                "answer_path": ("Code" if self.verbatim else "Generated")
+                if self.first_token else ""}
+
 
 class Robot:
     def __init__(self, camera, out: Path, memory: Path = SHARED / "memory",
@@ -724,8 +740,21 @@ class Robot:
                 if display else None,
                 source=(taken, id(frame), id(record)))
             targets = self._offers(tracks, objects) if self.focus else []
+            detections = []
+            if self.focus and 0 <= time.time() - self.view_taken <= .2:
+                current_geometry = self.focus.geometry(tracks)
+                admitted = {b[:4] for b in self.focus.boxes(
+                    tracks, [], time.time(), geometry=current_geometry)}
+                admitted_tracks = {t.id for t in tracks
+                                   if t.label not in BODY and
+                                   current_geometry.get(t.id) in admitted}
+                detections = [{"track": t.id, "label": t.det.label,
+                               "score": round(float(t.det.conf), 3)} for t in self.tracker.tracks
+                              if t.id in admitted_tracks and not t.missed and
+                              t.det.label not in BODY and t.det.label not in self.focus.ignored]
             screen = replace(screen, control={"session": self.session_id,
                 "targets": targets,
+                "detections": detections,
                 "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source,
                 "muted": self.muted, "volume": self.volume,
@@ -751,18 +780,9 @@ class Robot:
             if turn is not None:
                 if turn.deleted or self.hiding:
                     turns = [turn]  # Deleted visitor/object content leaves the live UI, too.
-                evidence = {"knowledge": turn.facts if not turn.verbatim else
-                            [turn.answer] if turn.answer in turn.facts else [],
-                            "statements": turn.told if not turn.verbatim else [],
-                            "memory_ids": turn.memories, "memories": turn.ui_evidence,
-                            "deleted": bool(turn.deleted or self.hiding), "turn_id": str(turn.line),
-                            "timing": {name: round(1000 * (end - turn.speech_end), 1)
-                                       if turn.speech_end and end >= turn.speech_end else None
-                                       for name, end in (("first_text_ms", turn.first_token),
-                                                         ("speech_ready_ms", turn.first_audio))},
-                            "answer_path": ("Code" if turn.verbatim else "Generated")
-                            if turn.first_token else ""}
-            transcript = [{"id": str(t.line), "question": t.question, "answer": t.answer}
+                evidence = turn.evidence(bool(self.hiding))
+            transcript = [{"id": str(t.line), "question": t.question, "answer": t.answer,
+                           "evidence": t.evidence(bool(self.hiding))}
                           for t in turns[-8:]]
             return frame, replace(screen, status=status, transcript=transcript,
                                   evidence=evidence, memory=self.panel)

@@ -28,17 +28,21 @@ Use one camera viewer. A second MJPEG subscriber replaces the first. Each sessio
 
 The camera shows known object names, one orange "???" teaching focus, and admitted grey object outlines. Person detection supplies internal cues; the page draws verified face outlines instead of body boxes. Face identity uses only the current verified result on its exact source pixels. The status and transcript show Listening, Hearing you, Thinking, and Speaking.
 
-A shared panel beneath the camera gives roughly 70% of its width to retrieved text and image cards. The remaining space shows personal memory points in Qdrant Edge and the current turn's timings. Conversation spans the full height beside both panels. Selecting a named object opens its Memory card. Search entries and source IDs stay expandable.
+The camera fills the main pane beside a narrow conversation column. The default framing crops the source to fill the pane without bars. **View controls**, then **Show full frame**, reveals the complete source when its edges matter. Narrow screens use a 16:9 camera followed by conversation. Session errors stay expandable so a traceback cannot cover the camera.
 
-The centered tip says `Say "Hey Edgy, ..."` inside a neutral, dashed pill. It sits in the middle of an empty conversation and stays centered at the top during conversation. Examples rotate every 12 seconds without extra controls. Hover, keyboard focus, hidden tabs, and reduced motion pause rotation.
+The bottom-left strip shows up to three admitted current detector categories and their detector confidence, with a count for additional detections. These scores describe categories independently of stored-object similarity. Stale sources, suppressed objects, faces, and carried outlines contribute no detections. Camera and state failures clear the strip.
 
-The map reads stored IDs from `seen` and named object points from `things`. Statements use violet, observations use teal, and recalled sources use pink. Lines connect evidence with its stored named-object ID. Stored IDs determine object positions; evidence positions derive from their IDs and object links. The positions are schematic. The map does not combine embedding spaces. Knowledge facts remain in the retrieved cards.
+Each of the eight published transcript turns carries its supplied evidence. The page renders these sources immediately before the answer and keeps them through streaming and reload. Sources retain their original labels, including generated captions. Empty source sections stay hidden. Selecting a named object opens its Memory card. Search results and timings remain under **Turn details**.
+
+The command tip says `Say "Hey Edgy, ..."`. It occupies the middle of an empty conversation and stays at the top during conversation. Examples rotate every 12 seconds without extra controls. Hover, keyboard focus, hidden tabs, and reduced motion pause rotation.
+
+The memory map opens from a compact bottom-right disclosure. Objects and evidence occupy separate columns. The map reads stored IDs from `seen` and named object points from `things`. Statements use violet, observations use teal, and recalled sources use pink. Lines connect evidence with its stored named-object ID. Stored IDs determine object positions; evidence positions derive from their IDs and object links. The positions are schematic. The map does not combine embedding spaces. Knowledge facts remain in the retrieved cards.
 
 The authenticated `/memory_map` endpoint reads at most 128 recent turns, 64 recent sightings, 32 current or recalled IDs, and 64 named objects. It selects metadata without vectors or image bytes. Current-turn writes stay visible when their capture time is old. The browser polls once per two seconds while Live is visible, with one request in flight. A sampled count and total remain visible. Point IDs encode storage allocation time; new named objects carry immutable `created` metadata. Legacy objects with no creation time do not get a birth pulse.
 
 A newly stored point gets a short arrival pulse. Recalled IDs pulse once per turn and remain pink while supplied to that turn. Current writes cannot count as recall. Initial snapshots and reconnects do not animate old points as births. Confirmed deletion clears cached map nodes and tooltips, rejects older responses, and reloads stored data. Missing points leave the map. Reduced motion retains the static recall color.
 
-The latency values are retrieval preparation, speech-end to first text, and speech-end to the first synthesized phrase. Retrieval preparation includes work beyond Edge queries. Speech-ready time measures the synthesis handoff, rather than physical audible latency. Missing measurements show a dash. Each new turn clears the previous retrieval panel.
+The latency values are retrieval preparation, speech-end to first text, and speech-end to the first synthesized phrase. Retrieval preparation includes work beyond Edge queries. Speech-ready time measures the synthesis handoff, rather than physical audible latency. Missing measurements show a dash. Each new turn updates the search details and preserves earlier supplied sources with their answer.
 
 The Memory tab groups cards by visitor ID and shows object, view, and visitor counts. Search filters object and visitor names. Refresh reloads the stored objects. Editing preserves the open management controls, gallery position, keyboard focus, and page position. Queued edits keep a visible status and continue polling until their result appears. Confirmed voice deletion clears cached cards and rejects older in-flight reads.
 
@@ -83,3 +87,11 @@ The [archived checks](archive/interface-checks-2026-10-16.md#ui-refresh-checks-2
 ## Stored memory map checks, 2026-10-16
 
 The [archived checks](archive/interface-checks-2026-10-16.md#stored-memory-map-checks-2026-10-16) retain creation, recall, deletion, bounded polling, and browser evidence.
+
+## Camera-first refresh checks, 2026-10-16
+
+Isolated Jetson publication checks use real Edge stores and a stub crop encoder. They test authenticated state responses, eight-turn history, source labels, fresh detection scores, stale clearing, and deletion. See `bench/results/2026-10-16-ui-camera-state.json`. The robot remains stopped after its separate servo communication failure. These checks qualify neither inference performance nor physical operation.
+
+The Chrome comparison uses isolated state and a development image. At 1770×971 CSS pixels, the candidate camera occupies 77.6% of the workspace (E). Fill framing shows 84.2% of the 16:9 source; full-frame mode shows the entire source. Narrow 16:9 framing preserves the source. Browser checks found no horizontal overflow at 433, 800, 1422, and 1770 CSS pixels (E). See `bench/results/2026-10-16-ui-camera-browser.json`.
+
+The [design review](../reviews/20261016-211758-49436-design.md) and [final task review](../reviews/20261016-213249-68016-review.md) cover this change. Full required checks passed in 263.97 seconds (E). The deployed release is recorded in STATE.md; the monitor was updated without starting a robot session.

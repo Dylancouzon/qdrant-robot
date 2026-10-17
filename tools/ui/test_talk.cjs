@@ -38,9 +38,9 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  await run("memoryEdit('remove_view',{object:'one',view:'view-3'},'Remove next view')");list[0].views=list[0].views.filter(v=>v.id!=='view-3');await run('loadMemory()');await tick();assert.equal(d.querySelector('#memory-one .views').scrollLeft,224);assert.equal(d.querySelector('#memory-one details').open,true);
  await run("openTab('live')");list[0].last_seen++;await run('loadMemory()');assert.equal(d.querySelector('#memory-one .views'),null);await run("openTab('memory')");await tick();assert.equal(d.querySelector('#memory-one .views').scrollLeft,224);
  accepted=false;await run("memoryEdit('forget_object',{object:'one'},'Forget mouse')");assert.match(d.querySelector('#memoryError').textContent,/changed/);assert.equal(d.querySelector('#memory-one [data-edit]').disabled,false);
- run(`evidence({knowledge:['A source <script>'],statements:['My mouse is blue'],memories:[{label:"Sam's mouse",object:'one',view:'view-0',source:'Observed object',text:'On the desk',time:10}],memory_ids:['point-1'],timing:{first_text_ms:1200,speech_ready_ms:1800}},{shards:['knowledge','seen'],hits:[['knowledge: a source',.82],['seen: a mouse',null]],ms:13.2})`);
- assert.equal(d.querySelectorAll('.sourcecard').length,3);assert.equal(d.querySelector('#textLatency').textContent,'1.20s');assert.match(d.querySelector('#retrievalContent').textContent,/includes work beyond Edge queries/);assert.equal(d.querySelector('#evidence script'),null);
- const map=d.querySelector('#memoryMap svg');run(`evidence({knowledge:['A source <script>'],statements:['My mouse is blue'],memories:[{label:"Sam's mouse",object:'one',view:'view-0',source:'Observed object',text:'On the desk',time:10}],memory_ids:['point-1'],timing:{first_text_ms:1200,speech_ready_ms:1900}},{shards:['knowledge','seen'],hits:[['knowledge: a source',.82],['seen: a mouse',null]],ms:13.2})`);assert.equal(d.querySelector('#memoryMap svg'),map);
+ run(`conversation([{id:'t1',question:'Where is my mouse?',answer:'On the desk.'}]);evidence({turn_id:'t1',knowledge:['A source <script>'],statements:['My mouse is blue'],memories:[{label:"Sam's mouse",object:'one',view:'view-0',source:'Observed object',text:'On the desk',time:10}],memory_ids:['point-1'],timing:{first_text_ms:1200,speech_ready_ms:1800}},{shards:['knowledge','seen'],hits:[['knowledge: a source',.82],['seen: a mouse',null]],ms:13.2})`);
+ assert.equal(d.querySelectorAll('.sourcecard').length,3);assert.equal(d.querySelector('#textLatency').textContent,'1.20s');assert.match(d.querySelector('#retrievalContent').textContent,/includes work beyond Edge queries/);assert.equal(d.querySelector('.evidence script'),null);
+ const map=d.querySelector('#memoryMap svg');run(`evidence({turn_id:'t1',knowledge:['A source <script>'],statements:['My mouse is blue'],memories:[{label:"Sam's mouse",object:'one',view:'view-0',source:'Observed object',text:'On the desk',time:10}],memory_ids:['point-1'],timing:{first_text_ms:1200,speech_ready_ms:1900}},{shards:['knowledge','seen'],hits:[['knowledge: a source',.82],['seen: a mouse',null]],ms:13.2})`);assert.equal(d.querySelector('#memoryMap svg'),map);
  // The map keeps real point identities across timing updates, samples, and recalls.
  const point={id:'seen:one',kind:'said',label:'My mouse is blue',created:90,object:'things:one'};
  const hub={id:'things:one',kind:'object',label:'mouse',created:80};
@@ -69,7 +69,20 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  mapData=next;run('mapLastRead=0');await run('loadMap()');assert.equal(d.querySelectorAll('.memorypoint').length,3);
  d.querySelector('[data-id="things:one"]').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));await tick();assert.equal(d.querySelector('#memoryPanel').hidden,false);await run("openTab('live')");
  d.querySelector('#memorySearch').value='bottle';d.querySelector('#memorySearch').dispatchEvent(new w.Event('input'));assert.equal(d.querySelectorAll('.objectcard').length,1);
- d.querySelector('#evidence .textlink').click();await tick();assert.equal(d.querySelector('#memorySearch').value,'');assert.equal(d.querySelectorAll('.objectcard').length,2);
+ d.querySelector('.evidence .textlink').click();await tick();assert.equal(d.querySelector('#memorySearch').value,'');assert.equal(d.querySelectorAll('.objectcard').length,2);
+ // Supplied evidence stays before its answer through streaming, new turns, and page reconstruction.
+ const originalSource=d.querySelector('.turnsources');
+ assert.equal(originalSource.nextElementSibling.textContent,'Edgy');assert.equal(originalSource.parentElement.querySelector('.edgy').textContent,'On the desk.');
+ run(`conversation([{id:'t1',question:'Where is my mouse?',answer:'On the desk, beside the keyboard.'},{id:'t2',question:'Hello',answer:'Hi.'}]);evidence({turn_id:'t2'})`);
+ assert.equal(d.querySelector('[data-turn="t1"] .turnsources'),originalSource);assert.equal(originalSource.querySelectorAll('.sourcecard').length,3);
+ assert.equal(d.querySelector('[data-turn="t2"] .turnsources').hidden,true);
+ run(`conversation([]);conversation([{id:'history',question:'What did I say?',answer:'You prefer tea.',evidence:{statements:['I prefer tea.']}}])`);
+ assert.match(d.querySelector('[data-turn="history"] .turnsources').textContent,/I prefer tea/);
+ assert.equal(d.querySelector('.turnsources').compareDocumentPosition(d.querySelector('.edgy'))&w.Node.DOCUMENT_POSITION_FOLLOWING,w.Node.DOCUMENT_POSITION_FOLLOWING);
+ run(`detections([{label:'cup <script>',score:.874},{label:'book',score:.61},{label:'phone',score:.9},{label:'chair',score:.4}])`);
+ assert.equal(d.querySelector('#detections').hidden,false);assert.equal(d.querySelectorAll('.detection').length,3);assert.match(d.querySelector('#detectionList').textContent,/87%.*61%.*90%.*\+1 more/);assert.equal(d.querySelector('#detectionList script'),null);
+ d.querySelector('#camera').dispatchEvent(new w.Event('error'));assert.equal(d.querySelector('#detections').hidden,true);
+ d.querySelector('#frameMode').click();assert.equal(d.querySelector('#camera').classList.contains('fullframe'),true);assert.equal(d.querySelector('#frameMode').getAttribute('aria-pressed'),'true');d.querySelector('#frameMode').click();assert.equal(d.querySelector('#camera').classList.contains('fullframe'),false);
  await run("openTab('live')");intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);
  d.querySelector('#commandTip').focus();intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);d.activeElement.blur();
  reducedMotion=true;intervals[0]();assert.equal(d.querySelector('#tipText').textContent,'Hey Edgy, this is my phone.');assert.match(d.querySelector('.tipBubble').textContent,/Say/);reducedMotion=false;
@@ -77,7 +90,7 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  await run("openTab('live')");let releaseRead;delayedRead=new Promise(resolve=>{releaseRead=resolve});const staleRead=run('loadMemory()');await tick();
  mapData={session:'a',at:110,total:0,nodes:[],recall:{turn:'',ids:[]}};live={status:'Listening',transcript:[{id:'deleted',question:'Yes',answer:'Done.'}],evidence:{deleted:true,turn_id:'deletion-1'},memory:null};
  await run('status()');releaseRead(structuredClone(list));await staleRead;delayedRead=null;
- assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('savedObjects.length'),0);assert.equal(d.querySelectorAll('#evidence img').length,0);assert.equal(d.querySelector('#retrievalContent').textContent,'');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(d.querySelector('#transcript').textContent.includes('clock'),false);
+ assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('savedObjects.length'),0);assert.equal(d.querySelectorAll('.evidence img').length,0);assert.equal(d.querySelector('#retrievalContent').textContent,'');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(d.querySelector('#transcript').textContent.includes('clock'),false);
  assert.equal(run('carouselUpdates.length'),0);await run("openTab('memory')");assert.equal(d.querySelectorAll('.objectcard').length,2);
  live.evidence={deleted:true,turn_id:'deletion-2'};await run('status()');assert.equal(d.querySelectorAll('.objectcard').length,0);assert.equal(run('carouselUpdates.length'),0);
  // Cooling is a head warning; camera, microphone, and the normal session remain usable.
@@ -89,5 +102,5 @@ const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTime
  live.control.head.warning='';await run('status()');assert.equal(d.querySelector('#headWarning').textContent,'');
  live.control.head.warning='Head motor cooling.';await run('status()');
  run('clearLive()');assert.equal(d.querySelector('#headWarning').textContent,'');assert.equal(d.querySelector('#speechLatency').textContent,'—');assert.equal(d.querySelectorAll('#memoryMap .memorypoint').length,0);assert.equal(errors.length,0,errors.join('\n'));
- global.console.log('PASS: two visitor IDs with the same name, queued edits, failed refresh, repeated removal, view retention, conflicts, evidence safety, timing, stable stored memory IDs, births, sample turnover, recall pulses, map deletion races, search, tips, confirmed voice deletion, stale-read rejection, and clearing.');dom.window.close();
+ global.console.log('PASS: two visitor IDs with the same name, queued edits, failed refresh, repeated removal, view retention, conflicts, evidence safety, per-turn source order and retention, historical sources, compact detections, camera framing, timing, stable stored memory IDs, births, sample turnover, recall pulses, map deletion races, search, tips, confirmed voice deletion, stale-read rejection, and clearing.');dom.window.close();
 })().catch(e=>{global.console.error(e);dom.window.close();process.exitCode=1;});

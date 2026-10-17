@@ -1,0 +1,33 @@
+{
+  "machine": "Jetson",
+  "label": "J",
+  "mode": "isolated state publication; real Edge stores, stub crop encoder; no inference or actuation",
+  "baseline_release": "599d42f96b75",
+  "tegrastats": "ui-camera-state-20261016-212631.tegrastats",
+  "comparison": {
+    "baseline": {
+      "samples": 200,
+      "state_bytes": 1679,
+      "serialize_ms_p50": 0.46539800018763344,
+      "serialize_ms_p95": 0.5992739997964236
+    },
+    "candidate": {
+      "samples": 200,
+      "state_bytes": 4525,
+      "serialize_ms_p50": 0.4439284998625226,
+      "serialize_ms_p95": 0.5529100003514031
+    }
+  },
+  "checks": [
+    "eight-turn history",
+    "source labels",
+    "authenticated state response",
+    "fresh detection score",
+    "stale detection clearing",
+    "deletion clears sources"
+  ],
+  "limitations": "No fps, answer latency, paging-safety, or live motor qualification.",
+  "candidate_main_sha256": "422e331c4ed866fe355a687ae66336f6b84d6250c7306dce9834ac2bc40989ea",
+  "check_script_sha256": "fe6954476450272985ff55540f3f694dd68eec5bfc3bc8b48acc963bede963ac",
+  "command": "python3 tools/jetson.py run ui-camera-state --wait -- /home/qdrant/qdrant-robot/shared/experiments/ui-camera/check.py"
+}
