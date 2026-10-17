@@ -43,6 +43,7 @@ from robot.memory import (
     article,
     is_question,
     is_statement,
+    names_any,
     kind_of,
     main_object,
     maxsim,
@@ -1506,13 +1507,8 @@ class Robot:
         started, detections = time.time(), self.detections
         question = self.embed([turn.question])[0]
         found = self.knowledge.search(question)
-        turn.verbatim = bool(found) and found[0][0] >= VERBATIM
-        prior = next((m["content"] for m in reversed(self.history) if m["role"] == "user"), "")
-        if not found and prior:
-            # A follow-up ("would that work offline?") names its topic in the line before; the
-            # joined text grounds the brain, never a word-for-word fact.
-            found = self.knowledge.search(self.embed([f"{prior} {turn.question}"])[0])
-        turn.facts = [fact for _, fact in found]
+        direct = bool(found)
+        turn.verbatim = direct and found[0][0] >= VERBATIM
         past = about_past(turn.question)
         recalled, memories = self._recall(turn, look.frame) if past else ([], [])
         # The frame at speech start: the cached look may show an earlier visitor.
@@ -1529,6 +1525,8 @@ class Robot:
             if look is None:
                 self.ui_thinking = False
                 return
+        found = found or self._follow_up_facts(question, turn.question)
+        turn.facts = [fact for _, fact in found]
         # A yes or no to the robot's own consent, deletion, or object question is a reply, not
         # a fact about the visitor (stored as one, "Yes, go for it." came back as a memory).
         replying = bool(self.asking or self.deleting or self.confirming)
@@ -1556,9 +1554,9 @@ class Robot:
         # Each kind of turn gets only its evidence: the image for sight, or whenever the question
         # points at the present; never for small talk or knowledge (it pulled answers to the room).
         turn.kind = self.route(question)
-        # A matched fact makes the question one about the robot: the image would pull the
+        # A question that matches a fact itself is about the robot: the image would pull the
         # answer to the room ("Where do you keep that?" described the visitor).
-        sees = compares(turn.question) or (turn.kind == "sight" and not past and not turn.facts)
+        sees = compares(turn.question) or (turn.kind == "sight" and not past and not direct)
         image = look.image if sees else None
         said = self._exchanges(turn, look.history) if about_dialogue(turn.question) else []
         msgs = brain.messages(look.history, image, memories, turn.facts,
@@ -1623,6 +1621,16 @@ class Robot:
             record.pop("ui_recalled")
             f.write(json.dumps(record) + "\n")
         self.turns.put(turn)
+
+    def _follow_up_facts(self, question: np.ndarray, text: str) -> list[tuple[float, str]]:
+        """Facts for a follow-up about the robot ("would that work offline?"), which names its
+        topic in the line before when that line matched a fact. The joined text grounds the
+        brain, never a word-for-word fact, and keeps the image."""
+        prior = next((m["content"] for m in reversed(self.history) if m["role"] == "user"), "")
+        if not prior or self.route(question) == "sight":
+            return []
+        before, joined = self.embed([prior, f"{prior} {text}"])
+        return self.knowledge.search(joined) if self.knowledge.search(before) else []
 
     def _told(self, question: np.ndarray, turn: Turn) -> list[dict]:
         """Recall only this visitor's statements, excluding ignored object kinds."""
@@ -2389,6 +2397,10 @@ class Robot:
         if any(p and p["object"] == named["id"] for p in (self.candidate, self.confirming)):
             self.candidate = self.confirming = None
         self.memory.forget(named["turns"])
+        words = {named["name"], *named["labels"]}
+        self.memory.forget_mentions(named["owner"], words)
+        self.history = [m for pair in zip(self.history[::2], self.history[1::2], strict=True)
+                        if not any(names_any(x["content"], words) for x in pair) for m in pair]
         self.memory.forget_named(named["id"])
         self.things.forget(named["id"])
         self.points = {t: p for t, p in self.points.items() if self.memory.points([p])}

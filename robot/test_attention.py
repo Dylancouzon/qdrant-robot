@@ -652,3 +652,24 @@ def test_filler_keeps_raw_turns_without_statement_vectors(tmp_path, monkeypatch)
                            selection_error="ambiguous", speech_start=time.time() + 1)) == []
     finally:
         close_robot(robot)
+
+
+def test_follow_up_facts_need_a_fact_before_and_never_serve_sight(tmp_path):
+    robot = speaking_robot(tmp_path)
+    try:
+        q = np.zeros(TEXT_DIM, np.float32)
+        robot.history = [{"role": "user", "content": "Where is your memory stored?"},
+                         {"role": "assistant", "content": "On my own disk."}]
+        robot.route = lambda v: "sight"
+        robot.knowledge.search = lambda v, limit=2: [(0.8, "fact")]
+        assert robot._follow_up_facts(q, "What do you see now?") == [], "sight keeps the image"
+        robot.route = lambda v: "knowledge"
+        results = iter([[(0.8, "fact")], [(0.79, "offline fact")]])
+        robot.knowledge.search = lambda v, limit=2: next(results)
+        assert robot._follow_up_facts(q, "Would that work offline?") == [(0.79, "offline fact")]
+        robot.knowledge.search = lambda v, limit=2: []
+        assert robot._follow_up_facts(q, "Would that work offline?") == [], "no fact before"
+        robot.history = []
+        assert robot._follow_up_facts(q, "Would that work offline?") == [], "no earlier line"
+    finally:
+        close_robot(robot)

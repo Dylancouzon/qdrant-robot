@@ -89,10 +89,13 @@ def score(step: dict, turns: list, frames: dict[str, Shown], oracle: bool) -> di
     frames[step["id"]] = Shown({turn.frame_id},
                                None if is_question(turn.question) else turn.question, turn.looked)
     want = [frames.get(k, Shown(set(), None, 0.0)) for k in step.get("evidence", [])]
+    # Quoted dialogue is evidence of what was said, never of what was seen.
+    dialogue = step.get("capability") == "dialogue-recall"
     row = {"id": step["id"], "ok": ok(step, turn.answer) and len(turns) == 1,
            "heard": " | ".join(t.question for t in turns), "split": len(turns),
            "evidence_ok": all(said in turn.told or bool(ids & set(turn.exchanges)) if said else
-                               bool(ids & {*turn.memories, *turn.exchanges}) or
+                               bool(ids & set(turn.memories)) or bool(
+                                   dialogue and ids & set(turn.exchanges)) or
                                (looked and turn.selected == looked and turn.delivered)
                                for ids, said, looked in want)
                            if want else None,

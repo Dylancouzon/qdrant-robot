@@ -321,6 +321,11 @@ def about_dialogue(question: str) -> bool:
     return bool(_DIALOGUE.search(question.replace("\u2019", "'")))
 
 
+def names_any(text: str, words: Collection[str]) -> bool:
+    """Whether `text` contains one of `words` as a whole word, ignoring case."""
+    return any(re.search(rf"\b{re.escape(w)}\b", text, re.I) for w in words)
+
+
 def about_now(question: str) -> bool:
     return bool(_NOW.search(question))
 
@@ -547,6 +552,20 @@ class Memory:
         while rows := self.shard.scroll(ScrollRequest(limit=100, with_payload=False, filter=Filter(
                 must=[FieldCondition(key="visitor", match=MatchValue(visitor))])))[0]:
             self.forget([r.id for r in rows])
+
+    def forget_mentions(self, visitor: str, words: Collection[str]) -> None:
+        """Delete this visitor's turns whose question or stored answer names one of `words`:
+        forgetting an object also forgets what was said about it."""
+        offset, found = None, []
+        while True:
+            page, offset = self.shard.scroll(ScrollRequest(
+                offset=offset, limit=1000, with_payload=["said", "answer"], filter=Filter(
+                    must=[FieldCondition(key="visitor", match=MatchValue(visitor))])))
+            found += [r.id for r in page if names_any(
+                f"{r.payload.get('said', '')} {r.payload.get('answer', '')}", words)]
+            if offset is None:
+                break
+        self.forget(found)
 
     def forget_named(self, ident: str) -> None:
         """Delete selected crops and sightings, including records outside current track links."""

@@ -74,3 +74,18 @@ def test_exchanges_survive_reopen_and_forget_me_deletes_them(tmp_path):
         assert [row["answer"] for row in memory.exchanges("Jo", 200, n=5)] == ["Hello!"]
     finally:
         memory.shard.close()
+
+
+def test_forgetting_an_object_forgets_what_was_said_about_it(tmp_path):
+    memory = Memory(tmp_path)
+    try:
+        said = memory.add(None, "Where is my umbrella?", ts=100, visitor="Mira",
+                          answer="I last saw your umbrella a minute ago.")
+        told = memory.add(None, "My Umbrella is from Paris.", vector(), ts=101, visitor="Mira")
+        other = memory.add(None, "Where is it stored?", ts=102, visitor="Mira", answer="On disk.")
+        theirs = memory.add(None, "I lost my umbrella.", vector(), ts=103, visitor="Jo")
+        memory.forget_mentions("Mira", {"umbrella"})
+        assert not memory.points([said, told])
+        assert [p["id"] for p in memory.points([other, theirs])] == [other, theirs]
+    finally:
+        memory.shard.close()
