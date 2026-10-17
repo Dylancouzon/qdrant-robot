@@ -99,6 +99,7 @@ async function openTab(name){
   if(name==='memory')await loadMemory();
   if(panel==='live'){requestAnimationFrame(scrollConversation);mapLastRead=0;}
 }
+matchMedia('(max-width:600px)').addEventListener('change',e=>{if(!e.matches&&el('livePanel').dataset.pane==='chat')openTab('live');});
 for(const tab of ['live','chat','memory','settings'])el(tab+'Tab').addEventListener('click',()=>openTab(tab));
 function relativeTime(time){
   if(time===null)return 'never';

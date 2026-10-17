@@ -28,7 +28,7 @@ SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
 LOCAL = False  # --on-robot: run commands here and reach the view without a tunnel
 HOTSPOT = "l6-hotspot"  # the robot's own WPA2 network (SSID l6-robot, 10.42.0.1)
-WIFI_CHECK_S, WIFI_MISSES = 30, 4  # raise the hotspot after two minutes without Wi-Fi
+WIFI_CHECK_S, WIFI_MISSES = 30, 4  # raise the hotspot 90 to 120 s after Wi-Fi drops
 
 
 def robot_args(camera_file: str | None, servo_calibration: str | None = None) -> list[str]:
@@ -69,7 +69,7 @@ def watch_wifi(down: int) -> int:
 def keep_reachable() -> None:
     down = 0
     while True:
-        time.sleep(WIFI_CHECK_S)  # first, so four misses span the full two minutes
+        time.sleep(WIFI_CHECK_S)
         down = watch_wifi(down)
 
 
