@@ -200,6 +200,7 @@ class Turn:
     #                               the brain answered
     speech_start: float = 0.0     # the VAD heard speech start
     target: int | None = None     # the object track the focus gave at speech start (Focus.target)
+    teaching_target: int | None = None  # the eligible orange focus or held fallback at speech start
     speech_end: float = 0.0       # end of the visitor's speech (from the ASR stream clock)
     line: float = 0.0             # the VAD ended the line
     transcribed: float = 0.0      # Parakeet's final transcript ready
@@ -343,6 +344,7 @@ class Robot:
         self.speaking = False                   # a visitor is mid-line: background work yields
         self.speech_start = 0.0
         self.start_target: int | None = None  # the focus object when the current line began
+        self.start_teaching_target: int | None = None
         self.start_frame: tuple[np.ndarray | None, float] = (None, 0.0)  # frame, capture time
         self.closing = threading.Event()
         self.detecting = threading.Lock()       # held while a frame is detected and tracked
@@ -377,7 +379,8 @@ class Robot:
         self.speaking = False
         self.asked += 1
         turn = Turn(question=text, line=t, transcribed=t, speech_end=t,
-                    speech_start=self.speech_start, target=self.start_target)
+                    speech_start=self.speech_start, target=self.start_target,
+                    teaching_target=self.start_teaching_target)
         self._motion_request(turn)
         self.jobs.put(("turn", turn, self.start_frame))
 
@@ -433,6 +436,7 @@ class Robot:
             self.told, self.last_line, self.last_input, self.face = None, 0.0, 0.0, None
             self.face_track, self.turn_seen = None, None
             self.teaching, self.start_target = None, None
+            self.start_teaching_target = None
             self.current_visitor = ""
             self._clear_confirmation()
             self.since, self.panel = time.time_ns() // 1000, None
@@ -456,26 +460,28 @@ class Robot:
         self.speaking, self.speech_start = True, time.time()
         self.start_frame = self.camera.latest()  # what the visitor sees as they speak
         with self.detecting:
-            self.start_target = self.focus and self.focus.target(
-                [Track(*t) for t in self.tracker.scored()])
+            tracks = [Track(*t) for t in self.tracker.scored()]
+            self.start_target = self.focus and self.focus.target(tracks)
+            self.start_teaching_target = self.focus and self.focus.target(tracks, teaching=True)
         if self._stale(self.start_frame[0]):
             self.jobs.put(("look", self.start_frame))
 
     def _heard_line(self, speech: np.ndarray, speech_end: float) -> None:
         self.speaking = False
         self.lines.put((speech, time.time(), speech_end, self.speech_start, self.start_frame,
-                        self.start_target))
+                        self.start_target, self.start_teaching_target))
 
     def _transcribe(self) -> None:
         # Its own thread: the final transcript overlaps a prefill instead of queuing behind it.
         self._consume(self.lines, self._line)
 
     def _line(self, line: tuple) -> None:
-        speech, t_line, speech_end, speech_start, shot, target = line
+        speech, t_line, speech_end, speech_start, shot, target, teaching_target = line
         if text := self.scribe(speech):  # empty: noise the VAD took for speech
             self.asked += 1
             turn = Turn(question=text, line=t_line, transcribed=time.time(),
-                        speech_end=speech_end, speech_start=speech_start, target=target)
+                        speech_end=speech_end, speech_start=speech_start, target=target,
+                        teaching_target=teaching_target)
             self.ui_turn, self.ui_thinking = turn, True
             self._motion_request(turn)
             self.jobs.put(("turn", turn, shot))
@@ -1908,7 +1914,7 @@ class Robot:
                 self.candidate = self.confirming = None
                 self.window = None
                 self._settle(turn.speech_start)
-                if (track := self._target(turn)) is None:
+                if (track := self._target(turn, teaching=True)) is None:
                     return NOTHING_HELD
                 with self.detecting:
                     self.teaching = track, self.focus.epoch(track)
@@ -2198,7 +2204,8 @@ class Robot:
                and not self.detect_failed):
             time.sleep(0.02)
 
-    def _target(self, turn: Turn, pin: tuple[int, int] | None = None) -> int | None:
+    def _target(self, turn: Turn, pin: tuple[int, int] | None = None, *,
+                teaching: bool = False) -> int | None:
         """The object a naming turn binds to (D67): an explicit `pin` track while it is in
         view, else None; otherwise the focus object as it stood at the line's speech start,
         while it is still in view (a focus lost for a moment before the line still counts;
@@ -2208,9 +2215,11 @@ class Robot:
                 return None
             if pin is not None:
                 return pin[0] if pin[0] in self.focus.visible else None
-            if turn.target in self.focus.visible:
-                return turn.target
-            return self.focus.target([Track(*t) for t in self.tracker.scored()])
+            target = turn.teaching_target if teaching and turn.teaching_target is not None \
+                else turn.target
+            if target in self.focus.visible:
+                return target
+            return self.focus.target([Track(*t) for t in self.tracker.scored()], teaching=teaching)
 
     def _name(self, turn: Turn, name: str, labels: list[str],
               pin: tuple[int, int] | None = None) -> str:
@@ -2222,7 +2231,7 @@ class Robot:
         old = self.things.named(turn.visitor, name, [])
         if {*labels, *(old["labels"] if old else [])} & self.ignored:
             return f"I am ignoring {plural(name)}. Ask me to notice it again first."
-        found = self._target(turn, pin)
+        found = self._target(turn, pin, teaching=True)
         with self.detecting:
             tracks = [Track(*t) for t in self.tracker.scored()]
             if found is None and old and self.focus and pin is None:

@@ -338,13 +338,12 @@ class Focus:
         return {hits[0][0]: (name, hits[0][1] >= settings.match)
                 for name, hits in grouped.items() if len(hits) == 1}
 
-    def target(self, tracks: list[Track]) -> int | None:
-        """The object a turn is about: the most salient object held up, named or not (a visitor
-        can always teach what they hold), unless the focus is held too; else the focus. A focus on
-        scenery (a keyboard in the corner) never beats the object in the visitor's hand."""
+    def target(self, tracks: list[Track], *, teaching: bool = False) -> int | None:
+        """Naming uses the eligible orange focus. Other turns prefer a held object over an
+        unheld focus. With no eligible focus, use the most salient eligible held object."""
         tracks = [t for t in tracks if self.eligible(t)]
         held = [t for t in tracks if t.label not in BODY and self._held(t) and t.id in self.seen]
-        if self.focus in {t.id for t in (held or tracks)}:  # a focus out of frame is not bound
+        if self.focus in {t.id for t in (tracks if teaching else held or tracks)}:
             return self.focus
         best = max(held, key=self.salience, default=None)
         return best and best.id

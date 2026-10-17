@@ -153,15 +153,37 @@ def test_target_is_the_held_object_even_when_named() -> None:
     assert f.focus is None and f.target([phone()]) == 1
 
 
-def test_target_prefers_the_held_object_over_an_unheld_focus() -> None:
+def test_target_keeps_the_orange_focus_over_another_held_object() -> None:
     f = Focus(W, H)
     keyboard = phone((1100, 500, 1270, 700), 1, "keyboard")  # outside PERSON: on the desk
     run(f, 0, 1.2, [keyboard])
     assert f.focus == 1
     held = phone(i=2)
     run(f, 1.2, 2 * DT, [keyboard, held], recognized={2: ("Dylan's controller", 0.9)})
-    assert f.focus == 1 and f.target([keyboard, held]) == 2, "the named object in hand wins"
+    assert f.focus == 1 and f.target([keyboard, held], teaching=True) == 1
+    assert f.target([keyboard, held]) == 2, "comparisons keep the held-object priority"
     assert f.target([keyboard]) == 1, "with nothing held, the focus is the target"
+    assert f.target([held], teaching=True) == 2, "a missing focus leaves the held-object fallback"
+
+
+@pytest.mark.parametrize("blocked", ["weak", "small", "ignored", "excluded", "checking"])
+def test_ineligible_focus_never_overrides_an_eligible_held_object(blocked):
+    f = Focus(W, H)
+    selected, held = phone(i=1), phone((700, 200, 850, 400), i=2)
+    run(f, 0, 1.2, [selected, held])
+    f.focus = selected.id
+    if blocked == "weak":
+        selected.score = .1
+    elif blocked == "small":
+        selected.box = (500, 200, 530, 230)
+    elif blocked == "ignored":
+        selected.label = "keyboard"
+        f.ignored.add(selected.label)
+    elif blocked == "excluded":
+        f.excluded[selected.id] = "ignored item"
+    else:
+        f.checking.add(selected.id)
+    assert f.target([selected, held], teaching=True) == held.id
 
 
 def test_steady_gate() -> None:

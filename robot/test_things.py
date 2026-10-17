@@ -1230,13 +1230,62 @@ def test_naming_uses_the_focus_from_speech_start(robot, monkeypatch):
     r.camera = SimpleNamespace(latest=lambda: (None, 0.0))
     r._heard_start()
     assert r.start_target == track, "the focus as the line begins"
-    monkeypatch.setattr(r.focus, "target", lambda tracks: None)  # lost just before the line
+    monkeypatch.setattr(r.focus, "target", lambda tracks, **kw: None)  # lost before the line
     turn = Turn(question="This is my phone.", speech_start=time.time() + 1,
                 target=track, visitor=r.conversation_visitor)
     assert r._things(turn).startswith("Got it, that is your phone")
     r.focus.focus = None
     r.focus.visible = set()  # gone now: no fresh view to bind
     assert r._things(Turn(question="This is my cup.", target=track)).startswith("I don't see")
+
+
+@pytest.mark.parametrize("two_lines", [False, True])
+@pytest.mark.parametrize("input_kind", ["typed", "audio"])
+def test_phone_then_cat_names_the_orange_focus_at_speech_start(robot, two_lines, input_kind,
+                                                             monkeypatch):
+    r = robot
+    show(r, [(GOLD, CENTER), (BLACK, RIGHT)])
+    hold(r, CENTER)
+    assert ask(r, "This is my phone.")[0].startswith("Got it")
+    phone_id = r.things.named(OWNER, "phone", [])["id"]
+    hold(r, RIGHT)
+    cat_track = r.focus.focus
+    r.focus.held = [(300, 0, 1000, 720)]  # only the known phone overlaps the person
+    tracks = [Track(*t) for t in r.tracker.scored()]
+    assert next(box for box in r.focus.boxes(tracks, r.focus.held)
+                if box[5] == "focus")[:4] == RIGHT
+    r.camera = SimpleNamespace(latest=lambda: (r.view[0], r.view_taken))
+    r.ready = None
+    r.asked = 0
+    text = "Track this" if two_lines else "This is my cat"
+    if input_kind == "typed":
+        monkeypatch.setattr(r, "check_health", lambda: None)
+        r.ask(text)
+    else:
+        r.scribe = lambda speech: text
+        r._heard_start()
+        r._heard_line(np.zeros(160, np.float32), time.time())
+        r._line(r.lines.get_nowait())
+    queued = []
+    while not r.jobs.empty():
+        queued.append(r.jobs.get_nowait())
+    turn = next(job[1] for job in queued if job[0] == "turn")
+    turn.visitor = OWNER
+    assert turn.teaching_target == cat_track and turn.target != cat_track
+    hold(r, CENTER)  # processing must keep the selection captured when speech began
+    if two_lines:
+        assert r._things(turn) == "What should I call it?"
+        r.last_line = time.time()
+        answer, turn = ask(r, "my cat")
+    else:
+        answer = r._things(turn)
+    assert answer.startswith("Got it, that is your cat")
+    cat = r.things.named(OWNER, "cat", [])
+    assert cat["id"] != phone_id
+    for ident, color in ((cat["id"], BLACK), (phone_id, GOLD)):
+        row = r.things.shard.retrieve([ident], False, True)[0]
+        assert np.argmax(row.vector["crops"], axis=1).tolist() == [color]
+    assert r.focus.name(cat_track) == cat["id"]
 
 
 @pytest.mark.parametrize("blocked", [None, "duplicate", "pending", "stale", "category", "weak",

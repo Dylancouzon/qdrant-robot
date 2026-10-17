@@ -4,6 +4,8 @@ The robot recognizes objects a visitor names ("this is my mouse") by DINOv3-smal
 
 ## Teaching
 
+The eligible orange focus is the naming target captured when speech starts. Another held object cannot override that selection. With no eligible focus, the most salient eligible held object remains the fallback. Typed and spoken naming preserve the same speech-start selection. Two-line naming keeps its original track and epoch. Comparison questions retain held-object priority. Fresh crop and source checks still govern writes. A saved label learned from the wrong object needs the existing Forget flow before teaching it again.
+
 - A naming turn stores the focused track's crops, then opens a teaching window: the robot says "Turn it slowly so I can see all sides" and adds views from that same track for `window_s` (6 s).
 - The window admits one view per `window_gap_s` (1 s), only above `window_floor` (0.722), and never while another same-label track overlaps the taught one. It ends on time, track loss, or a memory change.
 - `add_vectors` in `robot/things.py` skips a view whose cosine to a stored view is at least `duplicate` (0.952) and keeps at most `views_cap` (24) views, dropping the oldest except the first.

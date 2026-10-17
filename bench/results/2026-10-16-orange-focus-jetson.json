@@ -1,0 +1,11 @@
+{
+  "machine": "qdrant-robot",
+  "release": "43a78a5a93a3",
+  "baseline_revision": "b0c944f",
+  "baseline_expected_failures": 4,
+  "candidate_tests": 14,
+  "candidate_exit": 0,
+  "input": "Synthetic crop vectors, real Edge stores and tracker; typed and audio queue with stub transcript",
+  "limitation": "No live detector, ASR, or physical motion acceptance",
+  "tegrastats": "orange-focus-check-20261016-230446.tegrastats"
+}

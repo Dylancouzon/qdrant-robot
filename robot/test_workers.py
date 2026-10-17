@@ -35,7 +35,7 @@ def test_failed_worker_drains_and_reports(worker, capsys):
     if worker == "transcribe":
         pending = robot.lines
         robot.scribe = fail
-        item = (np.zeros(160, np.float32), 1.0, 1.0, 1.0, (None, 1.0), None)
+        item = (np.zeros(160, np.float32), 1.0, 1.0, 1.0, (None, 1.0), None, None)
     else:
         pending = robot.jobs
         robot._look = fail
@@ -59,7 +59,7 @@ def test_healthy_worker_drains(worker):
     if worker == "transcribe":
         pending = robot.lines
         robot.scribe = lambda speech: "Hey Edgy"
-        item = (np.zeros(160, np.float32), 1.0, 1.0, 1.0, (None, 1.0), None)
+        item = (np.zeros(160, np.float32), 1.0, 1.0, 1.0, (None, 1.0), None, None)
     else:
         pending = robot.jobs
         robot._look = lambda shot: calls.append(shot)

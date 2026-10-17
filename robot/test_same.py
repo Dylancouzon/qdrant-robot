@@ -182,6 +182,23 @@ def test_named_objects_compare_after_a_restart(robot) -> None:
         "No, this looks different from the one you showed me.", "another controller"
 
 
+def test_keyboard_focus_does_not_replace_the_held_controller(robot):
+    from robot.test_things import BLACK, GOLD, hold, show
+
+    show(robot, [(BLACK, RIGHT), (GOLD, CENTER)])
+    hold(robot, RIGHT)  # the orange keyboard is outside the person box
+    robot.focus.held = [(300, 0, 1000, 720)]
+    robot.camera = Stub(latest=lambda: (robot.view[0], robot.view_taken))
+    robot._heard_start()
+    turn = Turn(question="Am I holding the same controller as before?",
+                target=robot.start_target, teaching_target=robot.start_teaching_target)
+    robot.held.append(held("controller", GOLD))
+    now = robot._hold(turn)
+    assert now.track == turn.target and now.track != turn.teaching_target
+    assert all(shot.mean() == GOLD for shot in now.shots)
+    assert robot._same_answer(turn, now) == "Yes, it looks like the same one."
+
+
 def test_a_held_object_moving_keeps_the_answers(robot) -> None:
     """The robot keeps its own answers while the visitor moves the same object (one track); a
     new object in view drops them, as any scene change does (D27)."""

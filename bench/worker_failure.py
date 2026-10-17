@@ -46,7 +46,7 @@ def trial(arm: str, memory: Path, out: Path) -> dict:
                 robot.scribe = fail
                 now = time.time()
                 robot.lines.put((np.zeros(1600, np.float32), now, now, now,
-                                 camera.latest(), None))
+                                 camera.latest(), None, None))
             else:
                 robot._look = fail
                 robot.jobs.put(("look", camera.latest()))

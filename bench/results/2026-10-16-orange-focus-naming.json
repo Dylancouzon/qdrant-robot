@@ -1,0 +1,50 @@
+{
+  "what": "Naming captures the eligible orange focus without changing held-object comparisons",
+  "baseline_revision": "b0c944f",
+  "source_sha256": {
+    "robot/focus.py": "ba93df66a65e4666df735d76448fa2d4ed59f42b00e1c83c8abd8e7902f107d2",
+    "robot/main.py": "aa63defbe60a7cb75b3524f85e695e3a02e31000d6e35f51bfc7611f12a51ee2",
+    "robot/test_focus.py": "09f1ba5a4c31a56987726c910c3d5f2e9f4982f73100c955dcee06d8f32a07c4",
+    "robot/test_things.py": "f1ef6fd95bcb046ccaf2741d8c470e70d2f047f24602da5bb1c797bee1407710",
+    "robot/test_same.py": "3d81305ce536a800f8a640d3280ddedc263cc60839fa546ac241a0cb65f85609",
+    "bench/worker_failure.py": "f297758059ea6d269e2c4886f1f7f841d5e58fc2b68df00fd5f7333a0c0142ae",
+    "robot/test_workers.py": "6cf1cbb1f322db89f3e0d165830f9e9f51dfb50acd66741342bbf807f962d79b"
+  },
+  "baseline_expected_failures": 4,
+  "baseline_note": "Run the original Focus.target body; the adapter ignores the new teaching keyword.",
+  "candidate_focused": "14 passed, 262 deselected (E)",
+  "mac_paired": "Original selector: four naming failures; candidate: 14 passes (E)",
+  "input": "Synthetic crop vectors, real Edge stores and tracker; typed input and audio queue with stub transcript",
+  "design": "reviews/20261016-225432-43278-design.md",
+  "initial_design": "reviews/20261016-225203-40952-design.md",
+  "initial_design_outcome": "Global focus priority would reverse D169; keep comparison target separate.",
+  "limitations": [
+    "Live phone-to-cat confirmation remains pending.",
+    "No live detector, ASR, physical latency, paging, or motion acceptance."
+  ],
+  "task_review": "reviews/20261016-230012-49525-review.md",
+  "prior_task_review": "reviews/20261016-225534-44730-review.md",
+  "worker_checks": "12 passed in 0.24 s (E)",
+  "initial_full_checks": "602 passed and two stale six-field audio fixtures failed (E); both fixtures now carry teaching_target=None.",
+  "paired_runner_source": "BASELINE_SOURCE = 'def target(self, tracks: list[Track]) -> int | None:\\n        \"\"\"The object a turn is about: the most salient object held up, named or not (a visitor\\n        can always teach what they hold), unless the focus is held too; else the focus. A focus on\\n        scenery (a keyboard in the corner) never beats the object in the visitor\\'s hand.\"\"\"\\n        tracks = [t for t in tracks if self.eligible(t)]\\n        held = [t for t in tracks if t.label not in BODY and self._held(t) and t.id in self.seen]\\n        if self.focus in {t.id for t in (held or tracks)}:  # a focus out of frame is not bound\\n            return self.focus\\n        best = max(held, key=self.salience, default=None)\\n        return best and best.id'\nimport json\nimport os\nfrom pathlib import Path\nimport pytest\nfrom robot import focus\n\nnamespace = dict(vars(focus))\nexec(BASELINE_SOURCE, namespace)\noriginal = namespace['target']\ncandidate = focus.Focus.target\nfocus.Focus.target = lambda self, tracks, **kw: original(self, tracks)\nbefore = pytest.main(['-q', 'robot/test_things.py', '-k', 'phone_then_cat'])\nfocus.Focus.target = candidate\nassert before == 1, f'Expected baseline assertion failures, got {before}'\nafter = pytest.main(['-q', 'robot/test_focus.py', 'robot/test_things.py', 'robot/test_same.py',\n                     '-k', 'orange_focus or ineligible_focus or phone_then_cat or keyboard_focus or naming_uses_the_focus or pinned_object_gone or pin_that_left'])\nassert after == 0, f'Candidate failed: {after}'\nresult = dict(machine=os.uname().nodename, release=os.environ.get('ROBOT_RELEASE'),\n              baseline_revision='b0c944f', baseline_expected_failures=4,\n              candidate_tests=14, candidate_exit=int(after),\n              input='Synthetic crop vectors, real Edge stores and tracker; typed and audio queue with stub transcript',\n              limitation='No live detector, ASR, or physical motion acceptance',\n              tegrastats=os.environ.get('ROBOT_TEGRASTATS'))\nif os.environ.get('ROBOT_SHARED'):\n    path = Path(os.environ['ROBOT_SHARED']) / 'results/2026-10-16-orange-focus-jetson.json'\n    path.write_text(json.dumps(result, indent=2) + '\\n')\nprint(json.dumps(result))\n",
+  "full_checks": {
+    "status": "pass",
+    "machine": "Mac (E)",
+    "seconds": 265.27,
+    "pytest_seconds": 260.44
+  },
+  "deployed_release": "43a78a5a93a3",
+  "jetson": {
+    "machine": "qdrant-robot",
+    "release": "43a78a5a93a3",
+    "baseline_revision": "b0c944f",
+    "baseline_expected_failures": 4,
+    "candidate_tests": 14,
+    "candidate_exit": 0,
+    "input": "Synthetic crop vectors, real Edge stores and tracker; typed and audio queue with stub transcript",
+    "limitation": "No live detector, ASR, or physical motion acceptance",
+    "tegrastats": "orange-focus-check-20261016-230446.tegrastats",
+    "candidate_pytest_seconds": 5.22,
+    "baseline_pytest_seconds": 5.36
+  }
+}
