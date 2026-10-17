@@ -42,14 +42,14 @@ MODEL = "qwen3vl-2b"
 _SENTENCE = re.compile(r"[^.!?]+[.!?](?=\s|$)")
 IMAGE_WIDTH = 672   # frames are downscaled before encoding; the server caps tokens anyway
 MAX_TOKENS = 64
-MAX_SENTENCES = 1   # one sentence: second sentences were where hedges and stale details crept in
+MAX_SENTENCES = 2   # spoken replies; captions keep one (stale details crept into a second)
 MIN_WORDS = 6       # shorter sentences ("Of course!", "I see it now.") do not count
 SYSTEM = (
     "You are Edgy, a small robot built by Qdrant. Everything you do runs on the Jetson "
     "board inside you: hearing, seeing, thinking, speaking, and your memory, which is "
     "Qdrant Edge. You see through a wide camera; left and right mean the left and right "
     "parts of the image.\n"
-    "Answer in one short spoken sentence: no lists, no markdown, no emojis. "
+    "Answer in one or two short spoken sentences: no lists, no markdown, no emojis. "
     "Answer the question directly, starting with the answer itself, never with filler such "
     "as 'great question'; do not describe the whole scene unless asked. "
     "When the visitor tells you something about themselves, reply to that, warmly, "
@@ -201,12 +201,12 @@ class Brain:
         with urllib.request.urlopen(req, timeout=10) as r:
             return len(json.load(r)["tokens"])
 
-    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = ""
-               ) -> Iterator[str]:
-        """Stream the answer text, at most MAX_SENTENCES sentences and `max_tokens` tokens.
+    def answer(self, msgs: list[dict], max_tokens: int = MAX_TOKENS, prior: str = "",
+               most: int = MAX_SENTENCES) -> Iterator[str]:
+        """Stream the answer text, at most `most` sentences and `max_tokens` tokens.
         Closing the generator early stops generation; `prior` resumes it: the answer so far,
         as an assistant prefill, counts against `max_tokens`."""
-        if sentences(prior) >= MAX_SENTENCES:  # paused right after the last sentence
+        if sentences(prior) >= most:  # paused right after the last sentence
             return
         if prior:
             msgs = msgs + [{"role": "assistant", "content": prior}]
@@ -218,7 +218,7 @@ class Brain:
             for delta in unecho(prior, _content(r)):
                 yield delta
                 text += delta
-                if sentences(text) >= MAX_SENTENCES:
+                if sentences(text) >= most:
                     return
 
     def caption(self, image: dict, stop: Callable[[], bool]) -> str | None:
@@ -226,7 +226,7 @@ class Brain:
         is evidence of what was seen; None if `stop` interrupts it."""
         msgs = caption_messages(image)
         text = ""
-        for delta in self.answer(msgs, max_tokens=48):
+        for delta in self.answer(msgs, max_tokens=48, most=1):
             if stop():
                 return None
             text += delta
