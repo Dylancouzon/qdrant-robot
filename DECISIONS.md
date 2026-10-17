@@ -194,3 +194,5 @@ The full history (D1 to D148 and the 2026-10-10 session entries) is in [research
 **D198 2026-10-16: Keep the following camera still within ±12% of frame center.** Supersedes the ±6% band after Dylan identified small following corrections as a possible detection delay. Each motion resets object continuity; keep existing movement, freshness, Stop, and travel guards.
 
 **D199 2026-10-16: Reduce chat text and enlarge retrieved thumbnails.** At Dylan's request, supersedes D193's 16 px chat text with 10 pt, a reduction of two points. Scale the chat's retrieved thumbnails from 48 px to 62.4 px per side, or 30%, while preserving their width in narrow cards.
+
+**D200 2026-10-16: Preserve stationary camera validity during following holds.** A centered or unknown visitor requests a halt only when motion is active or pending. Supersedes D197: restore the original 0.25 detector settings after Dylan reported a live regression; keep D198's center band and D199's chat sizes.

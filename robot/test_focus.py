@@ -1,10 +1,7 @@
 """Focus selection intervals, drawing continuity, and named-track hysteresis on real Focus."""
-import dataclasses
-
 import pytest
 
 from robot import focus as F
-from robot.detect import CONFIRM, Detection, Tracker
 from robot.focus import Focus, Track
 
 
@@ -41,67 +38,6 @@ def test_takes_held_object_and_labels_it() -> None:
     [focus] = [b for b in f.boxes([phone()], [PERSON]) if b[5] == "focus"]
     assert focus[4] == "???"
     assert f.boxes([phone(score=0.3)], [])[0][4] == "???", "detector confidence never names it"
-
-
-@pytest.mark.parametrize("label", ["plush toy", "cup", "phone"])
-def test_weak_objects_confirm_and_take_focus_without_naming(label, monkeypatch):
-    monkeypatch.setattr(F, "MIN_SIDE", 120)
-    tracker, focus = Tracker(), Focus(W, H)
-    box = (500, 300, 720, 500)
-    for step in range(21):
-        taken = 10 + step * DT
-        tracker.update([Detection(label, .16, box)], W, taken)
-        tracks = [Track(*t) for t in tracker.scored()]
-        focus.update(taken, tracks, [PERSON])
-        if step < CONFIRM - 1:
-            assert not tracks and focus.focus is None
-    assert focus.focus == tracks[0].id and focus.target(tracks) == tracks[0].id
-    assert focus.boxes(tracks, [PERSON])[0][4:] == ("???", "focus")
-    assert not focus.names(), "detector confidence supplies no saved identity"
-    weak = dataclasses.replace(tracks[0], score=.14)
-    focus.update(taken + DT, [weak], [PERSON])
-    assert not focus.eligible(weak) and focus.target([weak]) is None
-    assert focus.boxes([weak], [PERSON])[0][4:] == ("???", "focus")
-
-
-@pytest.mark.parametrize("label", sorted(F.BODY))
-def test_object_admission_keeps_stricter_body_threshold(label):
-    tracker = Tracker()
-    box = (300, 0, 1000, 720)
-    for step in range(CONFIRM + 2):
-        tracker.update([Detection(label, .20, box)], W, step * DT)
-    assert not tracker.tracks, "a weak body proposal cannot start a new track"
-    focus = Focus(W, H)
-    assert not focus.confident(Track(1, box, label, .20))
-    assert focus.confident(Track(1, box, label, .25))
-
-
-def test_weak_body_label_cannot_take_over_an_object_track():
-    tracker = Tracker()
-    box = (300, 100, 650, 500)
-    for step in range(CONFIRM):
-        tracker.update([Detection("phone", .16, box)], W, step * DT)
-    assert tracker.scored()[0][2] == "phone"
-    for step in range(CONFIRM):
-        tracker.update([Detection("person", .249, box)], W, 1 + step * DT)
-    assert all(t.label != "person" for t in tracker.tracks)
-    assert not tracker.scored()
-    for step in range(CONFIRM):
-        tracker.update([Detection("person", .25, box)], W, 2 + step * DT)
-    assert any(t[2] == "person" for t in tracker.scored())
-
-
-def test_weak_object_admission_cannot_retain_a_name_with_weak_crop_evidence():
-    focus = Focus(W, H)
-    track = phone(score=.6)
-    focus.update(10, [track], [])
-    focus.bind(track.id, "Chosen")
-    weak = dataclasses.replace(track, score=.155)
-    focus.update(10.1, [weak], [], recognized={track.id: ("Chosen", .7754759788513184)})
-    assert not focus.names() and not focus.eligible(weak)
-    assert focus.eligible(weak, pending=True), "fresh recognition can still recheck the crop"
-    focus.update(10.2, [weak], [], recognized={track.id: ("Chosen", 1.)})
-    assert focus.names() == {track.id: ("Chosen", True)}
 
 
 def test_worn_small_objects_hidden_and_outside_zone_fallback() -> None:

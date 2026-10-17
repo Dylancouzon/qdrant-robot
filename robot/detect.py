@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from robot.config import BODY, DETECT_HIGH, DETECT_LOW, MODELS, OBJECT_CONFIDENCE, ROOT
+from robot.config import DETECT_HIGH, DETECT_LOW, MODELS, ROOT
 
 MODEL = MODELS / "detector/yoloe-26s-booth-384x640.onnx"  # recipe: research/detector.md
 INPUT = (384, 640)  # height, width: the 16:9 camera frame letterboxed with little padding
@@ -203,10 +203,6 @@ class Tracker:
         if not tracks or not dets:
             return []
         m = iou(np.array([t.det.box for t in tracks]), np.array([d.box for d in dets]))
-        # A weak body observation can continue a body track, but cannot turn an object into one.
-        objects = np.array([t.label not in BODY for t in tracks])[:, None]
-        weak_body = np.array([d.label in BODY and d.conf < HIGH for d in dets])[None, :]
-        m[objects & weak_body] = 0
         rows, cols = np.nonzero(m >= MATCH_IOU)
         pairs, used_t, used_d = [], set(), set()
         for k in np.argsort(-m[rows, cols], kind="stable"):  # best overlap first
@@ -223,13 +219,12 @@ class Tracker:
         for MAX_MISSED frames), or ended (lost for LOST frames with no new track continuing it)."""
         self.merged.clear()
         dets = distinct(dets)
-        high = [d for d in dets if d.conf >= (HIGH if d.label in BODY else OBJECT_CONFIDENCE)]
-        high_ids = {id(d) for d in high}
+        high = [d for d in dets if d.conf >= HIGH]
         live = [t for t in self.tracks if t.missed <= MAX_MISSED]
         first = self._match(live, high)
         taken = {id(x) for pair in first for x in pair}
         rest = [t for t in live if id(t) not in taken]
-        pairs = first + self._match(rest, [d for d in dets if id(d) not in high_ids])
+        pairs = first + self._match(rest, [d for d in dets if d.conf < HIGH])
         for t in self.tracks:
             t.missed += 1
         for t, d in pairs:
@@ -329,7 +324,7 @@ def _selftest() -> None:
     assert t.tracks == []
     _vote_selftest(w)
     for _ in range(CONFIRM):
-        assert t.update([Detection("x", OBJECT_CONFIDENCE - .01, (0, 0, 9, 9))], w, 100) == []
+        assert t.update([Detection("x", 0.2, (0, 0, 9, 9))], w, 100) == []
     assert t.tracks == [], "a low-score detection never starts a track"
     for _ in range(CONFIRM - 1):
         t.update([cup], w, 101)

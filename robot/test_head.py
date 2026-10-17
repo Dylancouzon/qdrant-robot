@@ -278,10 +278,19 @@ def test_centered_face_jitter_keeps_camera_view_stable():
         offset = 1280 * .11 * math.sin(step / 4)
         center = 640 + offset
         assert head.follow((center - 80, 50, center + 80, 400), 1280, now, now) == 'centered'
+        assert head.valid(now), "a centered callback must preserve stationary camera evidence"
         head.tick(now)
     assert head.view == view and len(motor.goals) == goals
     assert head.angle == 0 and not head.moving
     assert head.follow((1000, 50, 1160, 400), 1280, 108, 108) == 'goal'
+
+
+def test_stationary_unknown_visitor_hold_preserves_camera_evidence():
+    head = Head(SimMotor())
+    drive(head)
+    assert head.valid(101)
+    head.hold(taken=101)
+    assert head.valid(101) and not head.halt
 
 
 def test_exception_without_message_latches_before_cleanup_closes_motor():

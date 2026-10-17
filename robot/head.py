@@ -229,8 +229,7 @@ class Head:
                 self.awaiting_motion = False
                 self.condition.notify_all()
                 return "goal"
-            self.halt = True
-            self.condition.notify_all()
+            self.hold(generation)
             return "centered"
 
     def _follow_hold(self, taken, now):
@@ -250,7 +249,8 @@ class Head:
                 if taken is not None:
                     self.source = taken
                 self.expires = None
-                self.halt = True
+                self.halt = self.moving or self.goal != self.sent
+                self.condition.notify_all()
 
     def move(self, angle, generation):
         with self.condition:

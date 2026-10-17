@@ -1,0 +1,23 @@
+{
+  "machine": "Mac (E)",
+  "input": "Synthetic centered known and unknown visitor, real Edge memory with an Ignore rule, real Robot tracking/preview/display, stub face and crop vectors",
+  "baseline_head_revision": "6faa24d",
+  "baseline_head_sha256": "5b58ec783901f986aef2aefcf3965d6b39b7a41e8c275c14622cdac121bc742b",
+  "candidate_head_sha256": "c249c9ee2e9c447c5ed90a20ab1d451db8ac9fd80de7fa0eb0f0c03494b5865b",
+  "baseline_expected_regression_failures": [
+    "known",
+    "unknown"
+  ],
+  "candidate_targeted_tests": "19 passed, 35 deselected in 22.05s",
+  "detector_threshold": 0.25,
+  "live_validation": "pending",
+  "full_checks": {
+    "status": "pass",
+    "machine": "Mac (E)",
+    "seconds": 259.78,
+    "per_step_limit_s": 600
+  },
+  "task_review": "reviews/20261016-224058-30945-review.md",
+  "deployed_release": "d1cea3bcf37b",
+  "jetson_check": "Pass: centered and unknown stationary holds preserve validity; pending motion blocks validity. Simulated motor on Jetson (J)."
+}

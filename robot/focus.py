@@ -5,11 +5,13 @@ import math
 from collections import deque
 from dataclasses import dataclass, field
 
-from robot.config import BODY, DETECT_LOW, DISPLAY_CONFIDENCE, OBJECT_CONFIDENCE, OBJECT_MIN_SIDE
+from robot.config import DETECT_LOW, DISPLAY_CONFIDENCE, OBJECT_MIN_SIDE
 from robot.settings import settings
 
 Box = tuple[int, int, int, int]  # x1, y1, x2, y2 in frame pixels
 
+# Worn or part of a person: never the focus (the hoodie strings read "lanyard" in the live clip).
+BODY = frozenset({"person", "face", "t-shirt", "lanyard", "badge", "hat", "glasses"})
 MIN_SIDE = OBJECT_MIN_SIDE
 STEADY = 0.10  # of the frame width: how far a candidate's center may move in STEADY_S
 STEADY_S = 1.0
@@ -204,7 +206,7 @@ class Focus:
 
     def _fit(self, t: Track) -> bool:
         """An eligible unknown object. Held and teaching-zone cues raise priority."""
-        return (t.label not in BODY and t.score >= OBJECT_CONFIDENCE and self.eligible(t) and
+        return (t.label not in BODY and t.score >= DISPLAY_CONFIDENCE and self.eligible(t) and
                 not self.names().get(t.id, (None, False))[1]
                 and t.id not in self.scenery)
 
@@ -215,8 +217,7 @@ class Focus:
         """A sure name can continue at LOW; pending associations can only be reverified."""
         name = self.named.get(t.id)
         known = name and name.name and (pending or name.score >= settings.match)
-        floor = DISPLAY_CONFIDENCE if t.label in BODY or (name and name.name) else OBJECT_CONFIDENCE
-        return t.score >= (DETECT_LOW if known else floor)
+        return t.score >= (DETECT_LOW if known else DISPLAY_CONFIDENCE)
 
     def eligible(self, t: Track, *, pending: bool = False) -> bool:
         """Pending preference checks preserve drawing history, never action authority."""

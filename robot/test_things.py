@@ -1860,7 +1860,7 @@ def test_named_confidence_dip_reverifies_and_admitted_unknown_stays_grey(robot, 
     moved = (560, 300, 760, 600)
     frame = np.zeros((720, 1280, 3), np.uint8)
     frame[300:600, 560:760], frame[300:600, 100:300] = GOLD, BLACK
-    dets = [Detection("phone", .13, moved), Detection("phone", .13, LEFT)]
+    dets = [Detection("phone", .21, moved), Detection("phone", .21, LEFT)]
     r._track(frame, dets)
     assert r.focus.name(chosen) == object_id(r.things, r.conversation_visitor, "Dylan's smartphone")
     assert r.focus.seen[chosen].shown != moved, "the confidence dip preserves smoothing"

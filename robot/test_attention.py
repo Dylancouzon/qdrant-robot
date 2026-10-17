@@ -14,7 +14,8 @@ from robot.detect import CONFIRM, Detection
 from robot.main import Turn
 from robot.people import DIM
 from robot.head import Head, SimMotor
-from robot.test_things import GOLD, close_robot, open_robot
+from robot.test_things import GOLD, close_robot, open_robot, preview
+from robot.things import DIM as OBJECT_DIM
 from robot.text_embed import DIM as TEXT_DIM
 
 
@@ -132,6 +133,39 @@ def test_fresh_verified_face_follows_without_admitted_body_tracks(tmp_path, monk
         held = robot.head.goal
         robot._preview(frame, taken - 1, [], {}, robot.session_id, {}, robot.recognition.epoch)
         assert robot.head.goal == held, "An expired source cannot restart following"
+    finally:
+        robot.head.close()
+        close_robot(robot)
+
+
+@pytest.mark.parametrize("known", [True, False])
+def test_stationary_visitor_allows_object_preference_check_and_focus(tmp_path, monkeypatch, known):
+    robot = speaking_robot(tmp_path)
+    robot.head = Head(SimMotor())
+    vector = np.eye(DIM, dtype=np.float32)[0]
+    frame = np.zeros((720, 1280, 3), np.uint8)
+    frame[300:600, 540:740] = GOLD
+    clock = [time.time()]
+    monkeypatch.setattr(main.time, "time", lambda: clock[0])
+    monkeypatch.setattr(main, "located_faces", lambda *args: [(vector, 160, (560, 50, 720, 210))])
+    try:
+        if known:
+            robot.people.enroll("Sam", [vector, vector], clock[0])
+            robot.face = vector
+            robot.current_visitor = robot.people.person("Sam")["visitor"]
+        robot.things.ignore_item("Unrelated item", np.eye(OBJECT_DIM, dtype=np.float32)[[30]])
+        for _ in range(20):
+            clock[0] += 1 / 15
+            robot.head.tick(clock[0])
+            robot._track(frame, [Detection("person", .9, (300, 0, 1000, 720)),
+                                 Detection("phone", .9, (540, 300, 740, 600))], clock[0])
+            preview(robot)
+        track = next(t.id for t in robot.tracker.tracks if t.label == "phone")
+        assert robot.head.valid(clock[0]) and not robot.head.moving
+        assert track not in robot.focus.checking
+        assert robot.focus.focus == track
+        assert any(b[4:] == ("???", "focus") for b in robot._shown()[1].boxes)
+        assert robot.things.preferences(), "the existing Ignore rule remains active"
     finally:
         robot.head.close()
         close_robot(robot)

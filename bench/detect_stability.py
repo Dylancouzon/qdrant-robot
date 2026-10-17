@@ -40,7 +40,6 @@ SWEEP = {
     "MEAN",
     "LOW",
     "HIGH",
-    "OBJECT_CONFIDENCE",
     "MATCH_IOU",
     "CONFIRM",
     "MAX_MISSED",
