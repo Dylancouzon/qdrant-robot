@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Loopback monitor and controls for the robot. The robot is a Jetson-owned unit (`qr-robot`)
-that hears and speaks through its own USB audio. Start attaches to it, or starts it. Closing
-this page or losing the tunnel leaves it running; only Stop stops it."""
+"""Monitor and controls for the robot. The robot is a Jetson-owned unit (`qr-robot`) that hears
+and speaks through its own USB audio. Start attaches to it, or starts it. Closing this page or
+losing the tunnel leaves it running; only Stop stops it. The Mac serves the page on loopback
+through an SSH tunnel; `--on-robot` serves it from the Jetson to the network behind a key."""
 import argparse
 import contextlib
 import http.client
+import ipaddress
 import os
 import json
 import secrets
@@ -12,9 +14,11 @@ import socket
 import subprocess
 import sys
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from http.cookies import SimpleCookie
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
@@ -22,6 +26,9 @@ NAME = "robot"
 UNIT = f"qr-{NAME}.service"
 SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
        "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=2"]
+LOCAL = False  # --on-robot: run commands here and reach the view without a tunnel
+HOTSPOT = "l6-hotspot"  # the robot's own WPA2 network (SSID l6-robot, 10.42.0.1)
+WIFI_CHECK_S, WIFI_MISSES = 30, 4  # raise the hotspot after two minutes without Wi-Fi
 
 
 def robot_args(camera_file: str | None, servo_calibration: str | None = None) -> list[str]:
@@ -38,7 +45,32 @@ def command(args: list[str], env=None) -> str:
 
 
 def remote(script: str) -> str:
-    return command([*SSH, "robot", script])
+    return command(["bash", "-c", script] if LOCAL else [*SSH, "robot", script])
+
+
+def watch_wifi(down: int) -> int:
+    """One Wi-Fi check: returns the new count of consecutive checks without a connection.
+    The hotspot also counts as connected; it stays up until reboot or `nmcli con up <wifi>`."""
+    try:
+        states = command(["nmcli", "-t", "-f", "TYPE,STATE", "dev"]).splitlines()
+    except (OSError, RuntimeError, subprocess.SubprocessError):
+        return down  # an unknown state never raises the hotspot
+    if "wifi:connected" in states:
+        return 0
+    if down + 1 < WIFI_MISSES:
+        return down + 1
+    try:
+        command(["sudo", "-n", "nmcli", "--wait", "25", "con", "up", HOTSPOT])
+    except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+        print(f"Could not raise {HOTSPOT}: {exc}", flush=True)  # retried after another loss
+    return 0
+
+
+def keep_reachable() -> None:
+    down = 0
+    while True:
+        time.sleep(WIFI_CHECK_S)  # first, so four misses span the full two minutes
+        down = watch_wifi(down)
 
 
 def reap(process: subprocess.Popen | None) -> None:
@@ -58,9 +90,10 @@ def reap(process: subprocess.Popen | None) -> None:
 class Session:
     """Attach this page to the robot unit through one tunnel; the unit outlives the session."""
 
-    def __init__(self, release: str, camera_file: str | None = None,
+    def __init__(self, release: str | None, camera_file: str | None = None,
                  servo_calibration: str | None = None):
-        self.release = release
+        self.release = release  # None follows the deployed `current` release
+        self.follow = release is None
         self.camera_file = camera_file
         self.servo_calibration = servo_calibration
         self.view_port = self.view_token = None
@@ -112,7 +145,7 @@ class Session:
         self.update(phase="Warming up Jetson; microphone off")
         ready = False
         while not self.stopped.wait(0.5 if not ready else 2):
-            if tunnel.poll() is not None:
+            if tunnel is not None and tunnel.poll() is not None:
                 raise RuntimeError(tunnel.stderr.read().decode().strip() or "SSH tunnel closed")
             self.report()  # raises when the Jetson session stops; old logs cannot prove readiness
             if not ready:
@@ -185,6 +218,8 @@ class Session:
             status = remote(f"readlink -f {BASE}/current; systemctl list-units 'qr-*' "
                             "--state=active --no-legend --plain | awk '{print $1}'").splitlines()
             running = status[1:]
+            if self.follow:
+                self.release = status[0].rsplit("/", 1)[-1]
             if status[:1] != [f"{BASE}/releases/{self.release}"] or running not in ([], [UNIT]):
                 raise RuntimeError(f"Jetson must run no job but {UNIT}, on release "
                                    f"{self.release}. Received: {status}")
@@ -198,12 +233,15 @@ class Session:
                 command([sys.executable, str(ROOT / "tools/jetson.py"), "run", NAME,
                          "--", *robot_args(self.camera_file, self.servo_calibration)],
                         env={**os.environ, "ROBOT_VIEW_TOKEN": self.view_token})
-            with socket.socket() as reserve:
-                reserve.bind(("127.0.0.1", 0))
-                self.view_port = reserve.getsockname()[1]
-            tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes",
-                                       "-L", f"127.0.0.1:{self.view_port}:127.0.0.1:8090", "robot"],
-                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            if LOCAL:
+                self.view_port = 8090
+            else:
+                with socket.socket() as reserve:
+                    reserve.bind(("127.0.0.1", 0))
+                    self.view_port = reserve.getsockname()[1]
+                tunnel = subprocess.Popen([*SSH, "-N", "-o", "ExitOnForwardFailure=yes", "-L",
+                                           f"127.0.0.1:{self.view_port}:127.0.0.1:8090", "robot"],
+                                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             self.listen(tunnel)
         except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
             if not self.stopped.is_set():
@@ -222,6 +260,7 @@ class Session:
 class Handler(BaseHTTPRequestHandler):
     session = None
     token = origin = ""
+    lan = False  # --on-robot: any IP or .local host; the page needs ?key= or the cookie
 
     def reply(self, code, data, kind="application/json"):
         self.send_response(code)
@@ -233,14 +272,36 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def allowed(self):
-        return (self.headers.get("Host") == self.origin.removeprefix("http://") and
-                self.headers.get("Origin", self.origin) == self.origin)
+    def allowed(self) -> str:
+        """The request's page origin when Host and Origin are trusted, else ''."""
+        origin = self.origin
+        if self.lan:
+            host = self.headers.get("Host", "")
+            name = host.rsplit(":", 1)[0].strip("[]")
+            try:
+                ipaddress.ip_address(name)  # IP literals and mDNS names resist DNS rebinding
+            except ValueError:
+                if name != "localhost" and not name.endswith(".local"):
+                    return ""
+            origin = f"http://{host}"
+        if (self.headers.get("Host") == origin.removeprefix("http://") and
+                self.headers.get("Origin", origin) == origin):
+            return origin
+        return ""
+
+    def cookie_ok(self):
+        cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
+        return cookie is not None and secrets.compare_digest(cookie.value, self.token)
 
     def do_GET(self):
         if not self.allowed():
             self.reply(403, b"Forbidden")
-        elif self.path == "/":
+        elif self.path.split("?", 1)[0] == "/":
+            key = parse_qs(urlsplit(self.path).query).get("key", [""])[0]
+            if self.lan and not (self.cookie_ok() or secrets.compare_digest(key, self.token)):
+                self.reply(403, b"Open the monitor link with ?key= from shared/monitor-key",
+                           "text/plain")
+                return
             page = Path(__file__).with_suffix(".html").read_text().replace("TOKEN", self.token)
             self.reply(200, page.encode(), "text/html; charset=utf-8")
         elif self.path == "/mona-sans.woff2":
@@ -248,8 +309,7 @@ class Handler(BaseHTTPRequestHandler):
                        "font/woff2")
         elif self.path.split("?", 1)[0] in (
                 "/camera", "/robot", "/memory", "/memory_map", "/thumb"):
-            cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
-            if cookie is None or not secrets.compare_digest(cookie.value, self.token):
+            if not self.cookie_ok():
                 self.reply(403, b"Forbidden")
                 return
             self.proxy_view()
@@ -282,14 +342,14 @@ class Handler(BaseHTTPRequestHandler):
                 connection.close()
 
     def do_POST(self):
-        if (not self.allowed() or self.headers.get("Origin") != self.origin or
+        origin = self.allowed()
+        if (not origin or self.headers.get("Origin") != origin or
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
         if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head",
                          "/resume_head", "/forget_object", "/remove_view"):
-            cookie = SimpleCookie(self.headers.get("Cookie", "")).get("edgy")
-            if cookie is None or not secrets.compare_digest(cookie.value, self.token):
+            if not self.cookie_ok():
                 self.reply(403, b"Forbidden")
                 return
             connection = None
@@ -317,15 +377,28 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def serve(port: int, release: str, camera_file: str | None = None,
-          servo_calibration: str | None = None) -> None:
-    session = Session(release, camera_file, servo_calibration)
-    token = secrets.token_urlsafe(32)
-    Handler.session = session
-    Handler.token = token
-    origin = Handler.origin = f"http://127.0.0.1:{port}"
+def monitor_key() -> str:
+    """The robot page key: one per robot, kept across restarts so a saved link keeps working."""
+    path = Path(BASE) / "shared/monitor-key"
+    with (contextlib.suppress(FileExistsError),
+          os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as f):
+        f.write(secrets.token_urlsafe(24))
+    return path.read_text().strip()
 
-    with ThreadingHTTPServer(("127.0.0.1", port), Handler) as server:
+
+def serve(port: int, release: str | None, camera_file: str | None = None,
+          servo_calibration: str | None = None, on_robot: bool = False) -> None:
+    global LOCAL
+    LOCAL = Handler.lan = on_robot
+    session = Session(release, camera_file, servo_calibration)
+    Handler.session = session
+    Handler.token = monitor_key() if on_robot else secrets.token_urlsafe(32)
+    origin = Handler.origin = f"http://127.0.0.1:{port}"
+    if on_robot:
+        threading.Thread(target=keep_reachable, daemon=True).start()
+        origin = f"http://{socket.gethostname()}.local:{port}/?key=<shared/monitor-key>"
+
+    with ThreadingHTTPServer(("0.0.0.0" if on_robot else "127.0.0.1", port), Handler) as server:
         print(f"Robot monitor: {origin} (nothing runs until Start)", flush=True)
         try:
             server.serve_forever()
@@ -339,12 +412,14 @@ def serve(port: int, release: str, camera_file: str | None = None,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", type=int, default=8765, help="loopback control page port")
+    parser.add_argument("--port", type=int, default=8765, help="control page port")
     parser.add_argument("--release", help="exact Jetson release printed by tools/jetson.py deploy")
+    parser.add_argument("--on-robot", action="store_true",
+                        help="run on the Jetson: serve the network, follow `current`, keep Wi-Fi")
     parser.add_argument("--camera-file", help="existing Jetson recorded camera fixture path")
     parser.add_argument("--servo-calibration",
                         help="existing Jetson mounted servo calibration path")
     args = parser.parse_args()
-    if not args.release:
+    if not args.release and not args.on_robot:
         parser.error("--release is required for the deployed interface release")
-    serve(args.port, args.release, args.camera_file, args.servo_calibration)
+    serve(args.port, args.release, args.camera_file, args.servo_calibration, args.on_robot)

@@ -35,8 +35,9 @@ def remote(script: str, check: bool = True) -> int:
     # Pass the view secret on stdin, never in SSH/systemd command arguments or logs.
     if token := os.environ.get("ROBOT_VIEW_TOKEN"):
         script = f"export ROBOT_VIEW_TOKEN={shlex.quote(token)}\n" + script
-    return subprocess.run(["ssh", HOST, "bash -se"], input=script, text=True,
-                          check=check).returncode
+    here = Path(BASE).is_dir()  # on the Jetson itself, as the on-robot monitor runs it
+    return subprocess.run(["bash", "-se"] if here else ["ssh", HOST, "bash -se"], input=script,
+                          text=True, check=check).returncode
 
 
 def shipped() -> list[str]:
@@ -86,6 +87,7 @@ ln -sfn $venv .venv
 cd {BASE}
 [ "$(readlink current || true)" = releases/{release} ] || {{
   [ -L current ] && ln -sfn "$(readlink current)" previous; ln -sfn releases/{release} current; }}
+sudo systemctl try-restart robot-monitor 2>/dev/null || true  # the on-robot page follows `current`
 echo deployed {release}""")
 
 

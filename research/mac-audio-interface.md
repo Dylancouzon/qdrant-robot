@@ -14,8 +14,6 @@ Say "Hey Edgy" to start a turn. Follow-up questions work for about a minute afte
 
 A transcription or answer-worker exception stops the session and preserves its traceback in the Jetson journal. Pending work is discarded before resources close. Start launches another session after the failed unit stops.
 
-The Mac and Jetson can use the existing Wi-Fi network wherever its coverage reaches. All model inference and robot audio remain on the Jetson. The interface uses the Mac launcher and its SSH tunnel. An isolated hotspot needs another uplink for Internet access. Hotspot setup must use a separate control connection.
-
 **Mute** and the **volume** slider act on the robot through the view's token-protected `/mute` and `/volume` endpoints, proxied by the local page. Mute silences the Jetson microphone input. Volume sets the USB `Speaker` mixer (0 to 100 percent), is saved in `shared/speaker-volume`, and is applied at robot startup. The default is 62 percent, also used when the saved level is unreadable or out of range. If saving fails after the mixer changed, the page shows that the level is set but not saved.
 
 The robot does not hear itself. `Robot.hear` replaces every input chunk with silence while the speaker plays and for `SELF_VOICE_TAIL_S` (0.3 s) after the last phrase, for the USB microphone and replays alike. `Mouth` keeps the gate closed while a phrase is queued or its `aplay` runs, because `aplay` exits after the audio drains, then for the tail after the last sink call returns. A failed `aplay` is logged and the gate reopens.
@@ -23,6 +21,14 @@ The robot does not hear itself. `Robot.hear` replaces every input chunk with sil
 All models and Qdrant Edge run on the Jetson. The Mac stores no recording. The Jetson retains session logs and generated answer WAVs.
 
 Use one camera viewer. A second MJPEG subscriber replaces the first. Each session has a fresh view token, passed through environment and SSH stdin. The local page proxies camera/state access through its session cookie. Stop clears the live feed and transient conversation.
+
+## On the robot and without a network
+
+The boot unit `robot-monitor` (`tools/robot-monitor.service`, D211) runs `tools/talk.py --on-robot` on the Jetson. Open `http://qdrant-robot.local:8765/?key=KEY` or the robot's IP from any device on the same network. KEY is in `shared/monitor-key`; the page then keeps it in its session cookie. The page accepts only IP and `.local` hosts, which blocks DNS rebinding. It starts the robot unit locally through `tools/jetson.py run`, connects to the view on port 8090 without a tunnel, and follows the deployed `current` release. `tools/jetson.py deploy` restarts the unit. Install it once with the commands in the unit file.
+
+All model inference, robot audio, and the view stay on the Jetson, so a lost network never stops a session. The monitor checks Wi-Fi every 30 s. After four checks without a connection, it raises the existing `l6-hotspot` profile (SSID `l6-robot`, WPA2, `http://10.42.0.1:8765/?key=KEY`). An unreadable network state never counts. The hotspot stays up until a reboot or `nmcli con up <wifi>`. The hotspot has no Internet uplink. Plain HTTP on a shared venue network exposes the key to sniffing; prefer the hotspot at a booth. Never set up a hotspot over the active Wi-Fi link; use a separate control connection.
+
+The Mac launcher still works over Wi-Fi and its SSH tunnel.
 
 ## What the page shows
 

@@ -386,3 +386,52 @@ def test_brand_font_is_served_locally():
     handler.do_GET()
     code, font, kind = replies[0]
     assert code == 200 and kind == "font/woff2" and font.startswith(b"wOF2")
+
+
+@pytest.mark.parametrize("host,origin,cookie,query,code", [
+    ("192.168.1.239:8765", "", "", "?key=secret", 200),
+    ("qdrant-robot.local:8765", "", "secret", "", 200),
+    ("10.42.0.1:8765", "", "", "", 403),
+    ("10.42.0.1:8765", "", "", "?key=wrong", 403),
+    ("evil.test:8765", "", "", "?key=secret", 403),
+    ("10.42.0.1:8765", "http://evil.test", "", "?key=secret", 403),
+])
+def test_on_robot_page_needs_the_key_and_a_rebinding_safe_host(host, origin, cookie, query,
+                                                                code, monkeypatch):
+    from email.message import Message
+    handler = talk.Handler.__new__(talk.Handler)
+    monkeypatch.setattr(talk.Handler, "lan", True)
+    handler.origin, handler.token, handler.path = "http://127.0.0.1:8765", "secret", "/" + query
+    handler.headers = Message()
+    handler.headers["Host"] = host
+    if origin:
+        handler.headers["Origin"] = origin
+    if cookie:
+        handler.headers["Cookie"] = f"edgy={cookie}"
+    replies = []
+    handler.reply = lambda *args: replies.append(args)
+    handler.do_GET()
+    assert replies[0][0] == code
+
+
+def test_wifi_watch_raises_the_hotspot_only_after_sustained_loss(monkeypatch):
+    calls, states = [], iter(["wifi:connected"] + ["wifi:disconnected"] * 4 + [None])
+
+    def command(args, **_):
+        calls.append(args)
+        if args[:2] == ["sudo", "-n"]:
+            return ""
+        state = next(states)
+        if state is None:
+            raise RuntimeError("nmcli failed")
+        return f"ethernet:unavailable\nwifi-p2p:disconnected\n{state}"
+
+    monkeypatch.setattr(talk, "command", command)
+    down = talk.watch_wifi(2)
+    assert down == 0  # a connection resets the count
+    for expected in (1, 2, 3, 0):
+        down = talk.watch_wifi(down)
+        assert down == expected
+    assert [c for c in calls if c[0] == "sudo"] == [
+        ["sudo", "-n", "nmcli", "--wait", "25", "con", "up", talk.HOTSPOT]]
+    assert talk.watch_wifi(3) == 3  # an unknown state neither counts nor acts

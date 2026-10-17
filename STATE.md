@@ -8,11 +8,17 @@ The [memory demo session](research/overnight-conversation.md) is complete (D207,
 
 ## Robot and jobs
 
-No qr-* unit runs. Boot 748cf835. Deployed release 7629fadf194a (hybrid exchange recall, D210); `previous` is d1d27ee0fbad (time-ordered main). `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
+No qr-* unit runs; `robot-monitor` runs (D211). Boot 748cf835. Deployed release ded7b1bd276a (on-robot monitor, D211); `previous` is 5c9ee5f7842f; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
 
 Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; telemetry uses `shared/results/*.tegrastats`. Preserve memories, results, backups, and previous releases.
 
 [Head control](research/servo.md) owns mounted calibration, temperature guards, and recovery instructions. Physical heating, Stop/Resume, alternating-input following, and unattended motion remain unqualified. The [remaining-work list](research/edge-cases.md#next-steps) owns other gaps.
+
+## Running on the robot and network failsafes (D211)
+
+- The boot unit `robot-monitor` serves the page from the Jetson: `http://qdrant-robot.local:8765/?key=KEY`, or the robot's IP. Read KEY with `ssh robot cat qdrant-robot/shared/monitor-key` and bookmark the link. Start, Stop, and the view passed end to end from the Mac (E).
+- The robot needs no network after Start. After two minutes without Wi-Fi, it raises its own hotspot `l6-robot` at `http://10.42.0.1:8765/?key=KEY`. Read the hotspot password with `ssh robot sudo nmcli -s -g 802-11-wireless-security.psk con show l6-hotspot`. A reboot or `nmcli con up <wifi>` returns to Wi-Fi.
+- Unqualified: the live hotspot fallback and USB-C networking (`192.168.55.1`, `nv-l4t-usb-device-mode` is active). See [remaining work](research/edge-cases.md#next-steps).
 
 ## Demo notes for Dylan
 

@@ -5,7 +5,8 @@
 | Tool | Purpose |
 | --- | --- |
 | [jetson.py](jetson.py) | Deploy immutable releases, run named locked jobs, collect results, and roll back. |
-| [talk.py](talk.py), [talk.html](talk.html) | Serve the local robot monitor and proxy authenticated controls. |
+| [talk.py](talk.py), [talk.html](talk.html) | Serve the robot monitor and proxy authenticated controls, from the Mac or on the robot (`--on-robot`). |
+| [robot-monitor.service](robot-monitor.service) | Boot unit for the on-robot monitor and its Wi-Fi hotspot fallback (D211). |
 | [models.py](models.py) | Download and verify artifacts pinned in [models.json](../models.json). |
 | [gate.py](gate.py) | Run deterministic checks and read-only Codex gates. |
 | [results.py](results.py) | Summarize replay and brain bake-off JSONL offline. |

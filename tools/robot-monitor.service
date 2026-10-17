@@ -1,0 +1,15 @@
+# The on-robot monitor page and Wi-Fi watchdog (tools/talk.py --on-robot). Install once:
+#   sudo cp tools/robot-monitor.service /etc/systemd/system/ && sudo systemctl enable --now robot-monitor
+[Unit]
+Description=Qdrant robot monitor page and Wi-Fi watchdog
+After=NetworkManager.service
+
+[Service]
+User=qdrant
+WorkingDirectory=/home/qdrant/qdrant-robot/current
+ExecStart=/usr/bin/python3 -u tools/talk.py --on-robot --servo-calibration /home/qdrant/qdrant-robot/shared/servo-mounted.json
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
