@@ -13,7 +13,7 @@
 | Priority | Task | Finish when |
 | --- | --- | --- |
 | Next | Loaded power, cooling, and transient temperature feedback. | Explain guard trips and qualify prolonged watched operation before unattended use. |
-| Next | Qualify network failsafes (D211). | With a timed Wi-Fi restore armed on the robot, drop Wi-Fi, confirm the hotspot and the page at 10.42.0.1 after two minutes, and confirm the restore. Check USB-C networking at 192.168.55.1 with a cable. |
+| Parked | USB-C networking (D211). | A cable from the Mac reaches `192.168.55.1`; `nv-l4t-usb-device-mode` is active. The hotspot drill passed (`shared/results/wifi-drill-20261017-133450.log`). |
 | Parked | General conversation and recent recall. | A changed mechanism improves varied topics while preserving passing privacy, visual, correction, and transfer cases. See [conversation](conversation.md#next-steps). |
 | Parked | Booth acceptance. | Meet the targets and M4 checks in [CLAUDE.md](../CLAUDE.md). Physical latency remains parked under D160. |
 

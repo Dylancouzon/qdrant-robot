@@ -23,6 +23,8 @@ button{font:inherit;font-weight:500;border:0;border-radius:3px;padding:8px 12px;
 @media(max-width:1100px){.badge{display:none}.grid{grid-template-columns:minmax(0,1fr) 340px}.controls{gap:8px}.itemcontrols{top:58px}.detectionlist{gap:5px 10px}}
 @media(max-width:900px){body{padding:0 8px 8px}header{height:48px;gap:12px}.brand svg{width:78px}.brand h1{font-size:16px}.tabs{gap:12px}.tabs button.secondary{font-size:14px}.grid{display:flex;flex-direction:column;height:auto;min-height:0;gap:8px}.cameraCard{min-height:0}.camera{aspect-ratio:var(--camera-ratio,16/9);flex:none}.conversation{height:540px}.controls{top:8px;left:8px;max-width:calc(100% - 16px)}.actions button{padding:6px 8px}.itemcontrols{top:54px;right:8px;padding:8px}.detectionheading{margin-bottom:4px;font-size:12px}.detection{font-size:13px}.memoryworkspace>summary{padding:7px 9px}.sessionerror{left:8px;top:54px;max-width:calc(100% - 16px)}footer{position:static;margin:8px 0}footer details{margin-left:auto}.memoryhead{align-items:stretch;flex-direction:column;gap:16px;margin-top:24px}.memorytools input{width:100%;flex:1}.memorystats{gap:18px}.map{height:140px}}
 @media(max-width:480px){.brand{gap:8px}.brand h1{padding-left:8px}.tabs{gap:10px}.savedview{flex-basis:100%}.savedview img{height:190px}.memoryhead h2{font-size:28px}.memorystats{gap:14px;font-size:14px}.memorycards{gap:10px}}
+#chatTab{display:none}
+@media(max-width:600px){#chatTab{display:block}.brand h1{display:none}.tabs{gap:10px}#livePanel[data-pane=chat] .cameraCard,#livePanel:not([data-pane=chat]) .conversation{display:none}.conversation{height:calc(100dvh - 64px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .cameraextras{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-top:1px solid var(--line)}.detections{flex:1 1 240px;min-width:0;max-width:100%}.memoryworkspace{position:relative;flex:0 0 224px;margin-left:auto;max-width:100%;border:1px solid var(--line);border-radius:3px;background:#171c26}
@@ -74,7 +76,7 @@ button{font:inherit;font-weight:500;border:0;border-radius:3px;padding:8px 12px;
       </g>
     </g>
   </g>
-</svg><h1>Edgy</h1></div><nav class="tabs" aria-label="Page views"><button id="liveTab" aria-pressed="true" class="secondary">Live</button><button id="memoryTab" aria-pressed="false" class="secondary">Memory</button><button id="settingsTab" aria-pressed="false" class="secondary">Settings</button></nav><div class="badge" title="All models and memory run on the Jetson">On Jetson · Qdrant Edge</div></header>
+</svg><h1>Edgy</h1></div><nav class="tabs" aria-label="Page views"><button id="liveTab" aria-pressed="true" class="secondary">Live</button><button id="chatTab" aria-pressed="false" class="secondary">Chat</button><button id="memoryTab" aria-pressed="false" class="secondary">Memory</button><button id="settingsTab" aria-pressed="false" class="secondary">Settings</button></nav><div class="badge" title="All models and memory run on the Jetson">On Jetson · Qdrant Edge</div></header>
 <div id="livePanel">
 
 <main class="grid">
@@ -91,13 +93,13 @@ const el=id=>document.getElementById(id);
 let muted=false, cameraActive=false, transcriptText='', evidenceText='', carouselUpdates=[], itemControl={}, ignoredItems=[], headPending=false;
 async function openTab(name){
   if(!el('memoryPanel').hidden&&name!=='memory')saveMemoryState();
-  for(const tab of ['live','memory','settings']){
-    el(tab+'Panel').hidden=tab!==name;el(tab+'Tab').setAttribute('aria-pressed',String(tab===name));
-  }
+  const panel=name==='chat'?'live':name;el('livePanel').dataset.pane=name;  // Chat: the phone-width conversation pane
+  for(const tab of ['live','memory','settings'])el(tab+'Panel').hidden=tab!==panel;
+  for(const tab of ['live','chat','memory','settings'])el(tab+'Tab').setAttribute('aria-pressed',String(tab===name));
   if(name==='memory')await loadMemory();
-  if(name==='live'){requestAnimationFrame(scrollConversation);mapLastRead=0;}
+  if(panel==='live'){requestAnimationFrame(scrollConversation);mapLastRead=0;}
 }
-for(const tab of ['live','memory','settings'])el(tab+'Tab').addEventListener('click',()=>openTab(tab));
+for(const tab of ['live','chat','memory','settings'])el(tab+'Tab').addEventListener('click',()=>openTab(tab));
 function relativeTime(time){
   if(time===null)return 'never';
   const seconds=Math.max(0,Math.floor(Date.now()/1000-time));

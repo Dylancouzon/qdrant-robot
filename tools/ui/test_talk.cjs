@@ -23,6 +23,7 @@ const dom=new JSDOM(page,{url:'http://127.0.0.1:8765',runScripts:'dangerously',p
 }});
 const w=dom.window,d=w.document,run=s=>w.eval(s),tick=()=>new Promise(r=>setTimeout(r,30));
 (async()=>{
+ await run("openTab('chat')");assert.equal(d.querySelector('#livePanel').hidden,false);assert.equal(d.querySelector('#livePanel').dataset.pane,'chat');assert.equal(d.querySelector('#chatTab').getAttribute('aria-pressed'),'true');assert.equal(d.querySelector('#liveTab').getAttribute('aria-pressed'),'false');
  await run("openTab('memory')");await tick();
  assert.equal(d.querySelectorAll('.owner').length,2);assert.equal(d.querySelectorAll('.objectcard').length,2);
  assert.match(d.querySelector('#memoryStats').textContent,/2 objects8 saved views2 visitors/);
