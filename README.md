@@ -8,7 +8,7 @@ Read [CLAUDE.md](CLAUDE.md), [STATE.md](STATE.md), and the [lessons index](resea
 
 ## Run the interface
 
-The robot serves the page itself from boot. Open `http://qdrant-robot.local:8765/?key=MONITOR_KEY` from any device on its network, or `http://10.42.0.1:8765/?key=MONITOR_KEY` on its `l6-robot` hotspot. The robot raises the hotspot 90 to 120 s after Wi-Fi drops. `MONITOR_KEY` and `HOTSPOT_PASSWORD` are in the gitignored `.env`.
+The robot serves the page itself from boot. Open `http://qdrant-robot.local:8765` from any device on its network, or `http://10.42.0.1:8765` on its `l6-robot` hotspot. The robot raises the hotspot 90 to 120 s after Wi-Fi drops. `HOTSPOT_PASSWORD` is in the gitignored `.env`.
 
 The Mac launcher still works through an SSH tunnel:
 

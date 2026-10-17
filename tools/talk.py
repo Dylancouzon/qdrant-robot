@@ -2,7 +2,7 @@
 """Monitor and controls for the robot. The robot is a Jetson-owned unit (`qr-robot`) that hears
 and speaks through its own USB audio. Start attaches to it, or starts it. Closing this page or
 losing the tunnel leaves it running; only Stop stops it. The Mac serves the page on loopback
-through an SSH tunnel; `--on-robot` serves it from the Jetson to the network behind a key."""
+through an SSH tunnel; `--on-robot` serves it from the Jetson to the network."""
 import argparse
 import contextlib
 import http.client
@@ -18,7 +18,6 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from http.cookies import SimpleCookie
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "/home/qdrant/qdrant-robot"
@@ -260,7 +259,7 @@ class Session:
 class Handler(BaseHTTPRequestHandler):
     session = None
     token = origin = ""
-    lan = False  # --on-robot: any IP or .local host; the page needs ?key= or the cookie
+    lan = False  # --on-robot: any IP or .local host, open to the network (a demo, D211)
 
     def reply(self, code, data, kind="application/json"):
         self.send_response(code)
@@ -297,11 +296,6 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             self.reply(403, b"Forbidden")
         elif self.path.split("?", 1)[0] == "/":
-            key = parse_qs(urlsplit(self.path).query).get("key", [""])[0]
-            if self.lan and not (self.cookie_ok() or secrets.compare_digest(key, self.token)):
-                self.reply(403, b"Open the monitor link with ?key= from shared/monitor-key",
-                           "text/plain")
-                return
             page = Path(__file__).with_suffix(".html").read_text().replace("TOKEN", self.token)
             self.reply(200, page.encode(), "text/html; charset=utf-8")
         elif self.path == "/mona-sans.woff2":
@@ -377,26 +371,17 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def monitor_key() -> str:
-    """The robot page key: one per robot, kept across restarts so a saved link keeps working."""
-    path = Path(BASE) / "shared/monitor-key"
-    with (contextlib.suppress(FileExistsError),
-          os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as f):
-        f.write(secrets.token_urlsafe(24))
-    return path.read_text().strip()
-
-
 def serve(port: int, release: str | None, camera_file: str | None = None,
           servo_calibration: str | None = None, on_robot: bool = False) -> None:
     global LOCAL
     LOCAL = Handler.lan = on_robot
     session = Session(release, camera_file, servo_calibration)
     Handler.session = session
-    Handler.token = monitor_key() if on_robot else secrets.token_urlsafe(32)
+    Handler.token = secrets.token_urlsafe(32)
     origin = Handler.origin = f"http://127.0.0.1:{port}"
     if on_robot:
         threading.Thread(target=keep_reachable, daemon=True).start()
-        origin = f"http://{socket.gethostname()}.local:{port}/?key=<shared/monitor-key>"
+        origin = f"http://{socket.gethostname()}.local:{port}"
 
     with ThreadingHTTPServer(("0.0.0.0" if on_robot else "127.0.0.1", port), Handler) as server:
         print(f"Robot monitor: {origin} (nothing runs until Start)", flush=True)

@@ -388,16 +388,14 @@ def test_brand_font_is_served_locally():
     assert code == 200 and kind == "font/woff2" and font.startswith(b"wOF2")
 
 
-@pytest.mark.parametrize("host,origin,cookie,query,code", [
-    ("192.168.1.239:8765", "", "", "?key=secret", 200),
-    ("qdrant-robot.local:8765", "", "secret", "", 200),
-    ("10.42.0.1:8765", "", "", "", 403),
-    ("10.42.0.1:8765", "", "", "?key=wrong", 403),
-    ("evil.test:8765", "", "", "?key=secret", 403),
-    ("10.42.0.1:8765", "http://evil.test", "", "?key=secret", 403),
+@pytest.mark.parametrize("host,origin,query,code", [
+    ("192.168.1.239:8765", "", "", 200),
+    ("qdrant-robot.local:8765", "", "", 200),
+    ("10.42.0.1:8765", "", "?from=bookmark", 200),
+    ("evil.test:8765", "", "", 403),
+    ("10.42.0.1:8765", "http://evil.test", "", 403),
 ])
-def test_on_robot_page_needs_the_key_and_a_rebinding_safe_host(host, origin, cookie, query,
-                                                                code, monkeypatch):
+def test_on_robot_page_is_open_on_rebinding_safe_hosts(host, origin, query, code, monkeypatch):
     from email.message import Message
     handler = talk.Handler.__new__(talk.Handler)
     monkeypatch.setattr(talk.Handler, "lan", True)
@@ -406,8 +404,6 @@ def test_on_robot_page_needs_the_key_and_a_rebinding_safe_host(host, origin, coo
     handler.headers["Host"] = host
     if origin:
         handler.headers["Origin"] = origin
-    if cookie:
-        handler.headers["Cookie"] = f"edgy={cookie}"
     replies = []
     handler.reply = lambda *args: replies.append(args)
     handler.do_GET()
