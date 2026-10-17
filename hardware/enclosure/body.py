@@ -75,7 +75,6 @@ RIDGE_X, RIDGE_DEPTH = (-18.0, -6.0, 6.0, 18.0), (0.2, 2.4)  # on the window's s
 GRILLE_PRESS_MM3 = 10.0  # plug and shell overlap in the ridges only (0.9 mm deep with the plug
 # centered; it shifts 0.6 mm down, which leaves the 0.3 mm of grip)
 SLOT_GRIP, SLOT_TOP = JETSON_STRIP_D - 2.0, 48.0  # the slot grips all but 2 mm of the strip; Z 48
-RIM_H = 10.0  # the shallow pocket's far wall rises this far above the Jetson's bottom edge
 
 
 # Helpers shared with study.py ----------------------------------------------------------------
@@ -437,6 +436,7 @@ def risers():
     "Everything that stands on the plate above CUT_Z, as named boxes (x0, x1, y0, y1, z0, z1)."
     comp = components()
     t, slab, ports = comp["Jetson tray strip"], comp["Jetson tray and board"], comp["Jetson ports"]
+    header = comp["Jetson GPIO header"]
     s, a, bus = comp["Speaker"], comp["USB audio case"], comp["Bus board"]
     g, w, z = POCKET_GAP, POCKET_WALL, CUT_Z
     bus_l, bus_r = bus[0] - g - w, bus[1] + g + w  # bus end ribs' outer X
@@ -451,7 +451,8 @@ def risers():
         "jetson slot wall -": (back_x, grip_x, y_out[0], t[2] - SLOT_GAP, z, SLOT_TOP),
         "jetson slot wall +": (back_x, grip_x, t[3] + SLOT_GAP, y_out[1], z, SLOT_TOP),
         "jetson back wall": (grip_x, bus_r, y_out[0], t[2] - g, z, SLOT_TOP),  # bus rear wall too
-        "jetson rim": (grip_x, ports[0] - g, slab[3] + g, slab[3] + g + w, z, t[4] + RIM_H),
+        # Keep this lip below J12 so the header clears it during vertical insertion.
+        "jetson rim": (grip_x, ports[0] - g, slab[3] + g, slab[3] + g + w, z, header[4] - g),
         "audio end wall - front": (a[0] - g - w, a[0] - g, a[2], notch[0], z, z + 12.0),
         "audio end wall - rear": (a[0] - g - w, a[0] - g, notch[1], front[3], z, z + 12.0),
         "audio end wall + front": (a[1] + g, a[1] + g + w, a[2], notch[0], z, z + 12.0),
@@ -945,7 +946,7 @@ def check_alignment(shell, plate, panel):
 
 
 def jetson_envelope():
-    "Bounds of the three Jetson boxes (x0, x1, y0, y1, z0, z1)."
+    "Bounds of the Jetson boxes (x0, x1, y0, y1, z0, z1)."
     boxes = [components()[n] for n in JETSON_PARTS]
     return tuple(f(b[i] for b in boxes) for i, f in enumerate((min, max) * 3))
 
@@ -1049,6 +1050,8 @@ def check_jetson_slot(plate, shell):
     engage = SLOT_TOP - t[4]  # strip length in the slot at rest
     pcb_clear = slab[0] - (t[0] + SLOT_GRIP)  # slot end to the board's edge
     assert pcb_clear >= 2.0 - 1e-6, pcb_clear
+    header_gap = plate.distance(box(*comp["Jetson GPIO header"]))
+    assert header_gap >= POCKET_GAP - 0.01, header_gap
 
     def blocked(lift):
         prisms = (box(b[0], b[1], b[2], b[3], b[5], b[5] + lift) for b in boxes)
@@ -1064,6 +1067,8 @@ def check_jetson_slot(plate, shell):
         "slot_grip_mm": SLOT_GRIP,
         "strip_mm_thick_deep": [round(t[3] - t[2], 2), round(t[1] - t[0], 2)],
         "slot_end_to_board_edge_mm": round(pcb_clear, 2),
+        "gpio_header_to_plate_mm": round(header_gap, 2),
+        "rim_top_z_mm": round(risers()["jetson rim"][5], 2),
         "slot_height_above_plate_mm": round(SLOT_TOP - CUT_Z, 1),
         "slot_engagement_at_rest_mm": round(engage, 1),
         "max_lift_with_shell_mm": round(hi, 1),

@@ -412,8 +412,10 @@ STEPS = (
          "the servo connector faces the slot side, away from the port panel.",
          ("Jetson", "Bus board"), (40, 30, 650, (0, 0, 80)),
          "The Jetson strip is 6 mm thick, and the slot is 6.6 mm wide and grips 6 mm of the 8 mm "
-         "strip. Keep the USB port at the top and turn the board around until the barrel "
-         "jack faces the port side. Each pocket leaves about 1 mm of clearance on each side.",
+         "strip. Put the Jetson's 40-pin GPIO header along its lower edge. The low retaining lip "
+         "leaves 1 mm beneath that header. Keep the USB port at the top and turn the board around "
+         "until the barrel jack faces the port side. Each pocket leaves about 1 mm of clearance "
+         "on each side.",
          ((("Jetson",), away(UP, 45)), (("Bus board",), away(UP, 40))), reset=("base-plate",)),
     Step("Body", "Set the USB sound card in its pocket and plug it in.",
          "Set the USB sound card in the front pocket. Plug an angled USB cable and the speaker "

@@ -107,6 +107,11 @@ JETSON_PARTS = {
     "Jetson tray and board": placed((X0 + JETSON_STRIP_D, X1), (Y0, SLAB_Y), (Z0, Z1)),
     "Jetson ports": placed((PORT_X0, X1), (SLAB_Y, PORT_TOP_Y), (MID_Z - 50, MID_Z + 50)),
     "Jetson heatsink": placed(HEAT_RANGE[0], (SLAB_Y, Y1), HEAT_RANGE[1]),
+    # NVIDIA's P3766-P3768SKU4-P3767ENVELOPE STEP model: J12, including its pins, is
+    # 51 x 5.28 x 12 mm. Place the GPIO edge down, with I/O +X and the fan +Y.
+    "Jetson GPIO header": placed(
+        (X1 - 73.0, X1 - 22.0), (Y0 + 3.47, Y0 + 15.47), (Z0 + 2.86, Z0 + 8.14)
+    ),
 }
 
 # USB sound card on the plate. Its USB-A plug is on one short end and the speaker connector and

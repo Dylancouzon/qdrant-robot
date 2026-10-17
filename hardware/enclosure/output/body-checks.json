@@ -7,7 +7,7 @@
   ]
  },
  "overlaps": {
-  "reservations_checked": 17,
+  "reservations_checked": 18,
   "part_pairs_mm3": {
    "body-shell / base-plate": 0.0,
    "body-shell / port-panel": 0.0,
@@ -43,6 +43,7 @@
    "component Jetson tray and board": 0.0,
    "component Jetson ports": 0.0,
    "component Jetson heatsink": 0.0,
+   "component Jetson GPIO header": 0.0,
    "component Speaker": 0.0,
    "component USB audio case": 0.0,
    "component Bus board": 0.0
@@ -287,6 +288,8 @@
    8.0
   ],
   "slot_end_to_board_edge_mm": 2.0,
+  "gpio_header_to_plate_mm": 1.0,
+  "rim_top_z_mm": 11.86,
   "slot_height_above_plate_mm": 40.4,
   "slot_engagement_at_rest_mm": 38.0,
   "max_lift_with_shell_mm": 29.7,
@@ -360,9 +363,9 @@
    "floating_islands": 0,
    "island_max_mm2": 0.0,
    "island_max_z_mm": null,
-   "thin_mm2": 1.0,
-   "min_thickness_mm": 1.87,
-   "volume_mm3": 147246,
+   "thin_mm2": 0.0,
+   "min_thickness_mm": 2.4,
+   "volume_mm3": 146005,
    "bbox_mm": [
     143.2,
     116.5,
@@ -404,5 +407,5 @@
   }
  },
  "printcheck_total_overhang_mm2": 519.0,
- "runtime_s": 177.4
+ "runtime_s": 166.0
 }

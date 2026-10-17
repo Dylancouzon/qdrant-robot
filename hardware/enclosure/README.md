@@ -4,6 +4,10 @@ This is the simplified enclosure for the Qdrant Edge robot. It keeps the approve
 
 Open [the viewer](output/robot-viewer.html) to see the assembled robot, turn the head, and read the parts, fasteners, and steps. Read [ASSEMBLY.md](ASSEMBLY.md) to build it. Read [BRIEF.md](BRIEF.md) for the design reasons and [MEASUREMENTS.md](MEASUREMENTS.md) for the part sizes. Dylan confirmed robot assembly on 2026-10-16. Watched mounted motion and cable clearance passed through ±60° at 40°/s. Cooling, acoustics, transient servo temperature feedback, and prolonged loaded power remain unqualified. The ±80° value describes modeled mechanical travel; runtime travel is ±60°.
 
+The revised base plate lowers the Jetson retaining lip to clear the bottom GPIO header by 1 mm (E). The tray slot keeps its confirmed 6.6 mm fit. Physical fit of this revision remains U. Reprint only `base-plate` for this correction. The saved `assembly-white.3mf` session predates the correction; use the updated STL or generated `output/bambu/White.3mf` instead.
+
+To modify an existing print, disconnect power and remove the electronics first. Lower the shallow retaining lip on the fan side of the Jetson pocket to 4.3 mm above the plate's flat top. This removes about 8.1 mm from that lip (E). Keep the tall tray slot, its walls, and the supporting floor intact. Remove debris before checking the fit by hand.
+
 The saved [assembly print session](assembly-white.3mf) preserves the local Bambu Studio edits from the enclosure worktree. It has three plates, support settings enabled, and no sliced G-code. The generated projects and estimates below remain the reproducible design outputs. Re-slice the saved session before printing; `bambu.py` does not regenerate it.
 
 ## Printed parts
@@ -28,10 +32,10 @@ Print every part in the orientation shown. The STL files in `output/print/Requir
 | --- | --- | --- | --- | --- |
 | `Test pieces/Test pieces.3mf` | Test pieces | `fit-test-plate`, `slot-test-piece` | 0.4 h | 12 g |
 | `White.3mf` | White 1 | `body-shell`, `port-panel` | 6.7 h | 252 g |
-| `White.3mf` | White 2 | `base-plate`, `head-shell` | 3.6 h | 177 g |
+| `White.3mf` | White 2 | `base-plate`, `head-shell` | 3.5 h | 175 g |
 | `Black.3mf` | Black | `visor`, `speaker-grille`, `neck-hub`, `head-shaft`, `horn-disc` | 2.2 h | 61 g |
 
-The nine parts take 12.6 h and 488 g of PLA. The shell is the largest part and fits the 256 mm bed. Four 1.5 mm ridges on the grille window's top wall wedge the grille 0.3 mm tight (U) until the speaker sits behind it. To remove it, press it inward from outside.
+The nine parts take 12.5 h and 487 g of PLA. The shell is the largest part and fits the 256 mm bed. Four 1.5 mm ridges on the grille window's top wall wedge the grille 0.3 mm tight (U) until the speaker sits behind it. To remove it, press it inward from outside.
 
 ## Fasteners
 
@@ -56,7 +60,7 @@ Use socket-head (hex) M3 screws, so the 2.5 mm hex keys fit every screw. The pla
 
 Use a Bambu Lab P1S with a 0.4 mm nozzle and PLA. Set 0.2 mm layers, three walls, 15% grid infill, and supports off. `bambu.py` packages these settings into the three native projects.
 
-`printcheck.py` reports zero floating islands on all nine parts, and zero thin area (under 2 mm) on all but `base-plate`. There, 1 mm² measures 1.87 mm at the acute end of the port skirt, where it follows the slanted window edge. The total overhang is 732.7 mm² (E), against 34,887 mm² for Concept A. All of it is flat bridges over pockets and openings, except 63 mm² of gently sloped faces in `body-shell`. Three bridges are long: the 60.6 × 2.4 mm lintel above the grille window in `body-shell`, the 24 mm bearing seat roof in `neck-hub`, and the 22 mm eye ring in `visor`. Watch these three on the first print.
+`printcheck.py` reports zero floating islands and zero thin area (under 2 mm) on all nine parts. The revised base plate has a minimum checked thickness of 2.4 mm (E). The total overhang is 732.7 mm² (E), against 34,887 mm² for Concept A. All of it is flat bridges over pockets and openings, except 63 mm² of gently sloped faces in `body-shell`. Three bridges are long: the 60.6 × 2.4 mm lintel above the grille window in `body-shell`, the 24 mm bearing seat roof in `neck-hub`, and the 22 mm eye ring in `visor`. Watch these three on the first print.
 
 ## Print the test pieces first
 

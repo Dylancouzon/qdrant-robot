@@ -25,9 +25,9 @@
       "project": "output/bambu/White.3mf",
       "plate": 1,
       "name": "White 1: body shell and port panel",
-      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
-      "seconds": 24266.716796875,
-      "grams": 251.8656768798828,
+      "sha256": "4587fb203836084034535cdfbc4a032930995c7bd46545aac5d80d8571242be1",
+      "seconds": 24271.9609375,
+      "grams": 251.86611938476562,
       "parts": {
         "body-shell": [
           148.6,
@@ -45,9 +45,9 @@
       "project": "output/bambu/White.3mf",
       "plate": 2,
       "name": "White 2: base plate and head shell",
-      "sha256": "c42d2c8e8359aa3cd3dc767baad08f7beacd3ecc3bbc3716b764fe65eef26860",
-      "seconds": 12861.083984375,
-      "grams": 176.4818572998047,
+      "sha256": "4587fb203836084034535cdfbc4a032930995c7bd46545aac5d80d8571242be1",
+      "seconds": 12744.865234375,
+      "grams": 174.95242309570312,
       "parts": {
         "base-plate": [
           143.2,
