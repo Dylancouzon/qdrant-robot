@@ -69,7 +69,7 @@ _DIALOGUE = re.compile(
     r"^\W*remind me\b", re.I)
 # ASR ends some questions with a period ("is Qdrant written in Rust."): the opening word decides.
 _ASKS = re.compile(r"^(what|where|who|whom|whose|when|why|how|which|is|are|was|were|do|does|did|"
-                   r"can|could|will|would|should|have|has|tell me)\b", re.I)
+                   r"can|could|will|would|should|have|has|tell me|remind me)\b", re.I)
 
 
 # "What did I show you?" and its variants: the demo's key memory question, answered in code

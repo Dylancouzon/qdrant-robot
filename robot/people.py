@@ -294,5 +294,5 @@ def done(kind: str, name: str, ok: bool) -> str:
     if kind == "enroll":
         return f"Thank you, {name}. I will remember your face." if ok else NO_FACE
     if ok:
-        return f"Done, {name}. I have forgotten your face."
+        return f"Done, {name}. I have deleted your face and everything you told me."
     return "Sorry, something went wrong and I could not forget you. Please ask again."
