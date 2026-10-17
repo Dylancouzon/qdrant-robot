@@ -4,7 +4,7 @@ Updated 2026-10-17. Read [CLAUDE.md](CLAUDE.md), the [workflow](research/workflo
 
 ## Active task
 
-The [memory demo session](research/overnight-conversation.md) is complete (D207, D208). The [hybrid Edge memory session](research/edge-hybrid-memory.md) is complete and rejected for the runtime (D209): fused dense and BM25 exchange recall retrieved far better (13/13 against 6/13, E) but did not answer better (validation 23/55 against 25/55, J). Both demo validation sets are spent; a later conversation change needs a new set.
+The [memory demo session](research/overnight-conversation.md) is complete (D207, D208). The [hybrid Edge memory session](research/edge-hybrid-memory.md) is complete. Dylan chose hybrid exchange recall (D210, superseding D209): fused dense and BM25 retrieval finds far more (13/13 against 6/13, E), while judged answers stay within noise (validation 23/55 against 25/55, J). Both demo validation sets are spent; a later conversation change needs a new set.
 
 ## Robot and jobs
 
@@ -37,4 +37,4 @@ M4 also needs offline cold start, restart and deletion checks, physical latency,
 
 ## Next step
 
-Run a live demo rehearsal with Dylan and record its turns as fixtures. Dialogue recall is limited by the 2B model's use of quoted exchanges and by the speech-verb cue, not by retrieval; `bench/recall_bench.py` and the in-place vector APIs are ready for a later attempt. Other candidates: the run-on reply cap and a face-inside-person filter for false faces.
+Run a live demo rehearsal with Dylan and record its turns as fixtures. Dialogue recall is limited by the 2B model's use of quoted exchanges and by the speech-verb cue, not by retrieval; `bench/recall_bench.py` measures retrieval for a later attempt. Other candidates: the run-on reply cap and a face-inside-person filter for false faces.

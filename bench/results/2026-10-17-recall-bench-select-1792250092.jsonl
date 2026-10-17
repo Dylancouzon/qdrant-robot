@@ -1,9 +1,10 @@
 {"arm": "recent", "split": "select", "exchange": {"n": 16.0, "hit": 0.625, "first": 0.0, "rr": 0.199, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "dense", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 0.938, "rr": 0.969, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "dense-instruct", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 1.0, "rr": 1.0, "cue": 0.75}, "history": {"n": 5.0}}
-{"arm": "rrf", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 0.938, "rr": 0.969, "cue": 0.75}, "history": {"n": 5.0}}
+{"arm": "rrf", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 1.0, "rr": 1.0, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "dbsf", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 1.0, "rr": 1.0, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "rrf-instruct", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 0.938, "rr": 0.969, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "dbsf-instruct", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 1.0, "rr": 1.0, "cue": 0.75}, "history": {"n": 5.0}}
-{"arm": "robot", "split": "select", "exchange": {"n": 16.0, "hit": 0.625, "first": 0.0, "rr": 0.199, "cue": 0.75}, "history": {"n": 5.0}}
+{"arm": "robot", "split": "select", "exchange": {"n": 16.0, "hit": 1.0, "first": 1.0, "rr": 1.0, "cue": 0.75}, "history": {"n": 5.0}}
 {"arm": "runtime-statements", "split": "select", "statement": {"n": 18.0, "hit": 0.889, "first": 0.667, "rr": 0.778, "cue": 0.0}, "trap": {"n": 2.0, "delivered": 1.0}, "history": {"n": 2.0}}
+{"summary": "recall_bench", "split": "select", "machine": "macOS-26.6.2", "revision": "dbfb2c6", "data_sha256": "a1502854ab5f81c2"}

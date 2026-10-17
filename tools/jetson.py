@@ -123,7 +123,11 @@ def collect() -> None:
 
 
 def rollback() -> None:
-    remote(f"cd {BASE} && ln -sfn \"$(readlink previous)\" current && readlink current")
+    """Strip answer-derived vectors with the current release first: an older release deletes
+    only answer payloads (D210). The store is locked while the robot runs, so this stops."""
+    strip = "from robot.memory import Memory; Memory().drop_exchange_vectors()"
+    remote(f"cd {BASE}/current && ROBOT_SHARED={BASE}/shared .venv/bin/python -c '{strip}' && "
+           f"cd {BASE} && ln -sfn \"$(readlink previous)\" current && readlink current")
 
 
 def selftest(tmp: Path) -> None:

@@ -16,7 +16,7 @@ The pre-change memory backup is `shared/backups/pre-person-memory-17922143981654
 
 ## Memory demo session, 2026-10-17
 
-The [session plan](overnight-conversation.md) targets a developer demo of on-device memory. D207 keeps five changes. Each stored turn point also keeps the robot's answer. A question with a past speech verb ("what did you tell me", "what were we talking about") gets this visitor's six newest exchanges outside the live window, quoted as words, never as sight. Stored statements are recalled only for questions, and a yes or no to the robot's own consent, deletion, or object question stores no statement vector. A follow-up about the robot is grounded with the previous question when that question matched a fact; a direct fact match drops the image. Forgetting an object also deletes the visitor's turns that name it or its label.
+The [session plan](overnight-conversation.md) targets a developer demo of on-device memory. D207 keeps five changes. Each stored turn point also keeps the robot's answer. A question with a past speech verb ("what did you tell me", "what were we talking about") gets this visitor's six most relevant exchanges outside the live window (ranked by hybrid search since D210), quoted as words, never as sight. Stored statements are recalled only for questions, and a yes or no to the robot's own consent, deletion, or object question stores no statement vector. A follow-up about the robot is grounded with the previous question when that question matched a fact; a direct fact match drops the image. Forgetting an object also deletes the visitor's turns that name it or its label.
 
 | Run (oracle, `eval/dev/demo.jsonl`, 79 turns) | Judged, raw | Judged, paired |
 | --- | --- | --- |
@@ -31,9 +31,13 @@ All measurements are J. In the paired column, `bench/paired.py` gives a turn who
 
 Two-sentence replies were rejected again (D208). Omitting live-window statements from the prompt lost a direct "Where am I from?" recall and was reverted. Object answers still pass only 1/7 in development because the false face on the teddy bear locks out faceless turns. Sight answers stay at 3 to 5 of 10. Remaining gaps are in [edge cases](edge-cases.md).
 
+## Hybrid exchange recall, 2026-10-17
+
+Exchange quotes are ranked by Edge: a dense `dialog` vector (bge-small of the line and the answer) and a sparse BM25 `words` vector, fused with `Fusion.Dbsf` under the visitor filter (D210). The [trial record](edge-hybrid-memory.md) holds the measurements.
+
 ## Deferred next steps
 
-1. Retrieve complete exchanges for explicit conversation-history questions. Fix retrieval eligibility and duplicate history before revisiting the archived prototype.
+1. Make the 2B brain use quoted exchanges: with the right exchange delivered, it still answered "I don't remember" or quoted the wrong line (D210 trial). Widen the speech-verb cue only with a measured alternative.
 2. Choose retention beyond 12 hours only when returning-visitor use requires it. Named-object evidence already follows its own protection rules.
 3. Improve transcript admission only for observed recognition errors; preserve useful short statements and ordinary dialogue.
 4. Add recency weighting only after demonstrating stale results displacing relevant evidence.

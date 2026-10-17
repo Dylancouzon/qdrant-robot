@@ -1,6 +1,10 @@
 # Hybrid Edge memory session plan
 
-Completed 2026-10-17 and rejected for the runtime (D209). Ranked exchange recall retrieved far better but did not answer better; the 2B model's use of quoted evidence and the speech-verb cue limit dialogue recall, not Qdrant retrieval. The rejected commit is tag `archive/hybrid-exchanges-2026-10-17`.
+Completed 2026-10-17. The gates rejected hybrid exchange recall (D209) because it retrieved far better but did not answer better; Dylan then chose it for the Qdrant showcase (D210), and it is the runtime. The 2B model's use of quoted evidence and the speech-verb cue limit dialogue recall, not Qdrant retrieval.
+
+## Rollback
+
+An older release forgets only answer payloads, so `tools/jetson.py rollback` first runs `Memory.drop_exchange_vectors` with the current release on the closed live store, then switches `current`. The store is locked while the robot runs, so a rollback during operation stops before switching. On return, `Memory.backfill` drops vectors whose answer is gone and rebuilds the rest.
 
 ## Results
 

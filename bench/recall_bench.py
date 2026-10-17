@@ -7,8 +7,7 @@ six delivered exchanges, after the four newest turns (the live window) are dropp
 drops them: hit (a gold one delivered), first (the top one is gold), and reciprocal rank, plus
 how often the runtime cue (about_dialogue) would retrieve at all. Statement queries and traps
 are scored once on the runtime path (dense said vector, TOLD_MIN, two delivered). `--robot` also
-scores the robot's own Memory.exchanges, which must match the arm it implements (recent).
-D209 kept the time-ordered runtime: ranked arms retrieved better but did not answer better.
+scores the robot's own Memory.exchanges, which must match the arm it implements (dbsf, D210).
 """
 import hashlib
 import json
@@ -104,9 +103,9 @@ class Store:
         dense = Query.Nearest(q, using="dialog")
         if arm.startswith("dense"):
             return [h.id for h in self.shard.query(QueryRequest(limit=k, query=dense, filter=flt))]
-        legs = [Prefetch(limit=20, query=dense, filter=flt),
-                Prefetch(limit=20, query=Query.Nearest(self.bm25.embed_query(text), using="words"),
-                         filter=flt)]
+        legs = [Prefetch(limit=4 * k, query=dense, filter=flt),  # as Memory.exchanges
+                Prefetch(limit=4 * k, query=Query.Nearest(self.bm25.embed_query(text),
+                                                          using="words"), filter=flt)]
         fusion = Fusion.Rrf(k=2) if arm.startswith("rrf") else Fusion.Dbsf()
         return [h.id for h in self.shard.query(QueryRequest(limit=k, prefetches=legs,
                                                             query=fusion))]
@@ -152,13 +151,15 @@ def robot_find(convs: list[dict], store: Store):
     memory = Memory(Path(tempfile.mkdtemp()))
     ids = {}
     for c in convs:
+        dialog = store.embed([f"{t['said']} {t['answer']}" for t in c["turns"]])
         for i, t in enumerate(c["turns"]):
-            pid = memory.add(None, t["said"], ts=BASE + t["t"], visitor=c["visitor"],
-                             answer=t["answer"])
+            pid = memory.add(None, t["said"], ts=BASE + t["t"], dialog_vec=dialog[i],
+                             visitor=c["visitor"], answer=t["answer"])
             ids[pid] = store.ids[c["id"], i]
 
     def find(c, q, skip):
-        rows = memory.exchanges(c["visitor"], BASE + q["t"], n=EXCHANGES + LIVE)
+        rows = memory.exchanges(c["visitor"], BASE + q["t"], EXCHANGES + LIVE,
+                                store.embed([q["text"]])[0], q["text"])
         return [ids[r["id"]] for r in rows if ids[r["id"]] not in skip][:EXCHANGES]
     return find
 
@@ -188,8 +189,12 @@ def main(split: str, robot: bool) -> None:
     for name, find in finds.items():
         rows.append({"arm": name, "split": split,
                      **summary(score(convs, store, split, find, {"exchange", "history"}))})
-    if robot:  # the runtime implements the time-ordered arm (D209)
-        assert rows[-1]["exchange"] == rows[0]["exchange"], (rows[0], rows[-1])
+    if robot:  # the runtime implements the fused arm (D210): the same exchanges per query
+        for c in convs:
+            for q in c["queries"]:
+                if q["kind"] == "exchange" and q["split"] == split:
+                    skip = {store.ids[c["id"], i] for i in live(c, q)}
+                    assert finds["robot"](c, q, skip) == finds["dbsf"](c, q, skip), q["id"]
     statements = score(convs, store, split, lambda c, q, skip: store.told(
         q["text"], c["visitor"], BASE + q["t"]), {"statement", "trap"})
     rows.append({"arm": "runtime-statements", "split": split, **summary(statements)})
