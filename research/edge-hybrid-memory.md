@@ -4,7 +4,7 @@ Completed 2026-10-17. The gates rejected hybrid exchange recall (D209) because i
 
 ## Rollback
 
-An older release forgets only answer payloads, so `tools/jetson.py rollback` first runs `Memory.drop_exchange_vectors` with the current release on the closed live store, then switches `current`. The store is locked while the robot runs, so a rollback during operation stops before switching. On return, `Memory.backfill` drops vectors whose answer is gone and rebuilds the rest.
+An older release forgets only answer payloads, so `tools/jetson.py rollback` first runs `Memory.drop_exchange_vectors` with the current release on the closed live store, then switches `current`. The store is locked while the robot runs, so a rollback during operation stops before switching. On return, `Memory.backfill` drops vectors whose answer is gone and rebuilds the rest. A Jetson qualification on an isolated store passed with the real release code (J): the hybrid release wrote both vectors for two visitors, the strip removed all of them, release d1d27ee0fbad wrote a turn and forgot one visitor, and on return the backfill rebuilt only the other visitor's surviving answer; the forgotten visitor had no vectors and no quotes.
 
 ## Results
 
