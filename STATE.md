@@ -1,10 +1,12 @@
 # State
 
-Updated 2026-10-17. Read [CLAUDE.md](CLAUDE.md), the [workflow](research/workflow.md), and [lessons](research/lessons.md). The [topic index](research/README.md) links subsystem guidance; [DECISIONS.md](DECISIONS.md) records binding choices.
+Updated 2026-11-14 for future research; robot status remains from 2026-10-17. Read [CLAUDE.md](CLAUDE.md), the [workflow](research/workflow.md), and [lessons](research/lessons.md). The [topic index](research/README.md) links subsystem guidance; [DECISIONS.md](DECISIONS.md) records binding choices.
 
 ## Active task
 
 The [memory demo session](research/overnight-conversation.md) is complete (D207, D208). The [hybrid Edge memory session](research/edge-hybrid-memory.md) is complete. Dylan chose hybrid exchange recall (D210, superseding D209): fused dense and BM25 retrieval finds far more (13/13 against 6/13, E), while judged answers stay within noise (validation 23/55 against 25/55, J). Both demo validation sets are spent; a later conversation change needs a new set.
+
+Dylan's [future-version exploration list](research/edge-cases.md#future-version-exploration) records ReMEmbR, Meta-Memory, and DARP ideas. Qdrant retrieval must remain central. These candidates are parked for a future version.
 
 ## Robot and jobs
 

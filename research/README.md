@@ -8,6 +8,7 @@ The architecture is settled. Open the relevant row for the active task. Trial ou
 | Operating rules, reviews, evaluation, deployment, and recovery | [Workflow](workflow.md) |
 | Previous experiments and failure pitfalls | [Lessons index](lessons.md) |
 | Servo work, parked tasks, and known gaps | [Remaining work](edge-cases.md#next-steps) |
+| Future-version research with Qdrant retrieval central | [ReMEmbR, Meta-Memory, and DARP candidates](edge-cases.md#future-version-exploration) |
 | Enclosure, printing, and assembly | [Enclosure](../hardware/enclosure/README.md), [trial history](experiment-ledger.md#enclosure) |
 | Shared active visitor and bounded head movement | [Head control](servo.md) |
 | Conversation memory, exact regressions, next steps, and fixtures | [Conversation](conversation.md), [overnight execution plan](overnight-conversation.md) |

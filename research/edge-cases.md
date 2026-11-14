@@ -19,6 +19,17 @@
 
 Dylan confirmed assembly on 2026-10-16. Existing models, thresholds, fixtures, and rubrics stay fixed until a scoped change needs them.
 
+## Future-version exploration
+
+Dylan requested this backlog on 2026-11-14. Explore these candidates for a future version after the current acceptance work. Qdrant Edge retrieval must remain central to memory answers, source verification, and any future learned actions. These proposals need separate scoped comparisons before adoption.
+
+1. **Improve the use of retrieved evidence first.** Select relevant source IDs before generating an answer. Calculate time differences and event ordering in code. The [hybrid recall trial](edge-hybrid-memory.md#results) improved retrieval without establishing better answers; use its failure traces to choose the first comparison.
+2. **Try bounded additional retrieval from [ReMEmbR](https://arxiv.org/html/2409.13682).** Retrieve by meaning and time, then allow one additional query when the answer needs another observation. For example, answer "What did I show you before the phone?" from linked sightings. Keep query count and context size bounded. The paper's reported latency and cloud-backed demonstration do not establish suitability for our local speech target.
+3. **Test focused source-image checks from [Meta-Memory](https://arxiv.org/abs/2509.20754).** Retrieve a permitted image through its Edge memory record, then ask the local VLM about a detail missing from the caption. Keep the result linked to its source. Compare against the [earlier past-image failures](recall.md#results-j-2026-10-10); the changed mechanism is question-specific verification. Preserve existing visual retention rules. Reserve spatial memory integration for a version with calibrated localization; camera direction alone cannot establish world position.
+4. **Consider [DARP](https://personalrobotics-files.cs.washington.edu/pfeiferdifference.pdf) for future learned movement.** A trained policy adapts demonstrated actions using differences between retrieved states and the current state. Qdrant Edge could retrieve demonstration states and their actions. This requires suitable demonstrations, controller training, and comparison against the existing controller. Keep movement limits in code. Manipulation would require a separately approved scope expansion.
+
+Every candidate must keep inference on the Jetson, preserve visitor filters and consent, and delete linked sources through existing forgetting rules. Generated statements must retain source evidence. Score retrieval, evidence delivery, and answer correctness separately on fresh held-out questions. Preserve correction, stranger, restart, and deletion checks, and measure Jetson latency, detection rate, RAM headroom, and paging. Existing spent validation sets remain spent. The [full assessment](https://chatgpt.com/space/page_e47199a7eba481918fd9fce15d55a25c) retains the paper comparison and deployment caveats.
+
 ## Current limitations
 
 | Area | Remaining issue | Detail |
