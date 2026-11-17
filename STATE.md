@@ -10,7 +10,7 @@ Dylan's [future-version exploration list](research/edge-cases.md#future-version-
 
 ## Robot and jobs
 
-No qr-* unit runs; `robot-monitor` runs (D211). Boot 8cbcfb5c; a reboot started `robot-monitor` and rejoined Wi-Fi (E). Deployed release 4e10487b84ad (open on-robot monitor and phone tabs, D211); `previous` is f65fb1941942; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
+Dylan runs a session from the page; `robot-monitor` runs (D211). Deployed release ce5ecaea3368 (bounded camera stream buffers); `previous` is 4e10487b84ad (open on-robot monitor and phone tabs, D211); the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
 
 Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; telemetry uses `shared/results/*.tegrastats`. Preserve memories, results, backups, and previous releases.
 
@@ -21,6 +21,7 @@ Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; teleme
 - The boot unit `robot-monitor` serves the page from the Jetson at `http://qdrant-robot.local:8765`, or the robot's IP, with no key (Dylan). Start, Stop, and the view passed end to end from the Mac (E).
 - The robot needs no network after Start. 90 to 120 s after Wi-Fi drops, it raises its own hotspot `l6-robot` at `http://10.42.0.1:8765`. The drill passed: hotspot 111 s after the cut, page served, timed Wi-Fi restore worked (E). The password is in gitignored `.env` (`HOTSPOT_PASSWORD`). A reboot or `nmcli con up <wifi>` returns to Wi-Fi.
 - At phone width, a Chat tab splits the robot view from the conversation. USB-C networking (`192.168.55.1`) is untested.
+- A weak robot Wi-Fi link (living room, 2026-11-17: 2.4 GHz only, about 1 to 2 Mbit/s to the Mac) once queued about 9 MB of stale frames, so the page fell 30 s behind and other requests failed. Fixed 64 KiB stream buffers keep about two frames queued: 2.2 fps live, `/status` 23 ms while streaming (J). A USB-C cable is the planned webinar link.
 
 ## Demo notes for Dylan
 

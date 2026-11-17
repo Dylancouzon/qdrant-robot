@@ -28,6 +28,8 @@ SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10",
 LOCAL = False  # --on-robot: run commands here and reach the view without a tunnel
 HOTSPOT = "l6-hotspot"  # the robot's own WPA2 network (SSID l6-robot, 10.42.0.1)
 WIFI_CHECK_S, WIFI_MISSES = 30, 4  # raise the hotspot 90 to 120 s after Wi-Fi drops
+# Fixed camera relay buffers, as robot/view.py STREAM_BUFFER: a slow link gets fewer, newer frames.
+STREAM_BUFFER = 64 * 1024
 
 
 def robot_args(camera_file: str | None, servo_calibration: str | None = None) -> list[str]:
@@ -167,6 +169,8 @@ class Session:
             port, token = self.view_port, self.view_token
         connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
         try:
+            connection.connect()
+            connection.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, STREAM_BUFFER)
             connection.request("POST" if body is not None else "GET",
                                f"{path}{'&' if '?' in path else '?'}token={token}", body=body,
                                headers={"Host": "127.0.0.1:8090",
@@ -321,6 +325,7 @@ class Handler(BaseHTTPRequestHandler):
             if self.path != "/camera":
                 self.reply(response.status, response.read(), response.headers["Content-Type"])
                 return
+            self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, STREAM_BUFFER)
             self.send_response(200)
             self.send_header("Content-Type", response.headers["Content-Type"])
             self.send_header("Cache-Control", "no-store")

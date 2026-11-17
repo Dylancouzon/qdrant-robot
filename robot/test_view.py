@@ -7,6 +7,7 @@ import time
 import urllib.error
 import urllib.request
 
+import cv2
 import numpy as np
 import pytest
 
@@ -478,3 +479,39 @@ def test_control_post_routes(action):
     handler.end_headers = lambda: None
     handler.do_POST()
     assert calls == [(action, {})] and codes == [409]
+
+
+def test_slow_viewer_gets_a_recent_frame_not_a_backlog():
+    """A viewer on a slow link sees a recent frame, not the end of a growing queue of stale
+    ones (live, 2026-11-17: 2.3 Mbit/s Wi-Fi left the page 30 s behind, then stalled)."""
+    rng = np.random.default_rng(0)
+    noise = rng.integers(0, 256, (540, 960, 3), np.uint8)
+    count = [0]
+
+    def source(**kw):
+        count[0] += 1
+        frame = noise.copy()
+        frame[200:340, 400:560] = count[0] % 256
+        return frame, Screen()
+
+    view = View(source, 0, TOKEN, fps=30)
+    client = socket.create_connection(("127.0.0.1", view.port), timeout=5)
+    try:
+        client.sendall(f"GET /?token={TOKEN} HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n".encode())
+        data, end = b"", time.monotonic() + 6
+        while time.monotonic() < end:  # a slow link: about 400 KB/s, below the stream's rate
+            data += client.recv(20_000)
+            time.sleep(0.05)
+        newest, mark = count[0], len(data)
+        end = time.monotonic() + 2  # then a fast read: the next whole part shows the delay
+        while time.monotonic() < end:
+            data += client.recv(65536)
+        at = data.index(b"Content-Length:", mark)
+        size = int(data[at + 15:data.index(b"\r\n", at)])
+        body = data.index(b"\r\n\r\n", at) + 4
+        img = cv2.imdecode(np.frombuffer(data[body:body + size], np.uint8), cv2.IMREAD_GRAYSCALE)
+        lag = (newest - int(np.median(img[240:300, 440:520]))) % 256
+        assert lag <= 15, f"the frame after 6 s on a slow link is {lag} frames old"
+    finally:
+        client.close()
+        view.close()

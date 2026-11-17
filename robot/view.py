@@ -4,6 +4,7 @@ never writes a frame to disk.
 """
 import hmac
 import json
+import socket
 import threading
 import time
 import uuid
@@ -18,6 +19,9 @@ import numpy as np
 # x1, y1, x2, y2 in frame pixels, label, kind: known, guess, focus, or other
 Box = tuple[int, int, int, int, str, str]
 BOUNDARY = b"frame"
+# A fixed send buffer of about one frame: on a slow link the write blocks and the next frame is
+# the newest, instead of Linux growing the buffer to megabytes of stale frames (30 s, 2026-11-17).
+STREAM_BUFFER = 64 * 1024
 ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head", "/resume_head",
            "/forget_object", "/remove_view")
 EVENT_S = 6.0  # how long a memory event stays on the strip
@@ -155,6 +159,7 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", f"multipart/x-mixed-replace; boundary={BOUNDARY.decode()}")
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
+        self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, STREAM_BUFFER)
         with view.lock:  # a new viewer replaces the last one
             view.viewer += 1
             me = view.viewer
