@@ -431,3 +431,18 @@ def test_wifi_watch_raises_the_hotspot_only_after_sustained_loss(monkeypatch):
     assert [c for c in calls if c[0] == "sudo"] == [
         ["sudo", "-n", "nmcli", "--wait", "25", "con", "up", talk.HOTSPOT]]
     assert talk.watch_wifi(3) == 3  # an unknown state neither counts nor acts
+
+
+def test_relay_sends_whole_parts_and_drops_them_while_the_viewer_is_behind():
+    import socket
+    parts = [b"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n%s\r\n"
+             % (len(jpg), jpg) for jpg in (b"\xff\xd8one\xff\xd9", b"\xff\xd8two!\xff\xd9",
+                                           b"\xff\xd8three\xff\xd9")]
+    out, viewer = socket.socketpair()
+    with out, viewer:
+        talk.relay_newest(io.BufferedReader(io.BytesIO(b"".join(parts))), out,
+                          threading.Event())
+        out.shutdown(socket.SHUT_WR)
+        received = b"".join(iter(lambda: viewer.recv(65536), b""))
+    # A viewer that has not read the first part gets no later one; the Mac sends every part.
+    assert received == (parts[0] if sys.platform == "linux" else b"".join(parts))

@@ -5,14 +5,17 @@ losing the tunnel leaves it running; only Stop stops it. The Mac serves the page
 through an SSH tunnel; `--on-robot` serves it from the Jetson to the network."""
 import argparse
 import contextlib
+import fcntl
 import http.client
 import ipaddress
 import os
 import json
 import secrets
 import socket
+import struct
 import subprocess
 import sys
+import termios
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -86,6 +89,30 @@ def reap(process: subprocess.Popen | None) -> None:
         with contextlib.suppress(ProcessLookupError):
             process.kill()
         process.wait(timeout=2)
+
+
+def unacked(sock: socket.socket) -> int:
+    """Bytes the viewer has not acknowledged yet (Linux SIOCOUTQ); 0 where unsupported."""
+    try:
+        return struct.unpack("i", fcntl.ioctl(sock.fileno(), termios.TIOCOUTQ, b"\0" * 4))[0]
+    except OSError:  # ponytail: macOS sockets lack it, so the Mac preview sends every part
+        return 0
+
+
+def relay_newest(response, sock: socket.socket, stopped: threading.Event) -> None:
+    """Relay MJPEG parts from `response` to `sock`, dropping each part that arrives while the
+    viewer still has an earlier one in flight: a slow link shows fewer frames, never old ones."""
+    while not stopped.is_set():
+        head = b""
+        while not head.endswith(b"\r\n\r\n"):
+            if not (line := response.readline()):
+                return
+            head += line
+        size = next(int(v) for k, _, v in (h.partition(b":") for h in head.split(b"\r\n"))
+                    if k.strip().lower() == b"content-length")
+        part = head + response.read(size + 2)  # the JPEG and its closing CRLF
+        if not unacked(sock):
+            sock.sendall(part)
 
 
 class Session:
@@ -330,9 +357,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", response.headers["Content-Type"])
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
-            while not self.session.stopped.is_set() and (data := response.read1(65536)):
-                self.wfile.write(data)
-                self.wfile.flush()
+            relay_newest(response, self.connection, self.session.stopped)
         except (OSError, RuntimeError, http.client.HTTPException):
             if connection is None:
                 self.reply(503, b"View unavailable; start a session first")
