@@ -75,7 +75,7 @@ The helper attempts torque release on errors and Ctrl-C. If it prints **"Torque 
 
 ### Mounted-head travel limits
 
-The enclosure specifies **±70° from straight ahead for normal movement**, or **140° total travel**. Its mechanical stops are at **±80°**. Keep the 10° margin on each side; powered movement must stop before contact with a mechanical stop. These design limits come from [the enclosure requirements](https://github.com/Dylancouzon/qdrant-robot/blob/241aacc/hardware/DESIGN_REQUIREMENTS.md) and still need physical cable-clearance checks.
+The enclosure specifies **±70° from straight ahead for normal movement**, or **140° total travel**. Its mechanical stops are at **±80°**. Keep the 10° margin on each side; powered movement must stop before contact with a mechanical stop. These design limits come from [the enclosure requirements](https://github.com/qdrant-labs/qdrant-robot/blob/241aacc/hardware/DESIGN_REQUIREMENTS.md) and still need physical cable-clearance checks.
 
 The mounted-head controller must enforce these absolute limits relative to a calibrated forward position. Repeated relative nudges accumulate, so the bench helper's per-command limit does not protect an assembled neck. Use this helper only with the loose servo. The runtime controller enforces absolute travel from explicit calibration.
 
