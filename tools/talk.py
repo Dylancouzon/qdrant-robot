@@ -371,8 +371,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.headers.get("X-Session-Token") != self.token):
             self.reply(403, b"Forbidden")
             return
-        if self.path in ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head",
-                         "/resume_head", "/forget_object", "/remove_view"):
+        if self.path in ("/ignore", "/restore", "/mute", "/talk", "/volume", "/settings",
+                         "/stop_head", "/resume_head", "/forget_object", "/remove_view"):
             if not self.cookie_ok():
                 self.reply(403, b"Forbidden")
                 return

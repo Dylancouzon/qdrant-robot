@@ -10,7 +10,7 @@ Dylan's [future-version exploration list](research/edge-cases.md#future-version-
 
 ## Robot and jobs
 
-Dylan runs a session from the page; `robot-monitor` runs (D211). Deployed release 6cf081783253 (newest-frame camera relay); `previous` is ce5ecaea3368; 4e10487b84ad (open on-robot monitor and phone tabs, D211) remains; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
+Dylan runs a session from the page; `robot-monitor` runs (D211). Deployed release d9a5d7c2a6f4 (push to talk with Ctrl, steady status label); `previous` is 6cf081783253 (newest-frame camera relay); 4e10487b84ad (open on-robot monitor and phone tabs, D211) remains; the hybrid recall release 7629fadf194a (D210) remains under `releases/`. `tools/jetson.py rollback` strips answer vectors before switching (qualified, J); the pre-session release 6e8fd759c5d2 remains under `releases/`. The speaker is at 100% (mixer and `shared/speaker-volume`); set it to 0% for tests.
 
 Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; telemetry uses `shared/results/*.tegrastats`. Preserve memories, results, backups, and previous releases.
 
@@ -24,7 +24,7 @@ Use `tools/jetson.py` for remote work. Logs use `journalctl -u qr-robot`; teleme
 - A weak robot Wi-Fi link (living room, 2026-11-17: 2.4 GHz only, about 1 to 2 Mbit/s to the Mac) once queued about 9 MB of stale frames, so the page fell 30 s behind and other requests failed. Fixed 64 KiB stream buffers, then a relay that sends a frame only when the viewer has acknowledged the last one: 6.9 fps, under one frame queued, `/status` 23 ms while streaming (J). A USB-C cable is the planned webinar link.
 
 ## Demo notes for Dylan
-
+- Push to talk: press the Ctrl button, then hold Ctrl to speak; no wake phrase. The browser tab needs keyboard focus. Release ends the line after 0.25 s; a lost key-up closes the microphone after 30 s.
 - Name small objects while holding them; "That's my motorbike" is refused unless held.
 - One new person at a time for "remember me"; a crowded view refuses enrollment.
 - A false face on the teddy bear can lock faceless turns ("Please look at me"); keep your own face in view.

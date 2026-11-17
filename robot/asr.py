@@ -20,6 +20,7 @@ START_P, END_P = 0.5, 0.35   # speech starts above START_P, ends below END_P (hy
 START_FRAMES = 2             # voiced frames in a row before a line starts (64 ms)
 HANGOVER_S = 0.6             # silence that ends a line: real 0.4-0.6 s pauses split at 0.35 (D166)
 LONG_S, LONG_HANGOVER_S = 4.0, 0.7  # long questions pause longer (0.58 s in dev, D37)
+RELEASE_S = 0.25             # silence that ends a line after the push-to-talk key is released
 MIN_SPEECH_S = 0.25          # shorter lines are noise
 MAX_LINE_S = 25.0            # under BUFFER_S; a 16 s fixture question split at 15 s
 PAD_S = 0.2                  # audio kept before and after a line, so edge words are whole
@@ -98,6 +99,12 @@ class Ears:
         self.voiced = 0                                # voiced frames in a row, before a line
         self.start: int | None = None                  # first sample of the current line
         self.silence = 0                               # trailing silent samples in the line
+        self.released = False                          # push to talk ended the current line
+
+    def release(self) -> None:
+        """The speaker let go of push to talk: end the current line after RELEASE_S of silence
+        instead of the hangover. The short tail keeps a last word still in transit."""
+        self.released = self.start is not None
 
     def feed(self, chunk: np.ndarray) -> None:
         """16 kHz mono float32 audio, in order, at any chunk size."""
@@ -118,9 +125,10 @@ class Ears:
             return
         self.silence = self.silence + FRAME if p < END_P else 0
         speech_end = end - self.silence
-        hangover = LONG_HANGOVER_S if speech_end - self.start > LONG_S * RATE else HANGOVER_S
+        hangover = RELEASE_S if self.released else \
+            LONG_HANGOVER_S if speech_end - self.start > LONG_S * RATE else HANGOVER_S
         if self.silence >= hangover * RATE or end - self.start >= MAX_LINE_S * RATE:
-            start, self.start, self.voiced = self.start, None, 0
+            start, self.start, self.voiced, self.released = self.start, None, 0, False
             if speech_end - start >= MIN_SPEECH_S * RATE:
                 pad = int(PAD_S * RATE)
                 self.on_line(self.cut(start - pad, speech_end + pad), self.wall(speech_end))
@@ -165,7 +173,7 @@ if __name__ == "__main__":
     assert ears.cut(2, 5).tolist() == [3, 4, 5] and ears.cut(0, 9).tolist() == [3, 4, 5, 6]
     events: list = []
     ears.on_start, ears.on_line = lambda: events.append("start"), lambda a, t: events.append(t)
-    ears.voiced, ears.start, ears.silence = 0, None, 0
+    ears.voiced, ears.start, ears.silence, ears.released = 0, None, 0, False
     ears.fed, ears.buffer = RATE * 4, np.zeros(RATE * 4, np.float32)
     ears.arrivals = deque([(RATE * 4, 100.0)])
     quiet = int(HANGOVER_S * RATE / FRAME) + 1  # just past the hangover
@@ -179,4 +187,13 @@ if __name__ == "__main__":
         for k, p in enumerate(ps, 1):
             ears.step(p, k * FRAME)
         assert events[0] == "start" and len(events) == 2, (voiced, events)
+    events.clear()
+    ears.release()  # no line yet: nothing to end
+    assert not ears.released
+    for k in range(1, 21):
+        ears.step(0.9, k * FRAME)
+    ears.release()  # push to talk let go: RELEASE_S of silence ends the line, not the hangover
+    for k in range(21, 21 + int(RELEASE_S * RATE / FRAME) + 1):
+        ears.step(0.1, k * FRAME)
+    assert events[0] == "start" and len(events) == 2 and not ears.released, events
     print("selftest ok")

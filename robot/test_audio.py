@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from robot import audio
+from robot import main
 from robot.main import Robot
 from robot.head import Head
 
@@ -111,3 +112,39 @@ def test_control_endpoint_sets_mute_and_volume(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(audio, "VOLUME_FILE", tmp_path / "missing" / "volume")
     assert not r._control("volume", {"percent": 20}) and r.volume == 20
     assert "set to 20% but not saved" in r.control_message
+
+
+def test_push_to_talk_opens_the_microphone_only_while_held(monkeypatch) -> None:
+    r, fed = gated_robot(None)
+    released = []
+    r.ears.release = lambda: released.append(1)
+    assert not r._control("talk", {"held": True}), "the key does nothing until the mode is on"
+    assert r._control("talk", {"mode": True}) and r.push_to_talk
+    r.hear(LOUD)  # mode on, key up
+    assert r._control("talk", {"held": True})
+    r.hear(LOUD)
+    assert r._control("talk", {"held": False}) and released == [1]
+    r.hear(LOUD)
+    assert r._control("talk", {"held": True})
+    later = time.time() + main.HOLD_S + 1
+    monkeypatch.setattr(time, "time", lambda: later)  # the key-up was lost
+    r.hear(LOUD)
+    monkeypatch.undo()
+    assert not r._control("talk", {"held": "yes"})
+    assert r._control("talk", {"mode": False}) and not r.push_to_talk
+    r.hear(LOUD)
+    assert [bool(c.any()) for c in fed] == [False, True, False, False, True]
+    r.speaker.close()
+
+
+def test_push_to_talk_lines_need_no_wake_phrase() -> None:
+    from robot.main import Turn
+    r = Robot.__new__(Robot)
+    r.wake_word, r.last_line, r.last_input, r.head = True, 0.0, 0.0, Head()
+    turn = Turn(question="What do you see?", line=1e9, transcribed=1e9, speech_end=1e9,
+                speech_start=1e9)
+    r._motion_request(turn)
+    assert turn.motion == -1, "without push to talk, a line needs the wake phrase"
+    r.push_to_talk, turn.motion = True, 0
+    r._motion_request(turn)
+    assert turn.motion == 0

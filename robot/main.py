@@ -103,6 +103,7 @@ LINES = 4  # sighting lines for the brain at most: the newest of each kind
 # A line this soon after the last answer finishes playing continues the conversation (D65);
 # a visitor can walk to the keyboard and back inside it.
 CONVERSATION_S = 60
+HOLD_S = 30  # longest push-to-talk hold; past MAX_LINE_S, so only a lost key-up reaches it
 CLEAR_S = 30  # after "forget me", turns are not stored until another face, or no face this long
 VIEW_S = 0.33  # spacing of the recent views a named object's crops come from
 PREVIEW_TTL = 0.75  # source expiry for recognition writes
@@ -248,6 +249,10 @@ class Robot:
     # (visitor, object id, time) of the last turn that named or asked about an object: a
     # statement right after it that says "it" or "that" is about it, and is forgotten with it.
     topic: tuple[str, str, float] | None = None
+    # Push to talk (the page's Ctrl key): the microphone opens only while the key is held,
+    # and a held line needs no wake phrase. A lost key-up closes it after HOLD_S.
+    push_to_talk: bool = False
+    held_until: float = 0.0
 
     def __init__(self, camera, out: Path, memory: Path = SHARED / "memory",
                  play: Callable[[np.ndarray], None] | None = None, model: str = brain.MODEL,
@@ -372,9 +377,11 @@ class Robot:
 
     def hear(self, chunk: np.ndarray) -> None:
         """Every audio input enters here. The robot does not hear itself (silence while its
-        speaker plays and just after) and does not hear while muted."""
+        speaker plays and just after) and does not hear while muted, or while push to talk is
+        on and the key is up."""
         self.check_health()
-        if self.muted or self.speaker.playing(audio.SELF_VOICE_TAIL_S):
+        closed = self.muted or (self.push_to_talk and time.time() >= self.held_until)
+        if closed or self.speaker.playing(audio.SELF_VOICE_TAIL_S):
             chunk = np.zeros_like(chunk)
         self.ears.feed(chunk)
 
@@ -496,7 +503,7 @@ class Robot:
 
     def _motion_request(self, turn):
         text = woken(turn.question)
-        if self.wake_word and text is None and \
+        if self.wake_word and not self.push_to_talk and text is None and \
                 turn.speech_start - max(self.last_line, self.last_input) > CONVERSATION_S:
             turn.motion = -1
             return
@@ -772,7 +779,7 @@ class Robot:
                 "detections": detections,
                 "gallery": self.recognition.epoch,
                 "message": self.control_message, "camera_source": self.camera_source,
-                "muted": self.muted, "volume": self.volume,
+                "muted": self.muted, "push_to_talk": self.push_to_talk, "volume": self.volume,
                 "active_visitor": self._active_name(),
                 "head": {"enabled": self.head.motor is not None and not self.head.error,
                          "angle": None if angle is None else round(angle, 1),
@@ -2026,6 +2033,18 @@ class Robot:
                     data.get("epoch") == offer.epoch and
                     0 <= time.time() - offer.seen <= OFFER_HOLD_S)
 
+    def _talk(self, _action, data):
+        """Push to talk: {"mode": bool} turns it on or off; {"held": bool} is the key."""
+        if type(data.get("mode")) is bool:
+            self.push_to_talk, self.held_until = data["mode"], 0.0
+            return True
+        if type(data.get("held")) is not bool or not self.push_to_talk:
+            return False
+        self.held_until = time.time() + HOLD_S if data["held"] else 0.0
+        if not data["held"]:
+            self.ears.release()
+        return True
+
     def _setting(self, action, data):
         """Apply live microphone, volume, or recognition settings."""
         if action == "settings":
@@ -2064,7 +2083,8 @@ class Robot:
 
     def _control(self, action, data):
         """Queue crop-dependent Ignore; Restore uses the serial memory owner directly."""
-        direct = {"mute": self._setting, "volume": self._setting, "settings": self._setting,
+        direct = {"mute": self._setting, "talk": self._talk, "volume": self._setting,
+                  "settings": self._setting,
                   "forget_object": self._memory_control, "remove_view": self._memory_control,
                   "stop_head": self._head_control, "resume_head": self._head_control}
         if action in direct and isinstance(data, dict):

@@ -22,8 +22,8 @@ BOUNDARY = b"frame"
 # A fixed send buffer of about one frame: on a slow link the write blocks and the next frame is
 # the newest, instead of Linux growing the buffer to megabytes of stale frames (30 s, 2026-11-17).
 STREAM_BUFFER = 64 * 1024
-ACTIONS = ("/ignore", "/restore", "/mute", "/volume", "/settings", "/stop_head", "/resume_head",
-           "/forget_object", "/remove_view")
+ACTIONS = ("/ignore", "/restore", "/mute", "/talk", "/volume", "/settings", "/stop_head",
+           "/resume_head", "/forget_object", "/remove_view")
 EVENT_S = 6.0  # how long a memory event stays on the strip
 HINT = "Say: Track this as my ..."
 FONT, SMALL = cv2.FONT_HERSHEY_SIMPLEX, 0.5
